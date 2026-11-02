@@ -126,7 +126,7 @@ async function syPush(force){
     const commitPart=async(part,msg)=>{const committed=await ghCommitFiles({...o,branch:br},{head:hd,treeSha:baseTree},part,msg);hd=committed.head;baseTree=committed.treeSha;};
     const flushPart=async()=>{ if(committing) return committing; if(!entries.length) return; const part=entries; entries=[]; committing=commitPart(part,`sync 그림 ${done}/${need.length}`).catch(e=>{ entries=part.concat(entries); throw e; }).finally(()=>{ committing=null; }); return committing; };
     await ghUploadPool(need,async h=>{const b=await idbGet(byHash[h]);if(!b)throw Error('올릴 자료 파일을 찾지 못했습니다');await pace();const r=await ghCreateBlob(o,b,`자료 ${done+1}/${need.length}`);entries.push({path:'sync/b/'+h,mode:'100644',type:'blob',sha:r.sha});done++;syBar(`자료 올리는 중 ${done}/${need.length}`);if(entries.length>=40)await flushPart();});if(committing)await committing;
-    const withKeys=!!o.keys; let ls={}; syLsKeys(withKeys).forEach(k=>{ const v=appStorage.getItem(k); if(v!=null) ls[k]=syStrip(k,v,withKeys); }); ls=lsHoldMerge(ls,R.state&&R.state.ls);
+    const withKeys=!!o.keys; let ls={}; syLsKeys(withKeys).forEach(k=>{ const v=syLsValue(k); if(v!=null) ls[k]=syStrip(k,v,withKeys); }); ls=lsHoldMerge(ls,R.state&&R.state.ls);
     const state={v:1,at:Date.now(),device:syDevice(),devId:devId(),build:APP_BUILD,ls,bin,types};
     syBar('게임 진행 저장하는 중…');
     const sb=await ghCreateBlob(o,new Blob([JSON.stringify(state)]),'진행 정보');

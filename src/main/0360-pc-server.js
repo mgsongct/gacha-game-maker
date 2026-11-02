@@ -17,7 +17,7 @@ async function pcPush(silent,force){
       if(ent&&ent.size===b.size&&ent.hash) h=ent.hash; else { h=await shaHex(await b.arrayBuffer()); idx[k]={hash:h,size:b.size}; } bin[k]=h;
       if(!have.has(h)){ const ack=await pcApi('/api/store/blob/'+h,{method:'POST',body:{content:bytesToB64(new Uint8Array(await b.arrayBuffer()))}});if(ack?.ok!==true)throw Error('PC 자료 저장 완료를 확인하지 못했습니다');have.add(h); } }
     saveSyIdx(idx);
-    let ls={}; syLsKeys(true).forEach(k=>{ const v=appStorage.getItem(k); if(v!=null) ls[k]=v; }); ls=lsHoldMerge(ls,S0&&S0.ls);
+    let ls={}; syLsKeys(true).forEach(k=>{ const v=syLsValue(k); if(v!=null) ls[k]=v; }); ls=lsHoldMerge(ls,S0&&S0.ls);
     const state={v:1,at:Date.now(),baseAt:S0?.at||0,device:syDevice(),devId:devId(),build:APP_BUILD,ls,bin,types};
     const ack=await pcApi('/api/store/state',{method:'POST',body:state});if(ack?.ok!==true)throw Error('PC 진행 저장 완료를 확인하지 못했습니다');
     const o=PCS(); o.last=state.at; o.localAt=G.prog.savedAt||Date.now(); delete o.restored; setPCS(o); PCWARNED=false; if(!silent) toast('PC에 저장했어요'); return true;
@@ -54,12 +54,14 @@ async function pcStart(){
 }
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'&&!LKMODE()){ const pc=PCS(); if(pc&&pc.auto!==false&&(G.prog.savedAt||0)>(pc.localAt||0)+3000) pcPush(true); } });
 setInterval(()=>{ const pc=PCS(); if(pc&&pc.auto!==false&&!PCJOB&&!LK.locked&&(G.prog.savedAt||0)>(pc.localAt||0)+3000) pcPush(true); },2*60000);
+// IndexedDB는 캐시예요: 기기 저장이 끝날 때마다(5초 모아서) PC 서버의 data 폴더로 올려요
+let PCSOON=null;addEventListener('ggm-storage-ok',()=>{ const pc=PCS(); if(!pc||pc.auto===false) return; clearTimeout(PCSOON); PCSOON=setTimeout(()=>{ const o=PCS(); if(o&&!PCJOB&&!LK.locked&&(G.prog.savedAt||0)>(o.localAt||0)) pcPush(true); },5000); });
 function openPcSet(lost){ const pc=PCS();
   openModal(`${head('PC 서버',`<span class="muted">내 컴퓨터를 저장소·AI 중계로 쓰기</span>`)}
     ${lost?`<div class="panel" style="border-color:var(--gold);margin-bottom:10px"><b>PC 서버에 다시 연결해 주세요</b><p class="muted" style="margin:6px 0 0">이 주소는 PC 서버인데 연결 키가 없어서 이 기기의 빈 게임으로 열렸어요. PC 화면의 QR을 다시 찍거나, QR 주소(끝에 ?pc=… 가 붙은 주소)를 아래에 붙여 넣으면 PC에 저장된 게임을 받아 와요.${IS_IOS?' 아이폰은 홈 화면 앱과 Safari의 저장 공간이 따로라서, 홈 화면 아이콘으로 열면 이렇게 될 수 있어요.':''}</p></div>`:''}
     <p class="muted">PC에서 <b>PC서버-시작.bat</b>을 켜면 QR이 떠요. 휴대폰으로 찍으면 연결되고, 게임이 PC에 저장돼요. 내 PC의 ComfyUI·Ollama 주소(127.0.0.1)도 그대로 쓸 수 있어요.</p>
     <label class="f" for="pc_link">PC 서버 주소 (QR 주소를 붙여 넣기)</label><input class="in" id="pc_link" value="${pc?esc(pc.base+'/?pc='+pc.key):''}" placeholder="https://xxxx.trycloudflare.com/?pc=...">
-    <label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="pc_auto" ${!pc||pc.auto!==false?'checked':''}><span>자동으로 PC에 저장 (앱을 나갈 때, 5분마다)</span></label>
+    <label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="pc_auto" ${!pc||pc.auto!==false?'checked':''}><span>자동으로 PC에 저장 (저장할 때마다 몇 초 안에 · PC의 data/게임/종류.json)</span></label>
     <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="pc_lock" ${!pc||pc.lock!==false?'checked':''}><span>한 번에 한 기기만 (다른 기기에서 하면 여기는 멈추고, 넘겨받을 때 진행을 이어받아요)</span></label>
     <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="pc_pxoff" ${proxyOff()?'checked':''}><span>AI 요청은 PC를 거치지 않고 직접 보내기 <span class="muted" style="font-size:.78rem">(PC와 같은 기기에서 쓸 때 더 빨라요. 휴대폰에서 PC의 로컬 AI를 쓰거나 웹에서 막히는 서비스가 있으면 끄세요)</span></span></label>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="pcsave">연결</button>${pc?'<button class="btn ghost" data-act="pcoff">연결 해제</button>':''}</div>

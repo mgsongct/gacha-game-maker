@@ -179,7 +179,8 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 |---|---|---|
 | 백업 파일 | `BACKUP_STORAGE_MODULE` (`openBackupChoice`, staging 스토어) | 파일 |
 | PC·폰 연동 | `SY()`, `syPush/syPull`, `syCheckOnStart` | 내 GitHub **비공개** 저장소(Git Data API: tree·commit, 바뀐 파일만 업로드) |
-| PC 서버 | `PCS()`, `pcPush/pcPull`, `pcStart` | `ggm-server.py` |
+| PC 서버 | `PCS()`, `pcPush/pcPull`, `pcStart`, 저장 후 5초 자동 push | `pc/ggm-server.py` → `data/<게임id>/<종류>.json` |
+| 데이터 폴더 zip | `DATA_FOLDER_MODULE` (`dataExport`, `dataImport`, `zipMake/zipRead`) | 파일 (`data/<id>/*.json` + media) |
 | 한 기기만 플레이 | `LKMODE()`, `lkActivate`, `lkPullIfNewer` | PC 서버 lease 또는 GitHub |
 | 게임 게시·구독 | `PUB()`, 게시 / `subCheck()`, `subPullImages` | 내 GitHub **공개** 저장소. 주소 `GGMSUB:owner/repo/branch/dir`. 구독자는 콘텐츠만 교체, 진행은 유지 |
 | 시작 시 자동 받기 | `bootSync()` | PC 또는 GitHub |

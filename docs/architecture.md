@@ -13,7 +13,8 @@
 | `version.json` | 업데이트 채널 매니페스트. 앱이 GitHub raw에서 읽어 새 빌드 여부·`sha256`·필요 APK 버전을 판단 |
 | `proxy/worker.js` | Cloudflare Workers용 CORS 중계 서버(웹 버전용) |
 | `proxy/vercel/` | 같은 중계 서버의 Vercel 판(`api/proxy.js`) |
-| `gacha-game-maker-pc.zip` | PC 서버(`ggm-server.py` 등). 압축 안에만 있음 |
+| `pc/` | PC 서버 소스(`ggm-server.py`, 실행 파일, README), 검사 `test_store.py` |
+| `gacha-game-maker-pc.zip` | `pc/`를 묶은 배포용 압축 ([build.md §5](build.md#5-릴리스)) |
 | `.nojekyll` | GitHub Pages에서 Jekyll 처리 끔 |
 
 `www/index.html`은 **`src/`에서 빌드되는 결과물**입니다([build.md](build.md)). 직접 고치지 말고 `src/`를 고친 뒤 `node build/build.mjs`. 안드로이드 APK(Capacitor 셸)는 이 저장소에 소스가 없고 Releases로만 배포됩니다.
@@ -120,7 +121,7 @@
 |---|---|---|---|---|
 | 웹/PWA (GitHub Pages, iOS Safari) | 기본 | `fetch`. CORS 막히는 호스트는 `ggm-proxy`(중계 서버) 경유 | IndexedDB + localStorage | `checkWebUpdate()` — 알림만, 새로고침으로 반영 |
 | 안드로이드 APK (Capacitor) | `IS_NATIVE` (`window.Capacitor`) | `CapacitorHttp` 네이티브(CORS 없음) | + Capacitor Filesystem(`updates/*.html`) | `checkUpdate()` → `version.json` 비교 → HTML 다운로드·`sha256` 검증 → `saveLive()` → 재시작 시 교체 |
-| PC 서버 (`ggm-server.py`) | URL `?pc=키`, 포트 8790, `*.trycloudflare.com` | `/api/proxy` 경유(서버가 대신 호출, 로컬 ComfyUI/Ollama 가능) | PC `ggm-data/state.json` + `blobs/`(그림, sha256 이름) + `history/` 백업 | 서버 시작 시 GitHub raw에서 `www/*` 받아 옴 |
+| PC 서버 (`pc/ggm-server.py`) | URL `?pc=키`, 포트 8790, `*.trycloudflare.com` | `/api/proxy` 경유(서버가 대신 호출, 로컬 ComfyUI/Ollama 가능) | **PC `data/<게임id>/<종류>.json`이 영구 저장소**, IndexedDB는 캐시([data-model.md §5-1](data-model.md#5-1-데이터-폴더-게임별종류별-json)). 그림은 `ggm-data/blobs/`, 백업은 `ggm-data/history/` | 서버 시작 시 GitHub raw에서 `www/*` 받아 옴 |
 
 ### PC 서버 API (`ggm-server.py`)
 
@@ -130,10 +131,10 @@
 |---|---|
 | `GET /api/hello` | 상태 확인 |
 | `/api/proxy?u=` | AI 요청 중계 |
-| `GET/PUT /api/store/state` | 게임 전체 상태. 저장마다 `history/state-*.json`(최근 20) 백업, 크게 줄면 `keep-*`(10) 보존. 동시 저장 충돌 감지 |
+| `GET/PUT /api/store/state` | 전체 상태(앱 형식 그대로). 서버는 게임을 `data/<id>/<종류>.json`으로 나눠 저장하고 받을 때 합침. 저장마다 `history/state-*.json`(최근 20) 백업, 크게 줄면 `keep-*`(10) 보존. 동시 저장 충돌 감지(409) |
 | `GET /api/store/history[/파일]` | 백업 목록/복원 |
 | `/api/store/list`, `/api/store/blob/<sha256>` | 그림·소리 바이너리 |
 | `/api/lease` | 한 번에 한 기기만 플레이 |
 | `POST /api/update` | `www/` 최신화 |
 
-환경 변수: `GGM_PORT`(8790), `GGM_REPO`(기본 `jjhk0803/gacha-game-maker` — 포크라면 바꿔야 함).
+환경 변수: `GGM_PORT`(8790), `GGM_REPO`(기본 `jjhk0803/gacha-game-maker` — 포크라면 바꿔야 함), `GGM_DATA_DIR`(기본 서버 폴더의 `data/`). 옵션: `--no-tunnel`, `--no-update`(GitHub에서 `www/` 받지 않음 — 직접 빌드한 앱 시험용).

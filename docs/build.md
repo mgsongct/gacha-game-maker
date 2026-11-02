@@ -15,6 +15,10 @@ node build/test.mjs           # 검증: 동일성 · 왕복 · 모듈 추가/수
 ```
 
 ```bash
+python3 pc/test_store.py     # PC 서버 data 폴더 저장 검사
+```
+
+```bash
 node build/split.mjs [upstream.html] [src]   # 단일 HTML → src (원본 업데이트 가져오기)
 ```
 
@@ -32,7 +36,7 @@ src/
 │ ├ app/010-confirm.js           → id ggm-app-confirm
 │ └ combat/010-catalog.js … 090-practice.js  → ggm-combat-catalog … (전투 v2)
 └ main/                 앱 본체 ggm-main. 파일 이름순으로 이어 붙여 <script> 하나가 됨
-  ├ 0010-rules.js  0020-ai-connect.js  …  0500-gacha.js  0510-actions.js  …  0570-modal-nav.js
+  ├ 0010-rules.js  0020-ai-connect.js  …  0500-gacha.js  0510-actions.js  0520-backup-storage.js  0525-data-folder.js  …  0570-modal-nav.js
 ```
 
 `main/` 파일과 원래 섹션의 대응은 [architecture.md §2 섹션 지도](architecture.md#ggm-main-섹션-지도)와 같습니다(파일 이름은 `build/split.mjs`의 `NAMES` 표).
@@ -77,6 +81,11 @@ src/
 1. `src/boot/head.js`의 `BUILT` 올리기 (필요하면 `REQUIRED_APK`)
 2. `node build/build.mjs` → `version.json`의 `build`·`sha256`이 자동으로 맞춰짐
 3. `version.json`의 `notes`, `at`, `apk` 손으로 수정 → 커밋·푸시
+4. PC 서버(`pc/`)를 고쳤다면 `SERVER_VER`를 올리고 배포 zip을 다시 묶기:
+
+```bash
+cd pc && python3 -c "import zipfile;z=zipfile.ZipFile('../gacha-game-maker-pc.zip','w',8);[z.write(f) for f in ['ggm-server.py','start.sh','PC서버-시작.bat','README.txt']]"
+```
 
 ## 6. 원본(upstream) 새 릴리스 가져오기
 
@@ -100,3 +109,7 @@ node build/split.mjs /tmp/upstream.html /tmp/upstream-src && diff -ru src /tmp/u
 | 2 | `split` → `build` 왕복이 원본과 동일 |
 | 3 | 임시 복사본에 `modules/app/020-hello.js`, `main/0545-hello.js` 추가와 기존 파일 수정 → 빌드 결과에서 제 순서 |
 | 4 | 그 결과를 Chromium(Playwright)으로 실행 → 추가 모듈·파트·수정 코드 실행, 앱 화면 렌더링, 페이지 오류 0 (Playwright가 없으면 건너뜀) |
+| 5 | 실제 빌드에서 데이터 폴더 zip 내보내기 → 다시 읽으면 같은 내용 → 새 게임으로 가져오기(그림 포함) |
+| 6 | 실제 PC 서버를 켜고 앱에서 저장 → `data/main/*.json` 자동 동기화, 빈 브라우저는 서버에서 게임을 받아 옴 (python3 없으면 건너뜀) |
+
+`pc/test_store.py`: 나눠 저장·합쳐 받기 동일성, 바뀐 종류만 쓰기, 409 충돌, 삭제 게임 보존, 예전 `state.json` 이전.

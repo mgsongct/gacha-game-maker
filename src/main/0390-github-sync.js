@@ -59,6 +59,8 @@ async function ghCommitFiles(o,base,entries,message){
 async function ghCreateBlob(o,blob,label){if(blob.size>100*1048576)throw Error(label+': 파일 하나가 GitHub 전송 한도 100MiB를 넘습니다. 해당 자료를 줄여 주세요. 전체 게임의 합계 용량 제한은 아닙니다.');const result=await gh(o,'/git/blobs',{method:'POST',body:{content:bytesToB64(new Uint8Array(await blob.arrayBuffer())),encoding:'base64'},timeout:300000});ghSHA(result?.sha,label);return result;}
 async function ghUploadPool(items,task){let next=0,failure=null;await Promise.all(Array.from({length:Math.min(3,items.length)},async()=>{while(!failure&&next<items.length){const item=items[next++];try{await task(item);}catch(e){failure=failure||e;}}}));if(failure)throw failure;}
 
+// 게임 목록(starfall-projects)은 한 번도 저장 안 됐을 수 있어요(샘플 게임만 쓴 기기). 받는 쪽은 목록이 꼭 있어야 해서 기본 목록을 채워 보내요
+function syLsValue(k){ const v=appStorage.getItem(k); return v==null&&k===PJKEY?JSON.stringify(PJ()):v; }
 function syLsKeys(withKeys){ const pj=PJ(); const keys=[PJKEY,SETUP_KEY,...pj.list.map(x=>pjKey(x.id))]; keys.push(NKEY,SKEY); if(withKeys) keys.push(PKEY); return keys; }
 function syStrip(k,v,withKeys){ if(withKeys||v==null) return v; try{ if(k===NKEY){ const o=JSON.parse(v); delete o.key; return JSON.stringify(o); } if(k===SKEY){ const o=JSON.parse(v); delete o.fishKey; delete o.elKey; return JSON.stringify(o); } }catch(e){} return v; }
 function syMerge(k,v){ if(v==null) return v; try{ if(k===NKEY){ const cur=JSON.parse(appStorage.getItem(NKEY)||'{}'), o=JSON.parse(v); if(!o.key&&cur.key) o.key=cur.key; return JSON.stringify(o); } if(k===SKEY){ const cur=JSON.parse(appStorage.getItem(SKEY)||'{}'), o=JSON.parse(v); ['fishKey','elKey'].forEach(x=>{ if(!o[x]&&cur[x]) o[x]=cur[x]; }); return JSON.stringify(o); } }catch(e){} return v; }

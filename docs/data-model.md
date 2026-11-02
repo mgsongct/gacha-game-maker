@@ -76,6 +76,29 @@ IndexedDB 'starfall-img' (v2): stores = img(그림·소리 바이너리) | recor
 - 저장 실패 시 `storageWarning()` 배너 + 가챠·강화 등 재화 액션을 클릭 단계에서 차단.
 - 큰 일괄 교체: `replaceAll(newGame)` / `appStorage.commitRecords()`.
 
+## 5-1. 데이터 폴더 (게임별·종류별 JSON)
+
+PC 서버를 쓰면 **영구 저장소는 PC의 `data/` 폴더**이고, 기기의 IndexedDB는 그 캐시입니다.
+
+```
+<PC 서버 폴더>/
+├ www/                      앱 (index.html)
+├ data/                     ← 게임 데이터 (영구 저장소)
+│ ├ index.json              게임 목록 (= starfall-projects)
+│ └ <게임id>/               main = 샘플/첫 게임, 그 외 g……
+│   ├ meta.json  world.json  chars.json  npcs.json  rels.json  chapters.json  lib.json
+│   ├ threads.json  opening.json  banners.json  events.json  dispatches.json  prog.json
+│   └ game.json             위 목록에 없는 나머지 키(ver 등)
+└ ggm-data/                 key.txt, blobs/(그림·소리, sha256 이름), history/(저장 백업), state.json(기기 설정·자료 목록)
+```
+
+- 배치 규칙은 한 곳에 정의: 앱 `src/main/0525-data-folder.js`의 `DATA_TYPES`/`dataSplit`/`dataJoin`, 서버 `pc/ggm-server.py`의 `TYPES`/`save_games`/`load_state` (둘을 같이 고치세요).
+- 동기화: 기기 저장이 끝나면(`ggm-storage-ok` 이벤트) 5초 모아서 `pcPush` → 서버가 게임을 나눠 **내용이 바뀐 종류 파일만** 다시 씀. 새 기기·빈 캐시는 켤 때 `bootSync`/`pcStart`가 서버에서 받아 옴.
+- 서버 프로토콜(`/api/store/state`)은 그대로라 예전 앱과도 호환. 서버는 받을 때 나누고, 보낼 때 다시 합칩니다. 예전 `state.json`(게임 포함)은 서버를 켤 때 자동 이전.
+- 백업 `ggm-data/history/state-*.json`은 저장마다 전체 상태 한 파일(최근 20개), 앱에서 지운 게임 폴더는 `history/deleted-<id>-<시각>/`로 옮김.
+- 내보내기·가져오기: 설정 → 데이터의 **데이터 폴더 내보내기/가져오기** = 같은 배치의 zip (`data/index.json`, `data/<id>/*.json`, `data/<id>/media.json`, `data/<id>/media/<자료 키>`). 가져오면 새 게임으로 추가. PC 서버가 없어도(웹·APK) 사용 가능.
+- ponytail: 종류별 파일 하나라 캐릭터 하나만 바뀌어도 `chars.json` 전체를 다시 씀. 더 커지면 `chars/<id>.json`처럼 항목별로 나누는 게 다음 단계.
+
 ## 6. 저장 키 목록
 
 | 키 | 위치 | 내용 |

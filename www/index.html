@@ -10167,7 +10167,7 @@ async function pcPush(silent,force){
       if(ent&&ent.size===b.size&&ent.hash) h=ent.hash; else { h=await shaHex(await b.arrayBuffer()); idx[k]={hash:h,size:b.size}; } bin[k]=h;
       if(!have.has(h)){ const ack=await pcApi('/api/store/blob/'+h,{method:'POST',body:{content:bytesToB64(new Uint8Array(await b.arrayBuffer()))}});if(ack?.ok!==true)throw Error('PC 자료 저장 완료를 확인하지 못했습니다');have.add(h); } }
     saveSyIdx(idx);
-    let ls={}; syLsKeys(true).forEach(k=>{ const v=appStorage.getItem(k); if(v!=null) ls[k]=v; }); ls=lsHoldMerge(ls,S0&&S0.ls);
+    let ls={}; syLsKeys(true).forEach(k=>{ const v=syLsValue(k); if(v!=null) ls[k]=v; }); ls=lsHoldMerge(ls,S0&&S0.ls);
     const state={v:1,at:Date.now(),baseAt:S0?.at||0,device:syDevice(),devId:devId(),build:APP_BUILD,ls,bin,types};
     const ack=await pcApi('/api/store/state',{method:'POST',body:state});if(ack?.ok!==true)throw Error('PC 진행 저장 완료를 확인하지 못했습니다');
     const o=PCS(); o.last=state.at; o.localAt=G.prog.savedAt||Date.now(); delete o.restored; setPCS(o); PCWARNED=false; if(!silent) toast('PC에 저장했어요'); return true;
@@ -10204,12 +10204,14 @@ async function pcStart(){
 }
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'&&!LKMODE()){ const pc=PCS(); if(pc&&pc.auto!==false&&(G.prog.savedAt||0)>(pc.localAt||0)+3000) pcPush(true); } });
 setInterval(()=>{ const pc=PCS(); if(pc&&pc.auto!==false&&!PCJOB&&!LK.locked&&(G.prog.savedAt||0)>(pc.localAt||0)+3000) pcPush(true); },2*60000);
+// IndexedDB는 캐시예요: 기기 저장이 끝날 때마다(5초 모아서) PC 서버의 data 폴더로 올려요
+let PCSOON=null;addEventListener('ggm-storage-ok',()=>{ const pc=PCS(); if(!pc||pc.auto===false) return; clearTimeout(PCSOON); PCSOON=setTimeout(()=>{ const o=PCS(); if(o&&!PCJOB&&!LK.locked&&(G.prog.savedAt||0)>(o.localAt||0)) pcPush(true); },5000); });
 function openPcSet(lost){ const pc=PCS();
   openModal(`${head('PC 서버',`<span class="muted">내 컴퓨터를 저장소·AI 중계로 쓰기</span>`)}
     ${lost?`<div class="panel" style="border-color:var(--gold);margin-bottom:10px"><b>PC 서버에 다시 연결해 주세요</b><p class="muted" style="margin:6px 0 0">이 주소는 PC 서버인데 연결 키가 없어서 이 기기의 빈 게임으로 열렸어요. PC 화면의 QR을 다시 찍거나, QR 주소(끝에 ?pc=… 가 붙은 주소)를 아래에 붙여 넣으면 PC에 저장된 게임을 받아 와요.${IS_IOS?' 아이폰은 홈 화면 앱과 Safari의 저장 공간이 따로라서, 홈 화면 아이콘으로 열면 이렇게 될 수 있어요.':''}</p></div>`:''}
     <p class="muted">PC에서 <b>PC서버-시작.bat</b>을 켜면 QR이 떠요. 휴대폰으로 찍으면 연결되고, 게임이 PC에 저장돼요. 내 PC의 ComfyUI·Ollama 주소(127.0.0.1)도 그대로 쓸 수 있어요.</p>
     <label class="f" for="pc_link">PC 서버 주소 (QR 주소를 붙여 넣기)</label><input class="in" id="pc_link" value="${pc?esc(pc.base+'/?pc='+pc.key):''}" placeholder="https://xxxx.trycloudflare.com/?pc=...">
-    <label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="pc_auto" ${!pc||pc.auto!==false?'checked':''}><span>자동으로 PC에 저장 (앱을 나갈 때, 5분마다)</span></label>
+    <label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="pc_auto" ${!pc||pc.auto!==false?'checked':''}><span>자동으로 PC에 저장 (저장할 때마다 몇 초 안에 · PC의 data/게임/종류.json)</span></label>
     <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="pc_lock" ${!pc||pc.lock!==false?'checked':''}><span>한 번에 한 기기만 (다른 기기에서 하면 여기는 멈추고, 넘겨받을 때 진행을 이어받아요)</span></label>
     <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="pc_pxoff" ${proxyOff()?'checked':''}><span>AI 요청은 PC를 거치지 않고 직접 보내기 <span class="muted" style="font-size:.78rem">(PC와 같은 기기에서 쓸 때 더 빨라요. 휴대폰에서 PC의 로컬 AI를 쓰거나 웹에서 막히는 서비스가 있으면 끄세요)</span></span></label>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="pcsave">연결</button>${pc?'<button class="btn ghost" data-act="pcoff">연결 해제</button>':''}</div>
@@ -10325,6 +10327,8 @@ async function ghCommitFiles(o,base,entries,message){
 async function ghCreateBlob(o,blob,label){if(blob.size>100*1048576)throw Error(label+': 파일 하나가 GitHub 전송 한도 100MiB를 넘습니다. 해당 자료를 줄여 주세요. 전체 게임의 합계 용량 제한은 아닙니다.');const result=await gh(o,'/git/blobs',{method:'POST',body:{content:bytesToB64(new Uint8Array(await blob.arrayBuffer())),encoding:'base64'},timeout:300000});ghSHA(result?.sha,label);return result;}
 async function ghUploadPool(items,task){let next=0,failure=null;await Promise.all(Array.from({length:Math.min(3,items.length)},async()=>{while(!failure&&next<items.length){const item=items[next++];try{await task(item);}catch(e){failure=failure||e;}}}));if(failure)throw failure;}
 
+// 게임 목록(starfall-projects)은 한 번도 저장 안 됐을 수 있어요(샘플 게임만 쓴 기기). 받는 쪽은 목록이 꼭 있어야 해서 기본 목록을 채워 보내요
+function syLsValue(k){ const v=appStorage.getItem(k); return v==null&&k===PJKEY?JSON.stringify(PJ()):v; }
 function syLsKeys(withKeys){ const pj=PJ(); const keys=[PJKEY,SETUP_KEY,...pj.list.map(x=>pjKey(x.id))]; keys.push(NKEY,SKEY); if(withKeys) keys.push(PKEY); return keys; }
 function syStrip(k,v,withKeys){ if(withKeys||v==null) return v; try{ if(k===NKEY){ const o=JSON.parse(v); delete o.key; return JSON.stringify(o); } if(k===SKEY){ const o=JSON.parse(v); delete o.fishKey; delete o.elKey; return JSON.stringify(o); } }catch(e){} return v; }
 function syMerge(k,v){ if(v==null) return v; try{ if(k===NKEY){ const cur=JSON.parse(appStorage.getItem(NKEY)||'{}'), o=JSON.parse(v); if(!o.key&&cur.key) o.key=cur.key; return JSON.stringify(o); } if(k===SKEY){ const cur=JSON.parse(appStorage.getItem(SKEY)||'{}'), o=JSON.parse(v); ['fishKey','elKey'].forEach(x=>{ if(!o[x]&&cur[x]) o[x]=cur[x]; }); return JSON.stringify(o); } }catch(e){} return v; }
@@ -10465,7 +10469,7 @@ async function syPush(force){
     const commitPart=async(part,msg)=>{const committed=await ghCommitFiles({...o,branch:br},{head:hd,treeSha:baseTree},part,msg);hd=committed.head;baseTree=committed.treeSha;};
     const flushPart=async()=>{ if(committing) return committing; if(!entries.length) return; const part=entries; entries=[]; committing=commitPart(part,`sync 그림 ${done}/${need.length}`).catch(e=>{ entries=part.concat(entries); throw e; }).finally(()=>{ committing=null; }); return committing; };
     await ghUploadPool(need,async h=>{const b=await idbGet(byHash[h]);if(!b)throw Error('올릴 자료 파일을 찾지 못했습니다');await pace();const r=await ghCreateBlob(o,b,`자료 ${done+1}/${need.length}`);entries.push({path:'sync/b/'+h,mode:'100644',type:'blob',sha:r.sha});done++;syBar(`자료 올리는 중 ${done}/${need.length}`);if(entries.length>=40)await flushPart();});if(committing)await committing;
-    const withKeys=!!o.keys; let ls={}; syLsKeys(withKeys).forEach(k=>{ const v=appStorage.getItem(k); if(v!=null) ls[k]=syStrip(k,v,withKeys); }); ls=lsHoldMerge(ls,R.state&&R.state.ls);
+    const withKeys=!!o.keys; let ls={}; syLsKeys(withKeys).forEach(k=>{ const v=syLsValue(k); if(v!=null) ls[k]=syStrip(k,v,withKeys); }); ls=lsHoldMerge(ls,R.state&&R.state.ls);
     const state={v:1,at:Date.now(),device:syDevice(),devId:devId(),build:APP_BUILD,ls,bin,types};
     syBar('게임 진행 저장하는 중…');
     const sb=await ghCreateBlob(o,new Blob([JSON.stringify(state)]),'진행 정보');
@@ -12390,7 +12394,7 @@ async function legacyMediaBlob(value){
 /* Three explicit backup scopes; new archives are streamed JSON records, not one giant JSON string. */
 var BACKUP_TYPES={progress:{name:'진행 백업',desc:'보유 캐릭터·레벨·스킬·장비·재화·스토리 진행과 게임 설정을 저장합니다. 이미지·음성 파일과 API 키는 포함하지 않습니다. 같은 기기의 기존 자료와 함께 이어하기에 적합합니다.'},assets:{name:'자료 백업',desc:'현재 게임에 등록된 이미지·음성 파일만 저장합니다. 캐릭터 보유·성장·재화·스토리 진행은 포함하지 않습니다. 같은 게임에 자료를 복원할 때 사용하며 진행 상태는 바꾸지 않습니다.'},full:{name:'전체 백업',desc:'진행 백업과 자료 백업을 함께 저장합니다. 다른 기기로 게임을 옮기거나 모든 내용을 보관할 때 사용합니다. API 키와 앱 전체 설정은 포함하지 않습니다.'}};
 var BACKUP_IMPORT_KIND='full',BACKUP_BUSY=false;
-function backupBlocks(){return Object.entries(BACKUP_TYPES).map(([k,v])=>`<section class="panel backup-block" data-backup-kind="${k}"><h3>${v.name}</h3><p class="muted">${v.desc}</p><p class="muted">불러오기: .ggmbak 또는 이전 .json 백업을 선택하세요. 파일명 변경은 필요 없으며, 파일 내용으로 형식을 확인합니다.</p>${k==='progress'?'<p class="muted">새 기기에는 그림이 따라가지 않습니다. 자료 백업도 따로 불러오거나 전체 백업을 사용하세요.</p>':''}<div class="row"><button class="btn sm" data-act="backup-save" data-kind="${k}">${v.name} 저장</button><button class="btn sm ghost" data-act="backup-load" data-kind="${k}">${v.name} 불러오기</button></div></section>`).join('');}
+function backupBlocks(){return Object.entries(BACKUP_TYPES).map(([k,v])=>`<section class="panel backup-block" data-backup-kind="${k}"><h3>${v.name}</h3><p class="muted">${v.desc}</p><p class="muted">불러오기: .ggmbak 또는 이전 .json 백업을 선택하세요. 파일명 변경은 필요 없으며, 파일 내용으로 형식을 확인합니다.</p>${k==='progress'?'<p class="muted">새 기기에는 그림이 따라가지 않습니다. 자료 백업도 따로 불러오거나 전체 백업을 사용하세요.</p>':''}<div class="row"><button class="btn sm" data-act="backup-save" data-kind="${k}">${v.name} 저장</button><button class="btn sm ghost" data-act="backup-load" data-kind="${k}">${v.name} 불러오기</button></div></section>`).join('')+(typeof dataFolderBlock==='function'?dataFolderBlock():'');}
 function backupIdentity(g){return {title:String(g.meta?.title||''),ids:(g.chars||[]).map(x=>x.id).sort()};}
 function backupMatches(a,g){const b=backupIdentity(g);return a&&a.title===b.title&&JSON.stringify(a.ids)===JSON.stringify(b.ids);}
 function backupChatKeys(g){const keys=new Set();function visit(o){if(!o||typeof o!=='object')return;for(const[k,v]of Object.entries(o)){if(k==='img'&&typeof v==='string'&&v.startsWith('chat_'))keys.add(v);else if(v&&typeof v==='object')visit(v);}}visit(g);return [...keys];}
@@ -12476,6 +12480,89 @@ document.getElementById('durable-backup-file').addEventListener('change',e=>{con
 function backupBusyOverlay(on){let el=document.getElementById('backup-busy-lock');if(!on){if(el)el.remove();return;}if(el)return;el=document.createElement('div');el.id='backup-busy-lock';el.setAttribute('role','status');el.style.cssText='position:fixed;inset:0;z-index:2147483640;background:rgba(0,0,0,.65);display:grid;place-items:center;color:white;padding:24px;pointer-events:auto';el.innerHTML='<div><b>파일 처리 중…</b><p>완료될 때까지 앱을 닫지 마세요.</p></div>';document.body.appendChild(el);}
 
 /* /BACKUP_STORAGE_MODULE */
+/* DATA_FOLDER_MODULE
+   게임 하나 = data/<게임id>/ 폴더, 종류별 JSON (meta.json, world.json, chars.json, chapters.json …).
+   PC 서버(pc/ggm-server.py)가 영구 저장소로 쓰는 배치와 같아요. 여기서는 그 배치로 내보내기·가져오기(.zip)를 해요.
+   zip 안: data/index.json · data/<id>/<종류>.json · data/<id>/media.json · data/<id>/media/<자료 키> */
+const DATA_TYPES=['meta','world','chars','npcs','rels','chapters','lib','threads','opening','banners','events','dispatches','prog'];
+function dataSplit(g){const files={},rest={};for(const[k,v]of Object.entries(g))(DATA_TYPES.includes(k)?files:rest)[k]=v;files.game=rest;return files;}
+function dataJoin(files){const g={...(files.game||{})};for(const k of DATA_TYPES)if(k in files)g[k]=files[k];return g;}
+
+/* zip: 압축 없이 저장(stored) · UTF-8 이름. 읽기는 stored와 deflate(브라우저 DecompressionStream) 둘 다.
+   ponytail: zip64 없음 → 파일 하나·전체 4GB, 항목 65535개까지 */
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+function crc32(u){let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC_T[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+function zipMake(entries){const enc=new TextEncoder(),parts=[],central=[];let off=0;
+ for(const e of entries){const n=enc.encode(e.name),d=e.data,crc=crc32(d),h=new DataView(new ArrayBuffer(30)),c=new DataView(new ArrayBuffer(46));
+  h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(12,33,true);h.setUint32(14,crc,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,n.length,true);
+  c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(14,33,true);c.setUint32(16,crc,true);c.setUint32(20,d.length,true);c.setUint32(24,d.length,true);c.setUint16(28,n.length,true);c.setUint32(42,off,true);
+  parts.push(h,n,d);central.push(c,n);off+=30+n.length+d.length;}
+ const size=central.reduce((s,x)=>s+x.byteLength,0),end=new DataView(new ArrayBuffer(22));
+ end.setUint32(0,0x06054b50,true);end.setUint16(8,entries.length,true);end.setUint16(10,entries.length,true);end.setUint32(12,size,true);end.setUint32(16,off,true);
+ return new Blob([...parts,...central,end],{type:'application/zip'});}
+async function zipRead(file){ // → Map(name → Blob). 파일 전체를 한 번에 읽지 않고 항목별로 잘라 읽어요
+ const tail=new DataView(await file.slice(Math.max(0,file.size-65557)).arrayBuffer());let e=-1;
+ for(let i=tail.byteLength-22;i>=0;i--)if(tail.getUint32(i,true)===0x06054b50){e=i;break;}
+ if(e<0)throw Error('zip 파일이 아니에요');
+ const count=tail.getUint16(e+10,true),cdSize=tail.getUint32(e+12,true),cdOff=tail.getUint32(e+16,true),cd=new DataView(await file.slice(cdOff,cdOff+cdSize).arrayBuffer()),dec=new TextDecoder(),out=new Map();
+ for(let p=0,i=0;i<count;i++){if(cd.getUint32(p,true)!==0x02014b50)throw Error('zip 목록이 손상됐어요');
+  const method=cd.getUint16(p+10,true),comp=cd.getUint32(p+20,true),nl=cd.getUint16(p+28,true),xl=cd.getUint16(p+30,true),cl=cd.getUint16(p+32,true),lo=cd.getUint32(p+42,true),name=dec.decode(new Uint8Array(cd.buffer,cd.byteOffset+p+46,nl));p+=46+nl+xl+cl;
+  if(name.endsWith('/'))continue;
+  const lh=new DataView(await file.slice(lo,lo+30).arrayBuffer()),start=lo+30+lh.getUint16(26,true)+lh.getUint16(28,true),raw=file.slice(start,start+comp);
+  if(method===0)out.set(name,raw);
+  else if(method===8&&window.DecompressionStream)out.set(name,await new Response(raw.stream().pipeThrough(new DecompressionStream('deflate-raw'))).blob());
+  else throw Error('지원하지 않는 zip 압축 방식이에요: '+name);}
+ return out;}
+
+const jsonBytes=o=>new TextEncoder().encode(JSON.stringify(o,null,1));
+async function dataExportZip(game,gid){ // 현재 게임 하나 → zip Blob
+ const media=backupMedia(game),entries=[],meta={},files=dataSplit(game),pj=PJ(),entry=pj.list.find(x=>x.id===gid)||{id:gid,title:game.meta?.title||''};
+ entries.push({name:'data/index.json',data:jsonBytes({format:'ggm-data',version:1,build:APP_BUILD,at:new Date().toISOString(),games:[entry]})});
+ for(const[k,v]of Object.entries(files))entries.push({name:`data/${gid}/${k}.json`,data:jsonBytes(v)});
+ const keys=[...media.images.map(x=>x.id),...media.audios.map(x=>'a_'+x.id),...media.chat];let n=0;
+ for(const k of keys){syBar(`데이터 폴더: 자료 ${++n}/${keys.length}`);const b=await idbGetNS(k);if(!b)throw Error('자료 파일을 찾지 못했습니다: '+k);meta[k]={type:b.type||''};entries.push({name:`data/${gid}/media/${k}`,data:new Uint8Array(await b.arrayBuffer())});}
+ entries.push({name:`data/${gid}/media.json`,data:jsonBytes(meta)});
+ return zipMake(entries);}
+async function dataReadZip(file){ // zip → {game, media:[{key,blob}], title}
+ const z=await zipRead(file),ix=z.get('data/index.json');if(!ix)throw Error('data/index.json이 없어요. 데이터 폴더 zip이 맞는지 확인해 주세요');
+ const index=JSON.parse(await ix.text()),gid=index?.games?.[0]?.id;if(index.format!=='ggm-data'||!gid||!/^[\w-]{1,64}$/.test(gid))throw Error('데이터 폴더 정보가 올바르지 않아요');
+ const files={},re=new RegExp('^data/'+gid+'/([a-z]+)\\.json$');for(const[name,b]of z){const m=name.match(re);if(m&&m[1]!=='media')files[m[1]]=JSON.parse(await b.text());}
+ const game=dataJoin(files);if(!Array.isArray(game.chars))throw Error('chars.json이 없거나 올바르지 않아요');
+ const mj=z.get(`data/${gid}/media.json`),mm=mj?JSON.parse(await mj.text()):{},media=[];
+ for(const[k,v]of Object.entries(mm)){if(!/^[\w-]{1,80}$/.test(k))throw Error('자료 이름이 올바르지 않아요: '+k);const b=z.get(`data/${gid}/media/${k}`);if(!b)throw Error('자료 파일이 빠졌어요: '+k);media.push({key:k,blob:new Blob([b],{type:String(v?.type||'')})});}
+ return {game,media,title:index.games[0].title||game.meta?.title||'가져온 게임'};}
+
+async function dataSaveBlob(blob,name){
+ if(IS_NATIVE&&CAP&&CAP.Filesystem){const FS=CAP.Filesystem,path='가챠게임메이커/'+name;try{if(FS.requestPermissions)await FS.requestPermissions();}catch(e){}
+  await FS.writeFile({path,data:String(await blobToData(blob)).split(',')[1],directory:'DOCUMENTS',recursive:true});return 'Documents/'+path;}
+ if(window.showSaveFilePicker){try{const h=await showSaveFilePicker({suggestedName:name,types:[{description:'데이터 폴더 zip',accept:{'application/zip':['.zip']}}]}),w=await h.createWritable();await w.write(blob);await w.close();return h.name;}catch(e){if(e?.name==='AbortError')return null;}}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);return name;}
+async function dataExport(){
+ if(BACKUP_BUSY)return;BACKUP_BUSY=true;backupBusyOverlay(true);
+ try{await flush();await appStorage.drain();const gid=PJ().active,game=JSON.parse(JSON.stringify(G)),blob=await dataExportZip(game,gid),
+  name='ggm-data-'+String(game.meta?.title||gid).replace(/[^\w가-힣-]+/g,'_').slice(0,30)+'-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.zip',where=await dataSaveBlob(blob,name);
+  syBar('');if(where)openModal(`${head('데이터 폴더 내보내기 완료')}<p>${esc(where)}</p><p class="muted">압축을 풀면 data/${esc(gid)}/ 안에 종류별 JSON(chars.json, chapters.json, world.json …)과 media 폴더가 있어요.</p><button class="btn" data-act="close">확인</button>`);}
+ catch(e){syBar('');toast('내보내기 실패: '+(e.message||e));}finally{BACKUP_BUSY=false;backupBusyOverlay(false);}}
+async function dataImport(file){
+ if(BACKUP_BUSY)return;if(!appStorage.durable){toast('이 환경은 안전한 가져오기를 지원하지 않습니다.');return;}
+ BACKUP_BUSY=true;backupBusyOverlay(true);const prefix='data-'+Date.now()+'-'+uid()+'::';let paused=false;
+ try{syBar('데이터 폴더 zip 검사 중…');const r=await dataReadZip(file);syBar('');backupBusyOverlay(false);
+  if(!await appConfirm(`「${r.title}」을(를) 새 게임으로 추가할까요?\n캐릭터 ${r.game.chars.length}명 · 자료 ${r.media.length}개 · 진행 포함`))return;
+  backupBusyOverlay(true);let n=0;for(const m of r.media){await appStorage.stage(prefix+n++,{key:m.key,blob:m.blob});}
+  const have=new Set(r.media.map(m=>m.key)),game=fix(r.game);
+  for(const o of imgObjsOf(game))if(o.img?.idb&&!have.has(o.id))o.img=null;
+  for(const l of game.lib||[])if(l.audio?.idb&&!have.has('a_'+l.id))l.audio=null;
+  const registry=PJ(),id='g'+uid();registry.list.push({id,title:game.meta?.title||r.title});registry.active=id;
+  await flush();window.__NOFLUSH=1;paused=true;
+  await appStorage.commitImport(prefix,pjKey(id),JSON.stringify(game),id+'::',{[PJKEY]:JSON.stringify(registry)});dirty.clear();clearTimeout(flushT);
+  toast('새 게임으로 추가했어요. 다시 시작할게요');setTimeout(()=>reloadGame(),800);}
+ catch(e){syBar('');toast('가져오기 실패: '+(e.message||e)+'. 현재 저장은 바꾸지 않았어요.');if(paused)window.__NOFLUSH=0;}
+ finally{await appStorage.discard(prefix).catch(()=>{});BACKUP_BUSY=false;backupBusyOverlay(false);}}
+function dataFolderBlock(){return `<section class="panel backup-block" data-backup-kind="data-folder"><h3>데이터 폴더 (종류별 JSON)</h3><p class="muted">현재 게임을 data/게임id/ 폴더 구조의 zip으로 내보내요. 캐릭터·시나리오·세계관 등이 종류별 JSON 파일로 나뉘어 있어서 직접 열어 보거나 고칠 수 있어요. 그림·음성은 media 폴더에 들어가요. 가져오면 새 게임으로 추가돼요.</p><p class="muted">PC 서버를 쓰면 같은 구조로 PC의 data 폴더에 자동으로 저장돼요.</p><div class="row"><button class="btn sm" data-act="data-save">데이터 폴더 내보내기</button><button class="btn sm ghost" data-act="data-load">데이터 폴더 가져오기</button></div></section>`;}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;
+ if(b.dataset.act==='data-save')dataExport();
+ if(b.dataset.act==='data-load'){const i=document.createElement('input');i.type='file';i.accept='.zip,application/zip';i.onchange=()=>{if(i.files[0])dataImport(i.files[0]);};i.click();}});
+/* /DATA_FOLDER_MODULE */
 /* STORY_MEMORY_MODULE */
 /* Author-facing story memory. Original scripts are never replaced by memory edits. */
 var SM_LIMITS={plot:100000,summary:6000,older:600,recent:2,previous:6000,scene:6000,relations:12000,codex:10000,chunk:10000};
