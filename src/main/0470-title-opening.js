@@ -1,0 +1,59 @@
+/* =========================================================
+   타이틀과 오프닝
+   ========================================================= */
+function showGate(){
+  const g=document.createElement('div'); g.className='gate';
+  g.innerHTML=`<div class="mark">19</div><h2 class="disp" style="margin:0;font-size:1.6rem">청소년 이용불가</h2><p style="max-width:320px;opacity:.85;margin:0">가챠 게임 메이커는 만 19세 이상을 위한 개인용 앱입니다. 만 19세 이상인가요?</p><div class="row" style="width:100%;max-width:320px"><button class="btn ghost" data-act="gateno">아니요</button><button class="btn" data-act="gateyes">네, 19세 이상입니다</button></div>`;
+  document.body.appendChild(g);
+}
+// 타이틀 로고 모양: 게임 정의에서 고르고, 자동이면 화면 테마에 맞춰요
+const LOGO_STYLES=[['auto','자동 (화면 테마에 맞춤)'],['stroke','가로획 명조 · 먹빛'],['star','별빛 그라데이션 · 첨탑'],['orbitline','궤도선 · 행성 외곽선'],['stencil','거친 스텐실 질감'],['regal','기품 · 명조 금빛'],['sharp','전술 · 각진 금속'],['orbit','SF · 네온'],['heavy','묵직한 장식체'],['cute','귀여운 · 파스텔']];
+/* 타이틀 줄 나누기: 띄어쓰기에서만 나누고(글자 중간에서 끊지 않음), 두 줄 길이를 비슷하게. 긴 한 단어는 줄이지 않고 글자를 작게 */
+const tlLen=x=>[...String(x)].reduce((n,ch)=>n+(/[가-힣ㄱ-ㅎ一-鿿]/.test(ch)?1:/\s/.test(ch)?0.35:0.62),0);
+function titleLines(t){ const w=String(t||'').trim().split(/\s+/).filter(Boolean); if(w.length<2) return [w.join('')];
+  let best=null; for(let k=1;k<w.length;k++){ const a=w.slice(0,k).join(' '), b=w.slice(k).join(' '), m=Math.max(tlLen(a),tlLen(b)); if(!best||m<best.m) best={m,l:[a,b]}; } return best.l; }
+const tlSpan=x=>`<span class="tl" style="--tl:${Math.max(2.2,tlLen(x)*1.06).toFixed(2)}">${esc(x)}</span>`;
+function logoHTML(st){ const t=String(G.meta.title||''), w=t.split(/\s+/).filter(Boolean), sub=String(G.meta.sub||'');
+  let kr=titleLines(t).map(tlSpan).join('');
+  if(st==='orbitline'&&w.length>1) kr=`<small>${esc(w[0])}</small>${tlSpan(w.slice(1).join(' '))}`;
+  if(st==='stroke') kr=tlSpan(w.join(' '));
+  const en=!sub?'':st==='star'?`<div class="t-en">${sub.split(/\s+/).map(esc).join('<br>')}</div>`:st==='stroke'?`<div class="t-en"><span>-&nbsp;&nbsp;${esc(sub)}&nbsp;&nbsp;-</span></div>`:`<div class="t-en"><span>${esc(sub)}</span></div>`;
+  return `<div class="t-logo ls-${st}">${st==='star'?'<i class="t-spire"></i>':''}${st==='orbitline'?'<i class="t-planet"></i>':''}<div class="t-kr">${kr}${st==='orbitline'||st==='stroke'?'<i class="t-line"></i>':''}</div>${en}</div>`; }
+function logoStyle(){ const v=G.meta.logoStyle||'auto'; if(v!=='auto'&&LOGO_STYLES.some(x=>x[0]===v)) return v; return ({fantasy:'star',noir:'stroke',neon:'orbitline',pastel:'cute',tactical:'stencil'})[G.meta.theme]||'stencil'; }
+function showTitle(){
+  const c=charById(P().titleChar)||charById(P().sec)||G.chars.find(x=>x.rarity===3&&(charIllust(x)||imgSrc(x)))||G.chars.find(x=>x.rarity===3)||G.chars[0];
+  const oc=c&&own(c.id), ill=c&&P().lobbyMode!=='stand'&&((oc&&oc.useCg&&oc.dup>=5&&lbcgSrc(c))||charIllust(c));
+  $('#ov').innerHTML=`<div class="title" data-act="titletap">${ill?`<div class="t-bg t-ill"><img src="${esc(ill)}" alt="" draggable="false"></div>`:`<div class="t-bg" style="${bgStyle(P().titleBg||'낙성 분화구')}"></div>${c?`<div class="t-char">${art(c)}</div>`:''}`}<div class="t-shade"></div>${shootHTML(7)}
+    ${logoHTML(logoStyle())}
+    <button class="t-snd" id="tsnd" data-act="titlesnd" aria-label="${SND().bgmOn?'배경음 끄기':'배경음 켜기'}">${SND().bgmOn?'🔊':'🔇'}</button>
+    <div class="t-touch">화면을 터치하세요</div><div class="t-ver">GACHA GAME MAKER · ${esc(APP_BUILD)}</div></div>`;
+  $('#ov').hidden=false; bgm(sceneOf().title);
+}
+let OP=null;
+function playOpening(){
+  OP={lines:(G.opening.lines||[]).filter(Boolean),i:-1,t:null};
+  $('#ov').innerHTML=`<div class="op" data-act="opnext">${shootHTML(4)}<div class="op-txt" id="opTxt"></div><button class="skipb" data-act="opskip">건너뛰기</button></div>`;
+  $('#ov').hidden=false; opNext();
+}
+function opNext(){
+  if(!OP) return; clearTimeout(OP.t); OP.i++;
+  if(OP.i>=OP.lines.length){opEnd();return;}
+  const el=$('#opTxt'), last=OP.i===OP.lines.length-1, i=OP.i;
+  el.classList.remove('show');
+  setTimeout(()=>{ if(!OP||OP.i!==i) return; el.textContent=sub(OP.lines[i]); el.classList.toggle('big',last); el.classList.add('show'); OP.t=setTimeout(opNext,last?3600:2800); },500);
+}
+function opEnd(){
+  if(!OP) return; clearTimeout(OP.t); OP=null;
+  if(!P().seenOpening&&P().nameAsked){ playStory('프롤로그',G.opening.prologue,afterPrologue); return; }
+  if(!P().seenOpening){
+    openModal(`<h2>${esc(T('player'))}의 이름</h2><p class="muted">${esc(T('crew'))}들은 평소에 「${esc(T('player'))}」(이)라고 부르고, 이름은 필요할 때 불러요. 나중에 설정에서 바꿀 수 있어요.</p><label class="f" for="nm_call">호칭</label><input class="in" id="nm_call" maxlength="12" value="${esc(T('player'))}"><label class="f" for="nm_in">이름</label><input class="in" id="nm_in" maxlength="12" placeholder="비우면 호칭으로만 불려요" value="${esc(P().player)}"><div class="row" style="margin-top:14px"><button class="btn" data-act="setname">임명장에 서명하기</button></div>`,true);
+    setTimeout(()=>$('#nm_in')&&$('#nm_in').focus({preventScroll:true}),100);
+  } else playStory('프롤로그',G.opening.prologue,()=>render());
+}
+function afterPrologue(){ setTimeout(()=>{ if(typeof prepAsk==='function') prepAsk(); },4000);
+  const first=!P().seenOpening; P().seenOpening=true; mark('prog'); tab=first?'contract':tab; render();
+  if(first){ toast('첫 10회는 SSR 1명 확정이에요'); setTimeout(()=>checkTriggers(),1500); }
+  setTimeout(()=>liveTick(false),2500);
+  if(G.meta.subscr) setTimeout(()=>{ if($('#modal').hidden&&$('#ov').hidden) subCheck(false); },4500);
+}
+

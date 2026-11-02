@@ -4,9 +4,13 @@
 
 1. **포크에서 업데이트 채널이 원본을 가리킵니다.** 그대로 두면 앱(APK·PC 서버)이 원본 저장소의 새 빌드를 받아 **내 수정본을 덮어씁니다.** §6 참고.
 2. **라이선스 CC BY-NC-ND 4.0** (`LICENSE.md`): 개인 사용은 자유지만 **수정본 재배포·판매는 금지**입니다. 포크 커스텀은 개인 용도로 쓰고, 수정본을 공개 배포하려면 원저작자 허락을 받으세요.
-3. 빌드 도구가 없습니다. 편집기로 `www/index.html`을 고치고 로컬 서버로 확인하면 끝입니다.
+3. 소스는 `src/`에 있고 `node build/build.mjs`로 `www/index.html`을 만듭니다([build.md](build.md)). 아래에서 "섹션"·"모듈"은 `src/main/*.js`, `src/modules/*/*.js` 파일을 뜻합니다.
 
 ## 1. 로컬 실행
+
+```bash
+node build/build.mjs
+```
 
 ```bash
 cd www && python3 -m http.server 8000

@@ -5,7 +5,9 @@
 | 경로 | 역할 |
 |---|---|
 | `index.html` (루트) | GitHub Pages 진입점. `www/`로 meta refresh 리다이렉트만 함 |
-| `www/index.html` | **앱 전체** (HTML+CSS+JS 단일 파일) |
+| `src/` | **소스**: 템플릿 `index.html`, `boot/`, `style/`, `modules/`, `main/` ([build.md](build.md)) |
+| `build/` | `build.mjs`(합치기), `split.mjs`(단일 HTML → src), `test.mjs`(검증) |
+| `www/index.html` | **빌드 결과물 = 앱 전체** (HTML+CSS+JS 단일 파일) |
 | `www/sw.js` | 서비스 워커. 같은 출처는 network-first + 캐시 폴백, Google Fonts는 cache-first. `api.anthropic.com`은 건드리지 않음 |
 | `www/manifest.webmanifest`, `www/icons/` | PWA(홈 화면 추가) 설정 |
 | `version.json` | 업데이트 채널 매니페스트. 앱이 GitHub raw에서 읽어 새 빌드 여부·`sha256`·필요 APK 버전을 판단 |
@@ -14,7 +16,7 @@
 | `gacha-game-maker-pc.zip` | PC 서버(`ggm-server.py` 등). 압축 안에만 있음 |
 | `.nojekyll` | GitHub Pages에서 Jekyll 처리 끔 |
 
-빌드 단계 없음. **`www/index.html`을 고치면 그게 곧 배포물**입니다. 안드로이드 APK(Capacitor 셸)는 이 저장소에 소스가 없고 Releases로만 배포됩니다.
+`www/index.html`은 **`src/`에서 빌드되는 결과물**입니다([build.md](build.md)). 직접 고치지 말고 `src/`를 고친 뒤 `node build/build.mjs`. 안드로이드 APK(Capacitor 셸)는 이 저장소에 소스가 없고 Releases로만 배포됩니다.
 
 ## 2. `www/index.html` 내부 구조
 
