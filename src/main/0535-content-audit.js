@@ -39,7 +39,7 @@ const AUDIT_RULES=[
  {id:'c_range',scope:'char',kind:'upgrade',since:7,label:'사거리(근접·원거리·지원)가 정해지지 않았어요(무기·포지션으로 추정해 정해요)',test:c=>!c.npc&&!RANGE[c.range],fix:{mode:'auto',run:c=>{ c.range=charRange(c); }}},
  {id:'s_direct',scope:'stage',kind:'upgrade',since:6,label:'대본에 연출(감정 아이콘·동작·화면 효과)이 없어요(AI로 대사는 그대로 두고 연출만 더해요)',test:s=>!s.dirV&&String((s.pre||'')+(s.post||'')).split('\n').length>=6&&dirCount((s.pre||'')+'\n'+(s.post||''))===0,fix:{mode:'ai-run',run:s=>directStage(s)}},
  {id:'s_rules',scope:'stage',kind:'upgrade',since:5,label:'전장 규칙·별 조건이 없는 스테이지예요(예전 생성물)',test:s=>!s.story&&!s.farm&&(s.enemies||[]).length>0&&!s.rulesV,fix:{mode:'auto',run:s=>{ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)), L=ch?ch.stages:[s]; stageAutoRules(s,L.indexOf(s),L.length); }}},
- {id:'g_spots',scope:'game',kind:'upgrade',since:5,label:'일정(장소 방문) 장소가 없어요',test:()=>!spots().length,fix:{mode:'auto',run:()=>{ spotsAuto(); }}},
+ {id:'g_spots',scope:'game',kind:'upgrade',since:5,label:'일정(장소 방문) 장소가 없어요',test:()=>!spots().length,fix:{mode:'auto',ai:()=>spotsAI(),run:()=>{ spotsAuto(); }}},
  {id:'c_spot',scope:'char',kind:'upgrade',since:5,label:'일정 장소에서 만날 때의 장면이 없어요(기본 장면으로 나와요)',test:c=>!c.alt&&!c.npc&&spots().length>0&&spots().some(s=>!(c.spotTalk||{})[s.id]),fix:{mode:'ai-run',run:c=>spotTalkAI(c)}},
  {id:'l_imgperson',scope:'lib',kind:'missing',since:1,label:'배경·소품 그림 프롬프트에 사람 태그가 섞여 있어요(사람 그림이 돼요)',test:l=>!!IMG_NOHUMAN[l.kind]&&!!l.prompt&&imgGuard(l.kind,l.prompt).removed.length>0,fix:{mode:'auto',run:l=>{ plHit('img-person-'+l.kind,l.prompt); l.prompt=imgGuard(l.kind,l.prompt).out; }}},
  {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
@@ -68,8 +68,10 @@ async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(ins
 async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(`${RULES}\n${ctx()}\n\n${SCRIPT_FMT}\n「${ch?ch.title:''}」의 스테이지 「${s.title||''}」 전투 직전 장면 대본을 써라. 앞뒤 스테이지 흐름과 이어지게, 12~25줄.\nJSON만 출력: {"pre":"대본"}`,null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
 
 // 한 항목 고치기 — 점검 화면의 일괄 고치기(auditFix)와 실행 중 자동 채움(liveFill, 0537)이 같이 씀. 고쳤으면 true
+// 규칙 고치기 중 글 AI로 더 잘 채울 수 있는 것(fix.ai — 일정 장소는 AI가 좋아하는 것 태그까지 붙여 "좋아하는 장소 ♥"가 맞음)은 AI가 있으면 AI로, 없거나 실패하면 규칙으로
+async function auditAutoRun(rule,o){ if(SAMPLE&&rule.fix.ai){ try{ if(await rule.fix.ai(o)) return; }catch(e){ quietErr(e,'auditAutoRun'); } } rule.fix.run(o); }
 async function auditFixOne(rule,o){ const m=rule.fix.mode;
-  if(m==='auto'){ rule.fix.run(o); auditMarkObj(o); return true; }
+  if(m==='auto'){ await auditAutoRun(rule,o); auditMarkObj(o); return true; }
   if(m==='ai') return !!(await auditAIFill(o,rule.fix.fields));
   if(m==='ai-stage') return !!(await auditAIStage(o));
   if(m==='ai-rules') return !!(await rulesAIFill());

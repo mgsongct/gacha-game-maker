@@ -694,6 +694,8 @@ try {
     empty(); P().live.on.fill = false; await liveTick(); o.off = !spots().length;
     o.chip = (tab = 'studio', STTAB = 'live', render(), !!document.querySelector('[data-act="livetog"][data-k="fill"]'));
     o.one = typeof auditFixOne === 'function' && await auditFixOne(AUDIT_RULES.find(r => r.id === 'g_spots'), G) === true && spots().length > 0;
+    SAMPLE = { json: async p => /함께 시간을 보낼 장소/.test(p) ? { spots: [{ name: '온천', desc: '쉬는 곳', bg: '', tags: ['휴식', '목욕'] }] } : {} }; G.meta.spots = []; // 글 AI가 있으면 AI 장소(좋아하는 것 태그)
+    o.aiSpots = await auditFixOne(AUDIT_RULES.find(r => r.id === 'g_spots'), G) && spots().length === 1 && spots()[0].tags.includes('휴식'); SAMPLE = null;
     return o; });
   assert.ok(Object.values(r28).every(v => v === true), JSON.stringify(r28)); assert.deepEqual(err28, [], '페이지 오류');
   console.log('ok 28 포크 기능 내용 자동 채움: liveTick 첫 실행·다음 실행에서 빈 일정 장소·도감 규칙을 점검 규칙의 고치기로 채움, 설정으로 끔, 한 항목 고치기 공유');

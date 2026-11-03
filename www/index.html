@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.29'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.30'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -7715,7 +7715,7 @@ addEventListener('resize',()=>{ clearTimeout(window.__fitT); window.__fitT=setTi
    좋아하는 것(개성 시트 likes·hobby)이 장소 태그와 맞으면 "좋아하는 장소" → 호감도 1.5배.
    - 장소 G.meta.spots=[{id,name,desc,bg,tags}] : 자료실 배경에서 자동으로 만들거나(spotsAuto) AI로(spotsAI)
    - 장면 c.spotTalk={[spot id]:대본} : AI로(spotTalkAI) 만들고, 없으면 개성 시트로 짧은 기본 장면(spotTemplate)
-   - 생성 연계: 점검 규칙 g_spots(장소 없음 → 자동), c_spot(장면 없음 → AI) · 문서 docs/research/combat-content.md */
+   - 생성 연계: 점검 규칙 g_spots(장소 없음 → 글 AI가 있으면 AI, 없으면 자료실 배경), c_spot(장면 없음 → AI) · 문서 docs/research/combat-content.md */
 const SCHED_N=3;
 function SCHED(){ const p=P(); if(!p.sched||p.sched.day!==today()) p.sched={day:today(),left:SCHED_N,done:[]}; return p.sched; }
 function spots(){ return Array.isArray(G.meta.spots)?G.meta.spots:[]; }
@@ -14123,7 +14123,7 @@ const AUDIT_RULES=[
  {id:'c_range',scope:'char',kind:'upgrade',since:7,label:'사거리(근접·원거리·지원)가 정해지지 않았어요(무기·포지션으로 추정해 정해요)',test:c=>!c.npc&&!RANGE[c.range],fix:{mode:'auto',run:c=>{ c.range=charRange(c); }}},
  {id:'s_direct',scope:'stage',kind:'upgrade',since:6,label:'대본에 연출(감정 아이콘·동작·화면 효과)이 없어요(AI로 대사는 그대로 두고 연출만 더해요)',test:s=>!s.dirV&&String((s.pre||'')+(s.post||'')).split('\n').length>=6&&dirCount((s.pre||'')+'\n'+(s.post||''))===0,fix:{mode:'ai-run',run:s=>directStage(s)}},
  {id:'s_rules',scope:'stage',kind:'upgrade',since:5,label:'전장 규칙·별 조건이 없는 스테이지예요(예전 생성물)',test:s=>!s.story&&!s.farm&&(s.enemies||[]).length>0&&!s.rulesV,fix:{mode:'auto',run:s=>{ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)), L=ch?ch.stages:[s]; stageAutoRules(s,L.indexOf(s),L.length); }}},
- {id:'g_spots',scope:'game',kind:'upgrade',since:5,label:'일정(장소 방문) 장소가 없어요',test:()=>!spots().length,fix:{mode:'auto',run:()=>{ spotsAuto(); }}},
+ {id:'g_spots',scope:'game',kind:'upgrade',since:5,label:'일정(장소 방문) 장소가 없어요',test:()=>!spots().length,fix:{mode:'auto',ai:()=>spotsAI(),run:()=>{ spotsAuto(); }}},
  {id:'c_spot',scope:'char',kind:'upgrade',since:5,label:'일정 장소에서 만날 때의 장면이 없어요(기본 장면으로 나와요)',test:c=>!c.alt&&!c.npc&&spots().length>0&&spots().some(s=>!(c.spotTalk||{})[s.id]),fix:{mode:'ai-run',run:c=>spotTalkAI(c)}},
  {id:'l_imgperson',scope:'lib',kind:'missing',since:1,label:'배경·소품 그림 프롬프트에 사람 태그가 섞여 있어요(사람 그림이 돼요)',test:l=>!!IMG_NOHUMAN[l.kind]&&!!l.prompt&&imgGuard(l.kind,l.prompt).removed.length>0,fix:{mode:'auto',run:l=>{ plHit('img-person-'+l.kind,l.prompt); l.prompt=imgGuard(l.kind,l.prompt).out; }}},
  {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
@@ -14152,8 +14152,10 @@ async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(ins
 async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(`${RULES}\n${ctx()}\n\n${SCRIPT_FMT}\n「${ch?ch.title:''}」의 스테이지 「${s.title||''}」 전투 직전 장면 대본을 써라. 앞뒤 스테이지 흐름과 이어지게, 12~25줄.\nJSON만 출력: {"pre":"대본"}`,null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
 
 // 한 항목 고치기 — 점검 화면의 일괄 고치기(auditFix)와 실행 중 자동 채움(liveFill, 0537)이 같이 씀. 고쳤으면 true
+// 규칙 고치기 중 글 AI로 더 잘 채울 수 있는 것(fix.ai — 일정 장소는 AI가 좋아하는 것 태그까지 붙여 "좋아하는 장소 ♥"가 맞음)은 AI가 있으면 AI로, 없거나 실패하면 규칙으로
+async function auditAutoRun(rule,o){ if(SAMPLE&&rule.fix.ai){ try{ if(await rule.fix.ai(o)) return; }catch(e){ quietErr(e,'auditAutoRun'); } } rule.fix.run(o); }
 async function auditFixOne(rule,o){ const m=rule.fix.mode;
-  if(m==='auto'){ rule.fix.run(o); auditMarkObj(o); return true; }
+  if(m==='auto'){ await auditAutoRun(rule,o); auditMarkObj(o); return true; }
   if(m==='ai') return !!(await auditAIFill(o,rule.fix.fields));
   if(m==='ai-stage') return !!(await auditAIStage(o));
   if(m==='ai-rules') return !!(await rulesAIFill());
@@ -14215,7 +14217,7 @@ document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); 
    원안의 liveTick이 게임이 구동되는 동안 장·이벤트·톡을 AI로 만들듯, 포크 기능의 내용이 비어 있으면 구동 중에 자동으로 채워요.
    채우는 방법은 콘텐츠 점검(0535) 규칙의 고치기를 그대로 써요(auditFixOne). 자동이 기본이고, 사용자는 콘텐츠 점검·각 화면에서
    직접 고치거나 AI에 추가 지시할 수 있어요. 설정 → 라이브 운영의 "빈 콘텐츠 자동 채움"으로 끌 수 있어요(live.on.fill) */
-const LIVE_FILL_AUTO=['g_spots','g_codex','c_symbol','c_pos','c_range','s_rules']; // 규칙으로 채움(AI 없음) — 빈 것은 매번
+const LIVE_FILL_AUTO=['g_spots','g_codex','c_symbol','c_pos','c_range','s_rules']; // 규칙으로 채움(일정 장소만 글 AI가 있으면 AI로 — auditAutoRun) — 빈 것은 매번
 const LIVE_FILL_AI=['c_persona','c_afftalk','c_memorial','c_spot','s_direct'];    // AI로 채움 — 한 번에 LIVE_FILL_MAX개까지
 const LIVE_FILL_OWNED=new Set(['c_afftalk','c_memorial','c_spot']);              // 만날 수 있는(보유한) 대원부터
 const LIVE_FILL_NAME={g_spots:'일정 장소',g_codex:'도감 규칙',c_symbol:'상징 컬러·아이템',c_pos:'포지션',c_range:'사거리',s_rules:'전장 규칙',c_persona:'개성 시트',c_afftalk:'인연 톡',c_memorial:'메모리얼',c_spot:'일정 장면',s_direct:'대본 연출'};

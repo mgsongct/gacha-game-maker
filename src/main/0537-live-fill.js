@@ -2,7 +2,7 @@
    원안의 liveTick이 게임이 구동되는 동안 장·이벤트·톡을 AI로 만들듯, 포크 기능의 내용이 비어 있으면 구동 중에 자동으로 채워요.
    채우는 방법은 콘텐츠 점검(0535) 규칙의 고치기를 그대로 써요(auditFixOne). 자동이 기본이고, 사용자는 콘텐츠 점검·각 화면에서
    직접 고치거나 AI에 추가 지시할 수 있어요. 설정 → 라이브 운영의 "빈 콘텐츠 자동 채움"으로 끌 수 있어요(live.on.fill) */
-const LIVE_FILL_AUTO=['g_spots','g_codex','c_symbol','c_pos','c_range','s_rules']; // 규칙으로 채움(AI 없음) — 빈 것은 매번
+const LIVE_FILL_AUTO=['g_spots','g_codex','c_symbol','c_pos','c_range','s_rules']; // 규칙으로 채움(일정 장소만 글 AI가 있으면 AI로 — auditAutoRun) — 빈 것은 매번
 const LIVE_FILL_AI=['c_persona','c_afftalk','c_memorial','c_spot','s_direct'];    // AI로 채움 — 한 번에 LIVE_FILL_MAX개까지
 const LIVE_FILL_OWNED=new Set(['c_afftalk','c_memorial','c_spot']);              // 만날 수 있는(보유한) 대원부터
 const LIVE_FILL_NAME={g_spots:'일정 장소',g_codex:'도감 규칙',c_symbol:'상징 컬러·아이템',c_pos:'포지션',c_range:'사거리',s_rules:'전장 규칙',c_persona:'개성 시트',c_afftalk:'인연 톡',c_memorial:'메모리얼',c_spot:'일정 장면',s_direct:'대본 연출'};

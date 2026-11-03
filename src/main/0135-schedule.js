@@ -3,7 +3,7 @@
    좋아하는 것(개성 시트 likes·hobby)이 장소 태그와 맞으면 "좋아하는 장소" → 호감도 1.5배.
    - 장소 G.meta.spots=[{id,name,desc,bg,tags}] : 자료실 배경에서 자동으로 만들거나(spotsAuto) AI로(spotsAI)
    - 장면 c.spotTalk={[spot id]:대본} : AI로(spotTalkAI) 만들고, 없으면 개성 시트로 짧은 기본 장면(spotTemplate)
-   - 생성 연계: 점검 규칙 g_spots(장소 없음 → 자동), c_spot(장면 없음 → AI) · 문서 docs/research/combat-content.md */
+   - 생성 연계: 점검 규칙 g_spots(장소 없음 → 글 AI가 있으면 AI, 없으면 자료실 배경), c_spot(장면 없음 → AI) · 문서 docs/research/combat-content.md */
 const SCHED_N=3;
 function SCHED(){ const p=P(); if(!p.sched||p.sched.day!==today()) p.sched={day:today(),left:SCHED_N,done:[]}; return p.sched; }
 function spots(){ return Array.isArray(G.meta.spots)?G.meta.spots:[]; }
