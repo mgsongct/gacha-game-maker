@@ -40,6 +40,36 @@ try {
   assert.ok(at('window.__EDITED__=1;') < at('window.__HELLO_MAIN__') && at('window.__HELLO_MAIN__') < at('독립 앱 전용'));
   console.log('ok 3  추가 모듈·파트가 제 순서로 들어감');
 
+  // 7) 건조/영입 엔진(순수 함수): 등급 개방·확률·역할 편향·레시피·조건·이미지 프롬프트
+  const K = createRequire(import.meta.url)(join(ROOT, 'src/modules/app/020-construct.js'));
+  const seq = seed => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const low = K.rates([30, 30, 30, 30], {}), mid = K.rates([300, 300, 300, 300], {}), high = K.rates([999, 999, 999, 999], {});
+  assert.equal(low.rarity[1], 100); assert.equal(mid.rarity[3], 0); assert.ok(mid.rarity[2] > 0 && !mid.open[3]);
+  assert.ok(high.open[3] && Math.abs(high.rarity[3] - 10) < 1e-9 && Math.abs(high.rarity[2] - 40) < 1e-9, JSON.stringify(high.rarity));
+  // 분류 캡: 최소 투입은 지원만, 탄약 100↑이면 공격, 합금 100↑이면 방어가 열려요
+  const open = t => K.rates(t, {}).groups.filter(g => g.open).map(g => g.id).join();
+  assert.equal(open([30, 30, 30, 30]), 'g_sup'); assert.equal(open([30, 100, 30, 30]), 'g_sup,g_atk'); assert.equal(open([30, 100, 100, 30]), 'g_sup,g_atk,g_def');
+  const atkHeavy = K.rates([100, 700, 100, 100], {}).groups, gp = id => atkHeavy.find(g => g.id === id).p;
+  assert.ok(gp('g_atk') > 60 && gp('g_def') < 20 && Math.abs(atkHeavy.reduce((a, g) => a + g.p, 0) - 100) < 1e-9);
+  const pool = [{ id: 'a', rarity: 1, role: 'atk' }, { id: 'd', rarity: 1, role: 'def' }, { id: 's', rarity: 1, role: 'sup' }, { id: 'S', rarity: 3, role: 'sup' }], rng = seq(7), cnt = { a: 0, d: 0, s: 0, S: 0 };
+  const tb = K.table([100, 700, 100, 100], {}, pool); assert.ok(Math.abs(tb.rows.reduce((a, r) => a + r.p, 0) - 100) < 1e-9 && !tb.rows.some(r => r.id === 'S'), 'SSR 캡이 닫혀 있으면 SSR은 테이블에 없어요');
+  for (let i = 0; i < 3000; i++) cnt[K.roll([100, 700, 100, 100], {}, pool, [], rng).id]++;
+  assert.ok(cnt.a > cnt.d * 2.5 && cnt.a > cnt.s * 2.5 && cnt.S === 0, JSON.stringify(cnt));
+  assert.ok(K.table([999, 999, 999, 999], {}, pool).rows.some(r => r.id === 'S'), 'SSR 캡이 열리면 테이블에 들어와요');
+  const rc = { recipes: [{ id: 'x', name: 'x', min: [100, 600, 100, 100], effect: { type: 'char', value: 'a', up: 3 } }] };
+  assert.deepEqual(K.rates([100, 700, 100, 100], rc).recipes.map(r => r.id), ['x']); assert.equal(K.rates([100, 500, 100, 100], rc).recipes.length, 0);
+  const shareCfg = { groups: [{ id: 'g', name: 'g', match: {}, min: [30, 30, 30, 30], share: { 3: [0.4, 1] }, weight: { base: 1 } }] };
+  assert.equal(K.rates([100, 100, 100, 100], shareCfg).groups[0].open, false); assert.equal(K.rates([100, 100, 100, 300], shareCfg).groups[0].open, true);
+  assert.equal(K.roll([30, 30, 30, 30], {}, [{ id: 'z', rarity: 3, role: 'atk' }], [], seq(3)).kind, 'none'); // SSR만 있고 아직 안 열림
+  const tpl = { id: 'v', name: '수영복', prompt: 'swimsuit, beach', chance: 100, recipe: { min: [400, 100, 100, 400] } };
+  assert.equal(K.roll([400, 100, 100, 400], {}, pool, [{ tpl, bases: [{ id: 'b' }] }], seq(5)).kind, 'variant');
+  const ch = { name: '세라', faction: '새벽등대', role: 'atk', elem: '홍', atk: 170, rarity: 3, naiPrompt: '1girl, solo, long crimson hair, amber eyes, black tactical bodysuit, long dark coat, holding sniper rifle, full body', weapon: { prompt: 'no humans, object focus, long sniper rifle with red scope, simple background' } };
+  assert.ok(K.condMatch({ factions: ['새벽등대'], stats: [{ k: 'atk', op: '>=', v: 150 }], lv: 10 }, ch, { own: { lv: 12 } }));
+  assert.ok(!K.condMatch({ stats: [{ k: 'atk', op: '>=', v: 200 }] }, ch, {}) && !K.condMatch({ cleared: ['s11'] }, ch, { cleared: {} }) && K.condMatch({}, ch, {}));
+  const vp = K.variantPrompt(ch, tpl);
+  assert.ok(/swimsuit/.test(vp) && /long crimson hair/.test(vp) && /crimson color scheme/.test(vp) && /long sniper rifle with red scope motif/.test(vp) && !/bodysuit|coat|holding/.test(vp), vp);
+  console.log('ok 7  건조 엔진: 분류 캡(자원별 최소·비율) 해제로 확률 테이블 구성, 총량으로 희귀도 캡, 특수 레시피·바리에이션·조건·디자인 프롬프트');
+
   let chromium; try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch (e) {}
   if (!chromium) { console.log('skip 4  playwright 없음: 브라우저 실행 검사 생략'); process.exit(0); }
   const www = join(tmp, 'www'); cpSync(join(ROOT, 'www'), www, { recursive: true }); writeFileSync(join(www, 'index.html'), html);
@@ -86,6 +116,61 @@ try {
   await p2.waitForEvent('load', { timeout: 20000 });
   await p2.waitForFunction(() => typeof PJ === 'function' && typeof G === 'object' && typeof idbGet === 'function', null, { timeout: 15000 });
   const after = await p2.evaluate(async c => { const b = await idbGet(IMGNS + c); return { n: PJ().list.length, active: PJ().active, title: G.meta.title, img: G.chars[0].img, blob: b && b.size }; }, r5.cid);
+
+  // 8) 실제 빌드에서 건조/영입: 켜기 → 시작 자원, 구매, 원정 보상, 일반 건조, 레시피로 바리에이션(AI 없이 규칙 디자인), 뽑기 풀에서 제외
+  const p8 = await browser.newPage(), err8 = []; p8.on('pageerror', e => err8.push(String(e)));
+  await p8.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  await p8.goto(`http://127.0.0.1:${server.address().port}/?t=8`);
+  await p8.waitForFunction(() => typeof conSave === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r8 = await p8.evaluate(async () => {
+    const out = {}; tab = 'studio'; STTAB = 'game'; render(); out.panel = !!document.querySelector('[data-act="contoggle"]');
+    openConSet(); document.querySelector('#con_on').checked = true; const fac = document.querySelector('[data-vi="0"] [data-vf="factions"]'); fac.value = G.chars[0].faction; await conSave();
+    out.on = conOn(); out.start = { ...CRES() }; out.cond = VARIANTS()[0].cond.factions;
+    P().gems = 10000; conBuy('res1'); out.bought = CRES().res1 - out.start.res1; out.gems = P().gems;
+    out.disp = Object.keys(dispOffer([]).reward).filter(k => /^res/.test(k)).length;
+    const base = G.chars[0]; if (!own(base.id)) grantOwned(base, 't'); conMeta().recipes = []; // 레시피 편향 없이
+    tab = 'construct'; render(); out.page = !!document.querySelector('[data-act="conbuild"]');
+    Math.random = (() => { let s = 42; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+    const before = CRES().res2; [30, 30, 30, 30].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild(); out.spent = before - CRES().res2; out.n1 = CBUILD().n;
+    VARIANTS().forEach(t => { t.chance = t.id === 'v_swim' ? 100 : 0; }); CRES().res1 += 1000; CRES().res4 += 1000;
+    [400, 100, 100, 400].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild();
+    const v = G.chars.find(x => x.cvar === 'v_swim'), vb = v && charById(v.alt); out.variant = v && { base: vb && vb.name, baseOwned: !!(vb && own(vb.id)), name: v.name, owned: !!own(v.id), prompt: v.naiPrompt, inGacha: bannerPool(G.banners[0]).includes(v) };
+    out.found = !!CBUILD().found['v:v_swim']; out.log = CBUILD().log.length; return out;
+  });
+  assert.ok(r8.panel && r8.on && r8.page, JSON.stringify(r8));
+  assert.ok(Object.values(r8.start).every(v => v >= 600)); assert.equal(r8.bought, 300); assert.equal(r8.gems, 10000 - 60); assert.equal(r8.disp, 2); assert.equal(r8.spent, 30); assert.equal(r8.n1, 1);
+  assert.ok(r8.variant && r8.variant.owned && r8.variant.baseOwned && r8.variant.name === r8.variant.base + '(수영복)' && /swimsuit/.test(r8.variant.prompt) && !r8.variant.inGacha, JSON.stringify(r8.variant));
+  assert.ok(r8.found && r8.log === 2 && r8.cond.length === 1); assert.deepEqual(err8, [], '페이지 오류');
+  console.log(`ok 8  건조/영입: 켜기·시작 자원·가챠돌 구매·원정 보상·일반 건조·레시피 바리에이션(${r8.variant.name})·뽑기 제외`);
+
+  // 9) 상속형 이격: 수정치만 저장, 원본을 고치면 안 바꾼 항목은 같이 바뀜, 바꾼 항목은 유지, 능력치는 가중치로
+  const p9 = await browser.newPage(), err9 = []; p9.on('pageerror', e => err9.push(String(e)));
+  await p9.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  const url9 = `http://127.0.0.1:${server.address().port}/?t=9`; await p9.goto(url9);
+  await p9.waitForFunction(() => typeof inheritDiff === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r9 = await p9.evaluate(async () => {
+    const b = G.chars.find(c => !c.alt && !c.cvar), a = cleanChar({ ...JSON.parse(JSON.stringify(b)), name: b.name + '(테스트)' });
+    a.alt = b.id; Object.assign(a, { faction: b.faction, role: b.role, skills: JSON.parse(JSON.stringify(b.skills)), profile: b.profile, lines: b.lines, touch: b.touch, affLines: b.affLines, lvLines: b.lvLines, dupLines: b.dupLines, files: b.files, intro: b.intro, rarity: b.rarity, skill: b.skill, age: b.age, hp: b.hp, def: b.def, spd: b.spd });
+    a.elem = ELEMS.find(e => e !== b.elem); a.atk = Math.round(b.atk * 1.2); G.chars.push(a); mark('c:' + a.id);
+    const o = { over: Object.keys(a.over).sort(), mul: a.over.statMul };
+    b.faction = '상속테스트'; b.elem = ELEMS.find(e => e !== b.elem && e !== a.elem); b.atk = b.atk + 50; b.skills.passive.name = '원본스킬수정'; mark('c:' + b.id);
+    o.faction = a.faction; o.elemKept = a.elem !== b.elem; o.atk = [a.atk, Math.round(b.atk * a.over.statMul.atk)]; o.skill = a.skills.passive.name;
+    await flush(); const stored = JSON.parse(appStorage.getItem(LKEY)).chars.find(c => c.id === a.id);
+    o.stored = { faction: 'faction' in stored, atk: 'atk' in stored, skills: 'skills' in stored, elem: stored.elem === a.elem, over: !!stored.over, name: stored.name };
+    o.html = inheritHTML(a).includes('data-act="inhreset"'); window.__A = a.id; window.__B = b.id; return o;
+  });
+  await p9.reload(); await p9.waitForFunction(() => typeof G === 'object' && typeof inheritReset === 'function', null, { timeout: 15000 });
+  const r9b = await p9.evaluate(() => { const a = charById(window.__A || ''), id = a ? a.id : G.chars.find(c => c.alt && c.over && c.name.endsWith('(테스트)')).id, x = charById(id), b = charById(x.alt);
+    const o = { faction: x.faction, base: b.faction, skill: x.skills.passive.name, elemDiff: x.elem !== b.elem, atk: x.atk === Math.round(b.atk * x.over.statMul.atk) };
+    inheritReset(x, 'elem'); o.reset = x.elem === b.elem && !('elem' in x.over);
+    o.orphan = (() => { const ids = new Set(); return Object.keys(inheritStore(x, ids)).includes('faction'); })(); // 원본이 없으면 전체 저장
+    return o; });
+  assert.ok(r9.over.includes('elem') && !r9.over.includes('faction') && r9.mul && r9.mul.atk === 1.2, JSON.stringify(r9));
+  assert.equal(r9.faction, '상속테스트'); assert.ok(r9.elemKept); assert.equal(r9.atk[0], r9.atk[1]); assert.equal(r9.skill, '원본스킬수정');
+  assert.ok(!r9.stored.faction && !r9.stored.atk && !r9.stored.skills && r9.stored.elem && r9.stored.over && r9.html, JSON.stringify(r9.stored));
+  assert.ok(r9b.faction === '상속테스트' && r9b.base === '상속테스트' && r9b.skill === '원본스킬수정' && r9b.elemDiff && r9b.atk && r9b.reset && r9b.orphan, JSON.stringify(r9b));
+  assert.deepEqual(err9, [], '페이지 오류');
+  console.log('ok 9  상속형 이격: 저장은 수정치만(over), 원본 수정(소속·스킬·능력치)이 이격에 반영, 바꾼 속성은 유지, 되돌리기, 다시 열어도 같음');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);

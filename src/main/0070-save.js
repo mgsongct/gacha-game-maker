@@ -42,6 +42,7 @@ function fix(g){
   const old=(g.ver||1)<VER;
   g.world=Object.assign(d.world,g.world||{}); if(!Array.isArray(g.world.factions)) g.world.factions=[];
   g.chars=Array.isArray(g.chars)?g.chars:d.chars;
+  if(inheritAll(g)) g.__curveNew=true; // 이격 = 원본 + 수정치 (0065-inherit.js)
   g.chars.forEach(c=>{
     const dc=DEFAULT_CHARS.find(x=>x.id===c.id);
     c.episodes=Array.isArray(c.episodes)?c.episodes:[];
@@ -116,14 +117,14 @@ let DB=null,BASE=null,SAMPLE=null,ASSETS=null;
 // Draft builders temporarily use G; persistence must keep the real game.
 let NEW_GAME_SOURCE=null;
 const dirty=new Set(); let flushT=null,saveRevision=0,saveTail=Promise.resolve();
-function mark(...k){if(NEW_GAME_SOURCE&&G!==NEW_GAME_SOURCE)return;naiBlocksGame(G);k.forEach(x=>dirty.add(x));saveRevision++;clearTimeout(flushT);flushT=setTimeout(()=>flush().catch(()=>{}),100);}
+function mark(...k){if(NEW_GAME_SOURCE&&G!==NEW_GAME_SOURCE)return;naiBlocksGame(G);for(const x of k)if(typeof x==='string'&&x.startsWith('c:'))inheritOnMark(x.slice(2));k.forEach(x=>dirty.add(x));saveRevision++;clearTimeout(flushT);flushT=setTimeout(()=>flush().catch(()=>{}),100);}
 function flushNow(){if(dirty.size){clearTimeout(flushT);flush().catch(()=>{});}}
 addEventListener('pagehide',flushNow);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushNow();},true);
 function markAll(){mark('meta','world','prog','opening',...G.chars.map(c=>'c:'+c.id),...G.chapters.map(c=>'ch:'+c.id),...G.lib.map(l=>'l:'+l.id),...G.threads.map(t=>'t:'+t.id));}
 function flush(){
  if(window.__NOFLUSH)return appStorage.drain();
  const run=async()=>{if(!dirty.size)return appStorage.drain();const game=NEW_GAME_SOURCE||G,revision=saveRevision,keys=[...dirty],oldAt=game.prog.savedAt;const at=Date.now();
- try{const snapshot=JSON.stringify({...game,prog:{...game.prog,savedAt:at}});appStorage.setItem(LKEY,snapshot);await appStorage.drain();game.prog.savedAt=at;
+ try{const bases=new Set((game.chars||[]).filter(x=>!x.alt).map(x=>x.id)),snapshot=JSON.stringify({...game,chars:(game.chars||[]).map(c=>inheritStore(c,bases)),prog:{...game.prog,savedAt:at}});appStorage.setItem(LKEY,snapshot);await appStorage.drain();game.prog.savedAt=at;
  if(DB)for(const k of keys)await writeKey(k,game);
  if(revision===saveRevision)dirty.clear();const b=document.getElementById('save-warning');if(b)b.remove();
  }catch(e){game.prog.savedAt=oldAt;storageWarning(e.message||'기기에 저장하지 못했습니다');throw e;}};

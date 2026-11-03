@@ -153,6 +153,13 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - `bannerPool(b)`: `pool.mode`(all/factions/ids)로 후보 결정.
 - `discover()`: 재화를 써서 AI가 **새 캐릭터를 즉석 생성**하고 바로 획득.
 
+## 8-1. 건조/영입 · 원정 · 바리에이션
+
+- 엔진 `GGMConstruct`(`src/modules/app/020-construct.js`, 순수): `rates`(분류 개방·비중, 희귀도 캡) → `table`(캐릭터별 확률) → `roll`. `condMatch`(바리에이션 적용 조건), `variantPrompt`/`designBrief`(디자인 프롬프트)
+- 화면·상태 `src/main/0505-construct.js`: `constructHTML`(탭 `construct`, 계약 화면 위 진입), `conBuild`, `conBuy`, `conDispReward`(파견 보상에 자원), `conMakeVariant`(AI `aiAltChar` 또는 규칙), 설정 `openConSet`
+- 이격 상속 `src/main/0065-inherit.js`: `mark()`에서 `inheritOnMark`, `fix()`에서 `inheritAll`, `flush()`에서 `inheritStore`
+- 설계·수치: [research/construction.md](research/construction.md), [research/variants.md](research/variants.md)
+
 ## 9. 성장 · 경제 · 콘텐츠
 
 - 성장(성장·성장 곡선 섹션): 레벨(최대 120, 71~ 초월승급), 돌파, 스킬 강화, 전용 무기, 호감도(`addAff`, 레벨별 대사·에피소드 해금). 비용 공식은 `GGMCombat.growthCost/limitBreakCost` 등.

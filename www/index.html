@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.1'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.2'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -2003,6 +2003,101 @@ var appConfirm=window.appConfirm||function(message){
  });
 };
 
+</script>
+<script type="text/ggm-module" id="ggm-app-construct">
+/* 건조/영입 엔진 — 순수 함수(DOM·G 없음). 문서: docs/research/construction.md
+   완전 확률형(가챠)이 아니라, 투입한 자원으로 "확률 테이블"이 만들어져요:
+   1) 분류(group)마다 개방 조건(자원별 최소·최대, 총량, 비율 범위)이 있고, 조건을 넘은 분류만 테이블에 들어가요(캡 해제)
+   2) 열린 분류의 비중 = base + Σ(계수 × 투입량)  → 넣은 자원의 양·비율로 분류 확률이 정해져요
+   3) 희귀도 캡: 총량이 기준을 넘어야 SR·SSR이 열리고, 열린 뒤 총량에 비례해 확률이 올라요(분류마다 최대 희귀도 제한 가능)
+   4) 특수 레시피(최소 투입 조건)로 소속·캐릭터 확률 업, 바리에이션 템플릿 레시피로 바리에이션 개방 */
+(function(root){'use strict';
+const RES=['res1','res2','res3','res4'];
+const DEFAULTS={on:false,min:30,max:999,step:10,start:600,
+ // 희귀도 캡: 총 투입량 기준. SR은 sr.open 이상, SSR은 ssr.open 이상. 열린 뒤 총량이 늘수록 base → base+grow 까지 선형
+ sr:{open:800,base:18,grow:22},ssr:{open:2000,base:3,grow:7},
+ // 분류: match(역할·소속·속성) · 개방 조건 min/max(자원별)·total·share(자원 번호:[최소비율,최대비율]) · 비중 weight{base,res[4]} · maxRarity
+ groups:[
+  {id:'g_sup',name:'지원',match:{role:'sup'},min:[30,30,30,30],weight:{base:10,res:[.1,0,0,.02]}},
+  {id:'g_atk',name:'공격',match:{role:'atk'},min:[30,100,30,30],weight:{base:10,res:[0,.1,0,.02]}},
+  {id:'g_def',name:'방어',match:{role:'def'},min:[30,30,100,30],weight:{base:10,res:[0,0,.1,.02]}}],
+ buy:{gems:60,amt:300},
+ recipes:[]};
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+function config(c){const d=JSON.parse(JSON.stringify(DEFAULTS)),o=c&&typeof c==='object'?c:{};const r=Object.assign(d,o);
+ r.sr=Object.assign({},DEFAULTS.sr,o.sr||{});r.ssr=Object.assign({},DEFAULTS.ssr,o.ssr||{});r.buy=Object.assign({},DEFAULTS.buy,o.buy||{});
+ r.min=clamp(+r.min||30,1,99999);r.max=clamp(+r.max||999,r.min,99999);if(!Array.isArray(r.recipes))r.recipes=[];
+ if(!Array.isArray(r.groups)||!r.groups.length)r.groups=JSON.parse(JSON.stringify(DEFAULTS.groups));return r;}
+function normalize(input,cfg){return RES.map((k,i)=>clamp(Math.round(+((Array.isArray(input)?input[i]:input?.[k]))||0),cfg.min,cfg.max));}
+function matches(rule,input){ // rule: {min:[a,b,c,d], max?:[...]} — 모든 자원이 min 이상(그리고 max 이하)
+ if(!rule||!Array.isArray(rule.min))return false;return input.every((v,i)=>v>=(+rule.min[i]||0)&&(!Array.isArray(rule.max)||rule.max[i]==null||v<=+rule.max[i]));}
+function groupOpen(g,r,total,share){ // 분류 개방 조건(캡 해제)
+ if(!matches({min:g.min||[0,0,0,0],max:g.max},r))return false;if(g.total&&total<+g.total)return false;
+ for(const[i,[lo,hi]]of Object.entries(g.share||{}))if(share[i]<(+lo||0)||share[i]>(hi==null?1:+hi))return false;return true;}
+function rates(input,c){
+ const cfg=config(c),r=normalize(input,cfg),total=r.reduce((a,b)=>a+b,0),share=r.map(v=>v/total),top=cfg.max*4;
+ const lin=(t,o)=>total<t.open?0:t.base+t.grow*clamp((total-t.open)/Math.max(1,top-t.open),0,1);
+ const ssr=lin(cfg.ssr),sr=Math.min(100-ssr,lin(cfg.sr));
+ const groups=cfg.groups.map(g=>{const open=groupOpen(g,r,total,share),w=open?Math.max(0,(+g.weight?.base||0)+r.reduce((a,v,i)=>a+v*(+(g.weight?.res||[])[i]||0),0)):0;return {id:g.id,name:g.name,match:g.match||{},maxRarity:+g.maxRarity||3,open,w,need:{min:g.min,max:g.max,total:g.total,share:g.share}};});
+ const W=groups.reduce((a,g)=>a+g.w,0);groups.forEach(g=>{g.p=W>0?g.w/W*100:0;});
+ const recipes=cfg.recipes.filter(x=>x&&x.on!==false&&matches(x,r));
+ return {input:r,total,share,rarity:{3:ssr,2:sr,1:100-ssr-sr},groups,recipes,open:{2:total>=cfg.sr.open,3:total>=cfg.ssr.open}};}
+const inGroup=(p,m)=>(!m.role||p.role===m.role)&&(!m.faction||p.faction===m.faction)&&(!m.elem||p.elem===m.elem);
+// 이번 투입의 최종 확률 테이블: 분류 확률 × (그 분류 안의 희귀도 확률, 최대 희귀도 제한 반영) → 캐릭터별 확률. 후보가 없는 칸은 같은 분류의 다른 희귀도로 옮겨요
+function table(input,c,pool){
+ const info=rates(input,c),rows=new Map(),add=(p,v)=>rows.set(p.id,(rows.get(p.id)||0)+v);
+ const up=p=>info.recipes.reduce((m,rc)=>{const e=rc.effect||{};return m*((e.type==='faction'&&e.value===p.faction)||(e.type==='char'&&e.value===p.id)||(e.type==='role'&&e.value===p.role)?Math.max(1,+e.up||2):1);},1);
+ for(const g of info.groups.filter(g=>g.p>0)){
+  const mem=pool.filter(p=>inGroup(p,g.match)),rar=[3,2,1].filter(k=>k<=g.maxRarity&&(k===1||info.open[k])),pr={};let left=0;
+  for(const k of rar)pr[k]=k===1?100-rar.filter(x=>x>1).reduce((a,x)=>a+info.rarity[x],0):info.rarity[k];
+  const has=k=>mem.some(p=>p.rarity===k),avail=rar.filter(has);if(!avail.length)continue;
+  for(const k of rar)if(!has(k)){left+=pr[k];pr[k]=0;}
+  const sum=avail.reduce((a,k)=>a+pr[k],0);for(const k of avail){const share=sum>0?pr[k]/sum*(sum+left):(100/avail.length),m=mem.filter(p=>p.rarity===k),U=m.reduce((a,p)=>a+up(p),0);for(const p of m)add(p,g.p*share/100*up(p)/U);}}
+ const S=[...rows.values()].reduce((a,b)=>a+b,0);
+ return {info,rows:[...rows].map(([id,v])=>({id,p:S>0?v/S*100:0})).sort((a,b)=>b.p-a.p)};}
+function weighted(items,weight,rng){const w=items.map(weight),s=w.reduce((a,b)=>a+b,0);if(!(s>0))return items[Math.floor(rng()*items.length)];let x=rng()*s;for(let i=0;i<items.length;i++){x-=w[i];if(x<0)return items[i];}return items[items.length-1];}
+/* roll: pool = 건조로 나올 수 있는 캐릭터들 [{id,rarity,role,faction}], variants = 이번 투입으로 열린 바리에이션 후보 [{tpl, bases:[...]}] */
+function roll(input,c,pool,variants,rng=Math.random){
+ const t=table(input,c,pool),info=t.info;
+ for(const v of variants||[])if(v.bases.length&&rng()*100<(+v.tpl.chance||0))return {kind:'variant',tpl:v.tpl,base:v.bases[Math.floor(rng()*v.bases.length)],info,table:t};
+ if(!t.rows.length)return {kind:'none',info,table:t};
+ const pick=weighted(t.rows,x=>x.p,rng),p=pool.find(x=>x.id===pick.id);
+ return {kind:'char',id:pick.id,rarity:p.rarity,info,table:t};}
+/* 바리에이션 적용 조건: 비어 있는 항목은 조건 없음. ctx = {own:{lv,dup,aff}, affLv:n, cleared:{stageId:true}} */
+const OPS={'>=':(a,b)=>a>=b,'<=':(a,b)=>a<=b,'>':(a,b)=>a>b,'<':(a,b)=>a<b,'=':(a,b)=>a==b};
+function condMatch(cond,ch,ctx){cond=cond||{};ctx=ctx||{};const o=ctx.own||{},has=a=>Array.isArray(a)&&a.length;
+ if(has(cond.factions)&&!cond.factions.includes(ch.faction))return false;
+ if(has(cond.roles)&&!cond.roles.includes(ch.role))return false;
+ if(has(cond.elems)&&!cond.elems.includes(ch.elem))return false;
+ if(has(cond.rarity)&&!cond.rarity.map(Number).includes(+ch.rarity))return false;
+ for(const s of cond.stats||[]){if(!s||!s.k)continue;const f=OPS[s.op||'>='];if(!f||!f(+ch[s.k]||0,+s.v||0))return false;}
+ if(cond.lv&&(+o.lv||0)<+cond.lv)return false;
+ if(cond.dup&&(+o.dup||0)<+cond.dup)return false;
+ if(cond.aff&&(+ctx.affLv||0)<+cond.aff)return false;
+ if(has(cond.cleared)&&!cond.cleared.every(id=>ctx.cleared&&ctx.cleared[id]))return false;
+ return true;}
+/* 이미지 프롬프트: 원래 캐릭터의 외모 태그 + 기본형 의상 태그 + 상징 컬러·상징 아이템 */
+const CLOTHES=/(dress|coat|jacket|shirt|blouse|skirt|pants|shorts|uniform|bodysuit|armor|armour|suit|robe|kimono|hoodie|sweater|vest|cape|cloak|gloves|boots|shoes|heels|stockings|thighhighs|pantyhose|leotard|swimsuit|bikini|outfit|clothes|clothing|attire|costume|apron|corset|tie|necktie|scarf|hat|cap|helmet|holding )/i;
+const COMPO=/^(full body|standing|straight-on|simple background|white background|cowboy shot|upper body|portrait|looking at viewer|arms at sides)$/i;
+const tags=s=>String(s||'').split(',').map(t=>t.trim()).filter(Boolean);
+function symbolColor(ch){if(ch.symColor)return String(ch.symColor);const m=tags(ch.naiPrompt).map(t=>t.match(/^([a-z]+(?: [a-z]+)?) (hair|eyes)$/i)).find(Boolean);return m?m[1]:'';}
+function symbolItem(ch){if(ch.symItem)return String(ch.symItem);const w=ch.weapon||{};return tags(w.prompt).filter(t=>!/^(no humans|object focus|simple background|white background|sci-fi|fantasy)$/i.test(t)).slice(0,2).join(', ');}
+function variantPrompt(ch,tpl){
+ const look=tags(ch.naiPrompt).filter(t=>!CLOTHES.test(t)&&!COMPO.test(t)),color=symbolColor(ch),item=symbolItem(ch);
+ const extra=[color&&/^[\x20-\x7e]+$/.test(color)?`${color} color scheme outfit, ${color} accents`:'',item&&/^[\x20-\x7e]+$/.test(item)?`${item} motif accessory`:''].filter(Boolean);
+ return [...look,...tags(tpl.prompt),...extra,'full body','standing','simple background','white background'].filter((t,i,a)=>a.indexOf(t)===i).join(', ');}
+function designBrief(ch,tpl){const color=symbolColor(ch),item=symbolItem(ch);
+ return `의상 기본형 「${tpl.name}」(${tpl.prompt||tpl.name}). ${ch.name}의 외모 특징은 그대로 두고, 상징 컬러${color?`(${color})`:''}와 상징 아이템${item?`(${item})`:''}·성격을 의상 디자인에 녹인다. naiPrompt에는 원래 외모 태그 + 이 의상의 영어 태그를 자세히 쓴다.${tpl.brief?' 추가 지시: '+tpl.brief:''}`;}
+const VARIANT_DEFAULTS=[
+ {id:'v_swim',name:'수영복',prompt:'swimsuit, beach, summer, sunlight',chance:35,recipe:{min:[400,100,100,400]}},
+ {id:'v_school',name:'교복',prompt:'blazer, formal school-style uniform cosplay, adult',chance:35,recipe:{min:[100,400,100,400]}},
+ {id:'v_armor',name:'갑옷',prompt:'fantasy plate armor, ornate armor, cape',chance:30,recipe:{min:[100,100,500,400]}},
+ {id:'v_stage1',name:'공연의상1',prompt:'idol stage costume, frills, stage lights',chance:30,recipe:{min:[300,300,100,500]}},
+ {id:'v_stage2',name:'공연의상2',prompt:'elegant evening gown, concert stage, spotlight',chance:30,recipe:{min:[500,100,300,500]}},
+ {id:'v_stage3',name:'공연의상3',prompt:'rock band stage outfit, leather, electric guitar',chance:30,recipe:{min:[100,500,300,500]}}].map(v=>Object.assign({on:true,rarity:'same',brief:'',cond:{}},v));
+const api={RES,DEFAULTS,VARIANT_DEFAULTS,config,normalize,matches,rates,table,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
+root.GGMConstruct=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);
 </script>
 <!-- COMBAT_V2_BUNDLE -->
 <script type="text/ggm-module" id="ggm-combat-catalog">
@@ -4338,12 +4433,12 @@ const REFUND = {3:300,2:80,1:30};
 const COST = 120;
 const VER = 3;
 const DEFAULT_META={materialTermNamesVersion:1,title:'낙성계약',sub:'STARFALL CONTRACT',theme:'tactical',accent:'#ffb400',
-  terms:{player:'관리관',currency:'성석',gold:'크레딧',expMat:'전투 기록',wMat:'스킬 교본',core:'승급(Lv1~70) 재료',gearMat:'장비 강화 재료',transcMat:'초월승급(Lv71~120) 재료',gacha:'계약',ops:'작전',crew:'대원',talk:'등대톡',dispatch:'파견',farm:'훈련',pass:'시즌 패스',event:'이벤트',weapon:'전용 무기',files:'기밀 파일',skin:'스킨',enhance:'강화',limit:'돌파',abyss:'미지 탐사'},
+  terms:{player:'관리관',currency:'성석',gold:'크레딧',expMat:'전투 기록',wMat:'스킬 교본',core:'승급(Lv1~70) 재료',gearMat:'장비 강화 재료',transcMat:'초월승급(Lv71~120) 재료',gacha:'계약',ops:'작전',crew:'대원',talk:'등대톡',dispatch:'파견',farm:'훈련',pass:'시즌 패스',event:'이벤트',weapon:'전용 무기',files:'기밀 파일',skin:'스킨',enhance:'강화',limit:'돌파',abyss:'미지 탐사',construct:'영입',res1:'연료',res2:'탄약',res3:'합금',res4:'부품'},
   elems:[{n:'홍',c:'#ff5a5a'},{n:'녹',c:'#4fd18b'},{n:'청',c:'#4fa3ff'}],
   roles:{atk:'공격',def:'방어',sup:'지원'},
   farms:[{key:'exp',name:'전투 기록 회수'},{key:'gold',name:'크레딧 수급'},{key:'wmat',name:'스킬 교본 회수'},{key:'core',name:'성핵 코어 정제'}],
   shop:{name:'보급관',charId:'',hello:['어서 와요, {관리관}. 오늘은 뭐가 필요해요?','재고 넉넉해요. 천천히 골라요.','오늘 들어온 물건, 꽤 괜찮아요.'],buy:['좋은 선택이에요!','고마워요. 다음에 또 와요.','포장해 둘게요. 잘 쓰세요.'],poor:['음… 그건 조금 모자라요.','작전 한 번 다녀오면 살 수 있을 거예요.']}};
-const TERM_LABEL={player:'플레이어 호칭',currency:'유료 재화',gold:'일반 재화',expMat:'경험치 재료',wMat:'스킬 강화 재료',core:'승급(Lv1~70) 재료',gearMat:'장비 강화 재료',transcMat:'초월승급(Lv71~120) 재료',gacha:'뽑기 이름',ops:'전투 메뉴',crew:'아군 호칭',talk:'메신저 앱',dispatch:'파견',farm:'재료 던전',pass:'패스',event:'이벤트',weapon:'전용 무기',files:'캐릭터 기록',skin:'스킨',enhance:'강화',limit:'돌파',abyss:'로그라이크 탐험'};
+const TERM_LABEL={player:'플레이어 호칭',currency:'유료 재화',gold:'일반 재화',expMat:'경험치 재료',wMat:'스킬 강화 재료',core:'승급(Lv1~70) 재료',gearMat:'장비 강화 재료',transcMat:'초월승급(Lv71~120) 재료',gacha:'뽑기 이름',ops:'전투 메뉴',crew:'아군 호칭',talk:'메신저 앱',dispatch:'파견',farm:'재료 던전',pass:'패스',event:'이벤트',weapon:'전용 무기',files:'캐릭터 기록',skin:'스킨',enhance:'강화',limit:'돌파',abyss:'로그라이크 탐험',construct:'건조/영입 메뉴',res1:'건조 자원 1',res2:'건조 자원 2',res3:'건조 자원 3',res4:'건조 자원 4 (바리에이션)'};
 // Names are metadata only; saved runs and reward identifiers remain unchanged.
 function explorationName(value){return typeof value==='string'&&value.trim()?value.replace(/\s+/g,' ').trim().slice(0,12):'미지 탐사';}
 const EXPLORATION_NAME_RULE='탐사 콘텐츠 이름(terms.abyss)은 세계관에 어울리는 2~12자 이름으로 짓는다. 파티를 편성해 여러 구역에서 전투·발견·사건을 겪고 돌아오는 반복 탐사 콘텐츠다. 지하·심연을 전제하지 말고, 다른 메뉴 이름과 구분한다.';
@@ -6199,6 +6294,48 @@ function charReact(el,lv,zone){ if(!el) return; const k=zone==='body'?(lv>=6?'sh
 function floatAt(x,y,t){const f=document.createElement('div');f.className='float';f.textContent=t;f.style.left=(x-12)+'px';f.style.top=(y-16)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),800);}
 function shootHTML(n){let s='';for(let i=0;i<n;i++)s+=`<i class="shoot" style="top:${Math.round(Math.random()*45)}%;left:${50+Math.round(Math.random()*60)}%;animation-delay:${(i*0.9+Math.random()).toFixed(1)}s"></i>`;return s;}
 
+/* ===== 캐릭터 상속 (이격·바리에이션 = 원본 + 수정치) ===== */
+/* 이격(c.alt = 원본 id)은 원본과 다른 항목만 c.over에 저장해요(git 패치처럼). 원본을 고치면 이격에서 안 바꾼 항목은 같이 바뀌어요.
+   - 상속 항목: inheritKeys(). 이름·그림·외모 프롬프트·에피소드·전용 무기는 이격 자기 것(상속 안 함)
+   - 능력치(hp/atk/def/spd)는 절대값이 아니라 원본 대비 가중치(over.statMul)로 저장 → 원본 능력치가 오르면 같이 올라요
+   - 저장할 때는 상속 항목을 빼고(inheritStore), 불러올 때·원본을 고칠 때 다시 채워요(inheritApply)
+   이 파일은 0070-save.js의 fix()가 불러올 때 쓰므로, 최상위 const 없이 함수 선언만 둬요(호이스팅) */
+function inheritKeys(){ return ['faction','elem','role','rarity','skill','skills','profile','intro','lines','touch','affLines','lvLines','dupLines','files','age','voiceId','voiceName','naiStyle']; }
+function inheritStats(){ return ['hp','atk','def','spd']; }
+function inheritSame(a,b){ return JSON.stringify(a)===JSON.stringify(b); }
+function inheritDiff(c,b){ // 이격 c와 원본 b를 비교해서 다른 것만
+  const o={}; for(const k of inheritKeys()) if(k in c&&!inheritSame(c[k],b[k])) o[k]=JSON.parse(JSON.stringify(c[k]??null));
+  const m={}; for(const k of inheritStats()){ const x=+c[k], y=+b[k]; if(x&&y&&x!==y) m[k]=Math.round(x/y*10000)/10000; } if(Object.keys(m).length) o.statMul=m;
+  return o; }
+function inheritApply(c,b){ // 원본 + 수정치 → 이격 전체
+  const o=c.over||{};
+  for(const k of inheritKeys()) c[k]=JSON.parse(JSON.stringify(k in o?o[k]:(b[k]??null))); for(const k of inheritKeys()) if(c[k]===null&&!(k in o)&&!(k in b)) delete c[k];
+  for(const k of inheritStats()) if(b[k]!=null) c[k]=Math.round(+b[k]*((o.statMul||{})[k]||1));
+  if(!('skills' in o)&&b.skillBalance) c.skillBalance=JSON.parse(JSON.stringify(b.skillBalance)); // 스킬을 물려받으면 밸런스 검사 결과도 같이
+  return c; }
+function inheritAll(g){ // 불러올 때: 예전 이격(전체 복사본)은 지금 값 그대로 수정치를 만들어서 바뀌는 것이 없게
+  const by=new Map((g.chars||[]).map(c=>[c.id,c])); let changed=false;
+  for(const c of g.chars||[]){ const b=c.alt&&by.get(c.alt); if(!b||b.alt) continue;
+    if(!c.over||typeof c.over!=='object'){ c.over=inheritDiff(c,b); changed=true; }
+    inheritApply(c,b); }
+  return changed; }
+function inheritStore(c,ids){ // 저장용: 상속 항목은 빼고 수정치만. 원본이 게임에 없으면(지웠으면) 전체를 그대로 저장해요(물려받을 곳이 없으니까)
+  if(!c||!c.alt||!c.over||(ids&&!ids.has(c.alt))) return c; const s={...c}; for(const k of [...inheritKeys(),...inheritStats(),'skillBalance']) if(!(k in c.over)||k==='skillBalance') delete s[k]; if(c.over.skills) s.skillBalance=c.skillBalance; return s; }
+let INHERIT_SYNC=false;
+function inheritOnMark(id){ // mark('c:'+id) 때: 이격을 고쳤으면 수정치 다시 계산, 원본을 고쳤으면 이격들에 반영
+  if(INHERIT_SYNC||typeof G==='undefined'||!G) return; const c=G.chars.find(x=>x.id===id); if(!c) return;
+  if(c.alt){ const b=G.chars.find(x=>x.id===c.alt); if(b&&!b.alt) c.over=inheritDiff(c,b); return; }
+  const alts=G.chars.filter(x=>x.alt===c.id); if(!alts.length) return;
+  INHERIT_SYNC=true; try{ for(const a of alts){ if(!a.over) a.over=inheritDiff(a,c); inheritApply(a,c); dirty.add('c:'+a.id); } } finally{ INHERIT_SYNC=false; } }
+function inheritReset(c,k){ // 수정치 하나(또는 전부)를 버리고 원본을 따르게
+  const b=c&&c.alt&&G.chars.find(x=>x.id===c.alt); if(!b) return; if(k==='*') c.over={}; else if(k&&c.over){ if(inheritStats().includes(k)&&c.over.statMul){ delete c.over.statMul[k]; if(!Object.keys(c.over.statMul).length) delete c.over.statMul; } else delete c.over[k]; }
+  inheritApply(c,b); INHERIT_SYNC=true; try{ mark('c:'+c.id); } finally{ INHERIT_SYNC=false; } }
+function inheritLabel(k){ return ({faction:'소속',elem:'속성',role:'역할',rarity:'희귀도',skill:'스킬(구형)',skills:'스킬',profile:'프로필',intro:'첫 대사',lines:'대사',touch:'터치 대사',affLines:'호감도 대사',lvLines:'레벨 대사',dupLines:'돌파 대사',files:'기밀 파일',age:'나이',voiceId:'목소리',voiceName:'목소리 이름',naiStyle:'그림체',hp:'체력',atk:'공격',def:'방어',spd:'속도'})[k]||k; }
+function inheritHTML(c){ // 캐릭터 화면의 상속 정보
+  const b=c&&c.alt&&G.chars.find(x=>x.id===c.alt); if(!b||!c.over) return ''; const o=c.over, keys=Object.keys(o).filter(k=>k!=='statMul'), sm=o.statMul||{};
+  const items=[...keys.map(k=>[k,inheritLabel(k)]),...Object.entries(sm).map(([k,v])=>[k,`${inheritLabel(k)} ×${v}`])];
+  return `<div class="panel" style="margin:6px 0;padding:8px 10px"><p class="muted" style="margin:0 0 4px;font-size:.82rem">원본 「${esc(b.name)}」을(를) 물려받아요. 원본을 고치면 아래에 없는 항목은 같이 바뀌어요.</p>${items.length?`<div class="row" style="flex-wrap:wrap;gap:4px">${items.map(([k,l])=>`<button class="chip" data-act="inhreset" data-id="${c.id}" data-k="${k}" title="원본 값으로 되돌리기">${esc(l)} ✕</button>`).join('')}<button class="btn sm ghost" data-act="inhreset" data-id="${c.id}" data-k="*">모두 원본 따르기</button></div>`:'<p class="muted" style="margin:0;font-size:.82rem">바꾼 항목 없음 (모두 원본과 같아요)</p>'}</div>`; }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="inhreset"]'); if(!b) return; const c=charById(b.dataset.id); if(!c) return; inheritReset(c,b.dataset.k); toast(b.dataset.k==='*'?'모든 항목이 원본을 따라요':`${inheritLabel(b.dataset.k)}: 원본 값으로 되돌렸어요`); if(typeof render==='function') render(); if(typeof closeModal==='function'&&!$('#modal').hidden){ const id=c.id; closeModal(); if(typeof openChar==='function') openChar(id); } });
 /* =========================================================
    저장
    ========================================================= */
@@ -6243,6 +6380,7 @@ function fix(g){
   const old=(g.ver||1)<VER;
   g.world=Object.assign(d.world,g.world||{}); if(!Array.isArray(g.world.factions)) g.world.factions=[];
   g.chars=Array.isArray(g.chars)?g.chars:d.chars;
+  if(inheritAll(g)) g.__curveNew=true; // 이격 = 원본 + 수정치 (0065-inherit.js)
   g.chars.forEach(c=>{
     const dc=DEFAULT_CHARS.find(x=>x.id===c.id);
     c.episodes=Array.isArray(c.episodes)?c.episodes:[];
@@ -6317,14 +6455,14 @@ let DB=null,BASE=null,SAMPLE=null,ASSETS=null;
 // Draft builders temporarily use G; persistence must keep the real game.
 let NEW_GAME_SOURCE=null;
 const dirty=new Set(); let flushT=null,saveRevision=0,saveTail=Promise.resolve();
-function mark(...k){if(NEW_GAME_SOURCE&&G!==NEW_GAME_SOURCE)return;naiBlocksGame(G);k.forEach(x=>dirty.add(x));saveRevision++;clearTimeout(flushT);flushT=setTimeout(()=>flush().catch(()=>{}),100);}
+function mark(...k){if(NEW_GAME_SOURCE&&G!==NEW_GAME_SOURCE)return;naiBlocksGame(G);for(const x of k)if(typeof x==='string'&&x.startsWith('c:'))inheritOnMark(x.slice(2));k.forEach(x=>dirty.add(x));saveRevision++;clearTimeout(flushT);flushT=setTimeout(()=>flush().catch(()=>{}),100);}
 function flushNow(){if(dirty.size){clearTimeout(flushT);flush().catch(()=>{});}}
 addEventListener('pagehide',flushNow);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushNow();},true);
 function markAll(){mark('meta','world','prog','opening',...G.chars.map(c=>'c:'+c.id),...G.chapters.map(c=>'ch:'+c.id),...G.lib.map(l=>'l:'+l.id),...G.threads.map(t=>'t:'+t.id));}
 function flush(){
  if(window.__NOFLUSH)return appStorage.drain();
  const run=async()=>{if(!dirty.size)return appStorage.drain();const game=NEW_GAME_SOURCE||G,revision=saveRevision,keys=[...dirty],oldAt=game.prog.savedAt;const at=Date.now();
- try{const snapshot=JSON.stringify({...game,prog:{...game.prog,savedAt:at}});appStorage.setItem(LKEY,snapshot);await appStorage.drain();game.prog.savedAt=at;
+ try{const bases=new Set((game.chars||[]).filter(x=>!x.alt).map(x=>x.id)),snapshot=JSON.stringify({...game,chars:(game.chars||[]).map(c=>inheritStore(c,bases)),prog:{...game.prog,savedAt:at}});appStorage.setItem(LKEY,snapshot);await appStorage.drain();game.prog.savedAt=at;
  if(DB)for(const k of keys)await writeKey(k,game);
  if(revision===saveRevision)dirty.clear();const b=document.getElementById('save-warning');if(b)b.remove();
  }catch(e){game.prog.savedAt=oldAt;storageWarning(e.message||'기기에 저장하지 못했습니다');throw e;}};
@@ -6518,7 +6656,7 @@ $('#file').addEventListener('change',async e=>{
    ========================================================= */
 function own(id){return P().owned[id];}
 const levelCap=o=>Math.min(120,Math.max(Math.min(70,20+10*(o?.dup||0))+capExtra(),o?.legacyLevelCap||0)+(o?.transc||0)*10);
-function rewardText(r){const p=[];if(r.gems)p.push(`◆${nf(r.gems)} ${T('currency')}`);if(r.gold)p.push(`${T('gold')} ${nf(r.gold)}`);if(r.exp)p.push(`${T('expMat')} ${nf(r.exp)}`);if(r.wmat)p.push(`${T('wMat')} ${nf(r.wmat)}`);if(r.core)p.push(`${T('core')} ${nf(r.core)}`);if(r.gearMat)p.push(`${T('gearMat')} ${nf(r.gearMat)}`);if(r.transcMat)p.push(`${T('transcMat')} ${nf(r.transcMat)}`);if(r.token)p.push(`${r.tokenName||'토큰'} ${nf(r.token)}`);if(r.gift)p.push(`선물 ${r.gift}개`);return p.join(', ');}
+function rewardText(r){const p=[];if(r.gems)p.push(`◆${nf(r.gems)} ${T('currency')}`);if(r.gold)p.push(`${T('gold')} ${nf(r.gold)}`);if(r.exp)p.push(`${T('expMat')} ${nf(r.exp)}`);if(r.wmat)p.push(`${T('wMat')} ${nf(r.wmat)}`);if(r.core)p.push(`${T('core')} ${nf(r.core)}`);if(r.gearMat)p.push(`${T('gearMat')} ${nf(r.gearMat)}`);if(r.transcMat)p.push(`${T('transcMat')} ${nf(r.transcMat)}`);['res1','res2','res3','res4'].forEach(k=>{if(r[k])p.push(`${T(k)} ${nf(r[k])}`);});if(r.token)p.push(`${r.tokenName||'토큰'} ${nf(r.token)}`);if(r.gift)p.push(`선물 ${r.gift}개`);return p.join(', ');}
 /* 획득량 배율(설정 → 게임): 전투·소탕·파견·일일 보급으로 '버는' 보상에만 곱해요(상점 구매는 그대로) */
 function rateR(r){ const s=P().settings, o=Object.assign({},r), m=(k,x)=>{ if(typeof o[k]==='number') o[k]=Math.max(0,Math.round(o[k]*x/100)); };
   m('gold',s.goldRate||100); m('gems',s.gemRate||100); ['exp','wmat','core','gearMat','transcMat'].forEach(k=>m(k,s.expRate||100)); return o; }
@@ -6545,7 +6683,7 @@ function openStam(need){ const s=stam(), left=s.v>=STAM_MAX?0:Math.ceil((STAM_MS
     <p class="muted" style="margin:0 0 10px;font-size:.85rem">5분마다 1씩 차요.${s.v<STAM_MAX?` 다음 1 회복까지 ${left}분 · 가득 차기까지 약 ${full}분`:' 지금 가득 찼어요.'}<br>메인·이벤트 전투 10, 재료 던전 8을 써요.</p>
     <div class="row"><button class="btn" data-act="stamfill" ${P().gems>=STAM_FILL[0]?'':'disabled'}>${rIco('gems')} ${STAM_FILL[0]}로 ⚡${STAM_FILL[1]} 회복</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
 setInterval(()=>{ try{ if(typeof G!=='undefined'&&G) updStam(); }catch(e){} },30000);
-function giveReward(r,evId){const p=P();if(r.gift)addGifts(r.gift);if(r.gems)p.gems+=r.gems;if(r.gold)p.gold+=r.gold;['exp','wmat','core','gearMat','transcMat'].forEach(k=>{if(r[k])p.mat[k]=(p.mat[k]||0)+r[k];});if(r.token&&evId)p.tokens[evId]=(p.tokens[evId]||0)+r.token;mark('prog');}
+function giveReward(r,evId){const p=P();if(r.gift)addGifts(r.gift);if(r.gems)p.gems+=r.gems;if(r.gold)p.gold+=r.gold;['exp','wmat','core','gearMat','transcMat'].forEach(k=>{if(r[k])p.mat[k]=(p.mat[k]||0)+r[k];});['res1','res2','res3','res4'].forEach(k=>{if(r[k]){const c=CRES();c[k]=(c[k]||0)+r[k];}});if(r.token&&evId)p.tokens[evId]=(p.tokens[evId]||0)+r.token;mark('prog');}
 const MISSIONS=[{k:'login',name:'출석하기',goal:1,xp:100},{k:'battle',name:'전투 3회',goal:3,xp:150},{k:'pull',name:'뽑기 1회',goal:1,xp:100},{k:'dispatch',name:'파견 보내기',goal:1,xp:100},{k:'touch',name:'로비 터치 5회',goal:5,xp:60},{k:'enhance',name:'강화 1회',goal:1,xp:100}];
 function dm(){const p=P();if(p.dm.date!==today())p.dm={date:today(),cnt:{login:1},got:{}};return p.dm;}
 function bump(k,n){const d=dm();d.cnt[k]=(d.cnt[k]||0)+(n||1);mark('prog');}
@@ -7511,10 +7649,10 @@ function render(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewS
   if(tab==='lobby'&&typeof cashTick==='function') cashTick();
   updStam(); $('#gems').textContent=nf(P().gems); try{ $('#ic_gold').innerHTML=rIco('gold'); $('#ic_gems').innerHTML=rIco('gems'); }catch(e){} $('#gold').textContent=nf(P().gold); dm();
   $('#tb_ops').textContent=T('ops'); $('#tb_gacha').textContent=T('gacha'); $('#tb_crew').textContent=T('crew');
-  const navTab={evshop:'lobby',abyss:'lobby',challenge:'lobby',codex:'lobby',notice:'lobby',event:'lobby',evd:'lobby',farm:'lobby',disp:'lobby',pass:'lobby',shop:'lobby',cash:'lobby'}[tab]||tab;
+  const navTab={evshop:'lobby',abyss:'lobby',challenge:'lobby',codex:'lobby',notice:'lobby',event:'lobby',evd:'lobby',farm:'lobby',disp:'lobby',construct:'contract',pass:'lobby',shop:'lobby',cash:'lobby'}[tab]||tab;
   if(tab!=='lobby') document.body.classList.remove('lb-hidden');
   document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===navTab?'true':'false'));
-  const F={evshop:evShopHTML,abyss:abyssHTML,challenge:challengeHTML,codex:codexHTML,shop:shopHTML,cash:cashHTML,lobby:lobbyHTML,ops:opsHTML,contract:contractHTML,crew:crewHTML,studio:studioHTML,event:eventsHTML,evd:eventDetailHTML,notice:noticeHTML,farm:farmHTML,disp:dispHTML,pass:passHTML};
+  const F={evshop:evShopHTML,abyss:abyssHTML,challenge:challengeHTML,codex:codexHTML,shop:shopHTML,cash:cashHTML,lobby:lobbyHTML,ops:opsHTML,contract:()=>conEntryHTML()+contractHTML(),construct:constructHTML,crew:crewHTML,studio:studioHTML,event:eventsHTML,evd:eventDetailHTML,notice:noticeHTML,farm:farmHTML,disp:dispHTML,pass:passHTML};
   $('#view').innerHTML=(F[tab]||lobbyHTML)();
   document.body.classList.toggle('on-lobby',tab==='lobby'); document.body.classList.toggle('abyss-full',tab==='abyss');
   if(typeof applyDesk==='function') applyDesk();
@@ -8047,6 +8185,7 @@ function studioHTML(){
   const SEC={
   practice:`<div class="panel"><h3>연습장</h3><p class="muted">허수아비를 세워놓고 스킬을 시험할 수 있어요. 파티 구성과 공격 방식·이펙트를 확인하세요. 허수아비는 반격하지 않고 체력이 무제한이며, 행동력 소모와 보상은 없습니다.</p><button class="btn" data-act="v2practice">연습장 열기</button></div>`,
   game:`<div class="panel"><h3>플레이 모드 ${playMode()?'<span class="badge">켜짐</span>':''}</h3>${subLocked()?`<p class="muted" style="margin:0 0 10px">구독한 게임이라 <b>플레이 전용</b>이에요. 스토리·이벤트·캐릭터는 만든 사람이 업데이트하고, 이 기기에서는 시즌·새 이벤트 같은 자체 업데이트도 하지 않아요. AI 키 없이 그대로 즐기면 돼요. 직접 고치고 이어서 만들고 싶으면 아래 '구독 끊기'를 하세요.</p>`:`<p class="muted" style="margin:0 0 10px">켜면 새 캐릭터·스토리 만들기, 편집, 그림 다시 그리기, 글·그림 AI 설정 같은 메뉴를 숨기고 게임만 해요. 이미 연결해 둔 AI는 그대로 써요(${T('talk')}·라이브 운영 등). 언제든 여기서 다시 끌 수 있어요.</p>`}<div class="row">${subLocked()?'':`<button class="btn sm ${playMode()?'ghost':''}" data-act="playmode">${playMode()?'플레이 모드 끄기':'플레이 모드 켜기'}</button>`}${playMode()?`<button class="btn sm ghost" data-act="pj-open">게임 목록 (${pj.list.length})</button>`:''}</div></div>
+  ${conSettingsPanel()}
   <div class="panel pm-hide"><h3>게임</h3><p class="muted" style="margin:0 0 10px">지금 게임: <b>${esc(G.meta.title)}</b>. 세계관, 용어, 속성, 화면 테마를 바꾸거나, AI로 완전히 다른 가챠 게임을 새로 만들 수 있어요. 게임은 여러 개 만들어 두고 오갈 수 있어요.</p>
     <div class="row"><button class="btn sm" data-act="meta-open">게임 정의 편집</button><button class="btn sm" data-act="draft-open">AI로 새 게임 만들기</button><button class="btn sm ghost" data-act="pj-open">게임 목록 (${pj.list.length})</button></div></div>
   <div class="panel"><h3>게시·구독</h3><p class="muted" style="margin:0 0 10px">${G.meta.subscr?`구독 중인 게임이에요 · v${G.meta.subscr.ver||0}${G.meta.subscr.at?' · '+esc(new Date(G.meta.subscr.at).toLocaleDateString())+' 받음':''}. 만든 사람이 업데이트하면 켤 때 알려 줘요.`:G.meta.pub&&G.meta.pub.ver?`게시 중 · v${G.meta.pub.ver}. 새 장·이벤트를 만든 뒤 다시 게시하면 구독한 사람에게 업데이트가 가요.`:'내 게임을 GitHub 공개 저장소에 올려 다른 사람이 구독하게 하거나, 다른 사람이 게시한 게임을 주소로 받아요.'}</p>
@@ -8465,7 +8604,7 @@ function openChar(id){
     <h3 class="sec">표정과 ${T('skin')}</h3>
     <div class="facegrid">${c.faces.map(f=>`<button class="fc" data-act="faceview" data-id="${c.id}" data-f="${f.id}">${imgSrc(f)?`<img src="${esc(imgSrc(f))}" alt="">`:''}<span>${esc(f.name)}</span></button>`).join('')}</div>
     <div class="row" style="margin:8px 0"><button class="btn sm ghost" data-act="faces-open" data-id="${c.id}">표정 만들기</button><button class="btn sm ghost" data-act="skin-open" data-id="${c.id}">${T('skin')} 만들기</button>${c.alt?'':`<button class="btn sm ghost" data-act="altnew" data-id="${c.id}">이격 만들기</button>`}</div>
-    ${c.alt&&charById(c.alt)?`<p class="muted" style="margin:4px 0">이격: <button class="linkb" data-act="char" data-id="${c.alt}">${esc(charById(c.alt).name)}</button>의 다른 모습이에요.</p>`:altsOf(c).length?`<p class="muted" style="margin:4px 0">이격: ${altsOf(c).map(x=>`<button class="linkb" data-act="char" data-id="${x.id}">${esc(x.name)}</button>${own(x.id)?'':' (미보유)'}`).join(' · ')}</p>`:''}
+    ${c.alt&&charById(c.alt)?`<p class="muted" style="margin:4px 0">이격: <button class="linkb" data-act="char" data-id="${c.alt}">${esc(charById(c.alt).name)}</button>의 다른 모습이에요.</p>${inheritHTML(c)}`:altsOf(c).length?`<p class="muted" style="margin:4px 0">이격: ${altsOf(c).map(x=>`<button class="linkb" data-act="char" data-id="${x.id}">${esc(x.name)}</button>${own(x.id)?'':' (미보유)'}`).join(' · ')}</p>`:''}
     ${charImgList(c).length?`<h3 class="sec">그림 저장 <span class="muted" style="font-size:.75rem">${charImgList(c).length}장 · 묶음을 눌러 펼쳐요</span></h3><p class="muted" style="margin:0 0 6px;font-size:.8rem">${IS_NATIVE?'Documents/가챠게임메이커/그림 폴더에 저장돼요.':'휴대폰은 공유하기로 사진 앱에, PC는 다운로드 폴더에 저장돼요.'}</p>${(()=>{ const L=charImgList(c), gs=[...new Set(L.map(x=>x[2]))]; return gs.map(g=>{ const it=L.filter(x=>x[2]===g); return `<details class="isv"><summary>${esc(g)} <span class="muted">${it.length}장</span></summary><div class="isv-grid">${it.map(([o,l])=>`<button class="isv-it" data-act="imgsave" data-id="${c.id}" data-o="${esc(o.id)}"><img src="${esc(imgSrcRaw(o))}" alt="" loading="lazy"><span>⬇ ${esc(l)}</span></button>`).join('')}</div></details>`; }).join(''); })()}`:''}`);
   const info=`
     <div class="row" style="margin-top:4px">${o&&P().sec!==c.id?`<button class="btn sm" data-act="setsec" data-id="${c.id}">로비에 세우기</button>`:''}${o?`<button class="btn sm ghost" data-act="gift" data-id="${c.id}">🎁 선물하기</button>`:''}<button class="btn sm ghost" data-act="charedit" data-id="${c.id}">✏️ 이름·대사 편집</button><button class="btn sm ghost" data-act="puexist" data-id="${c.id}">★ 픽업 배너</button></div>
@@ -9555,6 +9694,7 @@ function dispOffer(taken){ const pool=(G.dispatches&&G.dispatches.length?G.dispa
   let focus=rand(['gold','gold','exp','exp','wmat','core']); if(focus==='core'&&hours<4) focus='exp';
   const pts=Math.pow(hours,0.85)*(1+0.35*(need-1)), r={}; r[focus]=Math.max(1,Math.round(DISP_FOCUS[focus][1]*pts*(focus==='gold'?1:1)));
   if(focus!=='gold') r.gold=Math.round(600*pts/100)*100; if(focus==='gold') r.gold=Math.round(r.gold/100)*100;
+  if(conOn()) Object.assign(r,conDispReward(hours,need)); // 건조/영입이 켜져 있으면 원정으로 건조 자원도 모아 와요
   return {id:'o'+uid(),name:String(tpl.name||'파견'),desc:String(tpl.desc||''),hours,need,reward:r}; }
 function DBOARD(){ const p=P(); let b=p.dboard; if(!b||!Array.isArray(b.list)) b=p.dboard={day:'',list:[],rr:0};
   // 예전 방식으로 보낸 파견은 그대로 이어서 보여 줘요
@@ -11215,7 +11355,8 @@ function gateCheck(){ if(!G.meta.gated) return; const p=P(); p.gateSeen=p.gateSe
   if(n.length){ mark('prog'); setTimeout(()=>toast('📮 새로 열렸어요: '+n.join(', ')),1600); } }
 function curBanner(){const bs=G.banners.filter(bnOpen);return bs.find(b=>b.id===P().curBanner)||bs[0]||null;}
 function bannerPool(b){
-  let pool=G.chars.filter(c=>(!c.limited||(b.pickup||[]).includes(c.id))&&(debutOk(c)||(b.pickup||[]).includes(c.id)));
+  // 건조 전용 바리에이션(c.cvar)은 건조/영입이 켜져 있으면 뽑기에 안 나와요(픽업으로 직접 넣은 건 예외)
+  let pool=G.chars.filter(c=>(!c.limited||(b.pickup||[]).includes(c.id))&&(debutOk(c)||(b.pickup||[]).includes(c.id))&&!(c.cvar&&conOn()&&!(b.pickup||[]).includes(c.id)));
   if(b.pool.mode==='faction') pool=pool.filter(c=>(b.pool.factions||[]).includes(c.faction));
   if(b.pool.mode==='list') pool=pool.filter(c=>(b.pool.ids||[]).includes(c.id));
   (b.pickup||[]).map(charById).filter(Boolean).forEach(c=>{if(!pool.includes(c))pool.push(c);});
@@ -11243,11 +11384,15 @@ function rollOne(guarSR,forceSSR,b){
   else { c=ups.length&&Math.random()*100<(b.rate||50)?rand(ups):rand(cand); if(r===3&&ups.length) p.guar[b.id]=!(b.pickup||[]).includes(c.id); }
   const np=c.rarity===3?0:pity; if(pk) p.pity=np; else p.pities[b.id]=np;
   p.spark[b.id]=(p.spark[b.id]||0)+1;
-  let isNew=false,refund=0;
+  return grantOwned(c,b.name);
+}
+// 뽑기·건조가 같이 써요: 처음이면 보유 등록, 이미 있으면 돌파(최대 5) + 환급, 기록 남기기
+function grantOwned(c,source){
+  const p=P(); p.hist2=p.hist2||[]; let isNew=false,refund=0;
   if(p.owned[c.id]){const o=p.owned[c.id];if(o.dup<5){o.dup++;if(o.dup>=5)o.cgNew=true;}refund=REFUND[c.rarity];p.gems+=refund;p.mat.core+=c.rarity;}
   else{p.owned[c.id]={levelCapVersion:1,transc:0,growthCostVersion:1,lv:1,exp:0,dup:0,aff:0,seen:[],wlv:0,skin:''};isNew=true;if(!p.sec)p.sec=c.id;if(p.squad.length<4)p.squad.push(c.id);}
   p.history.unshift(c.id); p.history=p.history.slice(0,80);
-  p.hist2.unshift({id:c.id,b:b.name,at:Date.now(),n:isNew}); p.hist2=p.hist2.slice(0,200);
+  p.hist2.unshift({id:c.id,b:source,at:Date.now(),n:isNew}); p.hist2=p.hist2.slice(0,200);
   return {c,isNew,refund};
 }
 function openSpark(bid){
@@ -11326,6 +11471,144 @@ function flipAll(){
   next(0);
 }
 
+/* ===== 건조/영입 (자원 4종 투입식) ===== */
+/* 엔진: modules/app/020-construct.js (GGMConstruct). 여기서는 게임 상태·화면·AI 연결만.
+   설정: G.meta.construct(바꾼 값만 저장) · G.meta.variants(바리에이션 공통 설정) · 진행: P().cres(자원) · P().cbuild(기록·발견한 레시피) */
+const CON_RES=GGMConstruct.RES;
+// 특수 레시피(소속·특정 캐릭터 확률 업). 분류 확률은 groups가 정해서 기본은 비워 둬요. 예: {id:'rc_x',name:'새벽 설계',min:[400,400,400,600],effect:{type:'faction',value:'새벽등대',up:3},hint:'부품을 넉넉히'}
+const CON_RECIPES=[];
+function conMeta(){ const m=G.meta; if(!m.construct||typeof m.construct!=='object') m.construct={on:false}; if(!Array.isArray(m.construct.recipes)) m.construct.recipes=clone(CON_RECIPES); return m.construct; }
+function CON(){ return GGMConstruct.config(conMeta()); }
+function conOn(){ return !!(G.meta.construct&&G.meta.construct.on); }
+function VARIANTS(){ if(!Array.isArray(G.meta.variants)) G.meta.variants=clone(GGMConstruct.VARIANT_DEFAULTS); return G.meta.variants; }
+function CRES(){ const p=P(); if(!p.cres||typeof p.cres!=='object') p.cres={}; CON_RES.forEach(k=>{ if(!(p.cres[k]>=0)) p.cres[k]=0; }); return p.cres; }
+function CBUILD(){ const p=P(); if(!p.cbuild||typeof p.cbuild!=='object') p.cbuild={n:0,found:{},log:[],input:null}; return p.cbuild; }
+const conGem=()=>`<span style="display:inline-flex;width:1em;height:1em;vertical-align:-.15em">${rIco('gems')}</span>`;
+const conResIcon=k=>`<i class="ricon-t" style="font-style:normal">${['⛽','✴','⬢','⚙'][CON_RES.indexOf(k)]}</i>`;
+function conResBar(){ const r=CRES(); return `<div class="row" style="gap:6px;flex-wrap:wrap">${CON_RES.map(k=>`<span class="chip">${conResIcon(k)} ${esc(T(k))} <b>${nf(r[k])}</b></span>`).join('')}<span class="chip">${conGem()} <b>${nf(P().gems)}</b></span></div>`; }
+
+/* 원정(파견) 보상: 시간·인원에 비례해서 건조 자원 2종 */
+function conDispReward(hours,need){ const pts=Math.pow(hours,0.85)*(1+0.35*(need-1)), ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2), r={}; ks.forEach(k=>{ r[k]=Math.max(10,Math.round(pts*60/10)*10); }); return r; }
+
+/* 바리에이션 후보: 레시피가 맞고, 조건에 맞는 보유 캐릭터 중 아직 그 바리에이션이 없는 캐릭터 */
+function conVariantOf(b,tpl){ return G.chars.find(x=>x.alt===b.id&&x.cvar===tpl.id); }
+function conTargets(tpl){ return G.chars.filter(b=>!b.alt&&!b.cvar&&own(b.id)&&GGMConstruct.condMatch(tpl.cond,b,{own:own(b.id),affLv:affLv(own(b.id)),cleared:P().cleared})); }
+function conVariantChoices(input){ return VARIANTS().filter(t=>t.on!==false&&GGMConstruct.matches(t.recipe,input)).map(tpl=>({tpl,bases:conTargets(tpl).filter(b=>{ const v=conVariantOf(b,tpl); return !(v&&own(v.id)); })})); }
+function conPool(){ return G.chars.filter(c=>!c.limited&&!c.cvar&&!c.alt&&debutOk(c)).map(c=>({id:c.id,rarity:c.rarity,role:c.role,faction:c.faction,elem:c.elem})); }
+
+async function conMakeVariant(b,tpl){
+  const rr=tpl.rarity==='same'||!tpl.rarity?String(b.rarity):String(tpl.rarity); let c=null;
+  if(SAMPLE){ try{ c=await aiAltChar(b,`${tpl.name}. ${GGMConstruct.designBrief(b,tpl)}`,rr,null); }catch(e){ c=null; } }
+  if(!c){ // AI가 없거나 실패: 원래 캐릭터를 바탕으로 규칙대로 만들어요(이름·외모 태그 + 기본형 의상 태그 + 상징 컬러·아이템)
+    const o=clone(b); delete o.id; o.name=`${b.name}(${tpl.name})`; o.naiPrompt=GGMConstruct.variantPrompt(b,tpl); o.rarity=+rr;
+    o.profile=`${b.profile||''}\n[${tpl.name}] ${b.name}의 ${tpl.name} 모습.`.trim(); c=cleanChar(o); G.chars.push(c); }
+  c.alt=b.id; c.cvar=tpl.id; c.altCanon=false; c.rarity=+rr||b.rarity; c.faction=b.faction||c.faction; if(b.age) c.age=b.age; if(b.voiceId) c.voiceId=b.voiceId; if(b.naiStyle) c.naiStyle=b.naiStyle;
+  const want=String(tpl.prompt||'').split(',')[0].trim(); if(want&&!String(c.naiPrompt||'').includes(want)) c.naiPrompt=GGMConstruct.variantPrompt(Object.assign({},b,{naiPrompt:c.naiPrompt||b.naiPrompt}),tpl);
+  mark('c:'+c.id); return c; }
+
+let CONJOB=false;
+function conReadInput(){ const cfg=CON(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:(CBUILD().input||[])[i]||cfg.min; }); }
+async function conBuild(){
+  if(CONJOB||NEW_GAME_SOURCE) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
+  const cfg=CON(), input=GGMConstruct.normalize(conReadInput(),cfg), r=CRES(), lack=CON_RES.filter((k,i)=>r[k]<input[i]);
+  if(lack.length){ toast(`${lack.map(k=>T(k)).join('·')}이(가) 모자라요`); return; }
+  const variants=conVariantChoices(input), res=GGMConstruct.roll(input,cfg,conPool(),variants);
+  if(res.kind==='none'){ toast(`${T('construct')}로 나올 ${T('crew')}이(가) 없어요`); return; }
+  CONJOB=true;
+  try{
+    CON_RES.forEach((k,i)=>{ r[k]-=input[i]; }); const B=CBUILD(); B.n++; B.input=input;
+    res.info.recipes.forEach(x=>{ if(!B.found[x.id]) { B.found[x.id]=Date.now(); toast(`새 레시피 발견: ${x.name}`); } });
+    res.info.groups.filter(g=>g.open&&!B.found['g:'+g.id]).forEach(g=>{ B.found['g:'+g.id]=Date.now(); });
+    let c;
+    if(res.kind==='variant'){ const key='v:'+res.tpl.id; if(!B.found[key]) B.found[key]=Date.now();
+      c=conVariantOf(res.base,res.tpl);
+      if(!c){ openModal(`<div class="decode"><div class="dc-ring"></div><div class="dc-ring b"></div><b>${esc(res.base.name)}의 「${esc(res.tpl.name)}」 설계 중…</b><span>새로운 모습을 디자인하고 있어요</span></div>`,true);
+        try{ c=await conMakeVariant(res.base,res.tpl); }finally{ closeModal(); } } }
+    else c=charById(res.id);
+    const got=grantOwned(c,T('construct')); B.log.unshift({id:c.id,at:Date.now(),input,v:res.kind==='variant'?res.tpl.id:''}); B.log=B.log.slice(0,30);
+    bump('pull',1); mark('prog'); try{ await flush(); }catch(e){ render(); return; }
+    render(); playGacha([got]);
+    if(res.kind==='variant'&&imgReady()&&!imgSrc(c)) setTimeout(()=>runPrep(['char'],it=>it.c&&it.c.id===c.id),1500);
+  } finally{ CONJOB=false; }
+}
+function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems){ toast(`${T('currency')}이(가) 모자라요`); return; } p.gems-=cfg.buy.gems; CRES()[k]+=cfg.buy.amt; mark('prog'); render(); }
+
+function conNeedText(n){ const out=[]; (n.min||[]).forEach((v,i)=>{ if(v>GGMConstruct.DEFAULTS.min&&v>CON().min) out.push(`${T(CON_RES[i])} ${nf(v)}↑`); }); (n.max||[]).forEach((v,i)=>{ if(v!=null) out.push(`${T(CON_RES[i])} ${nf(v)}↓`); }); if(n.total) out.push(`총 ${nf(n.total)}↑`); Object.entries(n.share||{}).forEach(([i,[lo,hi]])=>out.push(`${T(CON_RES[i])} 비율 ${Math.round((lo||0)*100)}~${Math.round((hi==null?1:hi)*100)}%`)); return out.join(' · ')||'조건 없음'; }
+function conInfoHTML(input){
+  const cfg=CON(), t=GGMConstruct.table(input,cfg,conPool()), i=t.info, B=CBUILD(), vs=conVariantChoices(i.input).filter(v=>v.bases.length), pct=v=>(Math.round(v*10)/10)+'%';
+  return `<p style="margin:0 0 6px">총 <b>${nf(i.total)}</b> · 희귀도 캡: SR ${i.open[2]?`<b>개방 ${pct(i.rarity[2])}</b>`:`잠김 <span class="muted">(총 ${nf(cfg.sr.open)}↑)</span>`} · SSR ${i.open[3]?`<b>개방 ${pct(i.rarity[3])}</b>`:`잠김 <span class="muted">(총 ${nf(cfg.ssr.open)}↑)</span>`}</p>
+    <div style="font-size:.85rem;margin:0 0 6px">${i.groups.map(g=>`<div style="display:flex;justify-content:space-between;gap:8px;${g.open?'':'opacity:.55'}"><span>${g.open?'🔓':'🔒'} <b>${esc(g.name)}</b> <span class="muted">${esc(conNeedText(g.need))}</span></span><b>${g.open?pct(g.p):'—'}</b></div>`).join('')}</div>
+    ${t.rows.length?`<details><summary class="muted" style="font-size:.82rem">이번 투입의 확률 테이블 (${t.rows.length}명)</summary><div style="font-size:.8rem;columns:2;margin-top:4px">${t.rows.map(r=>{ const c=charById(r.id); return c?`<div>${RL[c.rarity]} ${esc(c.name)} <b>${pct(r.p)}</b></div>`:''; }).join('')}</div></details>`:`<p class="muted" style="margin:0">열린 분류에 나올 ${esc(T('crew'))}이(가) 없어요. 다른 분류를 열어 보세요.</p>`}
+    ${i.recipes.length?`<p style="margin:6px 0 0">특수 레시피: ${i.recipes.map(x=>B.found[x.id]?`<b>${esc(x.name)}</b>`:'<b>??? (미발견)</b>').join(', ')}</p>`:''}
+    ${vs.length?`<p style="margin:4px 0 0">✦ 바리에이션 기회: ${vs.map(v=>`${esc(v.tpl.name)} ${pct(+v.tpl.chance||0)} (${v.bases.length}명)`).join(', ')}</p>`:''}`; }
+function conEntryHTML(){ if(!conOn()) return ''; return `<div class="panel" style="margin-bottom:10px;display:flex;gap:10px;align-items:center;justify-content:space-between"><div><b>${esc(T('construct'))}</b><div class="muted" style="font-size:.8rem">${CON_RES.map(k=>esc(T(k))).join('·')}을(를) 넣어 ${esc(T('crew'))}·바리에이션 영입</div></div><button class="btn sm" data-act="go" data-to="construct">열기</button></div>`; }
+function constructHTML(){
+  if(!conOn()) return pageHead(T('construct'),'CONSTRUCT','contract')+`<div class="panel"><p>설정 → 게임에서 ${esc(T('construct'))}을(를) 켜 주세요.</p></div>`;
+  const cfg=CON(), B=CBUILD(), input=GGMConstruct.normalize(B.input||[cfg.min,cfg.min,cfg.min,cfg.min],cfg), found=(cfg.recipes||[]).filter(x=>B.found[x.id]), vfound=VARIANTS().filter(t=>B.found['v:'+t.id]);
+  const presets=[['최소',[cfg.min,cfg.min,cfg.min,cfg.min]],['균형',[300,300,300,300]],['고급',[999,999,999,999]],...cfg.groups.filter(g=>B.found['g:'+g.id]).map(g=>[g.name+' 개방',(g.min||[]).map((v,i)=>Math.max(v,cfg.min))]),...found.map(x=>[x.name,x.min]),...vfound.map(t=>['✦'+t.name,t.recipe.min])];
+  return `${pageHead(T('construct'),'CONSTRUCT','contract')}${conResBar()}
+  <div class="panel" style="margin-top:10px"><h3>자원 투입 <span class="muted" style="font-size:.8rem">(${cfg.min}~${cfg.max})</span></h3>
+    ${CON_RES.map((k,i)=>`<label class="f" for="con_${i}">${conResIcon(k)} ${esc(T(k))}</label><div class="row" style="gap:8px;align-items:center"><input type="range" id="con_r${i}" data-con="${i}" min="${cfg.min}" max="${cfg.max}" step="${cfg.step}" value="${input[i]}" style="flex:1"><input class="in" type="number" id="con_${i}" data-con="${i}" min="${cfg.min}" max="${cfg.max}" value="${input[i]}" style="width:90px"></div>`).join('')}
+    <div class="row" style="margin-top:8px;flex-wrap:wrap">${presets.map(([n,v])=>`<button class="btn sm ghost" data-act="conpreset" data-v="${esc(v.join(','))}">${esc(n)}</button>`).join('')}</div>
+    <div id="conInfo" class="panel" style="margin-top:10px">${conInfoHTML(input)}</div>
+    <div class="row" style="margin-top:10px"><button class="btn" data-act="conbuild">${esc(T('construct'))} 시작</button></div></div>
+  <div class="panel"><h3>자원 보급 <span class="muted" style="font-size:.8rem">${conGem()}${nf(cfg.buy.gems)} → +${nf(cfg.buy.amt)}</span></h3><div class="row" style="flex-wrap:wrap">${CON_RES.map(k=>`<button class="btn sm ghost" data-act="conbuy" data-k="${k}">${conResIcon(k)} ${esc(T(k))} +${nf(cfg.buy.amt)}</button>`).join('')}</div><p class="muted" style="margin:8px 0 0;font-size:.8rem">${esc(T('dispatch'))}을(를) 보내면 건조 자원을 모아 와요.</p></div>
+  <div class="panel"><h3>레시피 노트</h3>${found.length||vfound.length?`<ul style="margin:0;padding-left:18px">${found.map(x=>`<li><b>${esc(x.name)}</b> — ${x.min.join(' / ')} 이상</li>`).join('')}${vfound.map(t=>`<li>✦ <b>${esc(t.name)}</b> — ${t.recipe.min.join(' / ')} 이상 · ${esc(t.prompt)}</li>`).join('')}</ul>`:`<p class="muted" style="margin:0">아직 발견한 레시피가 없어요. 자원 비율을 바꿔 보세요.${(cfg.recipes||[]).length?' 힌트: '+cfg.recipes.map(x=>esc(x.hint||'')).filter(Boolean).join(' / '):''}</p>`}</div>
+  <div class="panel"><h3>최근 기록</h3>${B.log.length?B.log.slice(0,10).map(l=>{ const c=charById(l.id); return c?`<div class="muted" style="font-size:.85rem">${esc(new Date(l.at).toLocaleString())} · ${l.input.join('/')} → <b>${esc(c.name)}</b> ${RL[c.rarity]}${l.v?' ✦':''}</div>`:''; }).join(''):'<p class="muted" style="margin:0">아직 없어요.</p>'}</div>`; }
+
+/* 설정: 게임 탭의 패널 + 상세 설정 창 */
+function conSettingsPanel(){ const on=conOn(), V=VARIANTS();
+  return `<div class="panel pm-hide"><h3>${esc(T('construct'))} (자원 투입식) ${on?'<span class="badge">켜짐</span>':''}</h3><p class="muted" style="margin:0 0 10px">${CON_RES.map(k=>esc(T(k))).join('·')} 4종을 넣어 ${esc(T('crew'))}을(를) 영입해요. 투입량으로 등급이 열리고, 비율로 역할 확률이 기울고, 레시피로 ${esc(T('gacha'))}에서 얻은 ${esc(T('crew'))}의 바리에이션(${V.filter(t=>t.on!==false).map(t=>esc(t.name)).join('·')||'없음'})이 열려요. 자원은 ${esc(T('currency'))}으로 사거나 ${esc(T('dispatch'))}으로 모아요.</p>
+    <div class="row"><button class="btn sm" data-act="contoggle">${on?'끄기':'켜기'}</button><button class="btn sm ghost" data-act="conset">상세 설정 · 바리에이션</button>${on?'<button class="btn sm ghost" data-act="go" data-to="construct">열기</button>':''}</div></div>`; }
+const CON_STATS=[['hp','체력'],['atk','공격'],['def','방어'],['spd','속도']];
+function conVariantRow(t,i){ const c=t.cond||{}, st=(c.stats||[])[0]||{}, n=conTargets(t);
+  return `<details class="panel" data-vi="${i}" style="margin:8px 0"><summary><b>${esc(t.name)}</b> <span class="muted">· ${t.on===false?'꺼짐':'켜짐'} · ${+t.chance||0}% · 적용 ${n.length}명</span></summary>
+  <label style="display:flex;gap:8px;margin:8px 0"><input type="checkbox" data-vf="on" ${t.on!==false?'checked':''}> 사용</label>
+  <div class="g2"><div><label class="f">이름(기본형)</label><input class="in" data-vf="name" value="${esc(t.name)}"></div><div><label class="f">확률 % (레시피가 맞고 대상이 있을 때)</label><input class="in" type="number" data-vf="chance" min="0" max="100" value="${+t.chance||0}"></div></div>
+  <label class="f">의상 기본형 태그 (NovelAI 영어 태그)</label><input class="in" data-vf="prompt" value="${esc(t.prompt||'')}">
+  <label class="f">디자인 추가 지시 (AI용, 선택)</label><input class="in" data-vf="brief" value="${esc(t.brief||'')}">
+  <label class="f">레시피: 최소 투입 (${CON_RES.map(k=>esc(T(k))).join(' / ')})</label><input class="in" data-vf="recipe" value="${esc((t.recipe&&t.recipe.min||[]).join(','))}">
+  <label class="f">등급</label><select class="in" data-vf="rarity">${[['same','원래 캐릭터와 같게'],['1','R'],['2','SR'],['3','SSR']].map(([v,l])=>`<option value="${v}" ${String(t.rarity||'same')===v?'selected':''}>${l}</option>`).join('')}</select>
+  <h4 style="margin:10px 0 4px">적용 조건 <span class="muted" style="font-size:.8rem">(비우면 조건 없음 · 보유한 ${esc(T('crew'))} 중 맞는 캐릭터에 자동 적용)</span></h4>
+  <div class="g2"><div><label class="f">소속(쉼표)</label><input class="in" data-vf="factions" value="${esc((c.factions||[]).join(','))}" placeholder="${esc((G.world.factions||[]).map(f=>f.name).join(','))}"></div>
+  <div><label class="f">역할</label><div class="row">${Object.keys(ROLE).map(r=>`<label style="display:flex;gap:4px"><input type="checkbox" data-vrole="${r}" ${(c.roles||[]).includes(r)?'checked':''}>${esc(ROLE[r])}</label>`).join('')}</div></div>
+  <div><label class="f">속성(쉼표)</label><input class="in" data-vf="elems" value="${esc((c.elems||[]).join(','))}" placeholder="${esc(ELEMS.join(','))}"></div>
+  <div><label class="f">능력치</label><div class="row"><select class="in" data-vf="stk"><option value="">없음</option>${CON_STATS.map(([k,l])=>`<option value="${k}" ${st.k===k?'selected':''}>${l}</option>`).join('')}</select><select class="in" data-vf="stop">${['>=','<=','>','<'].map(o=>`<option ${st.op===o?'selected':''}>${o}</option>`).join('')}</select><input class="in" type="number" data-vf="stv" value="${st.v!=null?+st.v:''}" style="width:80px"></div></div>
+  <div><label class="f">최소 레벨 · ${esc(T('limit'))} · 호감도</label><div class="row"><input class="in" type="number" data-vf="lv" value="${c.lv||''}" placeholder="Lv"><input class="in" type="number" data-vf="dup" value="${c.dup||''}" placeholder="${esc(T('limit'))}"><input class="in" type="number" data-vf="aff" value="${c.aff||''}" placeholder="호감도"></div></div>
+  <div><label class="f">업적: 클리어한 스테이지 id(쉼표)</label><input class="in" data-vf="cleared" value="${esc((c.cleared||[]).join(','))}" placeholder="s11,s12"></div></div>
+  <p class="muted" style="margin:8px 0 0;font-size:.8rem">지금 적용 대상: ${n.map(b=>esc(b.name)).join(', ')||'없음'}${n[0]?`<br>예시 이미지 프롬프트(${esc(n[0].name)}): <code style="overflow-wrap:anywhere">${esc(GGMConstruct.variantPrompt(n[0],t))}</code>`:''}</p>
+  <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="convdel" data-i="${i}">이 바리에이션 삭제</button></div></details>`; }
+let CONV=null; // 설정 창에서 고치는 중인 바리에이션(저장 전에는 게임에 반영 안 됨)
+function openConSet(){ CONV=clone(VARIANTS()); const m=conMeta(), cfg=CON(), adv={min:cfg.min,max:cfg.max,step:cfg.step,start:cfg.start,sr:cfg.sr,ssr:cfg.ssr,groups:cfg.groups,recipes:cfg.recipes};
+  openModal(`${head(T('construct')+' 설정')}
+    <label style="display:flex;gap:8px"><input type="checkbox" id="con_on" ${m.on?'checked':''}> <b>${esc(T('construct'))} 사용</b></label>
+    <p class="muted" style="font-size:.8rem;margin:4px 0 10px">자원 이름과 메뉴 이름은 게임 정의 편집 → 용어에서 바꿔요. 켜면 ${esc(T('gacha'))}에서 바리에이션이 빠지고 ${esc(T('construct'))}으로만 열려요.</p>
+    <div class="g2"><div><label class="f" for="con_bg">구매 가격 (${esc(T('currency'))})</label><input class="in" type="number" id="con_bg" min="1" value="${cfg.buy.gems}"></div><div><label class="f" for="con_ba">구매량</label><input class="in" type="number" id="con_ba" min="1" value="${cfg.buy.amt}"></div></div>
+    <h3 class="sec" style="margin-top:14px">바리에이션 (공통 설정)</h3><p class="muted" style="font-size:.8rem;margin:0">기본형을 정하고 적용 조건을 걸면, 조건에 맞는 캐릭터마다 그 캐릭터의 특징·상징 컬러·상징 아이템(무기)을 반영해 디자인돼요.</p>
+    <div id="con_vars">${CONV.map(conVariantRow).join('')}</div><button class="btn sm ghost" data-act="convadd">+ 바리에이션 추가</button>
+    <details style="margin-top:12px"><summary>고급 설정 (확률 테이블 JSON)</summary><p class="muted" style="font-size:.8rem">sr/ssr.open: 희귀도 캡이 열리는 총 투입량 · base/grow: 확률(%) · groups: 분류 [{id,name,match:{role|faction|elem},min:[4],max:[4],total,share:{자원번호:[최소비율,최대비율]},weight:{base,res:[4]},maxRarity}] · recipes: 특수 레시피 [{id,name,min:[4],effect:{type:role|faction|char,value,up}}]</p><textarea class="in" id="con_adv" rows="10" style="font-family:monospace;font-size:.78rem">${esc(JSON.stringify(adv,null,1))}</textarea></details>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="consave">저장</button><button class="btn ghost" data-act="close">취소</button></div>`); }
+function conReadVariants(){ return [...document.querySelectorAll('#con_vars [data-vi]')].map(d=>{ const f=k=>d.querySelector(`[data-vf="${k}"]`), v=k=>String(f(k)?.value||'').trim(), list=k=>v(k).split(',').map(s=>s.trim()).filter(Boolean), old=(CONV||[])[+d.dataset.vi]||{};
+  const nums=v('recipe').split(',').map(x=>Math.max(0,+x||0)); while(nums.length<4) nums.push(0);
+  const cond={factions:list('factions'),roles:[...d.querySelectorAll('[data-vrole]:checked')].map(x=>x.dataset.vrole),elems:list('elems'),stats:v('stk')?[{k:v('stk'),op:v('stop')||'>=',v:+v('stv')||0}]:[],lv:+v('lv')||0,dup:+v('dup')||0,aff:+v('aff')||0,cleared:list('cleared')};
+  return {id:old.id||'v_'+uid(),name:v('name')||'바리에이션',prompt:v('prompt'),brief:v('brief'),chance:Math.min(100,Math.max(0,+v('chance')||0)),recipe:{min:nums.slice(0,4)},rarity:v('rarity')||'same',on:!!f('on')?.checked,cond}; }); }
+async function conSave(){ let adv; try{ adv=JSON.parse($('#con_adv').value); }catch(e){ toast('고급 설정 JSON을 확인해 주세요: '+e.message); return; }
+  const m=conMeta(), wasOn=m.on; Object.assign(m,adv,{on:$('#con_on').checked,buy:{gems:Math.max(1,+$('#con_bg').value||60),amt:Math.max(1,+$('#con_ba').value||300)}});
+  G.meta.variants=conReadVariants();
+  if(m.on&&!wasOn&&!CBUILD().started){ CBUILD().started=Date.now(); const r=CRES(), s=CON().start; CON_RES.forEach(k=>{ r[k]+=s; }); toast(`${T('construct')}을(를) 켰어요. 시작 자원 ${nf(s)}씩 드려요`); }
+  mark('meta','prog'); closeModal(); render(); }
+
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+  if(a==='conbuild') conBuild();
+  else if(a==='conbuy') conBuy(b.dataset.k);
+  else if(a==='conpreset'){ const v=b.dataset.v.split(',').map(Number); v.forEach((x,i)=>{ const n=$('#con_'+i), r=$('#con_r'+i); if(n) n.value=x; if(r) r.value=x; }); const info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(GGMConstruct.normalize(v,CON())); CBUILD().input=GGMConstruct.normalize(v,CON()); }
+  else if(a==='contoggle'){ if(conOn()){ conMeta().on=false; mark('meta'); render(); } else openConSet(); }
+  else if(a==='conset') openConSet();
+  else if(a==='consave') conSave();
+  else if(a==='convadd'){ CONV=[...conReadVariants(),{id:'v_'+uid(),name:'새 바리에이션',prompt:'',brief:'',chance:30,recipe:{min:[200,200,200,400]},rarity:'same',on:true,cond:{}}]; $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); }
+  else if(a==='convdel'){ CONV=conReadVariants(); CONV.splice(+b.dataset.i,1); $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); } });
+document.addEventListener('input',e=>{ const i=e.target.dataset&&e.target.dataset.con; if(i==null) return; const v=e.target.value; const n=$('#con_'+i), r=$('#con_r'+i); if(n&&n!==e.target) n.value=v; if(r&&r!==e.target) r.value=v;
+  const input=GGMConstruct.normalize(conReadInput(),CON()), info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(input); CBUILD().input=input; });
 /* =========================================================
    이벤트
    ========================================================= */

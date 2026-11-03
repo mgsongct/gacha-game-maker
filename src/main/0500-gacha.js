@@ -16,7 +16,8 @@ function gateCheck(){ if(!G.meta.gated) return; const p=P(); p.gateSeen=p.gateSe
   if(n.length){ mark('prog'); setTimeout(()=>toast('📮 새로 열렸어요: '+n.join(', ')),1600); } }
 function curBanner(){const bs=G.banners.filter(bnOpen);return bs.find(b=>b.id===P().curBanner)||bs[0]||null;}
 function bannerPool(b){
-  let pool=G.chars.filter(c=>(!c.limited||(b.pickup||[]).includes(c.id))&&(debutOk(c)||(b.pickup||[]).includes(c.id)));
+  // 건조 전용 바리에이션(c.cvar)은 건조/영입이 켜져 있으면 뽑기에 안 나와요(픽업으로 직접 넣은 건 예외)
+  let pool=G.chars.filter(c=>(!c.limited||(b.pickup||[]).includes(c.id))&&(debutOk(c)||(b.pickup||[]).includes(c.id))&&!(c.cvar&&conOn()&&!(b.pickup||[]).includes(c.id)));
   if(b.pool.mode==='faction') pool=pool.filter(c=>(b.pool.factions||[]).includes(c.faction));
   if(b.pool.mode==='list') pool=pool.filter(c=>(b.pool.ids||[]).includes(c.id));
   (b.pickup||[]).map(charById).filter(Boolean).forEach(c=>{if(!pool.includes(c))pool.push(c);});
@@ -44,11 +45,15 @@ function rollOne(guarSR,forceSSR,b){
   else { c=ups.length&&Math.random()*100<(b.rate||50)?rand(ups):rand(cand); if(r===3&&ups.length) p.guar[b.id]=!(b.pickup||[]).includes(c.id); }
   const np=c.rarity===3?0:pity; if(pk) p.pity=np; else p.pities[b.id]=np;
   p.spark[b.id]=(p.spark[b.id]||0)+1;
-  let isNew=false,refund=0;
+  return grantOwned(c,b.name);
+}
+// 뽑기·건조가 같이 써요: 처음이면 보유 등록, 이미 있으면 돌파(최대 5) + 환급, 기록 남기기
+function grantOwned(c,source){
+  const p=P(); p.hist2=p.hist2||[]; let isNew=false,refund=0;
   if(p.owned[c.id]){const o=p.owned[c.id];if(o.dup<5){o.dup++;if(o.dup>=5)o.cgNew=true;}refund=REFUND[c.rarity];p.gems+=refund;p.mat.core+=c.rarity;}
   else{p.owned[c.id]={levelCapVersion:1,transc:0,growthCostVersion:1,lv:1,exp:0,dup:0,aff:0,seen:[],wlv:0,skin:''};isNew=true;if(!p.sec)p.sec=c.id;if(p.squad.length<4)p.squad.push(c.id);}
   p.history.unshift(c.id); p.history=p.history.slice(0,80);
-  p.hist2.unshift({id:c.id,b:b.name,at:Date.now(),n:isNew}); p.hist2=p.hist2.slice(0,200);
+  p.hist2.unshift({id:c.id,b:source,at:Date.now(),n:isNew}); p.hist2=p.hist2.slice(0,200);
   return {c,isNew,refund};
 }
 function openSpark(bid){

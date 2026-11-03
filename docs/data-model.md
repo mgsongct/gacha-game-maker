@@ -43,6 +43,8 @@ const P = () => G.prog;      // 진행 상태 단축
   skill (구형), skills:{version:2,passive,active,ultimate} (전투 v2), skillBalance, voiceId }
 ```
 
+**이격(`alt`)은 상속형**입니다: 원본과 다른 항목만 `over`(능력치는 `over.statMul` 배율)로 저장하고, 불러올 때·원본을 고칠 때 원본 + 수정치로 채웁니다([research/variants.md §3](research/variants.md#3-상속형-관리-원본--수정치)). 바리에이션은 여기에 `cvar`(템플릿 id)가 더 붙습니다.
+
 `fix()`가 빠진 필드를 모두 채우므로, 새 필드를 추가할 때도 `fix()`에서 기본값을 넣는 패턴을 따르세요.
 
 ## 4. 진행(`prog`) 주요 필드
@@ -50,7 +52,8 @@ const P = () => G.prog;      // 진행 상태 단축
 | 키 | 내용 |
 |---|---|
 | `gems`, `gold`, `mat{exp,wmat,core,gearMat,transcMat}` | 재화·재료 |
-| `owned{[charId]: {lv,exp,dup,aff,wlv,skin,transc,seen[],skillTraining,...}}` | 보유 캐릭터. `rollOne()`이 생성 |
+| `owned{[charId]: {lv,exp,dup,aff,wlv,skin,transc,seen[],skillTraining,...}}` | 보유 캐릭터. `grantOwned()`(가챠·건조 공통)가 생성 |
+| `cres{res1..res4}`, `cbuild{n,input,found,log}` | 건조/영입 자원·기록 ([research/construction.md](research/construction.md)) |
 | `squad[]` (최대 4), `sec` | 편성, 로비 비서 |
 | `pity`, `pities{[bannerId]}`, `guar{}`, `spark{}`, `history[]`, `hist2[]` | 가챠 천장·확정·포인트·기록 |
 | `settings{ssr,sr,pity,...}` | 확률 설정 (천장 기본 150) |

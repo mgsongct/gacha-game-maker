@@ -3,7 +3,7 @@
    ========================================================= */
 function own(id){return P().owned[id];}
 const levelCap=o=>Math.min(120,Math.max(Math.min(70,20+10*(o?.dup||0))+capExtra(),o?.legacyLevelCap||0)+(o?.transc||0)*10);
-function rewardText(r){const p=[];if(r.gems)p.push(`◆${nf(r.gems)} ${T('currency')}`);if(r.gold)p.push(`${T('gold')} ${nf(r.gold)}`);if(r.exp)p.push(`${T('expMat')} ${nf(r.exp)}`);if(r.wmat)p.push(`${T('wMat')} ${nf(r.wmat)}`);if(r.core)p.push(`${T('core')} ${nf(r.core)}`);if(r.gearMat)p.push(`${T('gearMat')} ${nf(r.gearMat)}`);if(r.transcMat)p.push(`${T('transcMat')} ${nf(r.transcMat)}`);if(r.token)p.push(`${r.tokenName||'토큰'} ${nf(r.token)}`);if(r.gift)p.push(`선물 ${r.gift}개`);return p.join(', ');}
+function rewardText(r){const p=[];if(r.gems)p.push(`◆${nf(r.gems)} ${T('currency')}`);if(r.gold)p.push(`${T('gold')} ${nf(r.gold)}`);if(r.exp)p.push(`${T('expMat')} ${nf(r.exp)}`);if(r.wmat)p.push(`${T('wMat')} ${nf(r.wmat)}`);if(r.core)p.push(`${T('core')} ${nf(r.core)}`);if(r.gearMat)p.push(`${T('gearMat')} ${nf(r.gearMat)}`);if(r.transcMat)p.push(`${T('transcMat')} ${nf(r.transcMat)}`);['res1','res2','res3','res4'].forEach(k=>{if(r[k])p.push(`${T(k)} ${nf(r[k])}`);});if(r.token)p.push(`${r.tokenName||'토큰'} ${nf(r.token)}`);if(r.gift)p.push(`선물 ${r.gift}개`);return p.join(', ');}
 /* 획득량 배율(설정 → 게임): 전투·소탕·파견·일일 보급으로 '버는' 보상에만 곱해요(상점 구매는 그대로) */
 function rateR(r){ const s=P().settings, o=Object.assign({},r), m=(k,x)=>{ if(typeof o[k]==='number') o[k]=Math.max(0,Math.round(o[k]*x/100)); };
   m('gold',s.goldRate||100); m('gems',s.gemRate||100); ['exp','wmat','core','gearMat','transcMat'].forEach(k=>m(k,s.expRate||100)); return o; }
@@ -30,7 +30,7 @@ function openStam(need){ const s=stam(), left=s.v>=STAM_MAX?0:Math.ceil((STAM_MS
     <p class="muted" style="margin:0 0 10px;font-size:.85rem">5분마다 1씩 차요.${s.v<STAM_MAX?` 다음 1 회복까지 ${left}분 · 가득 차기까지 약 ${full}분`:' 지금 가득 찼어요.'}<br>메인·이벤트 전투 10, 재료 던전 8을 써요.</p>
     <div class="row"><button class="btn" data-act="stamfill" ${P().gems>=STAM_FILL[0]?'':'disabled'}>${rIco('gems')} ${STAM_FILL[0]}로 ⚡${STAM_FILL[1]} 회복</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
 setInterval(()=>{ try{ if(typeof G!=='undefined'&&G) updStam(); }catch(e){} },30000);
-function giveReward(r,evId){const p=P();if(r.gift)addGifts(r.gift);if(r.gems)p.gems+=r.gems;if(r.gold)p.gold+=r.gold;['exp','wmat','core','gearMat','transcMat'].forEach(k=>{if(r[k])p.mat[k]=(p.mat[k]||0)+r[k];});if(r.token&&evId)p.tokens[evId]=(p.tokens[evId]||0)+r.token;mark('prog');}
+function giveReward(r,evId){const p=P();if(r.gift)addGifts(r.gift);if(r.gems)p.gems+=r.gems;if(r.gold)p.gold+=r.gold;['exp','wmat','core','gearMat','transcMat'].forEach(k=>{if(r[k])p.mat[k]=(p.mat[k]||0)+r[k];});['res1','res2','res3','res4'].forEach(k=>{if(r[k]){const c=CRES();c[k]=(c[k]||0)+r[k];}});if(r.token&&evId)p.tokens[evId]=(p.tokens[evId]||0)+r.token;mark('prog');}
 const MISSIONS=[{k:'login',name:'출석하기',goal:1,xp:100},{k:'battle',name:'전투 3회',goal:3,xp:150},{k:'pull',name:'뽑기 1회',goal:1,xp:100},{k:'dispatch',name:'파견 보내기',goal:1,xp:100},{k:'touch',name:'로비 터치 5회',goal:5,xp:60},{k:'enhance',name:'강화 1회',goal:1,xp:100}];
 function dm(){const p=P();if(p.dm.date!==today())p.dm={date:today(),cnt:{login:1},got:{}};return p.dm;}
 function bump(k,n){const d=dm();d.cnt[k]=(d.cnt[k]||0)+(n||1);mark('prog');}
