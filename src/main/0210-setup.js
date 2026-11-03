@@ -1,7 +1,6 @@
 /* =========================================================
    처음 실행 설정 (AI 키)
    ========================================================= */
-const APP_NAME='가챠 게임 메이커';
 const SETUP_KEY='starfall-setup-done';
 let SW=null;
 function needSetup(){ return !appStorage.getItem(SETUP_KEY)&&!AIP().list.length&&!imgReady(); }

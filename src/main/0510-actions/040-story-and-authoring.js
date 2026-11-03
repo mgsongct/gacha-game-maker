@@ -46,11 +46,10 @@ case 'evreroll': { const ev=G.events.find(x=>x.id===id); if(!ev) break; const ol
         G.events=G.events.filter(x=>x!==ne); G.banners=G.banners.filter(b=>b.id!==ne.bannerId); markAll(); mark('prog');
         return {title:`이벤트 스토리 「${ev.title}」로 다시 썼어요`,body:`${T('event')} 화면에서 처음부터 플레이할 수 있어요.`}; }); break; }
 case 'stamopen': openStam(0); break;
-case 'stamfill': { if(P().gems<STAM_FILL[0]) break; P().gems-=STAM_FILL[0]; const s=stam(); s.v+=STAM_FILL[1]; mark('prog'); closeModal(); render(); toast(`⚡ ${STAM_FILL[1]} 회복 (${s.v}/${STAM_MAX})`); break; }
+case 'stamfill': { if(P().gems<STAM_FILL[0]) break; pay({gems:STAM_FILL[0]}); const s=stam(); s.v+=STAM_FILL[1]; mark('prog'); closeModal(); render(); toast(`⚡ ${STAM_FILL[1]} 회복 (${s.v}/${STAM_MAX})`); break; }
 case 'stamtog': { const st=P().settings; st.stamina=!t.checked?false:true; mark('prog'); updStam(); toast(st.stamina?'행동력을 켰어요':'행동력을 껐어요(전투 무제한)'); break; }
 case 'scimg': { const ta=$('#'+t.dataset.ta); if(!ta) break; uploadFor={kind:'scimg',ta:ta.id,pos:ta.selectionStart}; $('#file').click(); break; }
 case 'charedit': openCharEdit(id); break;
-case 'charnew': openCharEdit(null); break;
 case 'savechar': { if(id){const c=charById(id), old=c.name;if(!readCharForm(c))break; if(old&&old!==c.name&&old.length>=2&&(await appConfirm(`이름이 「${old}」에서 「${c.name}」(으)로 바뀌어요. 스토리·${T('talk')}·다른 캐릭터 대사에 나온 「${old}」도 모두 바꿀까요?`))){ const n=renameEverywhere(old,c.name); toast(`이름을 ${n}곳에서 바꿨어요`); } mark('c:'+id);closeModal();render();openChar(id);}
       else{const c=cleanChar({});if(!readCharForm(c))break;G.chars.push(c);mark('c:'+c.id);closeModal(); if(window.__ADDOWN){ window.__ADDOWN=false; joinChar(c,'새로'); } setTimeout(()=>artAfterAI(x=>x.o===c||x.c===c,'새 '+T('crew')+' '+c.name),300); if(NEWPU){ const lim=NEWPU==='limited'; NEWPU=false; addPickupFor(c,lim); if(window.__PUSTORY&&SAMPLE){ window.__PUSTORY=false; puStoryBg(c,lim); } tab='contract'; render(); toast(`${c.name} 픽업이 열렸어요`); artAfterAI(x=>x.o===c||x.c===c,'신규 '+T('crew')+' '+c.name); } else { render(); openChar(c.id); } } break; }
 case 'delchar': if((await appConfirm('이 '+T('crew')+'을(를) 삭제할까요? 에피소드와 성장 기록도 함께 사라져요.'))){G.chars=G.chars.filter(c=>c.id!==id);delete p.owned[id];p.squad=p.squad.filter(x=>x!==id);if(p.sec===id)p.sec=null;mark('c:'+id,'prog');closeModal();render();} break;
@@ -163,8 +162,6 @@ case 'drmanual': { drRead(); if(!(await appConfirm('적은 내용 그대로 새 
 case 'drmake': { drRead(); if(DR2.mode==='auto'?!String(DR2.auto||'').trim():(!String(DR2.kw||'').trim()&&!String(DR2.world||'').trim())){ toast(DR2.mode==='auto'?'만들고 싶은 게임을 적어 주세요':'테마의 장르와 키워드나 세계관 중 하나는 적어 주세요'); break; }
       document.querySelectorAll('#drPage button').forEach(b=>{ if(b!==t&&b.dataset.act!=='ailog') b.disabled=true; }); t.textContent='만드는 중… 화면을 끄지 마세요'; try{ await newGame(t,DR2); }catch(err){ aiLog({ok:false,stage:'새 게임 만들기',err:'앱 오류: '+String((err&&(err.stack||err.message))||err).slice(0,600)}); const st=$('#ng_stat'); if(st) st.textContent='만드는 중 오류가 났어요. 아래 \'AI 기록\'에서 내용을 확인해 주세요.'; } AISTAGE=''; document.querySelectorAll('#drPage button').forEach(b=>b.disabled=false); if(t.isConnected) t.textContent='다시 시도'; break; }
 case 'charregen': openRegen(id); break;
-case 'cheat2': giveReward({gold:50000,exp:200,wmat:100,core:50}); render(); toast('재료 한 묶음을 넣었어요'); break;
-case 'cheat': p.gems+=10000; mark('prog'); render(); toast(`${T('currency')} 10,000개를 넣었어요`); break;
   }
 }
 

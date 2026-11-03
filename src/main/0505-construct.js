@@ -58,7 +58,7 @@ async function conBuild(){
     if(res.kind==='variant'&&imgReady()&&!imgSrc(c)) setTimeout(()=>runPrep(['char'],it=>it.c&&it.c.id===c.id),1500);
   } finally{ CONJOB=false; }
 }
-function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems){ toast(`${T('currency')}이(가) 모자라요`); return; } p.gems-=cfg.buy.gems; CRES()[k]+=cfg.buy.amt; mark('prog'); render(); }
+function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems){ toast(`${T('currency')}이(가) 모자라요`); return; } pay({gems:cfg.buy.gems}); CRES()[k]+=cfg.buy.amt; mark('prog'); render(); }
 
 function conNeedText(n){ const out=[]; (n.min||[]).forEach((v,i)=>{ if(v>GGMConstruct.DEFAULTS.min&&v>CON().min) out.push(`${T(CON_RES[i])} ${nf(v)}↑`); }); (n.max||[]).forEach((v,i)=>{ if(v!=null) out.push(`${T(CON_RES[i])} ${nf(v)}↓`); }); if(n.total) out.push(`총 ${nf(n.total)}↑`); Object.entries(n.share||{}).forEach(([i,[lo,hi]])=>out.push(`${T(CON_RES[i])} 비율 ${Math.round((lo||0)*100)}~${Math.round((hi==null?1:hi)*100)}%`)); return out.join(' · ')||'조건 없음'; }
 function conInfoHTML(input){

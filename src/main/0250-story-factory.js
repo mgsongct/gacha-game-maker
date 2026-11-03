@@ -94,7 +94,7 @@ function scanScriptAssets(){ const want=new Map(); const scan=t=>{ if(!t) return
 // 프롬프트가 없는 자료(대본에서 찾은 소품 등)는 그리기 전에 AI로 한꺼번에 영어 프롬프트를 써요
 let LIBP_JOB=null;
 function ensureLibPrompts(){ if(LIBP_JOB) return LIBP_JOB; const need=G.lib.filter(l=>(['prop','bg'].includes(l.kind)||(l.kind==='enemy'&&!l.alias&&!l.charId))&&!l.prompt); if(!need.length) return Promise.resolve();
-  LIBP_JOB=(async()=>{ try{ let r=null; if(SAMPLE){ try{ r=await SAMPLE.json(`${ctx().slice(0,3000)}\n\n다음 자료의 NovelAI 영어 태그 프롬프트를 써라. 소품(prop)은 "no humans, object focus"로 시작하고 물건의 생김새·재질·색을 쓴다. 배경(bg)은 "no humans, scenery"로 시작한다. 적(enemy)은 괴물·기계면 "no humans"로, 사람형이면 "1other, faceless"로 시작하고 생김새·재질·색·무기·위압감을 쓴다. 모두 이 세계관 설정과 분위기에 꼭 맞게 만들고, 어울리지 않는 디자인은 쓰지 않는다.\n${need.map(l=>`- ${l.kind}: ${l.name}`).join('\n')}\nJSON만 출력: {"items":[{"name":"","prompt":""}]}`,{modelTier:'quick',cache:false}); }catch(e){} }
+  LIBP_JOB=(async()=>{ try{ let r=null; if(SAMPLE){ try{ r=await SAMPLE.json(`${ctx().slice(0,3000)}\n\n다음 자료의 NovelAI 영어 태그 프롬프트를 써라. 소품(prop)은 "no humans, object focus"로 시작하고 물건의 생김새·재질·색을 쓴다. 배경(bg)은 "no humans, scenery"로 시작한다. 적(enemy)은 괴물·기계면 "no humans"로, 사람형이면 "1other, faceless"로 시작하고 생김새·재질·색·무기·위압감을 쓴다. 모두 이 세계관 설정과 분위기에 꼭 맞게 만들고, 어울리지 않는 디자인은 쓰지 않는다.\n${need.map(l=>`- ${l.kind}: ${l.name}`).join('\n')}\nJSON만 출력: {"items":[{"name":"","prompt":""}]}`,{modelTier:'quick',cache:false}); }catch(e){ quietErr(e,'0250-story-factory.js:97'); } }
       need.forEach(l=>{ const x=(r&&Array.isArray(r.items)?r.items:[]).find(y=>y&&y.name===l.name); l.prompt=String((x&&x.prompt)||({bg:'no humans, scenery, ',enemy:'no humans, monster, '})[l.kind]||'no humans, object focus, simple background, ')+(x&&x.prompt?'':l.name); mark('l:'+l.id); }); }
     finally{ LIBP_JOB=null; } })(); return LIBP_JOB; }
 async function aiChapterGen0(dir,n,cast,t){
@@ -117,7 +117,7 @@ async function aiChapterGen0(dir,n,cast,t){
       step('요약·관계·'+T('talk')+'를 정리하는 중…'); const w=await storyWrapUp(ch,'1~2'); if(w){ ch.summary=String(w.summary||'').slice(0,6000); relApply(w.relations,`${k+1}장`); nt=addThreads(w.threads,ch,true); } }
     else { const memoryResult=await storyWrapUp(ch,'1~2',{followups:false});ch.summary=String(memoryResult?.summary||r.summary||'').slice(0,6000); relApply(r.relations,`${k+1}장`); nt=addThreads(r.threads,ch,true); }
     relFromScripts(ch,`${k+1}장`); mark('ch:'+ch.id); nb+=scanScriptAssets();
-    try{ await autoNpcs([ch]); }catch(e){}
+    try{ await autoNpcs([ch]); }catch(e){ quietErr(e,'0250-story-factory.js:120'); }
     return {ch,nb,nt,newc,nc:newc,npcs};
   } finally { if(t){ t.disabled=false; if(t.isConnected&&lbl) t.textContent=lbl; } }
 }
@@ -153,7 +153,7 @@ async function aiEventGen0(dir,n,mk,cast,t,len,lore){ len=STORY_LEN[len]?len:sto
     step('요약·관계·'+T('talk')+'를 정리하는 중…'); const w=await storyWrapUp(ch,'1~2'); if(w){ ch.summary=String(w.summary||'').slice(0,6000); relApply(w.relations,src,false,LORE); addThreads(w.threads,ch,false); } }
   else { const memoryResult=await storyWrapUp(ch,'1~2',{followups:false});ch.summary=String(memoryResult?.summary||r.summary||'').slice(0,6000); relApply(r.relations,src,false,LORE); addThreads(r.threads,ch,false); }
   relFromScripts(ch,src); mark('ch:'+chId); nb+=scanScriptAssets();
-  try{ await autoNpcs([ch]); }catch(e){}
+  try{ await autoNpcs([ch]); }catch(e){ quietErr(e,'0250-story-factory.js:156'); }
   mark('prog'); return {ev,nc,ncs,nb,npcs};
   } finally { if(t){ t.disabled=false; if(t.isConnected&&lbl) t.textContent=lbl; } }
 }

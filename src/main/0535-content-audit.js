@@ -91,7 +91,7 @@ async function auditFix(rule,items){
 async function auditConvert(chars,fields,instruction){
   if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(!chars.length||!fields.length||!instruction.trim()){ toast('대상·항목·지시를 모두 정해 주세요'); return; } if(AUDIT_JOB) return;
   auditSnap(chars,'지정 변환: '+instruction.slice(0,20)); const job=AUDIT_JOB={stop:false}; let ok=0;
-  try{ for(const [i,c] of chars.entries()){ if(job.stop) break; syBar(`지정 변환 ${i+1}/${chars.length}: ${c.name}`); try{ if(await auditAIFill(c,fields,instruction)) ok++; }catch(e){} } }
+  try{ for(const [i,c] of chars.entries()){ if(job.stop) break; syBar(`지정 변환 ${i+1}/${chars.length}: ${c.name}`); try{ if(await auditAIFill(c,fields,instruction)) ok++; }catch(e){ quietErr(e,'0535-content-audit.js:94'); } } }
   finally{ AUDIT_JOB=null; syBar(''); } toast(`지정 변환: ${ok}/${chars.length}명 바꿨어요 (되돌리기 가능)`); openAudit(AUDIT_FOCUS); }
 
 /* 화면 */

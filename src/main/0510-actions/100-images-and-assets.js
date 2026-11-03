@@ -17,13 +17,7 @@ case 'posegen': { const c=charById(id); if(!c||!c.pose||!c.lbbg) break; if(!imgR
       catch(err){ toast(naiErr(err,'그리기 실패')); t.disabled=false; t.textContent=label; } break; }
 case 'posedel': { if(playMode())break;const c=charById(id); if(!c||!c.pose) break; if(!(await appConfirm('포즈 그림을 지우고 상반신으로 표시할까요? 배경은 유지돼요.'))) break; await imgClear(c.pose); mark('c:'+c.id); openChar(c.id); render(); break; }
 case 'upload': uploadFor={kind:t.dataset.k,id}; $('#file').click(); break;
-case 'imgx': { const k=t.dataset.k; let o=null, after=()=>render(), what='그림';
-      if(k==='char'){ o=charById(id); what=o&&o.name+' 스탠딩'; after=()=>{ render(); openChar(id); }; }
-      else if(k==='weapon'){ const c=charById(id); o=c&&c.weapon; what=c&&(c.weapon.name||T('weapon'))+' 그림'; after=()=>{ render(); openChar(id); }; }
-      else if(k==='lib'){ o=libById(id); what=o&&'「'+o.name+'」 그림'; after=()=>{ render(); openLibItem(id); }; }
-      else if(k==='npc'||k==='npcup'){ const n=(G.npcs||[]).find(x=>x.id===id); o=n&&(k==='npc'?n:n.upper); what=n&&n.name+(k==='npc'?' 스탠딩':' 상반신'); after=()=>npcRefresh(id); }
-      else if(k==='shk'){ o=G.meta.shop&&G.meta.shop.self; what='상점 주인 그림'; after=()=>{ SHOP_LINE=''; const pv=document.querySelector('.sk-prev'); if(pv) pv.innerHTML='<span>그림 없음</span>'; render(); }; }
-      else if(k==='skinpart'){ const c=charById(id), sk=c&&(c.skins||[]).find(x=>x.id===t.dataset.s), x=t.dataset.x; o=sk&&(x==='stand'?sk:skinPart(sk,x)); what=sk&&sk.name+' '+(x==='stand'?'스탠딩':(SKP[x]||'')); after=()=>{ render(); skinRefresh(id); }; }
+case 'imgx': { const k=t.dataset.k, {o,what,after}=imgTarget(k,id,t);
       if(!o||!o.img) break; if(!(await appConfirm(`${what||'그림'}을(를) 지울까요? (항목은 남아요)`))) break;
       await imgClear(o); if(k==='char'){ (o.faces||[]).forEach(f=>{ if(f.img&&f.auto) imgClear(f); }); delete o.faceMask; mark('c:'+id); } else if(k==='lib') mark('l:'+id); else if(k==='skinpart'||k==='weapon') mark('c:'+id); else mark('meta');
       after(); toast('그림을 지웠어요'); break; }
@@ -60,7 +54,6 @@ case 'cftest': { const u=(($('#cf_url')||$('#sw_cfurl'))||{}).value; if(!u){toas
 case 'naitest': { const c=readNai(); if(!c.key){toast('토큰을 넣어 주세요');break;} t.disabled=true;
       try{ const r=await http(naiBase(c)+'/user/subscription',{headers:NAI_HDR(c.key),timeout:20000}); const j=okJSON(r); const sl=j.trainingStepsLeft||{}; const an=(sl.fixedTrainingStepsLeft||0)+(sl.purchasedTrainingSteps||0);
         toast(`연결 성공. ${['Paper','Tablet','Scroll','Opus'][j.tier]||'구독'} · Anlas ${an}`); }catch(e){ toast(naiErr(e,'연결 확인 실패')); } finally{ t.disabled=false; } break; }
-case 'naiall': await naiAll(t); break;
 case 'skinuse': {const c=charById(id),o=own(id);if(!c||!o)break;const sk=t.dataset.s;if(sk){const k=(c.skins||[]).find(x=>x.id===sk);if(!k)break;if(!skinHave(k)){toast(`캐시 상점의 ${T('skin')} 패키지에서 살 수 있어요`);break;}
  if(!skinDisplayReady(c,k)){if(SKJOB?.skinId===k.id){toast('이 스킨의 그림을 준비 중이에요. 완료 후 입혀 주세요');break;}if(c.useStanding!==false||!k.prompt||!imgReady()){toast(c.useStanding===false?'이 스킨의 상반신 그림이 필요해요. 스킨 편집에서 상반신을 넣거나 그림 AI를 연결해 주세요.':'아직 그려지지 않은 스킨이에요');break;}
  if(!(await appConfirm('이 스킨은 상반신 그림이 없어 기본 모습으로 표시되고 있어요. 그림 AI로 스킨 상반신을 생성한 뒤 입힐까요? 이미지 생성 비용이 발생할 수 있어요.')))break;
@@ -107,7 +100,6 @@ case 'skingo': { const c=charById(id), pr=$('#sk_prompt').value.trim(), nm=$('#s
       skinPropDraw(t); break; }
 case 'skindel': { const c=charById(id); c.skins=c.skins.filter(k=>k.id!==t.dataset.s); Object.values(P().owned).forEach(o=>{if(o.skin===t.dataset.s)o.skin='';}); mark('c:'+id,'prog'); skinRefresh(id); break; }
 case 'wnai': { const c=charById(id); if(!c) break; const pr=($('#f_wp')?$('#f_wp').value:'').trim(); if(pr&&pr!==String(c.weapon.prompt||'')){ c.weapon.prompt=pr; mark('c:'+id); } if(!String(c.weapon.prompt||'').trim()){toast(T('weapon')+' 프롬프트를 채워 주세요');break;} openNaiPrep('weapon',id); break; }
-case 'wgen': { const c=charById(id); if(!c) break; const sc=$('#wp_scene'); if(sc&&sc.value.trim()!==String(c.weapon.prompt||'')){ c.weapon.prompt=sc.value.trim();naiBlocksSave(c.weapon,'prompt',sc); mark('c:'+c.id); } if(!String(c.weapon.prompt||'').trim()){toast(T('weapon')+' 프롬프트를 채워 주세요');break;} openNaiPrep('weapon',id); break; }
 case 'imglib': openImgLib(id); break;
 case 'ilbtap': { if(!IMGLIB) break; const i=+t.dataset.i, its=charImgItems(charById(IMGLIB.cid)), it=its[i]; if(!it) break; const k=IMGLIB.sel.indexOf(i); if(k>=0) IMGLIB.sel.splice(k,1); else { IMGLIB.sel.push(i); if(IMGLIB.sel.length>2) IMGLIB.sel.shift(); }
       if(IMGLIB.sel.length===1&&k<0&&imgSrcRaw(it.o))imgViewer(imgSrcRaw(it.o)); openImgLib(IMGLIB.cid); break; }
@@ -156,14 +148,6 @@ case 'naiedit': { const j=NAIJOB; if(!j) break; NLASTSEED[j.id]=j.seed; openNaiP
 case 'naiuse': { await registerNaiJob(); break; }
 case 'naibatch': naiBatch(t.dataset.k); break;
 case 'naistop': if(NAIBATCH){NAIBATCH.stop=true;toast('지금 그리는 것까지만 하고 멈출게요');} break;
-case 'styopen': { const back=t.dataset.back||'';
-      if(back==='prep'&&NPREP&&$('#np_in')) NPREP.draft=Object.fromEntries(['np_in','np_neg','np_seed','np_model','np_size','np_frame','np_pose','np_posesel'].filter(k=>$('#'+k)).map(k=>[k,$('#'+k).value]));
-      else if($('#nai_key')){ appStorage.setItem(NKEY,JSON.stringify(readNai())); toast('지금까지 바꾼 그림 AI 설정을 저장했어요'); }
-      openStyles(back); break; }
-case 'styadd': { const x={id:'s'+uid(),name:'새 화풍',tags:'',neg:''}; $('#styList').insertAdjacentHTML('beforeend',styRow(x)); $('#sty_def').insertAdjacentHTML('beforeend',`<option value="${x.id}">새 화풍</option>`); const rows=document.querySelectorAll('#styList .styrow'); toast('새 화풍 항목을 목록 아래에 추가했어요'); break; }
-case 'stydel': { const r=t.closest('.styrow'); if(!r) break; if(document.querySelectorAll('#styList .styrow').length<=1){toast('프리셋은 하나 이상 있어야 해요');break;} const o2=$('#sty_def').querySelector(`option[value="${r.dataset.sid}"]`); if(o2) o2.remove(); r.remove(); break; }
-case 'stysave': { const st=readStyles(); let sv={}; try{sv=JSON.parse(appStorage.getItem(NKEY))||{};}catch(err){} sv.styles=st; const d=$('#sty_def').value; sv.styleId=st.some(x=>x.id===d)?d:st[0].id; sv.seeded=['am_v5']; appStorage.setItem(NKEY,JSON.stringify(sv)); toast('화풍 프리셋을 저장했어요');
-      if(STYBACK==='prep'&&NPREP){ const dr=NPREP.draft; openNaiPrep(NPREP.kind,NPREP.id); if(dr) Object.entries(dr).forEach(([k,v])=>{ const el=$('#'+k); if(el) el.value=v; }); } else openNaiSet(); break; }
 case 'skinbuy': openSkinBuy(id); break;
 case 'skinpkgdel': { const f=skinShopList().find(x=>x.k.id===id); if(!f) break; if((P().skinOwn||{})[id]){ toast('이미 산 '+T('skin')+'은 대원 화면에서 지워 주세요'); break; }
       if(!(await appConfirm(`${f.c.name} 「${f.k.name}」 패키지를 지울까요? 대원 화면의 🔒 ${T('skin')}도 함께 사라져요`))) break;
@@ -172,4 +156,12 @@ case 'skinpkgdel': { const f=skinShopList().find(x=>x.k.id===id); if(!f) break; 
 case 'skinnew': { if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); break; } t.disabled=true; const n=[]; let made=null; try{ made=await skinAuto(n); }finally{ liveBar(null); } toast(n[0]||'만들지 못했어요. AI 기록을 확인해 주세요'); render(); if(made&&made.k) openSkinBuy(made.k.id); break; }
   }
 }
-
+// 그림 지우기(imgx) 대상: 종류(k)별로 지울 그림 객체·이름·지운 뒤 다시 그릴 화면
+function imgTarget(k,id,t){ const re=f=>()=>{ render(); f&&f(); };
+  if(k==='char'){ const o=charById(id); return {o,what:o&&o.name+' 스탠딩',after:re(()=>openChar(id))}; }
+  if(k==='weapon'){ const c=charById(id); return {o:c&&c.weapon,what:c&&(c.weapon.name||T('weapon'))+' 그림',after:re(()=>openChar(id))}; }
+  if(k==='lib'){ const o=libById(id); return {o,what:o&&'「'+o.name+'」 그림',after:re(()=>openLibItem(id))}; }
+  if(k==='npc'||k==='npcup'){ const n=(G.npcs||[]).find(x=>x.id===id); return {o:n&&(k==='npc'?n:n.upper),what:n&&n.name+(k==='npc'?' 스탠딩':' 상반신'),after:()=>npcRefresh(id)}; }
+  if(k==='shk') return {o:G.meta.shop&&G.meta.shop.self,what:'상점 주인 그림',after:()=>{ SHOP_LINE=''; const pv=document.querySelector('.sk-prev'); if(pv) pv.innerHTML='<span>그림 없음</span>'; render(); }};
+  if(k==='skinpart'){ const c=charById(id), sk=c&&(c.skins||[]).find(x=>x.id===t.dataset.s), x=t.dataset.x; return {o:sk&&(x==='stand'?sk:skinPart(sk,x)),what:sk&&sk.name+' '+(x==='stand'?'스탠딩':(SKP[x]||'')),after:re(()=>skinRefresh(id))}; }
+  return {o:null,what:'그림',after:()=>render()}; }

@@ -35,8 +35,8 @@ const blobToData=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()
 async function saveImgBlob(b,base){
   const ext=/png/.test(b.type)?'png':/jpe?g/.test(b.type)?'jpg':'webp', name=String(base||'image').replace(/[^\w가-힣-]+/g,'_').slice(0,40)+'_'+Date.now().toString(36)+'.'+ext;
   if(IS_NATIVE&&CAP&&CAP.Filesystem){ const FS=CAP.Filesystem, data=String(await blobToData(b)).split(',')[1], path='가챠게임메이커/그림/'+name;
-    try{ try{ if(FS.requestPermissions) await FS.requestPermissions(); }catch(e){} await FS.writeFile({path,data,directory:'DOCUMENTS',recursive:true}); toast('Documents/'+path+' 에 저장했어요'); return; }
-    catch(e){ try{ await FS.writeFile({path:name,data,directory:'CACHE'}); const u=await FS.getUri({path:name,directory:'CACHE'}); if(CAP.Share){ await CAP.Share.share({title:name,files:[u.uri]}); return; } }catch(e2){} toast('그림을 저장하지 못했어요'); return; } }
+    try{ try{ if(FS.requestPermissions) await FS.requestPermissions(); }catch(e){ quietErr(e,'0550-standalone-app.js:38'); } await FS.writeFile({path,data,directory:'DOCUMENTS',recursive:true}); toast('Documents/'+path+' 에 저장했어요'); return; }
+    catch(e){ try{ await FS.writeFile({path:name,data,directory:'CACHE'}); const u=await FS.getUri({path:name,directory:'CACHE'}); if(CAP.Share){ await CAP.Share.share({title:name,files:[u.uri]}); return; } }catch(e2){ quietErr(e2,'0550-standalone-app.js:39'); } toast('그림을 저장하지 못했어요'); return; } }
   const file=new File([b],name,{type:b.type||'image/webp'});
   if(/iPhone|iPad|Android/i.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],title:name}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
   const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000); toast('다운로드 폴더에 저장했어요 · '+name);
@@ -57,7 +57,7 @@ function opt_(list,v){ return list.map(([k,l])=>`<option value="${esc(k)}" ${k==
 async function bkWriter(dest,name){
   if(IS_NATIVE&&CAP&&CAP.Filesystem){
     const FS=CAP.Filesystem, sub=dest==='docs'?'가챠게임메이커/':dest==='download'?'Download/가챠게임메이커/':'', dir=dest==='docs'?'DOCUMENTS':dest==='download'?'EXTERNAL_STORAGE':'CACHE', path=sub+name;
-    if(dest!=='share'){ try{ if(FS.requestPermissions) await FS.requestPermissions(); }catch(e){} }
+    if(dest!=='share'){ try{ if(FS.requestPermissions) await FS.requestPermissions(); }catch(e){ quietErr(e,'0550-standalone-app.js:60'); } }
     let first=true, buf='';
     const put=async()=>{ if(!buf&&!first) return; const data=buf; buf=''; if(first){ await FS.writeFile({path,data,directory:dir,encoding:'utf8',recursive:true}); first=false; } else await FS.appendFile({path,data,directory:dir,encoding:'utf8'}); };
     return {write:async s=>{ buf+=s; if(buf.length>1500000) await put(); }, close:async()=>{ await put(); const u=await FS.getUri({path,directory:dir}); return {uri:u.uri,where:dest==='share'?'':(dest==='docs'?'Documents/':'')+path}; }};

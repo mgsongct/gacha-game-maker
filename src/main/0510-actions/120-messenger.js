@@ -4,7 +4,6 @@ case 'phone': e.stopPropagation(); openPhone(); break;
 case 'openthread': { const n=$('#notif'); n.innerHTML=''; openPhone(id); break; }
 case 'phclose': closePhone(); break;
 case 'phback': phoneList(); break;
-case 'phtab': phoneList(); break;
 case 'openfc': openFree(id); break;
 case 'fcsend': fcSend(); break;
 case 'fcphoto': if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); break; } if(FCBUSY){ toast('답장을 기다리는 중이에요'); break; } $('#chatfile').click(); break;
@@ -12,7 +11,6 @@ case 'fcphototog': { const p=P(); p.fcPhoto=p.fcPhoto===false; mark('prog'); con
 case 'chatimg': chatImgView(t.dataset.k); break;
 case 'phpendx': if(PH){ PH.pendImg=null; phPendRender(); const i=$('#fcIn'); if(i) i.placeholder='메시지 보내기'; } break;
 case 'chatimgsave': { e.stopPropagation(); const u=chatImgCache[t.dataset.k]; if(u) saveImgUrl(u,'chat-photo'); break; }
-case 'fcmenu': phMenu(id); break;
 case 'phpick': { if(!PH) break; const tid=t.dataset.tid||PH.tid, th=threadById(tid), s=th&&p.inbox[tid]; if(!th||!s){ if(PH.fc) openRoom(PH.fc); break; }
       const c=threadChar(th), lines=parseScript(th.script); let L=lines[s.pos];
       if(!L||L.type!=='choice'){ let j=s.pos; while(j>0&&!(lines[j]&&lines[j].type==='choice')) j--; if(lines[j]&&lines[j].type==='choice'&&!s.log.some(x=>x.w==='me'&&x.pi===j)){ s.pos=j; L=lines[j]; } else { openRoom(c.id); break; } }

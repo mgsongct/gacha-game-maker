@@ -10,7 +10,9 @@ export function repeatedStrings(units, min = 60, times = 3) { const g = new Map(
 export function sgRules(units) { const R = { listeners: [], emptyCatch: [], rawHTML: [] };
   for (const u of units) { const sg = u.sg, at = n => { const p = u.at(n.range().start.line); return `${p.file}:${p.line}`; };
     for (const n of sg.findAll("document.addEventListener('click', $$$)")) R.listeners.push(at(n));
-    for (const n of sg.findAll('try { $$$ } catch ($E) {}')) R.emptyCatch.push(at(n));
+    for (const n of [...sg.findAll('try { $$$ } catch ($E) {}'), ...sg.findAll('try { $$$ } catch {}')]) { const t = n.text().replace(/catch[\s\S]*$/, ''), cb = n.text().slice(n.text().lastIndexOf('catch')); R.emptyCatch.push({ loc: at(n), cat: /\/\*|\/\//.test(cb) ? '의도 표시' : /JSON\.parse/.test(t) ? '파싱 대체' : /appStorage|localStorage|sessionStorage|idb|indexedDB/.test(t) ? '저장소 대체' : /\bawait\b|fetch\(|aiJSON|http\(/.test(t) ? '비동기 작업' : '동기 대체' }); }
     for (const n of sg.findAll('$EL.innerHTML = $V')) { const v = n.getMatch('V'); if (!v || v.kind() !== 'template_string') continue; const subs = v.findAll({ rule: { kind: 'template_substitution' } }).map(s => s.text()); const raw = subs.filter(s => /^\$\{\s*[A-Za-z_$][\w$.]*(\.(name|text|title|desc|msg))\s*\}$/.test(s)); if (raw.length) R.rawHTML.push({ loc: at(n), subs: raw.slice(0, 3) }); } }
   return R; }
-export function complexFns(fns, cc = 40, lines = 120) { return [...fns.values()].filter(f => f.cc >= cc || f.lines >= lines || f.depth >= 7).sort((a, b) => b.cc - a.cc); }
+export function complexFns(fns, cc = 40, lines = 120) { return [...fns.values()].filter(f => !f.cases && (f.cc >= cc || f.lines >= lines || f.depth >= 7)).sort((a, b) => b.cc - a.cc); }
+// 분배기의 case 중 복잡한 것(case 하나가 함수 하나만큼 커지면 따로 빼는 게 좋음)
+export function complexCases(fns, cc = 20) { return [...fns.values()].filter(f => f.cases).flatMap(f => f.cases.map(c => ({ ...c, fn: f.name }))).filter(c => c.cc >= cc || c.depth >= 5).sort((a, b) => b.cc - a.cc); }

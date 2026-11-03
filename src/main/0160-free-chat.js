@@ -84,7 +84,7 @@ async function fcSummarize(cid){
   try{ const r=await aiJSON(`${c.name}와(과) ${playerName()}의 메신저 대화를 다음 대화에서 참고할 수 있게 요약하라. 약속, 서로 알게 된 사실, 감정 변화, 별명, 농담을 중심으로 6문장 이내.
 ${f.sum?'기존 요약: '+f.sum+'\n':''}새 대화:
 ${part.map(l=>(l.w==='me'?playerName():l.w==='c'?c.name:'')+': '+l.t).join('\n')}
-JSON만 출력: {"summary":"요약"}`,null,'quick'); if(r&&r.summary){ f.sum=String(r.summary).slice(0,1200); f.sumTo=end; mark('prog'); } }catch(e){}
+JSON만 출력: {"summary":"요약"}`,null,'quick'); if(r&&r.summary){ f.sum=String(r.summary).slice(0,1200); f.sumTo=end; mark('prog'); } }catch(e){ quietErr(e,'0160-free-chat.js:87'); }
 }
 document.addEventListener('keydown',e=>{ if(e.target&&e.target.id==='fcIn'&&e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); if(e.isComposing||e.keyCode===229) return; fcSend(); } });
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='fcIn'){ const t=e.target; t.style.height='auto'; t.style.height=Math.min(120,t.scrollHeight)+'px'; } });

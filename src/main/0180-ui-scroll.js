@@ -379,23 +379,6 @@ function readNai(){
 
 function naiTarget(kind,id){if(ILK(kind)){const c=charById(id);return c&&c[kind];}if(kind==='weapon'){const c=charById(id);return c&&c.weapon;}return kind==='char'?charById(id):libById(id);}
 /* 화풍 프리셋 편집 */
-let STYBACK='';
-function styRow(x){return `<div class="styrow" data-sid="${esc(x.id)}"><div class="styhead"><input class="in sty-n" value="${esc(x.name)}" placeholder="프리셋 이름" maxlength="30"><button class="btn sm ghost" data-act="stydel" aria-label="삭제">삭제</button></div>
-  <label class="f">화풍 태그 (작가 태그, 연도, 채색 등)</label><textarea class="in sty-t" placeholder="artist:이름, 0.8::artist:이름2::, year 2024">${esc(x.tags)}</textarea>
-  <label class="f">네거티브 추가 (선택)</label><input class="in sty-g" value="${esc(x.neg||'')}"></div>`;}
-function openStyles(back){
-  STYBACK=back||''; const c=naiCfg();
-  openModal(`${head('화풍 프리셋')}
-    <p class="muted" style="margin:0 0 10px">그림체 태그를 묶어서 이름을 붙여 두면, 그릴 때 이름만 골라 쓸 수 있어요. 고른 프리셋의 태그가 프롬프트 맨 앞에 들어가요.</p>
-    <div id="styList">${c.styles.map(styRow).join('')}</div>
-    <button class="btn ghost block" data-act="styadd" style="margin-top:8px">＋ 새 프리셋</button>
-    <label class="f" for="sty_def">기본으로 쓸 프리셋</label><select class="in" id="sty_def">${c.styles.map(x=>`<option value="${esc(x.id)}" ${x.id===c.styleId?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
-    <div class="row" style="margin-top:14px"><button class="btn" data-act="stysave">저장</button></div>`);
-}
-function readStyles(){
-  const out=[]; document.querySelectorAll('#styList .styrow').forEach((r,i)=>{const name=r.querySelector('.sty-n').value.trim()||('화풍 '+(i+1)); out.push({id:r.dataset.sid,name,tags:r.querySelector('.sty-t').value.trim(),neg:r.querySelector('.sty-g').value.trim()});});
-  return out;
-}
 let CUTJOB=null;
 function openCut(kind,id){
   const o=naiTarget(kind,id); const src=o&&imgSrc(o); if(!src){toast('먼저 이미지를 등록해 주세요');return;}

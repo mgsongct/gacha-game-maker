@@ -171,16 +171,6 @@ async function runPrep(cats,filter,opt){
   }
   PREPJOB=null; prepChip(); render(); toast(`그림 ${j.done}장을 준비했어요`); if(opt.done) opt.done(j);
 }
-async function naiAll(btn){
-  const list=drawTodo(); if(!list.length){toast('그릴 것이 없어요');return;}
-  if(!imgReady()){toast(imgNeed());return;}
-  if(!(await appConfirm(`${list.length}장을 차례로 그려요. Opus 구독이 아니면 Anlas가 들어요. 진행할까요?`))) return;
-  btn.disabled=true; let n=0;
-  for(const it of list){ if(btn.isConnected) btn.textContent=`그리는 중 ${n}/${list.length} · ${it.label}`;
-    try{ const b=await naiDrawItem(it); await wait(600); await storeImage(it.o,b,it.k==='char'?'c:':(it.k==='weapon'||it.k==='upper'||it.k==='pose'||it.k==='lbbg'||it.k==='scg')?'':'l:'); if(it.k==='weapon'||it.k==='upper'||it.k==='pose'||it.k==='lbbg'||it.k==='scg') mark('c:'+it.c.id); n++; }
-    catch(e){ toast(naiErr(e)); break; } }
-  toast(`${n}장을 그렸어요`); render();
-}
 function noticeHTML(){
   const L=P().live; L.seen=Date.now(); mark('prog'); const todo=drawTodo();
   return `${pageHead('공지','NOTICE','lobby')}

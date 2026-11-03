@@ -40,7 +40,6 @@ case 'scgdel': { const c=charById(id); if(!c||!c.scg) break; if(!(await appConfi
 case 'scgtest': { const c=charById(id); if(c) skillCut(c,c.skill.name,true,document.body); break; }
 case 'ilgen': { const c=charById(id); if(!c) break; const k=t.dataset.k==='lbcg'?'lbcg':'illust'; if(!SAMPLE){toast('설정 → 글 AI를 먼저 등록해 주세요.');break;} const sc=$(k==='lbcg'?'#lb_scene':'#il_scene'); if(sc){ c[k].prompt=sc.value.trim();naiBlocksSave(c[k],'prompt',sc); mark('c:'+c.id); } if(!String(c.naiPrompt||'').trim()){toast('먼저 설정 편집에서 NAI 스탠딩 프롬프트를 채워 주세요');break;} openNaiPrep(k,c.id); break; }
 case 'vncgview': { const im=$('#vnCG img'); if(im) imgViewer(im.src); break; }
-case 'cgview': { const c=charById(id); if(c) lbReveal(c,t.dataset.k==='lbcg'?'lbcg':'illust'); break; }
 case 'cguse': { const o=own(id); if(!o) break; o.useCg=t.checked; mark('prog'); toast(o.useCg?'로비에 '+T('limit')+' CG를 써요':'로비에 기본 일러스트를 써요'); break; }
 case 'ildel': { const c=charById(id), k=t.dataset.k==='lbcg'?'lbcg':'illust'; if(!c||!(await appConfirm(k==='lbcg'?T('limit')+' CG를 지울까요?':'일러스트를 지울까요?'))) break; const o=c[k];await imgClear(o); mark('c:'+c.id); render(); openChar(id); break; }
 case 'ailog': openModal(aiLogHTML(!!(t.closest('#drPage')||t.dataset.v))); break;
@@ -62,8 +61,6 @@ case 'playep': { const c=charById(id),ep=c.episodes.find(x=>x.id===t.dataset.ep)
       playStory(`${c.name} · ${ep.title}`,ep.script,()=>{const o=own(id);if(o){o.seen=o.seen||[];if(!o.seen.includes(ep.id)){o.seen.push(ep.id);mark('prog');}}openChar(id);}); break; }
 case 'mapedit': { const ch=G.chapters.find(x=>x.id===t.dataset.ch); if(!ch) break; const l=ensureChMap(ch); openLibItem(l.id); break; }
 case 'locked': toast('이전 작전을 먼저 클리어하세요'); break;
-case 'sq': refreshForm(); break;
-case 'discover': discover(t); break;
 case 'ghist': openHistory(); break;
 case 'vnnext': vnStep(); break;
 case 'vnpick': { e.stopPropagation(); if(!S||!S.choice) break; const n=+t.dataset.n,o=S.choice.opts[n-1]; S.pick=n; S.lastPick=o; S.choice=null; if(S.branch){ storyFlag(S.branch,n,o); S.branch=null; } $('#vnCh').innerHTML=''; vnShow({type:'say',who:T('player'),text:o}); break; }
@@ -100,7 +97,6 @@ case 'ailib': { const k=t.dataset.k,nm=$('#li_name').value.trim(),ds=$('#li_desc
       if(k==='enemy'){ const r=await aiJSON(`세계관: ${G.world.summary}\n${G.world.lore}\n적 "${nm}"${ds?' ('+ds+')':''}의 NovelAI 외형 프롬프트를 영어 태그로 써라. 괴물이나 기계면 "no humans"로, 사람형 적이면 "1other, faceless"나 성별 태그로 시작한다. 생김새, 재질, 색, 빛, 무기, 위압감을 넣고 자세·배경·화풍 태그는 쓰지 않는다.\nJSON만 출력: {"prompt":"..."}`,t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
       const r=await aiJSON(`세계관: ${G.world.summary}\n${k==='bg'?'배경':'소품'} "${nm}"${ds?' ('+ds+')':''}의 NovelAI 이미지 프롬프트를 영어 태그로 써라. ${k==='bg'?'"no humans, scenery"로 시작하고 장소, 시간대, 날씨, 조명, 분위기 태그를 넣고 "anime background, highly detailed"로 끝낸다.':'"no humans, object focus"로 시작하고 물건의 모양, 재질, 디테일 태그를 넣고 "simple background, white background"로 끝낸다.'}\nJSON만 출력: {"prompt":"..."}`,t,'quick');
       if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
-case 'aichar-open': openNewPickup(); break;
 case 'newpu': openNewPickup(); break;
 case 'newpu-hand': { NEWPU=$('#pu_lim').value==='limited'?'limited':'pickup'; window.__PUSTORY=!!($('#pu_story')&&$('#pu_story').checked); closeModal(); openCharEdit(null); break; }
 case 'newpu-ai': { const con=$('#pu_c').value.trim(), kind=$('#pu_kind')?$('#pu_kind').value:'orig', col=kind==='collab'?{src:$('#pu_src').value.trim(),who:$('#pu_who').value.trim()}:null, altB=kind==='alt'?charById($('#pu_base').value):null;
@@ -121,11 +117,7 @@ case 'newpu-ai': { const con=$('#pu_c').value.trim(), kind=$('#pu_kind')?$('#pu_
         if(split) P().curBanner=b.id; mark('prog');
         if(story) puStoryBg(c,lim); const all=[c,...ex]; artAfterAI(y=>all.includes(y.o)||all.includes(y.c),'신규 '+T('crew')+' '+all.map(x=>x.name).join(', '));
         return {title:(c.alt?`이격 ${RL[c.rarity]} ${c.name}`:`신규 ${RL[c.rarity]} ${c.name}`)+(ex.length?` 외 ${ex.length}명`:'')+' 픽업이 열렸어요',body:`${T('gacha')} 화면에서 바로 뽑을 수 있어요.${story?'\n픽업 스토리는 이어서 뒤에서 쓰고 있어요. 다 되면 이벤트에 열려요.':''}`}; }); break; }
-case 'aichar': { const con=$('#ai_c').value.trim(); if(!con){toast('어떤 '+T('crew')+'인지 적어 주세요');break;}
-      const r=await aiJSON(`${RULES}\n${ctx()}\n\n새 ${T('crew')} 1명을 만들어라. 요청: "${con}"\n메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다.\nJSON 객체만 출력: ${charSchema()}\n${CHAR_STAT_RULE}`,t);
-      if(r){ const c=cleanChar(r); if(!c.name)c.name='이름 없음'; G.chars.push(c); mark('c:'+c.id); closeModal(); render(); openChar(c.id); artAfterAI(x=>x.o===c||x.c===c,'새 '+T('crew')+' '+c.name); toast(`${c.name}이(가) 추가됐어요`);} break; }
 case 'nextneedai': toast('설정 → 글 AI에서 AI를 먼저 등록해 주세요'); break;
-case 'testai': { const r=await aiJSON('연결 테스트다. {"ok":true}를 그대로 출력하라.',t,'quick'); if(r&&r.ok) toast('AI 연결 성공'); break; }
 case 'cplogin': readAp(); copilotLogin(t); break;
 case 'saload': { const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json'; inp.onchange=async()=>{ const f=inp.files[0]; if(!f) return; const tx=await f.text(); if($('#ap_sa')) $('#ap_sa').value=tx; try{ const j=JSON.parse(tx); if($('#ap_project')&&!$('#ap_project').value) $('#ap_project').value=j.project_id||''; toast('서비스 계정 키를 불러왔어요'); }catch(e){ toast('JSON 파일이 아니에요'); } }; inp.click(); break; }
 case 'seasoninfo': openSeasonInfo(); break;
@@ -160,7 +152,6 @@ case 'pget': { const l=+t.dataset.lv; if(l>passLv()||P().pass.got.includes(l)) b
 case 'logoprev': { const keep=G.meta.logoStyle; G.meta.logoStyle=$('#mt_logo').value; showTitle(); G.meta.logoStyle=keep; const t=$('.title'); if(t){ t.dataset.act='logoprevclose'; const tt=t.querySelector('.t-touch'); if(tt) tt.textContent='눌러서 설정으로 돌아가기'; }
       $('#modal').hidden=true; break; }
 case 'logoprevclose': $('#ov').hidden=true; $('#ov').innerHTML=''; if($('#modal').innerHTML) $('#modal').hidden=false; sceneBgm(); break;
-case 'newgame-open': openDraft(); break;
 case 'aievent-open': openAiEvent(); break;
 case 'aievent': await aiEvent(t); break;
 case 'sfxplay': { const l=libById(id); if(l) sfx(l.name); break; }
@@ -176,14 +167,14 @@ case 'shareopen': openShare(); break;
 case 'sharego': { const img=$('#sh_img').checked, audio=$('#sh_aud').checked, gate=$('#sh_gate')?$('#sh_gate').checked:true; closeModal(); exportFile({share:true,img,audio,gate}); break; }
 case 'fbopen': openFeedback(); break;
 case 'fbissue': { const txt=feedbackText(); const url=`https://github.com/${updRepo(LV())}/issues/new?title=${encodeURIComponent('[피드백] '+(($('#fb_bad')&&$('#fb_bad').value.trim())||($('#fb_good')&&$('#fb_good').value.trim())||'의견').slice(0,40))}&body=${encodeURIComponent(txt)}`; openUrl(url); break; }
-case 'fbpost': { try{ await navigator.clipboard.writeText(feedbackText()); toast('피드백을 복사했어요. 게시글 댓글에 붙여 넣어 주세요'); }catch(err){} openUrl(LV().feedback); break; }
+case 'fbpost': { try{ await navigator.clipboard.writeText(feedbackText()); toast('피드백을 복사했어요. 게시글 댓글에 붙여 넣어 주세요'); }catch(err){ quietErr(err,'0510-actions/020-navigation-and-tools.js:170'); } openUrl(LV().feedback); break; }
 case 'fbstar': FB_STAR=+t.dataset.n; document.querySelectorAll('#fbStars .chip').forEach(b=>b.classList.toggle('on',+b.dataset.n===FB_STAR)); break;
 case 'fbsend': { const txt=feedbackText(); await shareText(G.meta.title+' 피드백',txt); break; }
 case 'guidecopy': shareText(G.meta.title+' 테스트 안내',guideText()); break;
 case 'skbdraw': { const f=skinShopList().find(x=>x.k.id===id); if(!f) break; if(!imgReady()){ toast(imgNeed()); break; } if(document.querySelector('[data-skp]')) SKBUYSEL=skinSelRead(); t.disabled=true; t.textContent='그리는 중…';
       try{ const target=skinPrimaryPart(f.c,f.k),b=await skinPartDraw(f.c,f.k,target===f.k?'stand':'upper','manual');await storeImage(target,b,''); mark('c:'+f.c.id); }catch(err){ toast(naiErr(err)); } openSkinBuy(id); break; }
 case 'skbbuy': { const f=skinShopList().find(x=>x.k.id===id); if(!f) break; const p=P(), pr=f.k.price||SKIN_PRICE, sel=skinSelRead(); SKBUYSEL=sel; p.skinOwn=p.skinOwn||{}; if(p.skinOwn[id]) break;if(!skinDisplayReady(f.c,f.k)){toast('현재 표시 방식에 맞는 스킨 그림을 먼저 생성해 주세요');break;}if(p.gems<pr){ toast(`${T('currency')}이 모자라요`); break; }
-      p.gems-=pr; p.skinOwn[id]=true; f.k.faces=f.k.faces||[]; mark('prog'); closeModal(); render(); buyFx(f.k.name,`${f.c.name}의 ${T('skin')}`+(own(f.c.id)?' · 외형에서 입힐 수 있어요':' · '+T('crew')+'를 얻으면 입힐 수 있어요')); skinMakeRest(f.c,f.k,Object.assign({},sel)); break; }
+      pay({gems:pr}); p.skinOwn[id]=true; f.k.faces=f.k.faces||[]; mark('prog'); closeModal(); render(); buyFx(f.k.name,`${f.c.name}의 ${T('skin')}`+(own(f.c.id)?' · 외형에서 입힐 수 있어요':' · '+T('crew')+'를 얻으면 입힐 수 있어요')); skinMakeRest(f.c,f.k,Object.assign({},sel)); break; }
 case 'reroll0': { if(!(await appConfirm(`리세마라: 보유 ${T('crew')}·재화·클리어 기록만 지우고 처음부터 다시 해요.\n세계관·${T('crew')}·스토리·그림·설정은 그대로예요. 진행할까요?`))) break;
       const o=P(), keep={}; ['player','genderTxt','gender','look','bio','hideEyes','avatar','nameAsked','settings','scene','lobbyMode','csFull','lobbyBg','titleBg','titleChar','gachaBg','skillCut','battleMotion'].forEach(k=>{ if(o[k]!==undefined) keep[k]=o[k]; });
       G.prog=Object.assign(clone(DEFAULT_PROG),keep,{seenOpening:false,castDone:1,bootPrep:1}); markAll(); await flush(); reloadGame(); break; }

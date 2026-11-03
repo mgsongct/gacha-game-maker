@@ -44,7 +44,6 @@ case 'bdone': { if(B&&(B.ctx.kind==='raid'||B.ctx.kind==='rogue')){ const rg=B.c
       if(win&&first&&s.post) playStory(s.title,s.post,()=>{render();checkTriggers();}); else checkTriggers(); break; }
 case 'opsch': OPS_CH=t.dataset.ch; render(); $('#view').scrollTop=0; break;
 case 'opsback': OPS_CH=null; render(); break;
-case 'fsq': refreshForm(); break;
 case 'fpick': { const i=squadSel.indexOf(id), added=i<0; const x=e.clientX||innerWidth/2, y=e.clientY||innerHeight/2;
       if(i>=0) squadSel.splice(i,1); else if(squadSel.length<4) squadSel.push(id); else {toast('최대 4명까지 편성할 수 있어요');break;}
       const sh=$('#modal .sheet'), st=sh?sh.scrollTop:0; refreshForm(); const sh2=$('#modal .sheet'); if(sh2) sh2.scrollTop=st; ripple(x,y,false);

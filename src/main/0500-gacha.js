@@ -50,7 +50,7 @@ function rollOne(guarSR,forceSSR,b){
 // 뽑기·건조가 같이 써요: 처음이면 보유 등록, 이미 있으면 돌파(최대 5) + 환급, 기록 남기기
 function grantOwned(c,source){
   const p=P(); p.hist2=p.hist2||[]; let isNew=false,refund=0;
-  if(p.owned[c.id]){const o=p.owned[c.id];if(o.dup<5){o.dup++;if(o.dup>=5)o.cgNew=true;}refund=REFUND[c.rarity];p.gems+=refund;p.mat.core+=c.rarity;}
+  if(p.owned[c.id]){const o=p.owned[c.id];if(o.dup<5){o.dup++;if(o.dup>=5)o.cgNew=true;}refund=REFUND[c.rarity];giveReward({gems:refund});p.mat.core+=c.rarity;}
   else{p.owned[c.id]={levelCapVersion:1,transc:0,growthCostVersion:1,lv:1,exp:0,dup:0,aff:0,seen:[],wlv:0,skin:''};isNew=true;if(!p.sec)p.sec=c.id;if(p.squad.length<4)p.squad.push(c.id);}
   p.history.unshift(c.id); p.history=p.history.slice(0,80);
   p.hist2.unshift({id:c.id,b:source,at:Date.now(),n:isNew}); p.hist2=p.hist2.slice(0,200);
@@ -68,28 +68,11 @@ function openHistory(){
   openModal(`${head(T('gacha')+' 기록',`<span class="muted">최근 ${h.length}회 · SSR ${cnt[0]} · SR ${cnt[1]} · R ${cnt[2]}</span>`)}
     <div class="ghist">${h.map(x=>{const c=charById(x.id); if(!c) return ''; const d=new Date(x.at); return `<div class="gh r${c.rarity}"><span class="badge r${c.rarity}c">${RL[c.rarity]}</span><b>${esc(c.name)}${x.n?'<em>NEW</em>':''}</b><span class="muted">${esc(x.b||'')}</span><small>${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</small></div>`;}).join('')||'<p class="muted">아직 기록이 없어요.</p>'}</div>`);
 }
-const DISC_SEEDS=['몰락한 귀족','현상금 사냥꾼','기억을 잃은 실험체','전직 경찰','떠돌이 음유시인','암시장 정비공','전설의 은둔 고수','라이벌 조직의 이탈자','수상한 상인','도서관 사서','군 출신 저격수','길거리 요리사','점성술사','해커','무녀','기사단 낙오자','쌍둥이 중 한 명','하늘을 나는 배달부','유령을 보는 탐정','폐허의 수집가'];
-async function discover(btn){
-  const p=P(), s=p.settings, cost=COST*10;
-  if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; }
-  if(p.gems<cost){ toast(`${T('currency')}이(가) ${nf(cost-p.gems)}개 모자라요`); return; }
-  const x=Math.random()*100, ssr=Math.min(60,s.ssr*3), r=x<ssr?3:x<ssr+s.sr?2:1;
-  const seed=rand(DISC_SEEDS), role=rand(['atk','def','sup']), elem=rand(ELEMS), fac=(G.world.factions||[]).length?rand(G.world.factions).name:'';
-  openModal(`<div class="decode"><div class="dc-ring"></div><div class="dc-ring b"></div><b>신호 해독 중…</b><span>새로운 ${esc(T('crew'))}의 기록을 불러오고 있어요</span></div>`,true);
-  const res=await aiJSON(`${RULES}\n${ctx()}\n\n아직 등장하지 않은 새 ${T('crew')} 1명을 만들어라. 기존 ${T('crew')}과 이름, 외모, 성격이 겹치지 않게 한다.\n조건: 희귀도 ${r} (${RL[r]}), 역할 ${role}, 속성 ${elem}${fac?', 소속 후보 '+fac:''}, 콘셉트 힌트 "${seed}"(그대로 쓰지 말고 세계관에 맞게 비틀어라).\n메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다.\nJSON 객체만 출력: ${charSchema()}\n${CHAR_STAT_RULE}`,null,'complex');
-  if(!res){ closeModal(); return; }
-  const c=cleanChar(Object.assign(res,{rarity:r,role,elem})); if(!c.name) c.name='이름 없는 '+T('crew');
-  G.chars.push(c); mark('c:'+c.id); p.gems-=cost; bump('pull',10); artAfterAI(x=>x.o===c||x.c===c,'새 '+T('crew')+' '+c.name);
-  p.owned[c.id]={levelCapVersion:1,transc:0,growthCostVersion:1,lv:1,exp:0,dup:0,aff:0,seen:[],wlv:0,skin:''}; if(p.squad.length<4) p.squad.push(c.id); p.history.unshift(c.id);
-  mark('prog'); closeModal(); render();
-  playGacha([{c,isNew:true,refund:0}]);
-  if(imgReady()) setTimeout(()=>runPrep(['char'],it=>it.c&&it.c.id===c.id),1500);
-}
 async function pull(n){
   if(appStorage.failed||document.getElementById('save-warning')){storageWarning('저장을 먼저 복구해 주세요.');return;}
   if(!G.chars.length){toast(T('gacha')+'할 '+T('crew')+'이(가) 없어요.');return;}
   const b=curBanner(); if(!b){toast('열린 배너가 없어요');return;} const cost=n*COST; if(P().gems<cost){toast(`${T('currency')}이(가) ${nf(cost-P().gems)}개 모자라요.`);return;}
-  P().gems-=cost; bump('pull',n); const res=[]; const ft=n===10&&P().firstTen; if(ft) P().firstTen=false;
+  pay({gems:cost}); bump('pull',n); const res=[]; const ft=n===10&&P().firstTen; if(ft) P().firstTen=false;
   for(let i=0;i<n;i++) res.push(rollOne(n===10&&i===9&&!res.some(x=>x.c.rarity>=2),ft&&i===9&&!res.some(x=>x.c.rarity===3),b));
   mark('prog'); try{await flush();}catch(e){render();return;} render(); playGacha(res);
 }

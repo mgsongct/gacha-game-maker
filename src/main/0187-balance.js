@@ -41,7 +41,7 @@ function balSave(){ const v=id=>+(($('#'+id)||{}).value), m=G.meta; m.balance=Ob
 async function balFix(kind){ const ids=[...document.querySelectorAll('[data-bal]:checked')].map(x=>x.dataset.bal), cs=ids.map(charById).filter(Boolean); if(!cs.length){ toast('캐릭터를 골라 주세요'); return; }
   const label={edge:'능력치 범위 안으로',center:'능력치 기준값으로',remaster:'세대 맞추기',skill:'스킬 밸런스 재검사'}[kind]; auditSnap(cs,label); let n=0;
   for(const c of cs){ let ok=false; if(kind==='edge'||kind==='center') ok=balNormalize(c,kind); else if(kind==='remaster') ok=balRemaster(c); else if(kind==='skill'){ c.skillBalance=null; ok=true; } if(ok){ mark('c:'+c.id); n++; } }
-  if(kind==='skill'||kind==='remaster'){ syBar('스킬 밸런스 검사 중…'); try{ await v2ReadyChars(cs.filter(c=>!c.skillBalance)); }catch(e){} syBar(''); }
+  if(kind==='skill'||kind==='remaster'){ syBar('스킬 밸런스 검사 중…'); try{ await v2ReadyChars(cs.filter(c=>!c.skillBalance)); }catch(e){ quietErr(e,'0187-balance.js:44'); } syBar(''); }
   toast(`${label}: ${n}명 (되돌리기 가능)`); openBalance(); }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
   if(a==='balopen') openBalance();

@@ -609,6 +609,21 @@ try {
     return o; });
   assert.ok(Object.values(r25).every(v => v === true), JSON.stringify(r25)); assert.deepEqual(err25, [], '페이지 오류');
   console.log('ok 25 스테이지 양식: 회담(추궁·증거·설득·신뢰도·실패)·콘테스트(매력·취향·분위기·1위), 생성 검증·끄기·클리어·진입');
+  // 26) 정리 후 동작: 그림 지우기 대상(imgTarget)·리롤 초안(rerollDraft)·조용한 오류 기록(quietErr)·재화는 pay/giveReward로만·지운 액션이 분배 표에 없음
+  const p26 = await browser.newPage(), err26 = []; p26.on('pageerror', e => err26.push(String(e)));
+  await p26.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p26.goto(`http://127.0.0.1:${server.address().port}/?t=26`);
+  await p26.waitForFunction(() => typeof imgTarget === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r26 = await p26.evaluate(async () => {
+    const o = {}, c = G.chars[0], l = G.lib.find(x => x.kind === 'bg'); P().seenOpening = true;
+    const a = imgTarget('char', c.id, { dataset: {} }), b = imgTarget('lib', l.id, { dataset: {} }), w = imgTarget('weapon', c.id, { dataset: {} }), z = imgTarget('없음', 'x', { dataset: {} });
+    o.target = a.o === c && a.what.includes('스탠딩') && b.o === l && w.o === c.weapon && z.o === null && typeof a.after === 'function';
+    const d = rerollDraft(G, G.meta.title); o.reroll = d.mode === 'detail' && d.chars.length === G.chars.filter(x => !x.alt).length + (G.npcs || []).length && d.chars[0].name === G.chars.filter(x => !x.alt)[0].name;
+    const n0 = QUIET.length; quietErr(new Error('테스트 오류'), 'test:1'); o.quiet = QUIET.length === n0 + 1 && QUIET[0].msg === '테스트 오류';
+    P().gems = 1000; pay({ gems: 300 }); giveReward({ gems: 50 }); o.gems = P().gems === 750;
+    o.registry = !['gateyes', 'cheat', 'reset', 'naiall', 'styopen'].some(k => APP_ACTION_HANDLERS[k]) && !!APP_ACTION_HANDLERS.imgx && !!APP_ACTION_HANDLERS.pjreroll;
+    return o; });
+  assert.ok(Object.values(r26).every(v => v === true), JSON.stringify(r26)); assert.deepEqual(err26, [], '페이지 오류');
+  console.log('ok 26 정리 후 동작: 그림 지우기 대상·리롤 초안 함수, 조용한 오류 기록, 재화 단일 경로, 지운 액션이 분배 표에서 빠짐');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
