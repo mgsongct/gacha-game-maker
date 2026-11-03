@@ -446,7 +446,7 @@ try {
   const r20 = await p20.evaluate(async () => {
     const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true; closeModal(); closeOv();
     const L = parseScript('세라[미소|하트|점프]: 정말?\n[연출: 이브 땀 떨림]\n[효과: 비]\n이브[당황]: 어어…\n[스티커: 화남]');
-    o.parse = L[0].type === 'say' && L[0].who === '세라' && L[0].face === '미소' && L[0].dir.emo === '하트' && L[0].dir.motion === '점프' && L[1].cmd === '연출' && L[2].cmd === '효과' && L[3].dir.emo === '땀' && L[3].face === '' && L[4].cmd === '스티커';
+    o.parse = L[0].type === 'say' && L[0].who === '세라' && L[0].face === '미소' && L[0].dir.emo === '하트' && L[0].dir.motion === '점프' && L[1].cmd === '연출' && L[2].cmd === '효과' && L[3].face === '당황' && !L[3].dir && L[4].cmd === '스티커';
     o.plain = parseScript('세라[미소]: 안녕')[0].face === '미소' && !parseScript('세라[미소]: 안녕')[0].dir;
     o.auto = autoEmote('뭐라고?!') === '놀람' && autoEmote('좋아해') === '하트' && autoEmote('그냥 걷자') === '';
     o.guide = SCRIPT_FMT.includes('감정 아이콘') && SCRIPT_FMT.includes('[효과: 흔들림') && THREAD_FMT.includes('[스티커:');
@@ -700,6 +700,18 @@ try {
     return o; });
   assert.ok(Object.values(r29).every(v => v === true), JSON.stringify(r29)); assert.deepEqual(err29, [], '페이지 오류');
   console.log('ok 29 시나리오 설계 자동: 장을 쓰기 전에 없으면 설계·막이 끝났으면 잇기·글 AI 없으면 안 함, 스테이지 집필에 설계(복선·반전) 전달');
+  // 30) 규칙·세력·연출 수정: 현재 장(다 깨지 않은 첫 메인 장), 빈 배너 풀이 잠긴 캐릭터로 채워지지 않음, 넘기기가 분기 선택지에서 멈춤, 패배 화면 상성이 실제 상성표
+  const p30 = await browser.newPage(), err30 = []; p30.on('pageerror', e => err30.push(String(e)));
+  await p30.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p30.goto(`http://127.0.0.1:${server.address().port}/?t=30`);
+  await p30.waitForFunction(() => typeof vnSkip === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r30 = await p30.evaluate(async () => { const o = {}; P().seenOpening = true; closeModal(); closeOv();
+    const main = G.chapters.filter(ch => ch.kind === 'main'); P().cleared = {}; o.now1 = mainNow() === 1; P().cleared[main[0].stages[0].id] = true; o.nowPartial = mainNow() === 1; main[0].stages.forEach(s => { P().cleared[s.id] = true; }); o.nowNext = mainNow() === 2; P().cleared = {};
+    const lockAll = G.chars.map(c => [c, c.debutLater]); G.chars.forEach((c, i) => { if (i) c.debutLater = true; }); const pool = bannerPool({ id: 'x', pool: { mode: 'list', ids: [] }, pickup: [] }); o.poolOpen = pool.every(c => castOk(c)); lockAll.forEach(([c, v]) => { c.debutLater = v; });
+    let done = false; playStory('t', '세라: 하나\n세라: 둘\n[분기: b1]\n선택: 가 | 나\n세라: 끝', () => { done = true; }); vnSkip(); o.skipStops = !!(S && S.choice) && !done; document.querySelector('#vnCh [data-n="2"]').click(); o.flag = (P().flags || {}).b1 && P().flags.b1.n === 2; vnSkip(); o.ends = !S && done;
+    G.meta.elems = [{ n: '불' }, { n: '물' }, { n: '풀' }, { n: '빛' }]; G.meta.rules = { beats: { 불: '풀', 물: '불', 풀: '물', 빛: '불' } }; applyMeta(); o.elemLine = /빛은 불에 강함/.test(elemLine()) && !/undefined/.test(elemLine());
+    return o; });
+  assert.ok(Object.values(r30).every(v => v === true), JSON.stringify(r30)); assert.deepEqual(err30, [], '페이지 오류');
+  console.log('ok 30 규칙·세력·연출 수정: 현재 장 계산, 빈 배너 풀의 잠금 유지, 넘기기가 분기 선택지에서 멈추고 기록, 상성 문장이 실제 상성표(속성 4개)');
   await browser.close(); server.close();  assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
   assert.deepEqual(err2, [], '페이지 오류');

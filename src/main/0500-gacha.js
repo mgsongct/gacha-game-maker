@@ -25,7 +25,7 @@ function bannerPool(b){
   if(pool.length&&!pool.some(c=>c.rarity===3)) G.chars.filter(c=>c.rarity===3&&!c.limited&&castOk(c)).forEach(c=>pool.push(c));
   // R·SR이 없는 배너(픽업 캐릭터만 있는 배너, 소속 한정 등)도 상시 R·SR을 넣어 낮은 등급 자리에 SSR이 끼지 않게
   if(pool.length) [1,2].forEach(r=>{ if(!pool.some(c=>c.rarity===r)) G.chars.filter(c=>c.rarity===r&&!c.limited&&castOk(c)).forEach(c=>pool.push(c)); });
-  return pool.length?pool:G.chars;
+  if(pool.length) return pool; const open=G.chars.filter(c=>!c.limited&&castOk(c)); return open.length?open:G.chars; // 비면 열린(첫 등장·적대·몬스터 잠금 아닌) 캐릭터로 — 예전엔 모든 캐릭터라 잠긴 캐릭터가 나왔음
 }
 const SPARK=200;
 /* 천장·픽업 확정은 픽업 배너끼리 이어져요(시즌이 바뀌어 배너가 닫혀도 다음 픽업 배너로). 상시는 따로, 픽업 없는 배너(소속 모집 등)는 배너별.
@@ -71,7 +71,7 @@ function grantOwned(c,source){
 }
 function openSpark(bid){
   const b=G.banners.find(bn=>bn.id===bid)||curBanner(); if(!b) return; const p=P(), pts=(p.spark||{})[b.id]||0;
-  const ups=(b.pickup||[]).map(charById).filter(Boolean), list=ups.length?ups:bannerPool(b).filter(c=>c.rarity===3);
+  const ups=(b.pickup||[]).map(charById).filter(c=>c&&castOk(c)), list=ups.length?ups:bannerPool(b).filter(c=>c.rarity===3&&castOk(c)); // 모집 포인트 교환도 잠긴 캐릭터는 빼요
   openModal(`${head('모집 포인트 교환',`<span class="muted">${esc(b.name)} · ${pts}/${SPARK}</span>`)}
     <p class="muted" style="margin:0 0 10px">이 배너에서 1회 뽑을 때마다 1포인트가 쌓여요. ${SPARK}포인트로 원하는 ${esc(T('crew'))}을(를) 바로 데려올 수 있어요. 이미 있으면 ${esc(T('limit'))} +1이 돼요.</p>
     <div class="spk">${list.map(c=>`<button class="spk-c r${c.rarity}" data-act="sparkgo" data-id="${c.id}" data-b="${b.id}" ${pts>=SPARK?'':'disabled'}><div class="sa">${art(c)}</div><b>${esc(c.name)}</b><span>${own(c.id)?T('limit')+' '+own(c.id).dup+'/5':'미보유'}</span></button>`).join('')||'<p class="muted">교환할 수 있는 '+esc(T('crew'))+'이(가) 없어요.</p>'}</div>`);

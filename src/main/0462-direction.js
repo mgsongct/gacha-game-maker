@@ -30,7 +30,7 @@ function emoKey(t){ t=String(t||'').trim(); return EMOTES[t]?t:EMO_ALIAS[t]||'';
 function emoteHTML(name,big){ const k=emoKey(name); if(!k) return ''; const l=typeof G!=='undefined'&&G&&G.lib.find(x=>x.kind==='emote'&&x.name===k), s=l&&imgSrc(l);
   return `<i class="emo ${big?'big':''} e-${EMOTES[k].a}" data-emo="${esc(k)}">${s?`<img src="${esc(s)}" alt="${esc(k)}">`:EMOTES[k].svg}</i>`; }
 // "미소|하트|점프" → {face,emo,motion}
-function dirSplit(s){ const o={face:'',emo:'',motion:''}; String(s||'').split(/[|,·/]/).map(x=>x.trim()).filter(Boolean).forEach(t=>{ if(!o.emo&&emoKey(t)) o.emo=emoKey(t); else if(!o.motion&&MOTIONS[t]) o.motion=t; else if(!o.face) o.face=t; }); return o; }
+function dirSplit(s){ const o={face:'',emo:'',motion:''}; String(s||'').split(/[|,·/]/).map(x=>x.trim()).forEach((t,i)=>{ if(!t) return; if(i===0&&FACE_BASIC.includes(t)) o.face=t; /* 첫 칸(빈 칸 포함 위치 — [|놀람]은 표정 없음+감정)이 기본 표정 이름이면 표정(화남·놀람·슬픔·당황은 감정 이름과 겹침) — 기존 이름[표정] 문법 유지 */ else if(!o.emo&&emoKey(t)) o.emo=emoKey(t); else if(!o.motion&&MOTIONS[t]) o.motion=t; else if(!o.face) o.face=t; }); return o; }
 function autoEmote(text){ const t=String(text||'').trim(); for(const [k,d] of Object.entries(EMOTES)) if(d.k&&d.k.test(t)) return k; return ''; }
 function dirMode(){ const m=P().vnDirect; return m==='script'||m==='off'?m:'auto'; }
 // 무대: 최근 두 사람을 좌우로, 말하는 사람은 밝게

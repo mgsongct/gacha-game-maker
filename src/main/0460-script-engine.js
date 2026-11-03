@@ -102,6 +102,8 @@ function vnPrefetch(){ if(!SND().voiceStory) return; let n=0; for(let k=S.i;k<S.
 function vnType(t){S.full=t;S.typing=true;let k=0;const el=$('#vnText');el.textContent='';$('#vnNext').hidden=true;clearInterval(S.timer);const tid=S.timer=setInterval(()=>{if(!el.isConnected||!S||S.timer!==tid){clearInterval(tid);return;}k+=2;el.textContent=t.slice(0,k);if(k>=t.length)vnFinish();},28);}
 function vnFinish(){if(!S)return;clearInterval(S.timer);S.typing=false;const tx=$('#vnText'),nx=$('#vnNext');if(tx)tx.textContent=S.full;if(nx)nx.hidden=false;vnAutoNext();}
 function vnAutoNext(){if(!S||!S.auto||S.typing||S.choice)return;clearTimeout(S.autoT);const go=()=>{if(S&&S.auto&&!S.typing&&!S.choice)S.autoT=setTimeout(vnStep,600);};if(!VOICE.paused&&!VOICE.ended){VOICE.onended=go;}else S.autoT=setTimeout(vnStep,1000+S.full.length*40);}
+// 넘기기: 대본을 끝내되, 앞에 시나리오 분기([분기: id] 다음 선택지)가 있으면 그 선택지에서 멈춤 — 분기 기록이 빠지지 않게(0465). 분기 선택지가 떠 있으면 고를 때까지 기다림
+function vnSkip(){ if(!S) return; if(S.choice&&S.branch) return; const k=S.lines.findIndex((L,i)=>i>=S.i&&L.type==='cmd'&&L.cmd==='분기'); if(S.choice||k<0){ vnEnd(); return; } if(S.typing) vnFinish(); S.i=k; vnStep(); }
 function vnEnd(){if(!S)return;clearInterval(S.timer);clearTimeout(S.autoT);stopVoice();const d=S.done;S=null;closeOv();d&&d();}
 function closeOv(){$('#ov').hidden=true;$('#ov').innerHTML='';sceneBgm();}
 

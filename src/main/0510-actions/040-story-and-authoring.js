@@ -75,7 +75,7 @@ case 'aithread': { const c=charById(id),hint=$('#th_hint').value.trim(),tv=$('#t
 case 'ststory': { const ch0=G.chapters.find(x=>x.id===t.dataset.ch), s0=ch0&&ch0.stages.find(x=>x.id===t.dataset.st); if(!s0) break; closeModal(); playStoryStage(ch0,s0); break; }
 case 'story': { const ch=G.chapters.find(x=>x.id===t.dataset.ch),s=ch.stages.find(x=>x.id===t.dataset.st); closeModal(); playStory(s.title,s[t.dataset.k],()=>openStage(ch.id,s.id)); break; }
 case 'chedit': chDraft=clone(G.chapters.find(x=>x.id===t.dataset.ch)); openChEdit(); break;
-case 'addstage': readChForm(); chDraft.stages.push({id:uid(),title:'새 작전',reward:400,enemies:[{name:'잔광',elem:'홍',hp:900,atk:80,def:35,spd:95,boss:false}],pre:'',post:''}); openChEdit(); break;
+case 'addstage': readChForm(); chDraft.stages.push({id:uid(),title:'새 작전',reward:400,enemies:[{name:'적',elem:ELEMS[0],hp:900,atk:80,def:35,spd:95,boss:false}],pre:'',post:''}); openChEdit(); break;
 case 'delstage': { readChForm(); if(chDraft.stages.length<=1){ toast('스테이지는 1개 이상 있어야 해요'); break; } const st=chDraft.stages[+t.dataset.j], live=G.chapters.find(x=>x.id===chDraft.id);
       const L=st&&live&&live.stages.some(x=>x.id===st.id)?storyLinks([st.id],live,live.eventId&&G.events.find(e=>e.id===live.eventId)):null, n=L?L.threads.length+L.codex.length+L.libs.length+L.rels.length:0;
       if(n&&(await appConfirm(`이 스테이지에 연결된 ${T('talk')} ${L.threads.length}개, 도감 ${L.codex.length}개, CG·소품 ${L.libs.length}개, 관계 기록 ${L.rels.length}개도 지울까요?

@@ -12,7 +12,7 @@ const F_FIELDS=[['desc','개요'],['goal','목적'],['leader','지도자·핵심
 function castCfg(){ const c=G.meta.cast||{}; return {pickupGate:c.pickupGate!==false,hostileGate:c.hostileGate!==false}; }
 function factions(){ const w=G.world; if(!Array.isArray(w.factions)) w.factions=[]; G.chars.forEach(c=>{ if(c.faction&&!c.monster&&!c.collab&&!w.factions.some(f=>f.name===c.faction)) w.factions.push({name:c.faction,desc:'',kind:'playable',rel:{},stance:[]}); }); /* 캐릭터 소속인데 목록에 없는 세력 */ w.factions.forEach(f=>{ if(!FKIND[f.kind]) f.kind=G.chars.some(c=>c.faction===f.name&&!c.monster)?'playable':G.lib.some(l=>l.kind==='enemy'&&!l.charId&&l.name.includes(f.name))?'monster':'neutral'; if(!Array.isArray(f.stance)) f.stance=[]; if(!f.rel||typeof f.rel!=='object') f.rel={}; }); return w.factions; }
 function facByName(n){ return factions().find(f=>f.name===n); }
-function mainNow(){ return Math.max(1,G.chapters.filter(ch=>ch.kind==='main'&&(ch.stages||[]).some(s=>P().cleared[s.id])).length+1); } // 지금 진행 중인 장(1부터)
+function mainNow(){ const main=G.chapters.filter(ch=>ch.kind==='main'), i=main.findIndex(ch=>(ch.stages||[]).some(s=>!P().cleared[s.id])); return i<0?main.length+1:i+1; } // 지금 진행 중인 장(1부터) = 다 깨지 않은 첫 메인 장(예전엔 스테이지 하나만 깨도 다음 장으로 셈)
 function stanceAt(f,ch){ if(!f) return 'neutral'; const L=(f.stance||[]).filter(x=>+x.ch<=ch).sort((a,b)=>a.ch-b.ch); return L.length?L.at(-1).s:f.kind==='playable'?'ally':f.kind==='neutral'?'neutral':'hostile'; }
 // 몬스터: 자료실 적 중 캐릭터·NPC가 아닌 것
 const SYS_ENEMY=/^(훈련 |강화 표적|탑의 )/; // 훈련·탑의 표적은 시스템 적

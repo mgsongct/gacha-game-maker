@@ -4,7 +4,7 @@ case 'daily': if(p.daily!==today()){p.daily=today(); const dr=rateR({gems:120,go
 case 'shkdraw': { const m=G.meta.shop, o=shkSelf(); o.naiPrompt=stripMinor(stripAge($('#sk_prompt').value.trim())); naiBlocksSave(o,'naiPrompt','sk_prompt');o.name=$('#sk_name').value.trim()||m.name; if(!o.naiPrompt){ toast('외형 프롬프트를 먼저 적어 주세요'); break; } if(!imgReady()){ toast(imgNeed()); break; }
       const lab=t.textContent; t.disabled=true; t.textContent='그리는 중…'; try{ const bn=await naiDrawItem({k:'char',o,c:o}); await storeImage(o,bn,''); m.charId='__self'; mark('meta'); SHOP_LINE=''; const pv=document.querySelector('.sk-prev'); if(pv) pv.innerHTML=`<img src="${esc(imgSrc(o))}" alt="">`; $('#sk_char').value='__self'; render(); toast('상점 주인 그림을 그렸어요'); }catch(e){ toast(naiErr(e)); } finally{ if(t.isConnected){ t.disabled=false; t.textContent='다시 그리기'; } } break; }
 case 'sparkopen': openSpark(id); break;
-case 'sparkgo': { const bn=G.banners.find(x=>x.id===t.dataset.b), c=charById(id); if(!bn||!c) break; p.spark=p.spark||{}; if((p.spark[bn.id]||0)<SPARK){toast('포인트가 모자라요');break;}
+case 'sparkgo': { const bn=G.banners.find(x=>x.id===t.dataset.b), c=charById(id); if(!bn||!c||!castOk(c)) break; p.spark=p.spark||{}; if((p.spark[bn.id]||0)<SPARK){toast('포인트가 모자라요');break;}
       if(!(await appConfirm(`${c.name}을(를) ${SPARK}포인트로 데려올까요?`))) break; p.spark[bn.id]-=SPARK; let isNew=false;
       if(p.owned[c.id]){ const o=p.owned[c.id]; if(o.dup<5){o.dup++; if(o.dup>=5)o.cgNew=true;} else { p.mat.core+=10; } } else { p.owned[c.id]={levelCapVersion:1,transc:0,growthCostVersion:1,lv:1,exp:0,dup:0,aff:0,seen:[],wlv:0,skin:''}; isNew=true; if(p.squad.length<4)p.squad.push(c.id); }
       mark('prog'); closeModal(); render(); playGacha([{c,isNew,refund:0}]); break; }

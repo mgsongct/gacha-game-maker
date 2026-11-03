@@ -8681,7 +8681,7 @@ function rulesSave(){ rulesRead(); const R=RD, m=G.meta, r=RULESM();
   const g={}; Object.entries(R.grid).forEach(([a,row])=>{ const A=ren[a]||a; if(!keep(A)) return; Object.entries(row||{}).forEach(([t,v])=>{ const B=ren[t]||t; if(keep(B)&&+v>0){ g[A]=g[A]||{}; g[A][B]=+v; } }); }); r.grid=g;
   r.reactions=R.reactions.map(x=>({...x,a:ren[x.a]||x.a,b:ren[x.b]||x.b})).filter(x=>keep(x.a)&&keep(x.b)&&x.a!==x.b).map(x=>({a:x.a,b:x.b,name:String(x.name||'반응').slice(0,12),type:REACT_TYPES.some(([k])=>k===x.type)?x.type:'amp',value:+x.value||'',dur:+x.dur||'',both:!!x.both}));
   r.elemAdv=+R.adv||undefined; r.elemDis=+R.dis||undefined; r.aura=+R.aura||undefined;
-  const ids=new Set(); m.positions=R.positions.map(p=>{ let id=p.id||'p_'+uid(); while(ids.has(id)) id='p_'+uid(); ids.add(id); return {id,name:String(p.name||'포지션').slice(0,10),base:ROLE[p.base]?p.base:'atk',desc:String(p.desc||'').slice(0,80),t:Object.fromEntries(Object.entries(p.t||{}).filter(([k,v])=>POS_TRAITS.some(([x])=>x===k)&&+v).map(([k,v])=>[k,Math.max(-90,Math.min(500,+v))]))}; });
+  const ids=new Set(); m.positions=R.positions.map(p=>{ let id=p.id||'p_'+uid(); while(ids.has(id)) id='p_'+uid(); ids.add(id); return {id,name:String(p.name||'포지션').slice(0,10),base:ROLE[p.base]?p.base:'atk',desc:String(p.desc||'').slice(0,80),range:RANGE[p.range]?p.range:'',t:Object.fromEntries(Object.entries(p.t||{}).filter(([k,v])=>POS_TRAITS.some(([x])=>x===k)&&+v).map(([k,v])=>[k,Math.max(-90,Math.min(500,+v))]))}; }) /* 사거리(근접·원거리·지원)도 저장 */;
   G.chars.forEach(c=>{ const p=posById(c.pos)||POSITIONS().find(x=>x.base===c.role); if(p&&(c.pos!==p.id||c.role!==p.base)){ c.pos=p.id; c.role=p.base; mark('c:'+c.id); } });
   r.roleDesc={...R.roleDesc}; r.roleBase=R.roleBase; r.rarityMul={}; Object.entries(R.rarityMul).forEach(([f,a])=>{ if(a.some(x=>+x>0)) r.rarityMul[f]=a.map((x,i)=>+x>0?+x:GGMCombat.RULE_DEFAULTS.rarityMul[f][i]); });
   r.synergy={n:+R.synergy.n||0,atk:+R.synergy.atk||0,def:+R.synergy.def||0};
@@ -8701,10 +8701,10 @@ async function rulesAIFill(){ const res=await rulesAIData(null); if(!res) return
   (res.elems||[]).forEach((d,i)=>{ if(d&&G.meta.elems[i]&&!G.meta.elems[i].d) G.meta.elems[i].d=String(d).slice(0,80); }); Object.entries(res.roles||{}).forEach(([k,d])=>{ if(d&&ROLE[k]&&!r.roleDesc[k]) r.roleDesc[k]=String(d).slice(0,80); }); mark('meta'); return true; }
 function rulesMissingDesc(){ return G.meta.elems.some(e=>!e.d)||Object.keys(ROLE).some(k=>!((G.meta.rules||{}).roleDesc||{})[k]); }
 function rulesNotInCodex(){ return !(G.world.codex||[]).some(x=>x.title==='[규칙] 속성 상성'); }
-const POS_SCHEMA='"positions":[{"name":"포지션 이름(2~4자)","base":"atk|def|sup","desc":"기능 한 줄","t":{"hp":0,"atk":0,"def":0,"spd":0,"dmg":0,"taken":0,"heal":0,"crit":0,"sp":0,"threat":0}}]';
+const POS_SCHEMA='"positions":[{"name":"포지션 이름(2~4자)","base":"atk|def|sup","range":"melee|ranged|support","desc":"기능 한 줄","t":{"hp":0,"atk":0,"def":0,"spd":0,"dmg":0,"taken":0,"heal":0,"crit":0,"sp":0,"threat":0}}]';
 const POS_RULE_BASE='포지션은 4~8개, 세계관의 군 편제·직업·함종 같은 분류로 짓는다. base는 전투 기본형(atk 공격·def 방어·sup 지원). t는 기능 보정(%: hp atk def spd dmg 주는피해 taken 받는피해 heal 회복량 crit 치명타%p, sp 시작 SP 0~50, threat 위협도 -80~150). 보정은 -40~+40 안에서 장단점이 같이 있게.';
 pfDef('POS_RULE','포지션(직군·함종) 설계',()=>POS_RULE_BASE);
-function posClean(list){ return (Array.isArray(list)?list:[]).slice(0,10).map(p=>({id:'p_'+uid(),name:String(p.name||'포지션').slice(0,10),base:ROLE[p.base]?p.base:'atk',desc:String(p.desc||'').slice(0,80),t:Object.fromEntries(POS_TRAITS.map(([k])=>[k,Math.max(-80,Math.min(150,Math.round(+((p.t||{})[k])||0)))]).filter(([,v])=>v))})).filter(p=>p.name); }
+function posClean(list){ return (Array.isArray(list)?list:[]).slice(0,10).map(p=>({id:'p_'+uid(),name:String(p.name||'포지션').slice(0,10),base:ROLE[p.base]?p.base:'atk',desc:String(p.desc||'').slice(0,80),range:RANGE[p.range]?p.range:'',t:Object.fromEntries(POS_TRAITS.map(([k])=>[k,Math.max(-80,Math.min(150,Math.round(+((p.t||{})[k])||0)))]).filter(([,v])=>v))})).filter(p=>p.name); }
 async function rulesPosAI(btn){ rulesRead(); const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 세계관에 맞는 ${T('crew')} 포지션(직군·병과·함종 같은 분류)을 설계하라. ${POS_RULE}\nJSON만 출력: {${POS_SCHEMA}}`,btn,'default'); const L=posClean(r&&r.positions); if(!L.length) return; RD.positions=L; openRules(true); toast(`포지션 ${L.length}개를 설계했어요. 저장을 눌러 주세요`); }
 async function rulesRecalc(){ if(!(await appConfirm(`기본형·희귀도 기준으로 모든 ${T('crew')}의 체력·공격·방어·속도를 다시 계산할까요? 직접 고친 능력치도 바뀌어요(이격은 원본 비율을 따라가요).`))) return; if(!rulesSave()) return;
   let n=0; for(const c of G.chars){ if(c.alt) continue; const s=GGMCombat.generateBaseStats(c); Object.assign(c,{hp:s.hp,atk:s.atk,def:s.def,spd:s.spd}); mark('c:'+c.id); n++; } toast(`${n}명의 능력치를 다시 계산했어요`); openRules(); }
@@ -9606,7 +9606,7 @@ async function aiChapterGen0(dir,n,cast,t){
     step(deep?'장 구성을 짜는 중…':'대본을 쓰는 중…');
     const r=await aiJSON(`【스토리 참조: 메인 장 구성】\n${RULES}\n${ctx(false,dir+' '+cast.join(' '))}${memo}${rel}${planCtx(k+1)}\n${SCRIPT_FMT}\n${deep?'':THREAD_FMT}\n\n직전 장면: ${lastPost.slice(-6000)}\n\n다음 메인 챕터(${k+1}장)를 ${deep?'구성하라. 대본은 뒤에서 스테이지마다 따로 쓰니 지금은 쓰지 않는다. 대신 스테이지마다 장면 구성(beats)을 촘촘하고 구체적으로 짠다(누가 나와서 무엇을 하고, 무엇을 느끼고, 무엇이 드러나는지)':'써라'}. 추가로 JSON에 "codex" 배열을 넣어, 이 장에서 새로 드러나는 설정·장소·인물 기록 1~3개를 쓴다: [{"cat":"place|term|history|person|faction|item","title":"","body":"백과사전 말투 3~5문장"}]. 보유 중인 ${T('crew')}(${G.chars.filter(c=>own(c.id)).map(c=>c.name).join(', ')||'없음'})에게 활약할 장면을 주되, 같은 인물만 맴돌지 않게 아직 비중이 적었던 ${T('crew')}·NPC·새로 만나는 인물에게도 장면을 고르게 나눈다. 등장하는 ${T('crew')}의 ${T('files')}에 적힌 비밀 하나를 이야기에 엮는다. 스토리 중 한 번은 [톡: 이름]~[톡 끝] 메신저 장면을 넣는다. 방향: "${dir}". ${cast.length?'주요 등장 '+T('crew')+': '+cast.join(', ')+'.':''}\n메인 플롯을 한 걸음 진전시키고, 복선을 하나 회수하거나 새로 깐다. 인물 관계 기록을 이어받아 관계가 한 걸음씩 변하게 한다(이미 만난 사이를 처음 만난 것처럼 쓰지 않는다). ${npcRule()}\n${newcRule(SC.newc)}\n${talkOnlyRule(n)} ${STAGE_MODES}\n${deep?'':`각 스테이지 pre는 ${LS.pre}줄, post는 ${LS.post}줄. 스테이지마다 선택지 1개 이상. ${DETAIL_RULE}`} 마지막 스테이지는 보스전과 다음 장으로 이어지는 반전.\n스테이지 ${n}개. 적은 이름·속성·보스 여부·외형만 정한다(능력치는 시스템이 성장 곡선에 맞춘다).${enemyReuseHint()}${BATTLE_FLOW}\n스테이지마다 가장 인상적인 장면 하나씩을 CG로 정하고(스테이지 수만큼) ${deep?'그 장면의 beats에 "(CG: 이름)"이라고 표시한다':'대본의 그 지점에 [CG: 이름]과 [CG 끝]을 넣는다'}. cgs에는 CG 이름, NovelAI 영어 장면 태그(인물 외모 제외, 장소·구도·행동·분위기만), 등장 인물 이름 1~3명(플레이어가 장면에 나오면 "${T('player')}"도 넣는다)을 넣는다. 새로 필요한 배경이 있으면 backgrounds에 이름과 NovelAI 영어 프롬프트("no humans, scenery"로 시작)를 넣는다. 클로즈업할 새 소품이 있으면 props에 이름과 NovelAI 영어 프롬프트("no humans, object focus"로 시작)를 넣는다([소품: 이름]에는 소품 목록이나 props의 이름만 쓴다). 장면에 맞게 [음악: 이름]을 쓰고, 기존 음악 목록에 없는 곡이 꼭 필요하면 music에 이름과 영어 음악 프롬프트(instrumental, seamless loop 명시)를 넣는다. ${deep?'':`${T('talk')} 대화 1~2개도 만든다(afterStage는 그 대화가 도착하는 스테이지 번호, 1부터). ${THREAD_DUP_RULE}\n${REL_RULE} summary에는 이 장 줄거리를 사건·관계·종료 상태·인지·미회수 복선으로 구분해 2,000~3,000자 내외(최대 6,000자)로(누가 누구를 처음 만났고 무슨 약속·비밀·갈등 변화가 있었는지).`}\nJSON만 출력: {"title":"${k+1}장 제목","logline":"이 장의 한 줄 줄거리(40자 안팎, 스포일러 없이 궁금하게)","stages":${stageSchema(deep)},"backgrounds":[{"name":"","prompt":""}],"props":[{"name":"","prompt":""}],"music":[{"name":"","prompt":""}],"cgs":[{"name":"","prompt":"","cast":["등장 인물 이름"]}],"codex":[],"newCharacters":[],${BESTIARY_SCHEMA},"stance":[{"faction":"이 장에서 플레이어와의 관계가 바뀌는 세력(없으면 빈 배열)","s":"ally|neutral|hostile","why":""}],${NPC_SCHEMA}${deep?'':`,"threads":[{"char":"${T('crew')} 이름","title":"","afterStage":1,"script":""}],"summary":"",${REL_SCHEMA()}`}}`,null,'complex');
     if(!(r&&Array.isArray(r.stages)&&r.stages.length)){ if(r&&t) toast('AI 응답에 스테이지가 없어요. 다시 시도해 주세요.'); return null; }
-    const ch={id:uid(),ord:k,kind:'main',title:String(r.title||`${k+1}장`),logline:String(r.logline||'').slice(0,120),stages:buildStages(r.stages,{max:12,reward:i=>300+150*k+100*i,elem:'홍',hp:hl,atk:al,def:dl,foe:'잔광'})};
+    const ch={id:uid(),ord:k,kind:'main',title:String(r.title||`${k+1}장`),logline:String(r.logline||'').slice(0,120),stages:buildStages(r.stages,{max:12,reward:i=>300+150*k+100*i,elem:ELEMS[0],hp:hl,atk:al,def:dl,foe:'적'})};
     await v2BalanceChapter(ch,k);
     // 새 인물·자료를 먼저 넣어야 집필할 때 AI가 알아요
     const newc=addNewChars(r.newCharacters,SC.newc,ch.stages,{src:ch.title,ch}), npcs=addNpcs(r.newNpcs); stanceApply(r.stance,k+1); bestiaryApply(r.bestiary); debutResolve(ch); // 세력 관계 변화·적 도감·나중 등장 캐릭터(0445)
@@ -11541,7 +11541,7 @@ const F_FIELDS=[['desc','개요'],['goal','목적'],['leader','지도자·핵심
 function castCfg(){ const c=G.meta.cast||{}; return {pickupGate:c.pickupGate!==false,hostileGate:c.hostileGate!==false}; }
 function factions(){ const w=G.world; if(!Array.isArray(w.factions)) w.factions=[]; G.chars.forEach(c=>{ if(c.faction&&!c.monster&&!c.collab&&!w.factions.some(f=>f.name===c.faction)) w.factions.push({name:c.faction,desc:'',kind:'playable',rel:{},stance:[]}); }); /* 캐릭터 소속인데 목록에 없는 세력 */ w.factions.forEach(f=>{ if(!FKIND[f.kind]) f.kind=G.chars.some(c=>c.faction===f.name&&!c.monster)?'playable':G.lib.some(l=>l.kind==='enemy'&&!l.charId&&l.name.includes(f.name))?'monster':'neutral'; if(!Array.isArray(f.stance)) f.stance=[]; if(!f.rel||typeof f.rel!=='object') f.rel={}; }); return w.factions; }
 function facByName(n){ return factions().find(f=>f.name===n); }
-function mainNow(){ return Math.max(1,G.chapters.filter(ch=>ch.kind==='main'&&(ch.stages||[]).some(s=>P().cleared[s.id])).length+1); } // 지금 진행 중인 장(1부터)
+function mainNow(){ const main=G.chapters.filter(ch=>ch.kind==='main'), i=main.findIndex(ch=>(ch.stages||[]).some(s=>!P().cleared[s.id])); return i<0?main.length+1:i+1; } // 지금 진행 중인 장(1부터) = 다 깨지 않은 첫 메인 장(예전엔 스테이지 하나만 깨도 다음 장으로 셈)
 function stanceAt(f,ch){ if(!f) return 'neutral'; const L=(f.stance||[]).filter(x=>+x.ch<=ch).sort((a,b)=>a.ch-b.ch); return L.length?L.at(-1).s:f.kind==='playable'?'ally':f.kind==='neutral'?'neutral':'hostile'; }
 // 몬스터: 자료실 적 중 캐릭터·NPC가 아닌 것
 const SYS_ENEMY=/^(훈련 |강화 표적|탑의 )/; // 훈련·탑의 표적은 시스템 적
@@ -12005,6 +12005,8 @@ function vnPrefetch(){ if(!SND().voiceStory) return; let n=0; for(let k=S.i;k<S.
 function vnType(t){S.full=t;S.typing=true;let k=0;const el=$('#vnText');el.textContent='';$('#vnNext').hidden=true;clearInterval(S.timer);const tid=S.timer=setInterval(()=>{if(!el.isConnected||!S||S.timer!==tid){clearInterval(tid);return;}k+=2;el.textContent=t.slice(0,k);if(k>=t.length)vnFinish();},28);}
 function vnFinish(){if(!S)return;clearInterval(S.timer);S.typing=false;const tx=$('#vnText'),nx=$('#vnNext');if(tx)tx.textContent=S.full;if(nx)nx.hidden=false;vnAutoNext();}
 function vnAutoNext(){if(!S||!S.auto||S.typing||S.choice)return;clearTimeout(S.autoT);const go=()=>{if(S&&S.auto&&!S.typing&&!S.choice)S.autoT=setTimeout(vnStep,600);};if(!VOICE.paused&&!VOICE.ended){VOICE.onended=go;}else S.autoT=setTimeout(vnStep,1000+S.full.length*40);}
+// 넘기기: 대본을 끝내되, 앞에 시나리오 분기([분기: id] 다음 선택지)가 있으면 그 선택지에서 멈춤 — 분기 기록이 빠지지 않게(0465). 분기 선택지가 떠 있으면 고를 때까지 기다림
+function vnSkip(){ if(!S) return; if(S.choice&&S.branch) return; const k=S.lines.findIndex((L,i)=>i>=S.i&&L.type==='cmd'&&L.cmd==='분기'); if(S.choice||k<0){ vnEnd(); return; } if(S.typing) vnFinish(); S.i=k; vnStep(); }
 function vnEnd(){if(!S)return;clearInterval(S.timer);clearTimeout(S.autoT);stopVoice();const d=S.done;S=null;closeOv();d&&d();}
 function closeOv(){$('#ov').hidden=true;$('#ov').innerHTML='';sceneBgm();}
 
@@ -12040,7 +12042,7 @@ function emoKey(t){ t=String(t||'').trim(); return EMOTES[t]?t:EMO_ALIAS[t]||'';
 function emoteHTML(name,big){ const k=emoKey(name); if(!k) return ''; const l=typeof G!=='undefined'&&G&&G.lib.find(x=>x.kind==='emote'&&x.name===k), s=l&&imgSrc(l);
   return `<i class="emo ${big?'big':''} e-${EMOTES[k].a}" data-emo="${esc(k)}">${s?`<img src="${esc(s)}" alt="${esc(k)}">`:EMOTES[k].svg}</i>`; }
 // "미소|하트|점프" → {face,emo,motion}
-function dirSplit(s){ const o={face:'',emo:'',motion:''}; String(s||'').split(/[|,·/]/).map(x=>x.trim()).filter(Boolean).forEach(t=>{ if(!o.emo&&emoKey(t)) o.emo=emoKey(t); else if(!o.motion&&MOTIONS[t]) o.motion=t; else if(!o.face) o.face=t; }); return o; }
+function dirSplit(s){ const o={face:'',emo:'',motion:''}; String(s||'').split(/[|,·/]/).map(x=>x.trim()).forEach((t,i)=>{ if(!t) return; if(i===0&&FACE_BASIC.includes(t)) o.face=t; /* 첫 칸(빈 칸 포함 위치 — [|놀람]은 표정 없음+감정)이 기본 표정 이름이면 표정(화남·놀람·슬픔·당황은 감정 이름과 겹침) — 기존 이름[표정] 문법 유지 */ else if(!o.emo&&emoKey(t)) o.emo=emoKey(t); else if(!o.motion&&MOTIONS[t]) o.motion=t; else if(!o.face) o.face=t; }); return o; }
 function autoEmote(text){ const t=String(text||'').trim(); for(const [k,d] of Object.entries(EMOTES)) if(d.k&&d.k.test(t)) return k; return ''; }
 function dirMode(){ const m=P().vnDirect; return m==='script'||m==='off'?m:'auto'; }
 // 무대: 최근 두 사람을 좌우로, 말하는 사람은 밝게
@@ -12515,7 +12517,7 @@ function bEnd(win){
       <div class="rs-dmg">${B.allies.map(u=>`<div><b>${esc(u.name)}</b><span class="bar"><i style="width:${Math.round((u.dmg||0)/tot*100)}%"></i></span><em>${nf(u.dmg||0)}</em></div>`).join('')}</div>`:''}
       <p style="margin:4px 0">${rewardText(r)}${first?' (첫 클리어 보상)':(kind==='farm'?'':`<br><small class="muted">${esc(T('currency'))}은(는) 첫 클리어 때만 받아요</small>`)}${bonus}<br>참가 ${T('crew')} 경험치 +${exp}</p><button class="btn" data-act="bdone" data-win="1" data-first="${first?1:0}">계속</button>`;
     if(mvp&&mvp.c.voiceId&&SND().voiceLobby&&ml) setTimeout(()=>speak(mvp.c,ml),700);
-  } else { sfx('패배'); html=`<h2 class="disp" style="color:#ff5277">작전 실패</h2><p>${T('enhance')}로 레벨을 올리거나 편성과 속성을 바꿔 보세요.<br>${ELEMS.map((elem,i)=>elem+'은 '+ELEMS[(i+1)%3]+'에').join(', ')} 강해요.</p><div class="row"><button class="btn ghost" data-act="bdone">돌아가기</button><button class="btn" data-act="bretry">다시 도전</button></div>`; }
+  } else { sfx('패배'); html=`<h2 class="disp" style="color:#ff5277">작전 실패</h2><p>${T('enhance')}로 레벨을 올리거나 편성과 속성을 바꿔 보세요.<br>${esc(elemLine())}.</p><div class="row"><button class="btn ghost" data-act="bdone">돌아가기</button><button class="btn" data-act="bretry">다시 도전</button></div>`; }
   const d=document.createElement('div');d.className='result';d.innerHTML=html;$('#ov > .bt').appendChild(d);
 }
 // 훈련: 10단계, 단계마다 권장 레벨이 있어요(그 레벨 대원의 능력치에 맞춰 적이 강해져요)
@@ -12562,7 +12564,7 @@ function bannerPool(b){
   if(pool.length&&!pool.some(c=>c.rarity===3)) G.chars.filter(c=>c.rarity===3&&!c.limited&&castOk(c)).forEach(c=>pool.push(c));
   // R·SR이 없는 배너(픽업 캐릭터만 있는 배너, 소속 한정 등)도 상시 R·SR을 넣어 낮은 등급 자리에 SSR이 끼지 않게
   if(pool.length) [1,2].forEach(r=>{ if(!pool.some(c=>c.rarity===r)) G.chars.filter(c=>c.rarity===r&&!c.limited&&castOk(c)).forEach(c=>pool.push(c)); });
-  return pool.length?pool:G.chars;
+  if(pool.length) return pool; const open=G.chars.filter(c=>!c.limited&&castOk(c)); return open.length?open:G.chars; // 비면 열린(첫 등장·적대·몬스터 잠금 아닌) 캐릭터로 — 예전엔 모든 캐릭터라 잠긴 캐릭터가 나왔음
 }
 const SPARK=200;
 /* 천장·픽업 확정은 픽업 배너끼리 이어져요(시즌이 바뀌어 배너가 닫혀도 다음 픽업 배너로). 상시는 따로, 픽업 없는 배너(소속 모집 등)는 배너별.
@@ -12608,7 +12610,7 @@ function grantOwned(c,source){
 }
 function openSpark(bid){
   const b=G.banners.find(bn=>bn.id===bid)||curBanner(); if(!b) return; const p=P(), pts=(p.spark||{})[b.id]||0;
-  const ups=(b.pickup||[]).map(charById).filter(Boolean), list=ups.length?ups:bannerPool(b).filter(c=>c.rarity===3);
+  const ups=(b.pickup||[]).map(charById).filter(c=>c&&castOk(c)), list=ups.length?ups:bannerPool(b).filter(c=>c.rarity===3&&castOk(c)); // 모집 포인트 교환도 잠긴 캐릭터는 빼요
   openModal(`${head('모집 포인트 교환',`<span class="muted">${esc(b.name)} · ${pts}/${SPARK}</span>`)}
     <p class="muted" style="margin:0 0 10px">이 배너에서 1회 뽑을 때마다 1포인트가 쌓여요. ${SPARK}포인트로 원하는 ${esc(T('crew'))}을(를) 바로 데려올 수 있어요. 이미 있으면 ${esc(T('limit'))} +1이 돼요.</p>
     <div class="spk">${list.map(c=>`<button class="spk-c r${c.rarity}" data-act="sparkgo" data-id="${c.id}" data-b="${b.id}" ${pts>=SPARK?'':'disabled'}><div class="sa">${art(c)}</div><b>${esc(c.name)}</b><span>${own(c.id)?T('limit')+' '+own(c.id).dup+'/5':'미보유'}</span></button>`).join('')||'<p class="muted">교환할 수 있는 '+esc(T('crew'))+'이(가) 없어요.</p>'}</div>`);
@@ -12907,7 +12909,7 @@ case 'ghist': openHistory(); break;
 case 'vnnext': vnStep(); break;
 case 'vnpick': { e.stopPropagation(); if(!S||!S.choice) break; const n=+t.dataset.n,o=S.choice.opts[n-1]; S.pick=n; S.lastPick=o; S.choice=null; if(S.branch){ storyFlag(S.branch,n,o); S.branch=null; } $('#vnCh').innerHTML=''; vnShow({type:'say',who:T('player'),text:o}); break; }
 case 'vnauto': e.stopPropagation(); S.auto=!S.auto; t.classList.toggle('on',S.auto); if(S.auto&&!S.typing&&!S.choice) S.autoT=setTimeout(vnStep,700); else clearTimeout(S.autoT); break;
-case 'vnskip': e.stopPropagation(); vnEnd(); break;
+case 'vnskip': e.stopPropagation(); vnSkip(); break;
 case 'vnlog': e.stopPropagation(); openModal(`${head('대화 기록')}${S.log.map(L=>`<p style="margin:6px 0">${L.type==='say'?`<b>${esc(isMe(L.who)?playerName():L.who)}</b> ${esc(sub(L.text))}`:L.type==='place'?`<span class="muted">[${esc(L.text)}]</span>`:`<i class="muted">${esc(sub(L.text))}</i>`}</p>`).join('')}`); break;
 case 'bquit': if(B?.ctx.kind==='practice'){v2StopPractice();break;}if(B&&(B.ctx.kind==='raid'||B.ctx.kind==='rogue')){ if((await appConfirm(B.ctx.kind==='raid'?'여기서 끝낼까요? 지금까지 준 피해는 기록돼요.':'후퇴하면 이번 탐사가 끝나요. 지금까지의 보상은 받아요.'))){ if(!B.over) bEnd(false); } break; }
       if((await appConfirm('후퇴할까요? 보상은 받을 수 없어요.'))){clearInterval(B.timer);B=null;closeOv();render();} break;
@@ -13115,7 +13117,7 @@ case 'aithread': { const c=charById(id),hint=$('#th_hint').value.trim(),tv=$('#t
 case 'ststory': { const ch0=G.chapters.find(x=>x.id===t.dataset.ch), s0=ch0&&ch0.stages.find(x=>x.id===t.dataset.st); if(!s0) break; closeModal(); playStoryStage(ch0,s0); break; }
 case 'story': { const ch=G.chapters.find(x=>x.id===t.dataset.ch),s=ch.stages.find(x=>x.id===t.dataset.st); closeModal(); playStory(s.title,s[t.dataset.k],()=>openStage(ch.id,s.id)); break; }
 case 'chedit': chDraft=clone(G.chapters.find(x=>x.id===t.dataset.ch)); openChEdit(); break;
-case 'addstage': readChForm(); chDraft.stages.push({id:uid(),title:'새 작전',reward:400,enemies:[{name:'잔광',elem:'홍',hp:900,atk:80,def:35,spd:95,boss:false}],pre:'',post:''}); openChEdit(); break;
+case 'addstage': readChForm(); chDraft.stages.push({id:uid(),title:'새 작전',reward:400,enemies:[{name:'적',elem:ELEMS[0],hp:900,atk:80,def:35,spd:95,boss:false}],pre:'',post:''}); openChEdit(); break;
 case 'delstage': { readChForm(); if(chDraft.stages.length<=1){ toast('스테이지는 1개 이상 있어야 해요'); break; } const st=chDraft.stages[+t.dataset.j], live=G.chapters.find(x=>x.id===chDraft.id);
       const L=st&&live&&live.stages.some(x=>x.id===st.id)?storyLinks([st.id],live,live.eventId&&G.events.find(e=>e.id===live.eventId)):null, n=L?L.threads.length+L.codex.length+L.libs.length+L.rels.length:0;
       if(n&&(await appConfirm(`이 스테이지에 연결된 ${T('talk')} ${L.threads.length}개, 도감 ${L.codex.length}개, CG·소품 ${L.libs.length}개, 관계 기록 ${L.rels.length}개도 지울까요?
@@ -13656,7 +13658,7 @@ case 'daily': if(p.daily!==today()){p.daily=today(); const dr=rateR({gems:120,go
 case 'shkdraw': { const m=G.meta.shop, o=shkSelf(); o.naiPrompt=stripMinor(stripAge($('#sk_prompt').value.trim())); naiBlocksSave(o,'naiPrompt','sk_prompt');o.name=$('#sk_name').value.trim()||m.name; if(!o.naiPrompt){ toast('외형 프롬프트를 먼저 적어 주세요'); break; } if(!imgReady()){ toast(imgNeed()); break; }
       const lab=t.textContent; t.disabled=true; t.textContent='그리는 중…'; try{ const bn=await naiDrawItem({k:'char',o,c:o}); await storeImage(o,bn,''); m.charId='__self'; mark('meta'); SHOP_LINE=''; const pv=document.querySelector('.sk-prev'); if(pv) pv.innerHTML=`<img src="${esc(imgSrc(o))}" alt="">`; $('#sk_char').value='__self'; render(); toast('상점 주인 그림을 그렸어요'); }catch(e){ toast(naiErr(e)); } finally{ if(t.isConnected){ t.disabled=false; t.textContent='다시 그리기'; } } break; }
 case 'sparkopen': openSpark(id); break;
-case 'sparkgo': { const bn=G.banners.find(x=>x.id===t.dataset.b), c=charById(id); if(!bn||!c) break; p.spark=p.spark||{}; if((p.spark[bn.id]||0)<SPARK){toast('포인트가 모자라요');break;}
+case 'sparkgo': { const bn=G.banners.find(x=>x.id===t.dataset.b), c=charById(id); if(!bn||!c||!castOk(c)) break; p.spark=p.spark||{}; if((p.spark[bn.id]||0)<SPARK){toast('포인트가 모자라요');break;}
       if(!(await appConfirm(`${c.name}을(를) ${SPARK}포인트로 데려올까요?`))) break; p.spark[bn.id]-=SPARK; let isNew=false;
       if(p.owned[c.id]){ const o=p.owned[c.id]; if(o.dup<5){o.dup++; if(o.dup>=5)o.cgNew=true;} else { p.mat.core+=10; } } else { p.owned[c.id]={levelCapVersion:1,transc:0,growthCostVersion:1,lv:1,exp:0,dup:0,aff:0,seen:[],wlv:0,skin:''}; isNew=true; if(p.squad.length<4)p.squad.push(c.id); }
       mark('prog'); closeModal(); render(); playGacha([{c,isNew,refund:0}]); break; }
