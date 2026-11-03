@@ -16,6 +16,7 @@ const P = () => G.prog;      // 진행 상태 단축
 | 키 | 타입 | 내용 |
 |---|---|---|
 | `ver` | number | 스키마 버전 (`VER=3`) |
+| `meta.rules` | object | 게임 규칙: `beatIdx`, `elemAdv/elemDis`, `roleDesc`, `roleBase`, `rarityMul`, `synergy`, `rel[]` ([research/game-rules.md](research/game-rules.md)). 속성 설명은 `meta.elems[].d` |
 | `meta` | object | 게임 이름 `title/sub`, `theme`, `accent`, **용어 `terms`**(플레이어 호칭·재화·뽑기 이름 등, `T(k)`로 읽음), 속성 3개 `elems:[{n,c}]`, 역할 이름 `roles`, 재료 던전 `farms`, 상점 NPC `shop`, `tone`, `castSex`, 마이그레이션 플래그들, 게시 정보 `pub`, 구독 정보 `subscr` |
 | `world` | object | 세계관 설명, `factions[]`, 도감 `codex[{cat,title,body}]` |
 | `chars[]` | array | 아군 캐릭터 (아래 §3) |

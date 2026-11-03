@@ -240,6 +240,37 @@ try {
     return o; });
   assert.ok(Object.values(r12).every(v => v === true), JSON.stringify(r12)); assert.deepEqual(err12, [], '페이지 오류');
   console.log('ok 12 콘텐츠 점검: 빠진 대사·나이 태그·상징·구버전·빈 대본 감지 → 자동 변환·AI 채우기·지정 변환·되돌리기, 새 캐릭터 genVer');
+
+  // 13) 게임 규칙: 속성 상성(이기는 속성·배율)·역할 기본 능력치·희귀도 배율·진영 시너지·관계 배율을 보고 편집 → 전투 옵션·캐릭터 화면·도감에 반영
+  const p13 = await browser.newPage(), err13 = []; p13.on('pageerror', e => err13.push(String(e)));
+  await p13.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); const u13 = `http://127.0.0.1:${server.address().port}/?t=13`; await p13.goto(u13);
+  await p13.waitForFunction(() => typeof openRules === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r13 = await p13.evaluate(async () => {
+    const o = {}, E = G.meta.elems.map(e => e.n);
+    o.defaults = BEATS[E[0]] === E[1] && v2Options().elemAdv === 1.5 && v2Options().elemDis === .75 && GGMCombat.roleSpeed({ role: 'def', name: 'x' }) === GGMCombat.roleSpeed({ role: 'def', name: 'x' });
+    const c0 = G.chars.filter(c => !c.alt)[0], before = GGMCombat.generateBaseStats({ role: 'atk', rarity: 1 }, () => .5).atk;
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="rulesopen"]');
+    openRules(); const set = (id, v) => { document.querySelector('#' + id).value = v; };
+    set('ru_eb0', '2'); set('ru_eb1', '0'); set('ru_eb2', '1'); set('ru_adv', '2'); set('ru_ed0', '불꽃의 힘'); set('ru_rd_atk', '앞에서 싸워요'); set('ru_rb_atk_atk', '200');
+    set('ru_sn', '2'); set('ru_sa', '10'); set('ru_sd', '5');
+    document.querySelector('[data-act="rulesreladd"]').click(); const row = document.querySelector('#ru_rel [data-rel]'); row.querySelector('[data-rf="a"]').value = 'X'; row.querySelector('[data-rf="b"]').value = 'Y'; row.querySelector('[data-rf="mul"]').value = '1.3';
+    document.querySelector('[data-act="rulessave"]').click();
+    o.beats = BEATS[E[0]] === E[2] && BEATS[E[1]] === E[0]; const op = v2Options(); o.opts = op.elemAdv === 2 && op.synergy.n === 2 && op.rel[0].mul === 1.3 && op.beats[E[0]] === E[2];
+    o.roleBase = GGMCombat.generateBaseStats({ role: 'atk', rarity: 1 }, () => .5).atk === 200 && before === 120;
+    o.relMul = GGMCombat.relMul({ rel: op.rel }, { faction: 'X' }, { faction: 'Y' }) === 1.3 && GGMCombat.relMul({ rel: op.rel }, { faction: 'Y' }, { faction: 'X' }) === 1;
+    const html = rulesCharHTML(c0); o.charLine = html.includes('강함(×2)') && (c0.elem !== E[0] || html.includes('불꽃의 힘')) && (c0.role !== 'atk' || html.includes('앞에서 싸워요'));
+    o.auditBefore = auditScan().some(g => g.rule.id === 'g_codex') && auditScan().some(g => g.rule.id === 'g_rules');
+    openRules(); document.querySelector('[data-act="rulescodex"]').click(); o.codex = G.world.codex.some(x => x.title === '[규칙] 속성 상성' && x.body.includes('×2')) && G.world.codex.some(x => x.title === '[규칙] 진영 시너지'); o.auditAfter = !auditScan().some(g => g.rule.id === 'g_codex');
+    appConfirm = async () => true; const atkChar = G.chars.find(c => !c.alt && c.role === 'atk'); await rulesRecalc(); o.recalc = !atkChar || atkChar.atk >= 190; closeModal();
+    // 실제 전투 엔진: 시너지가 같은 진영 아군의 공격을 올려요
+    const mk = (id, f) => ({ name: id, role: 'atk', elem: E[0], faction: f, hp: 1000, atk: 100, def: 50, spd: 100, skills: GGMCombat.generationDefaults({ role: 'atk' }) });
+    const sim = GGMCombat.create([mk('a', 'F'), mk('b', 'F'), mk('c', 'G')].map(x => ({ ...x, kit: GGMCombat.normalize(x.skills), baseKit: GGMCombat.normalize(x.skills), ready: {} })), [{ ...mk('e', ''), kit: GGMCombat.normalize(mk('e', '').skills), baseKit: GGMCombat.normalize(mk('e', '').skills), ready: {} }], { ...v2Options(), seed: 1 });
+    o.synergy = sim.allies[0].atk === 110 && sim.allies[2].atk === 100 && sim.elemAdv === 2;
+    await flush(); return o; });
+  await p13.reload(); await p13.waitForFunction(() => typeof G === 'object' && typeof rulesOptions === 'function', null, { timeout: 15000 });
+  const r13b = await p13.evaluate(() => ({ desc: G.meta.elems[0].d === '불꽃의 힘', adv: rulesOptions().elemAdv === 2, beat: BEATS[G.meta.elems[0].n] === G.meta.elems[2].n }));
+  assert.ok(Object.values(r13).every(v => v === true), JSON.stringify(r13)); assert.ok(Object.values(r13b).every(v => v === true), JSON.stringify(r13b)); assert.deepEqual(err13, [], '페이지 오류');
+  console.log('ok 13 게임 규칙: 속성 상성·배율·역할 기본 능력치·희귀도·진영 시너지·관계 배율 편집 → 전투 엔진·캐릭터 화면·도감 반영, 다시 열어도 유지');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);

@@ -88,7 +88,7 @@ function openChar(id){
   const old=$('#modal .sheet.cs-sheet'), keep=old&&old.dataset.cid===id?old.scrollTop:0;
   const list=crewOrder(), i=list.findIndex(x=>x.id===id), prev=list[(i-1+list.length)%list.length], next=list[(i+1)%list.length];
   const lbs=imgSrcRaw(c.lbcg), cgOpen=!!(o&&o.dup>=5), skinSel=o&&o.skin, ill=c.illust?imgSrcRaw(c.illust):null, wearing=skinOf(c), sec=(k,h)=>`<section data-cs="${k}" ${CS_TAB===k?'':'hidden'}>${h}</section>`;
-  const equip=`
+  const equip=`${rulesCharHTML(c)}
     ${v2EquipmentCard(c,o)}
     ${v2SkillSummary(c)}
     <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="wnai" data-id="${c.id}">NAI로 ${T('weapon')} 그리기</button><button class="btn sm ghost" data-act="v2icons" data-id="${c.id}">스킬 이미지 생성</button></div>`;

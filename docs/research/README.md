@@ -6,6 +6,7 @@
 |---|---|---|
 | [construction.md](construction.md) | 칸코레류 건조·원정: 분류별 최소 투입으로 캡이 열려 **확률 테이블이 구성되는** 방식, 총량으로 희귀도 캡, 비율로 분류 비중, 특수 레시피, 자원 수급(구매·원정), 확률 공개 | `src/modules/app/020-construct.js`(엔진), `src/main/0505-construct.js`(화면·상태) |
 | [expedition.md](expedition.md) | 원정(파견)의 장르별 확장: 전투형 원정 · 방송 출연(인지도 등급에 따라 배정→선택, 컨디션·휴식기) · 스트리머(플랫폼·영상 라이브러리·라이브) · 경영(파트 배치, 실적×평판 정산) | `src/modules/app/030-expedition.js`(엔진), `src/main/0275-expedition.js`(화면·상태) |
+| [game-rules.md](game-rules.md) | 게임 규칙 공개·편집: 속성 상성(이기는 속성·배율), 역할 기본 능력치·속도, 희귀도 배율, 진영 시너지, 진영·역할·속성 관계 배율, 도감 기록 | `src/main/0185-game-rules.js`, 전투 엔진 `src/modules/combat/030-core.js` |
 | [content-audit.md](content-audit.md) | 콘텐츠 점검·업그레이드: 생성 기능 향상·구버전 생성물(genVer) 감지, 자동 변환·AI 채우기·지정 변환·되돌리기, 규칙 추가 방법 | `src/main/0535-content-audit.js` |
 | [variants.md](variants.md) | 바리에이션(이격·영의): 공통 템플릿, 조건으로 자동 적용, **상속형 관리(원본 + 수정치)**, 캐릭터 특징을 반영한 디자인 프롬프트 | 같은 파일들 + `src/main/0065-inherit.js`, `aiAltChar`(`src/main/0290-season-rotation.js`) |
 
