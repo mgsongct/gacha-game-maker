@@ -25,6 +25,8 @@ export function findings(J) {
   J.state.writeOnly.forEach(k => add('쓰기만 하는 키', k, k));
   J.actions.deadHandlers.forEach(x => add('발신 없는 처리기', x.act, `${x.act}`));
   J.css.dead.forEach(x => add('안 쓰는 CSS 클래스', x.cls, `.${x.cls} (${x.loc})`));
+  const MD = J.modules || {}; (MD.envy || []).forEach(e => add('영역 침범 후보', `${e.file} ${e.fn}`, `${e.fn} (${e.file}) — 참조 ${e.share}%가 ${e.to}`)); (MD.foreign || []).forEach(x => add('남의 상태 쓰기', `${x.file} ${x.key}`, `${x.file}가 ${x.key}(주인 ${x.owner})를 씀 ${x.n}곳`, { 곳: x.n })); (MD.scattered || []).forEach(x => add('파편화 상태', x.key, `${x.key} — ${x.files.length}개 모듈이 씀`, { 모듈: x.files.length }));
+  (J.promptAll || []).forEach(p => add('스튜디오 밖 LLM 프롬프트 글', p.key, `${p.key} ${p.chars}자 (${p.loc})`, { 글자: p.chars })); (J.promptImg || []).forEach(p => add('스튜디오 밖 이미지 프롬프트', p.key, `${p.key} ${p.chars}자 (${p.loc})`, { 글자: p.chars }));
   (J.inlinePrompts || []).forEach(p => add('스튜디오 밖 프롬프트 글', p.key, `${p.key} ${p.chars}자 (${p.loc})`, { 글자: p.chars })); // 늘면 나빠짐: 프롬프트는 스튜디오 조각(pfDef)으로
   const T = J.tools; if (T) { // 메타 점검(도구 코드)
     (T.cmt || []).forEach(c => add('도구 주석 속 코드', noLoc(`${c.loc} ${c.text}`), `${c.loc} ${c.text}`));

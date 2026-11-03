@@ -7,7 +7,8 @@ import { buildGraph, unused, unusedVars, cycles, cycleGuard, deepest, hubs, comp
 import { actions, mutations, stateFlow } from './flow.mjs';
 import { parseErrors, dupBodies, repeatedStrings, sgRules, complexFns, complexCases, commentedCode } from './quality.mjs';
 import { domIds, htmlInject, saveKeys, listenerLeaks, cssCheck, sideFiles, relayHosts, spaCheck } from './extra.mjs';
-import { inlinePrompts, pureModules, fragmentFiles } from './prompts.mjs';
+import { inlinePrompts, pureModules, fragmentFiles, promptText, IMAGE_SINKS, tagText } from './prompts.mjs';
+import { moduleMap } from './modules.mjs';
 
 export async function analyze(ROOT) {
   const units = await loadUnits(ROOT), html = readFileSync(join(ROOT, 'src/index.html'), 'utf8'), testText = existsSync(join(ROOT, 'build/test.mjs')) ? readFileSync(join(ROOT, 'build/test.mjs'), 'utf8') : '';
@@ -22,6 +23,8 @@ export async function analyze(ROOT) {
   R.prompts = inlinePrompts(units); // 프롬프트 스튜디오 밖(코드에 직접 쓴) 지시문
   R.pure = pureModules(units); // 순수 모듈(규칙 엔진)이 DOM·앱 상태를 참조
   R.frag = fragmentFiles(units); // 프롬프트 조각이 스튜디오 한곳에 모였는지
+  R.mod = moduleMap(units, fns, sf); // 모듈 경계: 영역 침범·남의 상태 쓰기·파편화
+  R.promptAll = inlinePrompts(units, { pred: promptText, home: R.frag.home }); R.promptImg = inlinePrompts(units, { sinks: IMAGE_SINKS, pred: tagText, home: R.frag.home, tables: true }); // 스튜디오 밖 LLM 프롬프트 글 전체·이미지 프롬프트 조각
   // 메타 점검: 도구 코드 자체의 위반(쓸데없는 예외 처리·복잡도·다중화·되풀이 문자열·안 쓰는 함수)
   const tu = await loadToolUnits(ROOT), tg = buildGraph(tu), tText = tu.map(u => u.text).join('\n');
   R.tools = { files: tu.length, cmt: commentedCode(tu), parse: parseErrors(tu), complex: [...complexFns(tg.fns), ...complexAnon(tu)], dup: dupBodies(tg.fns), strings: repeatedStrings(tu), emptyCatch: sgRules(tu).emptyCatch, unused: unused(tg.fns, tText, u => u.startsWith('tool:')) };
@@ -31,7 +34,7 @@ export async function analyze(ROOT) {
     ...R.cmt.map(x => ({ kind: '주석 속 코드(한 줄 코드 중간 // 주석으로 뒤 문장이 빠졌을 수 있음)', msg: `${x.loc} ${x.text}` })), ...R.dom.missing.map(m => ({ kind: '없는 요소를 찾는 코드(늘 null)', msg: `#${m.id} (${m.at.join(', ')})` })), ...R.inj.out.map(x => ({ kind: 'esc() 없이 HTML에 넣는 글', msg: `${x.loc} \${${x.what}}` })),
     ...(R.keys?.bad || []).map(x => ({ kind: 'writeKey가 모르는 저장 키', msg: `mark('${x.key}') ${x.loc} — PC·클라우드 문서 저장에서 빠짐` })), ...R.leaks.map(x => ({ kind: '떼지 않는 전역 리스너(누수)', msg: `'${x.ev}' ${x.loc} — ${x.why} 붙음, once·signal·removeEventListener 없음` })),
     ...(R.relay?.diff || []).map(x => ({ kind: '중계 서버 허용 주소 차이', msg: `${x.host} 이(가) ${x.missingIn}에 없음` })), ...(R.relay?.notAllowed || []).map(x => ({ kind: '중계 서버가 막는 API 주소', msg: `${x.host} (${x.loc}) — 웹 버전 중계에서 host not allowed` }))];
-  const J = { errors, warns, hubs: R.hubs.map(h => ({ name: h.f.name, loc: h.f.loc, fanIn: h.fanIn, cc: h.f.cc, mut: h.mut })), cycles: R.cycles, deep: R.deep, complex: R.complex.map(f => ({ name: f.name, loc: f.loc, cc: f.cc, lines: f.lines, depth: f.depth })), complexCases: R.ccases, anon: R.anon, unused: R.unused.map(f => f.name), unusedVars: R.unusedVars, actions: { missing: act.missing, deadHandlers: act.deadH, multi: act.multi }, state: { writeOnly: R.sf.writeOnly.map(x => x.key), scattered: R.sf.scattered.map(x => [x.key, x.writers]) }, strings: R.strings, emptyCatch: R.sg.emptyCatch, rawHTML: R.inj.out, domMissing: R.dom.missing, saveKeys: R.keys?.bad || [], leaks: R.leaks, css: { errors: R.css.errors, dead: R.css.dead }, inlinePrompts: R.prompts, side: { parse: R.side.parse, hosts: R.side.hosts }, relay: R.relay,
+  const J = { errors, warns, hubs: R.hubs.map(h => ({ name: h.f.name, loc: h.f.loc, fanIn: h.fanIn, cc: h.f.cc, mut: h.mut })), cycles: R.cycles, deep: R.deep, complex: R.complex.map(f => ({ name: f.name, loc: f.loc, cc: f.cc, lines: f.lines, depth: f.depth })), complexCases: R.ccases, anon: R.anon, unused: R.unused.map(f => f.name), unusedVars: R.unusedVars, actions: { missing: act.missing, deadHandlers: act.deadH, multi: act.multi }, state: { writeOnly: R.sf.writeOnly.map(x => x.key), scattered: R.sf.scattered.map(x => [x.key, x.writers]) }, strings: R.strings, emptyCatch: R.sg.emptyCatch, rawHTML: R.inj.out, domMissing: R.dom.missing, saveKeys: R.keys?.bad || [], leaks: R.leaks, css: { errors: R.css.errors, dead: R.css.dead }, inlinePrompts: R.prompts, modules: { envy: R.mod.envy, foreign: R.mod.foreign, scattered: R.mod.scattered }, promptAll: R.promptAll.map(({ key, chars, loc }) => ({ key, chars, loc })), promptImg: R.promptImg.map(({ key, chars, loc }) => ({ key, chars, loc })), side: { parse: R.side.parse, hosts: R.side.hosts }, relay: R.relay,
     tools: { files: R.tools.files, cmt: R.tools.cmt, parse: R.tools.parse, complex: R.tools.complex.map(f => ({ name: f.name, unit: f.unit, loc: f.loc, cc: f.cc, lines: f.lines, depth: f.depth })), dup: R.tools.dup.map(d => d.fns), strings: R.tools.strings, emptyCatch: R.tools.emptyCatch, unused: R.tools.unused.map(f => ({ name: f.name, loc: f.loc })) } };
   return { units, fns, act, mu, R, errors, warns, J, fnsN: [...fns.values()].filter(f => f.top).length };
 }

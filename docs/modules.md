@@ -196,7 +196,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 ## 8-2-5. 프롬프트 스튜디오
 
 - `src/main/0025-prompt-studio.js`: 조각 등록 `pfDef(id,label,get)` → `window[id]` 게터 → `promptFrag(id)`(게임별 덮어쓰기·덧붙이기 `G.meta.prompts`). 글 AI 지시문은 모두 이 파일의 「조각 모음」 한곳에 있어요(조각 184개 — 공통 형식·세계관·규칙·세력·등장·스토리·연출·생성기·공통 규칙·AI 컨텍스트·그림·화면 동작 등 묶음, 끝은 「조각 모음 끝」 표식). 수치·이름이 들어가는 조각은 `{이름}` 자리를 두고 호출 지점이 `pf('ID',{이름:값})`으로 채움(덮어쓴 글도 같은 자리). 고칠 때는 여기서, 게임별로는 스튜디오 화면(덮어쓰기·덧붙이기·AI 다듬기)에서
-- 지시문은 스튜디오 한곳에, 명단·수치 같은 데이터와 데이터 계약(스키마)은 각 기능 파일에. 도구가 다른 파일의 `pfDef`(오류)와 스튜디오 밖 지시문(늘면 실패)을 잡음(`tools/lib/prompts.mjs`)
+- 도구가 다른 파일의 `pfDef`(오류)와 스튜디오 밖 지시문(늘면 실패)을 잡음(`tools/lib/prompts.mjs`)
 - 그림 가드 `imgGuard(kind,tags)`: `composeNai`가 배경·소품·지도·아이콘에서 사람 태그를 빼고 `no humans` 머리말을 붙임
 - 교훈 `plList/plHit/plAdd`(appStorage `ggm-plessons`) → `llmWrap`이 `plInject`로 끼움. 점검 규칙 `l_imgperson`
 - 설계: [research/prompts.md](research/prompts.md)

@@ -25,16 +25,17 @@ function fragBases(units) { const out = new Set();
   for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression' || callee(n) !== 'pfDef') return; const get = n.childForFieldName('arguments')?.namedChildren[2]; if (get) walk(get, m => { if (m.type === 'identifier') out.add(m.text); }); });
   return out; }
 // 감싸기 함수: 매개변수를 글 AI 호출의 첫 인자로 그대로 넘기는 함수(예: story-memory의 request) — 그 함수를 부르는 곳도 글 AI 호출
-function aiCallees(units) { const set = new Set(AI_CALLS); let grew = true;
+function aiCallees(units, sinks) { const set = new Set(sinks || AI_CALLS); let grew = true;
   while (grew) { grew = false; for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression' || !set.has(callee(n))) return; const a0 = n.childForFieldName('arguments')?.namedChildren[0]; if (a0?.type !== 'identifier') return;
     let f = n.parent; while (f && !FN.has(f.type)) f = f.parent; if (!f) return; const ps = f.childForFieldName('parameters') || f.childForFieldName('parameter'); if (!ps || !ps.text.includes(a0.text)) return;
     const holder = f.type === 'function_declaration' ? f.childForFieldName('name')?.text : f.parent?.type === 'variable_declarator' ? f.parent.childForFieldName('name')?.text : null; if (holder && !set.has(holder)) { set.add(holder); grew = true; } }); }
   return set; }
 // 첫 인자가 이름이면 감싼 함수 안의 같은 이름 선언 값으로
-function resolveArg(a0) { if (a0?.type !== 'identifier') return a0; let f = a0.parent; while (f && !FN.has(f.type)) f = f.parent; let hit = null;
+function resolveArg(a0) { if (a0?.type === 'member_expression' && a0.childForFieldName('object')?.type === 'identifier') a0 = a0.childForFieldName('object'); /* p.input → const p=composeNai(…) */ if (a0?.type !== 'identifier') return a0; let f = a0.parent; while (f && !FN.has(f.type)) f = f.parent; let hit = null;
   if (f) walk(f, n => { if (hit) return false; if (n.type === 'variable_declarator' && n.childForFieldName('name')?.text === a0.text) hit = n.childForFieldName('value'); }); return hit || a0; }
 const ownText = n => n.type === 'template_string' ? n.namedChildren.filter(c => c.type === 'string_fragment').map(c => c.text).join('') : n.text.slice(1, -1);
-export function inlinePrompts(units, opts = {}) { /* opts.nodes: 원문(text)도 돌려줌(tools/prompts-move.mjs) */ const bases = fragBases(units), calls = aiCallees(units), tops = new Map(), roots = [];
+export function inlinePrompts(units, opts = {}) { /* opts.nodes: 원문(text)도 돌려줌(tools/prompts-move.mjs) · opts.sinks: 받는 호출(기본 글 AI) · opts.pred: 셀 글(기본 해라체 지시문) · opts.home: 이 파일 글은 뺌 · opts.tables: 배열·객체 상수(태그 표)도 따라감 */
+  const bases = fragBases(units), calls = aiCallees(units, opts.sinks), tops = new Map(), roots = [], pred = opts.pred || imperative;
   for (const u of units) { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const nm = declName(r.child(i)); if (nm && !tops.has(nm)) tops.set(nm, { u, node: r.child(i) }); } }
   // 창 게터: Object.defineProperty(window,'RULES',{get:rulesText}) → RULES는 rulesText처럼 따라감 / 모듈 이름공간(GGM…)의 함수: GGMCombat.prompt → 모듈 안 function prompt
   const getters = new Map(), modFns = new Map();
@@ -43,17 +44,22 @@ export function inlinePrompts(units, opts = {}) { /* opts.nodes: 원문(text)도
   for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'call_expression' && calls.has(callee(n))) { const a = resolveArg(n.childForFieldName('arguments')?.namedChildren[0]); if (a) roots.push({ u, node: a }); } });
   const seen = new Set(), lits = new Set(), visit = (u, node, depth) => walk(node, n => { if (n.type === 'call_expression' && callee(n) === 'pfDef') return false;
     if (n.type === 'string' || n.type === 'template_string') lits.add(n); // 같은 글 노드는 한 번만(Set)
-    const name = n.type === 'identifier' ? (getters.get(n.text) || n.text) : null; if (name && depth < 5 && tops.has(name) && !bases.has(name) && !seen.has(name) && (getters.has(n.text) || assembles(n, tops.get(name)))) { seen.add(name); const t = tops.get(name); visit(t.u, t.node, depth + 1); }
+    const name = n.type === 'identifier' ? (getters.get(n.text) || n.text) : null; if (name && depth < 5 && tops.has(name) && !bases.has(name) && !seen.has(name) && (getters.has(n.text) || opts.tables || assembles(n, tops.get(name)))) { seen.add(name); const t = tops.get(name); visit(t.u, t.node, depth + 1); }
     if (n.type === 'member_expression' && /^GGM\w+$/.test(n.childForFieldName('object')?.text || '') && depth < 5) { const p = n.childForFieldName('property')?.text, k = 'mod:' + p; if (modFns.has(p) && !seen.has(k)) { seen.add(k); const t = modFns.get(p); visit(t.u, t.node, depth + 1); } } });
   for (const r of roots) visit(r.u, r.node, 0);
   // 지시문 글 하나가 한 항목(최상위 선언 + 글 머리로 키) — 새로 넣은 문장은 새 항목으로, 늘린 문장은 글자 수로 드러남
   const unitOf = new Map(), out = [], dup = new Map(); units.forEach(u => walk(u.tree.rootNode, n => { if (n.type === 'string' || n.type === 'template_string') unitOf.set(n.id, u); }));
-  for (const n of lits) { const t = ownText(n); if (!imperative(t)) continue; const u = unitOf.get(n.id), loc = u.loc(n), file = loc.split(':')[0], top = ownerOf(n) || '(최상위 문장)', head = t.replace(/\s+/g, ' ').trim().slice(0, 40), base = `${file} ${top} 「${head}」`, k = (dup.get(base) || 0) + 1; dup.set(base, k);
+  for (const n of lits) { const t = ownText(n); if (!pred(t)) continue; const u = unitOf.get(n.id), loc = u.loc(n); if (opts.home && loc.startsWith(opts.home + ':')) continue; const file = loc.split(':')[0], top = ownerOf(n) || '(최상위 문장)', head = t.replace(/\s+/g, ' ').trim().slice(0, 40), base = `${file} ${top} 「${head}」`, k = (dup.get(base) || 0) + 1; dup.set(base, k);
     out.push({ key: k > 1 ? `${base} #${k}` : base, site: `${file} ${top}`, head, chars: t.length, loc, ...(opts.nodes ? { text: n.text } : {}) }); }
   return out.sort((a, b) => b.chars - a.chars); }
 // 위치(최상위 선언)별로 모음 — 보고서 표
 export const promptSites = rows => [...rows.reduce((m, r) => { const x = m.get(r.site) || { site: r.site, n: 0, chars: 0 }; x.n++; x.chars += r.chars; return m.set(r.site, x); }, new Map()).values()].sort((a, b) => b.chars - a.chars);
 
+// 프롬프트 글 전체(지시문만이 아니라 답 형식 견본·머리말 포함): 한글 글이나 JSON 키("x":)가 든 글 — 스튜디오 파일 밖 것
+export const promptText = t => /[가-힣]|"\w+"\s*:/.test(t);
+// 이미지 프롬프트 조각: 그림 생성(naiGenerate·comfyGenerate·composeNai)에 들어가는 영어 태그 글
+export const IMAGE_SINKS = ['naiGenerate', 'naiGenerate0', 'comfyGenerate'];
+export const tagText = t => /[a-z]{3,}/.test(t) && !/^[\w.-]+$/.test(t.trim());
 // 조각이 한곳에 모였는지: 프롬프트 스튜디오는 지시문을 파편화되지 않게 한곳에 모아 두고 거기서 개선하는 곳(사용자) — pfDef 등록이 여러 파일에 있으면 흩어진 것
 export function fragmentFiles(units) { const files = new Map();
   for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'call_expression' && callee(n) === 'pfDef') { const f = u.loc(n).split(':')[0]; files.set(f, (files.get(f) || 0) + 1); } });

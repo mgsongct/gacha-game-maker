@@ -13,7 +13,7 @@ function pf(id,vars){ const t=promptFrag(id); return vars?t.replace(/\{([A-Za-z]
 function promptFrag(id){ const f=(window.__PF||{})[id]; if(!f) return ''; const base=f.get(), o=promptOv()[id]; if(!o) return base; const t=o.text&&o.text.trim()?o.text:base; return o.add&&o.add.trim()?t+'\n'+o.add.trim():t; }
 /* ===== 조각 모음: 글 AI에 보내는 지시문은 모두 여기 한곳에(파편화 방지) =====
    고칠 때는 여기서 고치고, 게임마다 다르게 할 것은 스튜디오 화면(덮어쓰기·덧붙이기·AI 다듬기)에서. 호출 지점은 ${ID}로 넣기만 하고,
-   명단·수치 같은 데이터와 스키마(데이터 계약)만 각 기능 파일에 둬요. 도구가 다른 파일의 pfDef·지시문을 잡아요(tools/lib/prompts.mjs). */
+   도구가 다른 파일의 pfDef·지시문을 잡아요(tools/lib/prompts.mjs). */
 // ── 공통 형식
 const BATTLE_FLOW_BASE='\n전투 흐름: 스테이지마다 전투가 있는 건 게임 구조일 뿐이다. 데이트·일상·대화 장면 한가운데에 갑작스러운 습격을 만들어 전투에 억지 개연성을 붙이지 않는다. pre는 장면이 자연스럽게 마무리되는 곳에서 끝내고, 전투는 훈련·의뢰·순찰 중 마주친 적 정도로 한 줄만 언급하거나 아예 언급하지 않아도 된다. post도 전투를 길게 되짚지 말고 이야기의 흐름을 이어 간다.';
 pfDef('BATTLE_FLOW','전투 흐름(스토리 안의 전투 다루기)',()=>BATTLE_FLOW_BASE);
