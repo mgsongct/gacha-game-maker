@@ -220,7 +220,7 @@ async function buildNewGameDraft(t,draft,sourceProject){if(String(draft?.story||
   const src=!auto&&draft.fan?String(draft.src||'').trim():'';
   const hero=Object.assign({name:'',call:'',gender:'',look:'',bio:'',hide:false},draft.hero||{}), gen=genderCode(hero.gender), heroBlank=!String(hero.gender||'').trim()&&!String(hero.look||'').trim();
   const SC=auto?{plot:'',stages:0,len:'normal'}:{plot:String(draft.story||''),stages:+draft.stages||0,len:STORY_LEN[draft.len]?draft.len:'normal'}, LS=STORY_LEN[SC.len][1], N1=SC.stages||4;
-  const DT=auto?'':drText(draft).slice(0,100000), DRA=buildNewGameDraftDRAText({DT});
+  const DT=auto?'':drText(draft).slice(0,100000), DRA=buildNewGameDraftDRAText({DT,draft,plot:SC.plot});
   const DALL=auto?[]:(draft.chars||[]).filter(c=>String(c.name||'').trim()), DCH=DALL.filter(c=>c.kind!=='npc'), DNPC=DALL.filter(c=>c.kind==='npc');
   const STY=buildNewGameDraftSTYText({SC});
   const FAN=buildNewGameDraftFANText({src});
