@@ -27,16 +27,16 @@ const altsOf=c=>G.chars.filter(x=>x.alt===c.id);
 async function aiPickupStory(c,lim,link){
   const b=addPickupFor(c,lim); if(!SAMPLE) return null;
   const res=await aiEventGen(`신규 ${T('crew')} 「${c.name}」의 픽업 기념 이벤트 스토리. ${c.name}이(가) 주인공으로 처음 등장해 성격·매력·사연을 보여 주고 ${playerName()}와(과) 인연을 맺는다. 프로필: ${String(c.profile||'').slice(0,300)}. 기존 ${T('crew')} 1~2명이 조연으로 나온다. 픽업 배너와 이어지는 이야기라서 마지막 장면은 ${c.name}이(가) 동료가 되고 싶어 하는 여운으로 끝낸다.`,3,false,[c.name],null);
-  if(!res) return null; const ev=res.ev, eb=G.banners.find(x=>x.id===ev.bannerId);
-  if(eb&&eb!==b){ G.banners=G.banners.filter(x=>x!==eb); if(P().curBanner===eb.id) P().curBanner=b.id; }
+  if(!res) return null; const ev=res.ev, eb=G.banners.find(bn=>bn.id===ev.bannerId);
+  if(eb&&eb!==b){ G.banners=G.banners.filter(bn=>bn!==eb); if(P().curBanner===eb.id) P().curBanner=b.id; }
   ev.bannerId=b.id; ev.pickupFor=c.id; if(!link) ev.keepBanner=true; b.eventId=ev.id; b.desc=c.collab?`「${c.collab}」 콜라보! ${c.name} 등장 · 콜라보 스토리 「${ev.title}」`:`신규 ${RL[c.rarity]} ${c.name} 등장! 픽업 스토리 「${ev.title}」`; if(ev.bg&&!b.bg) b.bg=ev.bg;
   mark('prog'); return res; }
 async function seasonStart(type,notes){
   const L=P().live, meta=seasonMeta(type), now=Date.now(), d0=new Date(); d0.setHours(5,0,0,0); if(d0.getTime()>now) d0.setDate(d0.getDate()-1); const until=d0.getTime()+seasonDays()*864e5;
   const act=G.events.filter(e=>e.active!==false&&gateOpen(e)), past=G.events.filter(e=>e.active===false);
-  const closeEv=()=>{ act.forEach(e=>{ e.active=false; const b=G.banners.find(x=>x.id===e.bannerId); if(b&&!e.keepBanner){ b.active=false; sparkSettle(b); } }); if(act.length) notes.push(`이벤트 종료: ${act.map(e=>e.title).join(', ')}`); };
-  { const closed=[]; G.banners.forEach(b=>{ if(bnOpen(b)&&b.id!=='std'&&(b.newAt||b.eventId||b.seasonal)&&(!b.until||b.until<=now||b.until===((L.season&&L.season.until)||-1))){ b.active=false; sparkSettle(b); closed.push(b.name); } });
-    if(closed.length){ notes.push(`지난 시즌 픽업 종료: ${closed.join(', ')}`); const cb=G.banners.find(x=>x.id===P().curBanner); if(!cb||cb.active===false) P().curBanner=''; } }
+  const closeEv=()=>{ act.forEach(e=>{ e.active=false; const bn=G.banners.find(x=>x.id===e.bannerId); if(bn&&!e.keepBanner){ bn.active=false; sparkSettle(bn); } }); if(act.length) notes.push(`이벤트 종료: ${act.map(e=>e.title).join(', ')}`); };
+  { const closed=[]; G.banners.forEach(bn=>{ if(bnOpen(bn)&&bn.id!=='std'&&(bn.newAt||bn.eventId||bn.seasonal)&&(!bn.until||bn.until<=now||bn.until===((L.season&&L.season.until)||-1))){ bn.active=false; sparkSettle(bn); closed.push(bn.name); } });
+    if(closed.length){ notes.push(`지난 시즌 픽업 종료: ${closed.join(', ')}`); const cb=G.banners.find(bn=>bn.id===P().curBanner); if(!cb||cb.active===false) P().curBanner=''; } }
   L.season={type,key:seasonKey(),start:now,until}; notes.push(`${meta[3]} ${meta[1]} 시작! ${meta[2]} (${new Date(until-1).toLocaleDateString('ko-KR')}까지)`);
   if(type==='story'){ closeEv();
     if(!SAMPLE) notes.push('글 AI가 없어서 새 장은 쓰지 못했어요');
@@ -44,16 +44,16 @@ async function seasonStart(type,notes){
     else notes.push('아직 진행 중인 메인 장이 있어요. 이번 시즌에 마저 즐겨 보세요'); }
   else if(type==='event'){
     if(SAMPLE){ liveBar('이벤트 시즌: 새 이벤트를 만드는 중… 몇 분 걸려요. 그동안 플레이해도 돼요.'); const res=await aiEventGen('',4,true,[],null);
-      if(res){ const nb=G.banners.find(x=>x.id===res.ev.bannerId); if(nb){ nb.until=until; nb.seasonal=true; } act.forEach(e=>{ if(e!==res.ev){ e.active=false; const b=G.banners.find(x=>x.id===e.bannerId); if(b&&!e.keepBanner) b.active=false; } }); if(act.length) notes.push(`이벤트 종료: ${act.map(e=>e.title).join(', ')}`); notes.push(`새 이벤트 「${res.ev.title}」 개최${res.nc?`, 한정 ${T('crew')} ${res.nc.name} 등장`:''}`); bondNote((res.ncs||[]).slice(1),notes); } }
-    else if(past.length){ closeEv(); const ev=rand(past); ev.active=true; P().shopBuy[ev.id]={}; const b=G.banners.find(x=>x.id===ev.bannerId); if(b){ b.active=true; b.until=until; } notes.push(`글 AI가 없어서 복각 이벤트 「${ev.title}」로 열었어요`); } }
+      if(res){ const nb=G.banners.find(bn=>bn.id===res.ev.bannerId); if(nb){ nb.until=until; nb.seasonal=true; } act.forEach(e=>{ if(e!==res.ev){ e.active=false; const bn=G.banners.find(x=>x.id===e.bannerId); if(bn&&!e.keepBanner) bn.active=false; } }); if(act.length) notes.push(`이벤트 종료: ${act.map(e=>e.title).join(', ')}`); notes.push(`새 이벤트 「${res.ev.title}」 개최${res.nc?`, 한정 ${T('crew')} ${res.nc.name} 등장`:''}`); bondNote((res.ncs||[]).slice(1),notes); } }
+    else if(past.length){ closeEv(); const ev=rand(past); ev.active=true; P().shopBuy[ev.id]={}; const bn=G.banners.find(x=>x.id===ev.bannerId); if(bn){ bn.active=true; bn.until=until; } notes.push(`글 AI가 없어서 복각 이벤트 「${ev.title}」로 열었어요`); } }
   else if(type==='char'){ closeEv();
     if(SAMPLE){ liveBar('캐릭터 시즌: 신규 캐릭터를 구상하는 중…'); const c=await aiNewPickupChar('','ai',null);
       if(c){ liveBar(`캐릭터 시즌: ${c.name}의 픽업 스토리를 쓰는 중… 몇 분 걸려요.`); const res=await aiPickupStory(c,false,true); notes.push(`신규 ${RL[c.rarity]} ${c.name} 픽업 개시`); if(res) notes.push(`${c.name} 픽업 스토리 「${res.ev.title}」 공개`); setTimeout(()=>artAfterAI(x=>x.o===c||x.c===c,'신규 '+T('crew')+' '+c.name),2500); }
       if(L.on.talk){ liveBar('캐릭터 시즌: 톡을 쓰는 중…'); const n=await dailyTalks(); if(n) notes.push(`${T('talk')} 새 대화 ${n}개`); } }
     else { const r=rotatePickups(); if(r) notes.push(r); } }
   else if(type==='rerun'){
-    if(past.length){ closeEv(); const ev=rand(past); ev.active=true; P().shopBuy[ev.id]={}; const b=G.banners.find(x=>x.id===ev.bannerId); if(b){ b.active=true; b.until=until; } notes.push(`복각 이벤트 「${ev.title}」가 다시 열렸어요`); }
-    const lim=G.banners.filter(b=>b.active===false&&(b.pickup||[]).length&&b.type!=='event'); if(lim.length){ const b=rand(lim); b.active=true; b.until=until; notes.push(`복각 픽업: ${b.name}`); }
+    if(past.length){ closeEv(); const ev=rand(past); ev.active=true; P().shopBuy[ev.id]={}; const bn=G.banners.find(x=>x.id===ev.bannerId); if(bn){ bn.active=true; bn.until=until; } notes.push(`복각 이벤트 「${ev.title}」가 다시 열렸어요`); }
+    const lim=G.banners.filter(b=>b.active===false&&(b.pickup||[]).length&&b.type!=='event'); if(lim.length){ const bn=rand(lim); bn.active=true; bn.until=until; notes.push(`복각 픽업: ${bn.name}`); }
     const r=rotatePickups(); if(r) notes.push(r); }
   else if(type==='train'){ closeEv(); notes.push('훈련(경험·크레딧·재료) 보상 2배, 파견 보상 1.5배'); }
   mark('prog'); }
@@ -86,9 +86,9 @@ async function liveTick(force){
     if(due('month')&&on.pass&&!force){ P().pass={xp:0,got:[]}; notes.push(`${T('pass')} 새 시즌이 시작됐어요`); }
     if(!on.season&&due('week')&&(on.event||on.rerun)){
       const act=G.events.filter(e=>e.active!==false&&gateOpen(e)), past=G.events.filter(e=>e.active===false);
-      const close=()=>act.forEach(e=>{e.active=false;const b=G.banners.find(x=>x.id===e.bannerId); if(b&&!e.keepBanner) b.active=false;});
+      const close=()=>act.forEach(e=>{e.active=false;const bn=G.banners.find(x=>x.id===e.bannerId); if(bn&&!e.keepBanner) bn.active=false;});
       let opened=null;
-      if(on.rerun&&past.length&&(!on.event||!SAMPLE||Math.random()<0.25)){ const ev=rand(past); close(); ev.active=true; P().shopBuy[ev.id]={}; const b=G.banners.find(x=>x.id===ev.bannerId); if(b)b.active=true; opened=`복각 이벤트 「${ev.title}」가 다시 열렸어요`; }
+      if(on.rerun&&past.length&&(!on.event||!SAMPLE||Math.random()<0.25)){ const ev=rand(past); close(); ev.active=true; P().shopBuy[ev.id]={}; const bn=G.banners.find(x=>x.id===ev.bannerId); if(bn)bn.active=true; opened=`복각 이벤트 「${ev.title}」가 다시 열렸어요`; }
       else if(on.event&&SAMPLE){ liveBar('새 이벤트를 만드는 중… 몇 분 걸려요. 그동안 플레이해도 돼요.'); const res=await aiEventGen('',3,true,[],null);
         if(res){ act.forEach(e=>{if(e!==res.ev){e.active=false;const b=G.banners.find(x=>x.id===e.bannerId); if(b&&!e.keepBanner) b.active=false;}}); opened=`새 이벤트 「${res.ev.title}」 개최${res.nc?`, 한정 ${T('crew')} ${res.nc.name} 등장`:''}`; bondNote((res.ncs||[]).slice(1),notes); } }
       if(opened){ if(act.length) notes.push(`이벤트 종료: ${act.map(e=>e.title).join(', ')}`); notes.push(opened); }

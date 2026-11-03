@@ -2,7 +2,7 @@
 // 포크 기능 배선 점검: node tools/wiring.mjs [--strict]
 //   tree-sitter로 ① 포크 기능의 범위(커밋이 새로 들여온 함수 = 그 커밋 트리 − 부모 트리), 그 함수들이 읽는 데이터 키와 원본에 없던 새 필드,
 //   ② 생성기(tools/fork-features.json의 generators에서 부르는 함수들)가 쓰는 키·필드·프롬프트 스키마 키를 뽑고,
-//   ③ 생성된 게임(tools/play/games/*/game.json)에서 그 키·필드가 실제로 채워졌는지(없음·빔·기본값·값) 맞춰 봐요.
+//   ③ 생성된 게임(pc/data — PC 서버 data 폴더, 실제 저장 형식)에서 그 키·필드가 실제로 채워졌는지(없음·빔·기본값·값) 맞춰 봐요.
 //   결과: tools/out/wiring.md · wiring.json. --strict: P0·P1 판정이 기준선(tools/baseline.json의 wiring)보다 새로 생기면 exit 1 · --update-baseline: 줄었을 때 기준선 낮춤
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
@@ -12,6 +12,8 @@ import { buildGraph } from './lib/graph.mjs';
 import { stateFlow } from './lib/flow.mjs';
 import { constLiterals, wiringReport } from './lib/wiring.mjs';
 import { srcAt } from './lib/gitsrc.mjs';
+import { listGames, readGame } from './play/lib/data.mjs';
+import { PC_DIR } from './play/lib/page.mjs';
 import { compare, readBaseline, writeBaseline, diffMd } from './lib/ratchet.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url)), ROOT = resolve(HERE, '..'), OUT = join(HERE, 'out'), REG = JSON.parse(readFileSync(join(HERE, 'fork-features.json'), 'utf8'));
@@ -22,8 +24,8 @@ const upstream = await srcAtRef(REG.upstreamSrc || REG.upstream), features = [];
 for (const f of REG.features) { const added = new Set();
   for (const c of f.commits) { const [now, before] = [await srcAtRef(c), await srcAtRef(c + '^')], b = new Set(before.fns); now.fns.filter(k => !b.has(k)).forEach(k => added.add(k)); }
   features.push({ id: f.id, title: f.title, doc: f.doc, fns: new Set([...added].filter(k => fns.has(k))) }); }
-// 생성 게임: 커밋된 결과(game.json)와, 지금 코드로 같은 응답을 다시 생성한 결과(regress/game.json — tools/play/regress.mjs)
-const GD = join(HERE, 'play/games'), games = (existsSync(GD) ? readdirSync(GD) : []).flatMap(d => [['game.json', d], ['regress/game.json', d + '(재생)']].filter(([f]) => existsSync(join(GD, d, f))).map(([f, name]) => ({ name, game: JSON.parse(readFileSync(join(GD, d, f), 'utf8')) })));
+// 생성된 게임: PC 서버 폴더(pc/ — PC서버-시작.bat과 같은 경로)의 data/에 있는 게임(앱 기본 샘플 main 제외)
+const games = listGames(PC_DIR).map(x => ({ name: x.title, game: readGame(PC_DIR, x.id).game }));
 const W = wiringReport({ fns, sf, features, roots: REG.generators, defaults, games, upstreamProps: new Set(upstream.props), userKeys: REG.userKeys || {}, defaultOk: REG.defaultOk || {}, runtimeFields: REG.runtimeFields || {} });
 
 const t = (h, rs) => [`| ${h.join(' | ')} |`, `|${h.map(() => '---').join('|')}|`, ...rs.map(r => `| ${r.map(x => String(x ?? '').replace(/\|/g, '/')).join(' | ')} |`)].join('\n');

@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 // 생성된 게임을 새 플레이어로 화면에서 플레이하며 캡처(412×860, 그림 AI 없음 기준):
 //   로비 → 계약 → 첫 10연(연출 중·후) → 대원 → 캐릭터 시트 → 작전 → 1장 첫 스테이지 대본 → 전투(3배속) → 메신저
-//   node tools/play/shots.mjs <게임 폴더> [game.json]  → <게임 폴더>/shots/NN-이름.png · shots/play.json(화면 글·오류)
+//   node tools/play/shots.mjs <게임 폴더>  → <게임 폴더>/shots/NN-이름.png · shots/play.json(화면 글·오류) — 게임은 pc/data(PC 서버 data 폴더)에서
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { withPage } from './lib/page.mjs';
+import { hasGame, readGame, gidOf } from './lib/data.mjs';
+import { PC_DIR } from './lib/page.mjs';
 
-const dir = resolve(process.argv[2] || ''), file = process.argv[3] || 'game.json';
-if (!process.argv[2] || !existsSync(join(dir, file))) { console.log('사용법: node tools/play/shots.mjs <게임 폴더> [game.json]'); process.exit(2); }
-const game = readFileSync(join(dir, file), 'utf8'), outDir = join(dir, 'shots'); mkdirSync(outDir, { recursive: true });
+const dir = resolve(process.argv[2] || '');
+const gid = process.argv[2] && gidOf(dir); if (!gid || !hasGame(PC_DIR, gid)) { console.log('사용법: node tools/play/shots.mjs <게임 폴더> — pc/data에 그 폴더의 게임이 없어요'); process.exit(2); }
+const game = JSON.stringify(readGame(PC_DIR, gid).game), outDir = join(dir, 'shots'); mkdirSync(outDir, { recursive: true });
 const { out, errors } = await withPage(async page => {
   const log = {}, shot = name => page.screenshot({ path: join(outDir, name + '.png') }), text = sel => page.evaluate(s => (document.querySelector(s)?.innerText || '').replace(/\s+/g, ' ').slice(0, 400), sel);
   await page.evaluate(game => { closeModal(); closeOv(); G = fix(JSON.parse(game)); applyMeta(); P().owned = {}; P().squad = []; P().firstTen = true; P().seenOpening = true; P().gems = Math.max(P().gems, 3000); window.reloadGame = () => {}; tab = 'lobby'; render(); }, game);

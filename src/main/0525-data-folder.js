@@ -81,7 +81,7 @@ async function dataImport(file){
  catch(e){syBar('');toast('가져오기 실패: '+(e.message||e)+'. 현재 저장은 바꾸지 않았어요.');if(paused)window.__NOFLUSH=0;}
  finally{await appStorage.discard(prefix).catch(()=>{});BACKUP_BUSY=false;backupBusyOverlay(false);}}
 function dataFolderBlock(){return `<section class="panel backup-block" data-backup-kind="data-folder"><h3>데이터 폴더 (종류별 JSON)</h3><p class="muted">현재 게임을 data/게임id/ 폴더 구조의 zip으로 내보내요. 캐릭터·시나리오·세계관 등이 종류별 JSON 파일로 나뉘어 있어서 직접 열어 보거나 고칠 수 있어요. 그림·음성은 media 폴더에 들어가요. 가져오면 새 게임으로 추가돼요.</p><p class="muted">PC 서버를 쓰면 같은 구조로 PC의 data 폴더에 자동으로 저장돼요.</p><div class="row"><button class="btn sm" data-act="data-save">데이터 폴더 내보내기</button><button class="btn sm ghost" data-act="data-load">데이터 폴더 가져오기</button></div></section>`;}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;
- if(b.dataset.act==='data-save')dataExport();
- if(b.dataset.act==='data-load'){const i=document.createElement('input');i.type='file';i.accept='.zip,application/zip';i.onchange=()=>{if(i.files[0])dataImport(i.files[0]);};i.click();}});
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;
+ if(el.dataset.act==='data-save')dataExport();
+ if(el.dataset.act==='data-load'){const i=document.createElement('input');i.type='file';i.accept='.zip,application/zip';i.onchange=()=>{if(i.files[0])dataImport(i.files[0]);};i.click();}});
 /* /DATA_FOLDER_MODULE */

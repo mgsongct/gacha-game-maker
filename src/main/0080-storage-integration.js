@@ -1,6 +1,6 @@
 /* STORAGE_INTEGRATION_MODULE */
 /* These hooks run in the main script's global lexical environment. */
-function storageWarning(message){let b=document.getElementById('save-warning');if(!b){b=document.createElement('div');b.id='save-warning';b.setAttribute('role','alert');b.style.cssText='position:fixed;top:env(safe-area-inset-top,0px);left:8px;right:8px;z-index:2147483646;background:var(--panel,#fff);color:var(--ink,#222);border:2px solid var(--rose,#d92f5a);padding:12px;border-radius:12px';b.innerHTML='<b>저장 실패</b><p></p><button class="btn sm" type="button">저장 다시 시도</button>';b.querySelector('b').textContent='저장 실패 · 앱을 종료하지 마세요';b.querySelector('button').onclick=async()=>{try{await flush();if(!appStorage.failed)b.remove();}catch(e){}};document.body.appendChild(b);}b.querySelector('p').textContent=message+(/다른 메이커 화면/.test(message)?' 이 화면의 미저장 변경은 진행 백업으로 따로 보관해 주세요.':' 현재 변경 내용은 아직 저장되지 않았습니다. 저장 공간을 확보하고 다시 시도하거나 진행 백업을 내보내 주세요.');}
+function storageWarning(message){let el=document.getElementById('save-warning');if(!el){el=document.createElement('div');el.id='save-warning';el.setAttribute('role','alert');el.style.cssText='position:fixed;top:env(safe-area-inset-top,0px);left:8px;right:8px;z-index:2147483646;background:var(--panel,#fff);color:var(--ink,#222);border:2px solid var(--rose,#d92f5a);padding:12px;border-radius:12px';el.innerHTML='<b>저장 실패</b><p></p><button class="btn sm" type="button">저장 다시 시도</button>';el.querySelector('b').textContent='저장 실패 · 앱을 종료하지 마세요';el.querySelector('button').onclick=async()=>{try{await flush();if(!appStorage.failed)el.remove();}catch(e){}};document.body.appendChild(el);}el.querySelector('p').textContent=message+(/다른 메이커 화면/.test(message)?' 이 화면의 미저장 변경은 진행 백업으로 따로 보관해 주세요.':' 현재 변경 내용은 아직 저장되지 않았습니다. 저장 공간을 확보하고 다시 시도하거나 진행 백업을 내보내 주세요.');}
 addEventListener('ggm-storage-error',e=>storageWarning(e.detail.message));
 async function reloadGame(url){try{if(!window.__NOFLUSH)await flush();await appStorage.drain();if(url)location.href=url;else location.reload();}catch(e){storageWarning(e.message||'저장하지 못했습니다');}}
 // Capturing guard also covers enhancement buttons installed by combat modules.
@@ -32,7 +32,7 @@ function writeKey(k,game=G){
   if(k.startsWith('t:')){const id=k.slice(2);return put('t',game.threads,id,'t_'+id);}
 }
 function replaceAll(ng){
-  const olds=[...G.chars.map(c=>'c:'+c.id),...G.chapters.map(c=>'ch:'+c.id),...G.lib.map(l=>'l:'+l.id),...G.threads.map(t=>'t:'+t.id)];
+  const olds=[...G.chars.map(c=>'c:'+c.id),...G.chapters.map(ch=>'ch:'+ch.id),...G.lib.map(l=>'l:'+l.id),...G.threads.map(t=>'t:'+t.id)];
   G=fix(ng); delete G.__curveNew; mark(...olds); markAll(); loadIdbImages(); render();
 }
 
@@ -58,7 +58,7 @@ function imgSrc(o){
  if(o&&typeof G!=='undefined'&&G){const owner=(G.chars||[]).find(c=>c===o||(c.skins||[]).includes(o));if(owner){if(o!==owner)return skinPreviewSrc(owner,o);if(owner.useStanding===false)return owner.upper&&imgSrcRaw(owner.upper)||null;}}
  return imgSrcRaw(o);
 }
-function imgSrcRaw(o){ if(o&&!o.img&&o.alias&&typeof G!=='undefined'&&G&&G.lib){ const t=G.lib.find(x=>x.id===o.alias); return t&&t!==o&&!t.alias?imgSrc(t):null; } if(!o||!o.img) return null; if(o.img.asset) return null; if(o.img.idb) return imgCache[o.id]||null; return null; }
+function imgSrcRaw(o){ if(o&&!o.img&&o.alias&&typeof G!=='undefined'&&G&&G.lib){ const t=G.lib.find(l=>l.id===o.alias); return t&&t!==o&&!t.alias?imgSrc(t):null; } if(!o||!o.img) return null; if(o.img.asset) return null; if(o.img.idb) return imgCache[o.id]||null; return null; }
 const SKP={upper:'상반신',illust:'일러스트',lbcg:'돌파 CG'};
 let NOSKIN=0; // 계약(가챠) 화면·연출은 스킨 없이 기본 모습으로
 const noSkin=f=>function(){ NOSKIN++; try{ return f.apply(this,arguments); }finally{ NOSKIN--; } };
@@ -95,7 +95,7 @@ document.addEventListener('error',event=>{const img=event.target;if(!img?.matche
 function enemyLib(name){return G.lib.find(l=>l.kind==='enemy'&&l.name===name);}
 function enemyArt(e,cls){const l=enemyLib(e.name), ch=G.chars.find(c=>c.name===e.name), s=(ch&&imgSrc(ch))||(l&&imgSrc(l)); return s?`<img class="en-img ${cls||''}" src="${esc(s)}" alt="${esc(e.name)}" draggable="false">`:`<div class="shape"><i></i></div>`;}
 function libArt(name){
-  const it=G.lib.find(x=>x.name===name);
+  const it=G.lib.find(l=>l.name===name);
   const s=it&&imgSrc(it);
   if(s) return `<img class="art" src="${esc(s)}" alt="${esc(name)}">`;
   if(it&&it.kind==='bg') return `<div class="art" style="${bgStyle(name)}"></div>`;
@@ -116,7 +116,7 @@ function procBg(name){
   return procCache[name]=`url('data:image/svg+xml,${encodeURIComponent(svg)}'),linear-gradient(180deg,hsl(${hue},45%,14%),hsl(${(hue+35)%360},50%,30%) 75%,hsl(${(hue+60)%360},45%,20%))`;
 }
 function bgStyle(name){
-  const it=G.lib.find(x=>x.kind==='bg'&&x.name===name); const s=it&&imgSrc(it);
+  const it=G.lib.find(l=>l.kind==='bg'&&l.name===name); const s=it&&imgSrc(it);
   if(s) return `background-image:url('${s}');background-size:cover;background-position:center`;
   return `background-image:${procBg(name||'밤')};background-size:cover;background-position:center bottom`;
 }

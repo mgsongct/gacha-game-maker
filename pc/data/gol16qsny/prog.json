@@ -1,0 +1,106 @@
+{
+ "gems": 3600,
+ "pity": 0,
+ "total": 0,
+ "owned": {},
+ "cleared": {},
+ "squad": [],
+ "sec": null,
+ "daily": "",
+ "settings": {
+  "ssr": 4,
+  "sr": 18,
+  "pity": 150,
+  "rv": 2,
+  "expRate": 100,
+  "goldRate": 100,
+  "gemRate": 100,
+  "stamina": true
+ },
+ "firstTen": true,
+ "adult": true,
+ "show19": true,
+ "history": [],
+ "savedAt": 0,
+ "gold": 20000,
+ "mat": {
+  "exp": 40,
+  "wmat": 20,
+  "core": 10,
+  "gearMat": 0,
+  "transcMat": 0
+ },
+ "pities": {},
+ "tokens": {},
+ "disp": {},
+ "dm": {
+  "date": "",
+  "cnt": {},
+  "got": {}
+ },
+ "pass": {
+  "xp": 0,
+  "got": []
+ },
+ "farmClear": {},
+ "shopBuy": {},
+ "curBanner": "",
+ "curEvent": "",
+ "live": {
+  "on": {
+   "talk": true,
+   "event": true,
+   "rerun": true,
+   "rotate": true,
+   "pass": true,
+   "chapter": false,
+   "season": true,
+   "skin": true
+  },
+  "last": {},
+  "notices": [],
+  "seen": 0,
+  "recentPU": [],
+  "seasons": {
+   "story": true,
+   "event": true,
+   "char": true,
+   "rerun": true,
+   "train": true
+  },
+  "skillGeneration": 1,
+  "season": null
+ },
+ "player": "",
+ "gender": "",
+ "inbox": {},
+ "seenOpening": false,
+ "lobbyBg": "병원 복도",
+ "titleBg": "한강 둔치",
+ "titleChar": "",
+ "gachaBg": "",
+ "genderTxt": "",
+ "look": "단정한 셔츠에 사원증을 목에 건 20대 후반 성인, 늘 태블릿과 식은 커피를 들고 다닌다",
+ "bio": "",
+ "hideEyes": false,
+ "nameAsked": true,
+ "scene": {
+  "title": "타이틀",
+  "lobby": "로비",
+  "battle": "전투",
+  "boss": "보스전",
+  "gacha": "뽑기 연출"
+ },
+ "shop": {
+  "day": "",
+  "buy": {}
+ },
+ "cash": {
+  "first": {},
+  "month": {
+   "until": 0,
+   "last": ""
+  },
+  "total": 0
+ }
+}

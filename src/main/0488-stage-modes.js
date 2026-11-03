@@ -70,14 +70,14 @@ function contestAppeal(cid,k){ const e=MD.ent.find(x=>x.id===cid); if(!e) return
   const best=Math.max(0,...MD.rivals.map(r=>r.score)), mine=MD.score, win=mine>best, {ch,s}=MD, margin=best?mine/best:2; MD=null;
   if(!win){ closeModal(); toast(`콘테스트 결과: 우리 ${nf(mine)} · 1위 ${nf(best)} — 출전자와 어필을 바꿔 다시 도전해 보세요`); return; }
   modeClear(ch,s,margin>=1.3?3:margin>=1.1?2:1); }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
-  if(a==='mdgo'){ const ch=G.chapters.find(x=>x.id===b.dataset.ch), s=ch&&ch.stages.find(x=>x.id===b.dataset.st); if(!s) return; const sel=[...document.querySelectorAll('#modal [data-mdsel]')].filter(x=>x.checked).map(x=>x.dataset.mdsel); if(sel.length){ P().squad=sel.slice(0,s.mode==='contest'?3:4); mark('prog'); } closeModal(); const go=()=>s.mode==='debate'?debateStart(ch,s):contestStart(ch,s); if(!P().cleared[s.id]&&s.pre) playStory(s.title,s.pre,go); else go(); }
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
+  if(a==='mdgo'){ const ch=G.chapters.find(x=>x.id===el.dataset.ch), s=ch&&ch.stages.find(x=>x.id===el.dataset.st); if(!s) return; const sel=[...document.querySelectorAll('#modal [data-mdsel]')].filter(x=>x.checked).map(x=>x.dataset.mdsel); if(sel.length){ P().squad=sel.slice(0,s.mode==='contest'?3:4); mark('prog'); } closeModal(); const go=()=>s.mode==='debate'?debateStart(ch,s):contestStart(ch,s); if(!P().cleared[s.id]&&s.pre) playStory(s.title,s.pre,go); else go(); }
   else if(!MD) return;
-  else if(a==='dbnav'){ const R=MD.s.debate.rounds[MD.r]; MD.i=Math.max(0,Math.min(R.lines.length-1,MD.i+(+b.dataset.v))); debateDraw(); }
+  else if(a==='dbnav'){ const R=MD.s.debate.rounds[MD.r]; MD.i=Math.max(0,Math.min(R.lines.length-1,MD.i+(+el.dataset.v))); debateDraw(); }
   else if(a==='dbpress'){ const L=MD.s.debate.rounds[MD.r].lines[MD.i]; MD.pressed[MD.i]=1; debateDraw(L.press?`${MD.s.debate.opponent}: ${L.press}`:'더 이상 나오는 말이 없어요'); }
-  else if(a==='dbshow'){ const L=MD.s.debate.rounds[MD.r].lines[MD.i], ev=MD.s.debate.evidence.find(x=>x.id===b.dataset.v); if(L.weak&&L.weak===b.dataset.v) debateHit(`「${ev.name}」을(를) 제시 — "${L.text}"의 모순을 밝혀냈다!`); else debateMiss(`「${ev?ev.name:''}」은(는) 이 말과 맞지 않아요. 신뢰도 −1`); }
-  else if(a==='dbpers'){ const L=MD.s.debate.rounds[MD.r].lines[MD.i], c=charById(b.dataset.v); if(L.persuade&&c&&(c.name===L.persuade.who||ROLE[c.role]===L.persuade.who||c.faction===L.persuade.who)) debateHit(`${c.name}: ${L.persuade.text||'제 말을 들어 주세요.'}`); else debateMiss(`${c?c.name:''}의 말은 이 대목에서 통하지 않았어요. 신뢰도 −1`); }
-  else if(a==='ctap') contestAppeal(b.dataset.c,b.dataset.k);
+  else if(a==='dbshow'){ const L=MD.s.debate.rounds[MD.r].lines[MD.i], ev=MD.s.debate.evidence.find(x=>x.id===el.dataset.v); if(L.weak&&L.weak===el.dataset.v) debateHit(`「${ev.name}」을(를) 제시 — "${L.text}"의 모순을 밝혀냈다!`); else debateMiss(`「${ev?ev.name:''}」은(는) 이 말과 맞지 않아요. 신뢰도 −1`); }
+  else if(a==='dbpers'){ const L=MD.s.debate.rounds[MD.r].lines[MD.i], c=charById(el.dataset.v); if(L.persuade&&c&&(c.name===L.persuade.who||ROLE[c.role]===L.persuade.who||c.faction===L.persuade.who)) debateHit(`${c.name}: ${L.persuade.text||'제 말을 들어 주세요.'}`); else debateMiss(`${c?c.name:''}의 말은 이 대목에서 통하지 않았어요. 신뢰도 −1`); }
+  else if(a==='ctap') contestAppeal(el.dataset.c,el.dataset.k);
   else if(a==='dbquit'){ MD=null; closeModal(); } });
 
 document.addEventListener('change',e=>{ const id=e.target.dataset&&e.target.dataset.mdsel; if(id) e.target.closest('label').classList.toggle('on',e.target.checked); });

@@ -3,7 +3,7 @@
 let REGEN=null,REGEN_JOB=null,IMGLIB=null;
 const unFaceless=s=>String(s||'').replace(/(^|\s*,\s*)(1other\s*,\s*)?faceless\b/gi,(m,pre)=>pre||'').replace(/^[\s,]+/,'').trim();
 function charCGs(c){return G.lib.filter(l=>l.kind==='cg'&&(l.cast||[]).some(x=>x.id===c.id));}
-function weaponRenameOk(o,n){o=String(o||'').trim();n=String(n||'').trim();return o.length>=3&&n&&o!==n&&!G.chars.some(x=>x.name===o)&&!(G.npcs||[]).some(x=>x.name===o);}
+function weaponRenameOk(o,n){o=String(o||'').trim();n=String(n||'').trim();return o.length>=3&&n&&o!==n&&!G.chars.some(c=>c.name===o)&&!(G.npcs||[]).some(x=>x.name===o);}
 function regenSlot(slot){return Object.prototype.hasOwnProperty.call(GGMCombat.SLOTS,slot)?slot:'active';}
 function regenSkillLabel(c,slot){const s=v2Ensure(c)[regenSlot(slot)];return s.name+' — '+v2SkillText(s,regenSlot(slot));}
 function regenFields(slot='active'){slot=regenSlot(slot);return [
@@ -332,7 +332,7 @@ function eraseColorData(id,W,H,px,py,o){
 /* ---- cut tool canvas helpers ---- */
 const CUT_ZOOMS=[1,2,3,5,8];
 function cutCtx(){const j=CUTJOB;return j&&j.cv?j.cv.getContext('2d',{willReadFrequently:true}):null;}
-function cutPush(){const j=CUTJOB,x=cutCtx(); if(!x) return; j.undo.push(x.getImageData(0,0,j.W,j.H)); if(j.undo.length>10) j.undo.shift(); const u=$('#ct_undo'); if(u) u.disabled=false; j.changed=true; const sv=$('#ct_save'); if(sv) sv.disabled=false;}
+function cutPush(){const j=CUTJOB,x=cutCtx(); if(!x) return; j.undo.push(x.getImageData(0,0,j.W,j.H)); if(j.undo.length>10) j.undo.shift(); const el=$('#ct_undo'); if(el) el.disabled=false; j.changed=true; const sv=$('#ct_save'); if(sv) sv.disabled=false;}
 async function cutLoadBlob(b,push){
   const j=CUTJOB, x=cutCtx(); if(!x) return; if(push!==false) cutPush();
   const bmp=await createImageBitmap(b); x.clearRect(0,0,j.W,j.H); x.drawImage(bmp,0,0,j.W,j.H); cutDrawLoupe(); j.changed=true; const sv=$('#ct_save'); if(sv) sv.disabled=false;
@@ -340,23 +340,23 @@ async function cutLoadBlob(b,push){
 function cutBlob(){const j=CUTJOB;return new Promise(r=>j.cv.toBlob(b=>r(b),'image/png'));}
 function cutMap(){const j=CUTJOB, R=j.cv.getBoundingClientRect(), s=Math.min(R.width/j.W,R.height/j.H); return {s,ox:R.left+(R.width-j.W*s)/2,oy:R.top+(R.height-j.H*s)/2};}
 function cutMode(){const m=$('#ct_pmode');return m?m.value:'wand';}
-function cutBrush(){const b=$('#ct_brush');return b?+b.value:10;}
+function cutBrush(){const el=$('#ct_brush');return el?+el.value:10;}
 function cutPlaceCursor(){
-  const j=CUTJOB, cur=$('#cutCur'), view=$('#cutPrev'); if(!j||!cur||!view||j.cx<0) return;
+  const j=CUTJOB, el=$('#cutCur'), view=$('#cutPrev'); if(!j||!el||!view||j.cx<0) return;
   const m=cutMap(), V=view.getBoundingClientRect(), X=m.ox+j.cx*m.s, Y=m.oy+j.cy*m.s;
   const brush=['brush','restore'].includes(cutMode()), size=brush?Math.max(10,cutBrush()*2*m.s):26;
-  cur.hidden=false; cur.classList.toggle('brush',brush); cur.classList.toggle('restore',cutMode()==='restore');
-  cur.style.width=cur.style.height=size+'px'; cur.style.left=(X-V.left+view.scrollLeft-size/2)+'px'; cur.style.top=(Y-V.top+view.scrollTop-size/2)+'px';
+  el.hidden=false; el.classList.toggle('brush',brush); el.classList.toggle('restore',cutMode()==='restore');
+  el.style.width=el.style.height=size+'px'; el.style.left=(X-V.left+view.scrollLeft-size/2)+'px'; el.style.top=(Y-V.top+view.scrollTop-size/2)+'px';
 }
 function cutDrawLoupe(){
-  const j=CUTJOB, L=$('#cutLoupe'); if(!j||!L||j.cx<0) return; L.hidden=false;
-  const g=L.getContext('2d'), Z=L.width, span=Math.max(9,Math.round(Z/(j.zoom>=5?3:6)));
+  const j=CUTJOB, el=$('#cutLoupe'); if(!j||!el||j.cx<0) return; el.hidden=false;
+  const g=el.getContext('2d'), Z=el.width, span=Math.max(9,Math.round(Z/(j.zoom>=5?3:6)));
   g.imageSmoothingEnabled=false; for(let y=0;y<Z;y+=10) for(let x=0;x<Z;x+=10){ g.fillStyle=((x+y)/10)%2?'#3a3550':'#2c2541'; g.fillRect(x,y,10,10); }
   g.drawImage(j.cv,j.cx-span/2,j.cy-span/2,span,span,0,0,Z,Z);
   const k=Z/span; g.strokeStyle='rgba(255,255,255,.95)'; g.lineWidth=1; g.beginPath(); g.moveTo(Z/2,0); g.lineTo(Z/2,Z/2-k); g.moveTo(Z/2,Z/2+k); g.lineTo(Z/2,Z); g.moveTo(0,Z/2); g.lineTo(Z/2-k,Z/2); g.moveTo(Z/2+k,Z/2); g.lineTo(Z,Z/2); g.stroke();
   g.strokeStyle='#ff3d7f'; g.strokeRect(Z/2-k/2,Z/2-k/2,k,k);
   if(['brush','restore'].includes(cutMode())){ g.strokeStyle='rgba(255,211,90,.9)'; g.beginPath(); g.arc(Z/2,Z/2,cutBrush()*k,0,Math.PI*2); g.stroke(); }
-  const view=$('#cutPrev'); if(view){ const V=view.getBoundingClientRect(), m=cutMap(), X=m.ox+j.cx*m.s-V.left, Y=m.oy+j.cy*m.s-V.top; L.classList.toggle('right',X<V.width/2&&Y<Z+20); }
+  const view=$('#cutPrev'); if(view){ const V=view.getBoundingClientRect(), m=cutMap(), X=m.ox+j.cx*m.s-V.left, Y=m.oy+j.cy*m.s-V.top; el.classList.toggle('right',X<V.width/2&&Y<Z+20); }
   const px=cutCtx().getImageData(Math.max(0,Math.min(j.W-1,Math.round(j.cx))),Math.max(0,Math.min(j.H-1,Math.round(j.cy))),1,1).data; const sw=$('#ct_sw'); if(sw) sw.style.background=px[3]<10?'transparent':`rgb(${px[0]},${px[1]},${px[2]})`;
 }
 function cutAimAt(clientX,clientY){
@@ -519,7 +519,7 @@ let NAI_TP_OFF=false;
 const MINOR_TAGS=/^(loli|lolicon|shota|shotacon|child|children|kid|kids|toddler|baby|infant|young child|young girl|young boy|little girl|little boy|preteen|pre-teen|underage|minor|teen|teens|teenage|teenager|aged down|elementary school student|middle school student|elementary schooler|middle schooler|kindergartener)$/i;
 const stripMinor=s=>tagList(s).filter(t=>!MINOR_TAGS.test(tagKey(t))).join(', ');
 async function naiGenerate(prompt,kind,opts){
-  opts=opts||{}; prompt=stripMinor(prompt); if(Array.isArray(opts.chars)) opts.chars=opts.chars.map(x=>x&&typeof x.prompt==='string'?Object.assign({},x,{prompt:stripMinor(x.prompt)}):x); if(imgProvider()==='comfy') return comfyGenerate(prompt,kind,opts);
+  opts=opts||{}; prompt=stripMinor(prompt); if(Array.isArray(opts.chars)) opts.chars=opts.chars.map(c=>c&&typeof c.prompt==='string'?Object.assign({},c,{prompt:stripMinor(c.prompt)}):c); if(imgProvider()==='comfy') return comfyGenerate(prompt,kind,opts);
   try{ const b=await naiGenerate0(prompt,kind,opts); if(opts.usedTp&&opts.emptyAlpha) throw {code:'nai_empty',message:'투명 결과가 비어 있어요'}; try{ b.__seed=opts.usedSeed; }catch(_){} return b; }
   catch(e){
     if(!opts.usedTp||opts.noTp||(e&&['nai_nokey','bad_key','low_credit','nai_locked','rate_limited','network'].includes(e.code))) throw e;

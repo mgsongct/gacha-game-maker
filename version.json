@@ -1,5 +1,5 @@
 {
-  "build": "2026.11.03.19",
+  "build": "2026.11.03.20",
   "notes": [
     "캐릭터 개성 시트(성격·말투·반전 매력·결점·원하는 것…)와 프로필 템플릿, 직접 편집·AI 채우기·다듬기",
     "개성 검수(빠짐·흔함·겹침·말투 불일치)와 AI 매력 평가, 일괄 개선·되돌리기",
@@ -9,7 +9,7 @@
   ],
   "notice": null,
   "html": "www/index.html",
-  "sha256": "850e8e94a823aa25ac270771640291a9e53b0a4059d4f9719cd0383ec1bfc774",
+  "sha256": "843aa7ce2324d3b606115b9918ffa3735dbe1eb9138bc3ab068319e4c060461e",
   "apk": {
     "url": "https://github.com/jjhk0803/gacha-game-maker/releases/latest",
     "build": "2026.10.24.1",

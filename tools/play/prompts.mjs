@@ -7,6 +7,8 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 
 import { join, resolve, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { withPage } from './lib/page.mjs';
+import { readGame, gidOf } from './lib/data.mjs';
+import { PC_DIR } from './lib/page.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url)), dirs = process.argv.slice(2).map(d => resolve(d));
 if (!dirs.length) { console.log('사용법: node tools/play/prompts.mjs <게임 폴더…>'); process.exit(2); }
@@ -24,7 +26,7 @@ const CONFLICTS = [
 const out = [];
 for (const dir of dirs) {
   const P = join(dir, 'prompts'), files = readdirSync(P).filter(f => f.endsWith('.txt') && !/-\d+$/.test(f.slice(0, -4)) || /-1\.txt$/.test(f)).sort(), texts = Object.fromEntries(files.map(f => [f.slice(0, -4), readFileSync(join(P, f), 'utf8')]));
-  const game = readFileSync(join(dir, existsSync(join(dir, 'game.json')) ? 'game.json' : 'game-after-new.json'), 'utf8'), input = existsSync(join(dir, 'input.json')) ? JSON.parse(readFileSync(join(dir, 'input.json'), 'utf8')) : {};
+  const game = JSON.stringify(readGame(PC_DIR, gidOf(dir)).game), input = existsSync(join(dir, 'input.json')) ? JSON.parse(readFileSync(join(dir, 'input.json'), 'utf8')) : {};
   const { out: env } = await withPage(page => page.evaluate(game => { G = fix(JSON.parse(game)); applyMeta();
     const frags = Object.values(window.__PF || {}).map(f => ({ id: f.id, label: f.label, text: promptFrag(f.id) }));
     return { frags, rules: String(RULES), skill: String(GGMCombat.prompt()), sample: [...new Set([...(DEFAULT_WORLD.factions || []).map(f => f.name), ...(typeof DEFAULT_LIB !== 'undefined' ? DEFAULT_LIB : []).filter(l => ['bg', 'prop', 'bgm'].includes(l.kind)).map(l => l.name)])].filter(n => n && n.length >= 2) }; }, game), { tag: 'prompts' });

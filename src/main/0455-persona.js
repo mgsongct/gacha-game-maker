@@ -116,17 +116,17 @@ async function personaBatch(kind){ if(!SAMPLE){ toast('설정의 글 AI에서 AI
 function personaCfgSave(){ const m=G.meta, k=$('#ps_tpl').value, f=k==='custom'||$('#ps_tplf').value.trim()!==(PROFILE_TPLS[k]||[]).join(', ')?pStrs($('#ps_tplf').value):PROFILE_TPLS[k]; m.persona=Object.assign(m.persona||{},{tpl:f.length?f:PROFILE_TPLS.basic,affLv:[...new Set(String($('#ps_aff').value).split(/[,\s]+/).map(Number).filter(n=>n>=1&&n<=10))].sort((a,b)=>a-b),memoLv:Math.max(1,Math.min(10,+$('#ps_memo').value||8))}); mark('meta'); }
 const psReopen=c=>{ if(!$('#modal').hidden&&typeof openChar==='function'){ closeModal(); openChar(c.id); } else render(); };
 document.addEventListener('change',e=>{ if(e.target.id==='ps_tpl'&&PROFILE_TPLS[e.target.value]) $('#ps_tplf').value=PROFILE_TPLS[e.target.value].join(', '); });
-document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act, c=b.dataset.id&&charById(b.dataset.id);
+document.addEventListener('click',async e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act, c=el.dataset.id&&charById(el.dataset.id);
   if(a==='psedit'&&c) openPersona(c.id);
   else if(a==='pssave'&&c){ personaSave(c); closeModal(); toast('개성을 저장했어요'); if(typeof openChar==='function') openChar(c.id); }
-  else if(a==='psai'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } auditSnap([c],'개성 '+(b.dataset.k==='improve'?'다듬기':'채우기')); if(await personaAI(c,b.dataset.k,{lines:b.dataset.k==='improve',btn:b})){ toast('개성을 반영했어요 (점검 화면에서 되돌리기 가능)'); psReopen(c); } }
-  else if(a==='psreview'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await personaAIReview(c,b)) psReopen(c); }
-  else if(a==='pstalk'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } const n=await talkAffGen(c,b); if(n){ toast(`인연 톡 ${n}개를 만들었어요`); psReopen(c); } }
-  else if(a==='psmemo'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await memorialGen(c,b)){ toast('메모리얼을 만들었어요'); psReopen(c); } }
+  else if(a==='psai'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } auditSnap([c],'개성 '+(el.dataset.k==='improve'?'다듬기':'채우기')); if(await personaAI(c,el.dataset.k,{lines:el.dataset.k==='improve',btn:el})){ toast('개성을 반영했어요 (점검 화면에서 되돌리기 가능)'); psReopen(c); } }
+  else if(a==='psreview'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await personaAIReview(c,el)) psReopen(c); }
+  else if(a==='pstalk'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } const n=await talkAffGen(c,el); if(n){ toast(`인연 톡 ${n}개를 만들었어요`); psReopen(c); } }
+  else if(a==='psmemo'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await memorialGen(c,el)){ toast('메모리얼을 만들었어요'); psReopen(c); } }
   else if(a==='psmemoplay'&&c&&c.memorial){ closeModal(); playStory(c.memorial.title,c.memorial.script); }
   else if(a==='psmemolobby'&&c){ const p=P(); p.memoOn=p.memoOn||{}; p.memoOn[c.id]=!p.memoOn[c.id]; mark('prog'); toast(p.memoOn[c.id]?'메모리얼 로비를 켰어요. 로비에서 메모리얼 대사가 나와요':'메모리얼 로비를 껐어요'); psReopen(c); }
   else if(a==='psopen') openPersonaAll();
   else if(a==='pscfg'){ personaCfgSave(); toast('개성 설정을 저장했어요'); openPersonaAll(); }
-  else if(a==='psbatch') personaBatch(b.dataset.k);
+  else if(a==='psbatch') personaBatch(el.dataset.k);
   else if(a==='psstop'){ if(PS_JOB) PS_JOB.stop=true; }
   else if(a==='psundo'){ auditUndo(); openPersonaAll(); } });

@@ -23,7 +23,7 @@ function stam(){ const p=P();
   if(!p.stam||typeof p.stam!=='object') p.stam={v:STAM_MAX,at:Date.now()}; const s=p.stam, now=Date.now();
   if(s.v>=STAM_MAX) s.at=now; else { const n=Math.floor((now-s.at)/STAM_MS); if(n>0){ s.v=Math.min(STAM_MAX,s.v+n); s.at=s.v>=STAM_MAX?now:s.at+n*STAM_MS; } } return s; }
 function stamCost(kind){ return kind==='main'||kind==='event'?10:kind==='farm'?8:0; }
-function updStam(){ const b=document.getElementById('stamBox'); if(!b) return; b.hidden=!stamOn(); if(!stamOn()) return; const s=stam(); const v=document.getElementById('stamV'); if(v) v.textContent=s.v+'/'+STAM_MAX; }
+function updStam(){ const el=document.getElementById('stamBox'); if(!el) return; el.hidden=!stamOn(); if(!stamOn()) return; const s=stam(); const v=document.getElementById('stamV'); if(v) v.textContent=s.v+'/'+STAM_MAX; }
 function stamUse(n){ if(!stamOn()||!n) return true; const s=stam(); if(s.v<n){ openStam(n); return false; } s.v-=n; mark('prog'); updStam(); return true; }
 function openStam(need){ const s=stam(), left=s.v>=STAM_MAX?0:Math.ceil((STAM_MS-(Date.now()-s.at))/60000), full=s.v>=STAM_MAX?0:Math.ceil(((STAM_MAX-s.v-1)*STAM_MS+(STAM_MS-(Date.now()-s.at)))/60000);
   openModal(`${head('⚡ 행동력',`<span class="muted">${s.v} / ${STAM_MAX}</span>`)}${need?`<p style="margin:0 0 8px">행동력이 모자라요. 필요 <b>${need}</b> · 지금 <b>${s.v}</b></p>`:''}
@@ -90,7 +90,7 @@ function openUpConfirm(c,k){ const u=upPlan(c,k); if(!u) return;
 /* 스포일러 막기: 아직 만나지 않은 인물(보유하지 않았고, 본 스토리에도 안 나온)의 이름이 든 대사는 로비·터치에서 빼요 */
 let SEEN_K='', SEEN_T='';
 function seenText(){ const p=P(), k=Object.keys(p.cleared||{}).length+'|'+Object.keys(p.owned||{}).length+'|'+(p.seenOpening?1:0); if(k===SEEN_K) return SEEN_T;
-  const L=[p.seenOpening&&G.opening?String(G.opening.prologue||''):'']; G.chapters.forEach(ch=>ch.stages.forEach(st=>{ if(p.cleared[st.id]) L.push(st.pre||'',st.post||''); }));
+  const L=[p.seenOpening&&G.opening?String(G.opening.prologue||''):'']; G.chapters.forEach(ch=>ch.stages.forEach(s=>{ if(p.cleared[s.id]) L.push(s.pre||'',s.post||''); }));
   G.chars.forEach(c=>{ if(p.owned[c.id]) L.push(c.name); }); SEEN_K=k; SEEN_T=L.join('\n'); return SEEN_T; }
 function spoilFree(c,arr){ arr=arr||[]; if(!arr.length) return arr; const seen=seenText(), self=c&&c.name;
   const unseen=[...G.chars,...(G.npcs||[])].map(x=>x.name).filter(n=>n&&n.length>=2&&n!==self&&!seen.includes(n)); if(!unseen.length) return arr;

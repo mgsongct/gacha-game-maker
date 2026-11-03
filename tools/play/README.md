@@ -1,19 +1,21 @@
-# tools/play — 게임 생성·QA·플레이 점검
+# tools/play — 생성기 동적 분석(실제 앱에 데이터를 넣어 반응 보기)
 
-이 앱의 핵심은 "AI가 게임을 만들고, 만들어진 게임을 그대로 플레이한다"입니다. `tools/play`는 그 두 가지를 **실제 앱 코드로** 돌려서 점검하는 도구입니다. 정적 분석(`tools/check.mjs`)이 코드를 본다면, 여기서는 **생성 기능과 생성된 게임**을 봅니다.
+이 프로젝트는 **게임 생성기**(`www/index.html` SPA)이고, 게임은 사용자가 자기 AI로 생성합니다(`CLAUDE.md` §0). `tools/play`는 그 생성기와 생성 결과를 **실제 앱 코드로 돌려 분석**하는 도구입니다. 정적 분석(`tools/check.mjs`·`tools/wiring.mjs`)이 소스·생성물을 파서로 맞춰 본다면, 여기서는 실제 데이터를 넣어 반응을 봅니다.
 
-- 글 AI 요청만 가로채 **응답 파일로 답합니다**. 키가 없어도 되고, 사람이나 다른 AI(에이전트)가 앱이 보낸 프롬프트를 읽고 답을 써 넣는 방식으로 게임을 끝까지 만들 수 있습니다.
-- 응답이 모두 있으면 **재생**이 됩니다: 같은 응답으로 같은 게임을 다시 만들 수 있어, 앱 코드를 고친 뒤 생성 결과가 어떻게 달라졌는지 비교하는 회귀 시험이 됩니다.
-- 브라우저(playwright)가 필요합니다. 없으면 `test.mjs`는 건너뜁니다(CI).
+- 글 AI 요청만 가로채 **기록된 응답(데이터)으로 답합니다**. 같은 응답을 다른 빌드에 넣어 생성 결과를 비교할 수 있습니다(`regress.mjs`).
+- 저장은 앱 흐름 그대로입니다: 실제 PC 서버(`pc/ggm-server.py`)를 `pc/`(`PC서버-시작.bat`과 같은 경로)에서 켜고, 게임은 `pc/data/<게임id>/<종류>.json`, 브라우저 IndexedDB는 캐시(빈 브라우저가 서버 data에서 받아 오고 앱의 `pcPush`로 다시 씀). 분석에 쓰는 게임 데이터는 `pc/data/`에 커밋돼 있습니다(서버 상태 `pc/ggm-data/state.json` 포함, 나머지 `pc/www/`·키·blobs는 git에서 뺌).
+- 브라우저(playwright)와 python3가 필요합니다. 없으면 `test.mjs`는 건너뜁니다(CI).
 
 ## 명령
 
 ```bash
-node tools/play/generate.mjs <게임 폴더> new        # input.json → 새 게임(game.json). 답이 없는 요청은 prompts/에 내놓고 멈춤
-node tools/play/generate.mjs <게임 폴더> skills     # 스킬이 임시(기본) 상태인 대원의 스킬 설계
+node tools/play/generate.mjs <게임 폴더> new        # input.json의 입력으로 앱의 새 게임 생성 경로를 돌림(답이 없는 요청은 prompts/에 내놓고 멈춤) → pc/data/<id>
+node tools/play/generate.mjs <게임 폴더> skills     # 그 게임에서 스킬이 임시(기본) 상태인 대원의 스킬 설계
 node tools/play/generate.mjs <게임 폴더> chapter [--stages 4] [--dir "지시"]   # 다음 메인 장
-node tools/play/qa.mjs <게임 폴더> [game.json]      # QA·플레이 점검 → qa/<파일>.md · .json
-node tools/play/shots.mjs <게임 폴더> [game.json]   # 새 플레이어로 화면 플레이·캡처 → shots/
+node tools/play/generate.mjs <게임 폴더> import <게임.json>   # 게임 파일을 앱의 데이터 폴더 가져오기로 pc/data에 추가
+node tools/play/qa.mjs <게임 폴더>                  # 그 폴더의 게임(pc/data)을 QA·플레이 점검 → qa/game.md · .json
+node tools/play/shots.mjs <게임 폴더>               # 새 플레이어로 화면 플레이·캡처 → shots/
+node tools/play/regress.mjs [--ref <git 기준>] [게임 폴더…]   # 같은 응답을 기준 빌드와 지금 빌드에 넣어 새 게임 생성 결과 비교 → reports/regress.md
 node tools/play/faults.mjs [시나리오…]              # 생성기 실패 주입 → reports/faults.md
 node tools/play/prompts.mjs <게임 폴더…>            # 생성 프롬프트 점검(스튜디오 조각 비율·되풀이·충돌·샘플 이름) → reports/prompts.md
 node tools/play/test.mjs                           # 도구 자체 검사(fixtures/mini)
@@ -27,8 +29,9 @@ node tools/play/rekind.mjs <게임 폴더> [--dry]       # kind 규칙이 바뀌
 | `input.json` | 새 게임 입력. 초안 화면의 자율 모드와 같은 형식 `{"mode":"auto","auto":"한 줄 아이디어","n":6}` | 예 |
 | `prompts/<kind>.txt` | 앱이 글 AI에 보낸 글(지침·교훈·"JSON만 출력"까지 붙은 최종본) | 예 — 프롬프트 품질을 볼 근거 |
 | `responses/<kind>.txt` | 그 요청에 대한 답(모델이 낸 글 그대로) | 예 — 재생에 필요 |
-| `game.json` · `game-after-<단계>.json` | 생성된 게임(앱 저장 형식). `skills`·`chapter`는 대기 중 요청이 없을 때만 갱신(미완료 시도는 `attempt-<단계>.json`) — 반쯤 된 장을 저장하면 다음 실행이 그다음 장을 만들기 시작하기 때문 | 예 |
-| `runs.json` | 실행 기록: 호출 순서·길이·대기 중 요청·저장 시점·알림·AI 기록 | 예 |
+| (게임 데이터) | 이 폴더의 게임은 `pc/data/<게임id>/` — 게임 id는 `runs.json`의 마지막 `saved.gid`. `skills`·`chapter`는 대기 중 요청이 없을 때만 저장(반쯤 된 장을 저장하면 다음 실행이 그다음 장을 만들기 시작함) | `pc/data`에 |
+| `runs.json` | 실행 기록: 호출 순서·길이·대기 중 요청·저장 시점·저장한 게임 id·알림·AI 기록 | 예 |
+| `regress/` | 회귀 재생 때 앱이 보낸 프롬프트·QA(지금 빌드) | 예 |
 | `qa/` · `shots/` | QA 보고서·화면 캡처 | 예 |
 
 **kind** — `world` · `chars` · `opening` · `chapter1` · `skill-<대원 이름>-<그 대원의 n번째 요청>` · `<단계>-<요청 첫머리>[-s<스테이지>]-<프롬프트 전체 해시>`(규칙은 `lib/kind.mjs`). 스테이지별 대본처럼 앞부분이 같은 요청도 전체 해시로 구분됩니다. 규칙을 바꾸면 `node tools/play/rekind.mjs <게임 폴더>`로 기존 파일 이름을 옮깁니다. 끝에 `-cont1`이 붙으면 길이 초과로 끊긴 답을 이어 달라는 요청. `skill-이름-2`처럼 번호가 오르면 앱이 앞 답을 거절하고 이유를 덧붙여 다시 물은 것입니다.

@@ -14,7 +14,7 @@ case 'swgo1': swRead(); SW.step=1; renderSetup(); break;
 case 'swsub': { const a=($('#sw_sub')||{}).value; if(!String(a||'').trim()){ toast('구독 주소를 붙여 넣어 주세요'); break; } swRead(); swSave(); appStorage.setItem(SETUP_KEY,'1'); try{ sessionStorage.setItem('ggm-picked','1'); }catch(e){} await subscribe(String(a).trim(),t); break; }
 case 'swdone': swRead(); swSave(); if(PJ().active!=='main'){ appStorage.setItem(SETUP_KEY,'1'); await flush(); try{ sessionStorage.setItem('ggm-picked','1'); }catch(e){} const pj=PJ(); if(!pj.list.some(x=>x.id==='main')) pj.list.unshift({id:'main',title:DEFAULT_META.title}); pj.active='main'; appStorage.setItem(PJKEY,JSON.stringify(pj)); reloadGame(); break; } { const v=$('#ng_style')?$('#ng_style').value.trim():''; if(v){ G.meta.artTags=v; mark('meta'); } } appStorage.setItem(SETUP_KEY,'1'); SW=null; render(); showStart(); toast('설정을 저장했어요'); break;
 case 'swstytest': { swRead(); swSave(); if(!imgReady()){ toast(imgNeed()); break; } const r0=$('#sw_sres'); t.disabled=true; if(r0) r0.textContent='그리는 중… 20초쯤 걸려요';
-      try{ const b=await naiDraw('char','1girl, solo, long hair, smile, jacket, hand on hip',{styleId:swStyleId()}); if(SW.stPrev) URL.revokeObjectURL(SW.stPrev); SW.stPrev=URL.createObjectURL(b); renderSetup(); }
+      try{ const el=await naiDraw('char','1girl, solo, long hair, smile, jacket, hand on hip',{styleId:swStyleId()}); if(SW.stPrev) URL.revokeObjectURL(SW.stPrev); SW.stPrev=URL.createObjectURL(el); renderSetup(); }
       catch(err){ toast(naiErr(err,'시험 그리기 실패')); if(r0) r0.textContent=''; t.disabled=false; } break; }
 case 'swtestai': { swRead(); const pr=swProfile(), r0=$('#sw_res'); if(!apValid(pr)){toast('키를 넣어 주세요');break;} t.disabled=true; if(r0) r0.textContent='확인 중…';
       try{ const r=await aiOne(Object.assign(pr,{id:'tmp'}),'연결 테스트다. {"ok":true}를 그대로 출력하라.','quick'); SW.ok.ai=!!(r&&r.ok); if(r0) r0.textContent=SW.ok.ai?'✓ 연결됨':'응답은 왔지만 형식이 달라요'; }
@@ -27,7 +27,7 @@ case 'swpreset': { swRead(); const p=allPresets().find(x=>x.id===t.dataset.v); i
 case 'sweep': { if(!stamUse(stamCost('farm')*(+t.dataset.n||1))) break; const n=+t.dataset.n||1, r0=rateR(farmReward(t.dataset.k,+t.dataset.lv)), r={}; for(let i=0;i<n;i++){ giveReward(r0); bump('battle'); } Object.entries(r0).forEach(([k,v])=>r[k]=v*n); sfx('확인'); toast(`소탕 ${n>1?n+'회 ':''}완료: `+rewardText(r)); render(); break; }
 case 'swdraft': swRead(); swSave(); appStorage.setItem(SETUP_KEY,'1'); openDraft(); break;
 case 'swpjdraft': { let g=null; try{ g=JSON.parse(appStorage.getItem(pjKey(id))||'null'); }catch(e){} const d=g&&g.meta&&g.meta.draft; if(!d){ toast('이 게임에는 저장된 초안이 없어요'); break; } swRead(); swSave(); appStorage.setItem(SETUP_KEY,'1'); drLoadFrom(d,(g.meta.title||'')+' 초안'); break; }
-case 'titlesnd': { const s=SND(); s.bgmOn=!s.bgmOn; try{ appStorage.setItem(SKEY,JSON.stringify(s)); }catch(err){} if(s.bgmOn){ BGM.name=null; bgm(sceneOf().title); } else bgm(null); const b=$('#tsnd'); if(b){ b.textContent=s.bgmOn?'🔊':'🔇'; b.setAttribute('aria-label',s.bgmOn?'배경음 끄기':'배경음 켜기'); } toast(s.bgmOn?'배경음을 켰어요':'배경음을 껐어요'); break; }
+case 'titlesnd': { const s=SND(); s.bgmOn=!s.bgmOn; try{ appStorage.setItem(SKEY,JSON.stringify(s)); }catch(err){} if(s.bgmOn){ BGM.name=null; bgm(sceneOf().title); } else bgm(null); const el=$('#tsnd'); if(el){ el.textContent=s.bgmOn?'🔊':'🔇'; el.setAttribute('aria-label',s.bgmOn?'배경음 끄기':'배경음 켜기'); } toast(s.bgmOn?'배경음을 켰어요':'배경음을 껐어요'); break; }
   }
 }
 

@@ -2,7 +2,7 @@
    Legacy JSON remains an import format; sharing never carries player progress. */
 function shareDefinition(options){
  const game=JSON.parse(JSON.stringify(G));delete game.prog;
- const stages=game.chapters.filter(c=>c.kind==='main').reduce((n,ch)=>n+ch.stages.length,0);
+ const stages=game.chapters.filter(ch=>ch.kind==='main').reduce((n,ch)=>n+ch.stages.length,0);
  const spread=arr=>arr.forEach((x,k)=>{x.gate=options.gate===false?0:Math.min(stages,x.gate>0?x.gate:Math.max(1,Math.round((k+1)*stages/(arr.length+1))));});
  spread(game.events||[]);spread((game.banners||[]).filter(b=>b.id!=='std'&&!b.eventId));game.meta.gated=options.gate!==false&&stages>0;
  for(const b of game.banners||[]){delete b.until;if(b.id!=='std'&&game.meta.gated){b.active=true;delete b.newAt;}}
@@ -30,7 +30,7 @@ async function shareExport(options){
  finally{BACKUP_BUSY=false;backupBusyOverlay(false);syBar('');}
  if(retryAsShare)return shareExport({...options,dest:'share'});
 }
-function backupTransferStatus(message){const b=document.querySelector('#backup-busy-lock b');if(b)b.textContent=message;syBar(message);}
+function backupTransferStatus(message){const el=document.querySelector('#backup-busy-lock b');if(el)el.textContent=message;syBar(message);}
 function clearImportedMediaCache(){for(const cache of [imgCache,audioCache,chatImgCache])for(const k of Object.keys(cache)){URL.revokeObjectURL(cache[k]);delete cache[k];}}
 async function applySharedArchive(header,prefix){
  if(!header.game||!Array.isArray(header.game.chars))throw Error('공유팩 게임 정보가 올바르지 않습니다');

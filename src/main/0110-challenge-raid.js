@@ -1,10 +1,10 @@
 /* ===== 도전: 레이드 · 심연 탐사 ===== */
 const RAID_TICKS=700, RG_FLOORS=12;
 const RAID_MS=[[0.05,{gems:100,gold:5000}],[0.15,{gems:150,wmat:10,gift:2}],[0.3,{gems:200,core:3}],[0.5,{gems:300,exp:40}],[0.75,{gems:400,core:5}],[1,{gems:800,core:10,wmat:20}]];
-function progK(){ const main=G.chapters.filter(c=>c.kind==='main'); let k=0; main.forEach((ch,i)=>{ if(ch.stages.some(s=>P().cleared[s.id])) k=i; }); return k; }
+function progK(){ const main=G.chapters.filter(ch=>ch.kind==='main'); let k=0; main.forEach((ch,i)=>{ if(ch.stages.some(s=>P().cleared[s.id])) k=i; }); return k; }
 function hashN(s){ let h=0; for(const ch of String(s)) h=(h*31+ch.charCodeAt(0))|0; return Math.abs(h); }
 function RAID(){ const p=P(), wk=weekKey(); let r=p.raid; if(!r||r.wk!==wk){ const pr=r&&r.total?r.dmg/r.total:0; const lv=r?Math.max(1,Math.min(6,(r.lv||1)+(r.killed?1:pr<0.5?-1:0))):1; r=p.raid={wk,lv,dmg:0,killed:false,got:[],tries:{},best:0}; mark('prog'); } return r; }
-function raidBoss(){ const r=RAID(), pool=[], bgOf={}; G.chapters.filter(c=>c.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(e.boss&&!pool.some(x=>x.name===e.name)){ pool.push(e); bgOf[e.name]=stageBg(s); } })));
+function raidBoss(){ const r=RAID(), pool=[], bgOf={}; G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(e.boss&&!pool.some(x=>x.name===e.name)){ pool.push(e); bgOf[e.name]=stageBg(s); } })));
   const src=pool.length?pool[hashN(r.wk)%pool.length]:{name:'거대 잔광',elem:ELEMS[0]}; const b={name:src.name,elem:ELEMS[hashN(r.wk+'e')%ELEMS.length],hp:3000,atk:110,def:50,spd:95,boss:true};
   fitEnemy(b,enemyTarget(progK()+(r.lv-1)*0.6,6,true)*1.3); b.bg=bgOf[b.name]||'';
   if(r.total){ const k=r.total/30/b.hp; b.hp=Math.round(r.total/30); b.atk=Math.round(b.atk*Math.min(1.5,Math.max(0.7,k))); } else { r.total=b.hp*30; mark('prog'); }
@@ -30,7 +30,7 @@ function rgPick3(run){ const take=(arr,n)=>{ const a=[...arr], o=[]; while(o.len
   if(out.length<3) out.push('train');
   if(out.length<3) out=out.concat(take(Object.keys(RELICS).filter(k=>k!=='train'&&!out.includes(k)),3-out.length));
   return out; }
-function rgEnemies(run,kind){ const pool=[]; G.chapters.filter(c=>c.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(!pool.some(x=>x.name===e.name)) pool.push(e); })));
+function rgEnemies(run,kind){ const pool=[]; G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(!pool.some(x=>x.name===e.name)) pool.push(e); })));
   const pick=boss=>{ const c=pool.filter(e=>!!e.boss===boss); const src=(c.length?c:pool)[Math.floor(Math.random()*(c.length||pool.length||1))]||{name:'미확인 적',elem:ELEMS[0]}; return {name:src.name,elem:src.elem||ELEMS[0],hp:900,atk:85,def:35,spd:92,boss}; };
   const k=run.k+run.floor*0.12, i=run.floor*0.5; let en;
   if(kind==='boss'){ en=[pick(true),pick(false)]; fitEnemy(en[0],enemyTarget(k,i,true)*1.4); fitEnemy(en[1],enemyTarget(k,i,false)); }

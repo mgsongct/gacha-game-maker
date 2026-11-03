@@ -1,12 +1,12 @@
-async function handleStoryAndAuthoringAction(a,t,id,p,e){
+async function handleStoryAndAuthoringAction(a,t,id,p,el){
   switch(a){
 case 'cxcat': CXCAT=t.dataset.v; render(); break;
 case 'cxview': openCx(t.dataset.k); break;
 case 'cxadd': openCxEdit(''); break;
 case 'relopen': case 'relgo': openRel(t.dataset.r||REL_ME); break;
 case 'relseed': { const n=await relSeedAI(t); if(n){ toast(`관계 ${n}개를 정리했어요`); openRel(); } break; }
-case 'reladd': { const b=$('#rl_b').value, k=$('#rl_k').value.trim(), nt=$('#rl_n').value.trim(); if(!b||b===RELC) break; if(!k&&!nt){ toast('관계나 설명을 적어 주세요'); break; }
-      let r=relPair(RELC,b); if(r){ if(k) r.kind=k; if(nt) r.note=nt; } else { r={id:'r'+uid(),a:RELC,b,kind:k||'아는 사이',note:nt,hist:[]}; RELS().push(r); } r.at=Date.now(); mark('meta'); openRel(); break; }
+case 'reladd': { const bn=$('#rl_b').value, k=$('#rl_k').value.trim(), nt=$('#rl_n').value.trim(); if(!bn||bn===RELC) break; if(!k&&!nt){ toast('관계나 설명을 적어 주세요'); break; }
+      let r=relPair(RELC,bn); if(r){ if(k) r.kind=k; if(nt) r.note=nt; } else { r={id:'r'+uid(),a:RELC,b: bn,kind:k||'아는 사이',note:nt,hist:[]}; RELS().push(r); } r.at=Date.now(); mark('meta'); openRel(); break; }
 case 'reledit': openRelEdit(id); break;
 case 'relsave': { const r=RELS().find(x=>x.id===id); if(!r) break; r.kind=$('#rle_k').value.trim().slice(0,16)||r.kind; r.note=$('#rle_n').value.trim().slice(0,240);
       r.hist=lines($('#rle_h').value).slice(-12).map(l=>{ const m=l.match(/^(.{1,12}?) · (.+)$/); return m?{src:m[1],text:m[2]}:{src:'',text:l}; }); mark('meta'); openRel(); break; }
@@ -25,8 +25,8 @@ case 'cxdeep': { const k=t.dataset.k; t.disabled=true; t.textContent='기록을 
 case 'cxreadall': { const s=cxSeenSet(); cxEntries().forEach(e=>{ if(e.open) s[e.key]=1; }); CXMEMO=null; mark('prog'); render(); break; }
 case 'opening-play': closeModal(); playOpening(); break;
 case 'char': openChar(id); break;
-case 'evspoke': { const c=charById(id); if(!c) break; const o=own(c.id), lv=o?affLv(o):1, r=t.getBoundingClientRect(), y=e.clientY||r.top+r.height/2, zone=(y-r.top)/r.height<0.3?'head':'body';
-      ripple(e.clientX||r.left+r.width/2,y,lv>=7); charReact(t.querySelector('.art'),lv,zone); faceSwap(c,t.querySelector('.art'),touchFace(c,zone,lv));
+case 'evspoke': { const c=charById(id); if(!c) break; const o=own(c.id), lv=o?affLv(o):1, r=t.getBoundingClientRect(), y=el.clientY||r.top+r.height/2, zone=(y-r.top)/r.height<0.3?'head':'body';
+      ripple(el.clientX||r.left+r.width/2,y,lv>=7); charReact(t.querySelector('.art'),lv,zone); faceSwap(c,t.querySelector('.art'),touchFace(c,zone,lv));
       let pool=spoilFree(c,(zone==='head'?c.touch?.head:c.touch?.body)||[]); if(!pool.length) pool=affLinePool(c); const l=pickTouchLine(pool,sub(EVS_LINE)); EVS_LINE=l;
       const pe=$('#evsLine'); if(pe){ pe.textContent=sub(l); pe.classList.remove('pop'); void pe.offsetWidth; pe.classList.add('pop'); } if(voiceOf(c)&&SND().voiceLobby) speak(c,l); break; }
 case 'evreroll': { const ev=G.events.find(x=>x.id===id); if(!ev) break; const oldCh=G.chapters.find(c=>c.id===ev.chapterId); if(!oldCh) break;
@@ -37,13 +37,13 @@ case 'evreroll': { const ev=G.events.find(x=>x.id===id); if(!ev) break; const ol
         const res=await aiEventGen(dir,n,!!ev.gift,pu?[pu.name]:[],null,len,loreOf(ev)); if(!res) return null; const ne=res.ev, nch=G.chapters.find(c=>c.id===ne.chapterId); if(!nch) return null;
         // 예전 스토리에서 생긴 것(톡·도감·CG·관계·아직 보유하지 않은 인물·배포 캐릭터)은 정리해요. 새 스토리에도 나오는 CG는 남아요
         const oldGift=ev.gift; storyPurge(storyLinks(oldCh.stages.map(s0=>s0.id),oldCh,ev),{threads:1,codex:1,libs:1,rels:1,chars:1});
-        const kb=G.banners.find(b=>b.id===ev.bannerId), nb=G.banners.find(b=>b.id===ne.bannerId), keepPU=ev.pickupFor&&charById(ev.pickupFor)?[ev.pickupFor]:[];
+        const kb=G.banners.find(bn=>bn.id===ev.bannerId), nb=G.banners.find(bn=>bn.id===ne.bannerId), keepPU=ev.pickupFor&&charById(ev.pickupFor)?[ev.pickupFor]:[];
         if(kb&&nb) kb.pickup=[...new Set([...keepPU,...(nb.pickup||[])])].filter(x=>charById(x)).slice(0,3); else if(kb) kb.pickup=(kb.pickup||[]).filter(x=>charById(x)&&x!==oldGift);
         ev.gift=ne.gift||''; if(kb&&ne.desc&&!ev.pickupFor) kb.desc=String(ne.desc);
         // 새 장을 이 이벤트에 옮기고, 새로 생긴 이벤트·배너는 지워요(배너·교환소·토큰은 그대로)
         nch.ord=oldCh.ord; nch.eventId=ev.id; G.chapters=G.chapters.filter(c=>c!==oldCh); G.threads=G.threads.filter(t=>!(t.trigger&&oldCh.stages.some(s0=>s0.id===t.trigger.value)));
         oldCh.stages.forEach(s0=>{ delete P().cleared[s0.id]; }); ev.chapterId=nch.id; ev.title=ne.title; ev.desc=ne.desc; ev.gen={dir,n,len,lore:loreOf(ev)};
-        G.events=G.events.filter(x=>x!==ne); G.banners=G.banners.filter(b=>b.id!==ne.bannerId); markAll(); mark('prog');
+        G.events=G.events.filter(x=>x!==ne); G.banners=G.banners.filter(bn=>bn.id!==ne.bannerId); markAll(); mark('prog');
         return {title:`이벤트 스토리 「${ev.title}」로 다시 썼어요`,body:`${T('event')} 화면에서 처음부터 플레이할 수 있어요.`}; }); break; }
 case 'stamopen': openStam(0); break;
 case 'stamfill': { if(P().gems<STAM_FILL[0]) break; pay({gems:STAM_FILL[0]}); const s=stam(); s.v+=STAM_FILL[1]; mark('prog'); closeModal(); render(); toast(`⚡ ${STAM_FILL[1]} 회복 (${s.v}/${STAM_MAX})`); break; }
@@ -115,31 +115,31 @@ case 'evedit': openEvEdit(id); break;
 case 'evsave': { const ev=G.events.find(e=>e.id===id); ev.title=$('#ev_t').value.trim()||ev.title; ev.desc=$('#ev_d').value.trim(); ev.token=$('#ev_tok').value.trim()||ev.token; ev.bg=$('#ev_bg').value; ev.active=$('#ev_act').value==='1';
       if($('#ev_lore')){ const nl=$('#ev_lore').value; if(nl!==loreOf(ev)) evLoreSet(ev,nl); }
       const sh=lines($('#ev_shop').value).map((l,i)=>{const p2=l.split(/[,，]/).map(x=>x.trim());const ty=p2[0]||'gold';return {id:'s'+i,type:ty.startsWith('char:')?'char':ty,ref:ty.startsWith('char:')?ty.slice(5):undefined,amt:num(p2[1],1,999999,1),price:num(p2[2],1,999999,100),limit:num(p2[3],1,999,1)};});
-      if(sh.length) ev.shop=sh; const b=G.banners.find(x=>x.id===ev.bannerId); if(b) b.active=ev.active; mark('prog'); closeModal(); render(); break; }
+      if(sh.length) ev.shop=sh; const bn=G.banners.find(x=>x.id===ev.bannerId); if(bn) bn.active=ev.active; mark('prog'); closeModal(); render(); break; }
 case 'evdel': { const ev=G.events.find(e=>e.id===id); if(!ev) break; const ch0=G.chapters.find(c=>c.id===ev.chapterId);
       openStoryDel({title:'이벤트 「'+ev.title+'」',ids:ch0?ch0.stages.map(s=>s.id):[],ch:ch0,ev,back:()=>openEvEdit(id),after:()=>{ tab='event'; },run:()=>{ G.events=G.events.filter(e=>e.id!==id); G.chapters=G.chapters.filter(c=>c.id!==ev.chapterId); mark('ch:'+ev.chapterId); G.banners=G.banners.filter(b=>b.id!==ev.bannerId); }}); break; }
-case 'dreroll': { const b=DBOARD(); if(b.rr){ if(P().gold<2000){ toast('크레딧이 부족해요'); break; } P().gold-=2000; } b.rr=(b.rr||0)+1; b.list=b.list.map(o=>P().disp[o.id]?o:null); b.list=b.list.map(o=>o||dispOffer(b.list.filter(Boolean).map(x=>x.name))); mark('prog'); render(); toast('새 의뢰가 올라왔어요'); break; }
+case 'dreroll': { const bn=DBOARD(); if(bn.rr){ if(P().gold<2000){ toast('크레딧이 부족해요'); break; } P().gold-=2000; } bn.rr=(bn.rr||0)+1; bn.list=bn.list.map(o=>P().disp[o.id]?o:null); bn.list=bn.list.map(o=>o||dispOffer(bn.list.filter(Boolean).map(x=>x.name))); mark('prog'); render(); toast('새 의뢰가 올라왔어요'); break; }
 case 'meta-open': openMeta(); break;
 case 'metasave': { if($('#ng_story')&&$('#ng_story').value.trim().length>100000){toast('스토리는 최대 100,000자입니다. 초과 내용은 자르지 않았습니다.');break;}const m=G.meta, old=m.elems.map(e=>e.n); if($('#mt_logo')) m.logoStyle=$('#mt_logo').value; if($('#ng_story')) m.story=readStoryForm(); if($('#mt_cast')) m.castSex=$('#mt_cast').value; if($('#mt_tone')) m.tone=$('#mt_tone').value.trim(); if($('#mt_art')){ m.artTags=$('#mt_art').value.trim(); m.artNeg=$('#mt_artn').value.trim(); }
       m.title=$('#mt_title').value.trim()||m.title; m.sub=$('#mt_sub').value.trim(); m.theme=$('#mt_theme').value; m.accent=$('#mt_acc').value;
       Object.keys(DEFAULT_META.terms).forEach(k=>{const v=$('#mt_t_'+k).value.trim(); if(k==='abyss')m.terms[k]=explorationName(v);else if(v)m.terms[k]=v;});
       m.elems=m.elems.map((e0,i)=>({n:($('#mt_e'+i)?.value||'').trim()||old[i],c:$('#mt_c'+i)?.value||e0.c,d:e0.d||''})); // 속성 개수·설명은 게임 규칙 화면에서 // 설명(d)은 게임 규칙 화면에서 편집
       const map={}; old.forEach((o,i)=>{map[o]=m.elems[i].n;}); rulesRename(map);
-      G.chars.forEach(c=>{if(map[c.elem])c.elem=map[c.elem];}); G.chapters.forEach(ch=>ch.stages.forEach(st=>st.enemies.forEach(e2=>{if(map[e2.elem])e2.elem=map[e2.elem];})));
+      G.chars.forEach(c=>{if(map[c.elem])c.elem=map[c.elem];}); G.chapters.forEach(ch=>ch.stages.forEach(st=>st.enemies.forEach(en=>{if(map[en.elem])en.elem=map[en.elem];})));
       ['atk','def','sup'].forEach(k=>{m.roles[k]=$('#mt_r_'+k).value.trim()||m.roles[k];}); m.farms.forEach((f,i)=>{f.name=$('#mt_f'+i).value.trim()||f.name;});
       const pj=PJ(); const me=pj.list.find(x=>x.id===pj.active); if(me){me.title=m.title;appStorage.setItem(PJKEY,JSON.stringify(pj));}
       markAll(); applyMeta(); closeModal(); render(); toast('게임 정의를 저장했어요'); break; }
 case 'draft-open': openDraft(); break;
 case 'drlib': { drRead(); const ex=$('#drLib'); if(ex){ ex.remove(); break; } const top=document.querySelector('#drPage .dr-top'); if(top) top.insertAdjacentHTML('afterend',drLibHTML()); break; }
 case 'drlibsave': { drRead(); const nm=prompt('초안 이름',drName(DR2)); if(nm===null) break; const a=drLib(), name=nm.trim()||drName(DR2), old=a.find(x=>x.name===name);
-      if(old&&!(await appConfirm(`「${name}」 초안을 덮어쓸까요?`))) break; const rec={id:old?old.id:'d'+uid(),name,at:Date.now(),d:drClean(DR2)}; const b=a.filter(x=>x!==old); b.unshift(rec); if(drLibSave(b)){ toast('초안을 저장했어요'); const ex=$('#drLib'); if(ex) ex.outerHTML=drLibHTML(); } break; }
+      if(old&&!(await appConfirm(`「${name}」 초안을 덮어쓸까요?`))) break; const rec={id:old?old.id:'d'+uid(),name,at:Date.now(),d:drClean(DR2)}; const bn=a.filter(x=>x!==old); bn.unshift(rec); if(drLibSave(bn)){ toast('초안을 저장했어요'); const ex=$('#drLib'); if(ex) ex.outerHTML=drLibHTML(); } break; }
 case 'drlibload': { const x=drLib().find(y=>y.id===id); if(!x) break; drRead(); if(drText(DR2).trim()&&!(await appConfirm('지금 쓰던 초안 대신 불러올까요? (지금 초안은 먼저 보관함에 저장해 두세요)'))) break; drLoadFrom(x.d,x.name); break; }
 case 'drreuseoff': drRead(); delete DR2.reuse; drSave(); openDraft(); toast('그림을 새로 그리는 초안으로 바꿨어요'); break;
 case 'drxcur': drRead(); openDraftExport(drName(DR2),DR2,()=>{ openDraft(); }); break;
 case 'drxlib': { const x=drLib().find(y=>y.id===id); if(x){ drRead(); openDraftExport(x.name,x.d,()=>openDraft()); } break; }
 case 'drxcopy': { const tx=$('#drx_code').value; try{ await navigator.clipboard.writeText(tx); toast('초안 코드를 복사했어요'); }catch(e){ const ta=$('#drx_code'); uiSelectText(ta); try{ document.execCommand('copy'); toast('초안 코드를 복사했어요'); }catch(_){ toast('길게 눌러 직접 복사해 주세요'); } } break; }
 case 'drxfile': { if(!DRX) break; await saveTextFile(JSON.stringify({v:1,name:DRX.name,d:drClean(DRX.d)},null,1),'초안_'+String(DRX.name).replace(/[^\w가-힣-]+/g,'_').slice(0,30)+'.json'); break; }
-case 'drxback': { const b=DRX&&DRX.back; DRX=null; if(b) b(); else if($('#dri_code')) openDraft(); else closeModal(); break; }
+case 'drxback': { const bn=DRX&&DRX.back; DRX=null; if(bn) bn(); else if($('#dri_code')) openDraft(); else closeModal(); break; }
 case 'drimport': drRead(); openDraftImport(); break;
 case 'drigo': draftImportDone(draftFrom($('#dri_code').value),$('#dri_load').checked); break;
 case 'drifile': $('#drfile').click(); break;
@@ -149,7 +149,7 @@ case 'drcadd': drRead(); DR2.chars.push({name:'',role:'',profile:'',speech:'',lo
 case 'drcdel': drRead(); DR2.chars.splice(+t.dataset.i,1); drSave(); drRerender(); break;
 case 'drmode': drRead(); DR2.mode=t.dataset.v||''; drSave(); openDraft(); break;
 case 'drpreset': { drRead(); const v=t.dataset.v||''; DR2.preset=v; drSave(); if(v){ const sp=allPresets().find(x=>x.id===v); if(presetToCfg(v)) toast(`「${sp.name}」 그림체를 적용했어요`); } document.querySelectorAll('.dr-pre').forEach(b=>b.classList.toggle('on',(b.dataset.v||'')===v)); break; }
-case 'drautoex': { const e=$('#dr_auto'); if(e){ e.value=t.dataset.v; drRead(); } break; }
+case 'drautoex': { const el=$('#dr_auto'); if(el){ el.value=t.dataset.v; drRead(); } break; }
 case 'drpfdraw': drAvatarDraw(t); break;
 case 'drcfill': drFillChar(+t.dataset.i,t); break;
 case 'drpolish': drPolish(t.dataset.k,t); break;

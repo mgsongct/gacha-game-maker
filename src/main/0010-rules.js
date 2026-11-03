@@ -60,6 +60,6 @@ function applyMeta(){
   document.documentElement.dataset.skin=m.theme||'tactical';
   document.documentElement.style.setProperty('--acc',m.accent||'#ffb400');
   document.title=m.title;
-  const b=document.querySelector('.brand'); if(b){ b.innerHTML=`<b class="brand-t">${esc(m.title)}</b><i>${esc(m.sub)}</i>`; fitBrand(); }
+  const el=document.querySelector('.brand'); if(el){ el.innerHTML=`<b class="brand-t">${esc(m.title)}</b><i>${esc(m.sub)}</i>`; fitBrand(); }
 }
 

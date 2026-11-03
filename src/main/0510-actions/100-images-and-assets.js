@@ -7,7 +7,7 @@ case 'cfgo': castFacesGo(); break;
 case 'cfall': { const on=t.dataset.v==='1'; castChars().filter(c=>!c.npc&&imgSrc(c)).forEach(c=>on?CFSEL.chars.add(c.id):CFSEL.chars.delete(c.id)); document.querySelectorAll('#modal [data-act="cfsel"][data-k="c"]').forEach(b=>b.classList.toggle('on',on)); break; }
 case 'castface': { if(CAST&&CAST.busy){ toast('그리는 중이 끝나면 열 수 있어요'); break; } FACET={cid:id,sid:''}; openFaces(id); break; }
 case 'castok': case 'castskip': { if(a==='castok'&&CAST&&(CAST.busy||CAST.q.length)&&!(await appConfirm('아직 그리는 그림이 있어요. 나머지는 게임하면서 그릴까요?'))) break; P().castDone=1; mark('prog'); if(CAST) CAST.q=[];
-      const go=()=>{ if(CAST&&CAST.busy){ const st=$('#castStat'); if(st) st.textContent='지금 그리는 한 장만 마치고 넘어가요…'; return setTimeout(go,500); } CAST=null; showStart(); }; go(); break; }
+      const go=()=>{ if(CAST&&CAST.busy){ const el=$('#castStat'); if(el) el.textContent='지금 그리는 한 장만 마치고 넘어가요…'; return setTimeout(go,500); } CAST=null; showStart(); }; go(); break; }
 case 'imgsave': { const c=charById(id), it=c&&charImgList(c).find(([o])=>o.id===t.dataset.o); if(it) saveImgUrl(imgSrcRaw(it[0]),c.name+'_'+it[1]); break; }
 case 'posegen': { const c=charById(id); if(!c||!c.pose||!c.lbbg) break; if(!imgReady()){ toast(imgNeed()); break; } const w=t.dataset.w||'both'; if(w!=='bg'&&!c.naiPrompt){ toast('먼저 NAI 프롬프트를 채워 주세요'); break; }
       const sc=$('#lbbg_scene'); if(sc){ c.lbbg.prompt=sc.value.trim();naiBlocksSave(c.lbbg,'prompt',sc); mark('c:'+c.id); } const label=t.textContent; t.disabled=true; t.textContent='그리는 중…';
@@ -28,7 +28,7 @@ case 'npcdraw': { const n=(G.npcs||[]).find(x=>x.id===id); if(!n||NPCBUSY.has(id
 case 'npctags': { const n=(G.npcs||[]).find(x=>x.id===id); if(!n) break; npcRead(n); if(!String(n.look||n.profile||'').trim()){ toast('외모를 먼저 적어 주세요'); break; }
       const r=await aiJSON(`세계관: ${G.world.name} — ${String(G.world.summary||'').slice(0,400)}\n다음 NPC의 NovelAI 그림 프롬프트를 써라. 적힌 외모를 그대로 살리고, 의상은 세계관에 맞춘다. 등장인물은 모두 성인이다.\n이름: ${n.name}${n.role?' / '+n.role:''}\n외모: ${n.look||''}${n.profile?'\n설정: '+String(n.profile).slice(0,200):''}\n${NAI_CHAR}\nJSON만 출력: {"naiPrompt":""}`,t,'quick');
       if(r&&r.naiPrompt){ n.naiPrompt=allyTags(stripMinor(stripAge(String(r.naiPrompt)))); mark('meta'); npcRefresh(id); toast('태그를 썼어요. 확인하고 다시 그려 보세요'); } break; }
-case 'npcdel': { const n=(G.npcs||[]).find(x=>x.id===id); if(!n||!(await appConfirm(`NPC 「${n.name}」을(를) 지울까요? 스토리에는 이름만 나와요.`))) break; G.npcs=G.npcs.filter(x=>x!==n); mark('meta'); openNpcs(); break; }
+case 'npcdel': { const n=(G.npcs||[]).find(x=>x.id===id); if(!n||!(await appConfirm(`NPC 「${n.name}」을(를) 지울까요? 스토리에는 이름만 나와요.`))) break; G.npcs=G.npcs.filter(npc=>npc!==n); mark('meta'); openNpcs(); break; }
 case 'npcadd': { const nm=($('#npc_new').value||'').trim(); if(!nm){ toast('이름을 적어 주세요'); break; } if(npcBy(nm)||findSpeaker(nm)){ toast('이미 있는 이름이에요'); break; } G.npcs=G.npcs||[]; G.npcs.push(npcNew(nm)); mark('meta'); openNpcs(); break; }
 case 'cutclose': { stopVoice(); t.remove(); const f=GC&&GC.cutCb; if(GC) GC.cutCb=null; f&&f(); break; }
 case 'lib': openLib(t.dataset.k); break;
@@ -43,8 +43,8 @@ case 'packuse': { const p=allPresets().concat(userPacks()).find(x=>x.id===t.data
 case 'packdel': { const a=userPacks(), p=a.find(x=>x.id===t.dataset.v); if(!p||!(await appConfirm(`「${p.name}」 프리셋을 지울까요?`))) break; saveUserPacks(a.filter(x=>x!==p)); openModal(packHTML()); break; }
 case 'packcopy': { const p=userPacks().find(x=>x.id===t.dataset.v); if(!p) break; const code=packCode(Object.assign({},p,{id:undefined})); try{ await navigator.clipboard.writeText(code); toast('프리셋 코드를 복사했어요. 붙여 넣어 공유하세요'); }catch(e){ if(t.isConnected)openPresetCode('pack',code); } break; }
 case 'packimport': openPresetCode('pack'); break;
-case 'packsave': { const nm=prompt('프리셋 이름'); if(!nm) break; const by=prompt('만든 사람 (선택, 공유할 때 표시돼요)')||''; const c=naiCfg(), st=(c.styles||[]).find(x=>x.id===c.styleId)||(c.styles||[])[0]||{}, L=llmSlots();
-      const p={id:'u'+uid(),name:nm.trim().slice(0,30),by:by.trim().slice(0,20),desc:'내가 만든 팩',tags:joinTags(st.tags,c.quality?c.qtags:''),neg:st.neg||'',qtags:'',steps:c.steps,scale:c.scale,cfgRescale:c.cfgRescale,sampler:c.sampler};
+case 'packsave': { const nm=prompt('프리셋 이름'); if(!nm) break; const by=prompt('만든 사람 (선택, 공유할 때 표시돼요)')||''; const c=naiCfg(), el=(c.styles||[]).find(x=>x.id===c.styleId)||(c.styles||[])[0]||{}, L=llmSlots();
+      const p={id:'u'+uid(),name:nm.trim().slice(0,30),by:by.trim().slice(0,20),desc:'내가 만든 팩',tags:joinTags(el.tags,c.quality?c.qtags:''),neg:el.neg||'',qtags:'',steps:c.steps,scale:c.scale,cfgRescale:c.cfgRescale,sampler:c.sampler};
       const a=userPacks(); a.unshift(p); if(saveUserPacks(a)) toast('프리셋으로 저장했어요. 내보내기로 코드를 공유할 수 있어요'); openModal(packHTML()); break; }
 case 'naisave': appStorage.setItem(NKEY,JSON.stringify(readNai())); closeModal(); render(); toast('그림 AI 설정을 저장했어요'); break;
 case 'cfload': { const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json'; inp.onchange=async()=>{ const f=inp.files[0]; if(!f) return; const tx=await f.text(); const box=$('#cf_wf')||$('#sw_cfwf'); if(box) box.value=tx; try{ const j=JSON.parse(tx); toast(Array.isArray(j.nodes)?'UI 형식이에요. Export (API)로 저장한 파일을 넣어 주세요':'워크플로를 불러왔어요 (노드 '+Object.keys(j).length+'개)'); }catch(e){ toast('JSON 파일이 아니에요'); } }; inp.click(); break; }
@@ -82,7 +82,7 @@ case 'facego': { const c=charById(id), list=[...FACESEL]; if(!c) break; const F=
       t.disabled=true; let n=0; const tot=list.length*bodies.length;
       for(const ko of list){
         let f=F.faces.find(q=>q.name===ko); if(!f){ f={id:'f'+uid(),name:ko,img:null}; F.faces.push(f); }
-        for(const b of bodies){ const st=$('#fc_stat'); if(st) st.textContent=`${n}/${tot} · ${ko} (${b==='up'?'상반신':'전신'}) 그리는 중…`;
+        for(const b of bodies){ const el=$('#fc_stat'); if(el) el.textContent=`${n}/${tot} · ${ko} (${b==='up'?'상반신':'전신'}) 그리는 중…`;
           try{ await faceDrawOne(c,F,f,ko,b,O,x,tot===1?'manual':'batch'); n++; }
           catch(err){ toast(naiErr(err)); t.disabled=false; openFaces(id); return; } } }
       toast(`표정 그림 ${n}장을 만들었어요`); openFaces(id); break; }

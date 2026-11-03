@@ -1,0 +1,66 @@
+[
+ {
+  "id": "ev1",
+  "title": "잔광 축제의 밤",
+  "desc": "회색구에 1년에 한 번 열리는 등불 축제. 그런데 등불 속에 잔광이 섞여 있다.",
+  "token": "축제 쿠폰",
+  "active": true,
+  "chapterId": "evc1",
+  "bannerId": "b_ev1",
+  "bg": "카지노 뒷골목",
+  "bgm": "일상",
+  "shop": [
+   {
+    "id": "s1",
+    "type": "gems",
+    "amt": 300,
+    "price": 100,
+    "limit": 5
+   },
+   {
+    "id": "s2",
+    "type": "gold",
+    "amt": 10000,
+    "price": 40,
+    "limit": 10
+   },
+   {
+    "id": "s3",
+    "type": "exp",
+    "amt": 30,
+    "price": 60,
+    "limit": 10
+   },
+   {
+    "id": "s4",
+    "type": "wmat",
+    "amt": 15,
+    "price": 70,
+    "limit": 10
+   },
+   {
+    "id": "s5",
+    "type": "core",
+    "amt": 5,
+    "price": 150,
+    "limit": 4
+   },
+   {
+    "id": "sc0",
+    "type": "char",
+    "ref": "miho",
+    "amt": 1,
+    "price": 1200,
+    "limit": 2
+   },
+   {
+    "id": "sc1",
+    "type": "char",
+    "ref": "luna",
+    "amt": 1,
+    "price": 1200,
+    "limit": 2
+   }
+  ]
+ }
+]

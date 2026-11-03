@@ -6,7 +6,7 @@ let SW=null;
 function needSetup(){ return !appStorage.getItem(SETUP_KEY)&&!AIP().list.length&&!imgReady(); }
 function showSetup(){ const s=SND(); APD={id:'',type:'gemini',pub:'google',name:'',region:'global',base:'https://openrouter.ai/api/v1'}; SW={step:0,ai:{type:'gemini',key:''},img:imgProvider(),cf:Object.assign({},comfyCfg()),nai:naiCfg().key||'',fish:s.fishKey||'',el:s.elKey||'',ok:{},hasAI:AIP().list.some(apValid),cst:{tags:myStyle().tags||'',neg:myStyle().neg||''},stPrev:''}; renderSetup(); $('#ov').hidden=false; }
 const SETUP_HELP={vertex:['Google Cloud 콘솔에서 서비스 계정 키나 익스프레스 키를 만들어요','https://console.cloud.google.com/vertex-ai'],gemini:['Google AI Studio에서 무료로 받을 수 있어요','https://aistudio.google.com/apikey'],anthropic:['Anthropic Console에서 받아요 (유료)','https://console.anthropic.com/settings/keys'],openai:['OpenRouter 등 OpenAI 호환 서비스의 키','https://openrouter.ai/keys']};
-function swRead(){ const v=id=>{const e=$('#'+id);return e?e.value.trim():null;};
+function swRead(){ const v=id=>{const el=$('#'+id);return el?el.value.trim():null;};
   if($('#ap_type')){ readAp(); SW.ai.type=APD.type; SW.ai.key=APD.key||APD.sa||APD.vkey||''; }
   if(v('sw_img')!=null) SW.img=v('sw_img'); if(v('sw_cfurl')!=null) SW.cf.url=v('sw_cfurl'); if($('#sw_cfwf')) SW.cf.wf=$('#sw_cfwf').value.trim();
   if(v('sw_nai')!=null) SW.nai=v('sw_nai'); if(v('sw_fish')!=null) SW.fish=v('sw_fish'); if(v('sw_el')!=null) SW.el=v('sw_el');

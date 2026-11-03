@@ -9,7 +9,7 @@ case 'rffil': RF.filter=t.dataset.v; openRgForm(); break;
 case 'rfauto': RF.s=rfAuto(); RF.sel=0; openRgForm(); break;
 case 'rfclr': RF.s=[null,null,null,null]; RF.sel=0; openRgForm(); break;
 case 'rfpick': { const k=RF.s.indexOf(id), i=RF.sel; if(k===i) RF.s[i]=null; else { if(k>=0) RF.s[k]=RF.s[i]; RF.s[i]=id; } if(!RF.s[0]) RF.sel=0; else { const e=RF.s.indexOf(null); RF.sel=e>=0?e:RF.sel; } openRgForm(); break; }
-case 'rfgo': { const ids=rfIds(); if(!ids.length) break; RG().lastSquad=ids; P().squad=[...ids]; closeModal(); try{ rgStart(ids,'card'); }catch(err){ console.error(err); RG().run=null; mark('prog'); toast('탐사를 시작하지 못했어요: '+(err&&err.message||err)); render(); } RF=null; setTimeout(()=>{ const e=document.querySelector('.ch-card.rog'); if(e) e.scrollIntoView({block:'start',behavior:'smooth'}); },60); break; }
+case 'rfgo': { const ids=rfIds(); if(!ids.length) break; RG().lastSquad=ids; P().squad=[...ids]; closeModal(); try{ rgStart(ids,'card'); }catch(err){ console.error(err); RG().run=null; mark('prog'); toast('탐사를 시작하지 못했어요: '+(err&&err.message||err)); render(); } RF=null; setTimeout(()=>{ const el=document.querySelector('.ch-card.rog'); if(el) el.scrollIntoView({block:'start',behavior:'smooth'}); },60); break; }
 case 'rgnode': { const run=RG().run; if(!run) break; run.msg=''; rgNode(t.dataset.v); break; }
 case 'rgskip': { const run=RG().run; if(!run) break; run.pick=null; run.squad.forEach(id=>{ if(run.hp[id]>0) run.hp[id]=Math.min(1,run.hp[id]+0.1); }); run.msg='유물 대신 숨을 돌렸어요. 체력 10% 회복'; mark('prog'); render(); break; }
 case 'rgrelic': { const run=RG().run; if(!run) break; run.relics.push(t.dataset.v); run.pick=null; run.msg=RELICS[t.dataset.v][0]+'을(를) 얻었어요'; mark('prog'); render(); break; }

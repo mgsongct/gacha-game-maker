@@ -29,8 +29,8 @@ function schedHTML(){ const sc=SCHED(), S=spots();
   ${S.length?`<div class="sc-spots">${S.map(s=>{ const done=sc.done.includes(s.id), who=spotWho(s); return `<div class="sc-spot" style="${bgStyle(s.bg||s.name)}"><b>${esc(s.name)}</b>${s.desc?`<div class="muted" style="font-size:.75rem">${esc(s.desc)}</div>`:''}
     <div class="sc-who">${done?'<span class="badge">다녀옴</span>':who.length?who.map(c=>`<button class="btn sm" data-act="scvisit" data-s="${s.id}" data-c="${c.id}" ${sc.left?'':'disabled'}>${esc(c.name)}${spotFav(c,s)?' ♥':''}</button>`).join(''):'<span class="muted">아무도 없어요</span>'}</div></div>`; }).join('')}</div>`:`<p>아직 장소가 없어요.</p><button class="btn" data-act="scauto">자료실 배경으로 장소 만들기</button>`}
   ${playMode()?'':`<div class="row" style="margin-top:10px;gap:6px"><button class="btn sm ghost" data-act="scai">AI로 장소 다시 정하기</button><button class="btn sm ghost" data-act="sctalkall">AI로 장면 만들기(장면 없는 ${T('crew')})</button></div>`}`; }
-document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
-  if(a==='scvisit') schedVisit(b.dataset.s,b.dataset.c);
+document.addEventListener('click',async e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
+  if(a==='scvisit') schedVisit(el.dataset.s,el.dataset.c);
   else if(a==='scauto'){ spotsAuto(); render(); }
-  else if(a==='scai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await spotsAI(b)){ toast('장소를 정했어요'); render(); } }
+  else if(a==='scai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await spotsAI(el)){ toast('장소를 정했어요'); render(); } }
   else if(a==='sctalkall'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } const L=G.chars.filter(c=>own(c.id)&&!c.alt&&spots().some(s=>!(c.spotTalk||{})[s.id])); let n=0; for(const c of L){ syBar(`일정 장면 ${n+1}/${L.length}`); if(await spotTalkAI(c)) n++; } syBar(''); toast(`${n}명의 일정 장면을 만들었어요`); render(); } });

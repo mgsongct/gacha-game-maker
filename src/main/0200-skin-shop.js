@@ -5,12 +5,12 @@ function skinShopList(){ return G.chars.flatMap(c=>(c.skins||[]).filter(k=>k.sho
 function skinPeriodKey(){ const L=P().live, se=L.on.season&&L.season; return se&&se.start?'season:'+se.start:cycKey('rotate'); }
 async function skinAuto(notes,period){
   const game=G,project=PJ().active;
-  const L=P().live, rec=L.skinRecent||(L.skinRecent=[]), pu=G.banners.filter(b=>b.active!==false&&b.type==='pickup').flatMap(b=>b.pickup||[]);
+  const L=P().live, rec=L.skinRecent||(L.skinRecent=[]), pu=G.banners.filter(bn=>bn.active!==false&&bn.type==='pickup').flatMap(b=>b.pickup||[]);
   const shopN=c=>(c.skins||[]).filter(k=>k.shop).length, base=G.chars.filter(c=>c.naiPrompt&&!c.alt); if(!base.length) return null;
   // 상점 의상이 가장 적은 캐릭터 중에서(같으면 픽업·보유 우선), 최근에 나온 캐릭터는 다른 후보가 있으면 빼요
   const minN=Math.min(...base.map(shopN)); let cand=base.filter(c=>shopN(c)===minN&&!rec.includes(c.id)); if(!cand.length) cand=base.filter(c=>!rec.includes(c.id)); if(!cand.length){ L.skinRecent=[]; cand=base; }
   const pri=cand.filter(c=>pu.includes(c.id)), mine=cand.filter(c=>own(c.id)); cand=pri.length?pri:mine.length?mine:cand;
-  const c=rand(cand), evs=G.events.filter(e=>e.active!==false&&gateOpen(e)).map(e=>e.title).join(', ');
+  const c=rand(cand), evs=G.events.filter(ev=>ev.active!==false&&gateOpen(ev)).map(e=>e.title).join(', ');
   const originalPrompt=c.naiPrompt,skinBase=await naiSkinBase(c);
   if(G!==game||PJ().active!==project||charById(c.id)!==c||c.naiPrompt!==originalPrompt)throw Error('캐릭터나 게임이 바뀌어 스킨 생성을 중단했어요');
   const r=await aiJSON(`${RULES}\n세계관: ${G.world.summary}\n캐릭터: ${c.name} / ${String(c.profile||'').slice(0,300)}\n변하지 않는 외형(재작성하지 말 것): ${skinBase.appearance}\n기본 의상(새 의상에 복사하지 말 것): ${skinBase.outfit}\n이미 있는 ${T('skin')}: ${(c.skins||[]).map(k=>k.name).join(', ')||'없음'}\n새 의상을 기획하세요. 현재 ${new Date().getMonth()+1}월${evs?', 이벤트: '+evs:''}. 세계관·성격·계절에 어울리게. outfit에는 새 옷·신발·착용 장식만, other에는 표정·자세·소품만 영어 태그로 쓰세요. 머리·눈·피부·체형·종족은 변경하지 마세요.\nJSON만 출력: {"name":"의상 이름","desc":"소개 한 줄","line":"대사 한 줄","outfit":"영어 의상 태그","other":"영어 표정·자세·소품 태그"}`,null,'quick');

@@ -54,10 +54,10 @@ function sortieNodeEnd(win){ const x=sortieParts(); if(!x) return ''; const {run
   return `<h2 class="disp" style="color:var(--rose);margin:0">${esc(nodeById(x.R,run.node).name)} 돌파</h2><p>${rewardText(g)} · 경험치 +${xp}</p><button class="btn" data-act="somap">경로로</button>`; }
 function sortieEnd(){ P().sortie=null; mark('prog'); }
 function battleSysPanel(){ const r=G.meta.rules||{}; return `<div class="panel pm-hide"><h3>전투 체계</h3><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-act="bsys" data-k="formation" ${formOn()?'checked':''}>대열 (근접·원거리·지원, 전열이 후열을 지킴)</label><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-act="bsys" data-k="sortie" ${sortieOn()?'checked':''}>출격 경로 (지점마다 진격·퇴각, 갈림길, 체력 유지)</label><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-act="bsmode" data-k="debate" ${modesCfg().debate?'checked':''}>회담 스테이지 (주장·증거·설득) — 새 스토리 생성에 섞기</label><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-act="bsmode" data-k="contest" ${modesCfg().contest?'checked':''}>콘테스트 스테이지 (매력 어필) — 새 스토리 생성에 섞기</label></div>`; }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
-  if(a==='bsys'){ G.meta.rules=G.meta.rules||{}; G.meta.rules[b.dataset.k]=b.checked; mark('meta'); }
-  else if(a==='bsmode'){ G.meta.story=G.meta.story||{}; G.meta.story.modes=Object.assign({},G.meta.story.modes,{[b.dataset.k]:b.checked}); mark('meta'); }
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
+  if(a==='bsys'){ G.meta.rules=G.meta.rules||{}; G.meta.rules[el.dataset.k]=el.checked; mark('meta'); }
+  else if(a==='bsmode'){ G.meta.story=G.meta.story||{}; G.meta.story.modes=Object.assign({},G.meta.story.modes,{[el.dataset.k]:el.checked}); mark('meta'); }
   else if(a==='sogo') sortieFight();
-  else if(a==='sonext'){ const x=sortieParts(); if(!x) return; x.run.node=b.dataset.v; mark('prog'); sortieMap(); }
+  else if(a==='sonext'){ const x=sortieParts(); if(!x) return; x.run.node=el.dataset.v; mark('prog'); sortieMap(); }
   else if(a==='somap'){ B=null; closeOv(); render(); sortieMap(); }
   else if(a==='soretreat'){ const x=sortieParts(); const g=x?x.run.gained:{}; sortieEnd(); closeModal(); render(); toast(`퇴각했어요${g.gold?` · 얻은 골드 ${nf(g.gold)}`:''}`); } });

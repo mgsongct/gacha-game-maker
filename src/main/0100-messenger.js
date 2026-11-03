@@ -19,13 +19,13 @@ function checkTriggers(silent){
   if(fresh.length){ mark('prog'); if(!silent) notify(fresh[0],fresh.length-1); updateBadge(); }
 }
 function unread(){return Object.entries(P().inbox).filter(([id,s])=>!s.done&&threadChar(threadById(id))).length;}
-function updateBadge(){const b=document.querySelector('.lb-ico[data-act="phone"]'); if(!b) return; const n=unread(); let e=b.querySelector('em'); if(!n){ if(e) e.remove(); return; } if(!e){ e=document.createElement('em'); b.appendChild(e); } e.textContent=n;} // 로비 대화 아이콘 배지(예전 #phBadge는 화면에 없음)
+function updateBadge(){const el=document.querySelector('.lb-ico[data-act="phone"]'); if(!el) return; const n=unread(); let e=el.querySelector('em'); if(!n){ if(e) e.remove(); return; } if(!e){ e=document.createElement('em'); el.appendChild(e); } e.textContent=n;} // 로비 대화 아이콘 배지(예전 #phBadge는 화면에 없음)
 function notify(t,more){
   const c=threadChar(t); const first=parseScript(t.script).find(l=>l.type==='say'&&!isMe(l.who));
-  const n=$('#notif');
-  n.innerHTML=`<button class="nt" data-act="openthread" data-id="${t.id}"><div class="av">${art(c)}</div><div class="nt-t"><small>${esc(T('talk'))}${more>0?`, 외 ${more}건`:''}</small><b>${esc(c.name)}</b><span>${esc(sub(first?first.text:t.title))}</span></div></button>`;
+  const el=$('#notif');
+  el.innerHTML=`<button class="nt" data-act="openthread" data-id="${t.id}"><div class="av">${art(c)}</div><div class="nt-t"><small>${esc(T('talk'))}${more>0?`, 외 ${more}건`:''}</small><b>${esc(c.name)}</b><span>${esc(sub(first?first.text:t.title))}</span></div></button>`;
   sfx('알림'); try{navigator.vibrate&&navigator.vibrate([60,40,60]);}catch(e){}
-  clearTimeout(n._t); n._t=setTimeout(()=>{const b=n.querySelector('.nt'); if(b){b.classList.add('out');setTimeout(()=>{n.innerHTML='';},300);}},5000);
+  clearTimeout(el._t); el._t=setTimeout(()=>{const b=el.querySelector('.nt'); if(b){b.classList.add('out');setTimeout(()=>{el.innerHTML='';},300);}},5000);
 }
 let PH=null;
 function openPhone(tid){ $('#notif').innerHTML=''; $('#phone').hidden=false; if(tid&&P().inbox[tid]) openThread(tid); else phoneList(); }
@@ -106,5 +106,5 @@ function phMenu(cid){ const c=charById(cid); if(!c) return; const old=$('.ph-men
     ${imgReady()?`<button data-act="fcphototog">캐릭터가 사진 보내기 <small>${P().fcPhoto!==false?'켜짐 · 그림 AI 사용':'꺼짐'}</small></button>`:''}
     <button data-act="char" data-id="${esc(cid)}">${esc(T('crew'))} 정보</button>
     <button data-act="phmenuclose" class="ph-cancel">닫기</button></div></div>`); }
-function phMode(m){ if(!PH) return; PH.mode=m; const a=$('#phIn'), b=$('#phFree'); if(!a||!b) return; const hasPick=!!a.querySelector('[data-act=phpick],[data-act=phsay]');
-  if(m==='pick'&&hasPick){ a.hidden=false; b.hidden=true; } else { a.hidden=true; b.hidden=false; const sw=b.querySelector('.ph-sw'); if(sw) sw.hidden=!hasPick; } phScroll(); }
+function phMode(m){ if(!PH) return; PH.mode=m; const a=$('#phIn'), el=$('#phFree'); if(!a||!el) return; const hasPick=!!a.querySelector('[data-act=phpick],[data-act=phsay]');
+  if(m==='pick'&&hasPick){ a.hidden=false; el.hidden=true; } else { a.hidden=true; el.hidden=false; const sw=el.querySelector('.ph-sw'); if(sw) sw.hidden=!hasPick; } phScroll(); }

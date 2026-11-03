@@ -42,7 +42,7 @@ function playStory(title,script,done){
   const fb=ls.find(l=>(l.type==='cmd'&&l.cmd==='배경')||l.type==='place'); setVnBg(fb?(fb.arg||fb.text):'');
   vnStep();
 }
-function setVnBg(name){const b=$('#vnBg');if(!b)return;b.setAttribute('style',name?bgStyle(name):'background:linear-gradient(180deg,#1b1530,#2b1a33 60%,#120e1c)');b.classList.remove('fade');void b.offsetWidth;b.classList.add('fade');}
+function setVnBg(name){const el=$('#vnBg');if(!el)return;el.setAttribute('style',name?bgStyle(name):'background:linear-gradient(180deg,#1b1530,#2b1a33 60%,#120e1c)');el.classList.remove('fade');void el.offsetWidth;el.classList.add('fade');}
 function vnStep(){
   if(!S) return;
   if(S.typing){vnFinish();return;}
@@ -73,7 +73,7 @@ function vnCmd(L){
   else if(L.cmd==='톡'){ S.phone=a; const ph=$('#vnPhone'); ph.hidden=false; $('#vnPhName').textContent=a; $('#vnPhBody').innerHTML=''; }
   else if(L.cmd==='톡끝'){ S.phone=null; $('#vnPhone').hidden=true; }
   else if(L.cmd==='음악끝') bgm(null);
-  else if(L.cmd==='소품'||L.cmd==='사진'){const p=$('#vnProp');if(a==='끝')p.hidden=true;else{p.innerHTML=libArt(a);p.hidden=false;}}
+  else if(L.cmd==='소품'||L.cmd==='사진'){const el=$('#vnProp');if(a==='끝')el.hidden=true;else{el.innerHTML=libArt(a);el.hidden=false;}}
   else if(L.cmd==='소품끝') $('#vnProp').hidden=true;
   else if(L.cmd==='효과'){const v=$('#vn'),f=$('#vnFlash');
     if(/흔들/.test(a)){v.classList.remove('shake');void v.offsetWidth;v.classList.add('shake');}
@@ -81,7 +81,7 @@ function vnCmd(L){
     if(/암전/.test(a)){f.className='vn-flash';void f.offsetWidth;f.className='vn-flash b';}}
 }
 function vnShow(L){
-  S.log.push(L); const ch=$('#vnChar');
+  S.log.push(L); const el=$('#vnChar');
   if(S.phone&&L.type==='say'){
     const me=isMe(L.who), c=me?null:vnSpeaker(L.who), body=$('#vnPhBody');
     body.insertAdjacentHTML('beforeend',`<div class="msg ${me?'me':''}">${me?'':`<div class="av sm">${c?art(c):''}</div>`}<div class="bub">${esc(sub(L.text))}</div></div>`); body.scrollTop=body.scrollHeight;
@@ -90,11 +90,11 @@ function vnShow(L){
   }
   if(L.type==='say'){
     const me=isMe(L.who), c=me?null:vnSpeaker(L.who), fz=c?(L.face||textFace(c,L.text)):'', key=c?c.id+'|'+fz:'';
-    if(c){ const fresh=!(S.stage||[]).some(x=>x.c===c); vnDirectSay(L,c,fz); if(fresh){ const sl=ch.querySelector('.vn-slot.speak'); if(sl){ sl.classList.remove('enter'); void sl.offsetWidth; sl.classList.add('enter'); } } } // 무대·연출(0462)
-    ch.classList.toggle('dim',!c);
+    if(c){ const fresh=!(S.stage||[]).some(x=>x.c===c); vnDirectSay(L,c,fz); if(fresh){ const sl=el.querySelector('.vn-slot.speak'); if(sl){ sl.classList.remove('enter'); void sl.offsetWidth; sl.classList.add('enter'); } } } // 무대·연출(0462)
+    el.classList.toggle('dim',!c);
     $('#vnName').textContent=me?playerName():L.who; $('#vnText').classList.remove('nar');
     if(c&&c.voiceId&&SND().voiceStory) speak(c,L.text); else stopVoice();
-  } else { stopVoice(); ch.classList.add('dim'); $('#vnName').textContent=''; $('#vnText').classList.add('nar'); }
+  } else { stopVoice(); el.classList.add('dim'); $('#vnName').textContent=''; $('#vnText').classList.add('nar'); }
   vnPrefetch();
   vnType(sub(L.text));
 }

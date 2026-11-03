@@ -72,9 +72,9 @@ async function exSave(){ let adv; try{ adv=JSON.parse($('#ex_adv').value); }catc
   if(mode!==exMode()&&s){ s.jobs={}; s.biz.assign={}; s.biz.at=0; s.offers={}; }
   Object.assign(exMeta(),adv,{mode}); mark('meta','prog'); closeModal(); render(); }
 
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act, id=b.dataset.id;
-  if(a==='exjob'){ const o=exOffers(id), job=o.offers.find(x=>x.id===b.dataset.job); if(job) exStart(id,job); }
-  else if(a==='exstream'){ const pf=EXC().streamer.platforms.find(p=>p.id===b.dataset.pf); if(pf) exStart(id,pf); }
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act, id=el.dataset.id;
+  if(a==='exjob'){ const o=exOffers(id), job=o.offers.find(x=>x.id===el.dataset.job); if(job) exStart(id,job); }
+  else if(a==='exstream'){ const pf=EXC().streamer.platforms.find(p=>p.id===el.dataset.pf); if(pf) exStart(id,pf); }
   else if(a==='exrest') exRest(id,4);
   else if(a==='exclaim'){ exClaim(id); render(); }
   else if(a==='exclaimall'){ Object.keys(EXS().jobs).forEach(exClaim); render(); }

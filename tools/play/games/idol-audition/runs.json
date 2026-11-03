@@ -839,5 +839,20 @@
   "ms": 49,
   "stat": [],
   "pageErrors": []
+ },
+ {
+  "phase": "import",
+  "at": "2026-11-03T09:11:23.496Z",
+  "saved": {
+   "ok": true,
+   "gid": "gol16qsny"
+  },
+  "pending": [],
+  "log": [],
+  "toasts": [
+   "새 게임으로 추가했어요. 다시 시작할게요"
+  ],
+  "ailog": [],
+  "pageErrors": []
  }
 ]

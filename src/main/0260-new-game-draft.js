@@ -44,11 +44,11 @@ function drLibHTML(){ const a=drLib(); return `<div class="dr-lib" id="drLib"><d
 function drLoadFrom(d,label){ try{ appStorage.setItem(DR2KEY,JSON.stringify(drClean(d))); }catch(e){} DRTAB='theme'; openDraft(); toast(`「${label||drName(d)}」 초안을 불러왔어요. 고친 뒤 만들기를 누르면 새 게임으로 만들어져요`); }
 function drSave(){ try{ appStorage.setItem(DR2KEY,JSON.stringify(DR2)); }catch(e){} }
 function drLen(d){ d=d||DR2; return [d.auto,d.kw,d.tone,d.story,d.world,d.setting,d.hero.name,d.hero.gender,d.hero.look,d.hero.bio,...d.chars.flatMap(c=>[c.name,c.role,c.profile,c.look,c.speech])].reduce((n,s)=>n+String(s||'').length,0); }
-function drRead(){ if(!DR2||!$('#drPage')) return; const v=id=>{const e=$('#'+id);return e?(e.type==='checkbox'?e.checked:e.value):undefined;}, set=(k,id,f)=>{const x=v(id); if(x!==undefined) DR2[k]=f?f(x):x;};
+function drRead(){ if(!DR2||!$('#drPage')) return; const v=id=>{const el=$('#'+id);return el?(el.type==='checkbox'?el.checked:el.value):undefined;}, set=(k,id,f)=>{const x=v(id); if(x!==undefined) DR2[k]=f?f(x):x;};
   set('auto','dr_auto'); set('gtitle','dr_gtitle'); set('crewTerm','dr_crew',x=>String(x||'').trim().slice(0,8)); set('castSex','dr_cast'); set('kw','ng_kw'); set('tone','ng_tone'); set('theme','ng_theme'); set('n','ng_n',Number); set('style','ng_style'); set('fan','ng_fan'); set('src','ng_src'); set('story','ng_story'); set('stages','ng_stages',Number); set('len','ng_len'); set('depth','ng_depth'); set('newc','ng_newc',Number); set('talkOnly','ng_talkonly',Number); set('con','ng_con'); set('world','dr_world'); set('setting','dr_setting');
   document.querySelectorAll('#drPage [data-dc]').forEach(e=>{ const c=DR2.chars[+e.dataset.i]; if(c){c[e.dataset.dc]=e.value;if(e.dataset.dc==='tags')naiBlocksSave(c,'tags',e);} });
   ['name','call','gender','look','bio'].forEach(k=>{ const x=v('dr_h_'+k); if(x!==undefined) DR2.hero[k]=x; }); const hd=v('dr_h_hide'); if(hd!==undefined) DR2.hero.hide=hd;
-  drSave(); const c=$('#drCount'); if(c) c.textContent=nf(drLen()); }
+  drSave(); const el=$('#drCount'); if(el) el.textContent=nf(drLen()); }
 function drText(d){ d=d||DR2; const L=[];
   if(d.world.trim()) L.push('[세계관]\n'+d.world.trim());
   if(d.setting.trim()) L.push('[설정: 세력·용어·규칙·비밀]\n'+d.setting.trim());
@@ -116,7 +116,7 @@ function drAutoHTML(){ const d=DR2; return `<div class="dr-intro"><p><b>자율�
     <div class="row" style="margin-top:12px"><button class="btn" data-act="drmake" ${SAMPLE?'':'disabled'}>이 내용으로 새 게임 만들기</button></div>
     ${SAMPLE?'':'<p class="muted" style="font-size:.8rem;margin:6px 0 0">글 AI를 등록하면 만들 수 있어요.</p>'}<p class="muted" id="ng_stat" style="margin:6px 0 0"></p><button class="linkb" data-act="ailog" style="margin-top:4px;font-size:.8rem">🔍 AI 기록 보기 (안 만들어질 때 원인 확인)</button>`; }
 function openDraft(tab){ DR2=drLoad(); if(tab) DRTAB=tab;
-  if(DR2.hero.av&&!DRAVU){ idbGet('draft_avatar').then(b=>{ if(b){ DRAVU=URL.createObjectURL(b); const x=$('#drAvBox'); if(x) x.innerHTML=`<img src="${esc(DRAVU)}" alt="프로필">`; } }).catch(()=>{}); }
+  if(DR2.hero.av&&!DRAVU){ idbGet('draft_avatar').then(b=>{ if(b){ DRAVU=URL.createObjectURL(b); const el=$('#drAvBox'); if(el) el.innerHTML=`<img src="${esc(DRAVU)}" alt="프로필">`; } }).catch(()=>{}); }
   const top=`<div class="dr-top"><button class="x" data-act="close" aria-label="닫기">‹</button><div><i>NEW GAME</i><h2>새 게임 초안</h2></div><button class="btn sm ghost" data-act="drlib" style="margin-left:auto">📂 초안 보관함</button>${DR2.mode?`<button class="btn sm ghost" data-act="drmode" data-v="">${DR2.mode==='auto'?'1. 자율주행':'2. 디테일'} · 바꾸기</button>`:''}</div>${DR2.reuse?`<div class="optbox dr-reuse" style="margin:0 0 8px;font-size:.82rem">🎲 <b>그림 유지 리롤</b> · 「${esc(DR2.reuse.title||'')}」의 ${esc(T('crew'))}·NPC·배경 그림을 <b>이름이 같은 인물·배경</b>에 그대로 써요. 이름을 바꾸거나 새 인물을 넣으면 그 인물만 새로 그려요. 원래 게임은 그대로 남아요. <button class="linkb" type="button" data-act="drreuseoff">그림 새로 그리기로 바꾸기</button></div>`:''}`;
   if(!DR2.mode){ openModal(`<div id="drPage" class="dr-page">${top}<p class="muted" style="margin:0 0 10px">어떻게 만들까요? 지금 게임은 그대로 남아요.</p>${drModeHTML()}</div>`,false,'cs-sheet dr-sheet'); return; }
   if(DR2.mode==='auto'){ openModal(`<div id="drPage" class="dr-page">${top}${drAutoHTML()}</div>`,false,'cs-sheet dr-sheet'); return; }
@@ -128,7 +128,7 @@ function openDraft(tab){ DR2=drLoad(); if(tab) DRTAB=tab;
     <div class="chips dr-tabs">${DR_TABS.map(([k,l])=>`<button class="chip ${DRTAB===k?'on':''}" data-act="drtab" data-k="${k}">${l}</button>`).join('')}</div>
     ${DR_TABS.map(([k])=>drTabHTML(k)).join('')}</div>`,false,'cs-sheet dr-sheet'); }
 // 다시 그리기 전에 부르는 쪽에서 drRead()를 먼저 해요(여기서 읽으면 방금 바꾼 값이 옛 입력칸 값으로 덮여요)
-function drRerender(){ const sc=$('#modal .sheet'), y=sc?sc.scrollTop:0; openDraft(); const s2=$('#modal .sheet'); if(s2) s2.scrollTop=y; }
+function drRerender(){ const sc=$('#modal .sheet'), y=sc?sc.scrollTop:0; openDraft(); const el=$('#modal .sheet'); if(el) el.scrollTop=y; }
 document.addEventListener('input',e=>{ if(e.target.closest&&e.target.closest('#drPage')){ clearTimeout(drRead._t); drRead._t=setTimeout(drRead,400); } });
 document.addEventListener('change',e=>{ const cy=e.target&&e.target.dataset&&e.target.dataset.cyc; if(cy){ const L=P().live; L.cyc=Object.assign({},L.cyc||{},{[cy]:+e.target.value}); mark('prog'); render(); toast(`${cycLabel(cy)} 주기로 바꿨어요`); return; } });
 document.addEventListener('change',e=>{ if(e.target.closest&&e.target.closest('#drPage')){ drRead(); if(e.target.dataset&&e.target.dataset.dc==='kind') drRerender(); } });
@@ -222,8 +222,8 @@ async function openMaskPainter(src,prev,cb,po){ po=po||{}; const im=await loadIm
   cv.addEventListener('pointermove',e=>{ if(!down) return; const p=pt(e); stroke(last,p); last=p; draw(); });
   cv.addEventListener('pointerup',()=>{ down=false; }); cv.addEventListener('pointercancel',()=>{ down=false; });
   d.querySelector('input[type=range]').addEventListener('input',e=>{ size=+e.target.value; });
-  d.querySelector('.mp-bar').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const m=b.dataset.m;
-    if(m==='brush'||m==='erase'){ mode=m; d.querySelectorAll('[data-m=brush],[data-m=erase]').forEach(q=>q.classList.toggle('on',q===b)); }
+  d.querySelector('.mp-bar').addEventListener('click',e=>{ const el=e.target.closest('button'); if(!el) return; const m=el.dataset.m;
+    if(m==='brush'||m==='erase'){ mode=m; d.querySelectorAll('[data-m=brush],[data-m=erase]').forEach(q=>q.classList.toggle('on',q===el)); }
     else if(m==='clear'){ mx.fillStyle='#000'; mx.fillRect(0,0,W,H); draw(); }
     else if(m==='auto'){ const tall=H/W>1.25; mx.fillStyle='#fff'; mx.beginPath(); mx.ellipse(W*0.5,H*(tall?0.12:0.24),W*(tall?0.1:0.16),H*(tall?0.055:0.11),0,0,Math.PI*2); mx.fill(); draw(); toast('얼굴 위치를 대충 칠했어요. 맞지 않으면 고쳐 주세요'); }
     else if(m==='cancel'){ d.remove(); if(po.onCancel) po.onCancel(); }

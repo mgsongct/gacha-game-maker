@@ -1,0 +1,51 @@
+[
+ {
+  "id": "std",
+  "name": "질풍의 서임",
+  "type": "std",
+  "desc": "",
+  "pool": {
+   "mode": "all",
+   "factions": [],
+   "ids": []
+  },
+  "pickup": [],
+  "rate": 50,
+  "active": true,
+  "bg": ""
+ },
+ {
+  "id": "b_pu",
+  "name": "바람눈의 맹세",
+  "type": "pickup",
+  "desc": "SSR 카시아 확률 상승",
+  "pool": {
+   "mode": "all",
+   "factions": [],
+   "ids": []
+  },
+  "pickup": [
+   "q9okz0du"
+  ],
+  "rate": 50,
+  "active": true,
+  "bg": ""
+ },
+ {
+  "id": "b_fac",
+  "name": "황동 상회 특별 조달",
+  "type": "pool",
+  "desc": "황동 상회 연합 소속만 등장",
+  "pool": {
+   "mode": "faction",
+   "factions": [
+    "황동 상회 연합"
+   ],
+   "ids": []
+  },
+  "pickup": [],
+  "rate": 50,
+  "active": true,
+  "bg": ""
+ }
+]

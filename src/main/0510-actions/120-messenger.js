@@ -1,7 +1,7 @@
 async function handleMessengerAction(a,t,id,p,e){
   switch(a){
 case 'phone': e.stopPropagation(); openPhone(); break;
-case 'openthread': { const n=$('#notif'); n.innerHTML=''; openPhone(id); break; }
+case 'openthread': { const el=$('#notif'); el.innerHTML=''; openPhone(id); break; }
 case 'phclose': closePhone(); break;
 case 'phback': phoneList(); break;
 case 'openfc': openFree(id); break;
@@ -14,7 +14,7 @@ case 'chatimgsave': { e.stopPropagation(); const u=chatImgCache[t.dataset.k]; if
 case 'phpick': { if(!PH) break; const tid=t.dataset.tid||PH.tid, th=threadById(tid), s=th&&p.inbox[tid]; if(!th||!s){ if(PH.fc) openRoom(PH.fc); break; }
       const c=threadChar(th), lines=parseScript(th.script); let L=lines[s.pos];
       if(!L||L.type!=='choice'){ let j=s.pos; while(j>0&&!(lines[j]&&lines[j].type==='choice')) j--; if(lines[j]&&lines[j].type==='choice'&&!s.log.some(x=>x.w==='me'&&x.pi===j)){ s.pos=j; L=lines[j]; } else { openRoom(c.id); break; } }
-      const n=+t.dataset.n; s.pick=n; s.lastPick=L.opts[n-1]||''; const en={w:'me',t:sub(L.opts[n-1]||''),at:Date.now(),pi:s.pos}; s.pos++; s.log.push(en); s.at=en.at; PH.tid=tid;
+      const el=+t.dataset.n; s.pick=el; s.lastPick=L.opts[el-1]||''; const en={w:'me',t:sub(L.opts[el-1]||''),at:Date.now(),pi:s.pos}; s.pos++; s.log.push(en); s.at=en.at; PH.tid=tid;
       $('#phIn').innerHTML=''; phMode('free'); $('#phChat').insertAdjacentHTML('beforeend',bubbleHTML(en,c)); phScroll(); mark('prog'); phPlay(th,c,s,PH.token); break; }
 case 'phmenu': phMenu(id); break;
 case 'phmenuclose': { if(t.classList.contains('ph-menu')&&e.target!==t) break; $('.ph-menu')?.remove(); break; }

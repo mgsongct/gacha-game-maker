@@ -39,9 +39,6 @@ export function violations(B, conv, share = [], inv = inventory(B)) { const grp 
   for (const [k, n] of Object.entries(conv)) { if (!owner.has(n)) owner.set(n, new Set()); owner.get(n).add(k); }
   return B.filter(b => conv[b.kind] && b.name !== conv[b.kind]).map(b => { const same = new Set(grp(b.kind)), others = [...(inv.byName.get(b.name) || new Map()).keys(), ...(owner.get(b.name) || [])].filter(k => !same.has(k));
     return others.length ? { ...b, want: conv[b.kind], clash: [...new Set(others)].join('·') } : null; }).filter(Boolean); }
-// 범위: 바인딩을 둘러싼 최상위 함수가 원본(upstream 트리)에 없던 것이면 포크 코드
-export function topFnKey(b) { let top = null; for (let n = b.decl; n; n = n.parent) if (FNT.has(n.type)) top = n; if (!top) return null; const nm = top.type === 'function_declaration' ? top.childForFieldName('name')?.text : top.parent?.type === 'variable_declarator' ? top.parent.childForFieldName('name')?.text : null;
-  return nm ? (b.unit.name === 'main' ? nm : `${b.unit.name}#${nm}`) : null; }
 // 안전한 이름 바꾸기 편집 목록: 범위 안에서 새 이름이 이미 쓰이면(선언·참조·단축 속성) 건너뜀, 안쪽 함수가 같은 이름을 다시 선언하면 그 안은 건드리지 않음
 const declares = (fn, name) => { let d = false; const ps = fn.childForFieldName('parameter') ? [fn.childForFieldName('parameter')] : fn.childForFieldName('parameters')?.namedChildren || [];
   if (ps.some(p => p.text === name || (p.type !== 'identifier' && new RegExp(`\\b${name}\\b`).test(p.text)))) return true;
@@ -49,7 +46,11 @@ const declares = (fn, name) => { let d = false; const ps = fn.childForFieldName(
 export function renameEdits(v) { const { scope, decl, name, want } = v, edits = []; let clash = false;
   walk(scope, n => { if (clash) return false; if ((n.type === 'identifier' || n.type === 'shorthand_property_identifier' || n.type === 'shorthand_property_identifier_pattern') && n.text === want) { clash = true; return false; } });
   if (clash) return { ok: false, why: `범위 안에 「${want}」가 이미 있음` };
-  for (let a = scope.parent; a; a = a.parent) if (FNT.has(a.type) && declares(a, want)) return { ok: false, why: `바깥 범위의 「${want}」를 가림` }; // const c = G.chars.find(x => …)의 x를 c로 바꾸면 바깥 c를 가림
+  // 바깥 범위에 같은 이름이 있으면 가림 — 바깥 함수의 매개변수·선언, 바깥 catch 매개변수(catch(e){ … catch(e2) … }), 바깥 블록의 let/const
+  const blockDeclares = (blk, name) => blk.namedChildren.some(st => (st.type === 'lexical_declaration' || st.type === 'variable_declaration') && st.namedChildren.some(d => d.type === 'variable_declarator' && d.childForFieldName('name')?.text === name));
+  for (let a = scope.parent; a; a = a.parent) {
+    if ((FNT.has(a.type) && declares(a, want)) || (a.type === 'catch_clause' && a.childForFieldName('parameter')?.text === want) || ((a.type === 'statement_block' || a.type === 'program') && blockDeclares(a, want)))
+      return { ok: false, why: `바깥 범위의 「${want}」를 가림` }; }
   let bad = '';
   walk(scope, n => { if (bad) return false;
     if (n !== scope && FNT.has(n.type) && declares(n, name)) return false; // 안쪽에서 같은 이름을 다시 선언 → 다른 변수

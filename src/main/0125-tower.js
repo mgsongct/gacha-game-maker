@@ -25,6 +25,6 @@ function towerEnd(win){ const c=B.ctx, rec=TOWER()[c.tid]||(TOWER()[c.tid]={best
 function towerHTML(){ const T0=TOWER(); return `<section class="ch-card"><div class="ch-h"><i>TRIAL TOWER</i><h3>시련의 탑</h3><span>층마다 강해지는 적과 바뀌는 전장 규칙. 제한 탑은 그 소속·속성 ${T('crew')}만 출전해요. 5층마다 보스와 큰 보상.</span></div>
   <div class="tw-list">${towerList().map(t=>{ const b=(T0[t.id]||{}).best||0, n=t.allow?G.chars.filter(c=>own(c.id)&&t.allow(c)).length:G.chars.filter(c=>own(c.id)).length;
     return `<button class="tw-card" data-act="towergo" data-v="${esc(t.id)}" ${n?'':'disabled'}><b>${esc(t.name)}</b><span>${esc(t.desc)} · 보유 ${n}명</span><br><span>최고 ${b}층 → 다음 ${b+1}층</span></button>`; }).join('')}</div></section>`; }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
-  if(a==='towergo') towerGo(b.dataset.v);
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
+  if(a==='towergo') towerGo(el.dataset.v);
   else if(a==='towerstart'){ const c=FORM&&FORM.ctx; if(!c||c.kind!=='tower') return; P().squad=[...squadSel]; mark('prog'); closeModal(); startStage(FORM.stage,{kind:'tower',tid:c.tid,floor:c.floor,allow:c.allow}); } });

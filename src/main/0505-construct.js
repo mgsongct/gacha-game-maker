@@ -127,14 +127,14 @@ async function conSave(){ let adv; try{ adv=JSON.parse($('#con_adv').value); }ca
   if(m.on&&!wasOn&&!CBUILD().started){ CBUILD().started=Date.now(); const r=CRES(), s=CON().start; CON_RES.forEach(k=>{ r[k]+=s; }); toast(`${T('construct')}을(를) 켰어요. 시작 자원 ${nf(s)}씩 드려요`); }
   mark('meta','prog'); closeModal(); render(); }
 
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
   if(a==='conbuild') conBuild();
-  else if(a==='conbuy') conBuy(b.dataset.k);
-  else if(a==='conpreset'){ const v=b.dataset.v.split(',').map(Number); v.forEach((x,i)=>{ const n=$('#con_'+i), r=$('#con_r'+i); if(n) n.value=x; if(r) r.value=x; }); const info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(GGMConstruct.normalize(v,CON())); CBUILD().input=GGMConstruct.normalize(v,CON()); }
+  else if(a==='conbuy') conBuy(el.dataset.k);
+  else if(a==='conpreset'){ const v=el.dataset.v.split(',').map(Number); v.forEach((x,i)=>{ const n=$('#con_'+i), r=$('#con_r'+i); if(n) n.value=x; if(r) r.value=x; }); const info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(GGMConstruct.normalize(v,CON())); CBUILD().input=GGMConstruct.normalize(v,CON()); }
   else if(a==='contoggle'){ if(conOn()){ conMeta().on=false; mark('meta'); render(); } else openConSet(); }
   else if(a==='conset') openConSet();
   else if(a==='consave') conSave();
   else if(a==='convadd'){ CONV=[...conReadVariants(),{id:'v_'+uid(),name:'새 바리에이션',prompt:'',brief:'',chance:30,recipe:{min:[200,200,200,400]},rarity:'same',on:true,cond:{}}]; $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); }
-  else if(a==='convdel'){ CONV=conReadVariants(); CONV.splice(+b.dataset.i,1); $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); } });
-document.addEventListener('input',e=>{ const i=e.target.dataset&&e.target.dataset.con; if(i==null) return; const v=e.target.value; const n=$('#con_'+i), r=$('#con_r'+i); if(n&&n!==e.target) n.value=v; if(r&&r!==e.target) r.value=v;
+  else if(a==='convdel'){ CONV=conReadVariants(); CONV.splice(+el.dataset.i,1); $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); } });
+document.addEventListener('input',e=>{ const i=e.target.dataset&&e.target.dataset.con; if(i==null) return; const v=e.target.value; const el=$('#con_'+i), r=$('#con_r'+i); if(el&&el!==e.target) el.value=v; if(r&&r!==e.target) r.value=v;
   const input=GGMConstruct.normalize(conReadInput(),CON()), info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(input); CBUILD().input=input; });

@@ -46,7 +46,7 @@ document.addEventListener('click',()=>{ if(BGM.blocked){ BGM.blocked=false; cons
 function sceneOf(){return Object.assign({},SND().scene,(typeof G!=='undefined'&&G&&G.prog&&G.prog.scene)||{});}
 function sceneBgm(){
   const sc=sceneOf();
-  if(typeof B!=='undefined'&&B) return bgm(B.enemies.some(e=>e.boss)?sc.boss:sc.battle);
+  if(typeof B!=='undefined'&&B) return bgm(B.enemies.some(en=>en.boss)?sc.boss:sc.battle);
   if(typeof GC!=='undefined'&&GC) return bgm(sc.gacha);
   if(document.querySelector('.title')) return bgm(sc.title);
   if(typeof S!=='undefined'&&S) return;

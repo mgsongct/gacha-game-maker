@@ -116,10 +116,10 @@ function auditPanel(){ const n=auditScan().reduce((a,x)=>a+x.items.length,0), fr
 function auditNotice(){ try{ if((+G.meta.auditSeen||0)>=auditVer()||!P().seenOpening) return; const n=auditScan().reduce((a,x)=>a+x.items.length,0); if(n) toast(`생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 ${n}개를 업그레이드할 수 있어요`); }catch(e){} }
 setTimeout(auditNotice,6000);
 
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
-  if(a==='audopen') openAudit(b.dataset.id||null);
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
+  if(a==='audopen') openAudit(el.dataset.id||null);
   else if(a==='audundo'){ auditUndo(); openAudit(AUDIT_FOCUS); }
   else if(a==='audstop'){ if(AUDIT_JOB) AUDIT_JOB.stop=true; }
-  else if(a==='audfix'){ const r=AUDIT_RULES.find(x=>x.id===b.dataset.rule), g=r&&auditScan(AUDIT_FOCUS?(o=>o.id===AUDIT_FOCUS):null).find(x=>x.rule===r); if(!g) return;
+  else if(a==='audfix'){ const r=AUDIT_RULES.find(x=>x.id===el.dataset.rule), g=r&&auditScan(AUDIT_FOCUS?(o=>o.id===AUDIT_FOCUS):null).find(x=>x.rule===r); if(!g) return;
     const pick=[...document.querySelectorAll(`[data-aud="${r.id}"]`)].filter(x=>x.checked).map(x=>g.items[+x.dataset.i]).filter(Boolean); if(!pick.length){ toast('고칠 항목을 골라 주세요'); return; } auditFix(r,pick); }
   else if(a==='audconv'){ const cs=[...document.querySelectorAll('[data-audc]:checked')].map(x=>charById(x.dataset.audc)).filter(Boolean), fs=[...document.querySelectorAll('[data-audf]:checked')].map(x=>x.dataset.audf); auditConvert(cs,fs,($('#aud_ins')||{}).value||''); } });

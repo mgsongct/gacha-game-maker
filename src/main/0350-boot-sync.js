@@ -11,7 +11,7 @@ async function bootSync(){ const pc=PCS(), so=SY(); const mode=pc?'pc':(syReady(
       if(!bootPullOk()){ setTimeout(()=>openPullFail(mode,'loop'),800); return false; } // 받기→다시 시작이 되풀이되면 멈추고 알려요
       ov.querySelector('b').textContent=`${S.device||'다른 기기'}의 게임을 받아 오는 중…`;
       pulled=await (mode==='pc'?pcPull():syPull());
-      if(pulled){ setTimeout(()=>{ const x=$('#bootsync'); if(x){ x.remove(); reloadGame(); } },6000); return true; }
+      if(pulled){ setTimeout(()=>{ const el=$('#bootsync'); if(el){ el.remove(); reloadGame(); } },6000); return true; }
       setTimeout(()=>openPullFail(mode),800); return false; }
     if(!S&&mode==='pc'&&P().seenOpening) setTimeout(()=>pcPush(true),3000);
   }catch(e){ setTimeout(()=>toast(mode==='pc'?'PC 서버에 연결하지 못해서 이 기기의 게임으로 시작해요':'클라우드를 확인하지 못해서 이 기기의 게임으로 시작해요'),1500); }

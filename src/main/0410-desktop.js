@@ -25,7 +25,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){ if(modalOpen){ window.navBack(); e.preventDefault(); e.stopImmediatePropagation(); } else if(phoneOpen){ closePhone(); e.preventDefault(); } return; }
   if(modalOpen||phoneOpen) return;
   if(!ov.hidden){ const vn=$('#vn'), ti=ov.querySelector('.title,[data-act=opnext]');
-    if(vn&&(e.key===' '||e.key==='Enter'||e.key==='ArrowRight')){ e.preventDefault(); const ch=$('#vnCh'); if(ch&&ch.children.length) return; vn.click(); return; }
+    if(vn&&(e.key===' '||e.key==='Enter'||e.key==='ArrowRight')){ e.preventDefault(); const el=$('#vnCh'); if(el&&el.children.length) return; vn.click(); return; }
     if(vn&&(e.key==='a'||e.key==='A')){ const b=$('#vnAuto'); if(b) b.click(); return; }
     if(ti&&(e.key===' '||e.key==='Enter')){ e.preventDefault(); ti.click(); }
     return; }

@@ -7,12 +7,12 @@ function sealSVG(){
 }
 let GC=null;
 /* 공유 팩 해금: 받은 게임(meta.gated)에서는 픽업·이벤트가 메인 스토리 진행(깬 스테이지 수 gate)에 맞춰 차례로 열려요 */
-function mainCleared(){ const p=P(); return G.chapters.filter(c=>c.kind==='main').reduce((n,ch)=>n+ch.stages.filter(s=>p.cleared[s.id]).length,0); }
+function mainCleared(){ const p=P(); return G.chapters.filter(ch=>ch.kind==='main').reduce((n,ch)=>n+ch.stages.filter(s=>p.cleared[s.id]).length,0); }
 function gateOpen(x){ return !G.meta.gated||!x||!(x.gate>0)||mainCleared()>=x.gate; }
 function bnOpen(b){ if(b.active===false||!gateOpen(b)) return false; if(b.pin&&b.until&&b.until<=Date.now()) return false; const ev=b.eventId&&G.events.find(e=>e.id===b.eventId); return !ev||gateOpen(ev); }
 function gateCheck(){ if(!G.meta.gated) return; const p=P(); p.gateSeen=p.gateSeen||[]; const n=[];
-  G.events.forEach(e=>{ if(e.gate>0&&gateOpen(e)&&!p.gateSeen.includes(e.id)){ p.gateSeen.push(e.id); n.push(e.title); sendMail({from:'운영팀',title:`새 ${T('event')} 「${e.title}」가 열렸어요`,body:`메인 스토리를 진행해서 새 ${T('event')}이(가) 열렸어요. ${T('event')} 화면에서 확인해 보세요.`,days:30}); } });
-  G.banners.forEach(b=>{ if(b.gate>0&&!b.eventId&&bnOpen(b)&&!p.gateSeen.includes(b.id)){ p.gateSeen.push(b.id); n.push(b.name); b.newAt=Date.now(); sendMail({from:'운영팀',title:`「${b.name}」 배너가 열렸어요`,body:`${b.desc||''}\n${T('gacha')} 화면에서 확인해 보세요.`,days:30}); } });
+  G.events.forEach(ev=>{ if(ev.gate>0&&gateOpen(ev)&&!p.gateSeen.includes(ev.id)){ p.gateSeen.push(ev.id); n.push(ev.title); sendMail({from:'운영팀',title:`새 ${T('event')} 「${ev.title}」가 열렸어요`,body:`메인 스토리를 진행해서 새 ${T('event')}이(가) 열렸어요. ${T('event')} 화면에서 확인해 보세요.`,days:30}); } });
+  G.banners.forEach(bn=>{ if(bn.gate>0&&!bn.eventId&&bnOpen(bn)&&!p.gateSeen.includes(bn.id)){ p.gateSeen.push(bn.id); n.push(bn.name); bn.newAt=Date.now(); sendMail({from:'운영팀',title:`「${bn.name}」 배너가 열렸어요`,body:`${bn.desc||''}\n${T('gacha')} 화면에서 확인해 보세요.`,days:30}); } });
   if(n.length){ mark('prog'); setTimeout(()=>toast('📮 새로 열렸어요: '+n.join(', ')),1600); } }
 function curBanner(){const bs=G.banners.filter(bnOpen);return bs.find(b=>b.id===P().curBanner)||bs[0]||null;}
 function bannerPool(b){
@@ -70,7 +70,7 @@ function grantOwned(c,source){
   return {c,isNew,refund};
 }
 function openSpark(bid){
-  const b=G.banners.find(x=>x.id===bid)||curBanner(); if(!b) return; const p=P(), pts=(p.spark||{})[b.id]||0;
+  const b=G.banners.find(bn=>bn.id===bid)||curBanner(); if(!b) return; const p=P(), pts=(p.spark||{})[b.id]||0;
   const ups=(b.pickup||[]).map(charById).filter(Boolean), list=ups.length?ups:bannerPool(b).filter(c=>c.rarity===3);
   openModal(`${head('모집 포인트 교환',`<span class="muted">${esc(b.name)} · ${pts}/${SPARK}</span>`)}
     <p class="muted" style="margin:0 0 10px">이 배너에서 1회 뽑을 때마다 1포인트가 쌓여요. ${SPARK}포인트로 원하는 ${esc(T('crew'))}을(를) 바로 데려올 수 있어요. 이미 있으면 ${esc(T('limit'))} +1이 돼요.</p>
@@ -84,9 +84,9 @@ function openHistory(){
 async function pull(n){
   if(appStorage.failed||document.getElementById('save-warning')){storageWarning('저장을 먼저 복구해 주세요.');return;}
   if(!G.chars.length){toast(T('gacha')+'할 '+T('crew')+'이(가) 없어요.');return;}
-  const b=curBanner(); if(!b){toast('열린 배너가 없어요');return;} const cost=n*COST; if(P().gems<cost){toast(`${T('currency')}이(가) ${nf(cost-P().gems)}개 모자라요.`);return;}
+  const bn=curBanner(); if(!bn){toast('열린 배너가 없어요');return;} const cost=n*COST; if(P().gems<cost){toast(`${T('currency')}이(가) ${nf(cost-P().gems)}개 모자라요.`);return;}
   pay({gems:cost}); bump('pull',n); const res=[]; const ft=n===10&&P().firstTen; if(ft) P().firstTen=false;
-  for(let i=0;i<n;i++) res.push(rollOne(n===10&&i===9&&!res.some(x=>x.c.rarity>=2),ft&&i===9&&!res.some(x=>x.c.rarity===3),b));
+  for(let i=0;i<n;i++) res.push(rollOne(n===10&&i===9&&!res.some(x=>x.c.rarity>=2),ft&&i===9&&!res.some(x=>x.c.rarity===3),bn));
   mark('prog'); try{await flush();}catch(e){render();return;} render(); playGacha(res);
 }
 const playGacha=noSkin(playGacha0);
@@ -106,7 +106,7 @@ function playGacha0(res){
   const T=(ms,f)=>GC.timers.push(setTimeout(f,ms));
   sfx('계약진'); T(700,()=>{$('#gcStreak').classList.add('fall');sfx('낙하');});
   if(fake) T(1350,()=>{$('#gcStreak').style.setProperty('--sc',RCOL[3]);$('#gcSeal').classList.add('gold');try{navigator.vibrate&&navigator.vibrate(120);}catch(e){}});
-  T(1720,()=>{sfx('섬광');const f=$('#gcFlash');f.style.setProperty('--fc',top===3?'#fff3c4':RCOL[top]);f.classList.add('on');$('#gcSeal').classList.add('go');$('#gcStreak').style.opacity=0;});
+  T(1720,()=>{sfx('섬광');const el=$('#gcFlash');el.style.setProperty('--fc',top===3?'#fff3c4':RCOL[top]);el.classList.add('on');$('#gcSeal').classList.add('go');$('#gcStreak').style.opacity=0;});
   T(1950,()=>{$('#gcStage').hidden=false;$('.gc .skipb').hidden=true;if(res.length===1)T(600,()=>revealCard(0));});
 }
 const revealCard=noSkin(revealCard0);

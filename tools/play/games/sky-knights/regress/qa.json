@@ -220,7 +220,7 @@
   },
   {
    "name": "비비안",
-   "rarity": "SR",
+   "rarity": "R",
    "role": "sup",
    "elem": "증기",
    "faction": "검은 돛 공적단",
@@ -237,8 +237,8 @@
  "dist": {
   "rarity": {
    "SSR": 2,
-   "R": 1,
-   "SR": 3
+   "R": 2,
+   "SR": 2
   },
   "role": {
    "atk": 2,
@@ -474,11 +474,11 @@
   },
   {
    "n": "브람",
-   "dev": 0.017773620205799867
+   "dev": 0.04957904583723116
   },
   {
    "n": "넬",
-   "dev": 0.017346053772766767
+   "dev": 0.013876843018213458
   },
   {
    "n": "루시안",
@@ -490,7 +490,7 @@
   },
   {
    "n": "비비안",
-   "dev": 0.10576923076923084
+   "dev": 0.14436090225563913
   }
  ],
  "imgPerson": [],
@@ -540,9 +540,9 @@
    "운해 정찰 12h·4명 → {\"gold\":25400,\"exp\":51,\"wmat\":14,\"core\":3}"
   ],
   "groups": [
-   "지원({\"role\":\"sup\"})",
-   "공격({\"role\":\"atk\"})",
-   "방어({\"role\":\"def\"})"
+   "후방({\"role\":\"sup\"})",
+   "선봉({\"role\":\"atk\"})",
+   "수호({\"role\":\"def\"})"
   ],
   "start": 600,
   "buy": {
@@ -552,33 +552,33 @@
   "tables": [
    {
     "input": "최소 30×4",
-    "open": "지원 100%",
+    "open": "후방 100%",
     "rarity": "R 100 / SR 0 / SSR 0.0",
     "rows": ""
    },
    {
     "input": "균등 300×4",
-    "open": "지원 33% · 공격 33% · 방어 33%",
+    "open": "후방 33% · 선봉 33% · 수호 33%",
     "rarity": "R 79 / SR 21 / SSR 0.0",
     "rows": "브람 79.2%, 넬 20.8%"
    },
    {
     "input": "공격 쏠림 100/600/100/100",
-    "open": "지원 19% · 공격 62% · 방어 19%",
+    "open": "후방 19% · 선봉 62% · 수호 19%",
     "rarity": "R 81 / SR 19 / SSR 0.0",
     "rows": "브람 81.3%, 넬 18.7%"
    },
    {
     "input": "균등 500×4",
-    "open": "지원 33% · 공격 33% · 방어 33%",
+    "open": "후방 33% · 선봉 33% · 수호 33%",
     "rarity": "R 71 / SR 26 / SSR 3.0",
-    "rows": "브람 36.5%, 카시아 25.0%, 루시안 25.0%, 넬 13.5%"
+    "rows": "브람 68.7%, 넬 28.4%, 카시아 1.5%, 루시안 1.5%"
    },
    {
     "input": "최대 999×4",
-    "open": "지원 33% · 공격 33% · 방어 33%",
+    "open": "후방 33% · 선봉 33% · 수호 33%",
     "rarity": "R 50 / SR 40 / SSR 10.0",
-    "rows": "브람 27.8%, 카시아 25.0%, 루시안 25.0%, 넬 22.2%"
+    "rows": "넬 45.5%, 브람 45.5%, 카시아 4.5%, 루시안 4.5%"
    }
   ],
   "poolSize": 4,
@@ -689,46 +689,46 @@
     "name": "수영복",
     "prompt": "swimsuit, beach, summer, sunlight",
     "chance": 35,
-    "recipe": "400/100/100/400",
+    "recipe": "300/100/100/300",
     "cond": "{}",
     "eligible": [
      "브람",
      "넬",
      "루시안"
     ],
-    "affordable": 1
+    "affordable": 2
    },
    {
     "name": "교복",
     "prompt": "blazer, formal school-style uniform cosplay, adult",
     "chance": 35,
-    "recipe": "100/400/100/400",
+    "recipe": "100/300/100/300",
     "cond": "{}",
     "eligible": [
      "브람",
      "넬",
      "루시안"
     ],
-    "affordable": 1
+    "affordable": 2
    },
    {
     "name": "갑옷",
     "prompt": "fantasy plate armor, ornate armor, cape",
-    "chance": 30,
-    "recipe": "100/100/500/400",
+    "chance": 35,
+    "recipe": "100/100/300/300",
     "cond": "{}",
     "eligible": [
      "브람",
      "넬",
      "루시안"
     ],
-    "affordable": 1
+    "affordable": 2
    },
    {
     "name": "공연의상1",
     "prompt": "idol stage costume, frills, stage lights",
     "chance": 30,
-    "recipe": "300/300/100/500",
+    "recipe": "300/300/100/400",
     "cond": "{}",
     "eligible": [
      "브람",
@@ -741,7 +741,7 @@
     "name": "공연의상2",
     "prompt": "elegant evening gown, concert stage, spotlight",
     "chance": 30,
-    "recipe": "500/100/300/500",
+    "recipe": "300/100/300/400",
     "cond": "{}",
     "eligible": [
      "브람",
@@ -754,7 +754,7 @@
     "name": "공연의상3",
     "prompt": "rock band stage outfit, leather, electric guitar",
     "chance": 30,
-    "recipe": "100/500/300/500",
+    "recipe": "100/300/300/400",
     "cond": "{}",
     "eligible": [
      "브람",
@@ -777,8 +777,8 @@
   ]
  },
  "squadStats": [
-  "브람(R 수호) 체력3416 공격129 방어172",
-  "넬(SR 수호) 체력2978 공격113 방어163",
+  "브람(R 수호) 체력3500 공격129 방어188",
+  "넬(SR 수호) 체력2978 공격113 방어161",
   "루시안(SSR 선봉) 체력1664 공격234 방어81"
  ],
  "pageErrors": [],
@@ -790,10 +790,10 @@
   "commitAtCall": 4,
   "calls": 4,
   "mainSteps": [
-   "world:3670",
+   "world:4053",
    "chars:18291",
-   "opening:9229",
-   "chapter1:11716"
+   "opening:9228",
+   "chapter1:11715"
   ]
  }
 }

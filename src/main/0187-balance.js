@@ -43,8 +43,8 @@ async function balFix(kind){ const ids=[...document.querySelectorAll('[data-bal]
   for(const c of cs){ let ok=false; if(kind==='edge'||kind==='center') ok=balNormalize(c,kind); else if(kind==='remaster') ok=balRemaster(c); else if(kind==='skill'){ c.skillBalance=null; ok=true; } if(ok){ mark('c:'+c.id); n++; } }
   if(kind==='skill'||kind==='remaster'){ syBar('스킬 밸런스 검사 중…'); try{ await v2ReadyChars(cs.filter(c=>!c.skillBalance)); }catch(e){ quietErr(e,'0187-balance.js:44'); } syBar(''); }
   toast(`${label}: ${n}명 (되돌리기 가능)`); openBalance(); }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
   if(a==='balopen') openBalance();
   else if(a==='balsave'){ balSave(); toast('밸런스 설정을 저장했어요'); openBalance(); }
-  else if(a==='balfix') balFix(b.dataset.k);
+  else if(a==='balfix') balFix(el.dataset.k);
   else if(a==='balundo'){ auditUndo(); openBalance(); } });

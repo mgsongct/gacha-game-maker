@@ -8,7 +8,7 @@ function rebalanceChapter(ch,k){ (ch.stages||[]).forEach((s,i)=>{ const last=i==
 
 function effPower(ids,enemies){ const fb=factionBonus(ids), n=Math.max(1,enemies.length);
   return ids.map(charById).filter(Boolean).reduce((a,c)=>{ const m=matchup(c,enemies); return a+Math.round(charPower(c)*(1+(fb[c.faction]||0)/100)*(1+0.25*(m.good-m.bad)/n)); },0); }
-function matchup(c,enemies){let good=0,bad=0;enemies.forEach(e=>{if(BEATS[c.elem]===e.elem)good++;else if(BEATS[e.elem]===c.elem)bad++;});return {good,bad};}
+function matchup(c,enemies){let good=0,bad=0;enemies.forEach(en=>{if(BEATS[c.elem]===en.elem)good++;else if(BEATS[en.elem]===c.elem)bad++;});return {good,bad};}
 let FORM=null;
 async function openFormation(stage,ctx,startAct){
   try{await v2PrepareStage(stage,ctx);}catch(e){toast(e.message);return;}
@@ -28,13 +28,13 @@ async function openFormation(stage,ctx,startAct){
     <div class="fenemy">${en.map(e=>`<div class="fe ${e.boss?'boss':''}" style="--ec:${ECOL[e.elem]}"><div class="fe-art">${enemyArt(e)}</div><span class="el" style="--ec:${ECOL[e.elem]}">${esc(e.elem)}</span><b>${esc(e.name)}</b><span>${e.boss?'BOSS · ':''}${nf(e.hp)}</span></div>`).join('')}</div>
     ${stage.enemies.length&&!stage.story?rulesHTML(stage):''}
     ${en.filter(e=>e.boss).map(e=>`<p class="boss-pat"><b>보스 패턴</b> ${esc(e.name)}: ${esc(bossPatText(e,FORM.ctx.kind==='raid'))}</p>`).join('')}
-    <p class="muted" style="margin:6px 0 0">적 속성: ${Object.entries(elemCount).map(([k,v])=>`${esc(k)}×${v}`).join(' ')} → ${Object.keys(elemCount).map(k=>{const w=ELEMS.find(x=>BEATS[x]===k);return w?`<b style="color:${ECOL[w]}">${esc(w)}</b> 유리`:'';}).filter(Boolean).join(', ')}</p>
+    <p class="muted" style="margin:6px 0 0">적 속성: ${Object.entries(elemCount).map(([k,v])=>`${esc(k)}×${v}`).join(' ')} → ${Object.keys(elemCount).map(k=>{const w=ELEMS.find(elem=>BEATS[elem]===k);return w?`<b style="color:${ECOL[w]}">${esc(w)}</b> 유리`:'';}).filter(Boolean).join(', ')}</p>
     <div class="fpower"><div><i>편성 능력치 <small style="opacity:.7">상성 반영</small></i><b class="${ratio>=1?'ok':ratio>=0.8?'warn':'bad'}">${nf(tp)}</b>${tp!==tp0?`<small class="muted" style="display:block;font-size:.7rem">기본 ${nf(tp0)}</small>`:''}</div><div><i>적 능력치 (참고)</i><b>${nf(need)}</b></div><div class="fbar"><span style="width:${Math.min(100,ratio*100)}%" class="${ratio>=1?'ok':ratio>=0.8?'warn':'bad'}"></span></div></div>
     <div class="frow"><i>전열</i><i>후열</i></div><div class="fslots">${[0,1,2,3].map(slot).join('')}</div>
     <p class="muted" style="margin:4px 0 0">${formOn()?esc(formHelp()):'전열은 적의 공격을 두 배로 더 받아요. 방어형은 어디에 있든 공격을 끌어요.'}</p>
     ${Object.keys(fb).length?`<p class="fbonus">${Object.entries(fb).map(([f,v])=>`${esc(f)} 소속 보너스 공격 +${v}%`).join(' · ')}</p>`:`<p class="muted" style="margin:6px 0 0">같은 소속 2명 이상이면 공격 보너스 (2명 5%, 3명 10%, 4명 15%)</p>`}
     <div class="row" style="margin-top:8px"><button class="btn sm" data-act="fauto">자동 편성</button><button class="btn sm ghost" data-act="fclear">비우기</button>${[0,1,2].map(i=>{const pr=(P().presets||[])[i];return `<button class="btn sm ghost" data-act="fpre" data-i="${i}">${pr&&pr.length?'편성 '+(i+1):'빈 '+(i+1)}</button>`;}).join('')}<button class="btn sm ghost" data-act="fsave">현재 편성 저장</button></div>
-    <div class="ftools"><div class="chips">${[['all','전체'],...ELEMS.map(e=>[e,e]),...Object.entries(ROLE)].map(([v,l])=>`<button class="chip ${FORM.filter===v?'on':''}" data-act="ffil" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div>
+    <div class="ftools"><div class="chips">${[['all','전체'],...ELEMS.map(elem=>[elem,elem]),...Object.entries(ROLE)].map(([v,l])=>`<button class="chip ${FORM.filter===v?'on':''}" data-act="ffil" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div>
       <select class="in" id="fsort" style="max-width:120px">${opt([['power','전투력순'],['lv','레벨순'],['match','상성순']],FORM.sort)}</select></div>
     <div class="froster">${list.map(c=>{const on=squadSel.includes(c.id),b=busy.has(c.id),m=matchup(c,en);return `<button class="fr r${c.rarity} ${on?'on':''} ${b?'busy':''}" data-act="fpick" data-id="${c.id}" ${b?'disabled':''} style="--ec:${ECOL[c.elem]}"><div class="fr-art">${art(c)}</div><span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${b?'<em class="busy">파견</em>':m.good>m.bad?'<em class="adv">유리</em>':m.bad>m.good?'<em class="dis">불리</em>':''}${on?`<em class="num">${squadSel.indexOf(c.id)+1}</em>`:''}<b>${esc(c.name)}</b><span>Lv.${own(c.id).lv} · ${nf(charPower(c))}</span></button>`;}).join('')||'<p class="muted">보유한 '+T('crew')+'이(가) 없어요.</p>'}</div>
     <div class="row" style="margin-top:14px"><button class="btn block" data-act="${startAct}" ${FORM.ctx.extra||''} ${squadSel.length?'':'disabled'}>출격 (${squadSel.length}/4)</button></div>
@@ -65,7 +65,7 @@ function openChEdit(){
     ${ch.stages.map((s,j)=>`<div class="stage-edit">
       <div class="g2"><div><label class="f">스테이지 ${j+1} 제목</label><input class="in" id="st_t_${j}" value="${esc(s.title)}"></div><div><label class="f">보상 성석</label><input class="in" type="number" id="st_r_${j}" value="${s.reward}"></div></div>
       <label class="f" style="margin-top:6px"><input type="checkbox" id="st_s_${j}" ${s.story?'checked':''}> 전투 없음 (이야기만 보는 스테이지 · 전투 전 대본만 써요)</label>
-      <label class="f">적 (한 줄에 하나: 이름, 속성, 체력, 공격, 방어, 속도, 보스면 끝에 보스)</label><textarea class="in" id="st_e_${j}">${esc(s.enemies.map(e=>[e.name,e.elem,e.hp,e.atk,e.def,e.spd].join(', ')+(e.boss?', 보스':'')).join('\n'))}</textarea>
+      <label class="f">적 (한 줄에 하나: 이름, 속성, 체력, 공격, 방어, 속도, 보스면 끝에 보스)</label><textarea class="in" id="st_e_${j}">${esc(s.enemies.map(en=>[en.name,en.elem,en.hp,en.atk,en.def,en.spd].join(', ')+(en.boss?', 보스':'')).join('\n'))}</textarea>
       <label class="f">전투 전 대본</label><textarea class="in tall" id="st_pre_${j}">${esc(s.pre||'')}</textarea><button class="btn sm ghost scimg-b" data-act="scimg" data-ta="st_pre_${j}">🖼 이미지 넣기</button>
       <label class="f">전투 후 대본</label><textarea class="in" id="st_post_${j}" style="min-height:160px">${esc(s.post||'')}</textarea><button class="btn sm ghost scimg-b" data-act="scimg" data-ta="st_post_${j}">🖼 이미지 넣기</button>
       <div class="row" style="margin-top:8px">${SAMPLE?`<button class="btn sm ghost" data-act="stdetail" data-j="${j}">✦ AI로 디테일 보강</button>`:''}<button class="btn sm ghost" data-act="delstage" data-j="${j}">이 스테이지 삭제</button></div></div>`).join('')}
@@ -163,7 +163,7 @@ function openLibItem(id,kind){
     <div class="row" style="margin-top:16px"><button class="btn" data-act="savelib" data-id="${l.id}" data-k="${kind}">저장</button>${id?`<button class="btn ghost" data-act="naigen" data-k="lib" data-id="${l.id}">NAI로 그리기</button><button class="btn ghost" data-act="upload" data-k="lib" data-id="${l.id}">이미지 올리기</button>${(kind==='enemy'||kind==='prop'||kind==='icon')&&imgSrc(l)?`<button class="btn ghost" data-act="cutopen" data-k="lib" data-id="${l.id}">배경 지우기</button>`:''}${l.img?XBTN('lib',l.id):''}<button class="btn ghost" data-act="dellib" data-id="${l.id}">삭제</button>`:''}</div>`);
 }
 function openBanner(id){
-  const b=BD=id?clone(G.banners.find(x=>x.id===id)):{id:'',name:'새 배너',type:'pickup',desc:'',pool:{mode:'all',factions:[],ids:[]},pickup:[],rate:50,active:true,bg:''};
+  const b=BD=id?clone(G.banners.find(bn=>bn.id===id)):{id:'',name:'새 배너',type:'pickup',desc:'',pool:{mode:'all',factions:[],ids:[]},pickup:[],rate:50,active:true,bg:''};
   const facs=[...new Set(G.chars.map(c=>c.faction).filter(Boolean))];
   openModal(`${head(id?'배너 편집':'배너 만들기')}
     <label class="f" for="bn_name">이름</label><input class="in" id="bn_name" value="${esc(b.name)}">
@@ -179,7 +179,7 @@ function openBanner(id){
     <div class="row" style="margin-top:16px"><button class="btn" data-act="bnsave">저장</button>${id&&id!=='std'?'<button class="btn ghost" data-act="bndel">삭제</button>':''}</div>`);
 }
 let BD=null;
-function openBannerFrom(b){ const real=G.banners; const bak=BD; BD=b; const orig=G.banners.find(x=>x.id===b.id); const saved=JSON.stringify(b);
+function openBannerFrom(b){ const real=G.banners; const bak=BD; BD=b; const orig=G.banners.find(bn=>bn.id===b.id); const saved=JSON.stringify(b);
   // render from draft
   const facs=[...new Set(G.chars.map(c=>c.faction).filter(Boolean))];
   openModal(`${head(b.id?'배너 편집':'배너 만들기')}

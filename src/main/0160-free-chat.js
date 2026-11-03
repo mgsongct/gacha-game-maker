@@ -38,7 +38,7 @@ async function fcSend(opt){
   if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; }
   const f=fcOf(cid), token=PH.token, alive=()=>PH&&PH.token===token&&$('#phChat'); inp.value=''; inp.style.height=''; [0,60,200].forEach(ms=>setTimeout(()=>{ const v=inp.value.trim(); if(v&&text.endsWith(v)&&v.length<=Math.max(2,text.length)) inp.value=''; },ms));
   if(PH.tid){ const th=threadById(PH.tid), s0=th&&P().inbox[PH.tid]; if(th&&s0&&!s0.done){ s0.done=true; s0.freed=true; s0.pos=parseScript(th.script).length; s0.at=Date.now(); if(own(c.id)) addAff(c,10); updateBadge(); } PH.tid=null; const pi=$('#phIn'); if(pi) pi.innerHTML=''; phMode('free'); const sw=$('.ph-sw'); if(sw) sw.hidden=true; }
-  const me={w:'me',t:text,at:Date.now()}; if(opt.img) me.img=opt.img; f.log.push(me); f.at=me.at; if(alive()){ const ch=$('#phChat'); if(ch.children.length===1&&ch.querySelector('.sys')&&roomLog(cid).length===1) ch.innerHTML=''; ch.insertAdjacentHTML('beforeend',bubbleHTML(me,c)); phScroll(); } mark('prog');
+  const me={w:'me',t:text,at:Date.now()}; if(opt.img) me.img=opt.img; f.log.push(me); f.at=me.at; if(alive()){ const el=$('#phChat'); if(el.children.length===1&&el.querySelector('.sys')&&roomLog(cid).length===1) el.innerHTML=''; el.insertAdjacentHTML('beforeend',bubbleHTML(me,c)); phScroll(); } mark('prog');
   FCBUSY=true; const ty=document.createElement('div'); ty.className='msg'; ty.innerHTML=`<div class="av sm">${art(c)}</div><div class="bub typing"><i></i><i></i><i></i></div>`; if(alive()){ $('#phChat').appendChild(ty); phScroll(); }
   try{
     const o=own(c.id), lv=affLv(o), files=(c.files||[]).filter(x=>o&&o.dup>=(x.dup||0)).map(x=>x.text).filter(Boolean);
@@ -53,7 +53,7 @@ ${c.name}: 소속 ${c.faction||'무소속'}, ${ROLE[c.role]||''}. 프로필: ${c
 호감도 Lv.${lv} (1~10). 호감도에 맞는 거리감으로 대한다(낮으면 조금 서먹하게, 높으면 편하고 다정하게).
 ${files.length?'이 캐릭터가 이미 털어놓은 비밀: '+files.join(' / '):''}
 플레이어가 지금까지 겪은 이야기: ${fcProgress()}
-${(()=>{ const m=G.chapters.filter(x=>x.kind==='main'&&x.summary).slice(-2); return m.length?'최근 메인 스토리 요약: '+m.map(x=>x.title+' — '+x.summary).join(' / '):''; })()}${relCtx(recent+'\n'+text,[baseChar(c).id,REL_ME],30)}
+${(()=>{ const m=G.chapters.filter(ch=>ch.kind==='main'&&ch.summary).slice(-2); return m.length?'최근 메인 스토리 요약: '+m.map(x=>x.title+' — '+x.summary).join(' / '):''; })()}${relCtx(recent+'\n'+text,[baseChar(c).id,REL_ME],30)}
 ${f.sum?'예전 대화 요약: '+f.sum:''}
 최근 대화:
 ${recent}
@@ -88,9 +88,9 @@ JSON만 출력: {"summary":"요약"}`,null,'quick'); if(r&&r.summary){ f.sum=Str
 document.addEventListener('keydown',e=>{ if(e.target&&e.target.id==='fcIn'&&e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); if(e.isComposing||e.keyCode===229) return; fcSend(); } });
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='fcIn'){ const t=e.target; t.style.height='auto'; t.style.height=Math.min(120,t.scrollHeight)+'px'; } });
 // 휴대폰 키보드·주소창 때문에 입력칸이 가려지지 않게, 보이는 화면 높이에 맞춰요
-(function(){ const vv=window.visualViewport; if(!vv) return; const fit=()=>{ const ph=document.getElementById('phone'); if(!ph||ph.hidden) return; ph.style.top=vv.offsetTop+'px'; ph.style.height=vv.height+'px'; ph.style.bottom='auto'; const c=document.getElementById('phChat'); if(c&&document.activeElement&&document.activeElement.id==='fcIn') c.scrollTop=c.scrollHeight; };
+(function(){ const vv=window.visualViewport; if(!vv) return; const fit=()=>{ const ph=document.getElementById('phone'); if(!ph||ph.hidden) return; ph.style.top=vv.offsetTop+'px'; ph.style.height=vv.height+'px'; ph.style.bottom='auto'; const el=document.getElementById('phChat'); if(el&&document.activeElement&&document.activeElement.id==='fcIn') el.scrollTop=el.scrollHeight; };
   vv.addEventListener('resize',fit); vv.addEventListener('scroll',fit); new MutationObserver(fit).observe(document.getElementById('phone'),{attributes:true,attributeFilter:['hidden']}); })();
-function phScroll(){const ch=$('#phChat'); if(ch){ ch.scrollTop=ch.scrollHeight; if(ch.querySelector('[data-chatimg]')) hydrateChatImgs(); }}
+function phScroll(){const el=$('#phChat'); if(el){ el.scrollTop=el.scrollHeight; if(el.querySelector('[data-chatimg]')) hydrateChatImgs(); }}
 async function phPlay(t,c,s,token){
   const lines=parseScript(t.script);
   const alive=()=>PH&&PH.token===token&&$('#phChat');

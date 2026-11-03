@@ -111,11 +111,12 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   const u2 = await loadUnits(r2), H2 = htmlInject(u2, buildGraph(u2).fns); assert.ok(!H2.out.length && !H2.taint.length, 'HTML 안전한 T()는 통과'); rmSync(r2, { recursive: true, force: true }); }
 // 이름 규칙: 컬렉션 콜백·찾기 결과로 종류를 알아내고, 다른 종류에도 쓰이는 이름을 규칙 이름으로 안전하게 바꿈(한글 앞 글자·단축 속성·안쪽 재선언·충돌 건너뜀)
 { const r4 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r4, 'src/main'), { recursive: true });
-  const src = "let G={};\nfunction fa(){ const 이름='가나다'; return G.chapters.map(c => ({ c, t: c.title, n: (() => { const c = 1; return c; })() })).concat(G.chars.map(c => c.name)); }\nfunction fb(){ return G.chapters.map(c => { const ch = 1; return c.x + ch; }); }\nfunction fc(){ const c = G.chars.find(x => x.id === 1), k = $('#a').value; return [c, k, G.lib.map(x => x.kind)]; }\n";
+  const src = "let G={};\nfunction fa(){ const 이름='가나다'; return G.chapters.map(c => ({ c, t: c.title, n: (() => { const c = 1; return c; })() })).concat(G.chars.map(c => c.name)); }\nfunction fb(){ return G.chapters.map(c => { const ch = 1; return c.x + ch; }); }\nfunction fc(){ const c = G.chars.find(x => x.id === 1), k = $('#a').value; return [c, k, G.lib.map(x => x.kind)]; }\nasync function fd(){ try { await f1(); } catch (e) { try { await f2(); } catch (e2) { throw e2; } } }\nfunction fe(){ return G.chars.map(e2 => e2.id); }\n";
   writeFileSync(join(r4, 'src/main/010-n.js'), src); const u4 = await loadUnits(r4), B4 = bindings(u4), V4 = violations(B4, { 캐릭터: 'c', 장: 'ch' });
   assert.ok(!B4.some(b => b.name === 'k'), "$('#a').value는 DOM 요소가 아님(호출 결과의 멤버)");
   const V4x = violations(B4, { 캐릭터: 'c', 장: 'ch', 요소: 'el', 자료: 'l' }).filter(v => v.name === 'x' && v.kind === '캐릭터'); assert.ok(V4x.length === 1 && /가림/.test(renameEdits(V4x[0]).why || ''), '바깥 const c를 가리는 바꾸기는 건너뜀');
-  assert.equal(V4.length, 3, '장에 쓴 c 두 곳 + 캐릭터·자료에 쓴 x: ' + JSON.stringify(V4.map(v => v.loc)));
+  const V4e = violations(B4, { 오류: 'e', 캐릭터: 'c' }).filter(v => v.name === 'e2' && v.kind === '오류'); assert.ok(V4e.length === 1 && /가림/.test(renameEdits(V4e[0]).why || ''), '바깥 catch(e)를 가리는 catch(e2)→e 바꾸기는 건너뜀');
+  assert.equal(V4.length, 4, '장에 쓴 c 두 곳 + 캐릭터·자료에 쓴 x + 캐릭터·오류에 쓴 e2: ' + JSON.stringify(V4.map(v => v.loc)));
   const R4 = V4.map(renameEdits); assert.ok(R4[0].ok && !R4[1].ok && /이미 있음/.test(R4[1].why), '두 번째는 범위 안 ch와 충돌해 건너뜀');
   let t4 = u4[0].text; R4[0].edits.sort((a, b) => b.start - a.start).forEach(e => { t4 = t4.slice(0, e.start) + e.text + t4.slice(e.end); });
   assert.ok(t4.includes("G.chapters.map(ch => ({ c: ch, t: ch.title, n: (() => { const c = 1; return c; })() })).concat(G.chars.map(c => c.name))"), '바꾼 결과: ' + t4.split('\n')[1]);
