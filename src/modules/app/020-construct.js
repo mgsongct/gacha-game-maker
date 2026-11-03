@@ -86,14 +86,13 @@ function variantPrompt(ch,tpl){
  return [...look,...tags(tpl.prompt),...extra,'full body','standing','simple background','white background'].filter((t,i,a)=>a.indexOf(t)===i).join(', ');}
 function designBrief(ch,tpl){const color=symbolColor(ch),item=symbolItem(ch);
  return `의상 기본형 「${tpl.name}」(${tpl.prompt||tpl.name}). ${ch.name}의 외모 특징은 그대로 두고, 상징 컬러${color?`(${color})`:''}와 상징 아이템${item?`(${item})`:''}·성격을 의상 디자인에 녹인다. naiPrompt에는 원래 외모 태그 + 이 의상의 영어 태그를 자세히 쓴다.${tpl.brief?' 추가 지시: '+tpl.brief:''}`;}
-/* 기본 레시피: 4번째 자원이 열쇠(300~400 — 시작 자원 600으로 두 번은 시도), 앞 3종 중 강조하는 자원이 서로 달라 겹치지 않게 */
 const VARIANT_DEFAULTS=[
- {id:'v_swim',name:'수영복',prompt:'swimsuit, beach, summer, sunlight',chance:35,recipe:{min:[300,100,100,300]}},
- {id:'v_school',name:'교복',prompt:'blazer, formal school-style uniform cosplay, adult',chance:35,recipe:{min:[100,300,100,300]}},
- {id:'v_armor',name:'갑옷',prompt:'fantasy plate armor, ornate armor, cape',chance:35,recipe:{min:[100,100,300,300]}},
- {id:'v_stage1',name:'공연의상1',prompt:'idol stage costume, frills, stage lights',chance:30,recipe:{min:[300,300,100,400]}},
- {id:'v_stage2',name:'공연의상2',prompt:'elegant evening gown, concert stage, spotlight',chance:30,recipe:{min:[300,100,300,400]}},
- {id:'v_stage3',name:'공연의상3',prompt:'rock band stage outfit, leather, electric guitar',chance:30,recipe:{min:[100,300,300,400]}}].map(v=>Object.assign({on:true,rarity:'same',brief:'',cond:{}},v));
+ {id:'v_swim',name:'수영복',prompt:'swimsuit, beach, summer, sunlight',chance:35,recipe:{min:[400,100,100,400]}},
+ {id:'v_school',name:'교복',prompt:'blazer, formal school-style uniform cosplay, adult',chance:35,recipe:{min:[100,400,100,400]}},
+ {id:'v_armor',name:'갑옷',prompt:'fantasy plate armor, ornate armor, cape',chance:30,recipe:{min:[100,100,500,400]}},
+ {id:'v_stage1',name:'공연의상1',prompt:'idol stage costume, frills, stage lights',chance:30,recipe:{min:[300,300,100,500]}},
+ {id:'v_stage2',name:'공연의상2',prompt:'elegant evening gown, concert stage, spotlight',chance:30,recipe:{min:[500,100,300,500]}},
+ {id:'v_stage3',name:'공연의상3',prompt:'rock band stage outfit, leather, electric guitar',chance:30,recipe:{min:[100,500,300,500]}}].map(v=>Object.assign({on:true,rarity:'same',brief:'',cond:{}},v));
 const api={RES,DEFAULTS,VARIANT_DEFAULTS,config,normalize,matches,rates,table,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
 root.GGMConstruct=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
