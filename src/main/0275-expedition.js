@@ -2,6 +2,14 @@
 /* 엔진: modules/app/030-expedition.js (GGMExpedition). 설정: G.meta.expedition(바꾼 값만) · 진행: P().exped
    combat 모드는 기존 파견(dispHTML·dispOffer) 그대로. 나머지 모드는 이 파일의 화면을 써요. 문서: docs/research/expedition.md */
 const EX_MODE_LABEL={combat:['전투형 원정','지역에 보내 자원을 가져와요 (칸코레·소녀전선류)'],idol:['방송 출연','방송국·스폰서 일정에 나가 보수와 인지도를 얻어요 (아이돌 육성류)'],streamer:['콘텐츠 방송','플랫폼을 골라 영상·라이브·숏폼을 올려 수익과 구독자를 모아요 (스트리머·버튜버류)'],business:['경영','파트에 배치해 일하게 하고, 전체 실적과 평판으로 수익이 나와요 (상점·기업 경영류)']};
+// 세계관 단계(새 게임)가 정하는 파견 방식의 이름: 수치(시간·보수·인지도·파트 능력)는 엔진 기본값 그대로, 이름만 세계관에 맞게
+// (예전엔 방식만 정해져 아이돌 일·방송 매체·경영 파트·인기 수치 이름이 늘 공통 기본값 — 경영은 늘 식당)
+const EXPEDITION_NAME_RULE_BASE='expeditionNames는 고른 파견 방식의 이름을 세계관에 맞게 짓는다(combat이면 비워 둔다). fame은 인기 수치 이름(idol의 인지도, streamer의 구독자, business의 평판에 해당). jobs는 idol이면 7개(작은 일→큰 무대 순으로 지역 방송·팬 사인회·광고 촬영·음악 방송·예능 고정·드라마 출연·단독 콘서트에 해당하는 일), streamer면 3개(긴 영상·생방송·짧은 영상에 해당하는 매체), business면 4개(손님 응대·만들기·홍보·관리에 해당하는 파트 — 세계관의 가게·사업 종류에 맞게, 식당을 전제하지 않는다). 각 2~10자.';
+pfDef('EXPEDITION_NAME_RULE','파견 방식 이름',()=>EXPEDITION_NAME_RULE_BASE);
+const EX_NAME_SLOT={idol:['places','fameName'],streamer:['platforms','fameName'],business:['parts','repName']}; // 방식 → [이름을 바꿀 목록, 인기 수치 이름 키]
+function exNamesApply(mode,n){ const k=EX_NAME_SLOT[mode]; if(!k||!n||typeof n!=='object') return null; const D=GGMExpedition.DEFAULTS[mode], J=(Array.isArray(n.jobs)?n.jobs:[]).map(x=>String(x||'').trim().slice(0,16)), fame=String(n.fame||'').trim().slice(0,10);
+  if(!fame&&!J.some(Boolean)) return null; return {[k[1]]:fame||D[k[1]],[k[0]]:D[k[0]].map((x,i)=>Object.assign({},x,J[i]?{name:J[i]}:{}))}; }
+function exFromWorld(a){ if(!GGMExpedition.MODES.includes(a.expedition)) return null; const ex={mode:a.expedition}, ov=exNamesApply(a.expedition,a.expeditionNames); if(ov) ex[a.expedition]=ov; return ex; }
 function exMeta(){ if(!G.meta.expedition||typeof G.meta.expedition!=='object') G.meta.expedition={mode:'combat'}; return G.meta.expedition; }
 function EXC(){ return GGMExpedition.config(exMeta()); }
 function exMode(){ return (G.meta.expedition&&G.meta.expedition.mode)||'combat'; }
