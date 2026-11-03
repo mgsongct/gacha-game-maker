@@ -46,7 +46,7 @@ export function entityProps(node) { const bind = new Map(), key = (scope, name) 
 export function allProps(units) { const s = new Set(); for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'member_expression') { const p = n.childForFieldName('property'); if (p) s.add(p.text); } else if (n.type === 'pair') { const k = n.childForFieldName('key'); if (k) s.add(k.text.replace(/^['"]|['"]$/g, '')); } }); return s; }
 
 // 생성 루트에서 부르는 함수들(동기·비동기 호출, 깊이 제한, 화면·저장·AI 통신 같은 기반 함수는 뺌)
-const INFRA = /^(render|toast|mark|flush|stat|wait|aiJSON|aiCall|aiOne|aiLog|llmWrap|http|claudeMsg|esc|T|clone|uid|nf|num|openModal|closeModal|closeOv|applyMeta|fix|defaults|ctx|\$|\$\$|rand|pick|sub|jo|quietErr|appStorage|commitRecords|imgSrc|art|head|pageHead)$/;
+export const INFRA = /^(render|toast|mark|flush|stat|wait|aiJSON|aiCall|aiOne|aiLog|llmWrap|http|claudeMsg|esc|T|clone|uid|nf|num|openModal|closeModal|closeOv|applyMeta|fix|defaults|ctx|\$|\$\$|rand|pick|sub|jo|quietErr|appStorage|commitRecords|imgSrc|art|head|pageHead)$/;
 export function closure(fns, roots, depth = 3) { const seen = new Map(); let q = roots.filter(r => fns.has(r)).map(r => [r, 0]);
   while (q.length) { const [k, d] = q.shift(); if (seen.has(k)) continue; seen.set(k, d); if (d >= depth) continue; for (const c of fns.get(k).calls.keys()) { const f = fns.get(c); if (f && f.top && !INFRA.test(f.name) && !seen.has(c)) q.push([c, d + 1]); } }
   return seen; }

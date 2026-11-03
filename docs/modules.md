@@ -18,6 +18,7 @@
 | 기능 영역(이 문서 절마다 적은 파일): 영역 함수가 영역 밖에·영역 상태를 밖에서 씀 | `tools/modules.mjs` | 보고 |
 | 포크 기능이 생성기 ↔ 기능 ↔ 생성물로 이어짐 | `tools/wiring.mjs --strict` | 늘면 실패 |
 | 상황별 실제 프롬프트 조합에 깨짐·과잉·과소 없음, 코드를 옮겨도 보낸 프롬프트(글·그림)가 같음 | `node tools/play/combos.mjs [--ref <git>]` | 보고 · --ref는 다르면 실패 |
+| 연관 맵이 지금 코드와 맞음(모듈 → 빌드 → index.html 생성기·실행기·편집기 → data 게임 파일, `docs/map.md`) | `node tools/map.mjs --check` | 낡으면 실패 |
 | 지금 빌드로 생성한 게임을 플레이할 때 기능이 이어짐(가챠·장 진행·세력·관계·파견·원정·건조) | `node tools/play/link.mjs` | 실패 있으면 실패 |
 | 예전 빌드로 만든·빠진 데 있는 게임을 지금 앱이 감지·보완(불러오기 이전·점검 규칙·자동 채움·기본값) | `node tools/wiring.mjs`(정적 표 — 경로 없음이 늘면 실패) · `node tools/play/upgrade.mjs`(동적 — 놓침이 있으면 실패) | 늘면 실패 · 보고 |
 
@@ -187,7 +188,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - 엔진 `GGMConstruct`(`src/modules/app/020-construct.js`, 순수): `rates`(분류 개방·비중, 희귀도 캡) → `table`(캐릭터별 확률) → `roll`. `suggest`(나올 대원이 없는 투입이면 나올 수 있는 가장 적은 투입과 그 까닭 — 첫 건조 빈손 방지). `condMatch`(바리에이션 적용 조건), `variantPrompt`/`designBrief`(디자인 프롬프트), `variantsFrom`(새 게임이 만든 바리에이션 기본형 정리)
 - 생성기 연결 `src/main/0505-construct.js`: 세계관 단계 스키마 `CON_TERMS_SCHEMA`·`VARIANT_SCHEMA`, `variantsFromAI`(엔진 정리 + id)
 - 화면·상태 `src/main/0505-construct.js`: `constructHTML`(탭 `construct`, 계약 화면 위 진입 — 처음 기본 투입 `conDefaultInput`, 빈 투입 안내 `conEmptyWhy`), `conBuild`(빈 투입이면 맞춘 투입으로, 자원이 모자라면 캐시 상점 ₩0 보충 `cashTopUp`), `conBuy`, `conDispReward`(파견 보상에 자원), `conMakeVariant`(AI `aiAltChar` 또는 규칙), 설정 `openConSet`
-- 이격 상속 `src/main/0065-inherit.js`: `mark()`에서 `inheritOnMark`, `fix()`에서 `inheritAll`, `flush()`에서 `inheritStore`
+- 이격 상속 `src/main/0065-inherit.js`: 이격 data는 `c.alt`(원본 id)·`c.over`(원본과 다른 항목만)·`c.cvar`(바리에이션 기본형 id), `mark()`에서 `inheritOnMark`, `fix()`에서 `inheritAll`, `flush()`에서 `inheritStore`
 - 설계·수치: [research/construction.md](research/construction.md), [research/variants.md](research/variants.md)
 
 ## 8-2. 원정 모드
