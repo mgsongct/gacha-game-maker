@@ -715,6 +715,7 @@ try {
     const main = G.chapters.filter(ch => ch.kind === 'main'); P().cleared = {}; o.now1 = mainNow() === 1; P().cleared[main[0].stages[0].id] = true; o.nowPartial = mainNow() === 1; main[0].stages.forEach(s => { P().cleared[s.id] = true; }); o.nowNext = mainNow() === 2; P().cleared = {};
     const lockAll = G.chars.map(c => [c, c.debutLater]); G.chars.forEach((c, i) => { if (i) c.debutLater = true; }); const pool = bannerPool({ id: 'x', pool: { mode: 'list', ids: [] }, pickup: [] }); o.poolOpen = pool.every(c => castOk(c)); lockAll.forEach(([c, v]) => { c.debutLater = v; });
     let done = false; playStory('t', '세라: 하나\n세라: 둘\n[분기: b1]\n선택: 가 | 나\n세라: 끝', () => { done = true; }); vnSkip(); o.skipStops = !!(S && S.choice) && !done; document.querySelector('#vnCh [data-n="2"]').click(); o.flag = (P().flags || {}).b1 && P().flags.b1.n === 2; vnSkip(); o.ends = !S && done;
+    { const c = G.chars.find(x => !own(x.id) && !x.monster) || G.chars[0], d0 = c.debut, l0 = c.debutLater; delete c.debut; c.debutLater = true; o.laterCtx = /새 장을 쓸 때 이야기 흐름에 맞으면 첫 만남/.test(ctx()) && ctx().includes(c.name); c.debut = d0; if (l0) c.debutLater = l0; else delete c.debutLater; } // 나중 등장 대원은 새 장에서 첫 등장시키라고 안내
     G.meta.elems = [{ n: '불' }, { n: '물' }, { n: '풀' }, { n: '빛' }]; G.meta.rules = { beats: { 불: '풀', 물: '불', 풀: '물', 빛: '불' } }; applyMeta(); o.elemLine = /빛은 불에 강함/.test(elemLine()) && !/undefined/.test(elemLine());
     return o; });
   assert.ok(Object.values(r30).every(v => v === true), JSON.stringify(r30)); assert.deepEqual(err30, [], '페이지 오류');
