@@ -18,7 +18,7 @@ function startBattle(chId,stId){
 }
 async function startStage(s,ctx){
   const busy=busyIds();
-  const squad=(ctx.squad||P().squad).map(charById).filter(c=>c&&(ctx.kind==='practice'||own(c.id))&&(ctx.kind==='practice'||ctx.squad||!busy.has(c.id))).slice(0,4);
+  const squad=(ctx.squad||P().squad).map(charById).filter(c=>c&&(!ctx.allow||ctx.allow(c))&&(ctx.kind==='practice'||own(c.id))&&(ctx.kind==='practice'||ctx.squad||!busy.has(c.id))).slice(0,4);
   if(!squad.length){toast('편성할 수 있는 '+T('crew')+'이(가) 없어요. 파견 중인지 확인해 주세요.');return;}
   if(window.__v2Starting) return; window.__v2Starting=true;
   try{ if(ctx.kind==='practice')squad.forEach(v2Ensure);else await v2ReadyChars(squad);
@@ -29,12 +29,13 @@ async function startStage(s,ctx){
   const allies=squad.map(c=>{const st=stats(c),o=own(c.id)||{wlv:0};v2EnsureEquipment(c);return {side:'a',slot:squad.indexOf(c),c,name:c.name,elem:c.elem,role:c.role,maxhp:st.hp,hp:st.hp,atk:Math.round(st.atk*(1+(fbon[c.faction]||0)/100)),def:st.def,spd:st.spd,g:Math.random()*600,sh:0,mul:1,skillTraining:GGMCombat.trainingState(o.skillTraining),wlv:o.wlv||0};});
   const enemies=s.enemies.map(e=>({side:'e',name:e.name,elem:e.elem,role:e.role,boss:e.boss,maxhp:e.hp,hp:e.hp,baseHp:e.hp,atk:e.atk,def:e.def,spd:e.spd,g:Math.random()*400,turns:0,sh:0,mul:1,pattern:e.pattern,skills:e.skills}));
   if(ctx.prep) ctx.prep(allies,enemies);
+  fieldApply(s,allies,enemies); // 전장 규칙(0485)
   B={ch:ctx.ch||null,ctx,s,allies,enemies,auto:true,speed:[1,2,3].includes(P().settings.bspeed)?P().settings.bspeed:1,timer:null,over:false,log:[],ticks:0};
-  B.engine=GGMCombat.create(allies,enemies,{...v2Options(),timedImpacts:true,externalImpacts:true,seed:ctx.kind==='practice'?77:Math.floor(Math.random()*0xffffffff),maxTime:119,practice:ctx.kind==='practice'});
+  B.engine=GGMCombat.create(allies,enemies,{...v2Options(),timedImpacts:true,externalImpacts:true,seed:ctx.kind==='practice'?77:Math.floor(Math.random()*0xffffffff),maxTime:fieldTime(s)||119,practice:ctx.kind==='practice'});
   if(Object.keys(fbon).length) setTimeout(()=>B&&blog(Object.entries(fbon).map(([f,v])=>`${f} 소속 보너스 공격 +${v}%`).join(', ')),300);
   $('#ov').innerHTML=`<div class="bt"><div class="bt-bg" style="${bgStyle(stageBg(s)||'폐선로')}"></div>
     <div class="bt-top"><span class="ttl"><i>${ctx.kind==='practice'?'PRACTICE':ctx.kind==='farm'?'TRAINING':ctx.kind==='event'?'EVENT':ctx.kind==='raid'?'RAID · '+Math.ceil(RAID_TICKS*GGMCombat.DT)+'s':ctx.kind==='rogue'?'EXPEDITION':'OPERATION'}</i>${esc(s.title)}</span><button data-act="bauto" class="on">필살 자동</button><button data-act="bspeed" class="${(P().settings.bspeed||1)>1?'on':''}">${[1,2,3].includes(P().settings.bspeed)?P().settings.bspeed:1}x</button><button data-act="bquit">${ctx.kind==='practice'?'연습 종료':'후퇴'}</button></div>
-    <div class="bt-en">${enemies.map((u,i)=>`<div class="eu ${u.boss?'boss':''} ${enemyLib(u.name)&&imgSrc(enemyLib(u.name))?'hasimg':''}" id="u_e${i}" style="--ec:${ECOL[u.elem]}">${enemyArt(u)}<b>${esc(u.name)}</b><div class="hpb"><i></i></div><div class="gg"><i></i></div></div>`).join('')}</div>
+    <div class="bt-en">${enemies.map((u,i)=>`<div data-act="bfocus" data-i="${i}" class="eu ${u.boss?'boss':''} ${enemyLib(u.name)&&imgSrc(enemyLib(u.name))?'hasimg':''}" id="u_e${i}" style="--ec:${ECOL[u.elem]}">${enemyArt(u)}<b>${esc(u.name)}</b><div class="hpb"><i></i></div><div class="gg"><i></i></div></div>`).join('')}</div>
     <div class="bt-log" id="bLog"></div>
     <div class="bt-al">${allies.map((u,i)=>`<div class="au" id="u_a${i}" style="--ec:${ECOL[u.elem]}"><div class="au-art">${battleCharacterArt(u.c)}</div><div class="meta"><div class="hpb"><i></i></div><div class="shb"><i></i></div></div><button class="skill" data-act="skill" data-i="${i}">${esc(u.kit.ultimate.name)}<small></small><span class="v2-sp" role="progressbar" aria-label="궁극기 SP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" ><i></i></span></button><small class="v2-active-time" style="display:block;text-align:center;font-size:10px"></small></div>`).join('')}</div>
     <div class="cutin" id="cutin"></div></div>`;

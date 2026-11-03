@@ -197,6 +197,13 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - 교훈 `plList/plHit/plAdd`(appStorage `ggm-plessons`) → `llmWrap`이 `plInject`로 끼움. 점검 규칙 `l_imgperson`
 - 설계: [research/prompts.md](research/prompts.md)
 
+## 8-2-6. 전장 규칙 · 시련의 탑 · 일정
+
+- `src/main/0485-battle-rules.js`: `FIELDS`·`GOALS`, `stageAutoRules`(buildStages·점검 `s_rules`), `fieldApply`·`fieldTime`(startStage), `rulesHTML`(편성 화면), 집중 지시 `bFocus`(적 카드 `data-act="bfocus"`)
+- `src/main/0125-tower.js`: `towerList`·`towerStage`·`towerGo`·`towerEnd`(bEnd), 진척 `P().tower`. 편성·출격 제한은 ctx `allow(c)`(openFormation·autoSquad·startStage)
+- `src/main/0135-schedule.js`: `G.meta.spots`, `c.spotTalk`, `P().sched`, `spotsAuto`·`spotsAI`·`spotTalkAI`·`schedVisit`. 점검 `g_spots`·`c_spot`(fix 모드 `ai-run`)
+- 설계: [research/combat-content.md](research/combat-content.md)
+
 ## 8-3. 콘텐츠 점검·업그레이드
 
 - `src/main/0535-content-audit.js`: 규칙 `AUDIT_RULES`(감지 `test` + 고치기 `fix.mode`), `auditScan`, `auditFix`, 지정 변환 `auditConvert`, 되돌리기 `auditUndo`, 생성 버전 `auditGenVer()`(새 캐릭터 `cleanChar0`에서 `genVer`로 찍힘)

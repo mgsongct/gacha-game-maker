@@ -1,0 +1,12 @@
+/* 전장 규칙·집중 지시·탑·일정 (main/0485, 0125, 0135) */
+.eu{cursor:pointer}
+.eu.focus{outline:2px solid var(--gold,#ffd166);outline-offset:2px}
+.eu.focus::before{content:"집중";position:absolute;right:4px;top:4px;z-index:3;font-size:.65rem;padding:0 5px;border-radius:6px;background:var(--gold,#ffd166);color:#111}
+.tw-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.tw-card{text-align:left;padding:10px;border-radius:10px;border:1px solid var(--line,#ffffff22);background:var(--card,#ffffff0d);color:inherit}
+.tw-card b{display:block}.tw-card span{font-size:.75rem;opacity:.75}
+.sc-spots{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.sc-spot{padding:10px;border-radius:10px;border:1px solid var(--line,#ffffff22);background-size:cover;background-position:center;position:relative;min-height:110px}
+.sc-spot::before{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(transparent,#000c)}
+.sc-spot>*{position:relative}
+.sc-who{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}

@@ -402,7 +402,7 @@ function challengeHTML(){
       <div class="rg-sq">${run.squad.map(id=>{ const c=charById(id), h=run.hp[id]||0; return c?`<div class="rg-u ${h<=0?'down':''}"><div class="rg-a">${art(c)}</div><b>${esc(c.name)}</b><span class="hpb"><i style="width:${Math.round(h*100)}%"></i></span></div>`:''; }).join('')}</div>
       ${run.relics.length?`<div class="rg-rel">${[...new Set(run.relics)].map(k=>`<span title="${esc(RELICS[k][1])}">${esc(RELICS[k][0])}${rgCount(k)>1?' ×'+rgCount(k):''}</span>`).join('')}</div>`:''}
       ${nodes}<div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="rgquit">탐사 끝내기</button></div></section>`; }
-  return `${pageHead('도전','CHALLENGE','lobby')}${raid}${rog}`;
+  return `${pageHead('도전','CHALLENGE','lobby')}${raid}${towerHTML()}${rog}`;
 }
 
 

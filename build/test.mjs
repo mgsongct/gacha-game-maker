@@ -374,6 +374,54 @@ try {
     return o; });
   assert.ok(Object.values(r17).every(v => v === true), JSON.stringify(r17)); assert.deepEqual(err17, [], '페이지 오류');
   console.log('ok 17 프롬프트 스튜디오: 조각 덮어쓰기·덧붙이기·기본으로, 그림 가드(배경·소품의 사람 태그 제거), 교훈 기록→요청에 주입, 그림 점검·정리·되돌리기, 점검 규칙');
+  // 18) 전투 개선·탑: 전장 규칙(능력치 반영·시간 제한)·별 조건, 집중 지시(엔진 focus), 새 장 생성 시 규칙(AI 지정·자동), 예전 스테이지 점검, 시련의 탑(제한 탑 출전 제한·층 보상)
+  const p18 = await browser.newPage(), err18 = []; p18.on('pageerror', e => err18.push(String(e)));
+  await p18.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p18.goto(`http://127.0.0.1:${server.address().port}/?t=18`);
+  await p18.waitForFunction(() => typeof towerStage === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r18 = await p18.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true;
+    G.chars.slice(0, 4).forEach(c => { if (!own(c.id)) grantOwned(c, 't'); }); P().squad = G.chars.slice(0, 4).map(c => c.id);
+    const A = [{ elem: ELEMS[0], role: 'atk', atk: 100, def: 50, maxhp: 1000, hp: 1000, spd: 100, c: G.chars[0] }], E = [{ elem: ELEMS[1], atk: 100, def: 50, maxhp: 1000, hp: 1000, spd: 100 }];
+    fieldApply({ field: { k: 'resonance', a: ELEMS[0] } }, A, E); fieldApply({ field: { k: 'armor' } }, A, E); o.field = A[0].atk === 130 && E[0].atk === 100 && E[0].def === 80 && E[0].maxhp === 850;
+    o.clean = ruleClean(FIELDS, { k: 'resonance', a: '없는속성' }) === null && ruleClean(GOALS, { k: 'few', a: '3' }).a === 3 && fieldTime({ field: { k: 'timed', a: 45 } }) === 45;
+    const st = buildStages([{ title: 'a', enemies: [{ name: 'x' }] }, { title: 'b', enemies: [{ name: 'y' }], field: { k: 'swift' } }, { title: 'c', enemies: [{ name: 'z', boss: true }] }], { max: 5, reward: () => 10, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
+    o.gen = !st[0].field && st[1].field.k === 'swift' && ['fast', 'hp'].includes(st[2].goal.k) && st.every(s => s.rulesV === 1) && stageSchema(false).includes('"field"');
+    const ch = G.chapters.find(c => c.kind === 'main'), old = ch.stages.find(s => !s.story && s.enemies.length); delete old.rulesV; delete old.field; delete old.goal;
+    const ag = auditScan().find(g => g.rule.id === 's_rules'); o.audit = !!ag && ag.items.includes(old); await auditFix(ag.rule, ag.items); o.auditFix = old.rulesV === 1 && !!old.goal;
+    const s2 = ch.stages[1]; s2.field = { k: 'timed', a: 30 }; s2.goal = { k: 'few', a: 4 }; await openFormation(s2, { kind: 'main', ch }, 'stagestart'); o.intel = document.body.innerHTML.includes('시간 제한') && document.body.innerHTML.includes('4명 이하로 승리'); closeModal();
+    await startStage(s2, { kind: 'main', ch }); o.maxTime = B && B.engine.maxTime === 30;
+    document.querySelector('#u_e0').click(); o.focus = B.enemies[0].status.some(s => s.id === 'order' && s.type === 'focus') && B.log.some(l => l.includes('집중 공격'));
+    document.querySelector('#u_e0').click(); o.focusCd = B.enemies[0].status.filter(s => s.id === 'order').length === 1;
+    B.speed = 3; bRun(); for (let i = 0; i < 1500 && !document.querySelector('.result'); i++) await wait(20); o.goalShown = !!document.querySelector('.result') && (document.querySelector('.result').innerHTML.includes('4명 이하로 승리') || document.querySelector('.result').innerHTML.includes('작전 실패'));
+    B && (B.over = true, clearInterval(B.timer)); B = null; closeOv();
+    const L = towerList(); o.towers = L.length >= 1 + ELEMS.length && L.some(t => t.id.startsWith('f:'));
+    const t5 = towerStage('all', 5), t1 = towerStage('all', 1), t20 = towerStage('all', 20); o.floors = t5.enemies.some(e => e.boss) && !t1.enemies.some(e => e.boss) && stagePower(t20) > stagePower(t1) && t5.goal && towerStage('all', 5).enemies[0].hp === t5.enemies[0].hp;
+    const e0 = ELEMS[0], et = towerById('e:' + e0); towerGo('e:' + e0); await wait(50); o.restrict = !!FORM && [...document.querySelectorAll('.froster [data-act="fpick"]')].every(b => charById(b.dataset.id).elem === e0); closeModal();
+    const gems = P().gems; tab = 'challenge'; render(); o.page = !!document.querySelector('[data-act="towergo"][data-v="all"]');
+    towerGo('all'); await wait(50); document.querySelector('[data-act="towerstart"]').click(); await wait(50); o.tower = B && B.ctx.kind === 'tower' && B.ctx.floor === 1;
+    bEnd(true); o.towerWin = TOWER().all.best === 1 && P().gems > gems && document.querySelector('.result').innerHTML.includes('1층 돌파'); document.querySelector('.result [data-act="bdone"]').click(); o.closed = !B;
+    return o; });
+  assert.ok(Object.values(r18).every(v => v === true), JSON.stringify(r18)); assert.deepEqual(err18, [], '페이지 오류');
+  console.log('ok 18 전투 개선·탑: 전장 규칙(능력치·시간 제한)·별 조건·편성 화면 안내, 집중 지시, 새 장 규칙(AI 지정·자동)·예전 스테이지 점검, 시련의 탑(제한 탑·보스층·첫 돌파 보상)');
+  // 19) 일정: 장소(자동·AI)·좋아하는 장소·하루 3번·호감도/보상·장면(AI·기본), 점검 규칙 g_spots·c_spot
+  const p19 = await browser.newPage(), err19 = []; p19.on('pageerror', e => err19.push(String(e)));
+  await p19.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p19.goto(`http://127.0.0.1:${server.address().port}/?t=19`);
+  await p19.waitForFunction(() => typeof schedHTML === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r19 = await p19.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true; G.chars.slice(0, 4).forEach(c => { if (!own(c.id)) grantOwned(c, 't'); });
+    G.meta.spots = []; o.auditG = auditScan().some(g => g.rule.id === 'g_spots'); spotsAuto(); o.auto = spots().length > 0 && !auditScan().some(g => g.rule.id === 'g_spots');
+    SAMPLE = { json: async p => /함께 시간을 보낼 장소/.test(p) ? { spots: [{ name: '별빛 카페', desc: '조용한 카페', bg: '', tags: ['커피', '디저트'] }, { name: '옥상 정원', desc: '', bg: '', tags: ['꽃'] }] } : /우연히 만나/.test(p) ? { scenes: [{ spot: '별빛 카페', script: '[배경: 별빛 카페]\n세라: 여기 커피 좋아\n선택: 나도 | 별로\n1) 세라: 그치?\n2) 세라: 흥' }] } : {} };
+    await spotsAI(); o.ai = spots().length === 2 && spots()[0].tags.includes('커피');
+    const c = G.chars.find(x => own(x.id)); c.persona = Object.assign({}, c.persona, { likes: ['커피'] }); const cafe = spots()[0]; o.fav = spotFav(c, cafe) && spotWho(cafe).includes(c);
+    o.auditC = auditScan().some(g => g.rule.id === 'c_spot' && g.items.includes(c)); await spotTalkAI(c); o.talk = (c.spotTalk || {})[cafe.id].includes('커피 좋아');
+    o.tpl = spotTemplate(G.chars[1], spots()[1]).startsWith('[배경: 옥상 정원]') && parseScript(spotTemplate(G.chars[1], spots()[1])).some(l => l.type === 'choice');
+    tab = 'sched'; render(); o.page = !!document.querySelector(`[data-act="scvisit"][data-c="${c.id}"]`); const aff = own(c.id).aff || 0, gold = P().gold;
+    document.querySelector(`[data-act="scvisit"][data-c="${c.id}"]`).click(); for (let i = 0; i < 30 && S; i++) { document.querySelector('#vn') && document.querySelector('#vn').click(); const pk = document.querySelector('[data-act="vnpick"]'); if (pk) pk.click(); await wait(40); }
+    o.visit = !S && (own(c.id).aff || 0) === aff + 30 && P().gold > gold && SCHED().left === 2 && SCHED().done.includes(cafe.id);
+    schedVisit(cafe.id, c.id); o.once = !S && SCHED().left === 2; tab = 'lobby'; render(); o.lobby = !!document.querySelector('[data-act="go"][data-to="sched"]');
+    return o; });
+  assert.ok(Object.values(r19).every(v => v === true), JSON.stringify(r19)); assert.deepEqual(err19, [], '페이지 오류');
+  console.log('ok 19 일정: 장소(자동·AI)·좋아하는 장소(호감도 1.5배)·하루 3번·보상, 장면(AI·기본 대본), 점검 규칙(장소·장면), 로비 진입');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);

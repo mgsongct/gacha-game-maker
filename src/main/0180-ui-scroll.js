@@ -37,10 +37,10 @@ function render(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewS
   if(tab==='lobby'&&typeof cashTick==='function') cashTick();
   updStam(); $('#gems').textContent=nf(P().gems); try{ $('#ic_gold').innerHTML=rIco('gold'); $('#ic_gems').innerHTML=rIco('gems'); }catch(e){} $('#gold').textContent=nf(P().gold); dm();
   $('#tb_ops').textContent=T('ops'); $('#tb_gacha').textContent=T('gacha'); $('#tb_crew').textContent=T('crew');
-  const navTab={evshop:'lobby',abyss:'lobby',challenge:'lobby',codex:'lobby',notice:'lobby',event:'lobby',evd:'lobby',farm:'lobby',disp:'lobby',construct:'contract',pass:'lobby',shop:'lobby',cash:'lobby'}[tab]||tab;
+  const navTab={evshop:'lobby',abyss:'lobby',challenge:'lobby',codex:'lobby',notice:'lobby',event:'lobby',evd:'lobby',farm:'lobby',disp:'lobby',sched:'lobby',construct:'contract',pass:'lobby',shop:'lobby',cash:'lobby'}[tab]||tab;
   if(tab!=='lobby') document.body.classList.remove('lb-hidden');
   document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===navTab?'true':'false'));
-  const F={evshop:evShopHTML,abyss:abyssHTML,challenge:challengeHTML,codex:codexHTML,shop:shopHTML,cash:cashHTML,lobby:lobbyHTML,ops:opsHTML,contract:()=>conEntryHTML()+contractHTML(),construct:constructHTML,crew:crewHTML,studio:studioHTML,event:eventsHTML,evd:eventDetailHTML,notice:noticeHTML,farm:farmHTML,disp:dispPageHTML,pass:passHTML};
+  const F={sched:schedHTML,evshop:evShopHTML,abyss:abyssHTML,challenge:challengeHTML,codex:codexHTML,shop:shopHTML,cash:cashHTML,lobby:lobbyHTML,ops:opsHTML,contract:()=>conEntryHTML()+contractHTML(),construct:constructHTML,crew:crewHTML,studio:studioHTML,event:eventsHTML,evd:eventDetailHTML,notice:noticeHTML,farm:farmHTML,disp:dispPageHTML,pass:passHTML};
   $('#view').innerHTML=(F[tab]||lobbyHTML)();
   document.body.classList.toggle('on-lobby',tab==='lobby'); document.body.classList.toggle('abyss-full',tab==='abyss');
   if(typeof applyDesk==='function') applyDesk();
@@ -93,6 +93,7 @@ function lobbyHTML(){
       <div class="lb-right">
         ${ico('mailopen','','mail','우편함',mailCount()||'',mailCount()>0)}
         ${ico('go','disp','disp',T('dispatch'),dispDone()||'')}
+        ${ico('go','sched','talk','일정',G.chars.some(c=>own(c.id))&&SCHED().left?SCHED().left:'')}
         ${ico('go','farm','farm',T('farm'),'')}
         ${ico('go','challenge','raid','도전',RG().run?'!':(raidTriesLeft()&&!RAID().killed?raidTriesLeft():''))}
         ${ill||has?ico('lbhide','','eye','숨기기',''):''}

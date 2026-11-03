@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.9'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.10'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -1956,6 +1956,18 @@ img,video,canvas{max-width:100%}
 /* Redraws restore positions explicitly rather than browser scroll anchoring. */
 #view,.sheet{overflow-anchor:none}
 
+/* 전장 규칙·집중 지시·탑·일정 (main/0485, 0125, 0135) */
+.eu{cursor:pointer}
+.eu.focus{outline:2px solid var(--gold,#ffd166);outline-offset:2px}
+.eu.focus::before{content:"집중";position:absolute;right:4px;top:4px;z-index:3;font-size:.65rem;padding:0 5px;border-radius:6px;background:var(--gold,#ffd166);color:#111}
+.tw-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.tw-card{text-align:left;padding:10px;border-radius:10px;border:1px solid var(--line,#ffffff22);background:var(--card,#ffffff0d);color:inherit}
+.tw-card b{display:block}.tw-card span{font-size:.75rem;opacity:.75}
+.sc-spots{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.sc-spot{padding:10px;border-radius:10px;border:1px solid var(--line,#ffffff22);background-size:cover;background-position:center;position:relative;min-height:110px}
+.sc-spot::before{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(transparent,#000c)}
+.sc-spot>*{position:relative}
+.sc-who{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 </style>
 </head>
 <body>
@@ -7518,10 +7530,40 @@ function challengeHTML(){
       <div class="rg-sq">${run.squad.map(id=>{ const c=charById(id), h=run.hp[id]||0; return c?`<div class="rg-u ${h<=0?'down':''}"><div class="rg-a">${art(c)}</div><b>${esc(c.name)}</b><span class="hpb"><i style="width:${Math.round(h*100)}%"></i></span></div>`:''; }).join('')}</div>
       ${run.relics.length?`<div class="rg-rel">${[...new Set(run.relics)].map(k=>`<span title="${esc(RELICS[k][1])}">${esc(RELICS[k][0])}${rgCount(k)>1?' ×'+rgCount(k):''}</span>`).join('')}</div>`:''}
       ${nodes}<div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="rgquit">탐사 끝내기</button></div></section>`; }
-  return `${pageHead('도전','CHALLENGE','lobby')}${raid}${rog}`;
+  return `${pageHead('도전','CHALLENGE','lobby')}${raid}${towerHTML()}${rog}`;
 }
 
 
+/* ===== 시련의 탑 ===== */
+/* 층마다 강해지는 무한 전투. 통합 탑(누구나) + 제한 탑(소속별·속성별: 그 소속/속성 캐릭터만 출전) → 여러 캐릭터를 모으고 키울 이유.
+   적은 이 게임 스토리에 나온 적 이름·외형을 다시 쓰고(생성 연계), 층마다 전장 규칙이 바뀌어요(0485). 5층마다 보스·큰 보상.
+   P().tower={[탑 id]:{best}} · 문서: docs/research/combat-content.md */
+function TOWER(){ const p=P(); if(!p.tower||typeof p.tower!=='object') p.tower={}; return p.tower; }
+function towerList(){ const L=[{id:'all',name:'시련의 탑',desc:'누구나 출전',allow:null}];
+  ruleFacs().forEach(f=>L.push({id:'f:'+f,name:`${f}의 탑`,desc:`${f} 소속만 출전`,allow:c=>c.faction===f}));
+  ELEMS.forEach(e=>L.push({id:'e:'+e,name:`${e}의 탑`,desc:`${e} 속성만 출전`,allow:c=>c.elem===e}));
+  return L; }
+function towerById(id){ return towerList().find(t=>t.id===id); }
+function towerPool(boss){ const out=[]; G.chapters.forEach(ch=>(ch.stages||[]).forEach(s=>(s.enemies||[]).forEach(e=>{ if(!!e.boss===!!boss&&!out.some(x=>x.name===e.name)) out.push(e); }))); return out; }
+function towerStage(tid,floor){ const t=towerById(tid)||towerById('all'), h=hashN(tid+'#'+floor), boss=floor%5===0, k=(floor-1)*.4;
+  const pool=towerPool(false), bp=towerPool(true), foeElem=tid.startsWith('e:')?(ELEMS.find(x=>BEATS[tid.slice(2)]===x)||ELEMS[0]):null;
+  const mk=(src,i,b)=>{ const e={name:(src&&src.name)||(b?'탑의 수호자':'탑의 파수꾼'),look:src&&src.look,elem:foeElem&&i%2===0?foeElem:ELEMS[(h+i)%ELEMS.length],hp:900,atk:90,def:40,spd:92+Math.min(40,floor),boss:!!b}; return fitEnemy(e,enemyTarget(k,i,!!b)); };
+  const n=boss?2:Math.min(4,2+Math.floor(floor/10)), en=[]; for(let i=0;i<n;i++) en.push(mk(pool[(h+i*7)%Math.max(1,pool.length)],i,false)); if(boss) en.push(mk(bp[h%Math.max(1,bp.length)],n,true));
+  const s={id:`tower_${tid}_${floor}`,title:`${t.name} ${floor}층`,enemies:en,reward:0,pre:'',post:''};
+  stageAutoRules(s,floor%3===1?0:1,boss?2:9); return s; }
+function towerReward(floor){ return floor%5===0?{gems:80,gold:3000+floor*300,core:2}:{gems:20,gold:1500+floor*150}; }
+function towerGo(tid){ const t=towerById(tid); if(!t) return; const fl=((TOWER()[tid]||{}).best||0)+1, st=towerStage(tid,fl);
+  if(t.allow&&!G.chars.some(c=>own(c.id)&&t.allow(c))){ toast(`${t.desc} — 출전할 수 있는 ${T('crew')}이(가) 없어요`); return; }
+  squadSel=null; FORM=null; openFormation(st,{kind:'tower',tid,floor:fl,allow:t.allow,code:'',extra:`data-v="${esc(tid)}"`},'towerstart'); }
+function towerEnd(win){ const c=B.ctx, rec=TOWER()[c.tid]||(TOWER()[c.tid]={best:0}); let r=null;
+  if(win&&c.floor>rec.best){ rec.best=c.floor; r=rateR(towerReward(c.floor)); giveReward(r); } B.allies.forEach(u=>{ const o=own(u.c.id); if(o) gainExp(o,expR(40+c.floor*4)); }); mark('prog'); sfx(win?'승리':'패배');
+  return `<h2 class="disp" style="color:${win?'var(--rose)':'#ff5277'};margin:0">${win?`${c.floor}층 돌파!`:`${c.floor}층 실패`}</h2><p>${r?'첫 돌파 보상: '+rewardText(r):win?'':'편성·속성을 바꾸거나 더 키워서 다시 도전하세요. 전장 규칙을 확인해 보세요.'}</p><button class="btn" data-act="bdone">계속</button>`; }
+function towerHTML(){ const T0=TOWER(); return `<section class="ch-card"><div class="ch-h"><i>TRIAL TOWER</i><h3>시련의 탑</h3><span>층마다 강해지는 적과 바뀌는 전장 규칙. 제한 탑은 그 소속·속성 ${T('crew')}만 출전해요. 5층마다 보스와 큰 보상.</span></div>
+  <div class="tw-list">${towerList().map(t=>{ const b=(T0[t.id]||{}).best||0, n=t.allow?G.chars.filter(c=>own(c.id)&&t.allow(c)).length:G.chars.filter(c=>own(c.id)).length;
+    return `<button class="tw-card" data-act="towergo" data-v="${esc(t.id)}" ${n?'':'disabled'}><b>${esc(t.name)}</b><span>${esc(t.desc)} · 보유 ${n}명</span><br><span>최고 ${b}층 → 다음 ${b+1}층</span></button>`; }).join('')}</div></section>`; }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+  if(a==='towergo') towerGo(b.dataset.v);
+  else if(a==='towerstart'){ const c=FORM&&FORM.ctx; if(!c||c.kind!=='tower') return; P().squad=[...squadSel]; mark('prog'); closeModal(); startStage(FORM.stage,{kind:'tower',tid:c.tid,floor:c.floor,allow:c.allow}); } });
 /* ===== 선물 ===== */
 const GIFTS=[['g_cake','달콤한 케이크','🍰',20],['g_tea','고급 찻잎','🍵',20],['g_flower','꽃다발','💐',25],['g_book','두꺼운 책','📖',25],['g_tool','공구 세트','🔧',25],['g_doll','봉제 인형','🧸',30],['g_perfume','향수','🧴',35],['g_music','음반','💿',30],['g_brooch','보석 브로치','💎',50],['g_letter','손편지','✉️',60]];
 const giftById=id=>GIFTS.find(g=>g[0]===id);
@@ -7567,6 +7609,42 @@ function hsUpd(w){ const el=w.firstElementChild; if(!el) return; const max=el.sc
 function fitLobby(){ try{ hsDecorate(); }catch(e){} const l=document.querySelector('.lobby'); if(!l) return; const tb=document.querySelector('.tabs'); const top=l.getBoundingClientRect().top+(document.scrollingElement?document.scrollingElement.scrollTop:0);
   const tabsH=tb?tb.getBoundingClientRect().height:0; const h=Math.max(document.body.classList.contains('wide')?200:360,Math.floor(innerHeight-top-tabsH)); l.style.height=h+'px'; l.classList.toggle('short',h<600); l.classList.toggle('narrow',l.clientWidth<370); }
 addEventListener('resize',()=>{ clearTimeout(window.__fitT); window.__fitT=setTimeout(fitLobby,120); });
+/* ===== 일정 (장소 방문) ===== */
+/* 전투 말고 캐릭터를 쓰는 곳: 하루 3번, 장소에 나와 있는 캐릭터를 만나 짧은 장면을 보고 호감도·보상을 받아요.
+   좋아하는 것(개성 시트 likes·hobby)이 장소 태그와 맞으면 "좋아하는 장소" → 호감도 1.5배.
+   - 장소 G.meta.spots=[{id,name,desc,bg,tags}] : 자료실 배경에서 자동으로 만들거나(spotsAuto) AI로(spotsAI)
+   - 장면 c.spotTalk={[spot id]:대본} : AI로(spotTalkAI) 만들고, 없으면 개성 시트로 짧은 기본 장면(spotTemplate)
+   - 생성 연계: 점검 규칙 g_spots(장소 없음 → 자동), c_spot(장면 없음 → AI) · 문서 docs/research/combat-content.md */
+const SCHED_N=3;
+function SCHED(){ const p=P(); if(!p.sched||p.sched.day!==today()) p.sched={day:today(),left:SCHED_N,done:[]}; return p.sched; }
+function spots(){ return Array.isArray(G.meta.spots)?G.meta.spots:[]; }
+function spotsAuto(){ const L=[]; G.lib.filter(l=>l.kind==='bg'&&l.name).slice(0,7).forEach(l=>L.push({id:uid(),name:l.name,desc:'',bg:l.name,tags:[]}));
+  if(!L.length) ['광장','카페','훈련장','도서관'].forEach(n=>L.push({id:uid(),name:n,desc:'',bg:'',tags:[n]})); G.meta.spots=L; mark('meta'); return L.length; }
+function spotFav(c,s){ const p=c.persona||{}, likes=[...(p.likes||[]),p.hobby||''].join(' '); return !!likes&&[s.name,...(s.tags||[])].some(t=>t&&(likes.includes(t)||t.split(/\s+/).some(w=>w.length>1&&likes.includes(w)))); }
+function spotWho(s){ const owned=G.chars.filter(c=>own(c.id)&&!c.alt), h=hashN(today()+s.id); if(!owned.length) return [];
+  const fav=owned.filter(c=>spotFav(c,s)), rest=owned.filter(c=>!fav.includes(c)), out=[]; if(fav.length) out.push(fav[h%fav.length]);
+  const pool=[...rest,...fav.filter(c=>!out.includes(c))]; for(let i=0;out.length<2&&pool.length;i++) out.push(pool.splice((h>>(i+2))%pool.length,1)[0]); return out; }
+function spotTemplate(c,s){ const p=c.persona||{}, L=(c.lines||[]).filter(Boolean), r=i=>L.length?L[(hashN(s.id+c.id)+i)%L.length]:'…', n=c.name;
+  return [`[배경: ${s.bg||s.name}]`,`${s.name}에서 ${n}을(를) 만났다.`,`${n}: ${p.catch||r(0)}`,'선택: 같이 둘러볼래? | 여기서 뭐 하고 있었어?',
+    `1) ${n}: ${(p.likes||[])[0]?`좋아. ${p.likes[0]} 얘기라도 하면서 걸을까.`:r(1)}`,`2) ${n}: ${p.hobby?`${p.hobby}… 그런 거. 비밀이야.`:r(2)}`,`${n}: ${r(3)}`].join('\n'); }
+async function spotsAI(btn){ const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 세계관에서 ${T('crew')}와 플레이어가 함께 시간을 보낼 장소 5~7곳을 정하라(전투 장소가 아닌 일상·휴식·취미 장소 위주, 세계관에 맞게). 기존 배경 이름: ${G.lib.filter(l=>l.kind==='bg').map(l=>l.name).join(', ')||'없음'} (맞는 게 있으면 bg에 그 이름, 없으면 빈칸). tags는 그 장소와 어울리는 취미·좋아하는 것 키워드 2~4개(한국어).\nJSON만 출력: {"spots":[{"name":"","desc":"한 문장","bg":"","tags":[""]}]}`,btn,'complex');
+  const L=(r&&Array.isArray(r.spots)?r.spots:[]).slice(0,8).map(x=>({id:uid(),name:String(x.name||'').trim().slice(0,20),desc:String(x.desc||'').slice(0,120),bg:String(x.bg||'').trim(),tags:(Array.isArray(x.tags)?x.tags:[]).map(String).slice(0,4)})).filter(x=>x.name);
+  if(!L.length) return false; const old=spots(); L.forEach(s=>{ const o=old.find(x=>x.name===s.name); if(o) s.id=o.id; }); G.meta.spots=L; mark('meta'); return true; }
+async function spotTalkAI(c,btn){ const S=spots(); if(!S.length) return false;
+  const r=await aiJSON(`${RULES}\n${ctx(false,c.name)}\n${SCRIPT_FMT}\n\n${T('crew')} 「${c.name}」이(가) 아래 장소마다 플레이어와 우연히 만나 보내는 짧은 일상 장면을 써라. 장소마다 8~14줄, "[배경: 배경 이름]"으로 시작, 선택지 1개("선택: A | B"와 갈래 줄 1)·2)), 개성 시트의 말투·좋아하는 것·반전 매력이 드러나게. 전투·큰 사건 없이 가볍게, 장소마다 다른 면을 보여 준다.\n장소: ${S.map(s=>`${s.name}(${s.desc||''}${s.bg?' · 배경 '+s.bg:''})`).join(' / ')}\nJSON만 출력: {"scenes":[{"spot":"장소 이름","script":""}]}`,btn,'complex');
+  let n=0; (r&&Array.isArray(r.scenes)?r.scenes:[]).forEach(x=>{ const s=S.find(y=>y.name===String(x.spot||'').trim()), t=nl(x.script); if(s&&t){ c.spotTalk=c.spotTalk||{}; c.spotTalk[s.id]=t; n++; } }); if(n) mark('c:'+c.id); return n>0; }
+function schedVisit(sid,cid){ const sc=SCHED(), s=spots().find(x=>x.id===sid), c=charById(cid); if(!s||!c||!own(c.id)) return; if(sc.left<=0){ toast('오늘 일정을 다 썼어요. 내일 다시 와요'); return; } if(sc.done.includes(sid)){ toast('오늘 이미 다녀온 장소예요'); return; }
+  const fav=spotFav(c,s); playStory(`${s.name} · ${c.name}`,(c.spotTalk&&c.spotTalk[s.id])||spotTemplate(c,s),()=>{ const k=SCHED(); k.left--; k.done.push(sid); addAff(c,fav?30:20); const r=rateR({gold:800}); giveReward(r); mark('prog'); toast(`${c.name} 호감도 +${fav?30:20}${fav?' (좋아하는 장소)':''} · ${rewardText(r)}`); render(); }); }
+function schedHTML(){ const sc=SCHED(), S=spots();
+  return `${pageHead('일정','SCHEDULE','lobby')}<p class="muted">하루 ${SCHED_N}번, 장소에 나와 있는 ${T('crew')}을(를) 만나요. 좋아하는 장소에서 만나면 호감도를 더 많이 얻어요. 오늘 남은 일정 <b>${sc.left}/${SCHED_N}</b></p>
+  ${S.length?`<div class="sc-spots">${S.map(s=>{ const done=sc.done.includes(s.id), who=spotWho(s); return `<div class="sc-spot" style="${bgStyle(s.bg||s.name)}"><b>${esc(s.name)}</b>${s.desc?`<div class="muted" style="font-size:.75rem">${esc(s.desc)}</div>`:''}
+    <div class="sc-who">${done?'<span class="badge">다녀옴</span>':who.length?who.map(c=>`<button class="btn sm" data-act="scvisit" data-s="${s.id}" data-c="${c.id}" ${sc.left?'':'disabled'}>${esc(c.name)}${spotFav(c,s)?' ♥':''}</button>`).join(''):'<span class="muted">아무도 없어요</span>'}</div></div>`; }).join('')}</div>`:`<p>아직 장소가 없어요.</p><button class="btn" data-act="scauto">자료실 배경으로 장소 만들기</button>`}
+  ${playMode()?'':`<div class="row" style="margin-top:10px;gap:6px"><button class="btn sm ghost" data-act="scai">AI로 장소 다시 정하기</button><button class="btn sm ghost" data-act="sctalkall">AI로 장면 만들기(장면 없는 ${T('crew')})</button></div>`}`; }
+document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+  if(a==='scvisit') schedVisit(b.dataset.s,b.dataset.c);
+  else if(a==='scauto'){ spotsAuto(); render(); }
+  else if(a==='scai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await spotsAI(b)){ toast('장소를 정했어요'); render(); } }
+  else if(a==='sctalkall'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } const L=G.chars.filter(c=>own(c.id)&&!c.alt&&spots().some(s=>!(c.spotTalk||{})[s.id])); let n=0; for(const c of L){ syBar(`일정 장면 ${n+1}/${L.length}`); if(await spotTalkAI(c)) n++; } syBar(''); toast(`${n}명의 일정 장면을 만들었어요`); render(); } });
 /* ===== 신규 픽업 만들기 ===== */
 let NEWPU=false;
 function openNewPickup(pre){ pre=pre||{};
@@ -7818,10 +7896,10 @@ function render(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewS
   if(tab==='lobby'&&typeof cashTick==='function') cashTick();
   updStam(); $('#gems').textContent=nf(P().gems); try{ $('#ic_gold').innerHTML=rIco('gold'); $('#ic_gems').innerHTML=rIco('gems'); }catch(e){} $('#gold').textContent=nf(P().gold); dm();
   $('#tb_ops').textContent=T('ops'); $('#tb_gacha').textContent=T('gacha'); $('#tb_crew').textContent=T('crew');
-  const navTab={evshop:'lobby',abyss:'lobby',challenge:'lobby',codex:'lobby',notice:'lobby',event:'lobby',evd:'lobby',farm:'lobby',disp:'lobby',construct:'contract',pass:'lobby',shop:'lobby',cash:'lobby'}[tab]||tab;
+  const navTab={evshop:'lobby',abyss:'lobby',challenge:'lobby',codex:'lobby',notice:'lobby',event:'lobby',evd:'lobby',farm:'lobby',disp:'lobby',sched:'lobby',construct:'contract',pass:'lobby',shop:'lobby',cash:'lobby'}[tab]||tab;
   if(tab!=='lobby') document.body.classList.remove('lb-hidden');
   document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===navTab?'true':'false'));
-  const F={evshop:evShopHTML,abyss:abyssHTML,challenge:challengeHTML,codex:codexHTML,shop:shopHTML,cash:cashHTML,lobby:lobbyHTML,ops:opsHTML,contract:()=>conEntryHTML()+contractHTML(),construct:constructHTML,crew:crewHTML,studio:studioHTML,event:eventsHTML,evd:eventDetailHTML,notice:noticeHTML,farm:farmHTML,disp:dispPageHTML,pass:passHTML};
+  const F={sched:schedHTML,evshop:evShopHTML,abyss:abyssHTML,challenge:challengeHTML,codex:codexHTML,shop:shopHTML,cash:cashHTML,lobby:lobbyHTML,ops:opsHTML,contract:()=>conEntryHTML()+contractHTML(),construct:constructHTML,crew:crewHTML,studio:studioHTML,event:eventsHTML,evd:eventDetailHTML,notice:noticeHTML,farm:farmHTML,disp:dispPageHTML,pass:passHTML};
   $('#view').innerHTML=(F[tab]||lobbyHTML)();
   document.body.classList.toggle('on-lobby',tab==='lobby'); document.body.classList.toggle('abyss-full',tab==='abyss');
   if(typeof applyDesk==='function') applyDesk();
@@ -7874,6 +7952,7 @@ function lobbyHTML(){
       <div class="lb-right">
         ${ico('mailopen','','mail','우편함',mailCount()||'',mailCount()>0)}
         ${ico('go','disp','disp',T('dispatch'),dispDone()||'')}
+        ${ico('go','sched','talk','일정',G.chars.some(c=>own(c.id))&&SCHED().left?SCHED().left:'')}
         ${ico('go','farm','farm',T('farm'),'')}
         ${ico('go','challenge','raid','도전',RG().run?'!':(raidTriesLeft()&&!RAID().killed?raidTriesLeft():''))}
         ${ill||has?ico('lbhide','','eye','숨기기',''):''}
@@ -9120,8 +9199,8 @@ async function openFormation(stage,ctx,startAct){
   try{await v2PrepareStage(stage,ctx);}catch(e){toast(e.message);return;}
   FORM=FORM&&FORM.key===(stage.id||stage.title)?FORM:{key:stage.id||stage.title,stage,ctx,startAct,filter:'all',sort:'power'};
   FORM.stage=stage; FORM.ctx=ctx; FORM.startAct=startAct;
-  const busy=busyIds(), owned=G.chars.filter(c=>own(c.id));
-  if(!squadSel) squadSel=P().squad.filter(id=>own(id)&&charById(id)&&!busy.has(id)).slice(0,4);
+  const busy=busyIds(), owned=G.chars.filter(c=>own(c.id)&&(!ctx.allow||ctx.allow(c)));
+  if(!squadSel) squadSel=P().squad.filter(id=>own(id)&&charById(id)&&!busy.has(id)&&(!ctx.allow||ctx.allow(charById(id)))).slice(0,4);
   const en=stage.enemies, need=stagePower(stage), tp0=teamPower(squadSel), tp=effPower(squadSel,en), ratio=need?tp/need:1, fb=factionBonus(squadSel);
   const elemCount={}; en.forEach(e=>{elemCount[e.elem]=(elemCount[e.elem]||0)+1;});
   let list=owned.filter(c=>FORM.filter==='all'||c.elem===FORM.filter||c.role===FORM.filter);
@@ -9129,9 +9208,10 @@ async function openFormation(stage,ctx,startAct){
   const slot=i=>{const c=charById(squadSel[i]); if(!c) return `<button class="fslot empty" data-act="fsl" data-i="${i}"><span>+</span><i>${i<2?'전열':'후열'}</i></button>`;
     const m=matchup(c,en), o=own(c.id);
     return `<button class="fslot r${c.rarity}" data-act="fpick" data-id="${c.id}" style="--ec:${ECOL[c.elem]}"><div class="fs-art">${art(c)}</div><span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${m.good>m.bad?'<em class="adv">유리</em>':m.bad>m.good?'<em class="dis">불리</em>':''}<div class="fs-t"><b>${esc(c.name)}</b><span>Lv.${o.lv} · ${esc(ROLE[c.role])}</span><span class="pw">${nf(charPower(c))}</span></div></button>`;};
-  const head2=FORM.ctx.kind==='raid'?`<span class="muted">이번 주 누적 피해로 보상을 받아요 · 오늘 ${raidTriesLeft()}/3</span>`:FORM.ctx.kind==='rogue'?`<span class="muted">이 4명으로 끝까지 가요. 체력은 이어져요.</span>`:FORM.ctx.kind==='farm'?`<span class="muted">보상: ${rewardText(farmReward(stage.farm.key,stage.farm.lv))}</span>`:FORM.ctx.kind==='event'?`<span class="muted">이벤트 스테이지</span>`:`<span class="muted">보상 ◆${nf(stage.reward)}${P().cleared[stage.id]?'':' (첫 클리어 2배)'}</span>`;
+  const head2=FORM.ctx.kind==='tower'?`<span class="muted">첫 돌파 보상: ${rewardText(towerReward(FORM.ctx.floor))}</span>`:FORM.ctx.kind==='raid'?`<span class="muted">이번 주 누적 피해로 보상을 받아요 · 오늘 ${raidTriesLeft()}/3</span>`:FORM.ctx.kind==='rogue'?`<span class="muted">이 4명으로 끝까지 가요. 체력은 이어져요.</span>`:FORM.ctx.kind==='farm'?`<span class="muted">보상: ${rewardText(farmReward(stage.farm.key,stage.farm.lv))}</span>`:FORM.ctx.kind==='event'?`<span class="muted">이벤트 스테이지</span>`:`<span class="muted">보상 ◆${nf(stage.reward)}${P().cleared[stage.id]?'':' (첫 클리어 2배)'}</span>`;
   openModal(`${head(esc(FORM.ctx.code?FORM.ctx.code+' ':'')+esc(stage.title),head2)}
     <div class="fenemy">${en.map(e=>`<div class="fe ${e.boss?'boss':''}" style="--ec:${ECOL[e.elem]}"><div class="fe-art">${enemyArt(e)}</div><span class="el" style="--ec:${ECOL[e.elem]}">${esc(e.elem)}</span><b>${esc(e.name)}</b><span>${e.boss?'BOSS · ':''}${nf(e.hp)}</span></div>`).join('')}</div>
+    ${stage.enemies.length&&!stage.story?rulesHTML(stage):''}
     ${en.filter(e=>e.boss).map(e=>`<p class="boss-pat"><b>보스 패턴</b> ${esc(e.name)}: ${esc(bossPatText(e,FORM.ctx.kind==='raid'))}</p>`).join('')}
     <p class="muted" style="margin:6px 0 0">적 속성: ${Object.entries(elemCount).map(([k,v])=>`${esc(k)}×${v}`).join(' ')} → ${Object.keys(elemCount).map(k=>{const w=ELEMS.find(x=>BEATS[x]===k);return w?`<b style="color:${ECOL[w]}">${esc(w)}</b> 유리`:'';}).filter(Boolean).join(', ')}</p>
     <div class="fpower"><div><i>편성 능력치 <small style="opacity:.7">상성 반영</small></i><b class="${ratio>=1?'ok':ratio>=0.8?'warn':'bad'}">${nf(tp)}</b>${tp!==tp0?`<small class="muted" style="display:block;font-size:.7rem">기본 ${nf(tp0)}</small>`:''}</div><div><i>적 능력치 (참고)</i><b>${nf(need)}</b></div><div class="fbar"><span style="width:${Math.min(100,ratio*100)}%" class="${ratio>=1?'ok':ratio>=0.8?'warn':'bad'}"></span></div></div>
@@ -9147,7 +9227,7 @@ async function openFormation(stage,ctx,startAct){
 }
 function refreshForm(){ if(FORM) openFormation(FORM.stage,FORM.ctx,FORM.startAct); }
 function autoSquad(stage){
-  const busy=busyIds(), en=stage.enemies, pool=G.chars.filter(c=>own(c.id)&&!busy.has(c.id));
+  const busy=busyIds(), en=stage.enemies, pool=G.chars.filter(c=>own(c.id)&&!busy.has(c.id)&&(!(FORM&&FORM.ctx&&FORM.ctx.allow)||FORM.ctx.allow(c)));
   const score=c=>{const m=matchup(c,en);return charPower(c)*(1+0.25*m.good-0.2*m.bad);};
   pool.sort((a,b)=>score(b)-score(a));
   const pick=[]; const need=['def','sup'];
@@ -9310,7 +9390,7 @@ const NPC_SCHEMA='"newNpcs":[{"name":"","role":"한 단어","profile":"1~2문장
 function npcRule(noNew){ const ns=G.npcs||[]; return `${ns.length?`NPC(${ns.map(n=>n.name).join(', ')})는 이 세계에 사는 조연이다. 이야기에 어울리는 NPC를 1명 이상 장면에 등장시켜 대사를 준다(대사 이름은 NPC 이름 그대로). `:''}`+(noNew?'':`이름과 대사가 있는 새 조연(의뢰인, 상인, 적 간부, 옛 지인 등)이 필요하면 newNpcs에 넣는다(${T('crew')}가 아니다. 이미 있는 인물은 다시 만들지 않는다. 0~2명).`); }
 function newcRule(n,ev){ return n?`이 이야기에서 처음 등장하는 신규 ${T('crew')} ${n}명을 newCharacters에 만든다. ${castRule()}${ev?'첫 번째는 이벤트를 끝까지 깨면 무료로 합류하는 배포 '+T('crew')+'(등급 R 또는 SR)이고, 나머지는 SR이나 R이다.':'희귀도를 섞는다: 1명은 SSR 또는 SR, 나머지는 SR이나 R(저랭크도 사연과 매력이 있게). R·SR은 이 장을 끝까지 깨면 무료로 합류한다.'} 이야기 속에서 ${T('player')} 일행과 인연을 맺는 인물로 비중 있게 등장시키고(대사 이름은 그대로), debutStage에 처음 나오는 스테이지 번호(1부터)를 쓴다. 기존 인물과 이름·외모·역할·속성이 겹치지 않게 한다. 각 항목 스키마(끝에 "debutStage":숫자 추가, 능력치는 시스템이 정한다): ${charSchema(true)} ${NAI_CHAR}`:'newCharacters는 빈 배열.'; }
 function talkOnlyRule(n){ const k=storyCfg().talkOnly; if(!k||n<3) return '모든 스테이지는 전투가 있다(battle:true).'; const m=k>=3?Math.floor(n/2):Math.min(k,n-2); return `스테이지 중 ${m}개 정도는 전투 없이 이야기만 있는 스테이지(battle:false, enemies는 빈 배열)로 만든다. 일상, 대화, 조사, 관계가 깊어지는 장면에 쓴다. 마지막 스테이지는 반드시 전투(battle:true)다.`; }
-function stageSchema(deep){ return `[{"title":"","battle":true,${deep?'"beats":["장면 5~9개. 장면마다 장소, 나오는 인물, 일어나는 일, 감정·관계 변화, 드러나는 정보를 한 문장으로"]':'"pre":"","post":""'},"enemies":[{"name":"","elem":"${ELEMS.join('|')}","boss":false,"look":"새 적이면 NovelAI 영어 외형 태그(괴물은 no humans로 시작)"}]}]`; }
+function stageSchema(deep){ return `[{"title":"","battle":true,${deep?'"beats":["장면 5~9개. 장면마다 장소, 나오는 인물, 일어나는 일, 감정·관계 변화, 드러나는 정보를 한 문장으로"]':'"pre":"","post":""'},"enemies":[{"name":"","elem":"${ELEMS.join('|')}","boss":false,"look":"새 적이면 NovelAI 영어 외형 태그(괴물은 no humans로 시작)"}],"field":{"k":"이야기에 맞는 전장 규칙(선택): ${Object.keys(FIELDS).join('|')}","a":"resonance·suppress는 속성, role은 ${Object.keys(ROLE).join('|')}, home은 소속 이름, timed는 초"}}]`; }
 // 진행 표시: 버튼이 있으면 버튼 글자, 뒤에서 만드는 중이면 그 작업 칩, 아니면 위쪽 막대
 function genStep(t,key,label){ return m=>{ if(t){ if(t.isConnected) t.textContent=m; return; } const j=typeof BGJOBS!=='undefined'&&BGJOBS.find(x=>x.key===key); if(j){ j.sub=m; bgJobsDraw(); } else liveBar(label+' · '+m); }; }
 function nameTaken(n){ n=String(n||'').trim(); return G.chars.some(c=>c.name===n)||(G.npcs||[]).some(c=>c.name===n); }
@@ -9372,7 +9452,7 @@ function buildStages(arr,o){ const list=(Array.isArray(arr)?arr:[]).slice(0,o.ma
       enemies:story?[]:(Array.isArray(s.enemies)?s.enemies:[]).slice(0,5).map(e=>({name:String(e.name||'적'),elem:ELEMS.includes(e.elem)?e.elem:o.elem,hp:num(e.hp,100,99999,o.hp),atk:num(e.atk,10,999,o.atk),def:num(e.def,0,500,o.def),spd:num(e.spd,50,160,95),boss:!!e.boss}))};
     if(story){ st.story=true; if(s.post) st.pre=[st.pre,nl(s.post)].filter(Boolean).join('\n'); }
     else if(!st.enemies.length) st.enemies=[{name:o.foe||'적',elem:o.elem,hp:o.hp,atk:o.atk,def:o.def,spd:95,boss:false}];
-    if(!st.beats.length) delete st.beats; return st; }); }
+    if(!st.beats.length) delete st.beats; if(!story){ const f=ruleClean(FIELDS,s.field); stageAutoRules(st,i,n); if(f) st.field=f; } return st; }); } // 전장 규칙: AI가 고른 것 우선, 없으면 자동(0485)
 async function aiJSONRetry(prompt,tier,tries){ for(let i=0;i<(tries||2);i++){ const r=await aiJSON(prompt,null,tier); if(r) return r; await wait(1500); } return null; }
 async function writeStages(ch,o){ const n=ch.stages.length, outline=ch.stages.map((s,i)=>`${i+1}. ${s.title}${s.story?' (전투 없음)':''}: ${(s.beats||[]).join(' / ')}`).join('\n');
   for(let i=0;i<n;i++){ const s=ch.stages[i]; o.step(`집필 중 ${i+1}/${n} · ${s.title}`);
@@ -11871,7 +11951,7 @@ function startBattle(chId,stId){
 }
 async function startStage(s,ctx){
   const busy=busyIds();
-  const squad=(ctx.squad||P().squad).map(charById).filter(c=>c&&(ctx.kind==='practice'||own(c.id))&&(ctx.kind==='practice'||ctx.squad||!busy.has(c.id))).slice(0,4);
+  const squad=(ctx.squad||P().squad).map(charById).filter(c=>c&&(!ctx.allow||ctx.allow(c))&&(ctx.kind==='practice'||own(c.id))&&(ctx.kind==='practice'||ctx.squad||!busy.has(c.id))).slice(0,4);
   if(!squad.length){toast('편성할 수 있는 '+T('crew')+'이(가) 없어요. 파견 중인지 확인해 주세요.');return;}
   if(window.__v2Starting) return; window.__v2Starting=true;
   try{ if(ctx.kind==='practice')squad.forEach(v2Ensure);else await v2ReadyChars(squad);
@@ -11882,12 +11962,13 @@ async function startStage(s,ctx){
   const allies=squad.map(c=>{const st=stats(c),o=own(c.id)||{wlv:0};v2EnsureEquipment(c);return {side:'a',slot:squad.indexOf(c),c,name:c.name,elem:c.elem,role:c.role,maxhp:st.hp,hp:st.hp,atk:Math.round(st.atk*(1+(fbon[c.faction]||0)/100)),def:st.def,spd:st.spd,g:Math.random()*600,sh:0,mul:1,skillTraining:GGMCombat.trainingState(o.skillTraining),wlv:o.wlv||0};});
   const enemies=s.enemies.map(e=>({side:'e',name:e.name,elem:e.elem,role:e.role,boss:e.boss,maxhp:e.hp,hp:e.hp,baseHp:e.hp,atk:e.atk,def:e.def,spd:e.spd,g:Math.random()*400,turns:0,sh:0,mul:1,pattern:e.pattern,skills:e.skills}));
   if(ctx.prep) ctx.prep(allies,enemies);
+  fieldApply(s,allies,enemies); // 전장 규칙(0485)
   B={ch:ctx.ch||null,ctx,s,allies,enemies,auto:true,speed:[1,2,3].includes(P().settings.bspeed)?P().settings.bspeed:1,timer:null,over:false,log:[],ticks:0};
-  B.engine=GGMCombat.create(allies,enemies,{...v2Options(),timedImpacts:true,externalImpacts:true,seed:ctx.kind==='practice'?77:Math.floor(Math.random()*0xffffffff),maxTime:119,practice:ctx.kind==='practice'});
+  B.engine=GGMCombat.create(allies,enemies,{...v2Options(),timedImpacts:true,externalImpacts:true,seed:ctx.kind==='practice'?77:Math.floor(Math.random()*0xffffffff),maxTime:fieldTime(s)||119,practice:ctx.kind==='practice'});
   if(Object.keys(fbon).length) setTimeout(()=>B&&blog(Object.entries(fbon).map(([f,v])=>`${f} 소속 보너스 공격 +${v}%`).join(', ')),300);
   $('#ov').innerHTML=`<div class="bt"><div class="bt-bg" style="${bgStyle(stageBg(s)||'폐선로')}"></div>
     <div class="bt-top"><span class="ttl"><i>${ctx.kind==='practice'?'PRACTICE':ctx.kind==='farm'?'TRAINING':ctx.kind==='event'?'EVENT':ctx.kind==='raid'?'RAID · '+Math.ceil(RAID_TICKS*GGMCombat.DT)+'s':ctx.kind==='rogue'?'EXPEDITION':'OPERATION'}</i>${esc(s.title)}</span><button data-act="bauto" class="on">필살 자동</button><button data-act="bspeed" class="${(P().settings.bspeed||1)>1?'on':''}">${[1,2,3].includes(P().settings.bspeed)?P().settings.bspeed:1}x</button><button data-act="bquit">${ctx.kind==='practice'?'연습 종료':'후퇴'}</button></div>
-    <div class="bt-en">${enemies.map((u,i)=>`<div class="eu ${u.boss?'boss':''} ${enemyLib(u.name)&&imgSrc(enemyLib(u.name))?'hasimg':''}" id="u_e${i}" style="--ec:${ECOL[u.elem]}">${enemyArt(u)}<b>${esc(u.name)}</b><div class="hpb"><i></i></div><div class="gg"><i></i></div></div>`).join('')}</div>
+    <div class="bt-en">${enemies.map((u,i)=>`<div data-act="bfocus" data-i="${i}" class="eu ${u.boss?'boss':''} ${enemyLib(u.name)&&imgSrc(enemyLib(u.name))?'hasimg':''}" id="u_e${i}" style="--ec:${ECOL[u.elem]}">${enemyArt(u)}<b>${esc(u.name)}</b><div class="hpb"><i></i></div><div class="gg"><i></i></div></div>`).join('')}</div>
     <div class="bt-log" id="bLog"></div>
     <div class="bt-al">${allies.map((u,i)=>`<div class="au" id="u_a${i}" style="--ec:${ECOL[u.elem]}"><div class="au-art">${battleCharacterArt(u.c)}</div><div class="meta"><div class="hpb"><i></i></div><div class="shb"><i></i></div></div><button class="skill" data-act="skill" data-i="${i}">${esc(u.kit.ultimate.name)}<small></small><span class="v2-sp" role="progressbar" aria-label="궁극기 SP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" ><i></i></span></button><small class="v2-active-time" style="display:block;text-align:center;font-size:10px"></small></div>`).join('')}</div>
     <div class="cutin" id="cutin"></div></div>`;
@@ -11929,6 +12010,49 @@ function useSkill(u){
   B.engine.events=[];
   if(GGMCombat.cast(B.engine,u,'ultimate')){v2BattleEvents(B.engine.events);bCheck();}
 }
+/* ===== 전장 규칙 · 스테이지 목표 · 집중 지시 ===== */
+/* 모든 스테이지가 "다 쓰러뜨리기" 하나뿐이라 편성 고민이 없던 문제를 풀어요(docs/research/combat-content.md).
+   - 전장 규칙 s.field={k,a}: 속성·역할·소속을 우대/억제하거나 적을 단단하게 → 캐릭터를 골고루 모을 이유가 생김
+   - 스테이지 목표 s.goal={k,a}: 별 3번째 조건(없으면 기존 "빠른 클리어 71초")
+   - 집중 지시: 전투 중 적을 누르면 8초 동안 아군 기본 공격이 그 적을 노림(재사용 12초) — 엔진의 focus 상태를 씀
+   - 생성 연계: 새 장(buildStages)은 AI가 고른 규칙을 쓰고, 비우면 stageAutoRules가 정함. 예전 스테이지는 점검 규칙 s_rules */
+const FIELDS={
+ resonance:{n:'속성 공명',arg:'elem',d:a=>`${a} 속성 유닛 공격 +30%`,f:(A,E,a)=>[...A,...E].forEach(u=>{ if(u.elem===a) u.atk=Math.round(u.atk*1.3); })},
+ suppress:{n:'속성 억제',arg:'elem',d:a=>`${a} 속성 유닛 공격 −25%`,f:(A,E,a)=>[...A,...E].forEach(u=>{ if(u.elem===a) u.atk=Math.round(u.atk*.75); })},
+ role:{n:'역할 우대',arg:'role',d:a=>`${ROLE[a]||a}형 아군 공격·방어 +25%`,f:(A,E,a)=>A.forEach(u=>{ if(u.role===a){ u.atk=Math.round(u.atk*1.25); u.def=Math.round(u.def*1.25); } })},
+ home:{n:'홈그라운드',arg:'faction',d:a=>`${a} 소속 아군 체력·공격 +25%`,f:(A,E,a)=>A.forEach(u=>{ if((u.c&&u.c.faction)===a){ u.maxhp=Math.round(u.maxhp*1.25); u.hp=u.maxhp; u.atk=Math.round(u.atk*1.25); } })},
+ armor:{n:'철갑 전선',d:()=>'적 방어 +60% · 적 체력 −15%',f:(A,E)=>E.forEach(u=>{ u.def=Math.round(u.def*1.6); u.maxhp=Math.round(u.maxhp*.85); u.hp=Math.min(u.hp,u.maxhp); })},
+ fortress:{n:'요새',d:()=>'적 체력 +40% · 적 공격 −15%',f:(A,E)=>E.forEach(u=>{ u.maxhp=Math.round(u.maxhp*1.4); u.hp=Math.round(u.hp*1.4); u.atk=Math.round(u.atk*.85); })},
+ swift:{n:'질풍',d:()=>'모든 유닛 속도 +20%',f:(A,E)=>[...A,...E].forEach(u=>{ u.spd=Math.round(u.spd*1.2); })},
+ frenzy:{n:'광란',d:()=>'모든 유닛 공격 +35% (짧고 위험한 전투)',f:(A,E)=>[...A,...E].forEach(u=>{ u.atk=Math.round(u.atk*1.35); })},
+ timed:{n:'시간 제한',arg:'sec',d:a=>`${a}초 안에 이기지 못하면 실패`,f:()=>{}}};
+const GOALS={
+ fast:{arg:'sec',d:a=>`${a}초 안에 승리`,ok:(B,a)=>B.engine.time<=+a},
+ hp:{arg:'pct',d:a=>`남은 체력 합계 ${a}% 이상`,ok:(B,a)=>B.allies.reduce((n,u)=>n+Math.max(0,u.hp),0)/Math.max(1,B.allies.reduce((n,u)=>n+u.maxhp,0))*100>=+a},
+ elem:{arg:'elem',d:a=>`${a} 속성 2명 이상 편성`,ok:(B,a)=>B.allies.filter(u=>u.elem===a).length>=2},
+ role:{arg:'role',d:a=>`${ROLE[a]||a}형 2명 이상 편성`,ok:(B,a)=>B.allies.filter(u=>u.role===a).length>=2},
+ noRole:{arg:'role',d:a=>`${ROLE[a]||a}형 없이 승리`,ok:(B,a)=>!B.allies.some(u=>u.role===a)},
+ faction:{arg:'faction',d:a=>`${a} 소속 2명 이상 편성`,ok:(B,a)=>B.allies.filter(u=>(u.c&&u.c.faction)===a).length>=2},
+ few:{arg:'n',d:a=>`${a}명 이하로 승리`,ok:(B,a)=>B.allies.length<=+a}};
+function ruleFacs(){ const n={}; G.chars.forEach(c=>{ if(c.faction&&!c.npc) n[c.faction]=(n[c.faction]||0)+1; }); return Object.keys(n).filter(f=>n[f]>=2); }
+function ruleArg(kind,seed){ const pick=a=>a.length?a[seed%a.length]:''; return kind==='elem'?pick(ELEMS):kind==='role'?pick(Object.keys(ROLE)):kind==='faction'?pick(ruleFacs()):kind==='sec'?[60,75,90][seed%3]:kind==='pct'?[40,50,60][seed%3]:kind==='n'?3:''; }
+function ruleOk(cat,r){ const d=r&&cat[r.k]; if(!d) return false; if(!d.arg) return true; const a=r.a; return d.arg==='elem'?ELEMS.includes(a):d.arg==='role'?!!ROLE[a]:d.arg==='faction'?ruleFacs().includes(a):+a>0; }
+function ruleClean(cat,r){ if(!r||typeof r!=='object') return null; const o={k:String(r.k||'')}; if(cat[o.k]&&cat[o.k].arg) o.a=['sec','pct','n'].includes(cat[o.k].arg)?Math.round(+r.a||0):String(r.a||'').trim(); return ruleOk(cat,o)?o:null; }
+function fieldText(r){ const d=r&&FIELDS[r.k]; return d?`${d.n}: ${d.d(r.a)}`:''; }
+function goalText(r){ const d=r&&GOALS[r.k]; return d?d.d(r.a):'71초 안에 승리'; }
+// 스테이지 i/n에 규칙을 정해요(첫 스테이지는 규칙 없음, 마지막(보스)은 시간·체력 목표). 같은 스테이지는 늘 같은 결과
+function stageAutoRules(s,i,n){ if(!s||s.story||!(s.enemies||[]).length) return s; const h=hashN(s.id||s.title||i);
+  if(i>0){ const fk=['resonance','role','home','armor','fortress','swift','resonance','frenzy','suppress'].filter(k=>FIELDS[k].arg!=='faction'||ruleFacs().length), k=fk[h%fk.length]; const f=ruleClean(FIELDS,{k,a:ruleArg(FIELDS[k].arg,h>>3)}); if(f) s.field=f; }
+  const gk=i===n-1?['fast','hp']:['elem','role','noRole','few','hp','faction'].filter(k=>k!=='faction'||ruleFacs().length), g=gk[(h>>5)%gk.length], goal=ruleClean(GOALS,{k:g,a:ruleArg(GOALS[g].arg,h>>7)}); if(goal) s.goal=goal;
+  s.rulesV=1; return s; }
+function fieldApply(s,A,E){ const r=s&&s.field, d=r&&FIELDS[r.k]; if(d) d.f(A,E,r.a); }
+function fieldTime(s){ const r=s&&s.field; return r&&r.k==='timed'?Math.max(20,Math.min(119,+r.a||90)):0; }
+function rulesHTML(s){ const f=fieldText(s.field); return `<div class="panel" style="padding:8px;margin:6px 0;font-size:.82rem">${f?`<div><b>전장 규칙</b> ${esc(f)}</div>`:''}<div><b>별 조건</b> 승리 · 전원 생존 · ${esc(goalText(s.goal))}</div></div>`; }
+// 집중 지시
+function bFocus(i){ if(!B||B.over||!B.engine) return; const u=B.enemies[i], t=B.engine.time; if(!u||u.hp<=0) return; if(t<(B.focusReady||0)){ toast(`집중 지시는 ${Math.ceil(B.focusReady-t)}초 뒤에 다시 쓸 수 있어요`); return; }
+  B.enemies.forEach(e=>{ e.status=e.status.filter(s=>s.id!=='order'); }); u.status.push({id:'order',type:'focus',value:1,until:t+8,next:Infinity,source:null,slot:'order',remaining:1,hpRemain:1});
+  B.focusReady=t+12; blog(`집중 공격 지시: ${u.name}`); bUpdate(); }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="bfocus"]'); if(!b) return; e.stopPropagation(); bFocus(+b.dataset.i); });
 /* ===== 보스 패턴 ===== */
 const BPATS={aoe:['광역 포격','7초마다 전원 공격',7],snipe:['집중 저격','7초마다 체력 비율이 낮은 대상 공격',7],charge:['강타','7초마다 전원 강타',7],drain:['흡혈','7초마다 피해의 30% 회복',7],barrier:['방벽','7초마다 보호막',7],curse:['저주','7초마다 적 전체 공격력 감소',7],shift:['방어 약화','7초마다 적 전체 방어력 감소',7]};
 const BPAT_KEYS=Object.keys(BPATS);
@@ -11938,7 +12062,7 @@ function bossShake(){ const bt=$('#ov > .bt'); if(bt){ bt.classList.remove('shak
 function bossNext(u){return B&&B.engine&&u.ready&&u.ready.active-B.engine.time<=1;}
 function bUpdate(){
   if(!B||B.presentationBusy) return;
-  B.enemies.forEach((u,i)=>{const e=$('#u_e'+i);if(!e)return;e.querySelector('.hpb i').style.width=(u.hp/u.maxhp*100)+'%';e.querySelector('.gg i').style.width=Math.min(100,u.g/10)+'%';e.classList.toggle('dead',u.hp<=0);e.classList.toggle('warn',!!u.boss&&u.hp>0&&bossNext(u));});
+  B.enemies.forEach((u,i)=>{const e=$('#u_e'+i);if(!e)return;e.querySelector('.hpb i').style.width=(u.hp/u.maxhp*100)+'%';e.querySelector('.gg i').style.width=Math.min(100,u.g/10)+'%';e.classList.toggle('dead',u.hp<=0);e.classList.toggle('warn',!!u.boss&&u.hp>0&&bossNext(u));e.classList.toggle('focus',u.status.some(s=>s.id==='order'));});
   B.allies.forEach((u,i)=>{const e=$('#u_a'+i);if(!e)return;e.querySelector('.hpb i').style.width=(u.hp/u.maxhp*100)+'%';e.querySelector('.shb i').style.width=Math.min(100,u.sh/u.maxhp*100)+'%';e.classList.toggle('dead',u.hp<=0);
     const b=e.querySelector('.skill'),wait=Math.max(0,u.ready.ultimate-B.engine.time,(u.kit.ultimate.lockout||0)-(B.engine.time-u.lastCast.ultimate)),limited=!!u.kit.ultimate.limit&&u.casts.ultimate>=u.kit.ultimate.limit,blocked=u.status.some(s=>s.type==='stun')||GGMCombat.isSilenced(u,'ultimate'),r=wait<=0&&u.sp>=GGMCombat.SP.max&&u.hp>0&&!blocked&&!limited;b.classList.toggle('ready',r);b.disabled=!r;b.querySelector('small').textContent=u.hp<=0?'전투 불능':limited?'이번 전투 사용 완료':blocked?'행동 제한':r?'궁극기 사용':u.sp<100?'SP '+Math.floor(u.sp)+'/100':`${Math.ceil(wait)}초 후`;const sp=e.querySelector('.v2-sp');if(sp){sp.setAttribute('aria-valuenow',Math.floor(u.sp));sp.querySelector('i').style.width=u.sp+'%';}e.title=u.status.map(s=>GGMCombat.EFFECTS[s.type][0]).join(', ');const at=e.querySelector('.v2-active-time');if(at)at.textContent=u.hp>0?'액티브 · '+(u.kit.active.trigger==='interval'?Math.ceil(Math.max(0,u.ready.active-B.engine.time,(u.kit.active.lockout||0)-(B.engine.time-u.lastCast.active)))+'초 후':['after_basic','on_hit','attack_hit','critical'].includes(u.kit.active.trigger)?(u.counts[u.kit.active.trigger]||0)%Math.round(u.kit.active.triggerEvery)+'/'+Math.round(u.kit.active.triggerEvery)+'회':GGMCombat.TRIGGERS[u.kit.active.trigger]):'';});
   GGMVFX.sync();
@@ -11954,7 +12078,7 @@ function bCheck(){
 function bEnd(win){
   if(B.ctx.kind==='practice'){v2StopPractice();return;}
   B.over=true; clearInterval(B.timer); try{ window.GGMVFX&&GGMVFX.clear(); }catch(e){} bUpdate(); bump('battle'); // 공격 중이던 카드·이펙트가 결과 화면 위에 남지 않게
-  if(B.ctx.kind==='raid'||B.ctx.kind==='rogue'){ const html=B.ctx.kind==='raid'?raidEnd(win):rogueEnd(win); const d=document.createElement('div');d.className='result';d.innerHTML=html;$('#ov > .bt').appendChild(d); return; }
+  if(B.ctx.kind==='raid'||B.ctx.kind==='rogue'||B.ctx.kind==='tower'){ const html=B.ctx.kind==='raid'?raidEnd(win):B.ctx.kind==='tower'?towerEnd(win):rogueEnd(win); const d=document.createElement('div');d.className='result';d.innerHTML=html;$('#ov > .bt').appendChild(d); return; }
   const s=B.s, kind=B.ctx.kind; let html;
   if(win){
     sfx('승리'); const p=P(); let r={}, first=false, exp=60, note='';
@@ -11965,13 +12089,13 @@ function bEnd(win){
     if(first&&kind!=='farm') newBonds(s);
     B.allies.forEach(u=>{const o=own(u.c.id);if(o)gainExp(o,expR(exp));});
     mark('prog');
-    const noDeath=B.allies.every(u=>u.hp>0), fast=B.ticks<=420, stars=1+(noDeath?1:0)+(fast?1:0);
+    const noDeath=B.allies.every(u=>u.hp>0), fast=s.goal&&GOALS[s.goal.k]?GOALS[s.goal.k].ok(B,s.goal.a):B.ticks<=420, stars=1+(noDeath?1:0)+(fast?1:0);
     p.stars=p.stars||{}; const was=p.stars[s.id]||0; if(stars>was) p.stars[s.id]=stars; let bonus='';
     if(stars===3&&was<3&&kind!=='farm'){ p.gems+=50; bonus=` · 첫 ★3 보너스 ◆50`; }
     const mvp=[...B.allies].sort((a,b)=>(b.dmg||0)-(a.dmg||0))[0], tot=B.allies.reduce((a,u)=>a+(u.dmg||0),0)||1, ml=mvp&&rand((mvp.c.lvLines.length?mvp.c.lvLines:[]).concat(mvp.c.lines));
     html=`<div class="rs-stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}" style="animation-delay:${i*0.18}s">★</span>`).join('')}</div>
       <h2 class="disp" style="color:var(--rose);margin:0">${esc(T('ops'))} 성공</h2>
-      <div class="rs-cond"><span class="on">✓ 승리</span><span class="${noDeath?'on':''}">${noDeath?'✓':'✗'} 전원 생존</span><span class="${fast?'on':''}">${fast?'✓':'✗'} 빠른 클리어</span></div>
+      <div class="rs-cond"><span class="on">✓ 승리</span><span class="${noDeath?'on':''}">${noDeath?'✓':'✗'} 전원 생존</span><span class="${fast?'on':''}">${fast?'✓':'✗'} ${esc(goalText(s.goal))}</span></div>
       ${mvp?`<div class="rs-mvp"><div class="rs-art">${art(mvp.c)}</div><div class="rs-mt"><i>MVP</i><b>${esc(mvp.name)}</b>${ml?`<span>“${esc(sub(ml))}”</span>`:''}</div></div>
       <div class="rs-dmg">${B.allies.map(u=>`<div><b>${esc(u.name)}</b><span class="bar"><i style="width:${Math.round((u.dmg||0)/tot*100)}%"></i></span><em>${nf(u.dmg||0)}</em></div>`).join('')}</div>`:''}
       <p style="margin:4px 0">${rewardText(r)}${first?' (첫 클리어 보상)':(kind==='farm'?'':`<br><small class="muted">${esc(T('currency'))}은(는) 첫 클리어 때만 받아요</small>`)}${bonus}<br>참가 ${T('crew')} 경험치 +${exp}</p><button class="btn" data-act="bdone" data-win="1" data-first="${first?1:0}">계속</button>`;
@@ -13567,7 +13691,7 @@ document.addEventListener('input',e=>{if(e.target.id==='ng_story'){const count=d
    고치는 방법: auto(규칙 변환, AI 없이) · ai(빠진 항목만 AI로 채움) · image(그림 생성) · open(기존 편집 화면 열기)
    생성 버전: 새로 만드는 캐릭터에 genVer가 찍혀요(cleanChar0). genVer가 없거나 낮으면 구버전 생성물이에요.
    지정 변환: 고른 캐릭터·항목을 지시문대로 AI가 바꿔요. 마지막 일괄 작업은 되돌릴 수 있어요. 문서: docs/research/content-audit.md */
-function auditGenVer(){ return 4; } // 4: 개성 시트·인연 톡·메모리얼 // 생성 규칙이 바뀌면 올려요(2: 상징 컬러·아이템, 3: 바리에이션·상속 시대)
+function auditGenVer(){ return 5; } // 5: 전장 규칙·별 조건·일정 장면 // 4: 개성 시트·인연 톡·메모리얼 // 생성 규칙이 바뀌면 올려요(2: 상징 컬러·아이템, 3: 바리에이션·상속 시대)
 const AUDIT_FIELDS={profile:['프로필','"profile":"성격·배경·비밀을 담은 3~5문장"'],intro:['첫 대사','"intro":"첫 만남 대사 1줄"'],lines:['평소 대사','"lines":["로비·평소 대사 5개"]'],
   touch:['터치 반응','"touch":{"head":["머리 쓰다듬기 반응 3개"],"body":["몸 터치 반응 3개"],"pet":["쓰다듬기 반응 3개"]}'],affLines:['호감도 대사','"affLines":{"3":["대사 1~2개"],"5":["대사 1~2개"],"8":["대사 1~2개"]}'],
   lvLines:['레벨업 대사','"lvLines":["2개"]'],dupLines:['돌파 대사','"dupLines":["2개"]'],naiPrompt:['외모 태그','"naiPrompt":"NovelAI 영어 태그"']};
@@ -13597,6 +13721,9 @@ const AUDIT_RULES=[
  {id:'c_memorial',scope:'char',kind:'missing',since:4,label:'메모리얼(높은 호감도 특별 장면·로비 대사)이 없어요',test:c=>!c.alt&&!(c.memorial&&c.memorial.script),fix:{mode:'ai-memo'}},
  {id:'g_rules',scope:'game',kind:'upgrade',since:3,label:'속성·역할 설명이 없어요(게임 규칙·도감에 표시돼요)',test:()=>rulesMissingDesc(),fix:{mode:'ai-rules'}},
  {id:'g_codex',scope:'game',kind:'upgrade',since:3,label:'도감에 게임 규칙(상성·역할)이 기록되지 않았어요',test:()=>rulesNotInCodex(),fix:{mode:'auto',run:()=>{ rulesCodex(); }}},
+ {id:'s_rules',scope:'stage',kind:'upgrade',since:5,label:'전장 규칙·별 조건이 없는 스테이지예요(예전 생성물)',test:s=>!s.story&&!s.farm&&(s.enemies||[]).length>0&&!s.rulesV,fix:{mode:'auto',run:s=>{ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)), L=ch?ch.stages:[s]; stageAutoRules(s,L.indexOf(s),L.length); }}},
+ {id:'g_spots',scope:'game',kind:'upgrade',since:5,label:'일정(장소 방문) 장소가 없어요',test:()=>!spots().length,fix:{mode:'auto',run:()=>{ spotsAuto(); }}},
+ {id:'c_spot',scope:'char',kind:'upgrade',since:5,label:'일정 장소에서 만날 때의 장면이 없어요(기본 장면으로 나와요)',test:c=>!c.alt&&!c.npc&&spots().length>0&&spots().some(s=>!(c.spotTalk||{})[s.id]),fix:{mode:'ai-run',run:c=>spotTalkAI(c)}},
  {id:'l_imgperson',scope:'lib',kind:'missing',since:1,label:'배경·소품 그림 프롬프트에 사람 태그가 섞여 있어요(사람 그림이 돼요)',test:l=>!!IMG_NOHUMAN[l.kind]&&!!l.prompt&&imgGuard(l.kind,l.prompt).removed.length>0,fix:{mode:'auto',run:l=>{ plHit('img-person-'+l.kind,l.prompt); l.prompt=imgGuard(l.kind,l.prompt).out; }}},
  {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
 function auditVer(){ return Math.max(...AUDIT_RULES.map(r=>r.since)); }
@@ -13627,7 +13754,7 @@ async function auditFix(rule,items){
   if(AUDIT_JOB){ toast('점검 작업이 진행 중이에요'); return; } const m=rule.fix.mode;
   if(m==='open'){ const c=items[0]; if(rule.fix.stamp) items.forEach(x=>{ x.genVer=auditGenVer(); auditMarkObj(x); }); closeModal(); if(c&&typeof openRegen==='function') openRegen(c.id); if(items.length>1) toast(`${items.length}명을 지금 버전으로 표시했어요. 다시 만들 부분은 캐릭터마다 「다시 만들기」에서 골라요`); return; }
   if(m==='image'){ if(!imgReady()){ toast('그림 AI(NovelAI 또는 ComfyUI)를 먼저 설정해 주세요'); return; } const set=new Set(items); closeModal(); runPrep(rule.scope==='lib'?['bg','prop','cg','enemy']:auditImgCats,it=>set.has(it.c)||set.has(it.o)); return; }
-  if((m==='ai'||m==='ai-stage'||m==='weapon'||m==='ai-rules'||m==='ai-persona'||m==='ai-afftalk'||m==='ai-memo')&&!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; }
+  if((m==='ai'||m==='ai-stage'||m==='weapon'||m==='ai-rules'||m==='ai-persona'||m==='ai-afftalk'||m==='ai-memo'||m==='ai-run')&&!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; }
   auditSnap(items,rule.label); const job=AUDIT_JOB={stop:false,done:0,total:items.length}; let ok=0;
   try{ for(const o of items){ if(job.stop) break; syBar(`점검: ${rule.label} ${job.done+1}/${job.total}`);
       try{ if(m==='auto'){ rule.fix.run(o); auditMarkObj(o); ok++; }
@@ -13637,6 +13764,7 @@ async function auditFix(rule,items){
         else if(m==='ai-persona'){ if(await personaAI(o,rule.fix.k,{lines:rule.fix.k==='improve'})) ok++; }
         else if(m==='ai-afftalk'){ if(await talkAffGen(o)) ok++; }
         else if(m==='ai-memo'){ if(await memorialGen(o)) ok++; }
+        else if(m==='ai-run'){ if(await rule.fix.run(o)) ok++; }
         else if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); ok++; }
         else if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); ok++; }
         else if(m==='skills-remaster'){ if(balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); ok++; } } }catch(e){ console.warn('audit',rule.id,e); }
