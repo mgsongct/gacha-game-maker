@@ -2,7 +2,7 @@
    대본 엔진
    ========================================================= */
 // 한 줄에 붙어 나온 [소품 끝]·[배경: …] 같은 지시를 따로 떼어 내요(예: "문장. [소품 끝]")
-const TAG_RE=/\[(?:(?:소품|음악|톡|CG|cg)\s*끝|(?:배경|소품|효과음|효과|사진|음악|톡|CG|cg)\s*[:：][^\]\n]+)\]/g;
+const TAG_RE=/\[(?:(?:소품|음악|톡|CG|cg)\s*끝|(?:배경|소품|효과음|효과|사진|음악|톡|CG|cg|분기)\s*[:：][^\]\n]+)\]/g;
 function splitTags(l){ const m0=l.match(/^(\d\)\s*)?([\s\S]*)$/), pre=m0[1]||'', body=m0[2]; TAG_RE.lastIndex=0; if(!TAG_RE.test(body)){ TAG_RE.lastIndex=0; return [l]; } TAG_RE.lastIndex=0;
   if(/^[^:：\[\s][^:：]{0,20}[:：]\s*\[[^\]]+\]$/.test(body)||/^\[[^\]]+\]$/.test(body)) return [l];
   const out=[]; let last=0, mm; while((mm=TAG_RE.exec(body))){ const before=body.slice(last,mm.index).trim(); if(before) out.push(before); out.push(mm[0]); last=mm.index+mm[0].length; } const rest=body.slice(last).trim(); if(rest) out.push(rest); TAG_RE.lastIndex=0;
@@ -18,10 +18,10 @@ function parseScript(t){
     else if(/^\[음악\s*끝\]$/.test(l)) o={type:'cmd',cmd:'음악끝',arg:''};
     else if(/^\[톡\s*끝\]$/.test(l)) o={type:'cmd',cmd:'톡끝',arg:''};
     else if(/^\[CG\s*끝\]$/i.test(l)) o={type:'cmd',cmd:'CG끝',arg:''};
-    else if((m=l.match(/^\[(배경|소품|효과음|효과|사진|음악|톡|CG|cg)\s*[:：]\s*(.+?)\]$/))) o={type:'cmd',cmd:m[1],arg:m[2].trim()};
+    else if((m=l.match(/^\[(배경|소품|효과음|효과|사진|음악|톡|CG|cg|분기)\s*[:：]\s*(.+?)\]$/))) o={type:'cmd',cmd:m[1],arg:m[2].trim()};
     else if((m=l.match(/^\[(.+?)\]/))) o={type:'place',text:m[1].trim()};
     else if((m=l.match(/^선택\s*[:：]\s*(.+)$/))) o={type:'choice',opts:m[1].split('|').map(s=>s.trim()).filter(Boolean)};
-    else if((m=l.match(/^([^:：\s][^:：]{0,20})[:：]\s*(.+)$/))){ let who=m[1].trim(),face=''; const fm=who.match(/^(.+?)\s*\[(.+?)\]$/); if(fm){who=fm[1].trim();face=fm[2].trim();} const cm=m[2].trim().match(/^\[(배경|소품|효과음|효과|사진|음악|톡|CG|cg)\s*[:：]\s*(.+?)\]$/); o=cm?{type:'cmd',cmd:cm[1],arg:cm[2].trim(),who}:{type:'say',who,face,text:m[2]}; }
+    else if((m=l.match(/^([^:：\s][^:：]{0,20})[:：]\s*(.+)$/))){ let who=m[1].trim(),face=''; const fm=who.match(/^(.+?)\s*\[(.+?)\]$/); if(fm){who=fm[1].trim();face=fm[2].trim();} const cm=m[2].trim().match(/^\[(배경|소품|효과음|효과|사진|음악|톡|CG|cg|분기)\s*[:：]\s*(.+?)\]$/); o=cm?{type:'cmd',cmd:cm[1],arg:cm[2].trim(),who}:{type:'say',who,face,text:m[2]}; }
     else o={type:'nar',text:l};
     o.cond=cond; return o;
   });
@@ -63,6 +63,7 @@ function vnStep(){
 }
 function vnCmd(L){
   const a=L.arg;
+  if(L.cmd==='분기'){ S.branch=a; return; } // 다음 선택지를 시나리오 분기로 기록(0465-story-plan.js)
   if(L.cmd==='배경') setVnBg(a);
   else if(L.cmd==='음악') bgm(a);
   else if(L.cmd==='CG'||L.cmd==='cg'){ const g=$('#vnCG'); g.innerHTML=libArt(a)+'<button class="vn-cgx" data-act="vncgview" type="button">⤢ 크게 보기</button>'; g.hidden=false; g.classList.remove('in'); void g.offsetWidth; g.classList.add('in'); $('#vn').classList.add('cgon'); }

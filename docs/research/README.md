@@ -9,6 +9,8 @@
 | [game-rules.md](game-rules.md) | 게임 규칙 공개·편집: 속성 추가·제거·상성표·반응, 포지션(직군·함종, 기능 설계), 속성 상성(이기는 속성·배율), 역할 기본 능력치·속도, 희귀도 배율, 진영 시너지, 진영·역할·속성 관계 배율, 도감 기록 | `src/main/0185-game-rules.js`, 전투 엔진 `src/modules/combat/030-core.js` |
 | [balance.md](balance.md) | 밸런스 관리: 세대 인플레 제어(고정·자동 상승), AI 능력치 편차 점검·보수(성향 유지), 생성 시 자동 보정, 구캐릭터 AS(전투 보정·리마스터) | `src/main/0187-balance.js`, 엔진 `genBoost` |
 | [character.md](character.md) | 캐릭터 개성·매력: 개성 시트·프로필 템플릿·개성 검수(빠짐·흔함·겹침·말투), AI 채우기·다듬기·평가, 인연 톡(호감도 단계)·메모리얼 | `src/main/0455-persona.js` |
+| [story-design.md](story-design.md) | 시나리오 사전 설계: 막 구성·숨겨진 반전(복선→공개 장)·분기(선택 → 플래그 → 이후 장)·캐릭터 아크, 장마다 필요한 설계만 프롬프트에 | `src/main/0465-story-plan.js`, `aiChapterGen0`(`0250`), 대본 `[분기: id]`(`0460`) |
+| [prompts.md](prompts.md) | 프롬프트 현황 조사와 스튜디오: 흩어진 조각 등록·게임별 수정·AI 다듬기, 그림 가드(배경·소품의 사람 태그), 정정 → 교훈 자산화로 반복 방지, AI 기록 분석 | `src/main/0025-prompt-studio.js`, `llmWrap`·`composeNai`(`0020`) |
 | [content-audit.md](content-audit.md) | 콘텐츠 점검·업그레이드: 생성 기능 향상·구버전 생성물(genVer) 감지, 자동 변환·AI 채우기·지정 변환·되돌리기, 규칙 추가 방법 | `src/main/0535-content-audit.js` |
 | [variants.md](variants.md) | 바리에이션(이격·영의): 공통 템플릿, 조건으로 자동 적용, **상속형 관리(원본 + 수정치)**, 캐릭터 특징을 반영한 디자인 프롬프트 | 같은 파일들 + `src/main/0065-inherit.js`, `aiAltChar`(`src/main/0290-season-rotation.js`) |
 

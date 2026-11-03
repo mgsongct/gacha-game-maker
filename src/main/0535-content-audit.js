@@ -33,6 +33,7 @@ const AUDIT_RULES=[
  {id:'c_memorial',scope:'char',kind:'missing',since:4,label:'메모리얼(높은 호감도 특별 장면·로비 대사)이 없어요',test:c=>!c.alt&&!(c.memorial&&c.memorial.script),fix:{mode:'ai-memo'}},
  {id:'g_rules',scope:'game',kind:'upgrade',since:3,label:'속성·역할 설명이 없어요(게임 규칙·도감에 표시돼요)',test:()=>rulesMissingDesc(),fix:{mode:'ai-rules'}},
  {id:'g_codex',scope:'game',kind:'upgrade',since:3,label:'도감에 게임 규칙(상성·역할)이 기록되지 않았어요',test:()=>rulesNotInCodex(),fix:{mode:'auto',run:()=>{ rulesCodex(); }}},
+ {id:'l_imgperson',scope:'lib',kind:'missing',since:1,label:'배경·소품 그림 프롬프트에 사람 태그가 섞여 있어요(사람 그림이 돼요)',test:l=>!!IMG_NOHUMAN[l.kind]&&!!l.prompt&&imgGuard(l.kind,l.prompt).removed.length>0,fix:{mode:'auto',run:l=>{ plHit('img-person-'+l.kind,l.prompt); l.prompt=imgGuard(l.kind,l.prompt).out; }}},
  {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
 function auditVer(){ return Math.max(...AUDIT_RULES.map(r=>r.since)); }
 function auditTargets(scope){ if(scope==='char') return G.chars; if(scope==='lib') return G.lib; if(scope==='game') return [G.meta]; if(scope==='stage') return G.chapters.filter(ch=>ch.kind==='main'||ch.kind==='event').flatMap(ch=>ch.stages||[]); return []; }

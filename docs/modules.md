@@ -184,6 +184,19 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - `personaBrief`가 `ctx()`에 들어가 모든 AI 생성이 말투를 지킴. 새 캐릭터 스키마(`charSchema`)에 persona·pfields
 - 설계: [research/character.md](research/character.md)
 
+## 8-2-4. 시나리오 설계
+
+- `src/main/0465-story-plan.js`: `G.world.plan`(로그라인·주제·결말·막·반전·분기·아크·메모), `planCtx(n)`(장 n에 필요한 설계만 → `aiChapterGen0` 프롬프트), `planCheck`(복선·공개·분기 점검), `planAI`(새로·다듬기·잇기), 편집 `openPlan`
+- 분기: 대본 `[분기: id]` → `vnCmd`가 `S.branch` → `vnpick`이 `storyFlag` → `P().flags[id]={n,label}`
+- 설계: [research/story-design.md](research/story-design.md)
+
+## 8-2-5. 프롬프트 스튜디오
+
+- `src/main/0025-prompt-studio.js`: 조각 등록 `pfDef(id,label,get)` → `window[id]` 게터 → `promptFrag(id)`(게임별 덮어쓰기·덧붙이기 `G.meta.prompts`). 등록 조각: SCRIPT_FMT·THREAD_FMT·BATTLE_FLOW·TITLE_RULE·NAI_CHAR·EXPLORATION_NAME_RULE(0010), JSON_STRICT(0020), POS_RULE(0185), IMG_GUIDE
+- 그림 가드 `imgGuard(kind,tags)`: `composeNai`가 배경·소품·지도·아이콘에서 사람 태그를 빼고 `no humans` 머리말을 붙임
+- 교훈 `plList/plHit/plAdd`(appStorage `ggm-plessons`) → `llmWrap`이 `plInject`로 끼움. 점검 규칙 `l_imgperson`
+- 설계: [research/prompts.md](research/prompts.md)
+
 ## 8-3. 콘텐츠 점검·업그레이드
 
 - `src/main/0535-content-audit.js`: 규칙 `AUDIT_RULES`(감지 `test` + 고치기 `fix.mode`), `auditScan`, `auditFix`, 지정 변환 `auditConvert`, 되돌리기 `auditUndo`, 생성 버전 `auditGenVer()`(새 캐릭터 `cleanChar0`에서 `genVer`로 찍힘)

@@ -66,7 +66,7 @@ case 'sq': refreshForm(); break;
 case 'discover': discover(t); break;
 case 'ghist': openHistory(); break;
 case 'vnnext': vnStep(); break;
-case 'vnpick': { e.stopPropagation(); if(!S||!S.choice) break; const n=+t.dataset.n,o=S.choice.opts[n-1]; S.pick=n; S.lastPick=o; S.choice=null; $('#vnCh').innerHTML=''; vnShow({type:'say',who:T('player'),text:o}); break; }
+case 'vnpick': { e.stopPropagation(); if(!S||!S.choice) break; const n=+t.dataset.n,o=S.choice.opts[n-1]; S.pick=n; S.lastPick=o; S.choice=null; if(S.branch){ storyFlag(S.branch,n,o); S.branch=null; } $('#vnCh').innerHTML=''; vnShow({type:'say',who:T('player'),text:o}); break; }
 case 'vnauto': e.stopPropagation(); S.auto=!S.auto; t.classList.toggle('on',S.auto); if(S.auto&&!S.typing&&!S.choice) S.autoT=setTimeout(vnStep,700); else clearTimeout(S.autoT); break;
 case 'vnskip': e.stopPropagation(); vnEnd(); break;
 case 'vnlog': e.stopPropagation(); openModal(`${head('대화 기록')}${S.log.map(L=>`<p style="margin:6px 0">${L.type==='say'?`<b>${esc(isMe(L.who)?playerName():L.who)}</b> ${esc(sub(L.text))}`:L.type==='place'?`<span class="muted">[${esc(L.text)}]</span>`:`<i class="muted">${esc(sub(L.text))}</i>`}</p>`).join('')}`); break;

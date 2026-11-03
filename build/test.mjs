@@ -322,6 +322,58 @@ try {
     return o; });
   assert.ok(Object.values(r15).every(v => v === true), JSON.stringify(r15)); assert.deepEqual(err15, [], '페이지 오류');
   console.log('ok 15 캐릭터 개성: 개성 시트·검수(겹침·흔함·말투)·AI 채우기·다듬기, 인연 톡(호감도 해금), 메모리얼(로비 대사), 상속, 점검 규칙, 프로필 템플릿');
+  // 16) 시나리오 설계: 막·반전(복선→공개)·분기 → 장 프롬프트에 그 장에 필요한 것만, 대본 [분기: id] 선택이 플래그로 남아 다음 장에 반영, 점검, AI 설계, 편집 화면
+  const p16 = await browser.newPage(), err16 = []; p16.on('pageerror', e => err16.push(String(e)));
+  await p16.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p16.goto(`http://127.0.0.1:${server.address().port}/?t=16`);
+  await p16.waitForFunction(() => typeof planCtx === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r16 = await p16.evaluate(async () => {
+    const o = {}; o.empty = planCtx(1) === '';
+    G.world.plan = { logline: '잃어버린 별을 찾는 여정', theme: '신뢰', ending: '별을 되찾는다', acts: [{ name: '1막 만남', upto: 3, goal: '동료를 모은다' }, { name: '2막 균열', upto: 6, goal: '배신이 드러난다' }],
+      twists: [{ id: 't1', truth: '안내인이 적의 첩자다', reveal: 5, who: '안내인', clues: [{ ch: 2, hint: '안내인이 밤마다 사라진다' }, { ch: 4, hint: '적이 우리 경로를 안다' }] }],
+      branches: [{ id: 'b1', at: 2, question: '안내인을 믿을까', options: [{ label: '믿는다', result: '안내인이 마음을 연다' }, { label: '의심한다', result: '안내인과 거리가 생긴다' }] }], arcs: [{ name: '세라', start: '혼자 싸움', change: '동료를 의지', end: '앞장서는 리더' }] };
+    const c2 = planCtx(2), c5 = planCtx(5);
+    o.ctx2 = c2.includes('1막 만남') && c2.includes('밤마다 사라진다') && c2.includes('아직 밝히지 말 진실') && c2.includes('[분기: id]') && c2.includes('b1') && !c2.includes('적이 우리 경로를 안다');
+    o.ctx5 = c5.includes('2막 균열') && c5.includes('이번 장에서 밝힐 반전: 안내인이 적의 첩자다') && !c5.includes('아직 밝히지 말 진실');
+    o.wired = aiChapterGen0.toString().includes('planCtx(k+1)');
+    playStory('분기 시험', '세라: 어떻게 할까?\n[분기: b1]\n선택: 믿는다 | 의심한다\n세라: 알겠어');
+    for (let i = 0; i < 8 && !document.querySelector('[data-act="vnpick"]'); i++) { document.querySelector('#vn').click(); await new Promise(r => setTimeout(r, 30)); if (S && S.typing) document.querySelector('#vn').click(); }
+    document.querySelector('[data-act="vnpick"][data-n="2"]').click(); o.flag = P().flags.b1 && P().flags.b1.n === 2 && !S.branch; vnEnd && vnEnd();
+    const c3 = planCtx(3); o.after = c3.includes('「의심한다」') && c3.includes('거리가 생긴다');
+    const iss = planCheck(); o.check = iss.some(x => x.includes('[분기: b1]')) === (G.chapters.filter(c => c.kind === 'main').length >= 2) && planCheck().length >= 0;
+    G.world.plan.twists.push({ id: 't2', truth: '복선 없는 반전', reveal: 3, clues: [] }); o.check2 = planCheck().some(x => x.includes('복선이 없어요'));
+    SAMPLE = { json: async p => /메인 시나리오를/.test(p) ? { logline: '새 로그라인', acts: [{ name: '3막 귀환', upto: 9, goal: '결착' }], twists: [{ id: 't9', truth: '별은 처음부터 곁에 있었다', reveal: 9, clues: [{ ch: 7, hint: '세라의 목걸이가 빛난다' }] }], branches: [], arcs: [] } : {} };
+    await planAI('extend'); o.extend = G.world.plan.acts.length === 3 && G.world.plan.twists.some(t => t.id === 't9') && G.world.plan.logline === '잃어버린 별을 찾는 여정';
+    openPlan(); document.querySelector('[data-pl="logline"]').value = '바뀐 로그라인'; document.querySelector('[data-pl="t.0.clues"]').value = '1 | 첫 복선\n2 | 둘째 복선'; document.querySelector('[data-act="plansave"]').click();
+    o.edit = G.world.plan.logline === '바뀐 로그라인' && G.world.plan.twists[0].clues.length === 2 && G.world.plan.twists[0].clues[0].hint === '첫 복선'; closeModal();
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="planopen"]');
+    return o; });
+  assert.ok(Object.values(r16).every(v => v === true), JSON.stringify(r16)); assert.deepEqual(err16, [], '페이지 오류');
+  console.log('ok 16 시나리오 설계: 막·반전(복선→공개 장)·분기·아크 → 장마다 필요한 설계만 프롬프트에, [분기: id] 선택이 플래그로 남아 다음 장에 반영, 점검, AI 설계(잇기), 편집');
+  // 17) 프롬프트 스튜디오: 조각 덮어쓰기·덧붙이기·기본으로, 그림 가드(배경·소품의 사람 태그 제거), 교훈 기록 → llmWrap 주입, 점검 규칙, 화면
+  const p17 = await browser.newPage(), err17 = []; p17.on('pageerror', e => err17.push(String(e)));
+  await p17.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p17.goto(`http://127.0.0.1:${server.address().port}/?t=17`);
+  await p17.waitForFunction(() => typeof imgGuard === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r17 = await p17.evaluate(async () => {
+    const o = {}, base = BATTLE_FLOW; o.frags = ['SCRIPT_FMT', 'THREAD_FMT', 'NAI_CHAR', 'TITLE_RULE', 'BATTLE_FLOW', 'JSON_STRICT', 'POS_RULE', 'IMG_GUIDE'].every(k => window.__PF[k] && String(window[k]).length > 20);
+    pfSet('BATTLE_FLOW', { text: '전투는 짧게', add: '' }); o.over = BATTLE_FLOW === '전투는 짧게'; pfSet('BATTLE_FLOW', { text: '', add: '추가 규칙' }); o.add = BATTLE_FLOW === base + '\n추가 규칙'; pfSet('BATTLE_FLOW', null); o.reset = BATTLE_FLOW === base;
+    const g = imgGuard('bg', '1girl, solo, long hair, red eyes, forest, night, moonlight'); o.guard = g.out.startsWith('no humans, scenery') && !/1girl|long hair|red eyes|solo/.test(g.out) && g.out.includes('forest') && g.removed.length === 4;
+    const gp = imgGuard('prop', 'holding, 1girl, sword, gold hilt'); o.prop = gp.out.startsWith('no humans, object focus') && gp.out.includes('gold hilt') && !gp.out.includes('holding');
+    o.charSafe = imgGuard('char', '1girl, long hair').out === '1girl, long hair';
+    try { appStorage.removeItem('ggm-plessons'); } catch (e) {}
+    const ci = composeNai('bg', '1boy, short hair, ruined city', {}).input; o.compose = !/1boy|short hair/.test(ci) && ci.includes('ruined city') && plList().some(l => l.id === 'img-person-bg' && l.hits === 1);
+    const w = llmWrap('배경 NovelAI 영어 태그를 써라\nJSON만 출력: {}'); o.inject = w.includes('[프롬프트 교훈]') && w.includes('no humans, scenery') && w.indexOf('[프롬프트 교훈]') < w.indexOf('JSON만 출력');
+    o.noTag = !llmWrap('대사를 써라\nJSON만 출력: {}').includes('[프롬프트 교훈]');
+    plAdd('실제 게임 이름을 쓰지 않는다', 'all'); o.all = llmWrap('대사를 써라\nJSON만 출력: {}').includes('실제 게임 이름을 쓰지 않는다');
+    const bg = { id: uid(), kind: 'bg', name: '숲', prompt: '1girl, smile, forest' }; G.lib.push(bg);
+    o.audit = auditScan().some(x => x.rule.id === 'l_imgperson' && x.items.includes(bg)) && imgAuditScan().some(x => x.o === bg);
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="psopen"]');
+    openStudio('img'); document.querySelector('[data-act="psimgfix"]').click(); o.fix = bg.prompt === 'no humans, scenery, forest' && !auditScan().some(x => x.rule.id === 'l_imgperson');
+    document.querySelector('[data-act="psundo"]').click(); o.undo = bg.prompt === '1girl, smile, forest';
+    openStudio('frag'); document.querySelector('[data-pf="TITLE_RULE"][data-k="add"]').value = '영문 금지'; document.querySelector('[data-act="pfsave"][data-id="TITLE_RULE"]').click(); o.ui = TITLE_RULE.endsWith('영문 금지') && G.meta.prompts.TITLE_RULE.add === '영문 금지';
+    openStudio('lesson'); o.lessonUI = document.querySelectorAll('[data-act="pltog"]').length >= 2; openStudio('log'); o.logUI = document.body.innerHTML.includes('AI 기록 자세히'); closeModal();
+    return o; });
+  assert.ok(Object.values(r17).every(v => v === true), JSON.stringify(r17)); assert.deepEqual(err17, [], '페이지 오류');
+  console.log('ok 17 프롬프트 스튜디오: 조각 덮어쓰기·덧붙이기·기본으로, 그림 가드(배경·소품의 사람 태그 제거), 교훈 기록→요청에 주입, 그림 점검·정리·되돌리기, 점검 규칙');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
