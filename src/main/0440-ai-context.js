@@ -2,7 +2,8 @@
    AI
    ========================================================= */
 const STORY_LEN={short:['짧게',{pre:'8~12',post:'4~6',pro:'18~24'}],normal:['보통',{pre:'15~25',post:'8~15',pro:'30~40'}],long:['길게',{pre:'25~40',post:'12~20',pro:'45~60'}],xlong:['아주 길게',{pre:'40~60',post:'20~30',pro:'60~80'}]};
-function storyCfg(){ const s=(G.meta&&G.meta.story)||{}; return {finale:['contest','debate'].includes(s.finale)?s.finale:'battle',stages:+s.stages||0,len:STORY_LEN[s.len]?s.len:'normal',plot:String(s.plot||''),depth:s.depth==='fast'?'fast':'deep',newc:s.newc==null?2:Math.max(0,Math.min(3,+s.newc||0)),talkOnly:s.talkOnly==null?1:Math.max(0,Math.min(3,+s.talkOnly||0))}; }
+const finaleOf=f=>['contest','debate'].includes(f)?f:'battle'; // 장의 마지막 스테이지 형식(전투 중심 battle·무대 경쟁 contest·논쟁 debate)
+function storyCfg(){ const s=(G.meta&&G.meta.story)||{}; return {finale:finaleOf(s.finale),stages:+s.stages||0,len:STORY_LEN[s.len]?s.len:'normal',plot:String(s.plot||''),depth:s.depth==='fast'?'fast':'deep',newc:s.newc==null?2:Math.max(0,Math.min(3,+s.newc||0)),talkOnly:s.talkOnly==null?1:Math.max(0,Math.min(3,+s.talkOnly||0))}; }
 function storyN(def){ return storyCfg().stages||def; }
 function lenSpec(){ return STORY_LEN[storyCfg().len][1]; }
 function storyFormHTML(sc){ sc=sc||{}; return `<details class="optbox" style="margin-top:10px" ${sc.plot?'open':''}><summary><b>스토리 직접 짜기 · 분량</b> <span class="muted" style="font-size:.8rem">(선택)</span></summary>
