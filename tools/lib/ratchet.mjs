@@ -25,6 +25,7 @@ export function findings(J) {
   J.state.writeOnly.forEach(k => add('쓰기만 하는 키', k, k));
   J.actions.deadHandlers.forEach(x => add('발신 없는 처리기', x.act, `${x.act}`));
   J.css.dead.forEach(x => add('안 쓰는 CSS 클래스', x.cls, `.${x.cls} (${x.loc})`));
+  (J.inlinePrompts || []).forEach(p => add('스튜디오 밖 프롬프트 글', p.key, `${p.key} ${p.chars}자 (${p.loc})`, { 글자: p.chars })); // 늘면 나빠짐: 프롬프트는 스튜디오 조각(pfDef)으로
   const T = J.tools; if (T) { // 메타 점검(도구 코드)
     (T.cmt || []).forEach(c => add('도구 주석 속 코드', noLoc(`${c.loc} ${c.text}`), `${c.loc} ${c.text}`));
     T.parse.forEach(p => add('도구 파싱 오류', noLoc(`${p.loc} ${p.text}`), `${p.loc} ${p.text}`));

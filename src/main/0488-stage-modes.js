@@ -8,6 +8,18 @@
      같은 사람을 연달아 쓰면 분위기가 깨지고, 취향을 맞추거나 다른 사람으로 이어 가면 분위기가 오름. 1위면 통과.
    - 생성 연계: 조각 STAGE_MODES(프롬프트 스튜디오)를 장·이벤트·새 게임 1장 프롬프트에 넣고, stageSchema의 mode·debate·contest를
      buildStages가 검증(modeClean). 잘못되면 전투로. 설정에서 양식별로 끔. 문서: docs/research/stage-modes.md */
+// 장의 마지막(클라이맥스) 스테이지 형식 — 세계관 단계가 장르에 맞게 고름(G.meta.story.finale). 지시문은 프롬프트 스튜디오 조각, 값은 호출 지점이 줌
+const FINALE_RULE_BASE='finale(장의 마지막 스테이지 형식)은 장르에 맞게 정한다: 전투가 중심인 세계관이면 battle(마지막 스테이지는 반드시 보스전, battle:true), 무대·투표로 경쟁하면 contest(결승 콘테스트, mode "contest", enemies는 빈 배열), 논쟁·협상·재판이 중심이면 debate(결정적인 회담, mode "debate", enemies는 빈 배열).';
+pfDef('FINALE_RULE','장의 마지막 스테이지 형식(장르에 따라)',()=>FINALE_RULE_BASE);
+const FINALE_SCHEMA='"finale":"battle|contest|debate"'; // 새 게임 세계관 단계 스키마
+const FINALE_END={battle:'보스전과',contest:'결승 무대와',debate:'결정적인 회담과'};
+const finaleOf=f=>['contest','debate'].includes(f)?f:'battle';
+const finaleRule=()=>`이 게임의 finale: ${storyCfg().finale}. ${FINALE_RULE}`, finaleEnd=()=>FINALE_END[storyCfg().finale];
+// 스테이지 집필(writeStages): 회담·콘테스트는 그 자체를 게임이 진행하므로 대본은 그 전·후만(전투 흐름 안내도 빼요)
+const STAGE_WRITE_RULE_BASE='회담·콘테스트 스테이지는 그 전(pre)과 후(post)만 대본으로 쓴다. 회담 자체(추궁·증거·설득)와 콘테스트의 무대 경연(매력 어필·심사)은 게임이 진행하므로 대본에 쓰지 않는다.';
+pfDef('STAGE_WRITE_RULE','회담·콘테스트 스테이지의 대본 범위(스테이지 집필)',()=>STAGE_WRITE_RULE_BASE);
+const STAGE_KIND={debate:'회담 스테이지',contest:'콘테스트 스테이지'};
+function stageWhat(s){ return s.story?' — 전투 없는 이야기 스테이지':STAGE_KIND[s.mode]?` — ${STAGE_KIND[s.mode]}. ${STAGE_WRITE_RULE}`:' — 전투 전(pre)과 전투 후(post)'; }
 const CHARM={cool:'멋',cute:'귀여움',beauty:'아름다움',smart:'지성',tough:'강인함'};
 const CHARM_KW={cool:/쿨|냉정|과묵|카리스마|멋|차분|무뚝뚝/,cute:/귀여|밝|천진|장난|애교|활발|명랑/,beauty:/우아|아름|기품|섬세|예술|고상|신비/,smart:/똑똑|지적|분석|침착|박식|천재|논리|책/,tough:/강인|용감|열혈|근성|힘|투지|단단|호쾌/};
 function modesCfg(){ const m=(G.meta.story||{}).modes||{}; return {debate:m.debate!==false,contest:m.contest!==false}; }

@@ -3,6 +3,9 @@
    먼저 설계해 두고, 장을 쓸 때 그 장에 필요한 것만(막 목표·심을 복선·지금 밝힐 반전·아직 숨길 것·분기 결과) AI에 넘겨요.
    G.world.plan = {logline,theme,ending,acts[{name,upto,goal}],twists[{id,truth,reveal,clues[{ch,hint}],who}],branches[{id,at,question,options[{label,result}]}],arcs[{name,start,change,end}],notes}
    분기: 대본에 "[분기: id]" 다음 줄의 선택지를 고르면 P().flags[id]=번호(1부터) → 다음 장을 쓸 때 반영. 문서: docs/research/story-design.md */
+// 스테이지 집필에 설계를 넘길 때의 분기 지시(프롬프트 스튜디오 조각)
+const PLAN_WRITE_RULE_BASE='이 장의 분기가 있다면 장 전체에서 한 번만, 전체 구성에서 그 선택이 일어나는 스테이지에서만 쓴다.';
+pfDef('PLAN_WRITE_RULE','시나리오 설계의 분기 쓰기(스테이지 집필)',()=>PLAN_WRITE_RULE_BASE);
 function PLAN(){ const w=G.world; if(!w.plan||typeof w.plan!=='object') w.plan={}; const p=w.plan; for(const k of ['acts','twists','branches','arcs']) if(!Array.isArray(p[k])) p[k]=[]; return p; }
 function planHas(){ const p=G.world.plan; return !!(p&&(p.logline||(p.acts||[]).length||(p.twists||[]).length)); }
 function planActOf(n){ return PLAN().acts.find(a=>n<=(+a.upto||999))||PLAN().acts.at(-1)||null; }

@@ -9,6 +9,13 @@ function RULESM(){ if(!G.meta.rules||typeof G.meta.rules!=='object') G.meta.rule
 const RULE_STATS=[['hp','체력'],['atk','공격'],['def','방어'],['spd','속도']];
 const POS_TRAITS=[['hp','체력 %'],['atk','공격 %'],['def','방어 %'],['spd','속도 %'],['dmg','주는 피해 %'],['taken','받는 피해 %'],['heal','회복량 %'],['crit','치명타 %p'],['sp','시작 SP'],['threat','위협도 %']];
 const REACT_TYPES=[['amp','피해 증폭(배율)'],['burst','폭발(공격력×값 추가 피해)'],['stun','기절(초)'],['vuln','취약(받는 피해 +값%)']];
+// 새 게임 세계관 단계의 반응 스키마 — 값의 뜻은 종류마다 다름(REACT_TYPES)
+const REACT_SCHEMA='"reactions":[{"a":"속성","b":"다른 속성","name":"반응 이름","type":"amp|burst|stun|vuln","value":"amp는 피해 배율 1.2~2, burst는 공격력×값 0.5~2, stun은 기절 초 0.5~2, vuln은 받는 피해 +% 10~40"}]';
+// 생성기가 쓰는 속성 이름 다듬기 — 속성 목록·상성(beats)·반응의 속성 이름에 같이 써야 서로 맞음
+const elemName=v=>String(v||'').replace(/[<>"'&`.]/g,'').trim().slice(0,4);
+// 생성된 반응 정리: 값의 뜻은 종류마다 다름(REACT_TYPES — amp 배율·burst 공격력×값·stun 초·vuln 받는 피해 +%). vuln 값이 배율처럼 보이면(5 미만, 예 1.3) 백분율로(30)
+function reactClean(x){ const type=['amp','burst','stun','vuln'].includes(x.type)?x.type:'amp'; let value=+x.value||''; if(type==='vuln'&&value&&value<5) value=Math.round((value>1?value-1:value)*100);
+  return {a:x.a,b:x.b,name:String(x.name||'반응').slice(0,12),type,value}; }
 const POS_PRESETS={
  basic:[['공격','atk','적을 쓰러뜨리는 주력',{}],['방어','def','앞에서 버티며 동료를 지킴',{}],['지원','sup','회복과 강화로 돕기',{}]],
  squad8:[['선봉','atk','전투를 여는 돌격수. 시작부터 기술을 쓸 준비가 돼 있음',{sp:30,spd:10,hp:-10}],['근접','atk','근거리 주력 딜러',{atk:10,dmg:5}],['방벽','def','적의 공격을 끌어 아군을 지킴',{hp:15,def:15,threat:80,taken:-10}],['사수','atk','멀리서 약점을 노림',{crit:10,threat:-50,hp:-15}],['술사','atk','속성 공격 전문가',{dmg:15,def:-15}],['의무','sup','회복 전문',{heal:25,atk:-10}],['보조','sup','강화·약화로 판을 짬',{sp:20,threat:-30}],['특수','atk','변칙 전술',{spd:15,crit:5,hp:-10}]],

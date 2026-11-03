@@ -64,15 +64,51 @@
     "usedIn": 1
    },
    {
-    "id": "EXPEDITION_NAME_RULE",
-    "label": "파견 방식 이름",
-    "chars": 325,
+    "id": "CAST_RARITY_RULE",
+    "label": "새 게임 대원 희귀도 분포",
+    "chars": 62,
     "usedIn": 1
+   },
+   {
+    "id": "EXPEDITION_RULE",
+    "label": "파견(원정) 방식·이름(새 게임 세계관 단계)",
+    "chars": 574,
+    "usedIn": 1
+   },
+   {
+    "id": "CAST_LOCK_RULE",
+    "label": "아직 등장하지 않은 대원 다루기(장·이벤트·톡)",
+    "chars": 125,
+    "usedIn": 0
    },
    {
     "id": "FACTION_RULE",
     "label": "세력 설계 규칙(새 게임·세력 AI 채우기)",
     "chars": 381,
+    "usedIn": 1
+   },
+   {
+    "id": "CAST_DEBUT_RULE",
+    "label": "새 게임 대원의 첫 등장(debut)·소속",
+    "chars": 287,
+    "usedIn": 1
+   },
+   {
+    "id": "CAST_PLAN_RULE",
+    "label": "등장 계획 지키기(새 게임 오프닝·1장)",
+    "chars": 160,
+    "usedIn": 2
+   },
+   {
+    "id": "BESTIARY_RULE",
+    "label": "적 소속·적 도감(새 게임 1장)",
+    "chars": 102,
+    "usedIn": 1
+   },
+   {
+    "id": "PROFILE_TPL_RULE",
+    "label": "캐릭터 프로필 항목 틀(새 게임 세계관 단계)",
+    "chars": 194,
     "usedIn": 1
    },
    {
@@ -82,9 +118,33 @@
     "usedIn": 2
    },
    {
+    "id": "PLAN_WRITE_RULE",
+    "label": "시나리오 설계의 분기 쓰기(스테이지 집필)",
+    "chars": 56,
+    "usedIn": 0
+   },
+   {
+    "id": "FINALE_RULE",
+    "label": "장의 마지막 스테이지 형식(장르에 따라)",
+    "chars": 212,
+    "usedIn": 2
+   },
+   {
+    "id": "STAGE_WRITE_RULE",
+    "label": "회담·콘테스트 스테이지의 대본 범위(스테이지 집필)",
+    "chars": 103,
+    "usedIn": 0
+   },
+   {
     "id": "STAGE_MODES",
     "label": "스테이지 양식(전투·이야기·회담·콘테스트) 고르기",
     "chars": 412,
+    "usedIn": 1
+   },
+   {
+    "id": "VARIANT_RULE",
+    "label": "바리에이션 기본형(새 게임 세계관 단계)",
+    "chars": 197,
     "usedIn": 1
    }
   ],
@@ -93,15 +153,18 @@
   "rows": [
    {
     "kind": "chapter1",
-    "len": 10756,
+    "len": 11255,
     "frags": [
      "SCRIPT_FMT",
      "THREAD_FMT",
      "IMG_GUIDE",
+     "CAST_PLAN_RULE",
+     "BESTIARY_RULE",
      "DIRECTION_GUIDE",
+     "FINALE_RULE",
      "STAGE_MODES"
     ],
-    "fragPct": 22,
+    "fragPct": 25,
     "rulesIn": true,
     "skillIn": false,
     "fixedPct": 3,
@@ -110,12 +173,14 @@
    },
    {
     "kind": "chars",
-    "len": 18048,
+    "len": 18035,
     "frags": [
      "NAI_CHAR",
-     "IMG_GUIDE"
+     "IMG_GUIDE",
+     "CAST_RARITY_RULE",
+     "CAST_DEBUT_RULE"
     ],
-    "fragPct": 4,
+    "fragPct": 6,
     "rulesIn": true,
     "skillIn": true,
     "fixedPct": 60,
@@ -124,13 +189,14 @@
    },
    {
     "kind": "opening",
-    "len": 8228,
+    "len": 8384,
     "frags": [
      "SCRIPT_FMT",
      "IMG_GUIDE",
+     "CAST_PLAN_RULE",
      "DIRECTION_GUIDE"
     ],
-    "fragPct": 19,
+    "fragPct": 20,
     "rulesIn": true,
     "skillIn": false,
     "fixedPct": 4,
@@ -139,15 +205,18 @@
    },
    {
     "kind": "world",
-    "len": 4927,
+    "len": 5046,
     "frags": [
      "TITLE_RULE",
      "EXPLORATION_NAME_RULE",
      "POS_RULE",
-     "EXPEDITION_NAME_RULE",
-     "FACTION_RULE"
+     "EXPEDITION_RULE",
+     "FACTION_RULE",
+     "PROFILE_TPL_RULE",
+     "FINALE_RULE",
+     "VARIANT_RULE"
     ],
-    "fragPct": 25,
+    "fragPct": 41,
     "rulesIn": false,
     "skillIn": false,
     "fixedPct": 0,
@@ -227,6 +296,12 @@
     "n": 2,
     "head": "게임 \"앙코르 시그널\". 세계관 \"스타라인의 서울\": 국민 투표로 데뷔조를 뽑는 서바이벌 오디션 「스타라인」이 모든 화제를 삼",
     "frag": "하드코딩"
+   },
+   {
+    "chars": 160,
+    "n": 2,
+    "head": "등장 계획을 반드시 지킨다: 처음부터 함께하는 동료는 프롤로그에서 처음 만나고 1장부터는 이미 아는 사이다(1장에 첫 만남 장",
+    "frag": "CAST_PLAN_RULE"
    }
   ],
   "conflicts": [],
@@ -297,15 +372,51 @@
     "usedIn": 1
    },
    {
-    "id": "EXPEDITION_NAME_RULE",
-    "label": "파견 방식 이름",
-    "chars": 325,
+    "id": "CAST_RARITY_RULE",
+    "label": "새 게임 대원 희귀도 분포",
+    "chars": 62,
     "usedIn": 1
+   },
+   {
+    "id": "EXPEDITION_RULE",
+    "label": "파견(원정) 방식·이름(새 게임 세계관 단계)",
+    "chars": 574,
+    "usedIn": 1
+   },
+   {
+    "id": "CAST_LOCK_RULE",
+    "label": "아직 등장하지 않은 대원 다루기(장·이벤트·톡)",
+    "chars": 125,
+    "usedIn": 2
    },
    {
     "id": "FACTION_RULE",
     "label": "세력 설계 규칙(새 게임·세력 AI 채우기)",
     "chars": 381,
+    "usedIn": 1
+   },
+   {
+    "id": "CAST_DEBUT_RULE",
+    "label": "새 게임 대원의 첫 등장(debut)·소속",
+    "chars": 287,
+    "usedIn": 1
+   },
+   {
+    "id": "CAST_PLAN_RULE",
+    "label": "등장 계획 지키기(새 게임 오프닝·1장)",
+    "chars": 160,
+    "usedIn": 2
+   },
+   {
+    "id": "BESTIARY_RULE",
+    "label": "적 소속·적 도감(새 게임 1장)",
+    "chars": 102,
+    "usedIn": 1
+   },
+   {
+    "id": "PROFILE_TPL_RULE",
+    "label": "캐릭터 프로필 항목 틀(새 게임 세계관 단계)",
+    "chars": 194,
     "usedIn": 1
    },
    {
@@ -315,9 +426,33 @@
     "usedIn": 2
    },
    {
+    "id": "PLAN_WRITE_RULE",
+    "label": "시나리오 설계의 분기 쓰기(스테이지 집필)",
+    "chars": 56,
+    "usedIn": 0
+   },
+   {
+    "id": "FINALE_RULE",
+    "label": "장의 마지막 스테이지 형식(장르에 따라)",
+    "chars": 212,
+    "usedIn": 2
+   },
+   {
+    "id": "STAGE_WRITE_RULE",
+    "label": "회담·콘테스트 스테이지의 대본 범위(스테이지 집필)",
+    "chars": 103,
+    "usedIn": 0
+   },
+   {
     "id": "STAGE_MODES",
     "label": "스테이지 양식(전투·이야기·회담·콘테스트) 고르기",
     "chars": 412,
+    "usedIn": 1
+   },
+   {
+    "id": "VARIANT_RULE",
+    "label": "바리에이션 기본형(새 게임 세계관 단계)",
+    "chars": 197,
     "usedIn": 1
    }
   ],
@@ -326,13 +461,50 @@
   "rows": [
    {
     "kind": "chapter1",
-    "len": 11958,
+    "len": 12486,
     "frags": [
      "SCRIPT_FMT",
      "THREAD_FMT",
      "IMG_GUIDE",
+     "CAST_LOCK_RULE",
+     "CAST_PLAN_RULE",
+     "BESTIARY_RULE",
      "DIRECTION_GUIDE",
+     "FINALE_RULE",
      "STAGE_MODES"
+    ],
+    "fragPct": 23,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 3,
+    "json": 2,
+    "sample": 9
+   },
+   {
+    "kind": "chars",
+    "len": 18426,
+    "frags": [
+     "NAI_CHAR",
+     "IMG_GUIDE",
+     "CAST_RARITY_RULE",
+     "CAST_DEBUT_RULE"
+    ],
+    "fragPct": 6,
+    "rulesIn": true,
+    "skillIn": true,
+    "fixedPct": 59,
+    "json": 2,
+    "sample": 3
+   },
+   {
+    "kind": "opening",
+    "len": 9615,
+    "frags": [
+     "SCRIPT_FMT",
+     "IMG_GUIDE",
+     "CAST_LOCK_RULE",
+     "CAST_PLAN_RULE",
+     "DIRECTION_GUIDE"
     ],
     "fragPct": 19,
     "rulesIn": true,
@@ -342,45 +514,19 @@
     "sample": 9
    },
    {
-    "kind": "chars",
-    "len": 18439,
-    "frags": [
-     "NAI_CHAR",
-     "IMG_GUIDE"
-    ],
-    "fragPct": 4,
-    "rulesIn": true,
-    "skillIn": true,
-    "fixedPct": 59,
-    "json": 2,
-    "sample": 3
-   },
-   {
-    "kind": "opening",
-    "len": 9403,
-    "frags": [
-     "SCRIPT_FMT",
-     "IMG_GUIDE",
-     "DIRECTION_GUIDE"
-    ],
-    "fragPct": 16,
-    "rulesIn": true,
-    "skillIn": false,
-    "fixedPct": 4,
-    "json": 2,
-    "sample": 9
-   },
-   {
     "kind": "world",
-    "len": 4922,
+    "len": 5041,
     "frags": [
      "TITLE_RULE",
      "EXPLORATION_NAME_RULE",
      "POS_RULE",
-     "EXPEDITION_NAME_RULE",
-     "FACTION_RULE"
+     "EXPEDITION_RULE",
+     "FACTION_RULE",
+     "PROFILE_TPL_RULE",
+     "FINALE_RULE",
+     "VARIANT_RULE"
     ],
-    "fragPct": 25,
+    "fragPct": 41,
     "rulesIn": false,
     "skillIn": false,
     "fixedPct": 0,
@@ -466,6 +612,18 @@
     "n": 2,
     "head": "게임 \"게일 크레스트\". 세계관 \"아스테른 군도\": 수백 개의 하늘섬이 부유석의 힘으로 떠 있는 아스테른 군도에, 섬을 통째로",
     "frag": "하드코딩"
+   },
+   {
+    "chars": 160,
+    "n": 2,
+    "head": "등장 계획을 반드시 지킨다: 처음부터 함께하는 동료는 프롤로그에서 처음 만나고 1장부터는 이미 아는 사이다(1장에 첫 만남 장",
+    "frag": "CAST_PLAN_RULE"
+   },
+   {
+    "chars": 125,
+    "n": 2,
+    "head": "첫 등장 장면이 정해진 대원은 그 장면에서만 처음 만난다. 정해진 장면이 없는 대원은 메인 스토리의 새 장을 쓸 때 이야기 흐",
+    "frag": "CAST_LOCK_RULE"
    }
   ],
   "conflicts": [],

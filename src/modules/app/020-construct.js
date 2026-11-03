@@ -93,6 +93,11 @@ const VARIANT_DEFAULTS=[
  {id:'v_stage1',name:'공연의상1',prompt:'idol stage costume, frills, stage lights',chance:30,recipe:{min:[300,300,100,500]}},
  {id:'v_stage2',name:'공연의상2',prompt:'elegant evening gown, concert stage, spotlight',chance:30,recipe:{min:[500,100,300,500]}},
  {id:'v_stage3',name:'공연의상3',prompt:'rock band stage outfit, leather, electric guitar',chance:30,recipe:{min:[100,500,300,500]}}].map(v=>Object.assign({on:true,rarity:'same',brief:'',cond:{}},v));
-const api={RES,DEFAULTS,VARIANT_DEFAULTS,config,normalize,matches,rates,table,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
+// 새 게임 세계관 단계의 바리에이션 기본형 정리: 이름·영어 태그만, 조건은 이 게임에 있는 역할·소속·속성만 남김. 레시피·확률은 VARIANT_DEFAULTS와 같은 값을 순서대로(id는 앱이 붙임)
+function variantsFrom(list,o={}){if(!Array.isArray(list))return [];const F=o.factions||[],E=o.elems||[],R=['atk','def','sup'],seen=new Set();
+ return list.filter(v=>v&&typeof v==='object').map(v=>({name:String(v.name||'').replace(/[<>"'&`]/g,'').trim().slice(0,12),prompt:String(v.prompt||'').replace(/[^\x20-\x7e]/g,'').replace(/\s+/g,' ').replace(/^[ ,]+|[ ,]+$/g,'').slice(0,200),brief:String(v.brief||'').slice(0,160),cond:v.cond&&typeof v.cond==='object'?v.cond:{}}))
+  .filter(v=>v.name&&v.prompt&&!seen.has(v.name)&&seen.add(v.name)).slice(0,6).map((v,i)=>{const L=(x,ok)=>(Array.isArray(x)?x:[]).map(s=>String(s).trim()).filter(ok),c={factions:L(v.cond.factions,s=>F.includes(s)),roles:L(v.cond.roles,s=>R.includes(s)),elems:L(v.cond.elems,s=>E.includes(s))};
+   Object.keys(c).forEach(k=>{if(!c[k].length)delete c[k];});const d=VARIANT_DEFAULTS[i%VARIANT_DEFAULTS.length];return {name:v.name,prompt:v.prompt,brief:v.brief,chance:d.chance,recipe:{min:d.recipe.min.slice()},rarity:'same',on:true,cond:c};});}
+const api={RES,DEFAULTS,VARIANT_DEFAULTS,variantsFrom,config,normalize,matches,rates,table,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
 root.GGMConstruct=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

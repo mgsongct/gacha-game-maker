@@ -1,10 +1,10 @@
 # 생성 회귀 시험
 
-생성: `node tools/play/regress.mjs --ref HEAD` · 2026-11-03T11:39 · 같은 글 AI 응답을 `HEAD`(307001f) 빌드와 지금 빌드에 넣어 새 게임을 다시 만든 결과의 QA 발견 비교
+생성: `node tools/play/regress.mjs --ref HEAD` · 2026-11-03T12:06 · 같은 글 AI 응답을 `HEAD`(1705ae5) 빌드와 지금 빌드에 넣어 새 게임을 다시 만든 결과의 QA 발견 비교
 
 ## idol-audition — 앙코르 시그널
 
-- 재생 호출 4회 · 기본 단계 요청(자) world:4927 · chars:18048 · opening:8228 · chapter1:10756
+- 재생 호출 4회 · 기본 단계 요청(자) world:5046 · chars:18035 · opening:8384 · chapter1:11255
 - 발견 19 → 19 · **해결 0** · 남음 13 · 새로 생김 0
 
 ### 해결
@@ -35,7 +35,7 @@
 
 ## sky-knights — 게일 크레스트
 
-- 재생 호출 4회 · 기본 단계 요청(자) world:4922 · chars:18439 · opening:9403 · chapter1:11958
+- 재생 호출 4회 · 기본 단계 요청(자) world:5041 · chars:18426 · opening:9615 · chapter1:12486
 - 발견 16 → 16 · **해결 0** · 남음 15 · 새로 생김 0
 
 ### 해결

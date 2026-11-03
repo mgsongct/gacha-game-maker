@@ -6,6 +6,7 @@
 //   --strict: '오류'가 있거나 기준선(tools/baseline.json)보다 새로 생기거나 나빠진 항목이 있으면 exit 1 (CI용)
 //   --diff <기준>: 그 git 커밋의 트리에 같은 분석을 돌려 이번 변경으로 새로 생김·나빠짐·해결을 보여 줌(out/diff.md)
 //   --update-baseline: 지금 결과로 기준선을 다시 씀(줄었을 때만 — 늘었으면 코드를 고침)
+import { promptSites } from './lib/prompts.mjs';
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,6 +32,7 @@ const md = [`# 자기점검 보고서`, ``, `생성: \`node tools/check.mjs\` ·
   `## 파편화·다중화`, `- 문서 전역 클릭 리스너 ${R.sg.listeners.length}개: ${[...new Set(R.sg.listeners.map(l => l.split(':')[0]))].join(', ')}`, `- 3번 이상 되풀이되는 긴 문자열 ${R.strings.length}개`, ...R.strings.slice(0, 12).map(s => `  - ×${s.n} "${s.text}…" (${s.at.join(', ')})`), `- 빈 catch ${R.sg.emptyCatch.length}개: ${Object.entries(R.sg.emptyCatch.reduce((m, x) => (m[x.cat] = (m[x.cat] || 0) + 1, m), {})).map(([k, v]) => `${k} ${v}`).join(' · ')} — 비동기 작업은 quietErr()로 기록하세요(경고)`, `- esc() 없이 HTML 템플릿에 넣는 이름·글·용어 ${R.inj.out.length}곳: ${R.inj.out.slice(0, 8).map(x => `${x.loc} \${${x.what}}`).join(', ')}`,
   `- 안 쓰는 함수 ${R.unused.length}개: ${R.unused.slice(0, 40).map(f => `\`${f.name}\``).join(', ')}`, `- 안 쓰는 최상위 변수·상수 ${R.unusedVars.length}개: ${R.unusedVars.slice(0, 40).map(v => `\`${v.name}\` (${v.loc})`).join(', ')}`, ``,
   `## 저장·리스너·중계`, `- 저장 키(writeKey): ${R.keys ? `${R.keys.exact.join('·')} · 접두사 ${R.keys.pre.join('·')} — 모르는 키 ${R.keys.bad.length}` : 'writeKey 없음(건너뜀)'}`, `- 떼지 않는 전역 리스너 ${R.leaks.length}개`, `- 중계 서버 허용 주소: ${Object.entries(R.side.hosts).map(([p, v]) => `${p} ${v.length}개`).join(' · ') || '없음'} — 차이 ${R.relay?.diff.length ?? 0} · 앱 API 주소 ${R.relay?.api ?? 0}개 중 허용 안 됨 ${R.relay?.notAllowed.length ?? 0}`, ``,
+  `## 프롬프트 스튜디오 밖 프롬프트 글 (글 AI 호출의 프롬프트·조립 함수 속 지시문, pfDef 조각이 아님) — 지시문 ${R.prompts.length}개 ${R.prompts.reduce((a, p) => a + p.chars, 0)}자`, '| 위치(최상위 선언) | 지시문 글 | 글자 |', '|---|---|---|', ...promptSites(R.prompts).slice(0, 40).map(p => `| ${p.site} | ${p.n} | ${p.chars} |`), ``,
   `## CSS (src/style)`, `- 파싱 오류·괄호 짝 ${R.css.errors.length}개${R.css.errors.length ? ': ' + R.css.errors.slice(0, 10).map(e => `${e.loc} ${e.text}`).join(', ') : ''}`, `- 코드·HTML 어디에도 없는 클래스 선택자 ${R.css.dead.length}개(지운 화면의 흔적 — 동적 접두사 \`ls-\${…}\`는 씀으로 봄): ${R.css.dead.slice(0, 60).map(x => `\`.${x.cls}\` (${x.loc})`).join(', ')}`, ``].join('\n');
 const TL = R.tools, toolMd = [`## 도구 자체 (메타 점검 — tools/**·build/*.mjs ${TL.files}개 파일)`, `- 파싱 오류 ${TL.parse.length} · 복잡한 함수 ${TL.complex.length} · 같은 본문 ${TL.dup.length} · 되풀이 문자열 ${TL.strings.length} · 빈 catch ${TL.emptyCatch.length} · 안 쓰는 함수 ${TL.unused.length}`,
   ...TL.emptyCatch.map(x => `  - 빈 catch ${x.loc} (${x.cat})`), ...TL.complex.slice(0, 15).map(f => `  - 복잡 ${f.name} (${f.loc}) 복잡도 ${f.cc} · ${f.lines}줄 · 중첩 ${f.depth}`), ...TL.unused.map(f => `  - 안 쓰는 함수 ${f.name} (${f.loc})`), ...TL.dup.map(d => `  - 같은 본문 ${d.fns.join(' = ')}`), ''].join('\n');

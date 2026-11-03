@@ -589,7 +589,7 @@ try {
     if (!g) return o;
     const F = g.world.factions; o.factions = F.length >= 3 && F.find(f => f.name === '검은 조류').kind === 'hostile' && F.find(f => f.name === '검은 조류').stance.some(s => s.ch === 3 && s.s === 'ally') && F.find(f => f.name === '심해의 것').weakness === '불' && !!F.find(f => f.name === '등불단').rel['검은 조류'];
     const pa = P0.find(p => /속성\(elems\)은/.test(p)), pb = P0.find(p => /debut 항목/.test(p)), pc = P0.find(p => /프롤로그 다음으로 이어지는 1장/.test(p));
-    o.prompts = pa.includes('적대 세력(hostile)') && pa.includes('"kind":"playable|hostile|neutral|monster"') && pb.includes('"debut":"start|1~4|later"') && pc.includes('등장 계획') && pc.includes('네오(2번째 스테이지에서 첫 등장') && pc.includes('아직 등장하지 않는 인물') && pc.includes('"bestiary"');
+    o.prompts = pa.includes('적대 세력(hostile)') && pa.includes('"kind":"playable|hostile|neutral|monster"') && pb.includes('"debut":"start|1~4|later"') && pc.includes('등장 계획') && pc.includes('네오(2번째 스테이지)') && pc.includes('나중 등장: 다섯') && pc.includes('"bestiary"');
     const C = n => g.chars.find(c => c.name === n); o.noMonster = !C('심해 촉수') && g.chars.length === 5;
     o.debut = !C('하나').debut && C('네오').debut === g.chapters[0].stages[1].id && C('다섯').debutLater === true;
     const pk = g.banners.find(b => b.type === 'pickup'); o.pickup = !pk || !(pk.pickup || []).includes(C('네오').id);
@@ -599,7 +599,7 @@ try {
     Object.assign(o, (() => ({ // 포크 생성 배선 확인(안쪽 함수 — 테스트 콜백 복잡도를 늘리지 않게)
       facMatch: g.chars.find(c => c.name === '두리').faction === '등불단' && !g.world.factions.some(f => f.name === '등불 단'), // 비슷한 소속 이름은 세계관 세력으로 맞춤
       route1: (g.chapters[0].stages[0].route || {}).n1 === '부두 입구' && pc.includes('"route"'), // 1장도 출격 경로 지점 이름
-      finale: g.meta.story.finale === 'contest' && /결승 콘테스트/.test(pc),
+      finale: g.meta.story.finale === 'contest' && /이 게임의 finale: contest/.test(pc),
       exNames: (b => b.repName === '명성' && b.parts[1].name === '공방' && b.parts[1].stat === 'atk' && b.parts[3].name === GGMExpedition.DEFAULTS.business.parts[3].name)(GGMExpedition.config(g.meta.expedition).business) && g.meta.expedition.mode === 'business', // 원정 이름은 세계관 단계, 수치·빠진 이름은 기본값
       elemNames: (g.meta.rules.beats || {})['빛속성'] === '불' && (g.meta.rules.reactions || []).some(x => x.a === '빛속성' && x.type === 'vuln' && x.value === 30) }))()); // 다듬은 속성 이름으로 상성·반응이 맞고, 취약 1.3 → +30%
     o.profileTpl = (g.meta.persona || {}).tpl?.includes('종족') && g.chars.every(c => !c.pfields || typeof c.pfields === 'object');
@@ -607,13 +607,14 @@ try {
     // 생성된 게임을 불러와 잠금·이후 장의 첫 등장 확인
     const G0 = G; G = fix(JSON.parse(JSON.stringify(g)));
     const neo = charById(C('네오').id), five = charById(C('다섯').id); o.lock = !castOk(neo) && castLock(five).includes('아직 만나지') && castOk(charById(C('하나').id));
-    o.ctxPlan = ctx().includes('아직 이야기에 등장하지 않은') && ctx().includes('다섯');
+    o.ctxPlan = ctx().includes('아직 만나지 않은') && ctx().includes('다섯') && ctx().includes(CAST_LOCK_RULE);
     const ch2 = { id: 'c2', kind: 'main', title: '2장', stages: [{ id: 'x1', title: 'a', pre: '다섯: 오랜만이군', post: '', enemies: [] }] }; G.chapters.push(ch2); debutResolve(ch2); o.later = five.debut === 'x1' && !five.debutLater;
     G = G0; return o; });
   assert.ok(Object.values(r24).every(v => v === true), JSON.stringify(r24)); assert.deepEqual(err24, [], '페이지 오류');
   const r24b = await p24.evaluate(() => { const o = {}, P0 = window.__P24, find = re => P0.find(p => re.test(p)) || '', po = find(/이 게임의 시작 부분을 만들어라/), pch = find(/debut 항목/), pc = find(/프롤로그 다음으로 이어지는 1장/); // 생성 프롬프트 지시 충돌(S1)
-    o.meet = /첫 동료들\(처음부터 함께하는 동료: [^)]*하나/.test(po) && /\(네오, 다섯은\(는\) 1장부터 정해진 장면에서 처음 등장하니 프롤로그에 내지 않는다\)/.test(po) && /프롤로그에서 처음 만나 1장부터/.test(pch) && /프롤로그에서 이미 만난 사이/.test(pc);
-    o.faction = !/세력을 고르게/.test(pch) && /플레이어블 세력\(나중에 우호가 되는 세력 포함\) 사이에서 고르게/.test(pch);
+    o.meet = /등장 계획 — 처음부터 함께하는 동료: 하나, 두리, 세찌 \/ 1장에서 처음 만나는 인물: 네오\(2번째 스테이지\) \/ 나중 등장: 다섯/.test(po) && /첫 동료들과의 강렬한 만남/.test(po) && po.includes(CAST_PLAN_RULE) && pc.includes(CAST_PLAN_RULE) && /프롤로그에서 처음 만나 1장부터/.test(pch);
+    o.faction = !/세력을 고르게/.test(pch) && /그 세력들 사이에서 고르게 나눈다/.test(pch);
+    o.studio = ['FINALE_RULE', 'STAGE_WRITE_RULE', 'CAST_LOCK_RULE', 'CAST_DEBUT_RULE', 'CAST_PLAN_RULE', 'BESTIARY_RULE', 'EXPEDITION_RULE', 'VARIANT_RULE', 'PROFILE_TPL_RULE', 'PLAN_WRITE_RULE', 'CAST_RARITY_RULE'].every(id => window.__PF[id] && String(window[id]).length > 20) && (G.meta.prompts = { BESTIARY_RULE: { add: '[스튜디오 덧붙임]' } }, BESTIARY_RULE.endsWith('[스튜디오 덧붙임]')) && !(G.meta.prompts = {}).x; // 생성기 지시문은 프롬프트 스튜디오 조각(게임별 덧붙이기 반영)
     o.skillEx = pch.includes('"studio":true') && !/"crit_up"|"value":\d\.\d/.test(pch);
     o.bestiary = /bestiary에 새 적\(사람·캐릭터가 아닌 적\)마다/.test(pc); o.faces = SCRIPT_FMT.includes('목록이 없는 캐릭터는 ' + FACE_BASIC.join('·'));
     const k = v2PrepareGenerated(JSON.parse(JSON.stringify(GGMCombat.promptExample({ role: 'atk' }))), G.chars[0]); o.exCompiles = !!k && k.passive.effects.length > 0 && k.active.effects.some(e => e.type === 'damage');
