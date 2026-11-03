@@ -5,7 +5,9 @@ const CON_RES=GGMConstruct.RES;
 // 특수 레시피(소속·특정 캐릭터 확률 업). 분류 확률은 groups가 정해서 기본은 비워 둬요. 예: {id:'rc_x',name:'새벽 설계',min:[400,400,400,600],effect:{type:'faction',value:'새벽등대',up:3},hint:'부품을 넉넉히'}
 const CON_RECIPES=[];
 function conMeta(){ const m=G.meta; if(!m.construct||typeof m.construct!=='object') m.construct={on:false}; if(!Array.isArray(m.construct.recipes)) m.construct.recipes=clone(CON_RECIPES); return m.construct; }
-function CON(){ return GGMConstruct.config(conMeta()); }
+function CON(){ const c=GGMConstruct.config(conMeta()); c.groups.forEach(g=>{ const d=GGMConstruct.DEFAULTS.groups.find(x=>x.id===g.id); if(d&&g.name===d.name&&g.match&&ROLE[g.match.role]) g.name=ROLE[g.match.role]; }); return c; } /* 기본 분류 이름(지원·공격·방어)은 이 게임의 역할 이름으로 보여요 */
+/* 새 게임을 건조/영입이 켜진 채로 시작: 시작 자원 지급(설정에서 켤 때와 같은 양) */
+function conStartNew(ng){ ng.meta.construct=Object.assign({},ng.meta.construct||{},{on:true}); const s=GGMConstruct.config(ng.meta.construct).start; ng.prog.cres=Object.fromEntries(CON_RES.map(k=>[k,s])); ng.prog.cbuild={n:0,found:{},log:[],input:null,started:Date.now()}; }
 function conOn(){ return !!(G.meta.construct&&G.meta.construct.on); }
 function VARIANTS(){ if(!Array.isArray(G.meta.variants)) G.meta.variants=clone(GGMConstruct.VARIANT_DEFAULTS); return G.meta.variants; }
 function CRES(){ const p=P(); if(!p.cres||typeof p.cres!=='object') p.cres={}; CON_RES.forEach(k=>{ if(!(p.cres[k]>=0)) p.cres[k]=0; }); return p.cres; }

@@ -48,8 +48,8 @@ export function buildGraph(units) {
     const to = resolve(u, n, f.text); if (!to) return; const o = owner(u, n); if (!o || o.f === to) return; const from = o.f;
     from.calls.set(to.key, (from.calls.get(to.key) || 0) + 1); to.callers.add(from.key); if (!o.as) from.async.add(to.key); }); /* async 집합 = 동기로 부르는 대상 */
   // main 최상위 이름 충돌(let/const 중복은 실행 시 SyntaxError)
-  const mainU = units.find(u => u.name === 'main'), seen = new Map();
-  for (let i = 0; i < mainU.tree.rootNode.childCount; i++) { const n = mainU.tree.rootNode.child(i), names = [];
+  const mainU = units.find(u => u.name === 'main'), seen = new Map(); // main 한 스크립트가 없는 묶음(도구 코드 메타 점검)은 이름 충돌 검사 없음
+  for (let i = 0; mainU && i < mainU.tree.rootNode.childCount; i++) { const n = mainU.tree.rootNode.child(i), names = [];
     if (n.type === 'function_declaration' || n.type === 'class_declaration') names.push([n.childForFieldName('name')?.text, n.type === 'class_declaration' ? 'class' : 'function']);
     else if (n.type === 'lexical_declaration' || n.type === 'variable_declaration') walk(n, d => { if (d.type === 'variable_declarator') { const id = d.childForFieldName('name'); if (id?.type === 'identifier') names.push([id.text, n.child(0).type]); return false; } });
     for (const [nm, kind] of names) { if (!nm) continue; const prev = seen.get(nm); if (prev && (kind === 'let' || kind === 'const' || prev.kind === 'let' || prev.kind === 'const' || kind === 'class')) issues.push({ sev: 'error', kind: '이름 충돌', msg: `${nm}: ${prev.loc}(${prev.kind}) 와 ${mainU.loc(n)}(${kind}) — 한 스크립트라 실행 시 오류` }); else if (!prev) seen.set(nm, { kind, loc: mainU.loc(n) }); } }
@@ -58,7 +58,17 @@ export function buildGraph(units) {
 // 안 쓰는 최상위 변수·상수(함수 아닌 것)
 export function unusedVars(tops, fns, allText) { const out = []; for (const [nm, v] of tops) { if (v.kind === 'function' || fns.has(nm)) continue; const n = (allText.match(new RegExp(`(?<![\\w$])${nm.replace(/\$/g, '\\$')}(?![\\w$])`, 'g')) || []).length; if (n <= 1) out.push({ name: nm, loc: v.loc }); } return out; }
 // 안 쓰는 함수: 이름이 선언 말고는 어디에도(코드·문자열·HTML 템플릿) 안 나옴
-export function unused(fns, allText) { const out = []; for (const f of fns.values()) { if (!f.top || f.unit !== 'main') continue; const re = new RegExp(`(?<![\\w$])${f.name.replace(/\$/g, '\\$')}(?![\\w$])`, 'g'); const n = (allText.match(re) || []).length; if (n <= 1) out.push(f); } return out; }
+export function unused(fns, allText, unitOk = u => u === 'main') { const out = []; for (const f of fns.values()) { if (!f.top || !unitOk(f.unit)) continue; const re = new RegExp(`(?<![\\w$])${f.name.replace(/\$/g, '\\$')}(?![\\w$])`, 'g'); const n = (allText.match(re) || []).length; if (n <= 1) out.push(f); } return out; }
+// 이름 없는 콜백(인자로 넘긴 함수: page.evaluate(async () => {…}), addEventListener('click', e => {…}), arr.map(x => {…}))은 함수 그래프에 안 들어가
+// 복잡도를 따로 잼 — 큰 익명 콜백이 측정에서 빠지던 구멍. 이름: 둘러싼 함수→부른 함수(예: runQA→page.evaluate), 같은 이름이 또 있으면 #2…
+export function complexAnon(units, cc = 40, lines = 120) { const out = [];
+  for (const u of units) { const seen = new Map();
+    walk(u.tree.rootNode, n => { if (!FN.has(n.type) || fnName(n) || n.parent?.type !== 'arguments') return;
+      const call = n.parent.parent, callee = (call?.childForFieldName('function')?.text || '?').replace(/\s+/g, '').slice(-40); let encl = null; for (let p = n.parent; p && !encl; p = p.parent) if (FN.has(p.type)) encl = fnName(p) || null;
+      const loc = u.loc(n), file = loc.split(':')[0], base = `${encl || '(최상위)'}→${callee}`, sk = file + ' ' + base, k = (seen.get(sk) || 0) + 1; seen.set(sk, k); // 번호는 파일 안에서만(다른 파일에 콜백이 늘어도 이름이 안 밀리게)
+      const body = n.childForFieldName('body') || n, c = complexity(body), ln = n.endPosition.row - n.startPosition.row + 1;
+      if (c.cc >= cc || c.depth >= 7 || (ln >= lines && c.cc >= 10)) out.push({ name: `${base}${k > 1 ? ' #' + k : ''} @${file}`, unit: u.name, loc, cc: c.cc, lines: ln, depth: c.depth }); }); } // 줄 수만 큰 감싸기(본문이 다른 콜백 하나)는 빼요
+  return out.sort((a, b) => b.cc - a.cc); }
 // Tarjan SCC → 2개 이상이 서로 부르는 순환
 export function cycles(fns, syncOnly = false) { let idx = 0; const st = [], on = new Set(), I = new Map(), L = new Map(), out = [];
   const sc = v => { I.set(v, idx); L.set(v, idx); idx++; st.push(v); on.add(v);

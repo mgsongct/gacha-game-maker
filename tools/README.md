@@ -7,7 +7,9 @@ tree-sitter(`web-tree-sitter` + `tree-sitter-javascript`)로 소스를 구문 �
 ```bash
 npm ci --prefix tools
 node tools/check.mjs            # 요약 + tools/out/report.md · flow.mmd · report.json
-node tools/check.mjs --strict   # 오류가 있으면 exit 1 (CI)
+node tools/check.mjs --strict   # 오류가 있거나 기준선보다 새로 생기거나 나빠진 항목이 있으면 exit 1 (CI)
+node tools/check.mjs --diff HEAD          # 이번 변경으로 새로 생김·나빠짐·해결 (git 기준 트리에 같은 분석을 돌려 비교 → out/diff.md)
+node tools/check.mjs --update-baseline    # 줄었을 때 기준선(tools/baseline.json) 낮추기 — 늘었으면 거부(코드를 고침)
 node tools/test.mjs             # 도구 자체 검사
 node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(기본은 미리 보기, 지운 뒤 생긴 것까지 되풀이)
 ```
@@ -37,6 +39,16 @@ node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(
 | CSS | 파싱 오류(ast-grep ERROR)·**괄호 짝**(주석·문자열 빼고 — 닫히지 않은 `{`는 ast-grep이 조용히 복구해서 따로 셈), 코드·HTML 어디에도 없는 클래스 선택자(동적 접두사 `ls-${…}`·`'r-'+k`는 씀) | 오류 · 안 쓰는 클래스 목록 |
 | 부속 파일 | 서비스 워커·중계 서버(Cloudflare·Vercel)·빌드·도구 스크립트 tree-sitter 파싱, PC 서버 파이썬 `ast.parse` | **오류** |
 | 중계 서버 허용 주소 | 두 중계 서버의 `ALLOW_HOSTS`가 같은지, 앱이 부르는 API 주소(호출 첫 인자·`base`/`url`/`endpoint` 값·`…DEF`/`…ENDPOINT` 상수의 https 주소 중 API 모양)가 목록에 있는지 | **경고**(웹 버전 중계에서 host not allowed) |
+
+## 위반 래칫 (기준선·변경 비교)
+- 모든 발견(오류·경고·복잡한 함수·복잡한 익명 콜백·분배기 case·동기 순환·안 쓰는 코드·되풀이 문자열·빈 catch(파일·종류별 개수)·흩어진 상태·쓰기만 하는 키·발신 없는 처리기·안 쓰는 CSS·도구 메타 점검)을 **줄 번호 없는 키**로 바꿔 비교해요(`lib/ratchet.mjs`). 줄만 밀린 것은 같은 항목
+- **새로 생김**(기준에 없던 키) · **나빠짐**(같은 항목의 복잡도·줄·중첩·횟수·개수 증가) · 해결 · 좋아짐
+- 기준선 `tools/baseline.json`은 커밋돼 있고, CI의 `--strict`가 새로 생김·나빠짐을 막아요. 점검 항목을 새로 늘려 원래 있던 것이 처음 보이게 됐을 때만 `--update-baseline --force`(커밋 메시지에 이유)
+- `--diff <기준>`은 기준 커밋을 `out/ref/<sha>/`에 풀어(git archive) 같은 분석을 돌려요
+
+## 메타 점검 (도구 자체)
+- 도구 코드(`tools/**`, `build/*.mjs` — node_modules·out·fixtures·games·reports 제외)도 앱과 같은 규칙으로 봐요: 파싱 오류·빈 catch·복잡한 함수·복잡한 익명 콜백·같은 본문·되풀이 문자열·안 쓰는 함수. 보고서 끝 "도구 자체" 절, 래칫 대상
+- 큰 익명 콜백(`page.evaluate(async () => {…})`, `addEventListener('click', e => {…})`)은 이름이 없어 함수 그래프에 안 들어가므로 `complexAnon`이 따로 재요. 이름은 `둘러싼 함수→부른 함수 @파일`
 
 ## 규칙 늘리기
 - tree-sitter 분석은 `lib/graph.mjs`(구조)·`lib/flow.mjs`(흐름), ast-grep 패턴은 `lib/quality.mjs`의 `sgRules`

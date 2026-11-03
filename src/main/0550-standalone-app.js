@@ -1,7 +1,7 @@
 /* =========================================================
    독립 앱 전용: AI 연결, 백업 파일, 안드로이드 뒤로가기
    ========================================================= */
-setupAI(); render(); loadAudio().then(()=>sceneBgm()); setTimeout(()=>{ try{ skillResume(); }catch(e){} },4000); /* 생성 중 미룬 스킬 설계 이어서 */
+setupAI(); render(); loadAudio().then(()=>sceneBgm()); setTimeout(()=>skillResume().catch(e=>quietErr(e,'스킬 설계 이어 하기')),4000); /* 생성 중 미룬 스킬 설계 이어서 */
 (()=>{ const o=LV();
   if(window.__LIVE__){ o.boots=0; saveLV(o); }
   if(o.failed){ o.failed=false; if(o.build) o.badBuild=o.build; saveLV(o); setTimeout(()=>toast('새 버전이 실행되지 않아 설치 버전으로 돌아왔어요'),1500); }

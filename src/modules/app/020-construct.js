@@ -44,8 +44,10 @@ function table(input,c,pool){
   const mem=pool.filter(p=>inGroup(p,g.match)),rar=[3,2,1].filter(k=>k<=g.maxRarity&&(k===1||info.open[k])),pr={};let left=0;
   for(const k of rar)pr[k]=k===1?100-rar.filter(x=>x>1).reduce((a,x)=>a+info.rarity[x],0):info.rarity[k];
   const has=k=>mem.some(p=>p.rarity===k),avail=rar.filter(has);if(!avail.length)continue;
-  for(const k of rar)if(!has(k)){left+=pr[k];pr[k]=0;}
-  const sum=avail.reduce((a,k)=>a+pr[k],0);for(const k of avail){const share=sum>0?pr[k]/sum*(sum+left):(100/avail.length),m=mem.filter(p=>p.rarity===k),U=m.reduce((a,p)=>a+up(p),0);for(const p of m)add(p,g.p*share/100*up(p)/U);}}
+  /* 후보가 없는 희귀도 칸은 같은 분류의 더 낮은 희귀도로만 내려요. 더 낮은 칸도 없으면 그 몫은 버리고(마지막에 전체를 다시 100%로) — 위로 올리면 희귀도 캡을 넘어요
+     (예전: R이 없는 분류는 R 몫이 전부 SR로 가서, 표시 SR 21%인 투입에서 실제 SR이 70%를 넘었어요) */
+  for(const k of rar)if(!has(k)){const low=avail.filter(x=>x<k).sort((a,b)=>b-a)[0];if(low)pr[low]+=pr[k];pr[k]=0;}
+  for(const k of avail){const m=mem.filter(p=>p.rarity===k),U=m.reduce((a,p)=>a+up(p),0);for(const p of m)add(p,g.p*pr[k]/100*up(p)/U);}}
  const S=[...rows.values()].reduce((a,b)=>a+b,0);
  return {info,rows:[...rows].map(([id,v])=>({id,p:S>0?v/S*100:0})).sort((a,b)=>b.p-a.p)};}
 function weighted(items,weight,rng){const w=items.map(weight),s=w.reduce((a,b)=>a+b,0);if(!(s>0))return items[Math.floor(rng()*items.length)];let x=rng()*s;for(let i=0;i<items.length;i++){x-=w[i];if(x<0)return items[i];}return items[items.length-1];}
@@ -81,13 +83,14 @@ function variantPrompt(ch,tpl){
  return [...look,...tags(tpl.prompt),...extra,'full body','standing','simple background','white background'].filter((t,i,a)=>a.indexOf(t)===i).join(', ');}
 function designBrief(ch,tpl){const color=symbolColor(ch),item=symbolItem(ch);
  return `의상 기본형 「${tpl.name}」(${tpl.prompt||tpl.name}). ${ch.name}의 외모 특징은 그대로 두고, 상징 컬러${color?`(${color})`:''}와 상징 아이템${item?`(${item})`:''}·성격을 의상 디자인에 녹인다. naiPrompt에는 원래 외모 태그 + 이 의상의 영어 태그를 자세히 쓴다.${tpl.brief?' 추가 지시: '+tpl.brief:''}`;}
+/* 기본 레시피: 4번째 자원이 열쇠(300~400 — 시작 자원 600으로 두 번은 시도), 앞 3종 중 강조하는 자원이 서로 달라 겹치지 않게 */
 const VARIANT_DEFAULTS=[
- {id:'v_swim',name:'수영복',prompt:'swimsuit, beach, summer, sunlight',chance:35,recipe:{min:[400,100,100,400]}},
- {id:'v_school',name:'교복',prompt:'blazer, formal school-style uniform cosplay, adult',chance:35,recipe:{min:[100,400,100,400]}},
- {id:'v_armor',name:'갑옷',prompt:'fantasy plate armor, ornate armor, cape',chance:30,recipe:{min:[100,100,500,400]}},
- {id:'v_stage1',name:'공연의상1',prompt:'idol stage costume, frills, stage lights',chance:30,recipe:{min:[300,300,100,500]}},
- {id:'v_stage2',name:'공연의상2',prompt:'elegant evening gown, concert stage, spotlight',chance:30,recipe:{min:[500,100,300,500]}},
- {id:'v_stage3',name:'공연의상3',prompt:'rock band stage outfit, leather, electric guitar',chance:30,recipe:{min:[100,500,300,500]}}].map(v=>Object.assign({on:true,rarity:'same',brief:'',cond:{}},v));
+ {id:'v_swim',name:'수영복',prompt:'swimsuit, beach, summer, sunlight',chance:35,recipe:{min:[300,100,100,300]}},
+ {id:'v_school',name:'교복',prompt:'blazer, formal school-style uniform cosplay, adult',chance:35,recipe:{min:[100,300,100,300]}},
+ {id:'v_armor',name:'갑옷',prompt:'fantasy plate armor, ornate armor, cape',chance:35,recipe:{min:[100,100,300,300]}},
+ {id:'v_stage1',name:'공연의상1',prompt:'idol stage costume, frills, stage lights',chance:30,recipe:{min:[300,300,100,400]}},
+ {id:'v_stage2',name:'공연의상2',prompt:'elegant evening gown, concert stage, spotlight',chance:30,recipe:{min:[300,100,300,400]}},
+ {id:'v_stage3',name:'공연의상3',prompt:'rock band stage outfit, leather, electric guitar',chance:30,recipe:{min:[100,300,300,400]}}].map(v=>Object.assign({on:true,rarity:'same',brief:'',cond:{}},v));
 const api={RES,DEFAULTS,VARIANT_DEFAULTS,config,normalize,matches,rates,table,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
 root.GGMConstruct=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

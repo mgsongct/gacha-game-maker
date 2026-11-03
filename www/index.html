@@ -2137,8 +2137,10 @@ function table(input,c,pool){
   const mem=pool.filter(p=>inGroup(p,g.match)),rar=[3,2,1].filter(k=>k<=g.maxRarity&&(k===1||info.open[k])),pr={};let left=0;
   for(const k of rar)pr[k]=k===1?100-rar.filter(x=>x>1).reduce((a,x)=>a+info.rarity[x],0):info.rarity[k];
   const has=k=>mem.some(p=>p.rarity===k),avail=rar.filter(has);if(!avail.length)continue;
-  for(const k of rar)if(!has(k)){left+=pr[k];pr[k]=0;}
-  const sum=avail.reduce((a,k)=>a+pr[k],0);for(const k of avail){const share=sum>0?pr[k]/sum*(sum+left):(100/avail.length),m=mem.filter(p=>p.rarity===k),U=m.reduce((a,p)=>a+up(p),0);for(const p of m)add(p,g.p*share/100*up(p)/U);}}
+  /* 후보가 없는 희귀도 칸은 같은 분류의 더 낮은 희귀도로만 내려요. 더 낮은 칸도 없으면 그 몫은 버리고(마지막에 전체를 다시 100%로) — 위로 올리면 희귀도 캡을 넘어요
+     (예전: R이 없는 분류는 R 몫이 전부 SR로 가서, 표시 SR 21%인 투입에서 실제 SR이 70%를 넘었어요) */
+  for(const k of rar)if(!has(k)){const low=avail.filter(x=>x<k).sort((a,b)=>b-a)[0];if(low)pr[low]+=pr[k];pr[k]=0;}
+  for(const k of avail){const m=mem.filter(p=>p.rarity===k),U=m.reduce((a,p)=>a+up(p),0);for(const p of m)add(p,g.p*pr[k]/100*up(p)/U);}}
  const S=[...rows.values()].reduce((a,b)=>a+b,0);
  return {info,rows:[...rows].map(([id,v])=>({id,p:S>0?v/S*100:0})).sort((a,b)=>b.p-a.p)};}
 function weighted(items,weight,rng){const w=items.map(weight),s=w.reduce((a,b)=>a+b,0);if(!(s>0))return items[Math.floor(rng()*items.length)];let x=rng()*s;for(let i=0;i<items.length;i++){x-=w[i];if(x<0)return items[i];}return items[items.length-1];}
@@ -2174,13 +2176,14 @@ function variantPrompt(ch,tpl){
  return [...look,...tags(tpl.prompt),...extra,'full body','standing','simple background','white background'].filter((t,i,a)=>a.indexOf(t)===i).join(', ');}
 function designBrief(ch,tpl){const color=symbolColor(ch),item=symbolItem(ch);
  return `의상 기본형 「${tpl.name}」(${tpl.prompt||tpl.name}). ${ch.name}의 외모 특징은 그대로 두고, 상징 컬러${color?`(${color})`:''}와 상징 아이템${item?`(${item})`:''}·성격을 의상 디자인에 녹인다. naiPrompt에는 원래 외모 태그 + 이 의상의 영어 태그를 자세히 쓴다.${tpl.brief?' 추가 지시: '+tpl.brief:''}`;}
+/* 기본 레시피: 4번째 자원이 열쇠(300~400 — 시작 자원 600으로 두 번은 시도), 앞 3종 중 강조하는 자원이 서로 달라 겹치지 않게 */
 const VARIANT_DEFAULTS=[
- {id:'v_swim',name:'수영복',prompt:'swimsuit, beach, summer, sunlight',chance:35,recipe:{min:[400,100,100,400]}},
- {id:'v_school',name:'교복',prompt:'blazer, formal school-style uniform cosplay, adult',chance:35,recipe:{min:[100,400,100,400]}},
- {id:'v_armor',name:'갑옷',prompt:'fantasy plate armor, ornate armor, cape',chance:30,recipe:{min:[100,100,500,400]}},
- {id:'v_stage1',name:'공연의상1',prompt:'idol stage costume, frills, stage lights',chance:30,recipe:{min:[300,300,100,500]}},
- {id:'v_stage2',name:'공연의상2',prompt:'elegant evening gown, concert stage, spotlight',chance:30,recipe:{min:[500,100,300,500]}},
- {id:'v_stage3',name:'공연의상3',prompt:'rock band stage outfit, leather, electric guitar',chance:30,recipe:{min:[100,500,300,500]}}].map(v=>Object.assign({on:true,rarity:'same',brief:'',cond:{}},v));
+ {id:'v_swim',name:'수영복',prompt:'swimsuit, beach, summer, sunlight',chance:35,recipe:{min:[300,100,100,300]}},
+ {id:'v_school',name:'교복',prompt:'blazer, formal school-style uniform cosplay, adult',chance:35,recipe:{min:[100,300,100,300]}},
+ {id:'v_armor',name:'갑옷',prompt:'fantasy plate armor, ornate armor, cape',chance:35,recipe:{min:[100,100,300,300]}},
+ {id:'v_stage1',name:'공연의상1',prompt:'idol stage costume, frills, stage lights',chance:30,recipe:{min:[300,300,100,400]}},
+ {id:'v_stage2',name:'공연의상2',prompt:'elegant evening gown, concert stage, spotlight',chance:30,recipe:{min:[300,100,300,400]}},
+ {id:'v_stage3',name:'공연의상3',prompt:'rock band stage outfit, leather, electric guitar',chance:30,recipe:{min:[100,300,300,400]}}].map(v=>Object.assign({on:true,rarity:'same',brief:'',cond:{}},v));
 const api={RES,DEFAULTS,VARIANT_DEFAULTS,config,normalize,matches,rates,table,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
 root.GGMConstruct=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
@@ -4598,7 +4601,7 @@ const CAST_SEX={f:'여성만',m:'남성만',mix:'여성 + 남성 혼성'};
 function castRule(k){ k=k==null?((typeof G!=='undefined'&&G&&G.meta&&G.meta.castSex)||''):k; return k==='f'?'등장인물 성별: 아군과 주요 인물은 모두 여성이다(naiPrompt는 1girl로 시작). ':k==='m'?'등장인물 성별: 아군과 주요 인물은 모두 남성이다(naiPrompt는 1boy로 시작). ':k==='mix'?'등장인물 성별: 아군과 주요 인물은 여성과 남성을 고르게 섞는다(대략 반반. 여성은 1girl, 남성은 1boy로 시작). 새 인물을 만들 때 지금 아군의 성비를 보고 적은 쪽을 채운다. ':''; }
 function rulesText(){const tone=String((G.meta&&G.meta.tone)||'').trim();return genderText()+callText()+castRule()+`규칙: 등장인물은 모두 성인이다. ${tone?'이 게임의 분위기: '+tone+'. 글의 톤은 이 분위기를 따른다. ':''}모든 글은 한국어로 쓴다. 이 게임의 용어: 플레이어 호칭 "${T('player')}", 유료 재화 "${T('currency')}", 뽑기 "${T('gacha')}", 전투 "${T('ops')}", 탐사 콘텐츠 "${T('abyss')}", 아군 "${T('crew')}", 메신저 "${T('talk')}". 속성: ${ELEMS.join(', ')}${elemLine()?` (${elemLine()})`:''}.`;}
 // 속성 상성 문장: 실제 상성표(rulesElemMat, 없으면 BEATS)에서 만들어요(예전엔 속성 3개를 가정해 4개 이상인 게임에 틀린 상성을 알렸음)
-function elemLine(){ let m=null; try{ m=typeof rulesElemMat==='function'&&G&&G.meta&&G.meta.elems?rulesElemMat():null; }catch(e){} return ELEMS.map(e=>{ const s=m&&m[e]?Object.keys(m[e]).filter(t=>t!==e&&m[e][t]>1):(BEATS[e]?[BEATS[e]]:[]); return s.length?jo(e,'은','는')+' '+s.join('·')+'에 강함':''; }).filter(Boolean).join(', '); }
+function elemLine(){ const m=G&&G.meta&&Array.isArray(G.meta.elems)&&G.meta.elems.length?rulesElemMat():null; return ELEMS.map(e=>{ const s=m&&m[e]?Object.keys(m[e]).filter(t=>t!==e&&m[e][t]>1):(BEATS[e]?[BEATS[e]]:[]); return s.length?jo(e,'은','는')+' '+s.join('·')+'에 강함':''; }).filter(Boolean).join(', '); }
 // 받침에 맞는 조사: jo('열정','은','는') → '열정은', jo('캐스팅','으로','로') → '캐스팅으로'(ㄹ 받침이면 '로'). 한글이 아닌 끝 글자는 '을(를)'처럼 둘 다
 function jo(w,a,b){ w=String(w??''); const c=w.charCodeAt(w.length-1)-0xAC00, j=c>=0&&c<=11171?c%28:-1; if(j<0) return w+(a==='으로'?'(으)로':a+'('+b+')'); return w+((j>0&&!(a==='으로'&&j===8))?a:b); }
 // 이미 만든 이벤트 소재를 알려 줘서 같은 얘기를 또 하지 않게 해요
@@ -8095,7 +8098,7 @@ const contractHTML=noSkin(contractHTML0);
 function contractHTML0(){
   const s=P().settings, bs=G.banners.filter(bnOpen), b=curBanner();
   if(!b) return pageHead(T('gacha'),'RECRUIT')+`<div class="panel"><p>열린 배너가 없어요.</p><button class="btn" data-act="bnew">배너 만들기</button></div>`;
-  const pity=b.id==='std'?P().pity:(P().pities[b.id]||0), left=s.pity-pity, pool=bannerPool(b);
+  const pity=pityGet(b), left=s.pity-pity, pool=bannerPool(b);
   const ups=(b.pickup||[]).map(charById).filter(Boolean), show=(ups.length?ups:pool.filter(c=>c.rarity===3)).slice(0,4);
   const hero=show[0], hill=hero&&P().lobbyMode!=='stand'&&charIllust(hero);
   const rOf=r=>r===3?s.ssr:r===2?s.sr:Math.max(0,100-s.ssr-s.sr);
@@ -8121,7 +8124,7 @@ function contractHTML0(){
   </section>
   <div class="panel pk-pity"><div style="display:flex;justify-content:space-between"><span>SSR 확정까지</span><b>${left}회</b></div><div class="bar" style="margin-top:6px"><i style="width:${pity/s.pity*100}%"></i></div>
     ${pity>=Math.floor(s.pity*0.75)?`<p class="soft">🔥 확률 상승 중 · 지금 SSR ${softRate(s,pity+1).toFixed(1)}%</p>`:`<p class="muted" style="margin:6px 0 0;font-size:.75rem">${Math.floor(s.pity*0.75)}회부터 SSR 확률이 점점 올라가요</p>`}
-    ${ups.length&&(P().guar||{})[b.id]?`<p class="soft gold">★ 다음 SSR은 확률 업 ${esc(T('crew'))} 확정</p>`:''}
+    ${ups.length&&guarGet(b)?`<p class="soft gold">★ 다음 SSR은 확률 업 ${esc(T('crew'))} 확정</p>`:''}${pityKey(b)==='pickup'?`<p class="muted" style="margin:4px 0 0;font-size:.72rem">천장·확정은 다음 픽업 배너로 이어져요</p>`:''}
     <div class="sparkrow"><span>모집 포인트</span><div class="bar"><i style="width:${Math.min(100,((P().spark||{})[b.id]||0)/SPARK*100)}%"></i></div><b>${(P().spark||{})[b.id]||0}/${SPARK}</b><button class="btn sm ${((P().spark||{})[b.id]||0)>=SPARK?'':'ghost'}" data-act="sparkopen" data-id="${b.id}">교환</button></div>${P().firstTen?'<p class="muted" style="margin:8px 0 0">첫 10회는 SSR 1명 확정</p>':''}${ups.length?`<p class="muted" style="margin:8px 0 0">확률 업: ${ups.map(c=>esc(c.name)).join(', ')} · 같은 등급이 나오면 ${b.rate}% 확률</p>`:''}</div>
   <div class="pullrow"><button class="btn ghost" data-act="pull" data-n="1">1회<small>◆ ${COST}</small></button><button class="btn" data-act="pull" data-n="10">10회<small>◆ ${nf(COST*10)}${pool.some(c=>c.rarity>=2)?' · SR 이상 1명 보장':''}</small></button></div>
   <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="go" data-to="cash">◆ ${esc(T('currency'))} 충전</button></div>
@@ -9555,6 +9558,40 @@ function ensureLibPrompts(){ if(LIBP_JOB) return LIBP_JOB; const need=G.lib.filt
 // 새 게임의 빈 세계관: 원본 샘플(DEFAULT_WORLD)의 칸 구조만 쓰고 내용은 비워요(빠진 칸에 다른 세계의 플롯·세력이 남지 않게)
 function blankWorld(){ return Object.fromEntries(Object.entries(clone(DEFAULT_WORLD)).map(([k,v])=>[k,Array.isArray(v)?[]:typeof v==='string'?'':v&&typeof v==='object'?{}:v])); }
 // 파견 보상은 시간·인원에 비례(예전엔 순서대로 고정 표에서 붙어 0.5시간·1명짜리가 가장 큰 보상을 받기도 했음)
+/* 새 게임 공통 마무리: 건조/영입을 켰으면 시작 자원 지급, 지금 점검 규칙 판으로 표시(새 게임은 구버전 생성물이 아님) */
+function ngFinish(ng,draft){ if(draft&&draft.con) conStartNew(ng); ng.meta.auditSeen=auditVer(); }
+/* 원본 샘플의 상점 NPC(「보급관」) 대신 중립 이름 */
+function neutralShop(){ return Object.assign(clone(DEFAULT_META.shop),{name:'상점'}); }
+/* 세계 단계 결과 → 재료 던전 이름(키로 맞춤)·원정 방식·상점·바리에이션 기본형·파견(보상은 시간·인원에서 계산) */
+function ngWorldExtras(ng,a){ const FA=Array.isArray(a.farms)?a.farms:[], TT=ng.meta.terms, FN={exp:TT.expMat,gold:TT.gold,wmat:TT.wMat,core:TT.core};
+  ng.meta.farms=DEFAULT_META.farms.map((d,i)=>{ const f=FA.find(x=>x&&x.key===d.key)||(FA.length===4?FA[i]:null), nm=String((f&&f.name)||'').trim(); return {key:d.key,name:nm||`${FN[d.key]||d.key} 수급`}; });
+  if(['combat','idol','streamer','business'].includes(a.expedition)) ng.meta.expedition={mode:a.expedition};
+  ng.meta.shop=neutralShop();
+  const V=variantsFromAI(a.variants,ng); if(V.length>=2) ng.meta.variants=V;
+  ng.dispatches=(Array.isArray(a.dispatches)?a.dispatches:[]).slice(0,6).map((d,i)=>({id:'d'+(i+1),name:String(d.name||'파견'),desc:String(d.desc||''),hours:num(d.hours,0.5,24,2),need:num(parseInt(d.need,10),1,4,2)})).map(d=>Object.assign(d,{reward:dispReward(d.hours,d.need)}));
+  if(!ng.dispatches.length) ng.dispatches=clone(DEFAULT_DISP); }
+/* 대원 소속이 세계관 세력 이름과 조금 다르면(띄어쓰기·줄임) 그 세력에 맞추고, 없는 세력이면 플레이어블로 더함 */
+function ngFactionFix(ng){ const F=ng.world.factions, k=x=>String(x||'').replace(/\s+/g,'');
+  ng.chars.forEach(c=>{ if(!c.faction||F.some(f=>f.name===c.faction)) return; const hit=F.find(f=>k(f.name)===k(c.faction)||(k(c.faction).length>=2&&(k(f.name).includes(k(c.faction))||k(c.faction).includes(k(f.name))))); if(hit){ c.faction=hit.name; return; } F.push({name:c.faction,kind:'playable',desc:'',rel:{},stance:[]}); }); }
+/* 대원 단계 뒤: 희귀도 분포 보정(작가가 정한 등급은 그대로), 조건에 맞는 대원이 하나도 없는 바리에이션은 조건을 비움 */
+function ngCharsPost(ng,DCH){ rarityFix(ng.chars,new Set(DCH.filter(d=>d.rank).map(d=>d.name)));
+  (ng.meta.variants||[]).forEach(t=>{ if(t.cond&&Object.keys(t.cond).length&&!ng.chars.some(c=>!c.monster&&GGMConstruct.condMatch(t.cond,c,{}))) t.cond={}; }); }
+/* 바리에이션 기본형 정리: 이름·영어 태그만, 조건은 이 게임에 있는 역할·소속·속성만 남김. 레시피는 자동 — 4번째 자원이 열쇠이고, 앞 3종 중 강조하는 자원이 기본형마다 달라 서로 겹치지 않게.
+   4번째 자원 300~400이라 시작 자원(600)으로 두 번은 시도할 수 있어요 */
+const VAR_RECIPES=[[300,100,100,300],[100,300,100,300],[100,100,300,300],[300,300,100,400],[300,100,300,400],[100,300,300,400]];
+function variantsFromAI(list,ng){ if(!Array.isArray(list)) return []; const F=((ng.world||{}).factions||[]).map(f=>f.name), E=(ng.meta.elems||DEFAULT_META.elems).map(e=>e.n), R=['atk','def','sup'], seen=new Set();
+  return list.filter(v=>v&&typeof v==='object').map(v=>({name:String(v.name||'').replace(/[<>"'&`]/g,'').trim().slice(0,12),prompt:String(v.prompt||'').replace(/[^\x20-\x7e]/g,'').replace(/\s+/g,' ').replace(/^[ ,]+|[ ,]+$/g,'').slice(0,200),brief:String(v.brief||'').slice(0,160),cond:v.cond&&typeof v.cond==='object'?v.cond:{}}))
+    .filter(v=>v.name&&v.prompt&&!seen.has(v.name)&&seen.add(v.name)).slice(0,6).map((v,i)=>{ const L=(x,ok)=>(Array.isArray(x)?x:[]).map(s=>String(s).trim()).filter(ok), c={factions:L(v.cond.factions,s=>F.includes(s)),roles:L(v.cond.roles,s=>R.includes(s)),elems:L(v.cond.elems,s=>E.includes(s))};
+      Object.keys(c).forEach(k=>{ if(!c[k].length) delete c[k]; }); return {id:'v_'+uid(),name:v.name,prompt:v.prompt,brief:v.brief,chance:35,recipe:{min:VAR_RECIPES[i%VAR_RECIPES.length].slice()},rarity:'same',on:true,cond:c}; }); }
+/* 희귀도 분포: SSR은 ⌈n/3⌉명 이하, R은 ⌊n/3⌋명 이상, SR·SSR 1명 이상(3명 이상일 때). 뒤쪽(나중에 나온) 캐릭터부터 한 단계씩 조정하고 능력치를 그 등급 범위로 맞춰요.
+   생성 게임 둘 다 6명 중 R 1명이라 첫 10연에서 R 자리가 모두 같은 캐릭터였어요 */
+function rarityFix(L,fixed){ const n=L.length; if(n<3) return 0; let k=0; const free=()=>[...L].reverse().filter(c=>!fixed.has(c.name)), cnt=r=>L.filter(c=>c.rarity===r).length, set=(c,r)=>{ c.rarity=r; k++; balNormalize(c,'edge'); };
+  for(const c of free()){ if(cnt(3)<=Math.ceil(n/3)) break; if(c.rarity===3) set(c,2); }
+  for(const c of free()){ if(cnt(1)>=Math.floor(n/3)) break; if(c.rarity===2&&cnt(2)>1) set(c,1); }
+  for(const c of free()){ if(cnt(1)>=Math.floor(n/3)) break; if(c.rarity===3&&cnt(3)>1) set(c,2); }
+  if(!cnt(3)){ const c=free().reverse().find(c=>c.rarity===2)||free().reverse().find(c=>c.rarity===1&&cnt(1)>Math.floor(n/3)); if(c) set(c,3); }
+  if(!cnt(2)){ const c=free().find(c=>c.rarity===1&&cnt(1)>Math.floor(n/3))||free().find(c=>c.rarity===3&&cnt(3)>1); if(c) set(c,2); }
+  return k; }
 function dispReward(h,need){ const pts=Math.pow(+h||1,0.85)*(1+0.35*((+need||1)-1)), r={gold:Math.max(500,Math.round(pts*1500/100)*100)}; if(h>=1) r.exp=Math.max(1,Math.round(pts*3)); if(h>=2) r.wmat=Math.max(1,Math.round(pts*0.8)); if(h>=6) r.core=Math.max(1,Math.round(pts/5)); return r; }
 async function aiChapterGen0(dir,n,cast,t){
   const k=G.chapters.filter(c=>c.kind==='main').length,hl=Math.round(800*(1+.6*k)),hh=Math.round(1400*(1+.6*k)),al=Math.round(75*(1+.25*k)),ah=Math.round(105*(1+.25*k)),dl=30+15*k,dh=60+15*k;
@@ -9669,7 +9706,7 @@ async function buildNewGameDraft(t,draft,sourceProject){if(String(draft?.story||
       if(r) aiLog({ok:false,stage:AISTAGE,err:'응답은 왔지만 필요한 항목이 빠졌어요(길이 제한으로 잘렸거나 형식이 달라요). 받은 항목: '+Object.keys(r).join(', ').slice(0,200)}); await wait(1500); } AISTAGE=''; AI_QUIET_LAST=''; return null; };
   if(Object.keys(DR.r).length) toast('지난번에 만들던 단계부터 이어서 만들어요');
   t.disabled=true; const base=`규칙: 등장인물은 모두 성인이다. 서브컬처 수집형 RPG. 한국어로 쓴다. ${castRule(draft.castSex||'')}`;
-  const a=await ngStep('a','1/4 세계관과 게임 정의를 만드는 중…',()=>aiJSON(`${base}${FAN}${STY}${DRA}\n${EXPLORATION_NAME_RULE}\n${FACTION_RULE}\n속성(elems)은 세계관에 맞게 3~5개, 각 속성의 beats(이기는 속성)가 서로 맞물리게 정한다. reactions는 두 속성이 겹칠 때 생기는 반응 0~4개. ${POS_RULE}\nterms.core·terms.gearMat·terms.transcMat에는 이 세계관에서 실제로 쓰는 고유한 재료 이름을 지어 넣는다. 승급(Lv1~70) 재료·장비 강화 재료·초월승급(Lv71~120) 재료는 용도를 설명하는 항목 제목이며, 이 제목을 재료 이름으로 그대로 복사하지 않는다.${auto?'\n짧은 요청이다. 요청의 핵심은 지키고 나머지(세계관·세력·갈등·분위기)는 자유롭게 상상해서 구체적으로 채운다.':''}${heroBlank?'\nJSON에 "hero":{"gender":"주인공(플레이어) 성별·성 정체성. 세계관에 어울리게 정하거나, 정하지 않으려면 빈 문자열","look":"주인공 외모 한 줄(성인)"}도 넣는다.':''}${hero.call?`\n플레이어 호칭(terms.player)은 반드시 "${hero.call}"(으)로 한다.`:''}${String(draft.crewTerm||'').trim()?`\n아군 호칭(terms.crew)은 반드시 "${String(draft.crewTerm).trim()}"(으)로 한다.`:'\nterms(아군 호칭 등 용어)는 이 게임의 세계관에 맞게 새로 짓는다. 다른 게임에서 쓰던 용어를 가져오지 않는다.'}${!DT&&(hero.name||hero.gender||hero.look||hero.bio)?`\n주인공(플레이어): 이름 ${hero.name||'(세계관 호칭)'}, 성별·성 정체성 ${hero.gender||'정하지 않음'}${hero.look?', 외모 '+hero.look:''}${hero.bio?', 설정 '+hero.bio:''}.`:''}\n새 가챠 게임을 기획한다. 장르와 키워드: "${kw}". 분위기: "${tone&&!dupTxt(kw,tone)?tone:'자유'}".\n${userTitle?'게임 이름은 반드시 "'+userTitle+'"로 한다(그대로). ':TITLE_RULE+'키워드에서 떠올린 고유한 이름으로 짓는다.'} 샘플 게임 이름(낙성계약)과 비슷하게 짓지 말고, '계약'이라는 단어는 쓰지 않는다.\n화면 테마는 ${th==='auto'?'tactical, fantasy, neon, pastel, noir 중 어울리는 것':th}.\nJSON만 출력: {"title":"게임 이름","sub":"영문 부제","theme":"tactical|fantasy|neon|pastel|noir","accent":"#rrggbb","terms":{"player":"플레이어 호칭","currency":"유료 재화","gold":"일반 재화","expMat":"경험치 재료","wMat":"스킬 강화 재료","core":"세계관에 맞는 Lv1~70 승급 재료 고유 이름","gearMat":"세계관에 맞는 장비 강화 재료 고유 이름","transcMat":"세계관에 맞는 Lv71~120 초월승급 재료 고유 이름","gacha":"뽑기 이름(2~3자)","ops":"전투 메뉴 이름(2~3자)","crew":"아군 호칭(2~3자)","talk":"메신저 앱 이름","dispatch":"파견 이름","farm":"재료 던전 이름","pass":"패스 이름","event":"이벤트","weapon":"전용 무기 호칭","files":"캐릭터 비밀 기록 호칭","skin":"의상 호칭","enhance":"강화","limit":"돌파 호칭","abyss":"세계관에 어울리는 반복 탐사 콘텐츠 이름(2~12자)","construct":"자원을 넣어 새 동료를 데려오는 메뉴 이름(2~4자)","res1":"그 메뉴에 넣는 자원 1(2~4자, 세계관 고유)","res2":"자원 2","res3":"자원 3","res4":"자원 4(귀한 것 — 특별 의상·바리에이션의 열쇠)"},"elems":[{"n":"속성(1~2자)","c":"#색","d":"상징하는 것과 이기는 이유(한 줄)","beats":"이 속성이 이기는 속성 이름"}],"reactions":[{"a":"속성","b":"다른 속성","name":"반응 이름","type":"amp|burst|stun|vuln","value":1.5}],${POS_SCHEMA},"roleDesc":{"atk":"공격 역할 한 줄 설명","def":"방어 역할 한 줄","sup":"지원 역할 한 줄"},"roles":{"atk":"","def":"","sup":""},"farms":[{"key":"exp","name":""},{"key":"gold","name":""},{"key":"wmat","name":""},{"key":"core","name":""}],"expedition":"combat|idol|streamer|business","world":{"name":"","summary":"2~3문장, 플레이어 입장 포함","lore":"6~10문장","plot":"숨겨진 진실, 복선, 1부 전체 전개 6~10문장","factions":${FACTION_SCHEMA}},"dispatches":[{"name":"","desc":"","hours":1,"need":2}]}  파견은 6개, hours는 0.5~12. expedition은 파견(원정) 방식이다: 전투·모험 세계관은 combat(지역에 보내 자원을 가져옴), 아이돌·연예계는 idol(방송·행사 출연), 방송인·크리에이터는 streamer(콘텐츠 제작), 가게·회사 경영은 business(파트에 배치해 영업). 세계관에 가장 맞는 하나를 고르고, dispatches 이름도 그 방식에 맞게 짓는다.`,null,'complex'),r=>r&&r.title&&r.world&&String(r.world.plot||r.world.summary||'').trim()); /* 플롯·요약이 없으면 다시 묻기(빈 세계관에 원본 샘플이 남던 문제) */
+  const a=await ngStep('a','1/4 세계관과 게임 정의를 만드는 중…',()=>aiJSON(`${base}${FAN}${STY}${DRA}\n${EXPLORATION_NAME_RULE}\n${FACTION_RULE}\n속성(elems)은 세계관에 맞게 3~5개, 각 속성의 beats(이기는 속성)가 서로 맞물리게 정한다. reactions는 두 속성이 겹칠 때 생기는 반응 0~4개. ${POS_RULE}\nterms.core·terms.gearMat·terms.transcMat에는 이 세계관에서 실제로 쓰는 고유한 재료 이름을 지어 넣는다. 승급(Lv1~70) 재료·장비 강화 재료·초월승급(Lv71~120) 재료는 용도를 설명하는 항목 제목이며, 이 제목을 재료 이름으로 그대로 복사하지 않는다.${auto?'\n짧은 요청이다. 요청의 핵심은 지키고 나머지(세계관·세력·갈등·분위기)는 자유롭게 상상해서 구체적으로 채운다.':''}${heroBlank?'\nJSON에 "hero":{"gender":"주인공(플레이어) 성별·성 정체성. 세계관에 어울리게 정하거나, 정하지 않으려면 빈 문자열","look":"주인공 외모 한 줄(성인)"}도 넣는다.':''}${hero.call?`\n플레이어 호칭(terms.player)은 반드시 "${hero.call}"(으)로 한다.`:''}${String(draft.crewTerm||'').trim()?`\n아군 호칭(terms.crew)은 반드시 "${String(draft.crewTerm).trim()}"(으)로 한다.`:'\nterms(아군 호칭 등 용어)는 이 게임의 세계관에 맞게 새로 짓는다. 다른 게임에서 쓰던 용어를 가져오지 않는다.'}${!DT&&(hero.name||hero.gender||hero.look||hero.bio)?`\n주인공(플레이어): 이름 ${hero.name||'(세계관 호칭)'}, 성별·성 정체성 ${hero.gender||'정하지 않음'}${hero.look?', 외모 '+hero.look:''}${hero.bio?', 설정 '+hero.bio:''}.`:''}\n새 가챠 게임을 기획한다. 장르와 키워드: "${kw}". 분위기: "${tone&&!dupTxt(kw,tone)?tone:'자유'}".\n${userTitle?'게임 이름은 반드시 "'+userTitle+'"로 한다(그대로). ':TITLE_RULE+'키워드에서 떠올린 고유한 이름으로 짓는다.'} 샘플 게임 이름(낙성계약)과 비슷하게 짓지 말고, '계약'이라는 단어는 쓰지 않는다.\n화면 테마는 ${th==='auto'?'tactical, fantasy, neon, pastel, noir 중 어울리는 것':th}.\nJSON만 출력: {"title":"게임 이름","sub":"영문 부제","theme":"tactical|fantasy|neon|pastel|noir","accent":"#rrggbb","terms":{"player":"플레이어 호칭","currency":"유료 재화","gold":"일반 재화","expMat":"경험치 재료","wMat":"스킬 강화 재료","core":"세계관에 맞는 Lv1~70 승급 재료 고유 이름","gearMat":"세계관에 맞는 장비 강화 재료 고유 이름","transcMat":"세계관에 맞는 Lv71~120 초월승급 재료 고유 이름","gacha":"뽑기 이름(2~3자)","ops":"전투 메뉴 이름(2~3자)","crew":"아군 호칭(2~3자)","talk":"메신저 앱 이름","dispatch":"파견 이름","farm":"재료 던전 이름","pass":"패스 이름","event":"이벤트","weapon":"전용 무기 호칭","files":"캐릭터 비밀 기록 호칭","skin":"의상 호칭","enhance":"강화","limit":"돌파 호칭","abyss":"세계관에 어울리는 반복 탐사 콘텐츠 이름(2~12자)","construct":"자원을 넣어 새 동료를 데려오는 메뉴 이름(2~4자)","res1":"그 메뉴에 넣는 자원 1(2~4자, 세계관 고유)","res2":"자원 2","res3":"자원 3","res4":"자원 4(귀한 것 — 특별 의상·바리에이션의 열쇠)"},"elems":[{"n":"속성(1~2자)","c":"#색","d":"상징하는 것과 이기는 이유(한 줄)","beats":"이 속성이 이기는 속성 이름"}],"reactions":[{"a":"속성","b":"다른 속성","name":"반응 이름","type":"amp|burst|stun|vuln","value":1.5}],${POS_SCHEMA},"roleDesc":{"atk":"공격 역할 한 줄 설명","def":"방어 역할 한 줄","sup":"지원 역할 한 줄"},"roles":{"atk":"","def":"","sup":""},"farms":[{"key":"exp","name":""},{"key":"gold","name":""},{"key":"wmat","name":""},{"key":"core","name":""}],"expedition":"combat|idol|streamer|business","variants":[{"name":"바리에이션 기본형 이름(2~6자)","prompt":"그 의상의 영어 이미지 태그(쉼표로)","brief":"디자인 지시 한 줄","cond":{"roles":["atk|def|sup 중 어울리는 역할만"],"factions":["어울리는 소속만"],"elems":["어울리는 속성만"]}}],"world":{"name":"","summary":"2~3문장, 플레이어 입장 포함","lore":"6~10문장","plot":"숨겨진 진실, 복선, 1부 전체 전개 6~10문장","factions":${FACTION_SCHEMA}},"dispatches":[{"name":"","desc":"","hours":1,"need":2}]}  파견은 6개, hours는 0.5~12. expedition은 파견(원정) 방식이다: 전투·모험 세계관은 combat(지역에 보내 자원을 가져옴), 아이돌·연예계는 idol(방송·행사 출연), 방송인·크리에이터는 streamer(콘텐츠 제작), 가게·회사 경영은 business(파트에 배치해 영업). 세계관에 가장 맞는 하나를 고르고, dispatches 이름도 그 방식에 맞게 짓는다. variants는 같은 캐릭터의 다른 모습(특별 의상) 기본형 4~6개다: 교복·수영복·갑옷·무대의상처럼 여러 캐릭터에게 공통으로 입힐 수 있는 틀을 이 세계관에 맞게 짓는다(계절·행사·직업·의식 등). cond에는 그 틀이 어울리는 역할(atk/def/sup)·소속·속성만 넣고, 모두에게 어울리면 비운다. 위에서 정한 세력·속성 이름을 그대로 쓴다.`,null,'complex'),r=>r&&r.title&&r.world&&String(r.world.plot||r.world.summary||'').trim()); /* 플롯·요약이 없으면 다시 묻기(빈 세계관에 원본 샘플이 남던 문제) */
   if(!a){t.disabled=false;stat('세계관 생성에 실패했어요. 같은 내용으로 다시 누르면 이어서 만들어요.');return;}
   const ng=defaults(); ng.lib=ng.lib.filter(l=>!['bg','prop','cg','map'].includes(l.kind)); ng.world=blankWorld(); /* 원본 샘플 게임의 배경·소품·세계관은 새 게임에 남기지 않아요 — 남으면 생성 프롬프트의 "기존 목록"으로 들어가 다른 세계의 장소가 대본에 섞여요 */ if(heroBlank&&a.hero&&typeof a.hero==='object'){ hero.gender=String(a.hero.gender||'').slice(0,40); hero.look=String(a.hero.look||'').slice(0,400); } if(hero){ ng.prog.player=String(hero.name||'').slice(0,12); ng.prog.genderTxt=String(hero.gender||''); ng.prog.gender=genderCode(hero.gender); ng.prog.look=String(hero.look||''); ng.prog.bio=String(hero.bio||''); ng.prog.hideEyes=!!hero.hide; ng.prog.nameAsked=true; }
   ng.meta=Object.assign(clone(DEFAULT_META),{title:userTitle||String(a.title||'새 게임'),sub:String(a.sub||''),theme:['tactical','fantasy','neon','pastel','noir'].includes(a.theme)?a.theme:'tactical',accent:/^#[0-9a-f]{6}$/i.test(a.accent||'')?a.accent:'#ffb400'});
@@ -9677,23 +9714,21 @@ async function buildNewGameDraft(t,draft,sourceProject){if(String(draft?.story||
   ng.meta.terms=Object.assign(clone(DEFAULT_META.terms),a.terms||{}); ng.meta.terms.abyss=explorationName(a.terms?.abyss); if(String(draft.crewTerm||'').trim()) ng.meta.terms.crew=String(draft.crewTerm).trim().slice(0,8); if(String(hero.call||'').trim()) ng.meta.terms.player=String(hero.call).trim().slice(0,12); try{ ng.meta.draft=drClean(draft); }catch(e){} if(Array.isArray(a.elems)&&a.elems.length>=2){ const L=a.elems.slice(0,8).map((e,i)=>({d:String(e.d||'').slice(0,80),n:String(e.n||(DEFAULT_META.elems[i]||{}).n||'속성'+(i+1)).replace(/[<>"'&`.]/g,'').slice(0,4),c:/^#[0-9a-f]{6}$/i.test(e.c||'')?e.c:(DEFAULT_META.elems[i]||{c:'#999999'}).c,beats:String(e.beats||'')})); if(new Set(L.map(e=>e.n)).size===L.length){ ng.meta.elems=L.map(({beats,...e})=>e); const N=L.map(e=>e.n), beats={}; L.forEach(e=>{ if(N.includes(e.beats)&&e.beats!==e.n) beats[e.n]=e.beats; }); ng.meta.rules=Object.assign(ng.meta.rules||{},Object.keys(beats).length?{beats}:{},{reactions:(Array.isArray(a.reactions)?a.reactions:[]).slice(0,6).filter(x=>x&&N.includes(x.a)&&N.includes(x.b)&&x.a!==x.b).map(x=>({a:x.a,b:x.b,name:String(x.name||'반응').slice(0,12),type:['amp','burst','stun','vuln'].includes(x.type)?x.type:'amp',value:+x.value||''}))}); } }
   if(a.roleDesc&&typeof a.roleDesc==='object'){ ng.meta.rules=Object.assign(ng.meta.rules||{},{roleDesc:Object.fromEntries(['atk','def','sup'].map(k=>[k,String(a.roleDesc[k]||'').slice(0,80)]))}); }
   { const L=posClean(a.positions); if(L.length>=2&&['atk','def','sup'].every(k=>L.some(p=>p.base===k))) ng.meta.positions=L; }
-  ng.meta.roles=Object.assign(clone(DEFAULT_META.roles),a.roles||{}); { const FA=Array.isArray(a.farms)?a.farms:[], TT=ng.meta.terms; ng.meta.farms=DEFAULT_META.farms.map((d,i)=>{ const f=FA.find(x=>x&&x.key===d.key)||(FA.length===4?FA[i]:null), nm=String((f&&f.name)||'').trim(); return {key:d.key,name:nm||`${({exp:TT.expMat,gold:TT.gold,wmat:TT.wMat,core:TT.core})[d.key]||d.key} 수급`}; }); }
-  if(['combat','idol','streamer','business'].includes(a.expedition)) ng.meta.expedition={mode:a.expedition};
-  ng.meta.shop=Object.assign(clone(DEFAULT_META.shop),{name:'상점'}); /* 원본의 「보급관」 대신 중립 이름 */
+  ng.meta.roles=Object.assign(clone(DEFAULT_META.roles),a.roles||{});
   ng.world=Object.assign(blankWorld(),a.world||{}); ng.world.factions=factionClean(ng.world.factions); /* 세력 설계(0445) */ { const sd=[]; ng.world.summary=dedupText(ng.world.summary,sd).text; ng.world.lore=dedupText(ng.world.lore,sd).text; }
-  ng.dispatches=(Array.isArray(a.dispatches)?a.dispatches:[]).slice(0,6).map((d,i)=>({id:'d'+(i+1),name:String(d.name||'파견'),desc:String(d.desc||''),hours:num(d.hours,0.5,24,2),need:num(parseInt(d.need,10),1,4,2)})).map(d=>Object.assign(d,{reward:dispReward(d.hours,d.need)}));
-  if(!ng.dispatches.length) ng.dispatches=clone(DEFAULT_DISP);
+  ngWorldExtras(ng,a);
   const oldG=G; G=ng; applyMeta();
   const b=await ngStep('b',`2/4 ${T('crew')} ${n}명을 만드는 중…`,()=>aiJSON(`${RULES}${FAN}${STY?STY+'\n스토리에 이름이 나온 인물은 그 이름과 설정 그대로 '+T('crew')+'으로 만든다(적·악역 제외).':''}${DCH.length?`\n작가가 정한 ${T('crew')}(반드시 모두 포함하고, 이름·성격·과거·말투·외모를 그대로 살린다. 빈 칸만 채운다):\n${DCH.map(c=>`- ${c.name}${c.rank?' / 등급 '+RL[c.rank]+' (rarity '+c.rank+')':''}${c.role?' / '+c.role:''}${c.profile?' / 성격·과거·관계: '+c.profile:''}${c.speech?' / 말투: '+c.speech:''}${c.look?' / 외모: '+c.look:''}`).join('\n')}\n나머지 인원은 세계관에 맞게 새로 만든다.`:''}${DNPC.length?`\n다음 인물은 NPC(조연)라서 ${T('crew')}으로 만들지 않는다: ${DNPC.map(c=>c.name).join(', ')}`:''}${DRA}\n세계관: ${ng.world.summary}\n${ng.world.lore}\n플롯: ${ng.world.plot}\n세력: ${ng.world.factions.map(f=>f.name+'('+f.desc+')').join(', ')}\n\n이 게임의 ${T('crew')} ${Math.max(n,DCH.length)}명을 만들어라. SSR ${Math.max(1,Math.round(n/5))}~${Math.max(1,Math.round(n/3))}명, SR ${Math.max(1,Math.round(n/3))}명, 나머지 R(R이 가장 많게 — 뽑기·영입의 대부분이 R이라 R이 1~2명뿐이면 같은 대원만 되풀이해 나온다). 세력을 고르게 나누고, 역할(atk/def/sup)과 속성도 고르게. 각자 플롯과 연결된 비밀을 files에 넣는다. 이름은 세계관에 어울리게.\n${CAST_DEBUT_RULE(N1)}\n세력: ${ng.world.factions.map(f=>`${f.name}(${FKIND[f.kind]})`).join(', ')}\nJSON만 출력: {"chars":[${charSchema().replace(/^\{/,'{"debut":"start|1~'+N1+'|later",')}, ...]} ${NAI_CHAR}${src?' 원작 캐릭터라면 naiPrompt 앞부분에 Danbooru 캐릭터 태그와 작품 태그(예: 이름 (작품명), 작품명)를 넣는다.':''}`,null,'complex'),r=>r&&Array.isArray(r.chars)&&r.chars.length>=Math.max(1,Math.ceil(n*0.8))&&new Set(r.chars.map(x=>String(x&&x.name||'').trim())).size===r.chars.length); /* 요청 인원의 80% 이상·이름 중복 없음이어야 통과(아니면 다시 묻기) */
   if(!b){G=oldG;applyMeta();t.disabled=false;stat('캐릭터 생성에 실패했어요. 같은 내용으로 다시 누르면 1단계는 건너뛰고 이어서 만들어요.');return;}
   ng.chars=[]; b.chars.slice(0,Math.max(12,DCH.length)).forEach(x=>{ if(isMonsterLike(x)) return; const c=cleanChar(x); if(!c.name||DNPC.some(d=>d.name===c.name))return; c.ord=ng.chars.length; const db=String(x.debut||'start').trim(); if(db==='later') c.debutLater=true; else if(+db>=1) c.__deb=Math.min(N1,Math.round(+db)); ng.chars.push(c);});
-  { const st=ng.chars.filter(c=>!c.__deb&&!c.debutLater); ng.chars.filter(c=>c.__deb||c.debutLater).slice(0,Math.max(0,3-st.length)).forEach(c=>{ delete c.__deb; delete c.debutLater; }); ng.chars.forEach(c=>{ if(!c.faction||ng.world.factions.some(f=>f.name===c.faction)) return; const k=x=>String(x||'').replace(/\s+/g,''), hit=ng.world.factions.find(f=>k(f.name)===k(c.faction)||(k(c.faction).length>=2&&(k(f.name).includes(k(c.faction))||k(c.faction).includes(k(f.name))))); if(hit){ c.faction=hit.name; return; } ng.world.factions.push({name:c.faction,kind:'playable',desc:'',rel:{},stance:[]}); }); /* 세력 이름이 조금 다르면(띄어쓰기·줄임) 세계관의 세력에 맞춤 */ } // 등장 계획: 처음부터 동료 3명 이상, 소속 세력은 목록에
+  { const st=ng.chars.filter(c=>!c.__deb&&!c.debutLater); ng.chars.filter(c=>c.__deb||c.debutLater).slice(0,Math.max(0,3-st.length)).forEach(c=>{ delete c.__deb; delete c.debutLater; }); ngFactionFix(ng); } // 등장 계획: 처음부터 동료 3명 이상, 소속 세력은 목록에
   // 초안에 적은 대원은 반드시 대원으로: 이름이 바뀌었으면 되돌리고, 빠졌으면 따로 만들어 넣어요
   { const findD=d=>ng.chars.find(c=>c.name===d.name)||ng.chars.find(c=>c.name.includes(d.name)||d.name.includes(c.name));
     let miss=DCH.filter(d=>!findD(d));
     if(miss.length){ stat(`2/4 초안의 ${T('crew')} ${miss.length}명을 마저 만드는 중…`); for(let k=0;k<2&&miss.length;k++){ const r2=await aiJSON(`${RULES}\n세계관: ${ng.world.summary}\n세력: ${ng.world.factions.map(f=>f.name).join(', ')}\n다른 ${T('crew')}: ${ng.chars.map(c=>c.name).join(', ')}\n다음 인물을 ${T('crew')}으로 만들어라. 이름·성격·과거·말투·외모는 그대로 살리고 빈 칸만 채운다:\n${miss.map(c=>`- ${c.name}${c.rank?' / rarity '+c.rank:''}${c.role?' / '+c.role:''}${c.profile?' / '+c.profile:''}${c.speech?' / 말투: '+c.speech:''}${c.look?' / 외모: '+c.look:''}`).join('\n')}\nJSON만 출력: {"chars":[${charSchema()}, ...]} ${NAI_CHAR}`,null,'complex');
         (r2&&Array.isArray(r2.chars)?r2.chars:[]).forEach(x=>{ const c=cleanChar(x); if(!c.name) return; const d=miss.find(m=>m.name===c.name||c.name.includes(m.name)); if(d) c.name=d.name; c.ord=ng.chars.length; ng.chars.push(c); }); miss=DCH.filter(d=>!findD(d)); } }
     DCH.forEach(d=>{ const c=findD(d); if(!c) return; c.name=d.name; if(d.rank) c.rarity=+d.rank; const tg=String(d.tags||'').trim(); if(tg) c.naiPrompt=stripAge(tg); }); }
+  ngCharsPost(ng,DCH);
   if(SAMPLE&&ng.chars.some(c=>c.weapon&&wpBad(c.weapon.prompt))){ stat(`2/4 ${T('weapon')} 그림 프롬프트를 정리하는 중…`); await fixWeaponPrompts(ng.chars,ng.world); }
   // NPC: 대원은 아니지만 스토리에 나오고 그림(전신·상반신)을 가져요. 나중에 대원으로 쓸 수도 있어요
   ng.npcs=[]; if(DNPC.length){ stat('2/4 NPC 모습을 정하는 중…'); const r3=await aiJSON(`세계관: ${ng.world.name} — ${String(ng.world.summary||'').slice(0,400)}\n다음 NPC들의 NovelAI 그림 프롬프트를 써라. 적힌 외모를 그대로 살리고, 의상은 세계관에 맞춘다. 등장인물은 모두 성인이다.\n${DNPC.map(c=>`- ${c.name}${c.role?' / '+c.role:''}${c.look?' / 외모: '+c.look:''}${c.profile?' / '+String(c.profile).slice(0,200):''}`).join('\n')}\n${NAI_CHAR}\nJSON만 출력: {"npcs":[{"name":"","naiPrompt":""}]}`,null,'default');
@@ -9736,7 +9771,7 @@ async function buildNewGameDraft(t,draft,sourceProject){if(String(draft?.story||
   if(RU&&RU.ids.some(x=>ng.prog.avatar&&x===ng.prog.avatar.id)){ /* 원래 프로필 그림을 그대로 썼어요 */ }
   G=oldG;
   if(sourceProject&&PJ().active!==sourceProject)throw Error('게임이 바뀌어 새 게임 적용을 중단했습니다');await flush();
-  const pj=PJ();pj.list.push({id:id2,title:ng.meta.title});pj.active=id2;try{ ng.meta.auditSeen=auditVer(); }catch(e){} await appStorage.commitRecords({[pjKey(id2)]:JSON.stringify(ng),[PJKEY]:JSON.stringify(pj)});
+  ngFinish(ng,draft); const pj=PJ();pj.list.push({id:id2,title:ng.meta.title});pj.active=id2; await appStorage.commitRecords({[pjKey(id2)]:JSON.stringify(ng),[PJKEY]:JSON.stringify(pj)});
   try{ appStorage.removeItem('ggm-ng-draft'); }catch(e){}
   stat('완성! 새 게임으로 전환해요.'); setTimeout(()=>reloadGame(),900);
 }
@@ -9748,7 +9783,7 @@ async function buildManualGameDraft(t,draft,sourceProject){if(String(draft?.stor
   const ng=defaults(), hero=Object.assign({name:'',call:'',gender:'',look:'',bio:'',hide:false},draft.hero||{}), th=draft.theme||'auto';
   const kw=String(draft.kw||'').trim(), title=String(draft.gtitle||'').trim().slice(0,30)||kw.split(/[.\n,]/)[0].slice(0,16)||'새 게임';
   const ngSty=String(draft.style||'').trim()||(presetQualityParts(allPresets().find(x=>x.id===draft.preset)||{}).tags);
-  ng.meta=Object.assign(clone(DEFAULT_META),{title,sub:'',theme:th==='auto'?'tactical':th,accent:'#ffb400'}); ng.meta.shop=Object.assign(clone(DEFAULT_META.shop),{name:'상점'}); /* 원본 샘플의 상점 NPC 대신 중립 이름 */
+  ng.meta=Object.assign(clone(DEFAULT_META),{title,sub:'',theme:th==='auto'?'tactical':th,accent:'#ffb400'}); ng.meta.shop=neutralShop();
   ng.meta.artTags=ngSty; { const sp=allPresets().find(x=>x.id===draft.preset); if(sp&&ngSty===presetQualityParts(sp).tags) ng.meta.artNeg=sp.neg; }
   ng.meta.tone=String(draft.tone||''); ng.meta.castSex=CAST_SEX[draft.castSex]?draft.castSex:''; const DT=drText(draft); if(DT) ng.meta.bible=DT.slice(0,100000);
   ng.meta.story={plot:String(draft.story||''),stages:+draft.stages||0,len:STORY_LEN[draft.len]?draft.len:'normal'}; ng.meta.manual=true;
@@ -9778,7 +9813,7 @@ async function buildManualGameDraft(t,draft,sourceProject){if(String(draft?.stor
   const id2='g'+uid(); if(RSRC){ (RSRC.g.lib||[]).filter(l=>['bg','prop'].includes(l.kind)&&l.img&&!ng.lib.some(x=>x.kind===l.kind&&nameEq(x.name,l.name))).forEach(l=>ng.lib.push(clone(l))); if(!ng.prog.lobbyBg){ const b0=ng.lib.find(l=>l.kind==='bg'); if(b0) ng.prog.lobbyBg=b0.name; } } const RU=artReuse(ng,RSRC); if(RU){ await artReuseCopy(RU,id2); ng.prog.castDone=true; }
   try{ if(hero.av){ const b=await idbGet('draft_avatar'); if(b){ const av={id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:hero.av,img:{idb:true}}; await idbPut(id2+'::'+av.id,b); ng.prog.avatar=av; } } }catch(e){}
   if(sourceProject&&PJ().active!==sourceProject)throw Error('게임이 바뀌어 새 게임 적용을 중단했습니다');await flush();
-  const pj=PJ();pj.list.push({id:id2,title:ng.meta.title});pj.active=id2;try{ ng.meta.auditSeen=auditVer(); }catch(e){} await appStorage.commitRecords({[pjKey(id2)]:JSON.stringify(ng),[PJKEY]:JSON.stringify(pj)});
+  ngFinish(ng,draft); const pj=PJ();pj.list.push({id:id2,title:ng.meta.title});pj.active=id2; await appStorage.commitRecords({[pjKey(id2)]:JSON.stringify(ng),[PJKEY]:JSON.stringify(pj)});
   stat('완성! 새 게임으로 전환해요. 글 AI를 등록하면 편집 화면의 ✦ 버튼으로 대사·스킬·설정을 다듬을 수 있어요.'); setTimeout(()=>reloadGame(),1200);
 }
 function readBanner(){const b=BD;b.name=$('#bn_name').value.trim()||b.name;b.desc=$('#bn_desc').value.trim();b.type=$('#bn_type').value;b.bg=$('#bn_bg').value;b.pool.mode=$('#bn_mode').value;b.rate=num($('#bn_rate').value,0,100,50);b.active=$('#bn_act').value==='1';return b;}
@@ -9874,7 +9909,7 @@ function drLoadFrom(d,label){ try{ appStorage.setItem(DR2KEY,JSON.stringify(drCl
 function drSave(){ try{ appStorage.setItem(DR2KEY,JSON.stringify(DR2)); }catch(e){} }
 function drLen(d){ d=d||DR2; return [d.auto,d.kw,d.tone,d.story,d.world,d.setting,d.hero.name,d.hero.gender,d.hero.look,d.hero.bio,...d.chars.flatMap(c=>[c.name,c.role,c.profile,c.look,c.speech])].reduce((n,s)=>n+String(s||'').length,0); }
 function drRead(){ if(!DR2||!$('#drPage')) return; const v=id=>{const e=$('#'+id);return e?(e.type==='checkbox'?e.checked:e.value):undefined;}, set=(k,id,f)=>{const x=v(id); if(x!==undefined) DR2[k]=f?f(x):x;};
-  set('auto','dr_auto'); set('gtitle','dr_gtitle'); set('crewTerm','dr_crew',x=>String(x||'').trim().slice(0,8)); set('castSex','dr_cast'); set('kw','ng_kw'); set('tone','ng_tone'); set('theme','ng_theme'); set('n','ng_n',Number); set('style','ng_style'); set('fan','ng_fan'); set('src','ng_src'); set('story','ng_story'); set('stages','ng_stages',Number); set('len','ng_len'); set('depth','ng_depth'); set('newc','ng_newc',Number); set('talkOnly','ng_talkonly',Number); set('world','dr_world'); set('setting','dr_setting');
+  set('auto','dr_auto'); set('gtitle','dr_gtitle'); set('crewTerm','dr_crew',x=>String(x||'').trim().slice(0,8)); set('castSex','dr_cast'); set('kw','ng_kw'); set('tone','ng_tone'); set('theme','ng_theme'); set('n','ng_n',Number); set('style','ng_style'); set('fan','ng_fan'); set('src','ng_src'); set('story','ng_story'); set('stages','ng_stages',Number); set('len','ng_len'); set('depth','ng_depth'); set('newc','ng_newc',Number); set('talkOnly','ng_talkonly',Number); set('con','ng_con'); set('world','dr_world'); set('setting','dr_setting');
   document.querySelectorAll('#drPage [data-dc]').forEach(e=>{ const c=DR2.chars[+e.dataset.i]; if(c){c[e.dataset.dc]=e.value;if(e.dataset.dc==='tags')naiBlocksSave(c,'tags',e);} });
   ['name','call','gender','look','bio'].forEach(k=>{ const x=v('dr_h_'+k); if(x!==undefined) DR2.hero[k]=x; }); const hd=v('dr_h_hide'); if(hd!==undefined) DR2.hero.hide=hd;
   drSave(); const c=$('#drCount'); if(c) c.textContent=nf(drLen()); }
@@ -9899,6 +9934,7 @@ function drTabHTML(k){ const d=DR2, sec=(id,h)=>`<section data-dr="${id}" ${DRTA
     <div id="ng_srcw" ${d.fan?'':'hidden'}><label class="f" for="ng_src">원작 이름</label><input class="in" id="ng_src" value="${esc(d.src)}" placeholder="예: 작품 이름"><p class="muted" style="margin:4px 0 0;font-size:.78rem">원작에서 미성년자·학생인 캐릭터는 넣지 않고 성인 캐릭터만 써요. 개인 감상용으로만 써 주세요.</p></div>
     ${drPresetHTML()}
     <label class="f" for="ng_style">이 게임 그림체 태그 (선택 · 프리셋보다 우선)</label><input class="in" id="ng_style" value="${esc(d.style)}" placeholder="예: dark fantasy, muted colors">
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng_con" ${d.con?'checked':''}><span><b>건조/영입 사용</b> <span class="muted" style="font-size:.8rem">(자원 4종을 넣어 영입 · 기본 ${esc(d.crewTerm||'동료')}은(는) 뽑기, 특별 의상 바리에이션은 건조로 · 나중에 설정에서 켜고 끌 수 있어요)</span></span></label>
     ${storyFormHTML({plot:d.story,stages:d.stages,len:d.len,depth:d.depth,newc:d.newc,talkOnly:d.talkOnly})}
     <button class="btn sm ghost" data-act="drpolish" data-k="story">✦ 스토리 개요 AI로 다듬기</button>`);
   if(k==='world') return sec('world',`<div class="dr-h"><h3 class="sec">세계관</h3><span class="muted">${nf(d.world.length)}자 / 권장 8,000</span></div><p class="muted dr-help">역사, 사회 구조, 기술이나 마법의 규칙, 지금 벌어지는 갈등, 사람들이 일상에서 겪는 불편까지. 고유명사와 구체적인 디테일이 많을수록 AI가 지어낼 틈이 줄어요. 플레이어에게 숨길 반전은 여기 말고 <b>설정</b> 탭에 '비밀'로 따로 적어 두세요.</p>
@@ -9938,6 +9974,7 @@ function drAutoHTML(){ const d=DR2; return `<div class="dr-intro"><p><b>자율�
     <label class="f" for="dr_crew">아군 호칭 <span class="muted" style="font-size:.75rem">(유닛 이름 · 비우면 AI가 새로 지어요)</span></label><input class="in" id="dr_crew" maxlength="8" value="${esc(d.crewTerm||'')}" placeholder="예: 대원, 요원, 사도">
     <label class="f" for="dr_cast">등장인물 성별</label><select class="in" id="dr_cast">${opt([['','AI가 정하기 (키워드에 맞게)'],['f','여성만'],['m','남성만'],['mix','여성 + 남성 혼성']],d.castSex||'')}</select>
     <label class="f" for="ng_n">${esc(d.crewTerm||'동료')} 수</label><select class="in" id="ng_n">${opt([[6,'6명'],[8,'8명'],[10,'10명'],[12,'12명']],d.n)}</select>
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng_con" ${d.con?'checked':''}><span><b>건조/영입 사용</b> <span class="muted" style="font-size:.8rem">(자원 4종을 넣어 영입 · 특별 의상 바리에이션은 건조로)</span></span></label>
     ${drPresetHTML()}
     <details class="optbox" style="margin-top:10px" ${d.hero.name||d.hero.gender||d.hero.look?'open':''}><summary><b>주인공</b> <span class="muted" style="font-size:.8rem">(선택 · 비우면 AI가 정해요)</span></summary>${drHeroHTML()}</details>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="drmake" ${SAMPLE?'':'disabled'}>이 내용으로 새 게임 만들기</button></div>
@@ -10398,8 +10435,8 @@ async function aiPickupStory(c,lim,link){
 async function seasonStart(type,notes){
   const L=P().live, meta=seasonMeta(type), now=Date.now(), d0=new Date(); d0.setHours(5,0,0,0); if(d0.getTime()>now) d0.setDate(d0.getDate()-1); const until=d0.getTime()+seasonDays()*864e5;
   const act=G.events.filter(e=>e.active!==false&&gateOpen(e)), past=G.events.filter(e=>e.active===false);
-  const closeEv=()=>{ act.forEach(e=>{ e.active=false; const b=G.banners.find(x=>x.id===e.bannerId); if(b&&!e.keepBanner) b.active=false; }); if(act.length) notes.push(`이벤트 종료: ${act.map(e=>e.title).join(', ')}`); };
-  { const closed=[]; G.banners.forEach(b=>{ if(bnOpen(b)&&b.id!=='std'&&(b.newAt||b.eventId||b.seasonal)&&(!b.until||b.until<=now||b.until===((L.season&&L.season.until)||-1))){ b.active=false; closed.push(b.name); } });
+  const closeEv=()=>{ act.forEach(e=>{ e.active=false; const b=G.banners.find(x=>x.id===e.bannerId); if(b&&!e.keepBanner){ b.active=false; sparkSettle(b); } }); if(act.length) notes.push(`이벤트 종료: ${act.map(e=>e.title).join(', ')}`); };
+  { const closed=[]; G.banners.forEach(b=>{ if(bnOpen(b)&&b.id!=='std'&&(b.newAt||b.eventId||b.seasonal)&&(!b.until||b.until<=now||b.until===((L.season&&L.season.until)||-1))){ b.active=false; sparkSettle(b); closed.push(b.name); } });
     if(closed.length){ notes.push(`지난 시즌 픽업 종료: ${closed.join(', ')}`); const cb=G.banners.find(x=>x.id===P().curBanner); if(!cb||cb.active===false) P().curBanner=''; } }
   L.season={type,key:seasonKey(),start:now,until}; notes.push(`${meta[3]} ${meta[1]} 시작! ${meta[2]} (${new Date(until-1).toLocaleDateString('ko-KR')}까지)`);
   if(type==='story'){ closeEv();
@@ -12519,11 +12556,22 @@ function bannerPool(b){
   return pool.length?pool:G.chars;
 }
 const SPARK=200;
+/* 천장·픽업 확정은 픽업 배너끼리 이어져요(시즌이 바뀌어 배너가 닫혀도 다음 픽업 배너로). 상시는 따로, 픽업 없는 배너(소속 모집 등)는 배너별.
+   예전 저장(배너별 값)은 처음 읽을 때 픽업 배너들 중 가장 큰 천장·남은 확정을 이어받아요 */
+function pityKey(b){ return !b||b.id==='std'?'std':(b.pickup||[]).length?'pickup':b.id; }
+function pityGet(b){ const p=P(),k=pityKey(b); if(k==='std') return p.pity||0; p.pities=p.pities||{};
+  if(k==='pickup'&&p.pities.pickup==null){ const old=G.banners.filter(x=>x.id!=='std'&&(x.pickup||[]).length); p.pities.pickup=Math.max(0,...old.map(x=>p.pities[x.id]||0)); p.guar=p.guar||{}; if(p.guar.pickup==null) p.guar.pickup=old.some(x=>p.guar[x.id]); }
+  return p.pities[k]||0; }
+function pitySet(b,v){ const p=P(),k=pityKey(b); if(k==='std') p.pity=v; else p.pities[k]=v; }
+function guarGet(b){ pityGet(b); return !!(P().guar||{})[pityKey(b)]; }
+/* 배너가 닫힐 때 남은 모집 포인트는 1포인트당 ◆ COST/10으로 바꿔 우편으로 보내요(포인트가 말없이 사라지지 않게) */
+function sparkSettle(b){ const p=P(), n=(p.spark||{})[b.id]||0; if(!n) return 0; const gems=n*Math.round(COST/10); p.spark[b.id]=0;
+  sendMail({from:'운영팀',title:`「${b.name}」 모집 포인트 정산`,body:`배너가 끝나 남은 모집 포인트 ${n}점을 ${T('currency')} ${nf(gems)}개로 바꿔 드려요.`,reward:{gems}}); return gems; }
 function softRate(s,pity){ const start=Math.floor(s.pity*0.75); return pity>start?Math.min(100,s.ssr+(pity-start)*Math.max(2,(100-s.ssr)/Math.max(1,s.pity-start))*0.5):s.ssr; }
 function rollOne(guarSR,forceSSR,b){
-  b=b||curBanner()||G.banners[0]; const p=P(),s=p.settings; const pk=b.id==='std'?'pity':null;
+  b=b||curBanner()||G.banners[0]; const p=P(),s=p.settings, gk=pityKey(b);
   p.guar=p.guar||{}; p.spark=p.spark||{}; p.hist2=p.hist2||[];
-  const pity=(pk?p.pity:(p.pities[b.id]||0))+1; p.total++;
+  const pity=pityGet(b)+1; p.total++;
   const ssrRate=softRate(s,pity);
   let r=(forceSSR||pity>=s.pity)?3:(()=>{const x=Math.random()*100;return x<ssrRate?3:x<ssrRate+s.sr?2:1;})();
   if(r<2&&guarSR) r=2;
@@ -12531,10 +12579,12 @@ function rollOne(guarSR,forceSSR,b){
   /* 그 등급이 풀에 없으면 가장 가까운 등급으로 바꿔요(예전엔 아무나 나와서 R 자리에 SSR이 섞였어요). 위로 올릴 땐 SSR 확률을 넘지 않게 SR까지만 */
   if(!cand.length){ const order=r===1?[2,3]:r===2?[1,3]:[2,1]; for(const q of order){ if(q===3&&r<3&&pool.some(c=>c.rarity<3)) continue; const x=pool.filter(c=>c.rarity===q); if(x.length){ cand=x; r=q; break; } } if(!cand.length) cand=pool; }
   const ups=cand.filter(c=>(b.pickup||[]).includes(c.id));
+  /* 픽업에 실패하면 픽업이 아닌 같은 등급에서 골라요 — 표시한 확률(rate%)이 실제 확률이 되게(예전엔 실패해도 후보에 픽업이 남아 50% 표기가 실제 75%였어요) */
+  const rest=cand.filter(c=>!ups.includes(c));
   let c;
-  if(ups.length&&r===3&&p.guar[b.id]){ c=rand(ups); p.guar[b.id]=false; }
-  else { c=ups.length&&Math.random()*100<(b.rate||50)?rand(ups):rand(cand); if(r===3&&ups.length) p.guar[b.id]=!(b.pickup||[]).includes(c.id); }
-  const np=c.rarity===3?0:pity; if(pk) p.pity=np; else p.pities[b.id]=np;
+  if(ups.length&&r===3&&p.guar[gk]){ c=rand(ups); p.guar[gk]=false; }
+  else { c=ups.length&&(!rest.length||Math.random()*100<(b.rate||50))?rand(ups):rand(rest.length?rest:cand); if(r===3&&ups.length) p.guar[gk]=!(b.pickup||[]).includes(c.id); }
+  pitySet(b,c.rarity===3?0:pity);
   p.spark[b.id]=(p.spark[b.id]||0)+1;
   return grantOwned(c,b.name);
 }
@@ -12613,7 +12663,9 @@ const CON_RES=GGMConstruct.RES;
 // 특수 레시피(소속·특정 캐릭터 확률 업). 분류 확률은 groups가 정해서 기본은 비워 둬요. 예: {id:'rc_x',name:'새벽 설계',min:[400,400,400,600],effect:{type:'faction',value:'새벽등대',up:3},hint:'부품을 넉넉히'}
 const CON_RECIPES=[];
 function conMeta(){ const m=G.meta; if(!m.construct||typeof m.construct!=='object') m.construct={on:false}; if(!Array.isArray(m.construct.recipes)) m.construct.recipes=clone(CON_RECIPES); return m.construct; }
-function CON(){ return GGMConstruct.config(conMeta()); }
+function CON(){ const c=GGMConstruct.config(conMeta()); c.groups.forEach(g=>{ const d=GGMConstruct.DEFAULTS.groups.find(x=>x.id===g.id); if(d&&g.name===d.name&&g.match&&ROLE[g.match.role]) g.name=ROLE[g.match.role]; }); return c; } /* 기본 분류 이름(지원·공격·방어)은 이 게임의 역할 이름으로 보여요 */
+/* 새 게임을 건조/영입이 켜진 채로 시작: 시작 자원 지급(설정에서 켤 때와 같은 양) */
+function conStartNew(ng){ ng.meta.construct=Object.assign({},ng.meta.construct||{},{on:true}); const s=GGMConstruct.config(ng.meta.construct).start; ng.prog.cres=Object.fromEntries(CON_RES.map(k=>[k,s])); ng.prog.cbuild={n:0,found:{},log:[],input:null,started:Date.now()}; }
 function conOn(){ return !!(G.meta.construct&&G.meta.construct.on); }
 function VARIANTS(){ if(!Array.isArray(G.meta.variants)) G.meta.variants=clone(GGMConstruct.VARIANT_DEFAULTS); return G.meta.variants; }
 function CRES(){ const p=P(); if(!p.cres||typeof p.cres!=='object') p.cres={}; CON_RES.forEach(k=>{ if(!(p.cres[k]>=0)) p.cres[k]=0; }); return p.cres; }
@@ -14135,7 +14187,7 @@ applyMeta(); (async()=>{ if(PCS()||syReady()){ if(await bootSync()) return; } co
 /* =========================================================
    독립 앱 전용: AI 연결, 백업 파일, 안드로이드 뒤로가기
    ========================================================= */
-setupAI(); render(); loadAudio().then(()=>sceneBgm()); setTimeout(()=>{ try{ skillResume(); }catch(e){} },4000); /* 생성 중 미룬 스킬 설계 이어서 */
+setupAI(); render(); loadAudio().then(()=>sceneBgm()); setTimeout(()=>skillResume().catch(e=>quietErr(e,'스킬 설계 이어 하기')),4000); /* 생성 중 미룬 스킬 설계 이어서 */
 (()=>{ const o=LV();
   if(window.__LIVE__){ o.boots=0; saveLV(o); }
   if(o.failed){ o.failed=false; if(o.build) o.badBuild=o.build; saveLV(o); setTimeout(()=>toast('새 버전이 실행되지 않아 설치 버전으로 돌아왔어요'),1500); }

@@ -34,8 +34,8 @@ async function aiPickupStory(c,lim,link){
 async function seasonStart(type,notes){
   const L=P().live, meta=seasonMeta(type), now=Date.now(), d0=new Date(); d0.setHours(5,0,0,0); if(d0.getTime()>now) d0.setDate(d0.getDate()-1); const until=d0.getTime()+seasonDays()*864e5;
   const act=G.events.filter(e=>e.active!==false&&gateOpen(e)), past=G.events.filter(e=>e.active===false);
-  const closeEv=()=>{ act.forEach(e=>{ e.active=false; const b=G.banners.find(x=>x.id===e.bannerId); if(b&&!e.keepBanner) b.active=false; }); if(act.length) notes.push(`이벤트 종료: ${act.map(e=>e.title).join(', ')}`); };
-  { const closed=[]; G.banners.forEach(b=>{ if(bnOpen(b)&&b.id!=='std'&&(b.newAt||b.eventId||b.seasonal)&&(!b.until||b.until<=now||b.until===((L.season&&L.season.until)||-1))){ b.active=false; closed.push(b.name); } });
+  const closeEv=()=>{ act.forEach(e=>{ e.active=false; const b=G.banners.find(x=>x.id===e.bannerId); if(b&&!e.keepBanner){ b.active=false; sparkSettle(b); } }); if(act.length) notes.push(`이벤트 종료: ${act.map(e=>e.title).join(', ')}`); };
+  { const closed=[]; G.banners.forEach(b=>{ if(bnOpen(b)&&b.id!=='std'&&(b.newAt||b.eventId||b.seasonal)&&(!b.until||b.until<=now||b.until===((L.season&&L.season.until)||-1))){ b.active=false; sparkSettle(b); closed.push(b.name); } });
     if(closed.length){ notes.push(`지난 시즌 픽업 종료: ${closed.join(', ')}`); const cb=G.banners.find(x=>x.id===P().curBanner); if(!cb||cb.active===false) P().curBanner=''; } }
   L.season={type,key:seasonKey(),start:now,until}; notes.push(`${meta[3]} ${meta[1]} 시작! ${meta[2]} (${new Date(until-1).toLocaleDateString('ko-KR')}까지)`);
   if(type==='story'){ closeEv();

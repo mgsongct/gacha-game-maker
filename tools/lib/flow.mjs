@@ -16,7 +16,6 @@ export function actions(units, extraHTML = '') {
     const declAt = new Set(); // '함수시작:이름' — 그 함수 안에서 dataset.act로 만든 변수
     const fnOf = n => { for (let p = n.parent; p; p = p.parent) if (/function|arrow_function|method_definition/.test(p.type)) return p; return null; };
     walk(u.tree.rootNode, n => { if (n.type === 'variable_declarator' && /\.dataset\.act$/.test(n.childForFieldName('value')?.text || '')) { const nm = n.childForFieldName('name')?.text; actVars.add(nm); declAt.add(`${fnOf(n)?.startIndex}:${nm}`); } });
-    const isAct = x => !!x && (actVars.has(x.text) || /\.dataset\.act$/.test(x.text));
     const isActVar = x => { if (!x) return false; if (/\.dataset\.act$/.test(x.text)) return true; if (x.type !== 'identifier') return false; for (let f = fnOf(x); f; f = fnOf(f)) if (declAt.has(`${f.startIndex}:${x.text}`)) return true; return false; };
     for (const m of t.matchAll(/data-act=\\?["']([a-z0-9_-]+)\\?["']/gi)) { const before = t.slice(Math.max(0, m.index - 12), m.index); const p = lineOf(m.index); if (/closest\(\s*['"`]\[$|querySelector(All)?\(\s*['"`]\[$/.test(before)) { add(handle, m[1], { site: `${u.name}@sel:${m.index}`, loc: `${p.file}:${p.line}`, sel: true }); continue; } add(emit, m[1], `${p.file}:${p.line}`); }
     for (const m of t.matchAll(/data-act=\\?"\$\{([^}]{1,200})\}\\?"/g)) { const p = lineOf(m.index); for (const s of m[1].matchAll(/'([a-z0-9_-]+)'/gi)) add(emit, s[1], `${p.file}:${p.line}`); }

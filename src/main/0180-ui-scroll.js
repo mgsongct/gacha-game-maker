@@ -151,7 +151,7 @@ const contractHTML=noSkin(contractHTML0);
 function contractHTML0(){
   const s=P().settings, bs=G.banners.filter(bnOpen), b=curBanner();
   if(!b) return pageHead(T('gacha'),'RECRUIT')+`<div class="panel"><p>열린 배너가 없어요.</p><button class="btn" data-act="bnew">배너 만들기</button></div>`;
-  const pity=b.id==='std'?P().pity:(P().pities[b.id]||0), left=s.pity-pity, pool=bannerPool(b);
+  const pity=pityGet(b), left=s.pity-pity, pool=bannerPool(b);
   const ups=(b.pickup||[]).map(charById).filter(Boolean), show=(ups.length?ups:pool.filter(c=>c.rarity===3)).slice(0,4);
   const hero=show[0], hill=hero&&P().lobbyMode!=='stand'&&charIllust(hero);
   const rOf=r=>r===3?s.ssr:r===2?s.sr:Math.max(0,100-s.ssr-s.sr);
@@ -177,7 +177,7 @@ function contractHTML0(){
   </section>
   <div class="panel pk-pity"><div style="display:flex;justify-content:space-between"><span>SSR 확정까지</span><b>${left}회</b></div><div class="bar" style="margin-top:6px"><i style="width:${pity/s.pity*100}%"></i></div>
     ${pity>=Math.floor(s.pity*0.75)?`<p class="soft">🔥 확률 상승 중 · 지금 SSR ${softRate(s,pity+1).toFixed(1)}%</p>`:`<p class="muted" style="margin:6px 0 0;font-size:.75rem">${Math.floor(s.pity*0.75)}회부터 SSR 확률이 점점 올라가요</p>`}
-    ${ups.length&&(P().guar||{})[b.id]?`<p class="soft gold">★ 다음 SSR은 확률 업 ${esc(T('crew'))} 확정</p>`:''}
+    ${ups.length&&guarGet(b)?`<p class="soft gold">★ 다음 SSR은 확률 업 ${esc(T('crew'))} 확정</p>`:''}${pityKey(b)==='pickup'?`<p class="muted" style="margin:4px 0 0;font-size:.72rem">천장·확정은 다음 픽업 배너로 이어져요</p>`:''}
     <div class="sparkrow"><span>모집 포인트</span><div class="bar"><i style="width:${Math.min(100,((P().spark||{})[b.id]||0)/SPARK*100)}%"></i></div><b>${(P().spark||{})[b.id]||0}/${SPARK}</b><button class="btn sm ${((P().spark||{})[b.id]||0)>=SPARK?'':'ghost'}" data-act="sparkopen" data-id="${b.id}">교환</button></div>${P().firstTen?'<p class="muted" style="margin:8px 0 0">첫 10회는 SSR 1명 확정</p>':''}${ups.length?`<p class="muted" style="margin:8px 0 0">확률 업: ${ups.map(c=>esc(c.name)).join(', ')} · 같은 등급이 나오면 ${b.rate}% 확률</p>`:''}</div>
   <div class="pullrow"><button class="btn ghost" data-act="pull" data-n="1">1회<small>◆ ${COST}</small></button><button class="btn" data-act="pull" data-n="10">10회<small>◆ ${nf(COST*10)}${pool.some(c=>c.rarity>=2)?' · SR 이상 1명 보장':''}</small></button></div>
   <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="go" data-to="cash">◆ ${esc(T('currency'))} 충전</button></div>

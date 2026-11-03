@@ -10,7 +10,7 @@ export async function runGenerate({ phase, responses = {}, input = null, game = 
     await page.exposeFunction('__onPrompt', (kind, text) => { if (onPrompt) onPrompt(kind, text); });
     return page.evaluate(async ({ phase, responses, input, game, stages, direction, settleMs, kindSrc }) => {
       const log = [], pending = new Set(), toasts = [], seenSkill = {};
-      P().seenOpening = true; closeModal(); closeOv(); try { appStorage.removeItem('ggm-ng-draft'); } catch (e) {}
+      P().seenOpening = true; closeModal(); closeOv(); appStorage.removeItem('ggm-ng-draft');
       const tt = toast; toast = m => { toasts.push(String(m)); return tt(m); };
       appStorage.setItem(PKEY, JSON.stringify({ active: 'gen', fallback: false, list: [{ id: 'gen', type: 'anthropic', name: 'tools/play', key: 'replay', model: 'replay', quick: 'replay-quick' }] })); setupAI();
       const kindOf = p => (new Function('return ' + kindSrc)())(p, phase, seenSkill);
@@ -28,12 +28,12 @@ export async function runGenerate({ phase, responses = {}, input = null, game = 
       };
       const settle = ms => new Promise(r => setTimeout(r, ms)), result = {};
       if (phase === 'new') {
-        let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [, v] of Object.entries(recs)) if (/"chapters"/.test(v)) { try { saved = JSON.parse(v); result.commitAtCall = log.length; } catch (e) {} } return orig(recs); };
+        let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [, v] of Object.entries(recs)) if (/"chapters"/.test(v)) { saved = JSON.parse(v); result.commitAtCall = log.length; } return orig(recs); };
         window.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
         const stat = []; const mo = new MutationObserver(() => { const s = document.getElementById('ng_stat'); if (s && s.textContent && stat.at(-1) !== s.textContent) stat.push(s.textContent); }); mo.observe(document.body, { subtree: true, childList: true, characterData: true });
         const t0 = performance.now(); try { await newGame(btn, input); } /* 실제 진입점(NEW_GAME_SOURCE를 켜고 끝나면 원래 게임으로) */ catch (e) { result.thrown = String(e && (e.message || e.code) || e); }
         result.ms = Math.round(performance.now() - t0); await settle(settleMs); mo.disconnect(); result.stat = stat; result.game = saved;
-        let draft = null; try { draft = appStorage.getItem('ggm-ng-draft'); } catch (e) {} result.draftKept = !!draft;
+        result.draftKept = !!appStorage.getItem('ggm-ng-draft');
       } else {
         G = fix(JSON.parse(game)); applyMeta(); window.reloadGame = () => {};
         if (phase === 'skills') {

@@ -24,5 +24,11 @@ export async function loadUnits(root) {
   if (existsSync(join(src, 'boot'))) tree(join(src, 'boot')).filter(f => f.endsWith('.js')).forEach(f => units.push(unit(root, 'boot:' + relative(src, f), [read(f)])));
   return units;
 }
+// 메타 점검 대상: 도구 자신(tools/**, build/*.mjs)도 앱과 같은 품질 규칙(빈 catch·복잡도·다중화·되풀이 문자열·안 쓰는 함수)으로 봄 — 파일마다 따로
+export async function loadToolUnits(root) {
+  await tsInit(); const read = p => ({ path: p, text: readFileSync(p, 'utf8') }), skip = /[\\/](node_modules|out|fixtures|games|reports)[\\/]/;
+  const files = [...(existsSync(join(root, 'tools')) ? tree(join(root, 'tools')) : []), ...(existsSync(join(root, 'build')) ? tree(join(root, 'build')) : [])].filter(f => /\.(mjs|js)$/.test(f) && !skip.test(f));
+  return files.map(f => unit(root, 'tool:' + relative(root, f), [read(f)]));
+}
 // tree-sitter 노드 순회
 export function walk(node, fn, depth = 0) { if (fn(node, depth) === false) return; for (let i = 0; i < node.childCount; i++) walk(node.child(i), fn, depth + 1); }

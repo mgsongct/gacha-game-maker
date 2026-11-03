@@ -8,11 +8,11 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const WWW = join(ROOT, 'www'), TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.webmanifest': 'application/manifest+json' };
-let chromium = null; try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch (e) {}
+let chromium = null, noBrowser = ''; try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch (e) { noBrowser = e.message.split('\n')[0]; } // 없는 환경이면 이유를 남겨 둠(hasBrowser()가 false)
 export const hasBrowser = () => !!chromium;
 
 export async function withPage(fn, { tag = 'play', viewport } = {}) {
-  if (!chromium) throw new Error('playwright가 없어요: 브라우저 도구(tools/play)는 playwright가 설치된 환경에서만 돌아요');
+  if (!chromium) throw new Error('playwright가 없어요: 브라우저 도구(tools/play)는 playwright가 설치된 환경에서만 돌아요 — ' + noBrowser);
   const srv = createServer((q, r) => { let p = decodeURIComponent(q.url.split('?')[0]); if (p.endsWith('/')) p += 'index.html'; const f = join(WWW, p);
     if (!f.startsWith(WWW) || !existsSync(f)) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'content-type': TYPES[extname(f)] || 'application/octet-stream' }); r.end(readFileSync(f)); }).listen(0);
   const b = await chromium.launch(), page = await b.newPage(), errors = [];

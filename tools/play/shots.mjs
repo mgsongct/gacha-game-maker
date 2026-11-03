@@ -23,11 +23,11 @@ const { out, errors } = await withPage(async page => {
   await page.evaluate(() => { const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages[0]; playStory(s.title, s.pre || '', () => {}); });
   await page.waitForTimeout(800); await shot('08-story');
   for (let i = 0; i < 5; i++) { await page.mouse.click(206, 650); await page.waitForTimeout(450); } await shot('09-story-later'); log.story = await text('#ov');
-  await page.evaluate(() => { try { vnEnd(); } catch (e) {} closeOv(); const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages.find(x => (x.enemies || []).length && !x.mode) || ch.stages[0]; P().settings.bspeed = 3; startBattle(ch.id, s.id); });
+  await page.evaluate(() => { if (S) vnEnd(); closeOv(); const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages.find(x => (x.enemies || []).length && !x.mode) || ch.stages[0]; P().settings.bspeed = 3; startBattle(ch.id, s.id); });
   await page.waitForTimeout(3500); await shot('10-battle'); await page.waitForTimeout(15000); await shot('11-battle-later'); log.battle = await text('#ov');
-  await page.evaluate(() => { closeOv(); try { openPhone(); } catch (e) {} }); await page.waitForTimeout(600); await shot('12-phone');
+  await page.evaluate(() => { closeOv(); openPhone(); }); await page.waitForTimeout(600); await shot('12-phone');
   // 특수 스테이지(콘테스트·회담)가 있으면 열어서 첫 화면과 선택 몇 번 뒤를 캡처
-  const mode = await page.evaluate(() => { try { closePhone && closePhone(); } catch (e) {} closeOv(); closeModal(); for (const ch of G.chapters) for (const s of ch.stages || []) if (s.mode === 'contest' || s.mode === 'debate') { startBattle(ch.id, s.id); return s.mode + ':' + s.title; } return ''; });
+  const mode = await page.evaluate(() => { closePhone(); closeOv(); closeModal(); for (const ch of G.chapters) for (const s of ch.stages || []) if (s.mode === 'contest' || s.mode === 'debate') { startBattle(ch.id, s.id); return s.mode + ':' + s.title; } return ''; });
   if (mode) { await page.waitForTimeout(1200); await shot('13-mode'); log.mode = mode + ' | ' + await text('#ov') + ' | ' + await text('#modal');
     for (let i = 0; i < 4; i++) { const b = await page.$('#ov button:not([disabled]), #modal button:not([disabled])'); if (!b) break; await b.click().catch(() => {}); await page.waitForTimeout(700); } await shot('14-mode-later'); log.modeLater = await text('#ov') + ' | ' + await text('#modal'); }
   return log;

@@ -61,6 +61,9 @@ try {
   const shareCfg = { groups: [{ id: 'g', name: 'g', match: {}, min: [30, 30, 30, 30], share: { 3: [0.4, 1] }, weight: { base: 1 } }] };
   assert.equal(K.rates([100, 100, 100, 100], shareCfg).groups[0].open, false); assert.equal(K.rates([100, 100, 100, 300], shareCfg).groups[0].open, true);
   assert.equal(K.roll([30, 30, 30, 30], {}, [{ id: 'z', rarity: 3, role: 'atk' }], [], seq(3)).kind, 'none'); // SSR만 있고 아직 안 열림
+  // 희귀도 캡: R이 없는 분류의 R 몫이 SR로 올라가지 않음(표시 SR 이하)
+  const poolR = [{ id: 'a2', rarity: 2, role: 'atk' }, { id: 'd1', rarity: 1, role: 'def' }, { id: 's1', rarity: 1, role: 'sup' }], tR = K.table([300, 300, 300, 300], {}, poolR);
+  assert.ok(tR.rows.find(r => r.id === 'a2').p <= tR.info.rarity[2] + 1e-9, `실제 SR ${tR.rows.find(r => r.id === 'a2').p} ≤ 표시 ${tR.info.rarity[2]}`);
   const tpl = { id: 'v', name: '수영복', prompt: 'swimsuit, beach', chance: 100, recipe: { min: [400, 100, 100, 400] } };
   assert.equal(K.roll([400, 100, 100, 400], {}, pool, [{ tpl, bases: [{ id: 'b' }] }], seq(5)).kind, 'variant');
   const ch = { name: '세라', faction: '새벽등대', role: 'atk', elem: '홍', atk: 170, rarity: 3, naiPrompt: '1girl, solo, long crimson hair, amber eyes, black tactical bodysuit, long dark coat, holding sniper rifle, full body', weapon: { prompt: 'no humans, object focus, long sniper rifle with red scope, simple background' } };
@@ -76,7 +79,7 @@ try {
   const o0 = X.idolOffers(0, {}, seq(11)), o5 = X.idolOffers(5000, {}, seq(11));
   assert.ok(o0.offers.length === 1 && !o0.choice && o0.offers[0].assigned && ['local', 'sign', 'ad'].includes(o0.offers[0].id), JSON.stringify(o0));
   assert.ok(o5.offers.length === 6 && o5.choice && o5.offers.every(x => !x.assigned));
-  const payOf = (o, id) => (o.offers.find(x => x.id === id) || {}).pay; const both = o5.offers.find(x => x.id === o0.offers[0].id);
+  const both = o5.offers.find(x => x.id === o0.offers[0].id);
   if (both) assert.ok(both.pay > o0.offers[0].pay * 3, '톱 등급은 보수가 크게 올라요');
   assert.equal(X.condNow({ v: 20, at: 0 }, 2 * H, {}), 32); assert.equal(X.condNow({ v: 20, at: 0, rest: 2 * H }, 2 * H, {}), 56); assert.equal(X.condNow({ v: 50, at: 5 * H }, 2 * H, {}), 50);
   assert.ok(X.condFactor(10, {}) < 1 && X.condFactor(80, {}) === 1);
@@ -158,9 +161,19 @@ try {
     VARIANTS().forEach(t => { t.chance = t.id === 'v_swim' ? 100 : 0; }); CRES().res1 += 1000; CRES().res4 += 1000;
     [400, 100, 100, 400].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild();
     const v = G.chars.find(x => x.cvar === 'v_swim'), vb = v && charById(v.alt); out.variant = v && { base: vb && vb.name, baseOwned: !!(vb && own(vb.id)), name: v.name, owned: !!own(v.id), prompt: v.naiPrompt, inGacha: bannerPool(G.banners[0]).includes(v) };
-    out.found = !!CBUILD().found['v:v_swim']; out.log = CBUILD().log.length; return out;
+    out.found = !!CBUILD().found['v:v_swim']; out.log = CBUILD().log.length;
+    // 분류 이름은 게임의 역할 이름으로
+    const r0 = ROLE.atk; ROLE.atk = '돌격'; out.groupName = CON().groups.find(g => g.id === 'g_atk').name; ROLE.atk = r0;
+    // 뽑기: 픽업 표시 확률 = 실제 확률, 천장·확정은 픽업 배너끼리 이어짐(예전 배너별 값 이어받기), 닫힌 배너의 모집 포인트 정산
+    const ssr = G.chars.filter(c => c.rarity === 3 && !c.limited && castOk(c)), p = P();
+    if (ssr.length >= 2) { const b1 = { id: 'tb1', type: 'pickup', name: '픽업1', pickup: [ssr[0].id], pool: { mode: 'all' }, rate: 50 }, b2 = { id: 'tb2', type: 'pickup', name: '픽업2', pickup: [ssr[1].id], pool: { mode: 'all' }, rate: 50 }; G.banners.push(b1, b2);
+      let hit = 0; const N = 3000; for (let i = 0; i < N; i++) { p.guar = { pickup: false }; if (rollOne(false, true, b1).c.id === ssr[0].id) hit++; } out.pickupRate = Math.round(hit / N * 100);
+      p.pities = { tb1: 57 }; p.guar = { tb1: true }; out.migrate = pityGet(b2) === 57 && guarGet(b2); pitySet(b1, 12); out.shared = pityGet(b2) === 12 && pityKey(G.banners.find(b => b.id === 'std') || { id: 'std' }) === 'std';
+      p.spark = { tb1: 20 }; const m0 = (p.mail || []).length; out.settle = sparkSettle(b1) === 20 * Math.round(COST / 10) && !p.spark.tb1 && (p.mail || []).length === m0 + 1; }
+    return out;
   });
   assert.ok(r8.panel && r8.on && r8.page, JSON.stringify(r8));
+  assert.equal(r8.groupName, '돌격'); if (r8.pickupRate != null) { assert.ok(Math.abs(r8.pickupRate - 50) <= 4, '픽업 표시 50% = 실제 ' + r8.pickupRate + '%'); assert.ok(r8.migrate && r8.shared && r8.settle, JSON.stringify(r8)); }
   assert.ok(Object.values(r8.start).every(v => v >= 600)); assert.equal(r8.bought, 300); assert.equal(r8.gems, 10000 - 60); assert.equal(r8.disp, 2); assert.equal(r8.spent, 30); assert.equal(r8.n1, 1);
   assert.ok(r8.variant && r8.variant.owned && r8.variant.baseOwned && r8.variant.name === r8.variant.base + '(수영복)' && /swimsuit/.test(r8.variant.prompt) && !r8.variant.inGacha, JSON.stringify(r8.variant));
   assert.ok(r8.found && r8.log === 2 && r8.cond.length === 1); assert.deepEqual(err8, [], '페이지 오류');
@@ -553,14 +566,14 @@ try {
     const o = {}, P0 = []; P().seenOpening = true; closeModal(); closeOv(); try { appStorage.removeItem('ggm-ng-draft'); } catch (e) {}
     const ch = (nm, fac, role, deb, extra) => Object.assign({ name: nm, faction: fac, role, rarity: nm.length % 3 + 1, profile: nm + '의 프로필', lines: ['안녕'], naiPrompt: '1girl, solo', debut: deb }, extra || {});
     SAMPLE = { json: async p => { P0.push(p);
-      if (/속성\(elems\)은/.test(p)) return { title: '심연등불', sub: 'Abyss Lamp', world: { name: '등불섬', summary: '요약', lore: '설정', plot: '플롯', factions: [{ name: '등불단', kind: 'playable', desc: '섬을 지키는 수호단. 등불을 켜고 밤을 막는다.', goal: '섬 수호', leader: '단장', base: '등대', ideology: '빛은 나눈다', rel: { '검은 조류': '적대 — 섬을 노림' } }, { name: '검은 조류', kind: 'hostile', desc: '바다를 장악한 해적 연합.', goal: '섬 점령', leader: '조류왕', base: '난파선', ideology: '힘이 법', stance: [{ ch: 1, s: 'hostile', why: '' }, { ch: 3, s: 'ally', why: '공동의 적' }] }, { name: '심해의 것', kind: 'monster', desc: '심연에서 올라오는 괴물들.', origin: '가라앉은 신', nature: '빛을 먹는다', weakness: '불' }] }, elems: [{ n: '불', c: '#ff0000', d: '', beats: '물' }, { n: '물', c: '#0000ff', d: '', beats: '불' }] };
+      if (/속성\(elems\)은/.test(p)) return { variants: [{ name: '축제복', prompt: 'festival yukata, paper lanterns', cond: { factions: ['등불단'], roles: ['atk'] } }, { name: '잠수복', prompt: 'diving suit, ocean', cond: { factions: ['없는 세력'] } }, { name: '한글뿐', prompt: '유카타' }], title: '심연등불', sub: 'Abyss Lamp', world: { name: '등불섬', summary: '요약', lore: '설정', plot: '플롯', factions: [{ name: '등불단', kind: 'playable', desc: '섬을 지키는 수호단. 등불을 켜고 밤을 막는다.', goal: '섬 수호', leader: '단장', base: '등대', ideology: '빛은 나눈다', rel: { '검은 조류': '적대 — 섬을 노림' } }, { name: '검은 조류', kind: 'hostile', desc: '바다를 장악한 해적 연합.', goal: '섬 점령', leader: '조류왕', base: '난파선', ideology: '힘이 법', stance: [{ ch: 1, s: 'hostile', why: '' }, { ch: 3, s: 'ally', why: '공동의 적' }] }, { name: '심해의 것', kind: 'monster', desc: '심연에서 올라오는 괴물들.', origin: '가라앉은 신', nature: '빛을 먹는다', weakness: '불' }] }, elems: [{ n: '불', c: '#ff0000', d: '', beats: '물' }, { n: '물', c: '#0000ff', d: '', beats: '불' }] };
       if (/debut 항목/.test(p)) return { chars: [ch('하나', '등불단', 'atk', 'start'), ch('두리', '등불단', 'def', 'start'), ch('세찌', '등불단', 'sup', 'start'), ch('네오', '등불단', 'atk', '2'), ch('다섯', '검은 조류', 'atk', 'later'), ch('심해 촉수', '심해의 것', 'atk', 'start', { naiPrompt: 'no humans, monster, tentacles' })] };
       if (/이 게임의 시작 부분을 만들어라/.test(p)) return { opening: { lines: ['a'], prologue: '하나: 시작이야' }, backgrounds: [{ name: '등대', prompt: 'no humans, scenery' }], props: [], music: [], banners: { std: '상시', pickup: { name: '픽업', char: '네오' }, faction: { name: 'f', faction: '등불단' } } };
       if (/프롤로그 다음으로 이어지는 1장/.test(p)) return { summary: 's', relations: [], chapter: { title: '1장', logline: 'l', stages: [1, 2, 3, 4].map(i => ({ title: 's' + i, battle: true, pre: i === 2 ? '네오: 처음 뵙겠습니다' : '하나: 가자', post: '', enemies: [{ name: i === 4 ? '심연의 눈' : '촉수 무리', elem: '불', boss: i === 4, faction: '심해의 것', look: 'no humans, monster' }] })) }, bestiary: [{ name: '촉수 무리', faction: '심해의 것', desc: '심연의 촉수가 떼로 올라온 것', nature: '밤에 몰려온다', weak: '불' }, { name: '심연의 눈', faction: '심해의 것', desc: '거대한 눈', nature: '', weak: '빛' }], threads: [] };
       return {}; } };
     let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [k, v] of Object.entries(recs)) if (/"chapters"/.test(v)) saved = JSON.parse(v); return orig(recs); };
     window.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
-    await buildNewGameDraft(btn, { mode: 'auto', auto: '등불섬 판타지', n: 6 }, PJ().active);
+    await buildNewGameDraft(btn, { mode: 'auto', auto: '등불섬 판타지', n: 6, con: true }, PJ().active);
     const g = saved; o.built = !!g && g.meta.title === '심연등불';
     if (!g) return o;
     const F = g.world.factions; o.factions = F.length >= 3 && F.find(f => f.name === '검은 조류').kind === 'hostile' && F.find(f => f.name === '검은 조류').stance.some(s => s.ch === 3 && s.s === 'ally') && F.find(f => f.name === '심해의 것').weakness === '불' && !!F.find(f => f.name === '등불단').rel['검은 조류'];
@@ -571,6 +584,8 @@ try {
     const pk = g.banners.find(b => b.type === 'pickup'); o.pickup = !pk || !(pk.pickup || []).includes(C('네오').id);
     const en = g.lib.filter(l => l.kind === 'enemy'); o.bestiary = en.some(l => l.name === '촉수 무리' && l.desc && l.faction === '심해의 것') && en.some(l => l.name === '심연의 눈' && l.weak === '빛');
     o.rules = g.chapters[0].stages.every(s => s.rulesV === 1) && !g.chapters[0].stages[0].field;
+    const V = g.meta.variants || []; o.variants = V.length === 2 && V[0].name === '축제복' && V[0].cond.factions.join() === '등불단' && V[0].cond.roles.join() === 'atk' && !Object.keys(V[1].cond).length && V.every(t => t.recipe.min[3] <= 400 && t.recipe.min[3] * 2 <= 600 + 1e-9 + 600 && t.chance > 0);
+    o.construct = !!(g.meta.construct && g.meta.construct.on) && g.prog.cres && g.prog.cres.res4 >= 600 && !!g.prog.cbuild.started;
     // 생성된 게임을 불러와 잠금·이후 장의 첫 등장 확인
     const G0 = G; G = fix(JSON.parse(JSON.stringify(g)));
     const neo = charById(C('네오').id), five = charById(C('다섯').id); o.lock = !castOk(neo) && castLock(five).includes('아직 만나지') && castOk(charById(C('하나').id));

@@ -1,0 +1,1273 @@
+{
+ "note": "자기점검 기준선 — 늘리지 않음(CLAUDE.md §3). 줄면 node tools/check.mjs --update-baseline",
+ "findings": [
+  {
+   "key": "복잡한 함수|buildNewGameDraft",
+   "num": {
+    "복잡도": 150,
+    "줄": 89,
+    "중첩": 2
+   },
+   "text": "buildNewGameDraft (src/main/0250-story-factory.js:231) 복잡도 150 · 89줄 · 중첩 2"
+  },
+  {
+   "key": "복잡한 함수|cbPlay",
+   "num": {
+    "복잡도": 106,
+    "줄": 44,
+    "중첩": 3
+   },
+   "text": "cbPlay (src/main/0120-abyss.js:210) 복잡도 106 · 44줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 함수|v2CompileSlot",
+   "num": {
+    "복잡도": 100,
+    "줄": 64,
+    "중첩": 4
+   },
+   "text": "v2CompileSlot (src/modules/combat/060-generation.js:28) 복잡도 100 · 64줄 · 중첩 4"
+  },
+  {
+   "key": "복잡한 함수|openChar",
+   "num": {
+    "복잡도": 94,
+    "줄": 93,
+    "중첩": 2
+   },
+   "text": "openChar (src/main/0230-modal.js:85) 복잡도 94 · 93줄 · 중첩 2"
+  },
+  {
+   "key": "복잡한 함수|cutoutWhite",
+   "num": {
+    "복잡도": 91,
+    "줄": 65,
+    "중첩": 5
+   },
+   "text": "cutoutWhite (src/main/0030-character-regen.js:401) 복잡도 91 · 65줄 · 중첩 5"
+  },
+  {
+   "key": "복잡한 함수|apply",
+   "num": {
+    "복잡도": 90,
+    "줄": 45,
+    "중첩": 4
+   },
+   "text": "apply (src/modules/combat/030-core.js:762) 복잡도 90 · 45줄 · 중첩 4"
+  },
+  {
+   "key": "복잡한 함수|validate",
+   "num": {
+    "복잡도": 84,
+    "줄": 36,
+    "중첩": 5
+   },
+   "text": "validate (src/modules/combat/030-core.js:63) 복잡도 84 · 36줄 · 중첩 5"
+  },
+  {
+   "key": "복잡한 함수|http",
+   "num": {
+    "복잡도": 81,
+    "줄": 43,
+    "중첩": 5
+   },
+   "text": "http (src/main/0020-ai-connect.js:72) 복잡도 81 · 43줄 · 중첩 5"
+  },
+  {
+   "key": "복잡한 함수|fix",
+   "num": {
+    "복잡도": 78,
+    "줄": 75,
+    "중첩": 4
+   },
+   "text": "fix (src/main/0070-save.js:41) 복잡도 78 · 75줄 · 중첩 4"
+  },
+  {
+   "key": "복잡한 함수|damage",
+   "num": {
+    "복잡도": 74,
+    "줄": 40,
+    "중첩": 4
+   },
+   "text": "damage (src/modules/combat/030-core.js:685) 복잡도 74 · 40줄 · 중첩 4"
+  },
+  {
+   "key": "복잡한 함수|effectText",
+   "num": {
+    "복잡도": 70,
+    "줄": 2,
+    "중첩": 2
+   },
+   "text": "effectText (src/modules/combat/010-catalog.js:5) 복잡도 70 · 2줄 · 중첩 2"
+  },
+  {
+   "key": "복잡한 함수|fcSend",
+   "num": {
+    "복잡도": 69,
+    "줄": 39,
+    "중첩": 3
+   },
+   "text": "fcSend (src/main/0160-free-chat.js:36) 복잡도 69 · 39줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 함수|naiGenerate0",
+   "num": {
+    "복잡도": 68,
+    "줄": 62,
+    "중첩": 4
+   },
+   "text": "naiGenerate0 (src/main/0030-character-regen.js:533) 복잡도 68 · 62줄 · 중첩 4"
+  },
+  {
+   "key": "복잡한 함수|studioHTML",
+   "num": {
+    "복잡도": 68,
+    "줄": 81,
+    "중첩": 1
+   },
+   "text": "studioHTML (src/main/0180-ui-scroll.js:553) 복잡도 68 · 81줄 · 중첩 1"
+  },
+  {
+   "key": "복잡한 함수|liveTick",
+   "num": {
+    "복잡도": 64,
+    "줄": 43,
+    "중첩": 4
+   },
+   "text": "liveTick (src/main/0290-season-rotation.js:69) 복잡도 64 · 43줄 · 중첩 4"
+  },
+  {
+   "key": "복잡한 함수|stageBackup",
+   "num": {
+    "복잡도": 63,
+    "줄": 16,
+    "중첩": 7
+   },
+   "text": "stageBackup (src/main/0520-backup-storage.js:58) 복잡도 63 · 16줄 · 중첩 7"
+  },
+  {
+   "key": "복잡한 함수|lobbyHTML",
+   "num": {
+    "복잡도": 62,
+    "줄": 43,
+    "중첩": 0
+   },
+   "text": "lobbyHTML (src/main/0180-ui-scroll.js:71) 복잡도 62 · 43줄 · 중첩 0"
+  },
+  {
+   "key": "복잡한 함수|cast",
+   "num": {
+    "복잡도": 58,
+    "줄": 22,
+    "중첩": 3
+   },
+   "text": "cast (src/modules/combat/030-core.js:808) 복잡도 58 · 22줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 함수|aiPolicy",
+   "num": {
+    "복잡도": 56,
+    "줄": 33,
+    "중첩": 4
+   },
+   "text": "aiPolicy (src/modules/combat/030-core.js:334) 복잡도 56 · 33줄 · 중첩 4"
+  },
+  {
+   "key": "복잡한 함수|v2EditorAction",
+   "num": {
+    "복잡도": 56,
+    "줄": 37,
+    "중첩": 3
+   },
+   "text": "v2EditorAction (src/modules/combat/050-bridge.js:140) 복잡도 56 · 37줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 함수|aiEventGen0",
+   "num": {
+    "복잡도": 55,
+    "줄": 28,
+    "중첩": 2
+   },
+   "text": "aiEventGen0 (src/main/0250-story-factory.js:170) 복잡도 55 · 28줄 · 중첩 2"
+  },
+  {
+   "key": "복잡한 함수|buildManualGameDraft",
+   "num": {
+    "복잡도": 55,
+    "줄": 40,
+    "중첩": 3
+   },
+   "text": "buildManualGameDraft (src/main/0250-story-factory.js:321) 복잡도 55 · 40줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 함수|contractHTML0",
+   "num": {
+    "복잡도": 52,
+    "줄": 38,
+    "중첩": 1
+   },
+   "text": "contractHTML0 (src/main/0180-ui-scroll.js:151) 복잡도 52 · 38줄 · 중첩 1"
+  },
+  {
+   "key": "복잡한 함수|openNaiPrep",
+   "num": {
+    "복잡도": 52,
+    "줄": 35,
+    "중첩": 2
+   },
+   "text": "openNaiPrep (src/main/0180-ui-scroll.js:415) 복잡도 52 · 35줄 · 중첩 2"
+  },
+  {
+   "key": "복잡한 함수|bEnd",
+   "num": {
+    "복잡도": 51,
+    "줄": 29,
+    "중첩": 4
+   },
+   "text": "bEnd (src/main/0490-boss-patterns.js:21) 복잡도 51 · 29줄 · 중첩 4"
+  },
+  {
+   "key": "복잡한 함수|openLibItem",
+   "num": {
+    "복잡도": 45,
+    "줄": 35,
+    "중첩": 1
+   },
+   "text": "openLibItem (src/main/0240-growth-curve.js:130) 복잡도 45 · 35줄 · 중첩 1"
+  },
+  {
+   "key": "복잡한 함수|motif",
+   "num": {
+    "복잡도": 44,
+    "줄": 29,
+    "중첩": 3
+   },
+   "text": "motif (src/modules/combat/040-effects.js:234) 복잡도 44 · 29줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 함수|v2IconClick",
+   "num": {
+    "복잡도": 44,
+    "줄": 25,
+    "중첩": 3
+   },
+   "text": "v2IconClick (src/modules/combat/050-bridge.js:314) 복잡도 44 · 25줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 함수|regenApply",
+   "num": {
+    "복잡도": 43,
+    "줄": 15,
+    "중첩": 3
+   },
+   "text": "regenApply (src/main/0030-character-regen.js:86) 복잡도 43 · 15줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 함수|renderSetup",
+   "num": {
+    "복잡도": 43,
+    "줄": 47,
+    "중첩": 1
+   },
+   "text": "renderSetup (src/main/0210-setup.js:24) 복잡도 43 · 47줄 · 중첩 1"
+  },
+  {
+   "key": "복잡한 함수|auditFix",
+   "num": {
+    "복잡도": 43,
+    "줄": 21,
+    "중첩": 13
+   },
+   "text": "auditFix (src/main/0535-content-audit.js:70) 복잡도 43 · 21줄 · 중첩 13"
+  },
+  {
+   "key": "복잡한 함수|step",
+   "num": {
+    "복잡도": 43,
+    "줄": 29,
+    "중첩": 6
+   },
+   "text": "step (src/modules/combat/030-core.js:831) 복잡도 43 · 29줄 · 중첩 6"
+  },
+  {
+   "key": "복잡한 함수|aiOne",
+   "num": {
+    "복잡도": 41,
+    "줄": 37,
+    "중첩": 3
+   },
+   "text": "aiOne (src/main/0020-ai-connect.js:210) 복잡도 41 · 37줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 함수|eraseColorData",
+   "num": {
+    "복잡도": 41,
+    "줄": 26,
+    "중첩": 4
+   },
+   "text": "eraseColorData (src/main/0030-character-regen.js:306) 복잡도 41 · 26줄 · 중첩 4"
+  },
+  {
+   "key": "복잡한 함수|comfyGenerate",
+   "num": {
+    "복잡도": 41,
+    "줄": 27,
+    "중첩": 2
+   },
+   "text": "comfyGenerate (src/main/0030-character-regen.js:490) 복잡도 41 · 27줄 · 중첩 2"
+  },
+  {
+   "key": "복잡한 함수|value",
+   "num": {
+    "복잡도": 25,
+    "줄": 13,
+    "중첩": 7
+   },
+   "text": "value (src/main/0520-backup-storage.js:38) 복잡도 25 · 13줄 · 중첩 7"
+  },
+  {
+   "key": "복잡한 함수|lkOp",
+   "num": {
+    "복잡도": 22,
+    "줄": 12,
+    "중첩": 7
+   },
+   "text": "lkOp (src/main/0340-single-device-lease.js:11) 복잡도 22 · 12줄 · 중첩 7"
+  },
+  {
+   "key": "복잡한 함수|v2DrainBattleEvents",
+   "num": {
+    "복잡도": 22,
+    "줄": 35,
+    "중첩": 10
+   },
+   "text": "v2DrainBattleEvents (src/modules/combat/050-bridge.js:218) 복잡도 22 · 35줄 · 중첩 10"
+  },
+  {
+   "key": "복잡한 함수|budget",
+   "num": {
+    "복잡도": 21,
+    "줄": 16,
+    "중첩": 9
+   },
+   "text": "budget (src/modules/combat/030-core.js:100) 복잡도 21 · 16줄 · 중첩 9"
+  },
+  {
+   "key": "복잡한 함수|vnCmd",
+   "num": {
+    "복잡도": 20,
+    "줄": 19,
+    "중첩": 12
+   },
+   "text": "vnCmd (src/main/0460-script-engine.js:64) 복잡도 20 · 19줄 · 중첩 12"
+  },
+  {
+   "key": "복잡한 익명 콜백|main (최상위)→$('#file').addEventListener @src/main/0080-storage-integration.js",
+   "num": {
+    "복잡도": 76,
+    "줄": 29,
+    "중첩": 3
+   },
+   "text": "(최상위)→$('#file').addEventListener @src/main/0080-storage-integration.js (src/main/0080-storage-integration.js:154) 복잡도 76 · 29줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener #2 @src/main/0455-persona.js",
+   "num": {
+    "복잡도": 38,
+    "줄": 14,
+    "중첩": 13
+   },
+   "text": "(최상위)→document.addEventListener #2 @src/main/0455-persona.js (src/main/0455-persona.js:119) 복잡도 38 · 14줄 · 중첩 13"
+  },
+  {
+   "key": "복잡한 익명 콜백|main rulesRead→rySelectorAll('#modal[data-rk]').forEach @src/main/0185-game-rules.js",
+   "num": {
+    "복잡도": 27,
+    "줄": 6,
+    "중첩": 9
+   },
+   "text": "rulesRead→rySelectorAll('#modal[data-rk]').forEach @src/main/0185-game-rules.js (src/main/0185-game-rules.js:83) 복잡도 27 · 6줄 · 중첩 9"
+  },
+  {
+   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0488-stage-modes.js",
+   "num": {
+    "복잡도": 27,
+    "줄": 9,
+    "중첩": 8
+   },
+   "text": "(최상위)→document.addEventListener @src/main/0488-stage-modes.js (src/main/0488-stage-modes.js:73) 복잡도 27 · 9줄 · 중첩 8"
+  },
+  {
+   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0025-prompt-studio.js",
+   "num": {
+    "복잡도": 24,
+    "줄": 13,
+    "중첩": 11
+   },
+   "text": "(최상위)→document.addEventListener @src/main/0025-prompt-studio.js (src/main/0025-prompt-studio.js:62) 복잡도 24 · 13줄 · 중첩 11"
+  },
+  {
+   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0565-asset-library.js",
+   "num": {
+    "복잡도": 21,
+    "줄": 10,
+    "중첩": 10
+   },
+   "text": "(최상위)→document.addEventListener @src/main/0565-asset-library.js (src/main/0565-asset-library.js:43) 복잡도 21 · 10줄 · 중첩 10"
+  },
+  {
+   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0185-game-rules.js",
+   "num": {
+    "복잡도": 20,
+    "줄": 16,
+    "중첩": 13
+   },
+   "text": "(최상위)→document.addEventListener @src/main/0185-game-rules.js (src/main/0185-game-rules.js:128) 복잡도 20 · 16줄 · 중첩 13"
+  },
+  {
+   "key": "복잡한 익명 콜백|main parseScript→).filter(Boolean).flatMap(splitTags).map @src/main/0460-script-engine.js",
+   "num": {
+    "복잡도": 18,
+    "줄": 16,
+    "중첩": 9
+   },
+   "text": "parseScript→).filter(Boolean).flatMap(splitTags).map @src/main/0460-script-engine.js (src/main/0460-script-engine.js:12) 복잡도 18 · 16줄 · 중첩 9"
+  },
+  {
+   "key": "복잡한 익명 콜백|main openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/0260-new-game-draft.js",
+   "num": {
+    "복잡도": 15,
+    "줄": 6,
+    "중첩": 7
+   },
+   "text": "openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/0260-new-game-draft.js (src/main/0260-new-game-draft.js:225) 복잡도 15 · 6줄 · 중첩 7"
+  },
+  {
+   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0445-factions.js",
+   "num": {
+    "복잡도": 14,
+    "줄": 7,
+    "중첩": 7
+   },
+   "text": "(최상위)→document.addEventListener @src/main/0445-factions.js (src/main/0445-factions.js:91) 복잡도 14 · 7줄 · 중첩 7"
+  },
+  {
+   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0275-expedition.js",
+   "num": {
+    "복잡도": 13,
+    "줄": 10,
+    "중첩": 9
+   },
+   "text": "(최상위)→document.addEventListener @src/main/0275-expedition.js (src/main/0275-expedition.js:75) 복잡도 13 · 10줄 · 중첩 9"
+  },
+  {
+   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0505-construct.js",
+   "num": {
+    "복잡도": 12,
+    "줄": 9,
+    "중첩": 8
+   },
+   "text": "(최상위)→document.addEventListener @src/main/0505-construct.js (src/main/0505-construct.js:130) 복잡도 12 · 9줄 · 중첩 8"
+  },
+  {
+   "key": "복잡한 분배기 case|handleImagesAndAssetsAction facego",
+   "num": {
+    "복잡도": 25,
+    "줄": 15,
+    "중첩": 3
+   },
+   "text": "handleImagesAndAssetsAction · facego (src/main/0510-actions/100-images-and-assets.js:74) 복잡도 25 · 15줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 분배기 case|handleNavigationAndToolsAction ailib",
+   "num": {
+    "복잡도": 23,
+    "줄": 8,
+    "중첩": 3
+   },
+   "text": "handleNavigationAndToolsAction · ailib (src/main/0510-actions/020-navigation-and-tools.js:92) 복잡도 23 · 8줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 분배기 case|handleNavigationAndToolsAction poke",
+   "num": {
+    "복잡도": 21,
+    "줄": 9,
+    "중첩": 1
+   },
+   "text": "handleNavigationAndToolsAction · poke (src/main/0510-actions/020-navigation-and-tools.js:26) 복잡도 21 · 9줄 · 중첩 1"
+  },
+  {
+   "key": "복잡한 분배기 case|handleSettingsAndAudioAction vsai",
+   "num": {
+    "복잡도": 21,
+    "줄": 13,
+    "중첩": 3
+   },
+   "text": "handleSettingsAndAudioAction · vsai (src/main/0510-actions/050-settings-and-audio.js:57) 복잡도 21 · 13줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 분배기 case|handleImagesAndAssetsAction skinuse",
+   "num": {
+    "복잡도": 20,
+    "줄": 5,
+    "중첩": 3
+   },
+   "text": "handleImagesAndAssetsAction · skinuse (src/main/0510-actions/100-images-and-assets.js:57) 복잡도 20 · 5줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 분배기 case|handleCharactersAction upgo",
+   "num": {
+    "복잡도": 10,
+    "줄": 1,
+    "중첩": 5
+   },
+   "text": "handleCharactersAction · upgo (src/main/0510-actions/090-characters.js:25) 복잡도 10 · 1줄 · 중첩 5"
+  },
+  {
+   "key": "동기 순환|module:modules/combat/030-core.js#addStatus,module:modules/combat/030-core.js#apply,module:modules/combat/030-core.js#cast,module:modules/combat/030-core.js#damage,module:modules/combat/030-core.js#heal,module:modules/combat/030-core.js#hit@80347,module:modules/combat/030-core.js#proc,module:modules/combat/030-core.js#reactHit",
+   "num": {
+    "크기": 8
+   },
+   "text": "module:modules/combat/030-core.js#heal ↔ module:modules/combat/030-core.js#proc ↔ module:modules/combat/030-core.js#addStatus ↔ module:modules/combat/030-core.js#reactHit ↔ module:modules/combat/030-core.js#damage ↔ module:modules/combat/030-core.js#hit@80347 ↔ module:modules/combat/030-core.js#apply ↔ module:modules/combat/030-core.js#cast"
+  },
+  {
+   "key": "동기 순환|imgSrc,imgSrcRaw,skinPreviewSrc",
+   "num": {
+    "크기": 3
+   },
+   "text": "imgSrcRaw ↔ skinPreviewSrc ↔ imgSrc"
+  },
+  {
+   "key": "동기 순환|module:modules/combat/050-bridge.js#v2BattleEvents,module:modules/combat/050-bridge.js#v2DrainBattleEvents",
+   "num": {
+    "크기": 2
+   },
+   "text": "module:modules/combat/050-bridge.js#v2DrainBattleEvents ↔ module:modules/combat/050-bridge.js#v2BattleEvents"
+  },
+  {
+   "key": "빈 catch|src/main/0020-ai-connect.js 파싱 대체",
+   "num": {
+    "개수": 9
+   },
+   "text": "src/main/0020-ai-connect.js 파싱 대체 9개"
+  },
+  {
+   "key": "빈 catch|src/main/0020-ai-connect.js 동기 대체",
+   "num": {
+    "개수": 11
+   },
+   "text": "src/main/0020-ai-connect.js 동기 대체 11개"
+  },
+  {
+   "key": "빈 catch|src/main/0020-ai-connect.js 저장소 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0020-ai-connect.js 저장소 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0025-prompt-studio.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0025-prompt-studio.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0030-character-regen.js 동기 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0030-character-regen.js 동기 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0030-character-regen.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0030-character-regen.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0040-sound.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0040-sound.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0040-sound.js 저장소 대체",
+   "num": {
+    "개수": 6
+   },
+   "text": "src/main/0040-sound.js 저장소 대체 6개"
+  },
+  {
+   "key": "빈 catch|src/main/0040-sound.js 동기 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0040-sound.js 동기 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0060-util.js 의도 표시",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0060-util.js 의도 표시 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0060-util.js 동기 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0060-util.js 동기 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0070-save.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0070-save.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0070-save.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0070-save.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0080-storage-integration.js 저장소 대체",
+   "num": {
+    "개수": 6
+   },
+   "text": "src/main/0080-storage-integration.js 저장소 대체 6개"
+  },
+  {
+   "key": "빈 catch|src/main/0080-storage-integration.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0080-storage-integration.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0080-storage-integration.js 동기 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0080-storage-integration.js 동기 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0090-growth.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0090-growth.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0100-messenger.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0100-messenger.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0100-messenger.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0100-messenger.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0130-gift.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0130-gift.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0160-free-chat.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0160-free-chat.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0180-ui-scroll.js 동기 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0180-ui-scroll.js 동기 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0210-setup.js 파싱 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0210-setup.js 파싱 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0220-mail.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0220-mail.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0250-story-factory.js 동기 대체",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0250-story-factory.js 동기 대체 4개"
+  },
+  {
+   "key": "빈 catch|src/main/0250-story-factory.js 파싱 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0250-story-factory.js 파싱 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0250-story-factory.js 저장소 대체",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0250-story-factory.js 저장소 대체 4개"
+  },
+  {
+   "key": "빈 catch|src/main/0260-new-game-draft.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0260-new-game-draft.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0260-new-game-draft.js 저장소 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0260-new-game-draft.js 저장소 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0290-season-rotation.js 동기 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0290-season-rotation.js 동기 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0320-art-style.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0320-art-style.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0330-casting.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0330-casting.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0340-single-device-lease.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0340-single-device-lease.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0340-single-device-lease.js 동기 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0340-single-device-lease.js 동기 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0350-boot-sync.js 파싱 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0350-boot-sync.js 파싱 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0350-boot-sync.js 저장소 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0350-boot-sync.js 저장소 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0370-game-picker.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0370-game-picker.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0390-github-sync.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0390-github-sync.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0390-github-sync.js 파싱 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0390-github-sync.js 파싱 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0400-publish-subscribe.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0400-publish-subscribe.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0400-publish-subscribe.js 동기 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0400-publish-subscribe.js 동기 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0410-desktop.js 저장소 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0410-desktop.js 저장소 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0410-desktop.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0410-desktop.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0420-app-update.js 동기 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0420-app-update.js 동기 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0430-update-guidance.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0430-update-guidance.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0430-update-guidance.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0430-update-guidance.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0450-relations-memory.js 동기 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0450-relations-memory.js 동기 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0462-direction.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0462-direction.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0490-boss-patterns.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0490-boss-patterns.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0500-gacha.js 동기 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0500-gacha.js 동기 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0510-actions/010-setup.js 저장소 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0510-actions/010-setup.js 저장소 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0510-actions/010-setup.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0510-actions/010-setup.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0510-actions/020-navigation-and-tools.js 저장소 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0510-actions/020-navigation-and-tools.js 저장소 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0510-actions/040-story-and-authoring.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0510-actions/040-story-and-authoring.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0510-actions/050-settings-and-audio.js 저장소 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0510-actions/050-settings-and-audio.js 저장소 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0510-actions/060-storage-and-sharing.js 저장소 대체",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0510-actions/060-storage-and-sharing.js 저장소 대체 4개"
+  },
+  {
+   "key": "빈 catch|src/main/0510-actions/060-storage-and-sharing.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0510-actions/060-storage-and-sharing.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0510-actions/060-storage-and-sharing.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0510-actions/060-storage-and-sharing.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0510-actions/100-images-and-assets.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0510-actions/100-images-and-assets.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0510-actions/130-dispatch.js 저장소 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0510-actions/130-dispatch.js 저장소 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0535-content-audit.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0535-content-audit.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0550-standalone-app.js 동기 대체",
+   "num": {
+    "개수": 6
+   },
+   "text": "src/main/0550-standalone-app.js 동기 대체 6개"
+  },
+  {
+   "key": "빈 catch|src/main/0550-standalone-app.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0550-standalone-app.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0560-image-candidates.js 동기 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0560-image-candidates.js 동기 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0565-asset-library.js 저장소 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0565-asset-library.js 저장소 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0565-asset-library.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0565-asset-library.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/modules/combat/040-effects.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/modules/combat/040-effects.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/boot/durable-storage.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/boot/durable-storage.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/boot/durable-storage.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/boot/durable-storage.js 동기 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/boot/head.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/boot/head.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/boot/storage-boot.js 동기 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/boot/storage-boot.js 동기 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/boot/storage-boot.js 의도 표시",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/boot/storage-boot.js 의도 표시 1개"
+  },
+  {
+   "key": "흩어진 상태 쓰기|P().curBanner",
+   "num": {
+    "쓰는곳": 8
+   },
+   "text": "P().curBanner — 8곳에서 씀"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|lobby-stage",
+   "num": {},
+   "text": ".lobby-stage (src/style/0010-base.css:61)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|shade",
+   "num": {},
+   "text": ".shade (src/style/0010-base.css:62)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|vname",
+   "num": {},
+   "text": ".vname (src/style/0010-base.css:63)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|phbtn",
+   "num": {},
+   "text": ".phbtn (src/style/0010-base.css:70)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|nbadge",
+   "num": {},
+   "text": ".nbadge (src/style/0010-base.css:72)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|lobby-name",
+   "num": {},
+   "text": ".lobby-name (src/style/0010-base.css:77)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|float",
+   "num": {},
+   "text": ".float (src/style/0010-base.css:79)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|trio",
+   "num": {},
+   "text": ".trio (src/style/0010-base.css:99)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|bigart",
+   "num": {},
+   "text": ".bigart (src/style/0010-base.css:133)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|picking",
+   "num": {},
+   "text": ".picking (src/style/0010-base.css:413)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|lb-menu",
+   "num": {},
+   "text": ".lb-menu (src/style/0020-v3-theme-tactical-default-skins.css:54)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|lvrow",
+   "num": {},
+   "text": ".lvrow (src/style/0020-v3-theme-tactical-default-skins.css:78)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|cs-acts",
+   "num": {},
+   "text": ".cs-acts (src/style/0030-lobby-nav-char-screen-pickup-shops.css:156)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|cs-stars",
+   "num": {},
+   "text": ".cs-stars (src/style/0030-lobby-nav-char-screen-pickup-shops.css:161)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|styrow",
+   "num": {},
+   "text": ".styrow (src/style/0030-lobby-nav-char-screen-pickup-shops.css:193)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|styhead",
+   "num": {},
+   "text": ".styhead (src/style/0030-lobby-nav-char-screen-pickup-shops.css:194)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|lb-tl",
+   "num": {},
+   "text": ".lb-tl (src/style/0080-desktop.css:28)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|lb-ban",
+   "num": {},
+   "text": ".lb-ban (src/style/0080-desktop.css:28)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|ph-tabs",
+   "num": {},
+   "text": ".ph-tabs (src/style/0090-free-chat.css:2)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|fc-tag",
+   "num": {},
+   "text": ".fc-tag (src/style/0090-free-chat.css:5)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|ch-boss",
+   "num": {},
+   "text": ".ch-boss (src/style/0110-challenge-raid.css:7)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|sw-genre",
+   "num": {},
+   "text": ".sw-genre (src/style/0120-2026-10-07-2.css:24)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|sw-pj",
+   "num": {},
+   "text": ".sw-pj (src/style/0120-2026-10-07-2.css:34)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|sw-list",
+   "num": {},
+   "text": ".sw-list (src/style/0120-2026-10-07-2.css:54)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|disc-bg",
+   "num": {},
+   "text": ".disc-bg (src/style/0120-2026-10-07-2.css:77)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|disc-t",
+   "num": {},
+   "text": ".disc-t (src/style/0120-2026-10-07-2.css:79)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|disc-rate",
+   "num": {},
+   "text": ".disc-rate (src/style/0120-2026-10-07-2.css:83)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|disc-go",
+   "num": {},
+   "text": ".disc-go (src/style/0120-2026-10-07-2.css:84)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|collab-b",
+   "num": {},
+   "text": ".collab-b (src/style/0130-lobby-cleanup.css:88)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|look-who",
+   "num": {},
+   "text": ".look-who (src/style/0150-cards.css:51)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|ca",
+   "num": {},
+   "text": ".ca (src/style/0160-card-battle.css:14)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|ca-n",
+   "num": {},
+   "text": ".ca-n (src/style/0160-card-battle.css:16)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|it-aoe",
+   "num": {},
+   "text": ".it-aoe (src/style/0160-card-battle.css:19)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|ca-art",
+   "num": {},
+   "text": ".ca-art (src/style/0160-card-battle.css:21)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|cb-al",
+   "num": {},
+   "text": ".cb-al (src/style/0160-card-battle.css:27)"
+  },
+  {
+   "key": "안 쓰는 CSS 클래스|dgb",
+   "num": {},
+   "text": ".dgb (src/style/0160-card-battle.css:50)"
+  },
+  {
+   "key": "도구 복잡한 함수|tool:tools/play/lib/qa.mjs runQA",
+   "num": {
+    "복잡도": 2,
+    "줄": 123,
+    "중첩": 1
+   },
+   "text": "runQA (tools/play/lib/qa.mjs:4) 복잡도 2 · 123줄 · 중첩 1"
+  },
+  {
+   "key": "도구 복잡한 함수|tool:tools/play/lib/qa.mjs runQA→page.evaluate @tools/play/lib/qa.mjs",
+   "num": {
+    "복잡도": 137,
+    "줄": 123,
+    "중첩": 7
+   },
+   "text": "runQA→page.evaluate @tools/play/lib/qa.mjs (tools/play/lib/qa.mjs:4) 복잡도 137 · 123줄 · 중첩 7"
+  },
+  {
+   "key": "도구 복잡한 함수|tool:build/test.mjs (최상위)→p22.evaluate @build/test.mjs",
+   "num": {
+    "복잡도": 42,
+    "줄": 34,
+    "중첩": 1
+   },
+   "text": "(최상위)→p22.evaluate @build/test.mjs (build/test.mjs:494) 복잡도 42 · 34줄 · 중첩 1"
+  },
+  {
+   "key": "도구 빈 catch|build/test.mjs",
+   "num": {
+    "개수": 5
+   },
+   "text": "build/test.mjs 5개"
+  }
+ ]
+}
