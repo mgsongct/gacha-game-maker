@@ -167,7 +167,6 @@ const DEFAULT_SFX=[
  ['sfx_up','강화','Power-up level up sound, rising sparkly arpeggio',1.5],
  ['sfx_noti','알림','Smartphone message notification ping, soft two-note chime',0.8]
 ].map(([id,name,prompt,dur])=>({id,kind:'sfx',name,prompt,dur,img:null}));
-const FACE_TAGS={calm:'calm, relaxed, closed mouth, soft eyes',smile:'gentle smile, closed mouth, happy',teary:'teary eyes, trembling lips, about to cry, sad',happy:'smile, happy',laughing:'laughing, open mouth, closed eyes',playful:'smile, playful, one eye closed',sad:'sad, frown, teary eyes',angry:'angry, frown, clenched teeth',surprised:'surprised, open mouth, wide-eyed',embarrassed:'embarrassed, blush, wavy mouth',shy:'shy, blush, looking away',smug:'smug, smirk, half-closed eyes',worried:'worried, frown, sweat',determined:'determined, serious, v-shaped eyebrows',thinking:'thinking, hand on own chin',nervous:'nervous, sweatdrop, awkward smile',irritated:'annoyed, frown, pout',tired:'tired, half-closed eyes, sigh',love:'heart-shaped pupils, blush, smile',neutral:'expressionless, closed mouth',hurt:'pain, wince, teary eyes'};
 const FACE_BASIC=['평온','미소','슬픔','화남','놀람','당황'];
 const FACE_PRESETS=[['평온','calm'],['미소','smile'],['울먹','teary'],['웃음','happy'],['폭소','laughing'],['윙크','playful'],['슬픔','sad'],['화남','angry'],['놀람','surprised'],['부끄럼','embarrassed'],['수줍음','shy'],['의기양양','smug'],['걱정','worried'],['결의','determined'],['생각','thinking'],['당황','nervous'],['짜증','irritated'],['피곤','tired'],['반함','love'],['무표정','neutral'],['아픔','hurt']];
 const DEFAULT_CHARS = [

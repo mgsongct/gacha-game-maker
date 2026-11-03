@@ -3,6 +3,26 @@
 모든 모듈은 **같은 전역 스코프**를 공유합니다(ES 모듈·번들러 없음). "모듈"은 섹션 단위 묶음이고, 서로 전역 함수·전역 변수로 직접 호출합니다.
 예외로 전투 v2 코어는 `GGMCombat` 등 네임스페이스 객체를 `globalThis`에 내보냅니다.
 
+## 0-0. 구조 원칙과 검증 (어디에 무엇을 두나 — 어긋나면 도구가 막음)
+
+원안 `index.html` 한 파일을 개발 편의·혼돈 방지를 위해 모듈로 나눴어요(CLAUDE.md §0-1). 잘못된 위치에 코드를 두거나 파편화가 생기지 않게, 원칙마다 잡는 도구와 막는 정도를 둡니다. CI(`.github/workflows/check.yml`)가 모두 돌려요.
+
+| 원칙 | 잡는 도구 | 막는 정도 |
+|---|---|---|
+| 분석한 코드 = 빌드된 SPA(`www/index.html`) 코드, 로컬 파일을 따로 불러오지 않음 | `tools/check.mjs`(`spaCheck`) · `node build/build.mjs --check` | 오류 |
+| 불러올 때 아직 없는 이름 없음(모듈 블록 → main 이름순 실행 — 코드를 옮길 때 생기기 쉬움) | `tools/check.mjs`(`tdzRefs`) | 오류 |
+| 규칙 엔진(순수 모듈)은 DOM·앱 상태를 참조하지 않음 | `tools/check.mjs`(`pureModules`) | 오류 |
+| 프롬프트(LLM·그림)는 프롬프트 스튜디오 한 모듈(`src/main/0015-prompt-studio/`)에: 조각 등록(`pfDef`)은 스튜디오만, 지시문은 조각, 프롬프트 글·그림 태그는 스튜디오 밖에 없음(화면과 같이 쓰는 글 도구는 `tools/prompt-shared.json`에 이유와 함께) | `tools/check.mjs`(`tools/lib/prompts.mjs` 프롬프트 흐름) | 오류 |
+| 모듈 경계: 영역 침범 후보·남의 상태 쓰기·상태 파편화(3모듈 이상이 쓰는 키) | `tools/modules.mjs` · `tools/check.mjs` 래칫 | 늘면 실패 |
+| 자연 경계(함수 그래프 모듈성 최대화): 과잉 분할(서로 강하게 묶인 모듈·위성 모듈)·기능 섞임·기능 분산(다른 한 모듈의 일을 하는 함수) | `tools/modules.mjs` · `tools/check.mjs` 래칫 | 늘면 실패 |
+| 기능 영역(이 문서 절마다 적은 파일): 영역 함수가 영역 밖에·영역 상태를 밖에서 씀 | `tools/modules.mjs` | 보고 |
+| 포크 기능이 생성기 ↔ 기능 ↔ 생성물로 이어짐 | `tools/wiring.mjs --strict` | 늘면 실패 |
+| 상황별 실제 프롬프트 조합에 깨짐·과잉·과소 없음, 코드를 옮겨도 보낸 프롬프트(글·그림)가 같음 | `node tools/play/combos.mjs [--ref <git>]` | 보고 · --ref는 다르면 실패 |
+| 지금 빌드로 생성한 게임을 플레이할 때 기능이 이어짐(가챠·장 진행·세력·관계·파견·원정·건조) | `node tools/play/link.mjs` | 실패 있으면 실패 |
+| 예전 빌드로 만든·빠진 데 있는 게임을 지금 앱이 감지·보완(불러오기 이전·점검 규칙·자동 채움·기본값) | `node tools/wiring.mjs`(정적 표 — 경로 없음이 늘면 실패) · `node tools/play/upgrade.mjs`(동적 — 놓침이 있으면 실패) | 늘면 실패 · 보고 |
+
+새 기능은 새 파일로(`docs/build.md` §4), 그 기능의 절을 이 문서에 두고 파일을 적어요. 코드를 다른 파일로 옮길 때는 `tools/prompts-move.mjs`(프롬프트 — 원문 그대로, 지역 값·화면 입력은 인자로)처럼 뜻이 같게 옮기고 위 도구로 확인해요.
+
 ## 0. 연계 지도
 
 ```
@@ -198,11 +218,13 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8-2-5. 프롬프트 스튜디오
 
-- `src/main/0025-prompt-studio.js`: 조각 등록 `pfDef(id,label,get)` → `window[id]` 게터 → `promptFrag(id)`(게임별 덮어쓰기·덧붙이기 `G.meta.prompts`). 글 AI 지시문은 모두 이 파일의 「조각 모음」 한곳에 있어요(조각 184개 — 공통 형식·세계관·규칙·세력·등장·스토리·연출·생성기·공통 규칙·AI 컨텍스트·그림·화면 동작 등 묶음, 끝은 「조각 모음 끝」 표식). 수치·이름이 들어가는 조각은 `{이름}` 자리를 두고 호출 지점이 `pf('ID',{이름:값})`으로 채움(덮어쓴 글도 같은 자리). 고칠 때는 여기서, 게임별로는 스튜디오 화면(덮어쓰기·덧붙이기·AI 다듬기)에서
-- 도구가 다른 파일의 `pfDef`(오류)와 스튜디오 밖 지시문(늘면 실패)을 잡음(`tools/lib/prompts.mjs`)
+파일: `src/main/0015-prompt-studio/` (폴더 모듈 — AI 연결(0020)보다 먼저 돌아 그림 설정 기본값이 스튜디오의 태그를 씀)
+- `010-studio.js`: 조각 등록 `pfDef(id,label,get)` → `window[id]` 게터 → `promptFrag(id)`(게임별 덮어쓰기·덧붙이기 `G.meta.prompts`), `pf('ID',{이름:값})`(조각의 `{이름}` 자리 채움). 글 AI 지시문은 모두 「조각 모음」 한곳(끝은 「조각 모음 끝」 표식) — 연결 층 끝 지시(`JSON_ONLY_SUFFIX`)·새 게임·이벤트·픽업·그림·스킬·장비 설계 지시 포함. 교훈·그림 점검·AI 기록·스튜디오 화면
+- `020-requests.js` 요청 조립: 기능 파일이 글 AI·그림 AI에 보내는 요청 글(머리말·답 형식 견본·조건부 지시)을 만드는 함수(`buildNewGameDraftPrompt`·`aiChapterGen0Prompt`·`personaAIPrompt`·`ainaiPrompt` …). 기능 파일은 데이터(지역 값·화면 입력 값)만 넘김 — `tools/prompts-move.mjs --req`로 원문 그대로 옮김
+- `030-builders.js` 조립 함수: 여러 요청이 같이 쓰는 프롬프트 글 — AI 컨텍스트 `ctx`·`factionCtx`·`castLockCtx`·`castPlanData`·`relCtx`·`planCtx`·`drCtx`, 답 형식 견본 `charSchema`·`stageSchema`·`modeSchema()`·`*_SCHEMA`, 연결 층 `llmWrap`(지침·교훈 끼우기), 그림 `composeNai`·`composeCG`·`NAI_POSES`·`NAI_FRONT`·`FACE_TAGS`·그림 설정 기본 태그(`NAI_PARTS_DEF`·`NAI_NEG_DEF`·`COMFY_TAGS_DEF`)·그림체 프리셋 `STYLE_PRESETS`, 스킬 설계 `v2SlotPrompt`·`v2PalettePrompt`·`v2DesignContext`
+- 화면과 같이 쓰는 글 도구(도감 항목·스킬 설명·대본 해석·관계 한 줄 등)는 제 기능 파일에 두고 `tools/prompt-shared.json`에 이유와 함께 적음
+- 도구(오류로 막음): 다른 모듈의 `pfDef`, 스튜디오 조각이 아닌 지시문, 스튜디오 모듈 밖 프롬프트 글(LLM·그림), 목록에 있는데 코드에 없는 공용 글 도구(`tools/lib/prompts.mjs`·`tools/lib/analyze.mjs`). 상황별 실제 프롬프트 조합·깨짐·과잉·과소는 `node tools/play/combos.mjs`
 - 그림 가드 `imgGuard(kind,tags)`: `composeNai`가 배경·소품·지도·아이콘에서 사람 태그를 빼고 `no humans` 머리말을 붙임
-- 교훈 `plList/plHit/plAdd`(appStorage `ggm-plessons`) → `llmWrap`이 `plInject`로 끼움. 점검 규칙 `l_imgperson`
-- 설계: [research/prompts.md](research/prompts.md)
 
 ## 8-2-6. 전장 규칙 · 시련의 탑 · 일정
 

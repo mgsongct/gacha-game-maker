@@ -10,12 +10,12 @@ import { stateFlow } from './lib/flow.mjs';
 import { moduleMap, areaMap, naturalBoundaries } from './lib/modules.mjs';
 import { moduleOf } from './lib/scope.mjs';
 import { readFileSync } from 'node:fs';
-import { inlinePrompts, promptSites, fragmentFiles, promptText, IMAGE_SINKS, tagText } from './lib/prompts.mjs';
+import { inlinePrompts, promptSites, fragmentFiles, promptText, IMAGE_SINKS, tagText, sharedHelpers } from './lib/prompts.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..'), OUT = join(ROOT, 'tools/out');
-const units = await loadUnits(ROOT), { fns } = buildGraph(units), sf = stateFlow(units, fns), M = moduleMap(units, fns, sf), home = fragmentFiles(units).home;
-const llmIns = inlinePrompts(units), llmAll = inlinePrompts(units, { pred: promptText, home }), img = inlinePrompts(units, { sinks: IMAGE_SINKS, pred: tagText, home, tables: true });
-const NB = naturalBoundaries(fns, sf, M, moduleOf), short = m => String(m).replace(/^src\/(main|modules)\//, '');
+const units = await loadUnits(ROOT), { fns } = buildGraph(units), sf = stateFlow(units, fns), M = moduleMap(units, fns, sf, { modOf: moduleOf, layer: fragmentFiles(units).home }), home = fragmentFiles(units).home;
+const shared = sharedHelpers(ROOT), llmIns = inlinePrompts(units, { shared }), llmAll = inlinePrompts(units, { pred: promptText, home, shared }), img = inlinePrompts(units, { sinks: IMAGE_SINKS, pred: tagText, home, tables: true, shared });
+const NB = naturalBoundaries(fns, sf, M, moduleOf, fragmentFiles(units).home), short = m => String(m).replace(/^src\/(main|modules)\//, '');
 const areas = areaMap(readFileSync(join(ROOT, 'docs/modules.md'), 'utf8'), units, fns, M);
 const byFile = rows => { const m = new Map(); rows.forEach(r => { const f = r.loc.split(':')[0]; const x = m.get(f) || { n: 0, chars: 0 }; x.n++; x.chars += r.chars; m.set(f, x); }); return [...m].sort((a, b) => b[1].chars - a[1].chars); };
 const sum = rows => `${rows.length}개 ${rows.reduce((a, r) => a + r.chars, 0)}자`;

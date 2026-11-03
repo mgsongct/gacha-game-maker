@@ -154,3 +154,12 @@ export function spaCheck(ROOT, units = []) { const out = [], f = join(ROOT, 'www
   for (const m of html.matchAll(/\bimport\s*\(\s*["'](\.{0,2}\/[^"']+)["']\s*\)/g)) out.push({ loc: 'www/index.html', text: `로컬 모듈을 동적으로 불러옴: ${m[1]}` });
   for (const u of units) if (!html.includes(u.text)) out.push({ loc: u.files[0]?.path || u.name, text: `분석한 코드(${u.name})가 빌드된 www/index.html에 그대로 없음 — node build/build.mjs로 다시 빌드하거나 분석 단위를 빌드 구조에 맞추세요` });
   return { errors: out, scripts: (html.match(/<script\b/gi) || []).length }; }
+// 불러올 때 아직 없는 이름(TDZ): 앱 코드는 모듈 블록(src/modules — 차례로) 다음 main(이름순으로 이은 한 스크립트)이 돎. 함수 밖(불러올 때 바로 계산되는 곳)에서
+//   뒤에 선언된 const·let·class를 읽으면 "Cannot access … before initialization"으로 앱이 뜨지 않음(코드를 다른 파일로 옮길 때 생기기 쉬움). 함수 본문은 나중에 돌므로 셈하지 않음
+export function tdzRefs(units) { const order = [...units.filter(u => u.name.startsWith('module:')), ...units.filter(u => u.name === 'main')], decl = new Map(), out = [];
+  order.forEach((u, ui) => { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type === 'lexical_declaration' || c.type === 'class_declaration') (c.type === 'class_declaration' ? [c.childForFieldName('name')] : c.namedChildren.filter(d => d.type === 'variable_declarator').map(d => d.childForFieldName('name'))).forEach(n => { if (n?.type === 'identifier' && !decl.has(n.text)) decl.set(n.text, { ui, at: c.startIndex, loc: u.loc(c) }); }); } });
+  const FN = /^(arrow_function|function_expression|function_declaration|generator_function_declaration|method_definition|class_body)$/;
+  order.forEach((u, ui) => { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type === 'function_declaration') continue;
+    const visit = n => { if (FN.test(n.type)) return; if (n.type === 'identifier' && !(n.parent?.type === 'variable_declarator' && n.parent.childForFieldName('name')?.id === n.id)) { const d = decl.get(n.text); if (d && (d.ui > ui || (d.ui === ui && d.at > n.startIndex))) out.push({ loc: u.loc(n), name: n.text, decl: d.loc }); } for (let j = 0; j < n.childCount; j++) visit(n.child(j)); };
+    visit(c); } });
+  return out; }

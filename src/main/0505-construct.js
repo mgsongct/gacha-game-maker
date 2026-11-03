@@ -2,10 +2,6 @@
 /* 엔진: modules/app/020-construct.js (GGMConstruct). 여기서는 게임 상태·화면·AI 연결만.
    설정: G.meta.construct(바꾼 값만 저장) · G.meta.variants(바리에이션 공통 설정) · 진행: P().cres(자원) · P().cbuild(기록·발견한 레시피) */
 const CON_RES=GGMConstruct.RES;
-// 새 게임 세계관 단계의 바리에이션 결과 정리(엔진 GGMConstruct.variantsFrom + id). 지시문은 프롬프트 스튜디오의 VARIANT_RULE
-// 새 게임 세계관 단계 스키마: 건조 메뉴·자원 이름(terms), 바리에이션 기본형
-const CON_TERMS_SCHEMA='"construct":"자원을 넣어 새 동료를 데려오는 메뉴 이름(2~4자)","res1":"그 메뉴에 넣는 자원 1(2~4자, 세계관 고유)","res2":"자원 2","res3":"자원 3","res4":"자원 4(귀한 것 — 특별 의상·바리에이션의 열쇠)"';
-const VARIANT_SCHEMA='"variants":[{"name":"바리에이션 기본형 이름(2~6자)","prompt":"그 의상의 영어 이미지 태그(쉼표로)","brief":"디자인 지시 한 줄","cond":{"roles":["atk|def|sup 중 어울리는 역할만"],"factions":["어울리는 소속만"],"elems":["어울리는 속성만"]}}]';
 function variantsFromAI(list,ng){ return GGMConstruct.variantsFrom(list,{factions:((ng.world||{}).factions||[]).map(f=>f.name),elems:(ng.meta.elems||DEFAULT_META.elems).map(e=>e.n)}).map(v=>Object.assign({id:'v_'+uid()},v)); }
 // 특수 레시피(소속·특정 캐릭터 확률 업). 분류 확률은 groups가 정해서 기본은 비워 둬요. 예: {id:'rc_x',name:'새벽 설계',min:[400,400,400,600],effect:{type:'faction',value:'새벽등대',up:3},hint:'부품을 넉넉히'}
 const CON_RECIPES=[];

@@ -83,7 +83,7 @@ case 'sdelgo': { if(!SDEL) break; const {o,L}=SDEL, pick={}; document.querySelec
       const n=['threads','codex','libs','rels','chars'].filter(k=>pick[k]).reduce((a,k)=>a+L[k].length,0); toast(`「${o.title}」을(를) 지웠어요${n?` · 연결된 것 ${n}개도 함께`:''}`); break; }
 case 'saveopening': G.opening.lines=lines($('#op_lines').value); G.opening.prologue=$('#op_pro').value; mark('opening'); closeModal(); toast('오프닝을 저장했어요'); break;
 case 'aiopening': { const hint=$('#op_hint').value.trim();
-      const r=await aiJSON(`${pf('OPENING_REWRITE',{RULES,ctx:ctx(),SCRIPT_FMT,hint:hint?'요청: '+hint:''})}\nJSON만 출력: {"lines":[],"prologue":"대본"}`,t,'complex');
+      const r=await aiJSON(aiopeningPrompt({hint}),t,'complex');
       if(r&&$('#op_lines')){ $('#op_lines').value=strs(r.lines).join('\n'); $('#op_pro').value=nl(r.prologue); toast('입력칸을 채웠어요. 확인 후 저장하세요.'); } break; }
 case 'savelib': { const name=$('#li_name').value.trim(); if(!name){toast('이름을 입력해 주세요');break;}
       let l=id?libById(id):null; if(!l){l={id:'l'+uid(),kind:t.dataset.k,name,prompt:'',img:null};G.lib.push(l);}
@@ -91,11 +91,11 @@ case 'savelib': { const name=$('#li_name').value.trim(); if(!name){toast('이름
 case 'dellib': { const l=libById(id); if((await appConfirm('삭제할까요?'))){G.lib=G.lib.filter(x=>x.id!==id);mark('l:'+id);openLib(l.kind);render();} break; }
 case 'ailib': { const k=t.dataset.k,nm=$('#li_name').value.trim(),ds=$('#li_desc').value.trim();
       if(k==='cg'){ const ids=[0,1,2,3].map(i=>$('#cg_c'+i).value).filter(Boolean).map(charById).filter(Boolean);
-        const r=await aiJSON(`${pf('CG_ART',{summary:G.world.summary,nm,ds:ds?' ('+ds+')':'',name:ids.map(c=>c.name).join(', ')||'없음'})}\nJSON만 출력: {"prompt":"...","acts":["1번 인물 행동 태그","2번 ..."]}`,t,'quick');
+        const r=await aiJSON(ailibPrompt({nm,ds,ids}),t,'quick');
         if(r&&$('#li_prompt')){ if(r.prompt)$('#li_prompt').value=String(r.prompt); strs(r.acts).forEach((a2,i)=>{const e2=$('#cg_a'+i); if(e2&&!e2.value.trim()) e2.value=a2;}); } break; }
-      if(k==='bgm'){ const r=await aiJSON(`${pf('BGM_PROMPT',{summary:G.world.summary,nm,ds:ds?' ('+ds+')':''})}\nJSON만 출력: {"prompt":"..."}`,t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
-      if(k==='enemy'){ const r=await aiJSON(`${pf('ENEMY_ART',{summary:G.world.summary,lore:G.world.lore,nm,ds:ds?' ('+ds+')':''})}\nJSON만 출력: {"prompt":"..."}`,t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
-      const r=await aiJSON(`${pf('LIB_ITEM_ART',{summary:G.world.summary,kind:k==='bg'?'배경':'소품',nm,ds:ds?' ('+ds+')':'',pf:k==='bg'?pf('LIB_ITEM_BG'):pf('LIB_ITEM_PROP')})}\nJSON만 출력: {"prompt":"..."}`,t,'quick');
+      if(k==='bgm'){ const r=await aiJSON(ailibPrompt2({nm,ds}),t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
+      if(k==='enemy'){ const r=await aiJSON(ailibPrompt3({nm,ds}),t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
+      const r=await aiJSON(ailibPrompt4({k,nm,ds}),t,'quick');
       if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
 case 'newpu': openNewPickup(); break;
 case 'newpu-hand': { NEWPU=$('#pu_lim').value==='limited'?'limited':'pickup'; window.__PUSTORY=!!($('#pu_story')&&$('#pu_story').checked); closeModal(); openCharEdit(null); break; }
@@ -130,7 +130,7 @@ case 'skvclear': { const c=charById(id), k=c&&(c.skins||[]).find(x=>x.id===t.dat
 case 'aiskin': { const c=charById(id),idea=$('#sk_idea').value.trim(),field=$('#sk_prompt'),project=PJ().active,old=field.value,original=c.naiPrompt;
       if(!idea){toast('의상 아이디어를 적어 주세요');break;}
       const base=await naiSkinBase(c,t);
-      const r=await aiJSON(`${pf('OUTFIT_ART',{summary:G.world.summary,name:c.name,profile:c.profile,appearance:base.appearance,outfit:base.outfit,idea})}\nJSON만 출력: {"outfit":"","other":""}`,t,'quick');
+      const r=await aiJSON(aiskinPrompt({c,base,idea}),t,'quick');
       if(r&&field.isConnected&&PJ().active===project&&charById(id)===c&&c.naiPrompt===original&&field.value===old){naiBlocksSeed(field,naiSkinParts(base,r));if(!$('#sk_name').value.trim())$('#sk_name').value=idea.slice(0,16);}break; }
 case 'skpredo': skinPropRead(); skinPropDraw(t); break;
 case 'skpcancel': if(SKPROP){ if(SKPROP.url) URL.revokeObjectURL(SKPROP.url); const cid=SKPROP.cid; SKPROP=null; openSkin(cid); } else closeModal(); break;

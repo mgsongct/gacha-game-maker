@@ -17,6 +17,7 @@ import { listGames, readGame } from './play/lib/data.mjs';
 import { PC_DIR } from './play/lib/page.mjs';
 import { compare, readBaseline, writeBaseline, diffMd } from './lib/ratchet.mjs';
 
+import { auditRules, migrationWrites, upgradeCoverage, upstreamGenKeys } from './lib/upgrade.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url)), ROOT = resolve(HERE, '..'), OUT = join(HERE, 'out'), REG = JSON.parse(readFileSync(join(HERE, 'fork-features.json'), 'utf8'));
 const srcAtRef = ref => srcAt(ROOT, OUT, ref);
 
@@ -29,18 +30,23 @@ for (const f of REG.features) { const added = new Set();
 const games = listGames(PC_DIR).map(x => ({ name: x.title, game: readGame(PC_DIR, x.id).game }));
 const W = wiringReport({ fns, sf, features, stages: stageClosures(units, fns), genRoots: STAGES['생성'], defaults, games, upstreamProps: new Set(upstream.props), userKeys: REG.userKeys || {}, defaultOk: REG.defaultOk || {}, runtimeFields: REG.runtimeFields || {} });
 
+// 구버전·미비 생성 게임: 생성기가 만드는 키·필드가 예전 게임에 없을 때 감지·보완 경로(불러오기 이전·점검 규칙·실행 중 AI·기본값)
+const upU = await loadUnits(join(OUT, 'ref-src', upstream.sha)), upF = buildGraph(upU).fns, UPGEN = upstreamGenKeys(upF, stateFlow(upU, upF), stageClosures(upU, upF), STAGES['생성']);
+const UP = upgradeCoverage(W, auditRules(units, fns, sf), migrationWrites(fns, sf), UPGEN), UPGAP = UP.flatMap(f => f.rows.filter(r => r.status === '없음').map(r => ({ f: f.id, ...r }))), UPDEF = UP.flatMap(f => f.rows.filter(r => r.status === '기본값으로만').map(r => ({ f: f.id, ...r })));
 const t = (h, rs) => [`| ${h.join(' | ')} |`, `|${h.map(() => '---').join('|')}|`, ...rs.map(r => `| ${r.map(x => String(x ?? '').replace(/\|/g, '/')).join(' | ')} |`)].join('\n');
 const P0 = W.features.flatMap(f => f.flags.filter(x => x.sev === 'P0').map(x => ({ ...x, f: f.id }))), P1 = W.features.flatMap(f => f.flags.filter(x => x.sev === 'P1').map(x => ({ ...x, f: f.id })));
 const md = [`# 포크 기능 배선 점검 (생성기 ↔ 기능 ↔ 생성물)`, '', `생성: \`node tools/wiring.mjs\` · ${new Date().toISOString().slice(0, 16)} · 단계별 함수(lifecycle) ${Object.entries(W.closure).map(([k, v]) => `${k} ${v}`).join(' · ')} · 프롬프트 스키마 키 ${W.schemaKeys}개 · 생성 게임 ${W.games.join(', ') || '없음'}`, '',
   '판정(원안의 생성 경계 — 생성은 세계관·기본 원칙, 시나리오 등은 실행 중 AI): **P0** 어느 단계도 만들지 않아 기능이 비어 있음 · **P1** 사용자 조작으로만 만들어짐(자동이 기본) / 생성 단계 키인데 생성 게임에 없음 / 공통·샘플 기본값으로만 시작. 실행 중 AI가 만드는 키는 생성 직후 없어도 정상.', '',
   `## 요약 — P0 ${P0.length} · P1 ${P1.length}`, '', t(['등급', '기능', '키', '내용'], [...P0, ...P1].map(x => [x.sev, x.f, x.key, x.msg])), '',
+  `## 구버전·미비 생성 게임 감지·보완 — 없음 ${UPGAP.length} · 기본값으로만 ${UPDEF.length}`, '', '포크 기능이 새로 만든 키·필드(원안부터 있던 것은 뺌)가 예전 빌드로 만든 게임(또는 빠진 게임)에 없을 때 지금 앱이 무엇으로 알아채고 채우나: 불러오기 이전(fix) · 콘텐츠 점검 규칙(판 since — 점검 판이 오르면 알림) · 실행 중 AI · 없으면 기본값. **기본값으로만** = 동작은 하지만 그 게임에 맞춘 값으로 채우는 길이 없음 · **없음** = 그 기능이 빈 채로 남음', '',
+  t(['기능', '키·필드', '상태', '감지·보완'], UP.flatMap(f => f.rows.map(r => [f.id, r.what, r.status === '보완' ? r.status : `**${r.status}**`, r.via.join(' · ')]))), '',
   ...W.features.flatMap(f => [`## ${f.id} — ${f.title}`, '', `- 기능 함수 ${f.fns}개(커밋이 새로 들여온 최상위 함수)`, '', '### 데이터 키(기능이 읽음)', '', f.rows.length ? t(['키', '생성', '실행 중 AI', '사용자', '스키마(world/키)', '샘플 기본값', '기능 지연 기본값', '사용자 설정 키', ...W.games], f.rows.map(r => [r.key, r.gen, r.live, r.userW, r.schema ? '예' : '', r.def ? '예' : '', r.lazy === 'empty' ? '빈 값' : r.lazy ? '예' : '', r.user ? '예' : '', ...r.games])) : '없음', '',
     '### 원본에 없던 새 필드(기능이 읽음) — 생성기 어휘·생성물에 있는 것', '', f.fields.length ? t(['필드', '엔티티', '생성 어휘', '실행 중 AI 어휘', '스키마', ...W.games], f.fields.map(x => [x.field, x.on, x.gen ? '예' : '', x.live ? '예' : '', x.schema ? '예' : '', ...x.games])) : '없음', ''])].join('\n');
-mkdirSync(OUT, { recursive: true }); writeFileSync(join(OUT, 'wiring.md'), md); writeFileSync(join(OUT, 'wiring.json'), JSON.stringify(W, (k, v) => v instanceof Set ? [...v] : v, 1));
+mkdirSync(OUT, { recursive: true }); writeFileSync(join(OUT, 'wiring.md'), md); writeFileSync(join(OUT, 'wiring.json'), JSON.stringify({ ...W, upgrade: UP }, (k, v) => v instanceof Set ? [...v] : v, 1));
 // 래칫: 판정 목록을 기준선과 비교(새로 생긴 P0·P1이 있으면 --strict 실패)
-const WF = [...P0, ...P1].map(x => ({ key: `배선 ${x.sev}|${x.f} ${x.key}`, num: {}, text: `${x.sev} ${x.f} ${x.key}: ${x.msg}` })), WB = readBaseline(ROOT, 'wiring'), WD = WB ? compare(WB, WF) : null, arg = k => process.argv.includes(k);
+const WF = [...[...P0, ...P1].map(x => ({ key: `배선 ${x.sev}|${x.f} ${x.key}`, num: {}, text: `${x.sev} ${x.f} ${x.key}: ${x.msg}` })), ...UPGAP.map(x => ({ key: `구버전 감지·보완 없음|${x.f} ${x.what}`, num: {}, text: `구버전 게임 ${x.f} ${x.what}: 불러오기 이전·점검 규칙·실행 중 AI·기본값 어느 것도 없음` }))], WB = readBaseline(ROOT, 'wiring'), WD = WB ? compare(WB, WF) : null, arg = k => process.argv.includes(k);
 if (WD) writeFileSync(join(OUT, 'wiring-baseline-diff.md'), '# 배선 점검 기준선 대비\n\n' + diffMd(WD, '배선 판정'));
 if (arg('--update-baseline')) { if (WD && WD.added.length && !arg('--force')) { console.log(`기준선을 올리는 갱신은 하지 않아요: 새 판정 ${WD.added.length} — 고치세요(out/wiring-baseline-diff.md)`); process.exit(1); } writeBaseline(ROOT, WF, 'wiring'); console.log(`배선 기준선 갱신: ${WF.length}개`); }
-console.log(`배선 점검: 기능 ${W.features.length} · 단계별 함수 ${Object.values(W.closure).join('/')} · 게임 ${W.games.length} · P0 ${P0.length} · P1 ${P1.length}`); P0.slice(0, 30).forEach(x => console.log(`  P0 ${x.f} ${x.key}: ${x.msg}`)); console.log('보고서: ' + join(OUT, 'wiring.md'));
+console.log(`배선 점검: 기능 ${W.features.length} · 단계별 함수 ${Object.values(W.closure).join('/')} · 게임 ${W.games.length} · P0 ${P0.length} · P1 ${P1.length} · 구버전 게임 감지·보완: 없음 ${UPGAP.length} · 기본값으로만 ${UPDEF.length} / ${UP.reduce((a, f) => a + f.rows.length, 0)}`); P0.slice(0, 30).forEach(x => console.log(`  P0 ${x.f} ${x.key}: ${x.msg}`)); console.log('보고서: ' + join(OUT, 'wiring.md'));
 if (WD) { console.log(`기준선 대비: 새로 생김 ${WD.added.length} · 해결 ${WD.fixed.length}`); WD.added.forEach(f => console.log('  + ' + f.text)); } else console.log('배선 기준선 없음: node tools/wiring.mjs --update-baseline');
 if (arg('--strict') && WD && WD.added.length && !arg('--update-baseline')) process.exit(1);

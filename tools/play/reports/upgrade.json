@@ -1,0 +1,144 @@
+[
+ {
+  "game": "idol-audition",
+  "title": "앙코르 시그널",
+  "rows": [
+   {
+    "what": "G.meta.variants",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.expedition",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.rules",
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "g_rules 1"
+    ],
+    "err": "글 AI 요청 2"
+   },
+   {
+    "what": "G.meta.positions",
+    "res": "기본값으로 동작",
+    "notice": true,
+    "hit": [],
+    "err": "글 AI 요청 1"
+   },
+   {
+    "what": "G.meta.balance",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.persona",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "캐릭터.persona",
+    "res": "감지됨·보완 요청함(가짜 AI라 내용 미확인)",
+    "notice": true,
+    "hit": [
+     "c_persona 6"
+    ],
+    "err": "글 AI 요청 11"
+   },
+   {
+    "what": "캐릭터.pfields",
+    "res": "놓침",
+    "notice": true,
+    "hit": [],
+    "err": "글 AI 요청 1"
+   },
+   {
+    "what": "세력.stance",
+    "res": "놓침",
+    "notice": true,
+    "hit": [],
+    "err": "글 AI 요청 1"
+   },
+   {
+    "what": "캐릭터.debutLater",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   }
+  ],
+  "pageErrors": []
+ },
+ {
+  "game": "sky-knights",
+  "title": "게일 크레스트",
+  "rows": [
+   {
+    "what": "G.meta.variants",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.expedition",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.rules",
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "g_rules 1"
+    ],
+    "err": "글 AI 요청 2"
+   },
+   {
+    "what": "G.meta.positions",
+    "res": "기본값으로 동작",
+    "notice": true,
+    "hit": [],
+    "err": "글 AI 요청 1"
+   },
+   {
+    "what": "G.meta.balance",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.persona",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "캐릭터.persona",
+    "res": "감지됨·보완 요청함(가짜 AI라 내용 미확인)",
+    "notice": true,
+    "hit": [
+     "c_persona 8"
+    ],
+    "err": "글 AI 요청 11"
+   },
+   {
+    "what": "캐릭터.pfields",
+    "res": "놓침",
+    "notice": true,
+    "hit": [],
+    "err": "글 AI 요청 1"
+   },
+   {
+    "what": "세력.stance",
+    "res": "놓침",
+    "notice": true,
+    "hit": [],
+    "err": "글 AI 요청 1"
+   },
+   {
+    "what": "캐릭터.debutLater",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   }
+  ],
+  "pageErrors": []
+ }
+]

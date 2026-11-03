@@ -17,6 +17,8 @@ node tools/play/qa.mjs <게임 폴더>                  # 그 폴더의 게임(p
 node tools/play/shots.mjs <게임 폴더>               # 새 플레이어로 화면 플레이·캡처 → shots/
 node tools/play/regress.mjs [--ref <git 기준>] [게임 폴더…]   # 같은 응답을 기준 빌드와 지금 빌드에 넣어 새 게임 생성 결과 비교 → reports/regress.md
 node tools/play/faults.mjs [시나리오…]              # 생성기 실패 주입 → reports/faults.md
+node tools/play/link.mjs [--saved]                  # 플레이 연계: 지금 빌드로 게임 생성(기록된 응답) → 새 플레이어로 가챠·장 진행·세력·관계·파견·원정·건조 연계 → reports/link.md
+node tools/play/upgrade.mjs                         # 구버전·미비 게임 감지·보완: 포크 기능 데이터를 하나씩 뺀 예전 게임을 지금 빌드에 불러와 점검 알림·감지·자동 보완 확인 → reports/upgrade.md(먼저 node tools/wiring.mjs)
 node tools/play/combos.mjs [--ref <git>] [--quick]   # 프롬프트 조합 검증: 흐름(요청 지점)×상황(설정·상태·새 게임 입력)마다 실제로 조합된 프롬프트를 받아 깨짐·과잉·과소 검사 → reports/combos.md
 node tools/play/prompts.mjs <게임 폴더…>            # 생성 프롬프트 점검(스튜디오 조각 비율·되풀이·충돌·샘플 이름) → reports/prompts.md
 node tools/play/prompts.mjs --regress <게임 폴더…>  # 같은 점검을 회귀 재생이 지금 빌드로 보낸 프롬프트(regress/prompts)에 → reports/prompts-regress.md

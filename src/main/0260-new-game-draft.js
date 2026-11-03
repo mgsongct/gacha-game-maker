@@ -49,14 +49,6 @@ function drRead(){ if(!DR2||!$('#drPage')) return; const v=id=>{const el=$('#'+i
   document.querySelectorAll('#drPage [data-dc]').forEach(e=>{ const c=DR2.chars[+e.dataset.i]; if(c){c[e.dataset.dc]=e.value;if(e.dataset.dc==='tags')naiBlocksSave(c,'tags',e);} });
   ['name','call','gender','look','bio'].forEach(k=>{ const x=v('dr_h_'+k); if(x!==undefined) DR2.hero[k]=x; }); const hd=v('dr_h_hide'); if(hd!==undefined) DR2.hero.hide=hd;
   drSave(); const el=$('#drCount'); if(el) el.textContent=nf(drLen()); }
-function drText(d){ d=d||DR2; const L=[];
-  if(d.world.trim()) L.push('[세계관]\n'+d.world.trim());
-  if(d.setting.trim()) L.push('[설정: 세력·용어·규칙·비밀]\n'+d.setting.trim());
-  if(d.story.trim()) L.push('[스토리 개요]\n'+d.story.trim());
-  const cs=d.chars.filter(c=>String(c.name||'').trim()||String(c.profile||'').trim());
-  if(cs.length) L.push('[인물]\n'+cs.map((c,i)=>`${i+1}. ${c.name||'(이름 미정)'}${c.role?' — '+c.role:''} (구분: ${c.kind==='npc'?'NPC':(d.crewTerm||'동료')+(c.rank?', 등급 '+RL[c.rank]:'')})\n   성격·과거·관계: ${c.profile||'(비어 있음)'}\n   말투: ${c.speech||'(비어 있음)'}\n   외모: ${c.look||'(비어 있음)'}`).join('\n'));
-  const hr=d.hero; if(hr.name||hr.call||hr.gender||hr.look||hr.bio) L.push(`[주인공]\n호칭: ${hr.call||'(AI가 정함)'}\n이름: ${hr.name||'(호칭으로만 부름)'}\n성별·성 정체성: ${hr.gender||'정하지 않음'}\n외모: ${hr.look||'(비어 있음)'}\n설정: ${hr.bio||'(비어 있음)'}`);
-  return L.join('\n\n'); }
 function drTabHTML(k){ const d=DR2, sec=(id,h)=>`<section data-dr="${id}" ${DRTAB===id?'':'hidden'}>${h}</section>`;
   if(k==='theme') return sec('theme',`<h3 class="sec">테마</h3><p class="muted dr-help">장르, 분위기, 화면 테마, 규모를 정해요. 비워도 되는 칸은 AI가 채워요.</p>
     <label class="f" for="dr_gtitle">게임 이름 (선택 · 비우면 AI가 지어요)</label><input class="in" id="dr_gtitle" maxlength="30" value="${esc(d.gtitle||'')}" placeholder="예: 심연잔향, 어비스 에코">
@@ -134,8 +126,6 @@ document.addEventListener('change',e=>{ const cy=e.target&&e.target.dataset&&e.t
 document.addEventListener('change',e=>{ if(e.target.closest&&e.target.closest('#drPage')){ drRead(); if(e.target.dataset&&e.target.dataset.dc==='kind') drRerender(); } });
 // 장르·키워드와 분위기에 같은 글이 들어 있으면(한쪽이 다른 쪽을 품으면) 분위기는 한 번만 써요
 const dupTxt=(a,b)=>{ const n=x=>String(x||'').replace(/[\s"'“”‘’.,!?~·…]/g,''); a=n(a); b=n(b); return !!(a&&b&&(a.includes(b)||b.includes(a))); };
-function drTheme(d){ return [d.gtitle&&'게임 이름: '+d.gtitle,d.kw&&'장르·키워드: '+d.kw,d.tone&&!dupTxt(d.kw,d.tone)&&'분위기: '+d.tone,d.fan&&d.src&&'2차 창작 원작: '+d.src].filter(Boolean); }
-const DR_NODUP=pf('DR_NODUP');
 /* 중복 문장 정리(시스템, AI 없이): 앞 칸에 이미 나온 문장과 같거나 그 문장 안에 통째로 들어 있는 문장은 뒤 칸에서 지워요.
    같은 칸 안에서 되풀이된 문장도 지워요. 더 긴 문장이 짧은 문장을 품으면 긴 문장은 남겨요(내용이 줄지 않게) */
 const sentKey=x=>String(x||'').replace(/[\s"'“”‘’「」『』()\[\].,!?~·…:;\-–—]/g,'').toLowerCase();
@@ -145,30 +135,19 @@ function dedupText(text,seen,min){ min=min||8; let cut=0; const out=String(text|
 function drDedup(d){ d=d||DR2; const seen=[]; let n=0; const run=(o,k)=>{ if(!o||!String(o[k]||'').trim()) return; const r=dedupText(o[k],seen); if(r.cut){ o[k]=r.text; n+=r.cut; } };
   if(dupTxt(d.kw,d.tone)){ d.tone=''; n++; } run(d,'kw'); run(d,'tone'); run(d,'world'); run(d,'setting'); run(d,'story'); run(d.hero,'bio'); (d.chars||[]).forEach(c=>{ run(c,'role'); run(c,'profile'); });
   return n; }
-// 초안의 다른 칸을 함께 보여 줘서 서로 맞춰 다듬어요(skip: 'world'|'setting'|'story'|'c:번호')
-function drCtx(skip){ const d=DR2, L=[];
-  const th=drTheme(d).map(x=>x.startsWith('2차 창작')?x+pf('DR_SOURCE'):x);
-  if(th.length) L.push('[테마]\n'+th.join('\n'));
-  if(skip!=='world'&&d.world.trim()) L.push('[세계관]\n'+d.world.trim().slice(0,6000));
-  if(skip!=='setting'&&d.setting.trim()) L.push('[설정: 세력·용어·규칙·비밀]\n'+d.setting.trim().slice(0,4000));
-  if(skip!=='story'&&d.story.trim()) L.push('[스토리 개요]\n'+d.story.trim().slice(0,3000));
-  const cs=d.chars.map((c,i)=>[c,i]).filter(([c,i])=>skip!=='c:'+i&&(String(c.name||'').trim()||String(c.profile||'').trim()));
-  if(cs.length) L.push('[다른 인물]\n'+cs.map(([c])=>`- ${c.name||'(이름 미정)'}${c.role?' — '+c.role:''}: ${String(c.profile||'').slice(0,300)}${c.speech?' / 말투: '+c.speech:''}${c.look?' / 외모: '+c.look:''}`).join('\n'));
-  const hr=d.hero; if(skip!=='hero'&&(hr.name||hr.call||hr.gender||hr.look||hr.bio)) L.push(`[주인공(플레이어)]\n호칭: ${hr.call||'(미정)'} / 이름: ${hr.name||'(미정)'} / 성별: ${hr.gender||'정하지 않음'}${hr.look?' / 외모: '+hr.look:''}${hr.bio?'\n설정: '+hr.bio:''}`);
-  return L.length?pf('DR_OTHER')+L.join('\n\n')+'\n':''; }
 function drSnap(label){ const d=DR2; d.undo={label,kw:d.kw,tone:d.tone,world:d.world,setting:d.setting,story:d.story,chars:JSON.parse(JSON.stringify(d.chars)),hero:JSON.parse(JSON.stringify(Object.assign({},d.hero,{av:undefined})))}; }
 async function drPolish(k,btn){ drRead(); if(k==='hero') return drPolishHero(btn); const cur=String(DR2[k]||'').trim(); if(!cur){ toast('먼저 내용을 조금 적어 주세요'); return; }
-  const what=k==='world'?'게임 세계관':k==='story'?'스토리 개요':'게임 설정(세력·용어·규칙·비밀)';
-  const r=await aiJSON(`${pf('DR_POLISH',{what,pf:k==='setting'?pf('DR_POLISH_SECRET'):'',drCtx:drCtx(k),cur})}JSON만 출력: {"text":"다듬은 전체 글"}`,btn,'default');
+  const what=drPolishWhatText({k});
+  const r=await aiJSON(drPolishPrompt({what,k,cur}),btn,'default');
   if(r&&r.text){ drRead(); drSnap(what); DR2[k]=String(r.text); const dn=drDedup(); drSave(); drRerender(); toast('다른 항목에 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); } }
 async function drPolishHero(btn){ const h=DR2.hero;
-  const r=await aiJSON(`${pf('DR_POLISH_HERO',{drCtx:drCtx('hero'),call:JSON.stringify({call:h.call||'',name:h.name||'',gender:h.gender||'',look:h.look||'',bio:h.bio||''})})}JSON만 출력: {"call":"호칭(2~4자)","name":"이름(비어 있었으면 빈 문자열)","look":"외모","bio":"설정 3~5문장"}`,btn,'default');
+  const r=await aiJSON(drPolishHeroPrompt({h}),btn,'default');
   if(!r||typeof r!=='object') return; drRead(); drSnap('주인공'); const S=v=>typeof v==='string'?v.trim():''; const H=DR2.hero;
   if(S(r.call)) H.call=S(r.call).slice(0,12); if(S(r.name)&&!String(H.name||'').trim()) H.name=S(r.name).slice(0,12); if(S(r.look)) H.look=S(r.look).slice(0,400); if(S(r.bio)) H.bio=S(r.bio).slice(0,1500);
   drDedup(); drSave(); drRerender(); toast('주인공을 다듬었어요. 마음에 안 들면 「되돌리기」'); }
 /* 전체 맞추기: 세계관·설정·스토리·인물·주인공 설정을 한꺼번에 보고, 서로 어긋난 곳을 고치고 관계를 엮어요. 적힌 내용은 살리고, 한 번 되돌릴 수 있어요 */
 async function drHarmony(btn){ drRead(); const d=DR2; if(!drText(d).trim()){ toast('먼저 세계관이나 인물을 조금 적어 주세요'); return; }
-  const r=await aiJSON(`${pf('DR_HARMONY',{DR_NODUP,kw:d.kw||'(비어 있음)',tone:!d.tone?'(비어 있음)':dupTxt(d.kw,d.tone)?pf('DR_HARMONY_TONE'):d.tone,drTheme:drTheme(d).filter(x=>!/^장르|^분위기/.test(x)).join('\n'),drText:drText(d).slice(0,20000)})}JSON만 출력: {"kw":"장르와 키워드","tone":"분위기","world":"세계관 전체 글","setting":"설정 전체 글","story":"스토리 개요 전체 글","chars":[{"name":"","role":"","profile":"","speech":"","look":""}],"heroBio":"주인공 설정"} — chars는 위 인물 순서 그대로, 같은 수로.`,btn,'complex');
+  const r=await aiJSON(drHarmonyPrompt({d}),btn,'complex');
   if(!r||typeof r!=='object'){ return; } drRead();
   drSnap('전체 맞추기');
   const S=v=>typeof v==='string'?v.trim():'';
@@ -178,7 +157,7 @@ async function drHarmony(btn){ drRead(); const d=DR2; if(!drText(d).trim()){ toa
   if(String(d.hero.bio||'').trim()&&S(r.heroBio)) d.hero.bio=S(r.heroBio);
   const dn=drDedup(d); drSave(); drRerender(); toast('서로 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); }
 async function drFillChar(i,btn){ drRead(); const c=DR2.chars[i]; if(!c) return;
-  const r=await aiJSON(`${pf('DR_FILL_CHAR',{drCtx:drCtx('c:'+i),name:JSON.stringify({name:c.name||'',role:c.role||'',profile:c.profile||'',speech:c.speech||'',look:c.look||''})})}JSON만 출력: {"name":"","role":"한 줄 소개","profile":"성격·과거·관계 3~5문장","speech":"말투 설명과 예시 한 마디","look":"외모"}`,btn,'default');
+  const r=await aiJSON(drFillCharPrompt({i,c}),btn,'default');
   if(!r) return; let o=Array.isArray(r)?r[0]:r; if(o&&!o.profile&&!o.role){ const v=Object.values(o).find(x=>x&&typeof x==='object'&&!Array.isArray(x)); if(v) o=v; } if(!o||typeof o!=='object'){ toast('AI 응답을 읽지 못했어요. 다시 눌러 주세요'); return; }
   drRead(); const c2=DR2.chars[i]||c; drSnap((c2.name||'인물')+' 다듬기'); const S=v=>Array.isArray(v)?v.join(' ').trim():typeof v==='string'?v.trim():'';
   const RK=/\s*[\[(【]\s*(SSR|SR|R)\s*[\])】]\s*/gi; let rk=''; ['role','profile','speech','look'].forEach(k=>{ let v=S(o[k]); if(!v) return; v=v.replace(RK,(m,g)=>{ rk=rk||g.toUpperCase(); return ' '; }).replace(/\s{2,}/g,' ').trim(); if(v) c2[k]=v; }); if(rk&&!c2.rank&&c2.kind!=='npc') c2.rank=({SSR:3,SR:2,R:1})[rk]; if(!String(c2.name||'').trim()&&S(o.name)) c2.name=S(o.name).replace(RK,' ').trim();
@@ -237,10 +216,10 @@ async function focusedInpaint(src,maskUrl,draw){ const o=await loadImg(src), W=o
   finally{ URL.revokeObjectURL(ru); } }
 // 인페인팅 결과에서 칠한 얼굴 부분만 원본에 부드럽게 붙여요(원본의 투명 배경·흰 옷은 그대로)
 /* 표정 한 장 그리기 (b: 'full'|'up') — 표정 창과 새 게임 자동 표정이 같이 써요 */
-async function faceDrawOne(c,F,f,ko,b,O,x,generationMode='automatic'){const game=G,project=PJ().active;x=x||''; const en=(FACE_PRESETS.find(p=>p[0]===ko)||[])[1]||'happy', ft=FACE_TAGS[en]||en, ew=[1.7,1.5,1.35,1.2][O.lv]||1.5, i2s=[0.72,0.64,0.56,0.48][O.lv]||0.6, emph=`${ew}::${ft}::, 1.2::expressive face::`;
+async function faceDrawOne(c,F,f,ko,b,O,x,generationMode='automatic'){const game=G,project=PJ().active;x=x||''; const en=(FACE_PRESETS.find(p=>p[0]===ko)||[])[1]||'happy', ft=FACE_TAGS[en]||en, ew=[1.7,1.5,1.35,1.2][O.lv]||1.5, i2s=[0.72,0.64,0.56,0.48][O.lv]||0.6, emph=faceDrawOneEmphText({ew,ft});
   const basePr=F===c?c.naiPrompt:(F.prompt||c.naiPrompt), upO=faceUpperObj(c,F), srcO=b==='up'?upO:F, src=imgSrcRaw(srcO), frame=b==='up'?'cowboy shot':c.naiFrame, candidateEligible=imageCandidateEligible('face',b==='up'?f.up:f,c,generationMode),originalSrc=imgSrcRaw(b==='up'?f.up:f)||''; let blob;
   const refs=O.ref?[{image:await refImage(imgSrcRaw(F)||upO&&imgSrcRaw(upO)),type:'character',strength:1,fidelity:1}]:undefined;
-  if(O.m==='inpaint') blob=await focusedInpaint(src,F.faceMask[b],(img,msk,tw,th,candidate)=>{ const pz=composeNai('char',candidate.prompt||joinTags(basePr,emph,x),{styleId:c.naiStyle,frame:'portrait, face focus',pose:''}); return naiGenerate(pz.input,'char',{candidateBypass:true,seed:candidate.seed,neg:joinTags(pz.neg,'blurry, deformed face'),model:O.model,refs,size:[tw,th],noCut:true,noTp:true,inpaint:{image:img,mask:msk,strength:1,addOrig:false}}); },{candidateEligible,originalSrc,prompt:joinTags(basePr,emph,x)});
+  if(O.m==='inpaint') blob=await focusedInpaint(src,F.faceMask[b],(img,msk,tw,th,candidate)=>{ const pz=faceDrawOnePzText({candidate,basePr,emph,x,c}); return naiGenerate(pz.input,'char',{candidateBypass:true,seed:candidate.seed,neg:joinTags(pz.neg,'blurry, deformed face'),model:O.model,refs,size:[tw,th],noCut:true,noTp:true,inpaint:{image:img,mask:msk,strength:1,addOrig:false}}); },{candidateEligible,originalSrc,prompt:joinTags(basePr,emph,x)});
   else if(O.m==='raw') blob=await naiDraw('char',joinTags(basePr,emph,x),{candidateEligible,originalSrc,frame,pose:c.naiPose||undefined,styleId:c.naiStyle,model:O.model,seed:srcO.seed!=null?srcO.seed:undefined});
   else if(O.m==='emo') blob=await naiEmotion(src,en,x,O.lv,candidateEligible,originalSrc);
   else { const im=await loadImg(src), [w,h]=fitDims(im.naturalWidth||im.width,im.naturalHeight||im.height); blob=await naiDraw('char',joinTags(basePr,emph,x),{candidateEligible,originalSrc,frame,pose:c.naiPose||undefined,styleId:c.naiStyle,model:O.model,refs,size:[w,h],seed:srcO.seed!=null?srcO.seed:undefined,img2img:{image:await imgB64(src,w,h,'#ffffff'),strength:i2s,noise:0.05}}); }

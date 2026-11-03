@@ -6,12 +6,13 @@
 //         갈래 관찰: 각 갈래의 두 쪽이 실제 프롬프트에 나왔는지 — 한 번도 안 나온 쪽은 검증 안 된 조합
 //   node tools/play/combos.mjs [--ref <git>] [--quick]   → tools/play/reports/combos.md · combos.json
 //   --ref: 같은 상황·흐름을 그 커밋 빌드에서도 돌려 보낸 프롬프트를 바이트 단위로 비교(프롬프트 코드를 옮기거나 고친 뒤 뜻이 같은지). 다르면 종료 코드 1
-//   --quick: 기본 게임 하나·상황 기본만(자체 테스트·빠른 확인)
+//   --quick: 기본 게임 하나·상황 기본만(자체 테스트·빠른 확인) · --www <폴더>: 지금 쪽 빌드(기본 www/) · --ref-www <폴더>: 기준을 git 대신 빌드 폴더로 · --sit <글>: 이름에 그 글이 든 상황만 · --report <이름>: 보고서 이름
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
-import { join, dirname, basename } from 'node:path';
+import { join, dirname, basename, resolve } from 'node:path';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { loadUnits } from '../lib/source.mjs';
+import { IMAGE_SINKS } from '../lib/prompts.mjs';
 import { promptSitesStatic, checkPrompt, composition, schemaOf, lenientJSON } from '../lib/combos.mjs';
 import { withPage, ROOT, PC_DIR } from './lib/page.mjs';
 import { readGame, gidOf, hasGame } from './lib/data.mjs';
@@ -59,11 +60,15 @@ const FLOWS = {
   directScript: 'directScript((__ST()||{}).pre||"세라: 안녕하세요\\n나레이션: 바람이 분다.")', planAI: 'planAI("new",null)',
   smExtract: 'smExtract(__CH())', storyWrapUp: 'storyWrapUp(__CH(),"1~2")', auditAIFill: 'auditAIFill(__C(),["profile","speech"])', auditAIStage: 'auditAIStage(__ST())',
   v2ConceptPrompt: '(async()=>{ const c=__C(); return v2ConceptPrompt({items:{},slot:"ult",preview:null},c); })()',
+  // 그림(가짜 NovelAI 키 — 그림 요청의 프롬프트·제외 태그를 받아 적고 오류로 답함)
+  '그림: 캐릭터': 'naiDraw("char",__C().naiPrompt||"1girl, solo")', '그림: 상반신': 'naiDrawItem({k:"upper",o:{prompt:""},c:__C()})',
+  '그림: 배경': '(()=>{ const l=G.lib.find(x=>x.kind==="bg")||{prompt:"castle, sky"}; return naiDraw("bg",l.prompt||"castle"); })()', '그림: 소품': '(()=>{ const l=G.lib.find(x=>x.kind==="prop")||{prompt:"sword"}; return naiDraw("prop",l.prompt||"sword"); })()',
+  '그림: 적': 'naiDraw("enemy","monster, claws")', '그림: CG': '(()=>{ const it=G.lib.find(x=>x.kind==="cg")||{name:"테스트 CG",prompt:"sunset, two people",chars:[__C().id]}; return naiDraw("cg",null,{item:it}); })()',
   '(최상위 문장)': '(()=>{ const b=document.createElement("button"); b.dataset.act="pstai"; b.dataset.id=Object.keys(window.__PF)[0]; document.body.appendChild(b); b.click(); return new Promise(r=>setTimeout(r,1500)); })()',
 };
-const LAYER = new Set(['setupAI', 'aiJSON', 'aiJSONRetry']); // 모든 요청이 지나는 층(감싸기·연결) — 요청 지점으로 세지 않음
+const LAYER = new Set(['setupAI', 'aiJSON', 'aiJSONRetry', 'naiGenerate', 'naiGenerate0']); // 모든 요청이 지나는 층(감싸기·연결) — 요청 지점으로 세지 않음
 
-const units = await loadUnits(ROOT), { sites, wrappers, layerTexts } = promptSitesStatic(units), skip = new Set([...LAYER, ...wrappers, ...sites.filter(s => s.layer).map(s => s.owner)]);
+const units = await loadUnits(ROOT), S1 = promptSitesStatic(units), S2 = promptSitesStatic(units, { sinks: IMAGE_SINKS, tables: true }), sites = [...S1.sites, ...S2.sites.map(x => ({ ...x, key: '그림 ' + x.key, image: true }))], wrappers = [...S1.wrappers, ...S2.wrappers], layerTexts = S1.layerTexts, skip = new Set([...LAYER, ...wrappers, ...sites.filter(s => s.layer).map(s => s.owner)]);
 // 분배기 case(화면 동작) 운전 재료: case 값·그 본문이 읽는 입력 칸($('#x'))·버튼 dataset 키
 const acts = [];
 { const { walk } = await import('../lib/source.mjs'); for (const s of sites.filter(x => /^handle\w+Action$/.test(x.owner))) { const u = units.find(x => x.files?.some(f => s.loc.startsWith(f.path + ':')));
@@ -79,7 +84,8 @@ const games = []; for (const d of existsSync(join(HERE, 'games')) ? readdirSync(
   const g = readGame(PC_DIR, gid), responses = {}; if (existsSync(join(dir, 'responses'))) for (const f of readdirSync(join(dir, 'responses'))) if (f.endsWith('.txt')) responses[f.slice(0, -4)] = readFileSync(join(dir, 'responses', f), 'utf8');
   games.push({ name: d, game: JSON.stringify(g.game), input: JSON.parse(readFileSync(join(dir, 'input.json'), 'utf8')), responses }); }
 if (!games.length) games.push({ name: '앱 기본 게임', game: null, input: { mode: 'auto', auto: '하늘섬 기사단 판타지', n: 6 }, responses: {} });
-const GAMES = QUICK ? games.slice(0, 1) : games, SITS = QUICK ? SITUATIONS.slice(0, 1) : SITUATIONS, NG = QUICK ? NEWGAME.slice(0, 1) : NEWGAME;
+const si = argv.indexOf('--sit'), SF = si >= 0 ? argv[si + 1] : null, pick = (L, q) => SF ? L.filter(([n]) => (q + n).includes(SF)) : L; // --sit <글>: 이름에 그 글이 든 상황만
+const GAMES = QUICK ? games.slice(0, 1) : games, SITS = pick(QUICK ? SITUATIONS.slice(0, 1) : SITUATIONS, ''), NG = pick(QUICK ? NEWGAME.slice(0, 1) : NEWGAME, '새 게임 · ');
 
 // 페이지 안: 가짜 글 AI(http 가로채기) · 보낸 프롬프트·스택 기록 · 상황 적용 · 흐름 실행
 async function runSide(www, tag) {
@@ -96,9 +102,13 @@ async function runSide(www, tag) {
           appStorage.setItem(PKEY, JSON.stringify({ active: 'gen', fallback: false, list: [{ id: 'gen', type: 'anthropic', name: 'tools/play', key: 'replay', model: 'replay', quick: 'replay-quick' }] })); setupAI();
           // 형식 견본을 그대로 답(견본 속 범위·설명은 앞 값으로) — 흐름이 응답을 받아 다음 단계로 가게
           const schemaOf = new Function('return ' + libSrc.schemaOf)(), lenientJSON = new Function('return ' + libSrc.lenientJSON)();
-          const echo = p => { const sc = schemaOf(p), v = sc && sc.body ? lenientJSON(sc.body) : null; return v ? JSON.stringify(v) : '{}'; }; // 형식 견본을 그대로 답(tools/lib/combos.mjs와 같은 읽기)
+          let echoN = 0; const distinct = v => Array.isArray(v) ? v.map(distinct) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, distinct(x)])) : typeof v === 'string' && v ? `${v} ${++echoN}` : v; // 견본 값을 그대로 쓰면 대원마다 같은 글이 돼 같은 줄 되풀이가 가짜로 생김 — 번호를 붙여 서로 다르게
+          const echo = p => { const sc = schemaOf(p), v = sc && sc.body ? lenientJSON(sc.body) : null; return v ? JSON.stringify(distinct(v)) : '{}'; }; // 형식 견본을 그대로 답(tools/lib/combos.mjs와 같은 읽기)
           const realHttp = http;
-          http = async (url, opts) => { if (!/api\.anthropic\.com\/v1\/messages/.test(url)) return realHttp(url, opts);
+          appStorage.setItem(NKEY, JSON.stringify({ key: 'combos-fake', retries: 0 })); // 그림 AI가 켜진 것으로(요청은 아래에서 가로챔)
+          http = async (url, opts) => { if (/image\.novelai\.net/.test(url)) { const b = typeof opts.body === 'string' ? JSON.parse(opts.body) : (opts.body || {}), pr = b.parameters || {}; const frames = String(new Error().stack).split('\n').map(l => (/at (?:async )?([\w$.]+) \(/.exec(l) || [])[1]).filter(Boolean);
+              recs.push({ flow: cur, owner: frames.find(f => owners.includes(f) && !skip.includes(f)) || '', image: true, prompt: [b.input || '', '[제외] ' + (pr.negative_prompt || ''), pr.v4_prompt ? '[v4] ' + JSON.stringify(pr.v4_prompt) : '', pr.v4_negative_prompt ? '[v4 제외] ' + JSON.stringify(pr.v4_negative_prompt) : ''].filter(Boolean).join('\n'), frames: frames.slice(0, 12).join('<') }); return { status: 500, text: 'combos: image request recorded' }; }
+            if (!/api\.anthropic\.com\/v1\/messages/.test(url)) return realHttp(url, opts);
             const body = opts.body, first = body.messages[0].content, prompt = typeof first === 'string' ? first : first.map(b => b.text || '').join('');
             const frames = String(new Error().stack).split('\n').map(l => (/at (?:async )?([\w$.]+) \(/.exec(l) || [])[1]).filter(Boolean), owner = frames.find(f => owners.includes(f) && !skip.includes(f)) || '';
             const kind = step.kind === 'new' ? kindOfP(prompt, 'new', seenSkill) : ''; recs.push({ flow: cur, owner, prompt, max_tokens: body.max_tokens, frames: frames.slice(0, 12).join('<') });
@@ -112,7 +122,7 @@ async function runSide(www, tag) {
           const errs = [], S0 = game || JSON.stringify(G), load = () => { G = fix(JSON.parse(S0)); applyMeta(); if (step.code) { (0, eval)(step.code); applyMeta(); } };
           window.__C = () => G.chars.find(c => !c.alt) || G.chars[0]; window.__ALT = () => G.chars.find(c => c.alt); window.__CH = () => G.chapters.find(c => c.kind === 'main' && (c.stages || []).some(s => s.pre)) || G.chapters[0]; window.__ST = () => (__CH().stages || []).find(s => s.pre) || (__CH().stages || [])[0]; window.__B = () => document.createElement('button');
           const run = async (name, code) => { cur = name; load(); const n0 = recs.length; try { await Promise.race([(0, eval)(code), new Promise((_, rj) => setTimeout(() => rj(Error('시간 초과 20초')), 20000))]); } catch (e) { errs.push({ flow: name, err: String(e && (e.message || e.code) || e).slice(0, 200) }); recs.slice(n0).forEach(x => { x.failed = true; }); } await new Promise(r => setTimeout(r, 300)); };
-          if (step.kind === 'new') { load(); cur = '새 게임'; const btn = document.createElement('button'); document.body.appendChild(btn); try { await Promise.race([newGame(btn, step.input), new Promise((_, rj) => setTimeout(() => rj(Error('시간 초과 120초')), 120000))]); } catch (e) { errs.push({ flow: '새 게임', err: String(e && (e.message || e) || e).slice(0, 200) }); } await new Promise(r => setTimeout(r, 1500)); }
+          if (step.kind === 'new') { load(); cur = '새 게임'; const btn = document.createElement('button'); document.body.appendChild(btn); try { await Promise.race([newGame(btn, step.input.mode === 'auto' ? step.input : (() => { appStorage.setItem(DR2KEY, JSON.stringify(step.input)); return drLoad(); })()), new Promise((_, rj) => setTimeout(() => rj(Error('시간 초과 120초')), 120000))]); } catch (e) { errs.push({ flow: '새 게임', err: String(e && (e.message || e) || e).slice(0, 200) }); } await new Promise(r => setTimeout(r, 1500)); }
           else {
             for (const [name, code] of Object.entries(flows)) await run(name, code);
             for (const a of acts) { cur = a.owner + ':' + a.act; try { load(); const box = document.createElement('div'); box.style.display = 'none'; document.body.appendChild(box);
@@ -139,9 +149,10 @@ const byOwner = new Map(); sites.forEach(s => { if (!byOwner.has(s.owner)) byOwn
 const siteOf = r => { const cand = byOwner.get(r.owner) || sites.filter(s => !skip.has(s.owner)); let best = null, bs = -Infinity; for (const s of cand) { const sc = s.heads.reduce((a, h) => a + (r.prompt.includes(h) ? h.length : -h.length / 2), 0); if (sc > bs) { bs = sc; best = s; } } return r.owner || bs > 0 ? best : null; }; // 그 지점 코드 글이 많이 들고 적게 빠질수록
 const has = (r, comp, m) => m.startsWith('「') ? r.prompt.includes(m.slice(1, -1)) : comp.used.includes(m);
 
-const www = join(ROOT, 'www'), now = await runSide(www, '지금');
+const wi = argv.indexOf('--www'), www = wi >= 0 ? resolve(argv[wi + 1]) : join(ROOT, 'www'), now = await runSide(www, '지금'); // --www: 지금 쪽 빌드 폴더(작업 중 다시 빌드해도 흔들리지 않게 복사본으로)
 let ref = null;
-if (REF) { const sha = execSync(`git rev-parse --verify ${JSON.stringify(REF + '^{commit}')}`, { cwd: ROOT, encoding: 'utf8' }).trim(), refDir = join(ROOT, 'tools/out/regress', 'build-' + sha.slice(0, 12));
+const rwi = argv.indexOf('--ref-www'); if (rwi >= 0) ref = { sha: 'www:' + basename(resolve(argv[rwi + 1])), records: await runSide(resolve(argv[rwi + 1]), '기준 ' + basename(argv[rwi + 1])) }; // 빌드 폴더끼리 비교(git 빌드 없이)
+else if (REF) { const sha = execSync(`git rev-parse --verify ${JSON.stringify(REF + '^{commit}')}`, { cwd: ROOT, encoding: 'utf8' }).trim(), refDir = join(ROOT, 'tools/out/regress', 'build-' + sha.slice(0, 12));
   if (!existsSync(join(refDir, 'www/index.html'))) { mkdirSync(refDir, { recursive: true }); execSync(`git archive ${sha} src build | tar -x -C ${JSON.stringify(refDir)}`, { cwd: ROOT }); execSync(`cp -r ${JSON.stringify(www)} ${JSON.stringify(join(refDir, 'www'))}`);
     execSync(`node ${JSON.stringify(join(refDir, 'build/build.mjs'))} --src ${JSON.stringify(join(refDir, 'src'))} --out ${JSON.stringify(join(refDir, 'www/index.html'))} --no-version`, { cwd: refDir, stdio: 'ignore' }); }
   ref = { sha, records: await runSide(join(refDir, 'www'), '기준 ' + sha.slice(0, 7)) }; }
@@ -152,7 +163,7 @@ for (const r of reqs) { const s = siteOf(r), key = s ? s.key : '(지점 모름) 
   const x = per.get(key) || { key, site: s, n: 0, sits: new Set(), combos: new Map(), lens: [], seen: s ? s.switches.map(() => ({ yes: 0, no: 0 })) : [] }; per.set(key, x);
   x.n++; x.sits.add(`${r.game} · ${r.sit}`); x.lens.push(r.prompt.length); const ck = comp.used.join(','); x.combos.set(ck, (x.combos.get(ck) || 0) + 1);
   if (s) s.switches.forEach((w, i) => { if (w.yes.some(m => has(r, comp, m))) x.seen[i].yes++; if (w.no.some(m => has(r, comp, m))) x.seen[i].no++; });
-  for (const f of checkPrompt(r.prompt, { sink: s?.sink, frags: Object.fromEntries(comp.used.map(id => [id, r.frags[id]])), reads: s?.readsFound ? s.reads : null, used: r.used && !r.failed ? r.used : null, got: r.asked, strip: layerTexts })) {
+  for (const f of r.image ? [] : checkPrompt(r.prompt, { sink: s?.sink, frags: Object.fromEntries(comp.used.map(id => [id, r.frags[id]])), reads: s?.readsFound ? s.reads : null, used: r.used && !r.failed ? r.used : null, got: r.asked, strip: layerTexts })) {
     const fk = `${key}|${f.code}|${f.msg}`, y = findings.get(fk) || { key, ...f, sits: new Set() }; y.sits.add(`${r.game} · ${r.sit}`); findings.set(fk, y); } }
 const covered = new Set([...per.values()].filter(x => x.site).map(x => x.site.key)), uncovered = sites.filter(s => !covered.has(s.key) && !skip.has(s.owner));
 // 기준 비교: (게임·상황·흐름·주인·순번)마다 프롬프트 글이 같은지
@@ -174,8 +185,8 @@ const md = [`# 프롬프트 조합 검증`, '', `생성: \`node tools/play/combo
   ...(ref ? [`## 기준(${ref.sha.slice(0, 7)})과 다른 프롬프트 (${diffs.length})`, '', T(['게임|상황|흐름|주인|순번', '기준', '지금', '처음 다른 곳'], diffs.slice(0, 100).map(d => [d.at, d.ref, d.now, d.first])), ''] : []),
   `## 못 본 갈래 (지점별 앞 8개)`, '', ...rows.filter(x => x.site && x.seen.some(v => !v.yes || !v.no)).map(x => `- ${x.key}: ${x.site.switches.map((w, i) => ({ w, v: x.seen[i] })).filter(({ v }) => !v.yes || !v.no).slice(0, 8).map(({ w, v }) => `\`${w.cond}\`(${!v.yes && w.yes.length ? '참 못 봄' : ''}${!v.no && w.no.length ? ' 거짓 못 봄' : ''})`).join(' · ')}`), ''].join('\n');
 const SAMPLES = join(ROOT, 'tools/out/combos'); mkdirSync(SAMPLES, { recursive: true }); for (const x of rows) { const r = reqs.find(q => (siteOf(q)?.key || '(지점 모름) ' + (q.owner || q.flow)) === x.key); if (r) writeFileSync(join(SAMPLES, x.key.replace(/[^\w가-힣.#-]+/g, '_') + '.txt'), `# ${r.game} · ${r.sit} · 흐름 ${r.flow}\n${r.prompt}`); } // 지점마다 견본 프롬프트 하나(검토용 — tools/out/combos, git에서 뺌)
-writeFileSync(join(HERE, 'reports/combos.md'), md);
-const J = { at: new Date().toISOString(), ref: ref?.sha || null, sites: rows.map(x => ({ key: x.key, n: x.n, situations: [...x.sits], combos: Object.fromEntries(x.combos), switches: x.site ? x.site.switches.map((w, i) => ({ ...w, seen: x.seen[i] })) : [] })), findings: F.map(f => ({ ...f, sits: [...f.sits] })), requestsFile: 'tools/out/combos/requests.json', _r: reqs.map(r => ({ game: r.game, sit: r.sit, flow: r.flow, owner: r.owner, site: siteOf(r)?.key || null, len: r.prompt.length, asked: r.asked || null, used: r.used || null, failed: !!r.failed })), uncovered: uncovered.map(s => s.key), errors: errors.map(r => ({ game: r.game, sit: r.sit, ...r.error })), diffs }; writeFileSync(join(SAMPLES, 'requests.json'), JSON.stringify(J._r, null, 1)); delete J._r; writeFileSync(join(HERE, 'reports/combos.json'), JSON.stringify(J, null, 1)); // 요청별 기록은 크니 tools/out에
+const RN = argv.indexOf('--report') >= 0 ? argv[argv.indexOf('--report') + 1] : 'combos'; writeFileSync(join(HERE, `reports/${RN}.md`), md); // --report <이름>: 보고서 이름(동시에 둘 돌릴 때)
+const J = { at: new Date().toISOString(), ref: ref?.sha || null, sites: rows.map(x => ({ key: x.key, n: x.n, situations: [...x.sits], combos: Object.fromEntries(x.combos), switches: x.site ? x.site.switches.map((w, i) => ({ ...w, seen: x.seen[i] })) : [] })), findings: F.map(f => ({ ...f, sits: [...f.sits] })), requestsFile: 'tools/out/combos/requests.json', _r: reqs.map(r => ({ game: r.game, sit: r.sit, flow: r.flow, owner: r.owner, site: siteOf(r)?.key || null, len: r.prompt.length, asked: r.asked || null, used: r.used || null, failed: !!r.failed })), uncovered: uncovered.map(s => s.key), errors: errors.map(r => ({ game: r.game, sit: r.sit, ...r.error })), diffs }; writeFileSync(join(SAMPLES, 'requests.json'), JSON.stringify(J._r, null, 1)); delete J._r; writeFileSync(join(HERE, `reports/${RN}.json`), JSON.stringify(J, null, 1)); // 요청별 기록은 크니 tools/out에
 console.log(`요청 지점 ${covered.size}/${sites.length - sites.filter(s => skip.has(s.owner)).length} 닿음 · 프롬프트 ${reqs.length} · 깨짐 ${cnt('깨짐')} · 과잉 ${cnt('과잉')} · 과소 ${cnt('과소')}${ref ? ` · 기준과 다른 프롬프트 ${diffs.length}` : ''}`);
-console.log('→ tools/play/reports/combos.md');
+console.log(`→ tools/play/reports/${RN}.md`);
 if (ref && diffs.length) process.exit(1);

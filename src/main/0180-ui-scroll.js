@@ -237,17 +237,6 @@ function farmHTML(){
   ${G.meta.farms.map(f=>`<h3 class="sec">${esc(f.name)}</h3>${Array.from({length:FARM_N},(_,k)=>k+1).map(lv=>{const id=`farm_${f.key}_${lv}`, rec=farmRec(lv), low=topLv<rec,cl=!!p.farmClear[id],open=lv===1||!!p.farmClear[`farm_${f.key}_${lv-1}`];
     return `<div class="stage ${cl?'clear':''} ${open?'':'lock'}"><span class="code">${lv}</span><span class="t"><b>${lv}단계 <small class="${low?'farm-low':'muted'}">권장 Lv.${rec}</small></b><span class="st">${rewardText(farmReward(f.key,lv))}</span></span>${open?`<button class="btn sm ghost" data-act="farmgo" data-k="${f.key}" data-lv="${lv}">출격</button>`:''}${cl?`<button class="btn sm" data-act="sweep" data-k="${f.key}" data-lv="${lv}">소탕</button><button class="btn sm ghost" data-act="sweep" data-k="${f.key}" data-lv="${lv}" data-n="5">×5</button>`:''}</div>`;}).join('')}`).join('')}`;
 }
-function dispHTML(){
-  const p=P(), now=Date.now();
-  const nDone=dispList().filter(d=>{ const a=p.disp[d.id]; return a&&now>=a.start+a.hours*3600e3; }).length, nFree=dispList().filter(d=>!p.disp[d.id]).length;
-  return `${pageHead(T('dispatch'),'LOGISTICS','lobby')}<p class="muted">${T('crew')}을(를) 보내 두면 시간이 지나 보상을 가져와요. 파견 중인 ${T('crew')}은(는) 전투에 나갈 수 없어요.</p>
-  <div class="row" style="margin:6px 0 10px"><button class="btn sm" data-act="dispall" ${nDone?'':'disabled'}>완료된 파견 모두 받기${nDone?` (${nDone})`:''}</button><button class="btn sm ghost" data-act="dispredo" ${nFree?'':'disabled'}>빈 곳 모두 자동 파견</button><button class="btn sm ghost" data-act="dreroll" ${nFree?'':'disabled'}>의뢰 새로고침 ${DBOARD().rr?`(${rIco('gold')}2,000)`:'(오늘 1번 무료)'}</button></div>
-  <p class="muted" style="margin:-4px 0 8px;font-size:.75rem">의뢰는 매일 바뀌고, 하나를 받으면 그 자리에 새 의뢰가 올라와요. 보상은 시간과 인원에 비례해요.</p>
-  ${dispList().map(d=>{const a=p.disp[d.id], end=a?a.start+a.hours*3600e3:0, done=a&&now>=end;
-    const left=a&&!done?Math.ceil((end-now)/60000):0;
-    return `<div class="ep disp"><span class="t"><b>${esc(d.name)}</b><span class="muted">${esc(d.desc)} · ${d.hours}시간 · ${d.need}명</span><span class="muted">${rewardText(d.reward)}</span>${a?`<span class="dp-av">${a.chars.map(id=>{ const c=charById(id); return c?`<i title="${esc(c.name)}">${art(c)}</i>`:''; }).join('')}</span><span class="muted">${a.chars.map(id=>esc((charById(id)||{}).name||'')).join(', ')} · ${done?'완료':`${Math.floor(left/60)}시간 ${left%60}분 남음`}</span>`:''}</span>
-      ${!a?`<button class="btn sm" data-act="dispset" data-id="${d.id}">보내기</button>`:done?`<button class="btn sm" data-act="dispget" data-id="${d.id}">받기</button>`:`<button class="btn sm ghost" data-act="dispcancel" data-id="${d.id}">취소</button>`}</div>`;}).join('')}`;
-}
 function passHTML(){
   const p=P(), d=dm(), lv=passLv(), xp=p.pass.xp;
   return `${pageHead(T('pass'),'SEASON PASS','lobby')}

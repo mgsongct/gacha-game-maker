@@ -59,9 +59,9 @@ case 'saveep': { const c=charById(id),d={lv:+$('#ep_lv').value,dup:+$('#ep_dup')
       mark('c:'+id); openChar(id); break; }
 case 'delep': { const c=charById(id); if((await appConfirm('이 에피소드를 삭제할까요?'))){c.episodes=c.episodes.filter(x=>x.id!==t.dataset.ep);mark('c:'+id);openChar(id);} break; }
 case 'aiep': { const c=charById(id),lv=+$('#ep_lv').value,dup=+$('#ep_dup').value,after=$('#ep_after').value,hint=$('#ep_hint').value.trim();
-      const stg={1:'첫인상',2:'호기심과 첫 사적인 대화',3:'일상 속 해프닝',4:'신뢰, 과거의 일부를 털어놓음',5:'질투나 오해',6:'설렘, 서로를 의식함',7:'단둘이 위기를 넘김',8:'연인 직전의 긴장감',9:'과거의 상처와 마주함',10:'고백과 그 이후'}[lv];
+      const stg=aiepStgText({lv});
       const af=after?G.chapters.flatMap(ch=>ch.stages).find(x=>x.id===after):null;
-      const r=await aiJSON(`${pf('EPISODE',{RULES,ctx:ctx(),SCRIPT_FMT,name:c.name,profile:c.profile,lines:c.lines.join(' / '),files:T('files'),files2:c.files.filter(f=>f.dup<=dup).map(f=>f.text).join(' / ')||'없음',title:af?pf('EPISODE_AFTER',{title:af.title,post:String(af.post||'').slice(0,400)}):'',lv,stg,dup:dup?pf('EPISODE_SECRET',{limit:T('limit'),dup,files:T('files')}):'',episodes:c.episodes.map(x=>`Lv.${x.lv} ${x.title}`).join(', ')||'없음',hint:hint?'요청: '+hint:'',player:T('player')})}\nJSON만 출력: {"title":"제목","script":"대본"}`,t);
+      const r=await aiJSON(aiepPrompt({c,dup,af,lv,stg,hint}),t);
       if(r&&$('#ep_script')){ if(r.title)$('#ep_title').value=String(r.title); if(r.script)$('#ep_script').value=nl(r.script); toast('대본을 채웠어요. 확인 후 저장하세요.'); } break; }
 case 'thedit': openThEdit(id,t.dataset.th||null); break;
 case 'saveth': { const v=$('#th_trig').value, trig=v==='start'?{type:'start'}:{type:v.split(':')[0],value:v.split(':')[0]==='aff'?+v.split(':')[1]:v.split(':')[1]};
@@ -70,7 +70,7 @@ case 'saveth': { const v=$('#th_trig').value, trig=v==='start'?{type:'start'}:{t
       mark('t:'+th.id); checkTriggers(); openChar(id); break; }
 case 'delth': if((await appConfirm('이 '+T('talk')+'을(를) 삭제할까요?'))){G.threads=G.threads.filter(x=>x.id!==t.dataset.th);delete p.inbox[t.dataset.th];mark('t:'+t.dataset.th,'prog');openChar(id);} break;
 case 'aithread': { const c=charById(id),hint=$('#th_hint').value.trim(),tv=$('#th_trig').selectedOptions[0].textContent;
-      const r=await aiJSON(`${pf('THREAD_WRITE',{RULES,ctx:ctx(),THREAD_FMT,name:c.name,profile:c.profile,lines:c.lines.join(' / '),tv,own:own(c.id)?affLv(own(c.id)):1,hint:hint?'요청: '+hint:'',player:T('player')})}\nJSON만 출력: {"title":"대화방 미리보기 제목","script":"대화"}`,t);
+      const r=await aiJSON(aithreadPrompt({c,tv,hint}),t);
       if(r&&$('#th_script')){ if(r.title)$('#th_title').value=String(r.title); if(r.script)$('#th_script').value=nl(r.script); toast('대화를 채웠어요. 확인 후 저장하세요.'); } break; }
 case 'ststory': { const ch0=G.chapters.find(x=>x.id===t.dataset.ch), s0=ch0&&ch0.stages.find(x=>x.id===t.dataset.st); if(!s0) break; closeModal(); playStoryStage(ch0,s0); break; }
 case 'story': { const ch=G.chapters.find(x=>x.id===t.dataset.ch),s=ch.stages.find(x=>x.id===t.dataset.st); closeModal(); playStory(s.title,s[t.dataset.k],()=>openStage(ch.id,s.id)); break; }
@@ -85,8 +85,8 @@ case 'savech': { readChForm(); const pg=chDraft.__purge; delete chDraft.__purge;
       if(pg&&pg.length&&old){ storyPurge(storyLinks(pg,old,old.eventId&&G.events.find(e=>e.id===old.eventId)),{threads:1,codex:1,libs:1,rels:1}); pg.forEach(id=>{ delete P().cleared[id]; }); }
       const i=G.chapters.findIndex(x=>x.id===chDraft.id); delete chDraft.relScan; G.chapters[i]=chDraft; mark('ch:'+chDraft.id); syncEnemies(); scanScriptAssets(); relFromScripts(chDraft); closeModal(); render(); break; }
 case 'stdetail': { readChForm(); const j=+t.dataset.j, s0=chDraft.stages[j], ch0=chDraft; if(!s0) break; if(!(s0.pre||s0.post)){ toast('먼저 대본이 있어야 해요'); break; }
-      const nb=[ch0.stages[j-1],ch0.stages[j+1]].map((x,k)=>x?`${k?'다음':'이전'} 스테이지 「${x.title}」 ${k?'시작':'끝'}: ${String(k?x.pre:(x.post||x.pre)||'').split('\n').slice(k?0:-8,k?8:undefined).join(' / ')}`:'').filter(Boolean).join('\n');
-      const r=await aiJSON(`${pf('STAGE_REWRITE',{RULES,ctx:ctx(),storyMemo:storyMemo(),relCtx:relCtx((s0.pre||'')+'\n'+(s0.post||''),[],40),SCRIPT_FMT,title:ch0.title,j:j+1,title2:s0.title,DETAIL_RULE,nb,story:s0.story?pf('STAGE_REWRITE_STORY'):pf('STAGE_REWRITE_BATTLE'),pre:s0.pre||'',post:s0.post||''})}\nJSON만 출력: {"pre":"","post":""}`,t,'complex');
+      const nb=stdetailNbText({ch0,j});
+      const r=await aiJSON(stdetailPrompt({s0,ch0,j,nb}),t,'complex');
       if(r&&(r.pre||r.post)){ s0.pre=nl(r.pre)||s0.pre; if(!s0.story) s0.post=nl(r.post)||s0.post; const sh=$('#modal .sheet'), sc=sh?sh.scrollTop:0; openChEdit(); const sh2=$('#modal .sheet'); if(sh2) sh2.scrollTop=sc; toast('디테일을 보강했어요. 마음에 들면 저장을 눌러 주세요'); } break; }
 case 'delch': { const ch0=G.chapters.find(x=>x.id===chDraft.id)||chDraft, back=chDraft, ev0=ch0.eventId&&G.events.find(e=>e.id===ch0.eventId);
       openStoryDel({title:ch0.title,ids:ch0.stages.map(s=>s.id),ch:ch0,ev:ev0,back:()=>{ chDraft=back; openChEdit(); },run:()=>{ G.chapters=G.chapters.filter(x=>x.id!==ch0.id); mark('ch:'+ch0.id); }}); break; }
@@ -96,7 +96,7 @@ case 'saveworld': { const w=G.world; w.name=$('#w_name').value.trim()||w.name; w
       if(WTERMS&&$('#w_tchk')&&$('#w_tchk').checked){ Object.entries(WTERMS).forEach(([k,v])=>{ if(v&&TERM_LABEL[k]) G.meta.terms[k]=String(v).slice(0,12); }); mark('meta'); applyMeta(); } WTERMS=null;
       mark('world'); closeModal(); render(); toast('세계관을 저장했어요'); pcSoon(); break; }
 case 'aiworld': { const kw=$('#w_kw').value.trim(); if(!kw){toast('키워드를 입력해 주세요');break;}
-      const r=await aiJSON(`${pf('WORLD_QUICK',{RULES,kw,EXPLORATION_NAME_RULE})}\nJSON만 출력: {"name":"","summary":"2~3문장","lore":"6~10문장","plot":"6~10문장","factions":[{"name":"","desc":"한 문장"}],"terms":{"player":"","crew":"","talk":"","currency":"","gold":"","gacha":"","ops":"","abyss":""}} 세력은 3~5개.`,t);
+      const r=await aiJSON(aiworldPrompt({kw}),t);
       if(r&&$('#w_name')){ $('#w_name').value=r.name||''; $('#w_sum').value=r.summary||''; $('#w_lore').value=r.lore||''; $('#w_plot').value=r.plot||''; $('#w_fac').value=(r.factions||[]).map(f=>f.name+': '+f.desc).join('\n'); WTERMS=r.terms&&typeof r.terms==='object'?r.terms:null; const tb=$('#w_terms'); if(tb&&WTERMS){ tb.hidden=false; tb.querySelector('span').textContent=Object.entries(WTERMS).filter(([k,v])=>v&&TERM_LABEL[k]).map(([k,v])=>TERM_LABEL[k]+': '+v).join(' · '); } toast('입력칸을 채웠어요. 확인 후 저장하세요.'); } break; }
 case 'opening-edit': openOpeningEdit(); break;
 case 'aichapter-open': openAiChapter(); break;

@@ -9,8 +9,6 @@ function RULESM(){ if(!G.meta.rules||typeof G.meta.rules!=='object') G.meta.rule
 const RULE_STATS=[['hp','체력'],['atk','공격'],['def','방어'],['spd','속도']];
 const POS_TRAITS=[['hp','체력 %'],['atk','공격 %'],['def','방어 %'],['spd','속도 %'],['dmg','주는 피해 %'],['taken','받는 피해 %'],['heal','회복량 %'],['crit','치명타 %p'],['sp','시작 SP'],['threat','위협도 %']];
 const REACT_TYPES=[['amp','피해 증폭(배율)'],['burst','폭발(공격력×값 추가 피해)'],['stun','기절(초)'],['vuln','취약(받는 피해 +값%)']];
-// 새 게임 세계관 단계의 반응 스키마 — 값의 뜻은 종류마다 다름(REACT_TYPES)
-const REACT_SCHEMA='"reactions":[{"a":"속성","b":"다른 속성","name":"반응 이름","type":"amp|burst|stun|vuln","value":"amp는 피해 배율 1.2~2, burst는 공격력×값 0.5~2, stun은 기절 초 0.5~2, vuln은 받는 피해 +% 10~40"}]';
 // 생성기가 쓰는 속성 이름 다듬기 — 속성 목록·상성(beats)·반응의 속성 이름에 같이 써야 서로 맞음
 const elemName=v=>String(v||'').replace(/[<>"'&`.]/g,'').trim().slice(0,4);
 // 생성된 반응 정리: 값의 뜻은 종류마다 다름(REACT_TYPES — amp 배율·burst 공격력×값·stun 초·vuln 받는 피해 +%). vuln 값이 배율처럼 보이면(5 미만, 예 1.3) 백분율로(30)
@@ -118,15 +116,14 @@ function rulesCodex(){ const w=G.world; if(!Array.isArray(w.codex)) w.codex=[]; 
   if(r.synergy&&+r.synergy.n>1) up('[규칙] 진영 시너지',`같은 진영 ${r.synergy.n}명 이상이 함께 싸우면 공격 +${r.synergy.atk||0}%, 방어 +${r.synergy.def||0}%.`);
   if((r.rel||[]).length) up('[규칙] 관계',r.rel.map(x=>`${x.by==='pos'?(posById(x.a)||{}).name||x.a:x.a} → ${x.by==='pos'?(posById(x.b)||{}).name||x.b:x.b} ${rulesPct(+x.mul||1)}`).join(', '));
   mark('world'); toast('도감에 규칙을 기록했어요'); }
-async function rulesAIData(btn){ const m=G.meta; return aiJSON(`${pf('RULES_AI_DESC',{RULES,ctx:ctx(),elems:m.elems.length,elems2:m.elems.map(e=>e.n).join(', '),role:Object.keys(ROLE).map(k=>`${k}=${ROLE[k]}`).join(', '),rulesBeats:Object.entries(rulesBeats()).map(([a,b])=>`${a}→${b}`).join(', ')})}\nJSON만 출력: {"elems":[${m.elems.map(e=>`"${e.n} 설명"`).join(',')}],"roles":{"atk":"설명","def":"설명","sup":"설명"}}`,btn,'quick'); }
+async function rulesAIData(btn){ const m=G.meta; return aiJSON(rulesAIDataPrompt({m}),btn,'quick'); }
 async function rulesAI(btn){ rulesRead(); const res=await rulesAIData(btn); if(!res||!RD) return; (res.elems||[]).forEach((d,i)=>{ if(d&&RD.elems[i]) RD.elems[i].d=String(d).slice(0,80); }); Object.entries(res.roles||{}).forEach(([k,d])=>{ if(d&&ROLE[k]) RD.roleDesc[k]=String(d).slice(0,80); }); openRules(true); toast('설명을 채웠어요. 저장을 눌러 주세요'); }
 async function rulesAIFill(){ const res=await rulesAIData(null); if(!res) return false; const r=RULESM(); r.roleDesc=r.roleDesc||{};
   (res.elems||[]).forEach((d,i)=>{ if(d&&G.meta.elems[i]&&!G.meta.elems[i].d) G.meta.elems[i].d=String(d).slice(0,80); }); Object.entries(res.roles||{}).forEach(([k,d])=>{ if(d&&ROLE[k]&&!r.roleDesc[k]) r.roleDesc[k]=String(d).slice(0,80); }); mark('meta'); return true; }
 function rulesMissingDesc(){ return G.meta.elems.some(e=>!e.d)||Object.keys(ROLE).some(k=>!((G.meta.rules||{}).roleDesc||{})[k]); }
 function rulesNotInCodex(){ return !(G.world.codex||[]).some(x=>x.title==='[규칙] 속성 상성'); }
-const POS_SCHEMA='"positions":[{"name":"포지션 이름(2~4자)","base":"atk|def|sup","range":"melee|ranged|support","desc":"기능 한 줄","t":{"hp":0,"atk":0,"def":0,"spd":0,"dmg":0,"taken":0,"heal":0,"crit":0,"sp":0,"threat":0}}]';
 function posClean(list){ return (Array.isArray(list)?list:[]).slice(0,10).map(p=>({id:'p_'+uid(),name:String(p.name||'포지션').slice(0,10),base:ROLE[p.base]?p.base:'atk',desc:String(p.desc||'').slice(0,80),range:RANGE[p.range]?p.range:'',t:Object.fromEntries(POS_TRAITS.map(([k])=>[k,Math.max(-80,Math.min(150,Math.round(+((p.t||{})[k])||0)))]).filter(([,v])=>v))})).filter(p=>p.name); }
-async function rulesPosAI(btn){ rulesRead(); const r=await aiJSON(`${pf('POS_AI',{RULES,ctx:ctx(),crew:T('crew'),POS_RULE})}\nJSON만 출력: {${POS_SCHEMA}}`,btn,'default'); const L=posClean(r&&r.positions); if(!L.length) return; RD.positions=L; openRules(true); toast(`포지션 ${L.length}개를 설계했어요. 저장을 눌러 주세요`); }
+async function rulesPosAI(btn){ rulesRead(); const r=await aiJSON(rulesPosAIPrompt(),btn,'default'); const L=posClean(r&&r.positions); if(!L.length) return; RD.positions=L; openRules(true); toast(`포지션 ${L.length}개를 설계했어요. 저장을 눌러 주세요`); }
 async function rulesRecalc(){ if(!(await appConfirm(`기본형·희귀도 기준으로 모든 ${T('crew')}의 체력·공격·방어·속도를 다시 계산할까요? 직접 고친 능력치도 바뀌어요(이격은 원본 비율을 따라가요).`))) return; if(!rulesSave()) return;
   let n=0; for(const c of G.chars){ if(c.alt) continue; const s=GGMCombat.generateBaseStats(c); Object.assign(c,{hp:s.hp,atk:s.atk,def:s.def,spd:s.spd}); mark('c:'+c.id); n++; } toast(`${n}명의 능력치를 다시 계산했어요`); openRules(); }
 function rulesPosAssign(){ rulesRead(); const P=RD.positions; let n=0; G.chars.forEach(c=>{ if(P.some(p=>p.id===c.pos)) return; const cand=P.filter(p=>p.base===c.role); if(!cand.length) return; c.pos=cand[hashN(c.id)%cand.length].id; mark('c:'+c.id); n++; }); toast(`${n}명에게 포지션을 배정했어요(기본형이 같은 포지션 중에서). 캐릭터 편집에서 바꿀 수 있어요`); }

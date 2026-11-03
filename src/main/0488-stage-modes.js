@@ -8,14 +8,12 @@
      같은 사람을 연달아 쓰면 분위기가 깨지고, 취향을 맞추거나 다른 사람으로 이어 가면 분위기가 오름. 1위면 통과.
    - 생성 연계: 조각 STAGE_MODES(프롬프트 스튜디오)를 장·이벤트·새 게임 1장 프롬프트에 넣고, stageSchema의 mode·debate·contest를
      buildStages가 검증(modeClean). 잘못되면 전투로. 설정에서 양식별로 끔. 문서: docs/research/stage-modes.md */
-// 장의 마지막(클라이맥스) 스테이지 형식 — 세계관 단계가 장르에 맞게 고름(G.meta.story.finale). 지시문은 프롬프트 스튜디오의 FINALE_RULE, 값은 여기서
-const FINALE_SCHEMA='"finale":"battle|contest|debate"'; // 새 게임 세계관 단계 스키마
+ // 새 게임 세계관 단계 스키마
 const FINALE_END={battle:'보스전과',contest:'결승 무대와',debate:'결정적인 회담과'};
 const finaleOf=f=>['contest','debate'].includes(f)?f:'battle';
-const finaleRule=()=>`이 게임의 finale: ${storyCfg().finale}. ${FINALE_RULE}`, finaleEnd=()=>FINALE_END[storyCfg().finale];
+const finaleEnd=()=>FINALE_END[storyCfg().finale]; // finaleRule(프롬프트 글)은 프롬프트 스튜디오(0015) 조립 함수
 // 스테이지 집필(writeStages)의 스테이지 종류 표시 — 회담·콘테스트면 프롬프트 스튜디오의 STAGE_WRITE_RULE(대본은 그 전·후만)을 붙임
 const STAGE_KIND={debate:'회담 스테이지',contest:'콘테스트 스테이지'};
-function stageWhat(s){ return s.story?' — 전투 없는 이야기 스테이지':STAGE_KIND[s.mode]?` — ${STAGE_KIND[s.mode]}. ${STAGE_WRITE_RULE}`:' — 전투 전(pre)과 전투 후(post)'; }
 const CHARM={cool:'멋',cute:'귀여움',beauty:'아름다움',smart:'지성',tough:'강인함'};
 const CHARM_KW={cool:/쿨|냉정|과묵|카리스마|멋|차분|무뚝뚝/,cute:/귀여|밝|천진|장난|애교|활발|명랑/,beauty:/우아|아름|기품|섬세|예술|고상|신비/,smart:/똑똑|지적|분석|침착|박식|천재|논리|책/,tough:/강인|용감|열혈|근성|힘|투지|단단|호쾌/};
 function modesCfg(){ const m=(G.meta.story||{}).modes||{}; return {debate:m.debate!==false,contest:m.contest!==false}; }
@@ -31,7 +29,6 @@ function modeClean(s){ const mode=String(s&&s.mode||'').trim(), cfg=modesCfg();
   if(mode==='contest'&&cfg.contest&&s.contest){ const c=s.contest, judges=(Array.isArray(c.judges)?c.judges:[]).slice(0,3).map(j=>({name:S_(j.name,20)||'심사위원',likes:CHARM[j.likes]?j.likes:Object.keys(CHARM).find(k=>CHARM[k]===j.likes)||'cool'}));
     if(judges.length) return {mode:'contest',contest:{title:S_(c.title,40)||'콘테스트',judges,rounds:Math.max(2,Math.min(5,+c.rounds||3)),rivals:(Array.isArray(c.rivals)?c.rivals:[]).slice(0,3).map(r=>({name:S_(r.name,20)||'경쟁자',power:Math.max(.6,Math.min(1.6,+r.power||1))})).filter(r=>r.name)}}; }
   return null; }
-const MODE_SCHEMA=`"mode":"battle|debate|contest","debate":{"opponent":"상대 이름","goal":"이 회담의 목표","evidence":[{"id":"e1","name":"","desc":""}],"rounds":[{"claim":"상대 주장 요약","lines":[{"text":"상대의 말","press":"추궁하면 나오는 대답","weak":"모순을 밝히는 증거 id 또는 빈칸","persuade":{"who":"","text":""}}]}],"win":"","lose":""},"contest":{"title":"","judges":[{"name":"","likes":"${Object.keys(CHARM).join('|')}"}],"rounds":3,"rivals":[{"name":"","power":1}]}`;
 function modeIcon(s){ return s&&s.mode==='debate'?'⚖':s&&s.mode==='contest'?'✦':''; }
 
 /* 공통: 시작·클리어 */

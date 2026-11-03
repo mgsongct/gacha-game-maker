@@ -23,8 +23,6 @@ function routeAuto(s){ const r=s.route||{}, H=hashN(s.id), boss=(s.enemies||[]).
     {id:'n2b',kind:'supply',name:r.b||'우회로 보급 지점',hint:'체력 30% 회복 · 지원형이 있어야 갈 수 있어요',need:{role:'sup'},next:['n3']},
     {id:'n3',kind:'boss',name:r.boss||(boss?'적 본대':'목표 지점'),next:[]}],start:'n1',fork:r.fork||'두 갈래 길이 나타났다',seed:H}; }
 function routeOf(s){ return routeAuto(s); }
-// 생성기가 쓰는 경로 지점 이름 스키마·정리(1장(새 게임)과 2장 이후가 같이 씀)
-const ROUTE_SCHEMA='"route":{"n1":"첫 교전 지점 이름","fork":"갈림길 상황 한 줄","a":"정면 길(강한 적) 이름","b":"우회 길(보급) 이름","boss":"최종 지점 이름"}';
 function routeClean(x){ if(!x||typeof x!=='object') return null; const r={}; ['n1','fork','a','b','boss'].forEach(k=>{ const v=String(x[k]||'').trim(); if(v) r[k]=v.slice(0,k==='fork'?60:20); }); return Object.keys(r).length?r:null; }
 function nodeById(R,id){ return R.nodes.find(n=>n.id===id); }
 function nodeStage(s,n,R){ if(n.kind==='boss') return s; const src=(s.enemies||[]).filter(e=>!e.boss), pool=src.length?src:(s.enemies||[]), h=R.seed, en=[];

@@ -11,7 +11,7 @@
 | 그림 태그 검증 | 무기만 `wpBad`로 검사. **배경·소품은 지시만 하고 검증하지 않음** → 성능 낮은 AI가 `1girl, long hair…`를 섞으면 그대로 그려 사람 그림이 됨 |
 | 실패 기록 | `AILOG`(최근 40건)는 볼 수만 있고 단계별 통계가 없음. 고친 내용이 다음 요청에 남지 않아 **같은 실수가 반복** |
 
-## 2. 이 앱의 결정 (`src/main/0025-prompt-studio.js`)
+## 2. 이 앱의 결정 (`src/main/0015-prompt-studio/`)
 
 ### 조각 등록·관리
 - `pfDef(id,label,get)`로 등록 → `window[id]`가 `promptFrag(id)`를 돌려줌. 호출 지점 코드는 그대로(`${NAI_CHAR}` 등)

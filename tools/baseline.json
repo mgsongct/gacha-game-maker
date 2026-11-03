@@ -4,11 +4,11 @@
   {
    "key": "복잡한 함수|buildNewGameDraft",
    "num": {
-    "복잡도": 150,
+    "복잡도": 143,
     "줄": 89,
     "중첩": 2
    },
-   "text": "buildNewGameDraft (src/main/0250-story-factory.js:219) 복잡도 150 · 89줄 · 중첩 2"
+   "text": "buildNewGameDraft (src/main/0250-story-factory.js:214) 복잡도 143 · 89줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|cbPlay",
@@ -44,7 +44,7 @@
     "줄": 65,
     "중첩": 5
    },
-   "text": "cutoutWhite (src/main/0030-character-regen.js:396) 복잡도 91 · 65줄 · 중첩 5"
+   "text": "cutoutWhite (src/main/0030-character-regen.js:387) 복잡도 91 · 65줄 · 중첩 5"
   },
   {
    "key": "복잡한 함수|apply",
@@ -101,22 +101,13 @@
    "text": "effectText (src/modules/combat/010-catalog.js:5) 복잡도 70 · 2줄 · 중첩 2"
   },
   {
-   "key": "복잡한 함수|fcSend",
-   "num": {
-    "복잡도": 69,
-    "줄": 24,
-    "중첩": 3
-   },
-   "text": "fcSend (src/main/0160-free-chat.js:36) 복잡도 69 · 24줄 · 중첩 3"
-  },
-  {
    "key": "복잡한 함수|naiGenerate0",
    "num": {
     "복잡도": 68,
     "줄": 62,
     "중첩": 4
    },
-   "text": "naiGenerate0 (src/main/0030-character-regen.js:528) 복잡도 68 · 62줄 · 중첩 4"
+   "text": "naiGenerate0 (src/main/0030-character-regen.js:519) 복잡도 68 · 62줄 · 중첩 4"
   },
   {
    "key": "복잡한 함수|studioHTML",
@@ -125,7 +116,7 @@
     "줄": 81,
     "중첩": 1
    },
-   "text": "studioHTML (src/main/0180-ui-scroll.js:553) 복잡도 68 · 81줄 · 중첩 1"
+   "text": "studioHTML (src/main/0180-ui-scroll.js:542) 복잡도 68 · 81줄 · 중첩 1"
   },
   {
    "key": "복잡한 함수|liveTick",
@@ -155,6 +146,15 @@
    "text": "lobbyHTML (src/main/0180-ui-scroll.js:71) 복잡도 62 · 43줄 · 중첩 0"
   },
   {
+   "key": "복잡한 함수|fcSend",
+   "num": {
+    "복잡도": 61,
+    "줄": 24,
+    "중첩": 3
+   },
+   "text": "fcSend (src/main/0160-free-chat.js:35) 복잡도 61 · 24줄 · 중첩 3"
+  },
+  {
    "key": "복잡한 함수|cast",
    "num": {
     "복잡도": 58,
@@ -182,22 +182,13 @@
    "text": "v2EditorAction (src/modules/combat/050-bridge.js:140) 복잡도 56 · 37줄 · 중첩 3"
   },
   {
-   "key": "복잡한 함수|aiEventGen0",
-   "num": {
-    "복잡도": 55,
-    "줄": 28,
-    "중첩": 2
-   },
-   "text": "aiEventGen0 (src/main/0250-story-factory.js:158) 복잡도 55 · 28줄 · 중첩 2"
-  },
-  {
    "key": "복잡한 함수|buildManualGameDraft",
    "num": {
     "복잡도": 55,
     "줄": 40,
     "중첩": 3
    },
-   "text": "buildManualGameDraft (src/main/0250-story-factory.js:309) 복잡도 55 · 40줄 · 중첩 3"
+   "text": "buildManualGameDraft (src/main/0250-story-factory.js:304) 복잡도 55 · 40줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|contractHTML0",
@@ -215,7 +206,7 @@
     "줄": 35,
     "중첩": 2
    },
-   "text": "openNaiPrep (src/main/0180-ui-scroll.js:415) 복잡도 52 · 35줄 · 중첩 2"
+   "text": "openNaiPrep (src/main/0180-ui-scroll.js:404) 복잡도 52 · 35줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|bEnd",
@@ -234,6 +225,15 @@
     "중첩": 1
    },
    "text": "openLibItem (src/main/0240-growth-curve.js:130) 복잡도 45 · 35줄 · 중첩 1"
+  },
+  {
+   "key": "복잡한 함수|aiEventGen0",
+   "num": {
+    "복잡도": 45,
+    "줄": 28,
+    "중첩": 2
+   },
+   "text": "aiEventGen0 (src/main/0250-story-factory.js:153) 복잡도 45 · 28줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|motif",
@@ -260,7 +260,7 @@
     "줄": 15,
     "중첩": 3
    },
-   "text": "regenApply (src/main/0030-character-regen.js:86) 복잡도 43 · 15줄 · 중첩 3"
+   "text": "regenApply (src/main/0030-character-regen.js:85) 복잡도 43 · 15줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|renderSetup",
@@ -296,7 +296,7 @@
     "줄": 26,
     "중첩": 4
    },
-   "text": "eraseColorData (src/main/0030-character-regen.js:301) 복잡도 41 · 26줄 · 중첩 4"
+   "text": "eraseColorData (src/main/0030-character-regen.js:292) 복잡도 41 · 26줄 · 중첩 4"
   },
   {
    "key": "복잡한 함수|comfyGenerate",
@@ -305,7 +305,7 @@
     "줄": 27,
     "중첩": 2
    },
-   "text": "comfyGenerate (src/main/0030-character-regen.js:485) 복잡도 41 · 27줄 · 중첩 2"
+   "text": "comfyGenerate (src/main/0030-character-regen.js:476) 복잡도 41 · 27줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|value",
@@ -368,7 +368,7 @@
     "줄": 14,
     "중첩": 13
    },
-   "text": "(최상위)→document.addEventListener #2 @src/main/0455-persona.js (src/main/0455-persona.js:110) 복잡도 38 · 14줄 · 중첩 13"
+   "text": "(최상위)→document.addEventListener #2 @src/main/0455-persona.js (src/main/0455-persona.js:101) 복잡도 38 · 14줄 · 중첩 13"
   },
   {
    "key": "복잡한 익명 콜백|main rulesRead→rySelectorAll('#modal[data-rk]').forEach @src/main/0185-game-rules.js",
@@ -377,7 +377,7 @@
     "줄": 6,
     "중첩": 9
    },
-   "text": "rulesRead→rySelectorAll('#modal[data-rk]').forEach @src/main/0185-game-rules.js (src/main/0185-game-rules.js:90) 복잡도 27 · 6줄 · 중첩 9"
+   "text": "rulesRead→rySelectorAll('#modal[data-rk]').forEach @src/main/0185-game-rules.js (src/main/0185-game-rules.js:88) 복잡도 27 · 6줄 · 중첩 9"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0488-stage-modes.js",
@@ -386,16 +386,16 @@
     "줄": 9,
     "중첩": 8
    },
-   "text": "(최상위)→document.addEventListener @src/main/0488-stage-modes.js (src/main/0488-stage-modes.js:80) 복잡도 27 · 9줄 · 중첩 8"
+   "text": "(최상위)→document.addEventListener @src/main/0488-stage-modes.js (src/main/0488-stage-modes.js:77) 복잡도 27 · 9줄 · 중첩 8"
   },
   {
-   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0025-prompt-studio.js",
+   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0015-prompt-studio/010-studio.js",
    "num": {
     "복잡도": 24,
     "줄": 13,
     "중첩": 11
    },
-   "text": "(최상위)→document.addEventListener @src/main/0025-prompt-studio.js (src/main/0025-prompt-studio.js:340) 복잡도 24 · 13줄 · 중첩 11"
+   "text": "(최상위)→document.addEventListener @src/main/0015-prompt-studio/010-studio.js (src/main/0015-prompt-studio/010-studio.js:357) 복잡도 24 · 13줄 · 중첩 11"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0565-asset-library.js",
@@ -413,7 +413,7 @@
     "줄": 16,
     "중첩": 13
    },
-   "text": "(최상위)→document.addEventListener @src/main/0185-game-rules.js (src/main/0185-game-rules.js:133) 복잡도 20 · 16줄 · 중첩 13"
+   "text": "(최상위)→document.addEventListener @src/main/0185-game-rules.js (src/main/0185-game-rules.js:130) 복잡도 20 · 16줄 · 중첩 13"
   },
   {
    "key": "복잡한 익명 콜백|main parseScript→).filter(Boolean).flatMap(splitTags).map @src/main/0460-script-engine.js",
@@ -431,7 +431,7 @@
     "줄": 6,
     "중첩": 7
    },
-   "text": "openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/0260-new-game-draft.js (src/main/0260-new-game-draft.js:210) 복잡도 15 · 6줄 · 중첩 7"
+   "text": "openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/0260-new-game-draft.js (src/main/0260-new-game-draft.js:189) 복잡도 15 · 6줄 · 중첩 7"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0445-factions.js",
@@ -440,7 +440,7 @@
     "줄": 7,
     "중첩": 7
    },
-   "text": "(최상위)→document.addEventListener @src/main/0445-factions.js (src/main/0445-factions.js:95) 복잡도 14 · 7줄 · 중첩 7"
+   "text": "(최상위)→document.addEventListener @src/main/0445-factions.js (src/main/0445-factions.js:82) 복잡도 14 · 7줄 · 중첩 7"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0275-expedition.js",
@@ -449,7 +449,7 @@
     "줄": 10,
     "중첩": 9
    },
-   "text": "(최상위)→document.addEventListener @src/main/0275-expedition.js (src/main/0275-expedition.js:77) 복잡도 13 · 10줄 · 중첩 9"
+   "text": "(최상위)→document.addEventListener @src/main/0275-expedition.js (src/main/0275-expedition.js:75) 복잡도 13 · 10줄 · 중첩 9"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0505-construct.js",
@@ -458,7 +458,7 @@
     "줄": 9,
     "중첩": 8
    },
-   "text": "(최상위)→document.addEventListener @src/main/0505-construct.js (src/main/0505-construct.js:137) 복잡도 12 · 9줄 · 중첩 8"
+   "text": "(최상위)→document.addEventListener @src/main/0505-construct.js (src/main/0505-construct.js:133) 복잡도 12 · 9줄 · 중첩 8"
   },
   {
    "key": "복잡한 분배기 case|handleImagesAndAssetsAction facego",
@@ -470,15 +470,6 @@
    "text": "handleImagesAndAssetsAction · facego (src/main/0510-actions/100-images-and-assets.js:74) 복잡도 25 · 15줄 · 중첩 3"
   },
   {
-   "key": "복잡한 분배기 case|handleNavigationAndToolsAction ailib",
-   "num": {
-    "복잡도": 23,
-    "줄": 8,
-    "중첩": 3
-   },
-   "text": "handleNavigationAndToolsAction · ailib (src/main/0510-actions/020-navigation-and-tools.js:92) 복잡도 23 · 8줄 · 중첩 3"
-  },
-  {
    "key": "복잡한 분배기 case|handleNavigationAndToolsAction poke",
    "num": {
     "복잡도": 21,
@@ -486,15 +477,6 @@
     "중첩": 1
    },
    "text": "handleNavigationAndToolsAction · poke (src/main/0510-actions/020-navigation-and-tools.js:26) 복잡도 21 · 9줄 · 중첩 1"
-  },
-  {
-   "key": "복잡한 분배기 case|handleSettingsAndAudioAction vsai",
-   "num": {
-    "복잡도": 21,
-    "줄": 13,
-    "중첩": 3
-   },
-   "text": "handleSettingsAndAudioAction · vsai (src/main/0510-actions/050-settings-and-audio.js:57) 복잡도 21 · 13줄 · 중첩 3"
   },
   {
    "key": "복잡한 분배기 case|handleImagesAndAssetsAction skinuse",
@@ -536,6 +518,13 @@
    "text": "module:modules/combat/050-bridge.js#v2DrainBattleEvents ↔ module:modules/combat/050-bridge.js#v2BattleEvents"
   },
   {
+   "key": "빈 catch|src/main/0015-prompt-studio/010-studio.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0015-prompt-studio/010-studio.js 저장소 대체 1개"
+  },
+  {
    "key": "빈 catch|src/main/0020-ai-connect.js 파싱 대체",
    "num": {
     "개수": 9
@@ -555,13 +544,6 @@
     "개수": 3
    },
    "text": "src/main/0020-ai-connect.js 저장소 대체 3개"
-  },
-  {
-   "key": "빈 catch|src/main/0025-prompt-studio.js 저장소 대체",
-   "num": {
-    "개수": 1
-   },
-   "text": "src/main/0025-prompt-studio.js 저장소 대체 1개"
   },
   {
    "key": "빈 catch|src/main/0030-character-regen.js 동기 대체",
@@ -1237,11 +1219,6 @@
    "text": "syPush (src/main/0400-publish-subscribe.js) — 참조 85%가 src/main/0390-github-sync.js"
   },
   {
-   "key": "영역 침범 후보|src/main/0030-character-regen.js composeCG",
-   "num": {},
-   "text": "composeCG (src/main/0030-character-regen.js) — 참조 83%가 src/main/0020-ai-connect.js"
-  },
-  {
    "key": "영역 침범 후보|src/main/0030-character-regen.js naiDrawItem0",
    "num": {},
    "text": "naiDrawItem0 (src/main/0030-character-regen.js) — 참조 83%가 src/main/0020-ai-connect.js"
@@ -1250,11 +1227,6 @@
    "key": "영역 침범 후보|src/main/0260-new-game-draft.js openSkin",
    "num": {},
    "text": "openSkin (src/main/0260-new-game-draft.js) — 참조 83%가 src/main/0020-ai-connect.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0180-ui-scroll.js openNaiPrep",
-   "num": {},
-   "text": "openNaiPrep (src/main/0180-ui-scroll.js) — 참조 79%가 src/main/0020-ai-connect.js"
   },
   {
    "key": "영역 침범 후보|src/main/0030-character-regen.js naiGenerate0",
@@ -1267,6 +1239,16 @@
    "text": "bannerPool (src/main/0500-gacha.js) — 참조 78%가 src/main/0445-factions.js"
   },
   {
+   "key": "영역 침범 후보|src/main/0180-ui-scroll.js openNaiPrep",
+   "num": {},
+   "text": "openNaiPrep (src/main/0180-ui-scroll.js) — 참조 75%가 src/main/0020-ai-connect.js"
+  },
+  {
+   "key": "영역 침범 후보|src/main/0250-story-factory.js openMeta",
+   "num": {},
+   "text": "openMeta (src/main/0250-story-factory.js) — 참조 75%가 src/main/0510-actions/"
+  },
+  {
    "key": "영역 침범 후보|src/main/0180-ui-scroll.js openNaiSet",
    "num": {},
    "text": "openNaiSet (src/main/0180-ui-scroll.js) — 참조 71%가 src/main/0030-character-regen.js"
@@ -1274,12 +1256,17 @@
   {
    "key": "영역 침범 후보|src/main/0010-rules.js applyMeta",
    "num": {},
-   "text": "applyMeta (src/main/0010-rules.js) — 참조 67%가 src/main/0510-actions/040-story-and-authoring.js"
+   "text": "applyMeta (src/main/0010-rules.js) — 참조 67%가 src/main/0510-actions/"
   },
   {
    "key": "영역 침범 후보|src/main/0230-modal.js readCharForm",
    "num": {},
    "text": "readCharForm (src/main/0230-modal.js) — 참조 67%가 src/main/0185-game-rules.js"
+  },
+  {
+   "key": "영역 침범 후보|src/main/0290-season-rotation.js aiPickupStory",
+   "num": {},
+   "text": "aiPickupStory (src/main/0290-season-rotation.js) — 참조 67%가 src/main/0510-actions/"
   },
   {
    "key": "영역 침범 후보|src/main/0400-publish-subscribe.js syPull",
@@ -1292,11 +1279,6 @@
    "text": "relGC (src/main/0250-story-factory.js) — 참조 58%가 src/main/0450-relations-memory.js"
   },
   {
-   "key": "영역 침범 후보|src/main/0250-story-factory.js openMeta",
-   "num": {},
-   "text": "openMeta (src/main/0250-story-factory.js) — 참조 58%가 src/main/0510-actions/040-story-and-authoring.js"
-  },
-  {
    "key": "영역 침범 후보|src/main/0160-free-chat.js phPlay",
    "num": {},
    "text": "phPlay (src/main/0160-free-chat.js) — 참조 57%가 src/main/0100-messenger.js"
@@ -1305,11 +1287,6 @@
    "key": "영역 침범 후보|src/main/0180-ui-scroll.js contractHTML0",
    "num": {},
    "text": "contractHTML0 (src/main/0180-ui-scroll.js) — 참조 57%가 src/main/0500-gacha.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0180-ui-scroll.js dispHTML",
-   "num": {},
-   "text": "dispHTML (src/main/0180-ui-scroll.js) — 참조 57%가 src/main/0270-skin-proposal.js"
   },
   {
    "key": "영역 침범 후보|src/main/0210-setup.js renderSetup",
@@ -1337,19 +1314,9 @@
    "text": "naiBatch (src/main/0180-ui-scroll.js) — 참조 50%가 src/main/0030-character-regen.js"
   },
   {
-   "key": "영역 침범 후보|src/main/0250-story-factory.js writeStages",
-   "num": {},
-   "text": "writeStages (src/main/0250-story-factory.js) — 참조 50%가 src/main/0450-relations-memory.js"
-  },
-  {
    "key": "영역 침범 후보|src/main/0260-new-game-draft.js skinPartDraw",
    "num": {},
    "text": "skinPartDraw (src/main/0260-new-game-draft.js) — 참조 50%가 src/main/0030-character-regen.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0290-season-rotation.js aiPickupStory",
-   "num": {},
-   "text": "aiPickupStory (src/main/0290-season-rotation.js) — 참조 50%가 src/main/0150-pickup-existing.js"
   },
   {
    "key": "영역 침범 후보|src/main/0525-data-folder.js dataImport",
@@ -1357,39 +1324,18 @@
    "text": "dataImport (src/main/0525-data-folder.js) — 참조 50%가 src/main/0520-backup-storage.js"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js G.meta.elems",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.meta.elems",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 G.meta.elems(주인 src/main/0185-game-rules.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 G.meta.elems(주인 src/main/0185-game-rules.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js G.chars",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.lib",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 G.chars(주인 src/main/0250-story-factory.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0250-story-factory.js G.npcs",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0250-story-factory.js가 G.npcs(주인 src/main/0510-actions/100-images-and-assets.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0330-casting.js G.npcs",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0330-casting.js가 G.npcs(주인 src/main/0510-actions/100-images-and-assets.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/020-navigation-and-tools.js G.lib",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js가 G.lib(주인 src/main/0250-story-factory.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 G.lib(주인 src/main/0250-story-factory.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0565-asset-library.js G.lib",
@@ -1399,18 +1345,11 @@
    "text": "src/main/0565-asset-library.js가 G.lib(주인 src/main/0250-story-factory.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0445-factions.js G.world.factions",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.chars",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0445-factions.js가 G.world.factions(주인 src/main/0030-character-regen.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js G.world.factions",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 G.world.factions(주인 src/main/0030-character-regen.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 G.chars(주인 src/main/0250-story-factory.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0280-live-ops.js G.threads",
@@ -1420,123 +1359,25 @@
    "text": "src/main/0280-live-ops.js가 G.threads(주인 src/main/0250-story-factory.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js G.threads",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.threads",
    "num": {
     "곳": 2
    },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 G.threads(주인 src/main/0250-story-factory.js)를 씀 2곳"
+   "text": "src/main/0510-actions/가 G.threads(주인 src/main/0250-story-factory.js)를 씀 2곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0190-shop.js P().gems",
+   "key": "남의 상태 쓰기|src/main/0250-story-factory.js G.npcs",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0190-shop.js가 P().gems(주인 src/main/0090-growth.js)를 씀 1곳"
+   "text": "src/main/0250-story-factory.js가 G.npcs(주인 src/main/0510-actions/)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0190-shop.js P().gold",
+   "key": "남의 상태 쓰기|src/main/0330-casting.js G.npcs",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0190-shop.js가 P().gold(주인 src/main/0090-growth.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js P().gold",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 P().gold(주인 src/main/0090-growth.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/110-economy.js P().pass",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/110-economy.js가 P().pass(주인 src/main/0290-season-rotation.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0125-tower.js P().squad",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0125-tower.js가 P().squad(주인 src/main/0510-actions/070-combat-and-formation.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0488-stage-modes.js P().squad",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0488-stage-modes.js가 P().squad(주인 src/main/0510-actions/070-combat-and-formation.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0150-pickup-existing.js G.banners",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0150-pickup-existing.js가 G.banners(주인 src/main/0510-actions/040-story-and-authoring.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0290-season-rotation.js G.banners",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0290-season-rotation.js가 G.banners(주인 src/main/0510-actions/040-story-and-authoring.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/020-navigation-and-tools.js G.banners",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js가 G.banners(주인 src/main/0510-actions/040-story-and-authoring.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0130-gift.js P().curBanner",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0130-gift.js가 P().curBanner(주인 src/main/0150-pickup-existing.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0290-season-rotation.js P().curBanner",
-   "num": {
-    "곳": 2
-   },
-   "text": "src/main/0290-season-rotation.js가 P().curBanner(주인 src/main/0150-pickup-existing.js)를 씀 2곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/020-navigation-and-tools.js P().curBanner",
-   "num": {
-    "곳": 3
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js가 P().curBanner(주인 src/main/0150-pickup-existing.js)를 씀 3곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/110-economy.js P().curBanner",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/110-economy.js가 P().curBanner(주인 src/main/0150-pickup-existing.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js P().curEvent",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 P().curEvent(주인 src/main/0250-story-factory.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0490-boss-patterns.js P().stars",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0490-boss-patterns.js가 P().stars(주인 src/main/0488-stage-modes.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0487-formation-sortie.js G.meta.rules",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0487-formation-sortie.js가 G.meta.rules(주인 src/main/0185-game-rules.js)를 씀 1곳"
+   "text": "src/main/0330-casting.js가 G.npcs(주인 src/main/0510-actions/)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0250-story-factory.js G.world.codex",
@@ -1553,32 +1394,137 @@
    "text": "src/main/0300-codex.js가 G.world.codex(주인 src/main/0185-game-rules.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js G.world.codex",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.world.codex",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 G.world.codex(주인 src/main/0185-game-rules.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 G.world.codex(주인 src/main/0185-game-rules.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/030-mail.js P().mail",
+   "key": "남의 상태 쓰기|src/main/0445-factions.js G.world.factions",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0445-factions.js가 G.world.factions(주인 src/main/0030-character-regen.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.world.factions",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0510-actions/가 G.world.factions(주인 src/main/0030-character-regen.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0190-shop.js P().gems",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0190-shop.js가 P().gems(주인 src/main/0090-growth.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0190-shop.js P().gold",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0190-shop.js가 P().gold(주인 src/main/0090-growth.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0510-actions/ P().gold",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0510-actions/가 P().gold(주인 src/main/0090-growth.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0510-actions/ P().pass",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0510-actions/가 P().pass(주인 src/main/0290-season-rotation.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0125-tower.js P().squad",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0125-tower.js가 P().squad(주인 src/main/0510-actions/)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0488-stage-modes.js P().squad",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0488-stage-modes.js가 P().squad(주인 src/main/0510-actions/)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0150-pickup-existing.js G.banners",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0150-pickup-existing.js가 G.banners(주인 src/main/0510-actions/)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0290-season-rotation.js G.banners",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0290-season-rotation.js가 G.banners(주인 src/main/0510-actions/)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0130-gift.js P().curBanner",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0130-gift.js가 P().curBanner(주인 src/main/0510-actions/)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0150-pickup-existing.js P().curBanner",
+   "num": {
+    "곳": 3
+   },
+   "text": "src/main/0150-pickup-existing.js가 P().curBanner(주인 src/main/0510-actions/)를 씀 3곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0290-season-rotation.js P().curBanner",
    "num": {
     "곳": 2
    },
-   "text": "src/main/0510-actions/030-mail.js가 P().mail(주인 src/main/0220-mail.js)를 씀 2곳"
+   "text": "src/main/0290-season-rotation.js가 P().curBanner(주인 src/main/0510-actions/)를 씀 2곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/010-setup.js G.meta.artTags",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ P().curEvent",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/010-setup.js가 G.meta.artTags(주인 src/main/0370-game-picker.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 P().curEvent(주인 src/main/0250-story-factory.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js G.meta.artTags",
+   "key": "남의 상태 쓰기|src/main/0490-boss-patterns.js P().stars",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 G.meta.artTags(주인 src/main/0370-game-picker.js)를 씀 1곳"
+   "text": "src/main/0490-boss-patterns.js가 P().stars(주인 src/main/0488-stage-modes.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0487-formation-sortie.js G.meta.rules",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0487-formation-sortie.js가 G.meta.rules(주인 src/main/0185-game-rules.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0510-actions/ P().mail",
+   "num": {
+    "곳": 2
+   },
+   "text": "src/main/0510-actions/가 P().mail(주인 src/main/0220-mail.js)를 씀 2곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0370-game-picker.js G.meta.artTags",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0370-game-picker.js가 G.meta.artTags(주인 src/main/0510-actions/)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0450-relations-memory.js G.rels",
@@ -1588,25 +1534,18 @@
    "text": "src/main/0450-relations-memory.js가 G.rels(주인 src/main/0250-story-factory.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js G.rels",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.rels",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 G.rels(주인 src/main/0250-story-factory.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 G.rels(주인 src/main/0250-story-factory.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js G.meta.logoStyle",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.meta.story",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 G.meta.logoStyle(주인 src/main/0510-actions/020-navigation-and-tools.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js G.meta.story",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 G.meta.story(주인 src/main/0487-formation-sortie.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 G.meta.story(주인 src/main/0487-formation-sortie.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0370-game-picker.js P().prepAsked",
@@ -1616,46 +1555,32 @@
    "text": "src/main/0370-game-picker.js가 P().prepAsked(주인 src/main/0290-season-rotation.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/020-navigation-and-tools.js P().prepAsked",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ P().prepAsked",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js가 P().prepAsked(주인 src/main/0290-season-rotation.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 P().prepAsked(주인 src/main/0290-season-rotation.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0370-game-picker.js P().bootPrep",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0370-game-picker.js가 P().bootPrep(주인 src/main/0510-actions/020-navigation-and-tools.js)를 씀 1곳"
+   "text": "src/main/0370-game-picker.js가 P().bootPrep(주인 src/main/0510-actions/)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/040-story-and-authoring.js G.meta.relProf",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.meta.relProf",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/040-story-and-authoring.js가 G.meta.relProf(주인 src/main/0450-relations-memory.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 G.meta.relProf(주인 src/main/0450-relations-memory.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/130-dispatch.js P().pity",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ P().pity",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/130-dispatch.js가 P().pity(주인 src/main/0500-gacha.js)를 씀 1곳"
-  },
-  {
-   "key": "파편화 상태|P().curBanner",
-   "num": {
-    "모듈": 5
-   },
-   "text": "P().curBanner — 5개 모듈이 씀"
-  },
-  {
-   "key": "파편화 상태|G.banners",
-   "num": {
-    "모듈": 4
-   },
-   "text": "G.banners — 4개 모듈이 씀"
+   "text": "src/main/0510-actions/가 P().pity(주인 src/main/0500-gacha.js)를 씀 1곳"
   },
   {
    "key": "파편화 상태|G.world.codex",
@@ -1665,11 +1590,11 @@
    "text": "G.world.codex — 4개 모듈이 씀"
   },
   {
-   "key": "파편화 상태|G.npcs",
+   "key": "파편화 상태|P().curBanner",
    "num": {
-    "모듈": 3
+    "모듈": 4
    },
-   "text": "G.npcs — 3개 모듈이 씀"
+   "text": "P().curBanner — 4개 모듈이 씀"
   },
   {
    "key": "파편화 상태|G.lib",
@@ -1679,18 +1604,25 @@
    "text": "G.lib — 3개 모듈이 씀"
   },
   {
-   "key": "파편화 상태|G.world.factions",
-   "num": {
-    "모듈": 3
-   },
-   "text": "G.world.factions — 3개 모듈이 씀"
-  },
-  {
    "key": "파편화 상태|G.threads",
    "num": {
     "모듈": 3
    },
    "text": "G.threads — 3개 모듈이 씀"
+  },
+  {
+   "key": "파편화 상태|G.npcs",
+   "num": {
+    "모듈": 3
+   },
+   "text": "G.npcs — 3개 모듈이 씀"
+  },
+  {
+   "key": "파편화 상태|G.world.factions",
+   "num": {
+    "모듈": 3
+   },
+   "text": "G.world.factions — 3개 모듈이 씀"
   },
   {
    "key": "파편화 상태|P().gold",
@@ -1707,11 +1639,11 @@
    "text": "P().squad — 3개 모듈이 씀"
   },
   {
-   "key": "파편화 상태|G.meta.artTags",
+   "key": "파편화 상태|G.banners",
    "num": {
     "모듈": 3
    },
-   "text": "G.meta.artTags — 3개 모듈이 씀"
+   "text": "G.banners — 3개 모듈이 씀"
   },
   {
    "key": "파편화 상태|G.rels",
@@ -1728,3324 +1660,234 @@
    "text": "P().prepAsked — 3개 모듈이 씀"
   },
   {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/060-generation.js v2SlotPrompt 「캐릭터의 딱 하나를 설계하세요. 다른 두 스킬은 변경하지 않습니다. 먼저」",
-   "num": {
-    "글자": 1356
-   },
-   "text": "src/modules/combat/060-generation.js v2SlotPrompt 「캐릭터의 딱 하나를 설계하세요. 다른 두 스킬은 변경하지 않습니다. 먼저」 1356자 (src/modules/combat/060-generation.js:103)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/060-generation.js v2PalettePrompt 「색상 해석은 당신(LLM)이 담당합니다. 캐릭터의 appearanceTa」",
-   "num": {
-    "글자": 1257
-   },
-   "text": "src/modules/combat/060-generation.js v2PalettePrompt 「색상 해석은 당신(LLM)이 담당합니다. 캐릭터의 appearanceTa」 1257자 (src/modules/combat/060-generation.js:99)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「JSON만 출력: {\"title\":\"게임 이름\",\"sub\":\"영문 부제\"」",
-   "num": {
-    "글자": 1066
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「JSON만 출력: {\"title\":\"게임 이름\",\"sub\":\"영문 부제\"」 1066자 (src/main/0250-story-factory.js:239)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js charSchema 「{\"skills\":,\"name\":\"짧은 이름\",\"faction\":\"소속 」",
-   "num": {
-    "글자": 993
-   },
-   "text": "src/main/0450-relations-memory.js charSchema 「{\"skills\":,\"name\":\"짧은 이름\",\"faction\":\"소속 」 993자 (src/main/0450-relations-memory.js:91)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/050-bridge.js v2GenerateSkills 「캐릭터의 패시브·액티브·궁극기를 한 주역할로 설계하세요. 참고 데이터는 」",
-   "num": {
-    "글자": 835
-   },
-   "text": "src/modules/combat/050-bridge.js v2GenerateSkills 「캐릭터의 패시브·액티브·궁극기를 한 주역할로 설계하세요. 참고 데이터는 」 835자 (src/modules/combat/050-bridge.js:286)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「JSON만 출력: {\"summary\":\"\",,\"chapter\":{\"tit」",
-   "num": {
-    "글자": 430
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「JSON만 출력: {\"summary\":\"\",,\"chapter\":{\"tit」 430자 (src/main/0250-story-factory.js:276)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js aiChapterGen0 「【스토리 참조: 메인 장 구성】직전 장면: JSON만 출력: {\"titl」",
-   "num": {
-    "글자": 394
-   },
-   "text": "src/main/0250-story-factory.js aiChapterGen0 「【스토리 참조: 메인 장 구성】직전 장면: JSON만 출력: {\"titl」 394자 (src/main/0250-story-factory.js:134)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0455-persona.js personaAI 「「」(, , , )의 개성 시트를 . 프로필: 지금 개성: 지금 대사: 」",
-   "num": {
-    "글자": 394
-   },
-   "text": "src/main/0455-persona.js personaAI 「「」(, , , )의 개성 시트를 . 프로필: 지금 개성: 지금 대사: 」 394자 (src/main/0455-persona.js:40)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0488-stage-modes.js MODE_SCHEMA 「\"mode\":\"battle|debate|contest\",\"debate\":」",
-   "num": {
-    "글자": 385
-   },
-   "text": "src/main/0488-stage-modes.js MODE_SCHEMA 「\"mode\":\"battle|debate|contest\",\"debate\":」 385자 (src/main/0488-stage-modes.js:34)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/070-equipment.js v2GearGenerate 「장비의 고유 패시브 하나를 설계하세요. 패시브와 액티브를 모두 분석하여 」",
-   "num": {
-    "글자": 352
-   },
-   "text": "src/modules/combat/070-equipment.js v2GearGenerate 「장비의 고유 패시브 하나를 설계하세요. 패시브와 액티브를 모두 분석하여 」 352자 (src/modules/combat/070-equipment.js:73)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js aiEventGen0 「JSON만 출력: {\"title\":\"\",\"desc\":\"한두 문장\",\"to」",
-   "num": {
-    "글자": 324
-   },
-   "text": "src/main/0250-story-factory.js aiEventGen0 「JSON만 출력: {\"title\":\"\",\"desc\":\"한두 문장\",\"to」 324자 (src/main/0250-story-factory.js:166)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planAI 「JSON만 출력: {\"logline\":\"\",\"theme\":\"\",\"endi」",
-   "num": {
-    "글자": 323
-   },
-   "text": "src/main/0465-story-plan.js planAI 「JSON만 출력: {\"logline\":\"\",\"theme\":\"\",\"endi」 323자 (src/main/0465-story-plan.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionAI 「적(몬스터) 목록: — 기존 세력: JSON만 출력: {\"factions」",
-   "num": {
-    "글자": 322
-   },
-   "text": "src/main/0445-factions.js factionAI 「적(몬스터) 목록: — 기존 세력: JSON만 출력: {\"factions」 322자 (src/main/0445-factions.js:48)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0200-skin-shop.js skinAuto 「세계관: 캐릭터: / 변하지 않는 외형(재작성하지 말 것): 기본 의상(」",
-   "num": {
-    "글자": 283
-   },
-   "text": "src/main/0200-skin-shop.js skinAuto 「세계관: 캐릭터: / 변하지 않는 외형(재작성하지 말 것): 기본 의상(」 283자 (src/main/0200-skin-shop.js:16)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0290-season-rotation.js aiNewPickupChar 「콜라보 : 다른 작품 「」이(가) 이 세계에 찾아온 콜라보 게스트로 만든」",
-   "num": {
-    "글자": 269
-   },
-   "text": "src/main/0290-season-rotation.js aiNewPickupChar 「콜라보 : 다른 작품 「」이(가) 이 세계에 찾아온 콜라보 게스트로 만든」 269자 (src/main/0290-season-rotation.js:16)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「JSON만 출력: {\"opening\":{\"lines\":[],\"prolog」",
-   "num": {
-    "글자": 243
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「JSON만 출력: {\"opening\":{\"lines\":[],\"prolog」 243자 (src/main/0250-story-factory.js:273)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js stageSchema 「[{\"title\":\"\",\"battle\":true,,\"enemies\":[{」",
-   "num": {
-    "글자": 225
-   },
-   "text": "src/main/0250-story-factory.js stageSchema 「[{\"title\":\"\",\"battle\":true,,\"enemies\":[{」 225자 (src/main/0250-story-factory.js:6)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0135-schedule.js spotsAI 「이 세계관에서 와 플레이어가 함께 시간을 보낼 장소 5~7곳을 정하라(전」",
-   "num": {
-    "글자": 223
-   },
-   "text": "src/main/0135-schedule.js spotsAI 「이 세계관에서 와 플레이어가 함께 시간을 보낼 장소 5~7곳을 정하라(전」 223자 (src/main/0135-schedule.js:19)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「JSON만 출력: {\"name\":\"\",\"summary\":\"2~3문장\",\"」",
-   "num": {
-    "글자": 217
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「JSON만 출력: {\"name\":\"\",\"summary\":\"2~3문장\",\"」 217자 (src/main/0510-actions/040-story-and-authoring.js:99)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/090-characters.js handleCharactersAction 「JSON만 출력: {\"lines\":[\"로비 인사 대사 8개(상황을 다양하」",
-   "num": {
-    "글자": 216
-   },
-   "text": "src/main/0510-actions/090-characters.js handleCharactersAction 「JSON만 출력: {\"lines\":[\"로비 인사 대사 8개(상황을 다양하」 216자 (src/main/0510-actions/090-characters.js:19)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drHarmony 「JSON만 출력: {\"kw\":\"장르와 키워드\",\"tone\":\"분위기\",\"」",
-   "num": {
-    "글자": 215
-   },
-   "text": "src/main/0260-new-game-draft.js drHarmony 「JSON만 출력: {\"kw\":\"장르와 키워드\",\"tone\":\"분위기\",\"」 215자 (src/main/0260-new-game-draft.js:171)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js requestUltimateScene 「현재 캐릭터의 궁극기 컷인 장면을 NovelAI 영어 태그 10~16개로」",
-   "num": {
-    "글자": 210
-   },
-   "text": "src/main/0030-character-regen.js requestUltimateScene 「현재 캐릭터의 궁극기 컷인 장면을 NovelAI 영어 태그 10~16개로」 210자 (src/main/0030-character-regen.js:117)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0185-game-rules.js POS_SCHEMA 「\"positions\":[{\"name\":\"포지션 이름(2~4자)\",\"bas」",
-   "num": {
-    "글자": 196
-   },
-   "text": "src/main/0185-game-rules.js POS_SCHEMA 「\"positions\":[{\"name\":\"포지션 이름(2~4자)\",\"bas」 196자 (src/main/0185-game-rules.js:127)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js illustrationScenePreparation 「세계관: 캐릭터: (, ) 프로필: 외모 태그(반복하지 말 것): 의 장」",
-   "num": {
-    "글자": 195
-   },
-   "text": "src/main/0030-character-regen.js illustrationScenePreparation 「세계관: 캐릭터: (, ) 프로필: 외모 태그(반복하지 말 것): 의 장」 195자 (src/main/0030-character-regen.js:142)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0505-construct.js VARIANT_SCHEMA 「\"variants\":[{\"name\":\"바리에이션 기본형 이름(2~6자)\"」",
-   "num": {
-    "글자": 184
-   },
-   "text": "src/main/0505-construct.js VARIANT_SCHEMA 「\"variants\":[{\"name\":\"바리에이션 기본형 이름(2~6자)\"」 184자 (src/main/0505-construct.js:8)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js FACTION_SCHEMA 「[{\"name\":\"\",\"kind\":\"playable|hostile|neu」",
-   "num": {
-    "글자": 182
-   },
-   "text": "src/main/0445-factions.js FACTION_SCHEMA 「[{\"name\":\"\",\"kind\":\"playable|hostile|neu」 182자 (src/main/0445-factions.js:107)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「2차 창작: 원작 「」을(를) 바탕으로 한다. 세계관·세력·용어·인물을 」",
-   "num": {
-    "글자": 176
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「2차 창작: 원작 「」을(를) 바탕으로 한다. 세계관·세력·용어·인물을 」 176자 (src/main/0250-story-factory.js:231)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0185-game-rules.js REACT_SCHEMA 「\"reactions\":[{\"a\":\"속성\",\"b\":\"다른 속성\",\"name」",
-   "num": {
-    "글자": 167
-   },
-   "text": "src/main/0185-game-rules.js REACT_SCHEMA 「\"reactions\":[{\"a\":\"속성\",\"b\":\"다른 속성\",\"name」 167자 (src/main/0185-game-rules.js:13)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js REL_SCHEMA 「\"relations\":[{\"a\":\"인물 이름\",\"b\":\"인물 이름(플레이」",
-   "num": {
-    "글자": 160
-   },
-   "text": "src/main/0450-relations-memory.js REL_SCHEMA 「\"relations\":[{\"a\":\"인물 이름\",\"b\":\"인물 이름(플레이」 160자 (src/main/0450-relations-memory.js:38)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0020-ai-connect.js naiBlocksSeparate 「기존 NovelAI 영어 태그를 세 칸으로 분류하세요. 태그를 추가·삭제」",
-   "num": {
-    "글자": 159
-   },
-   "text": "src/main/0020-ai-connect.js naiBlocksSeparate 「기존 NovelAI 영어 태그를 세 칸으로 분류하세요. 태그를 추가·삭제」 159자 (src/main/0020-ai-connect.js:589)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/060-generation.js v2ResolvePalette 「스킬의 성능·이름을 바꾸지 말고 색상 해석만 보완하세요. 참고 데이터는 」",
-   "num": {
-    "글자": 149
-   },
-   "text": "src/modules/combat/060-generation.js v2ResolvePalette 「스킬의 성능·이름을 바꾸지 말고 색상 해석만 보완하세요. 참고 데이터는 」 149자 (src/modules/combat/060-generation.js:132)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0505-construct.js CON_TERMS_SCHEMA 「\"construct\":\"자원을 넣어 새 동료를 데려오는 메뉴 이름(2~4」",
-   "num": {
-    "글자": 146
-   },
-   "text": "src/main/0505-construct.js CON_TERMS_SCHEMA 「\"construct\":\"자원을 넣어 새 동료를 데려오는 메뉴 이름(2~4」 146자 (src/main/0505-construct.js:7)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js aiEventGen0 「\\n이 이야기는 IF(만약에) 스토리다. 정사와 이어지지 않는 평행 세계」",
-   "num": {
-    "글자": 145
-   },
-   "text": "src/main/0250-story-factory.js aiEventGen0 「\\n이 이야기는 IF(만약에) 스토리다. 정사와 이어지지 않는 평행 세계」 145자 (src/main/0250-story-factory.js:159)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js NPC_SCHEMA 「\"newNpcs\":[{\"name\":\"\",\"role\":\"한 단어\",\"pro」",
-   "num": {
-    "글자": 135
-   },
-   "text": "src/main/0250-story-factory.js NPC_SCHEMA 「\"newNpcs\":[{\"name\":\"\",\"role\":\"한 단어\",\"pro」 135자 (src/main/0250-story-factory.js:2)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxDiscover 「JSON만 출력: {\"entries\":[{\"cat\":\"place|term」",
-   "num": {
-    "글자": 134
-   },
-   "text": "src/main/0300-codex.js cxDiscover 「JSON만 출력: {\"entries\":[{\"cat\":\"place|term」 134자 (src/main/0300-codex.js:77)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js BESTIARY_SCHEMA 「\"bestiary\":[{\"name\":\"이 이야기에 새로 나온 적 이름 그」",
-   "num": {
-    "글자": 129
-   },
-   "text": "src/main/0445-factions.js BESTIARY_SCHEMA 「\"bestiary\":[{\"name\":\"이 이야기에 새로 나온 적 이름 그」 129자 (src/main/0445-factions.js:108)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0455-persona.js personaAIReview 「JSON만 출력: {\"score\":0~100,\"strengths\":[\"2」",
-   "num": {
-    "글자": 108
-   },
-   "text": "src/main/0455-persona.js personaAIReview 「JSON만 출력: {\"score\":0~100,\"strengths\":[\"2」 108자 (src/main/0455-persona.js:53)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js writeStages 「【스토리 참조: 스테이지 집필】이야기 제목: 한 줄 줄거리: 전체 구성:」",
-   "num": {
-    "글자": 106
-   },
-   "text": "src/main/0250-story-factory.js writeStages 「【스토리 참조: 스테이지 집필】이야기 제목: 한 줄 줄거리: 전체 구성:」 106자 (src/main/0250-story-factory.js:74)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0487-formation-sortie.js ROUTE_SCHEMA 「\"route\":{\"n1\":\"첫 교전 지점 이름\",\"fork\":\"갈림길 상」",
-   "num": {
-    "글자": 103
-   },
-   "text": "src/main/0487-formation-sortie.js ROUTE_SCHEMA 「\"route\":{\"n1\":\"첫 교전 지점 이름\",\"fork\":\"갈림길 상」 103자 (src/main/0487-formation-sortie.js:27)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drFillChar 「JSON만 출력: {\"name\":\"\",\"role\":\"한 줄 소개\",\"pr」",
-   "num": {
-    "글자": 102
-   },
-   "text": "src/main/0260-new-game-draft.js drFillChar 「JSON만 출력: {\"name\":\"\",\"role\":\"한 줄 소개\",\"pr」 102자 (src/main/0260-new-game-draft.js:181)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js regenRun 「다음 참고 데이터의 선택한 항목만 다시 작성하세요. 선택하지 않은 항목,」",
-   "num": {
-    "글자": 92
-   },
-   "text": "src/main/0030-character-regen.js regenRun 「다음 참고 데이터의 선택한 항목만 다시 작성하세요. 선택하지 않은 항목,」 92자 (src/main/0030-character-regen.js:49)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drPolishHero 「JSON만 출력: {\"call\":\"호칭(2~4자)\",\"name\":\"이름(」",
-   "num": {
-    "글자": 85
-   },
-   "text": "src/main/0260-new-game-draft.js drPolishHero 「JSON만 출력: {\"call\":\"호칭(2~4자)\",\"name\":\"이름(」 85자 (src/main/0260-new-game-draft.js:165)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/090-characters.js handleCharactersAction 「JSON만 출력: {\"lines\":[\"새 로비 인사 대사 ~개\"],\"he」",
-   "num": {
-    "글자": 84
-   },
-   "text": "src/main/0510-actions/090-characters.js handleCharactersAction 「JSON만 출력: {\"lines\":[\"새 로비 인사 대사 ~개\"],\"he」 84자 (src/main/0510-actions/090-characters.js:22)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0530-story-memory.js storyWrapUp 「JSON만 출력: {,\"threads\":[{\"char\":\"인물 이름\",\"」",
-   "num": {
-    "글자": 83
-   },
-   "text": "src/main/0530-story-memory.js storyWrapUp 「JSON만 출력: {,\"threads\":[{\"char\":\"인물 이름\",\"」 83자 (src/main/0530-story-memory.js:27)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js weaponPromptAI 「JSON만 출력: {\"weapons\":[{\"name\":\"캐릭터 이름\",\"」",
-   "num": {
-    "글자": 81
-   },
-   "text": "src/main/0030-character-regen.js weaponPromptAI 「JSON만 출력: {\"weapons\":[{\"name\":\"캐릭터 이름\",\"」 81자 (src/main/0030-character-regen.js:169)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js charSchema 「\"hp\":800~3000(방어형은2280~2820),\"atk\":80~18」",
-   "num": {
-    "글자": 81
-   },
-   "text": "src/main/0450-relations-memory.js charSchema 「\"hp\":800~3000(방어형은2280~2820),\"atk\":80~18」 81자 (src/main/0450-relations-memory.js:91)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「작가가 직접 쓴 설정(적힌 내용·고유명사·인물을 그대로 살리고, 비어 있」",
-   "num": {
-    "글자": 80
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「작가가 직접 쓴 설정(적힌 내용·고유명사·인물을 그대로 살리고, 비어 있」 80자 (src/main/0250-story-factory.js:228)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「이미 그림이 있는 배경()과 소품()은 이름 그대로 backgrounds」",
-   "num": {
-    "글자": 80
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「이미 그림이 있는 배경()과 소품()은 이름 그대로 backgrounds」 80자 (src/main/0250-story-factory.js:271)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js aiChapterGen0 「,\"threads\":[{\"char\":\" 이름\",\"title\":\"\",\"af」",
-   "num": {
-    "글자": 79
-   },
-   "text": "src/main/0250-story-factory.js aiChapterGen0 「,\"threads\":[{\"char\":\" 이름\",\"title\":\"\",\"af」 79자 (src/main/0250-story-factory.js:134)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/060-generation.js v2GenerateSelected 「세대 기준 배로 너무 강합니다. 기존 이름과 컨셉은 유지하고 power와」",
-   "num": {
-    "글자": 79
-   },
-   "text": "src/modules/combat/060-generation.js v2GenerateSelected 「세대 기준 배로 너무 강합니다. 기존 이름과 컨셉은 유지하고 power와」 79자 (src/modules/combat/060-generation.js:193)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js aiEventGen0 「,\"threads\":[{\"char\":\"\",\"title\":\"\",\"after」",
-   "num": {
-    "글자": 76
-   },
-   "text": "src/main/0250-story-factory.js aiEventGen0 「,\"threads\":[{\"char\":\"\",\"title\":\"\",\"after」 76자 (src/main/0250-story-factory.js:166)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0330-casting.js autoNpcs 「JSON만 출력: {\"npcs\":[{\"name\":\"\",\"role\":\"한 」",
-   "num": {
-    "글자": 76
-   },
-   "text": "src/main/0330-casting.js autoNpcs 「JSON만 출력: {\"npcs\":[{\"name\":\"\",\"role\":\"한 」 76자 (src/main/0330-casting.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0020-ai-connect.js aiOne 「\\n\\n다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안」",
-   "num": {
-    "글자": 75
-   },
-   "text": "src/main/0020-ai-connect.js aiOne 「\\n\\n다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안」 75자 (src/main/0020-ai-connect.js:216)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcSend 「JSON만 출력: {\"replies\":[\"말풍선1\",\"말풍선2\"],\"af」",
-   "num": {
-    "글자": 72
-   },
-   "text": "src/main/0160-free-chat.js fcSend 「JSON만 출력: {\"replies\":[\"말풍선1\",\"말풍선2\"],\"af」 72자 (src/main/0160-free-chat.js:47)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/110-economy.js handleEconomyAction 「JSON만 출력: {\"hello\":[\"인사 5개\"],\"buy\":[\"구매 」",
-   "num": {
-    "글자": 71
-   },
-   "text": "src/main/0510-actions/110-economy.js handleEconomyAction 「JSON만 출력: {\"hello\":[\"인사 5개\"],\"buy\":[\"구매 」 71자 (src/main/0510-actions/110-economy.js:35)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js stageSchema 「\"beats\":[\"장면 5~9개. 장면마다 장소, 나오는 인물, 일어나는」",
-   "num": {
-    "글자": 71
-   },
-   "text": "src/main/0250-story-factory.js stageSchema 「\"beats\":[\"장면 5~9개. 장면마다 장소, 나오는 인물, 일어나는」 71자 (src/main/0250-story-factory.js:6)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「플레이어가 직접 짠 스토리(이 줄거리를 그대로 따른다. 인물 이름·설정·」",
-   "num": {
-    "글자": 71
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「플레이어가 직접 짠 스토리(이 줄거리를 그대로 따른다. 인물 이름·설정·」 71자 (src/main/0250-story-factory.js:230)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js aiEventGen0 「이 이야기는 이격 「」만의 외전이다. 여기서 생긴 일은 「」의 기록에만 」",
-   "num": {
-    "글자": 70
-   },
-   "text": "src/main/0250-story-factory.js aiEventGen0 「이 이야기는 이격 「」만의 외전이다. 여기서 생긴 일은 「」의 기록에만 」 70자 (src/main/0250-story-factory.js:159)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0280-live-ops.js dailyTalks 「JSON만 출력: {\"threads\":[{\"char\":\"이름\",\"titl」",
-   "num": {
-    "글자": 69
-   },
-   "text": "src/main/0280-live-ops.js dailyTalks 「JSON만 출력: {\"threads\":[{\"char\":\"이름\",\"titl」 69자 (src/main/0280-live-ops.js:33)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0455-persona.js talkAffGen 「JSON만 출력: {\"threads\":[{\"lv\":,\"title\":\"알림」",
-   "num": {
-    "글자": 67
-   },
-   "text": "src/main/0455-persona.js talkAffGen 「JSON만 출력: {\"threads\":[{\"lv\":,\"title\":\"알림」 67자 (src/main/0455-persona.js:57)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0185-game-rules.js rulesAIData 「JSON만 출력: {\"elems\":[],\"roles\":{\"atk\":\"설명」",
-   "num": {
-    "글자": 65
-   },
-   "text": "src/main/0185-game-rules.js rulesAIData 「JSON만 출력: {\"elems\":[],\"roles\":{\"atk\":\"설명」 65자 (src/main/0185-game-rules.js:121)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js designAI 「JSON만 출력: {\"all\":\"\",\"factions\":[{\"name\":」",
-   "num": {
-    "글자": 64
-   },
-   "text": "src/main/0030-character-regen.js designAI 「JSON만 출력: {\"all\":\"\",\"factions\":[{\"name\":」 64자 (src/main/0030-character-regen.js:162)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0530-story-memory.js smExtract 「JSON만 출력: {\"text\":\"상세 기억\",\"brief\":\"짧은 기억」",
-   "num": {
-    "글자": 64
-   },
-   "text": "src/main/0530-story-memory.js smExtract 「JSON만 출력: {\"text\":\"상세 기억\",\"brief\":\"짧은 기억」 64자 (src/main/0530-story-memory.js:26)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js illustrationScenePreparation 「를 끝까지 해서 플레이어와 가장 가까워진 순간을 담은 특별 일러스트. 감」",
-   "num": {
-    "글자": 64
-   },
-   "text": "src/main/0030-character-regen.js illustrationScenePreparation 「를 끝까지 해서 플레이어와 가장 가까워진 순간을 담은 특별 일러스트. 감」 64자 (src/main/0030-character-regen.js:141)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0455-persona.js memorialGen 「JSON만 출력: {\"title\":\"메모리얼 제목\",\"script\":\"대」",
-   "num": {
-    "글자": 58
-   },
-   "text": "src/main/0455-persona.js memorialGen 「JSON만 출력: {\"title\":\"메모리얼 제목\",\"script\":\"대」 58자 (src/main/0455-persona.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"prompt\":\"...\",\"acts\":[\"1번 인물」",
-   "num": {
-    "글자": 58
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"prompt\":\"...\",\"acts\":[\"1번 인물」 58자 (src/main/0510-actions/020-navigation-and-tools.js:94)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0270-skin-proposal.js skinLinesAI 「JSON만 출력: {\"lines\":[\"대사 6개\"],\"intro\":\"이 」",
-   "num": {
-    "글자": 56
-   },
-   "text": "src/main/0270-skin-proposal.js skinLinesAI 「JSON만 출력: {\"lines\":[\"대사 6개\"],\"intro\":\"이 」 56자 (src/main/0270-skin-proposal.js:19)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0455-persona.js personaAI 「lines는 이 말투로 다시 쓴 평소 대사 5개. affLines는 호감」",
-   "num": {
-    "글자": 56
-   },
-   "text": "src/main/0455-persona.js personaAI 「lines는 이 말투로 다시 쓴 평소 대사 5개. affLines는 호감」 56자 (src/main/0455-persona.js:46)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/100-images-and-assets.js handleImagesAndAssetsAction 「JSON만 출력: {\"lines\":[\"대사 6개\"],\"intro\":\"이 」",
-   "num": {
-    "글자": 56
-   },
-   "text": "src/main/0510-actions/100-images-and-assets.js handleImagesAndAssetsAction 「JSON만 출력: {\"lines\":[\"대사 6개\"],\"intro\":\"이 」 56자 (src/main/0510-actions/100-images-and-assets.js:92)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「세계관: — JSON만 출력: {\"npcs\":[{\"name\":\"\",\"na」",
-   "num": {
-    "글자": 55
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「세계관: — JSON만 출력: {\"npcs\":[{\"name\":\"\",\"na」 55자 (src/main/0250-story-factory.js:264)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0455-persona.js personaAI 「,\"lines\":[\"5개\"],\"affLines\":{\"3\":[\"\"],\"5\"」",
-   "num": {
-    "글자": 55
-   },
-   "text": "src/main/0455-persona.js personaAI 「,\"lines\":[\"5개\"],\"affLines\":{\"3\":[\"\"],\"5\"」 55자 (src/main/0455-persona.js:47)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/050-settings-and-audio.js handleSettingsAndAudioAction 「JSON만 출력: {\"picks\":[{\"id\":\"후보 id\",\"reaso」",
-   "num": {
-    "글자": 54
-   },
-   "text": "src/main/0510-actions/050-settings-and-audio.js handleSettingsAndAudioAction 「JSON만 출력: {\"picks\":[{\"id\":\"후보 id\",\"reaso」 54자 (src/main/0510-actions/050-settings-and-audio.js:66)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「게임 \"\". 세계관 \"\": : 배경 목록: 소품 목록: 음악 목록: 효과」",
-   "num": {
-    "글자": 53
-   },
-   "text": "src/main/0440-ai-context.js ctx 「게임 \"\". 세계관 \"\": : 배경 목록: 소품 목록: 음악 목록: 효과」 53자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0020-ai-connect.js naiBlocksSeparate 「\\nJSON만 출력: {\"appearance\":\"\",\"outfit\":\"\"」",
-   "num": {
-    "글자": 52
-   },
-   "text": "src/main/0020-ai-connect.js naiBlocksSeparate 「\\nJSON만 출력: {\"appearance\":\"\",\"outfit\":\"\"」 52자 (src/main/0020-ai-connect.js:589)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0135-schedule.js spotTalkAI 「JSON만 출력: {\"scenes\":[{\"spot\":\"장소 이름\",\"sc」",
-   "num": {
-    "글자": 51
-   },
-   "text": "src/main/0135-schedule.js spotTalkAI 「JSON만 출력: {\"scenes\":[{\"spot\":\"장소 이름\",\"sc」 51자 (src/main/0135-schedule.js:23)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0530-story-memory.js smCodex 「\\n이번 장과 관련된 도감 기록(출처: 도감, 작가 확정 규칙과 충돌하면」",
-   "num": {
-    "글자": 50
-   },
-   "text": "src/main/0530-story-memory.js smCodex 「\\n이번 장과 관련된 도감 기록(출처: 도감, 작가 확정 규칙과 충돌하면」 50자 (src/main/0530-story-memory.js:14)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「JSON만 출력: {\"title\":\"대화방 미리보기 제목\",\"script」",
-   "num": {
-    "글자": 47
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「JSON만 출력: {\"title\":\"대화방 미리보기 제목\",\"script」 47자 (src/main/0510-actions/040-story-and-authoring.js:73)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/120-messenger.js handleMessengerAction 「JSON만 출력: {\"title\":\"대화방 미리보기 제목\",\"script」",
-   "num": {
-    "글자": 47
-   },
-   "text": "src/main/0510-actions/120-messenger.js handleMessengerAction 「JSON만 출력: {\"title\":\"대화방 미리보기 제목\",\"script」 47자 (src/main/0510-actions/120-messenger.js:24)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js illustrationScenePreparation 「로비와 타이틀·픽업 화면에 쓸 대표 일러스트. 캐릭터의 개성과 세계관이 」",
-   "num": {
-    "글자": 47
-   },
-   "text": "src/main/0030-character-regen.js illustrationScenePreparation 「로비와 타이틀·픽업 화면에 쓸 대표 일러스트. 캐릭터의 개성과 세계관이 」 47자 (src/main/0030-character-regen.js:141)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「tactical, fantasy, neon, pastel, noir 중 」",
-   "num": {
-    "글자": 46
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「tactical, fantasy, neon, pastel, noir 중 」 46자 (src/main/0250-story-factory.js:239)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js ensureLibPrompts 「JSON만 출력: {\"items\":[{\"name\":\"\",\"prompt\":」",
-   "num": {
-    "글자": 45
-   },
-   "text": "src/main/0250-story-factory.js ensureLibPrompts 「JSON만 출력: {\"items\":[{\"name\":\"\",\"prompt\":」 45자 (src/main/0250-story-factory.js:95)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「세계관: 플롯: 세력: 세력: JSON만 출력: {\"chars\":[, .」",
-   "num": {
-    "글자": 45
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「세계관: 플롯: 세력: 세력: JSON만 출력: {\"chars\":[, .」 45자 (src/main/0250-story-factory.js:251)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0275-expedition.js EXPEDITION_SCHEMA 「\",\"expeditionNames\":{\"fame\":\"\",\"jobs\":[\"」",
-   "num": {
-    "글자": 43
-   },
-   "text": "src/main/0275-expedition.js EXPEDITION_SCHEMA 「\",\"expeditionNames\":{\"fame\":\"\",\"jobs\":[\"」 43자 (src/main/0275-expedition.js:6)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js aiChapterGen0 「각 스테이지 pre는 줄, post는 줄. 스테이지마다 선택지 1개 이상」",
-   "num": {
-    "글자": 42
-   },
-   "text": "src/main/0250-story-factory.js aiChapterGen0 「각 스테이지 pre는 줄, post는 줄. 스테이지마다 선택지 1개 이상」 42자 (src/main/0250-story-factory.js:134)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「세계관: 세력: 다른 : JSON만 출력: {\"chars\":[, ...]」",
-   "num": {
-    "글자": 42
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「세계관: 세력: 다른 : JSON만 출력: {\"chars\":[, ...]」 42자 (src/main/0250-story-factory.js:258)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「규칙: 등장인물은 모두 성인이다. 서브컬처 수집형 RPG. 한국어로 쓴다」",
-   "num": {
-    "글자": 42
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「규칙: 등장인물은 모두 성인이다. 서브컬처 수집형 RPG. 한국어로 쓴다」 42자 (src/main/0250-story-factory.js:238)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcSend 「,\"photo\":\"사진을 보낼 때만, 장면 태그. 안 보내면 빈 문자열\"」",
-   "num": {
-    "글자": 40
-   },
-   "text": "src/main/0160-free-chat.js fcSend 「,\"photo\":\"사진을 보낼 때만, 장면 태그. 안 보내면 빈 문자열\"」 40자 (src/main/0160-free-chat.js:47)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0290-season-rotation.js aiNewPickupChar 「지금 세계관과 이야기 흐름에 어울리는 새 얼굴. 기존 인물과 다른 매력」",
-   "num": {
-    "글자": 39
-   },
-   "text": "src/main/0290-season-rotation.js aiNewPickupChar 「지금 세계관과 이야기 흐름에 어울리는 새 얼굴. 기존 인물과 다른 매력」 39자 (src/main/0290-season-rotation.js:17)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"lines\":[],\"prologue\":\"대본\"}」",
-   "num": {
-    "글자": 38
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"lines\":[],\"prologue\":\"대본\"}」 38자 (src/main/0510-actions/020-navigation-and-tools.js:86)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「JSON만 출력: {\"title\":\"제목\",\"script\":\"대본\"}」",
-   "num": {
-    "글자": 38
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「JSON만 출력: {\"title\":\"제목\",\"script\":\"대본\"}」 38자 (src/main/0510-actions/040-story-and-authoring.js:64)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「. (구분: ) 성격·과거·관계: 말투: 외모:」",
-   "num": {
-    "글자": 36
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「. (구분: ) 성격·과거·관계: 말투: 외모:」 36자 (src/main/0260-new-game-draft.js:57)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0462-direction.js directScript 「JSON만 출력: {\"script\":\"연출을 더한 대본 전체\"}」",
-   "num": {
-    "글자": 35
-   },
-   "text": "src/main/0462-direction.js directScript 「JSON만 출력: {\"script\":\"연출을 더한 대본 전체\"}」 35자 (src/main/0462-direction.js:61)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「아직 밝히지 말 진실(이번 장에서는 숨기고 어긋나지 않게만):」",
-   "num": {
-    "글자": 35
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「아직 밝히지 말 진실(이번 장에서는 숨기고 어긋나지 않게만):」 35자 (src/main/0465-story-plan.js:17)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"outfit\":\"\",\"other\":\"\"}」",
-   "num": {
-    "글자": 34
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"outfit\":\"\",\"other\":\"\"}」 34자 (src/main/0510-actions/020-navigation-and-tools.js:133)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「\\n공유 보관함 배경(이 이름을 쓰면 그림을 바로 재사용):」",
-   "num": {
-    "글자": 34
-   },
-   "text": "src/main/0440-ai-context.js ctx 「\\n공유 보관함 배경(이 이름을 쓰면 그림을 바로 재사용):」 34자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「【시나리오 설계 — 작가 전용, 대사로 그대로 말하지 않는다】」",
-   "num": {
-    "글자": 34
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「【시나리오 설계 — 작가 전용, 대사로 그대로 말하지 않는다】」 34자 (src/main/0465-story-plan.js:12)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/090-characters.js handleCharactersAction 「JSON만 출력: {\"looks\":{\"적 이름\":\"태그\"}}」",
-   "num": {
-    "글자": 33
-   },
-   "text": "src/main/0510-actions/090-characters.js handleCharactersAction 「JSON만 출력: {\"looks\":{\"적 이름\":\"태그\"}}」 33자 (src/main/0510-actions/090-characters.js:40)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/090-characters.js handleCharactersAction 「JSON만 출력: {\"looks\":{\"적 이름\":\"태그\"}}」 #2",
-   "num": {
-    "글자": 33
-   },
-   "text": "src/main/0510-actions/090-characters.js handleCharactersAction 「JSON만 출력: {\"looks\":{\"적 이름\":\"태그\"}}」 #2 33자 (src/main/0510-actions/090-characters.js:43)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0488-stage-modes.js FINALE_SCHEMA 「\"finale\":\"battle|contest|debate\"」",
-   "num": {
-    "글자": 32
-   },
-   "text": "src/main/0488-stage-modes.js FINALE_SCHEMA 「\"finale\":\"battle|contest|debate\"」 32자 (src/main/0488-stage-modes.js:12)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/120-messenger.js handleMessengerAction 「요청: 지금 이 캐릭터가 보낼 법한 일상적인 메신저 대화」",
-   "num": {
-    "글자": 31
-   },
-   "text": "src/main/0510-actions/120-messenger.js handleMessengerAction 「요청: 지금 이 캐릭터가 보낼 법한 일상적인 메신저 대화」 31자 (src/main/0510-actions/120-messenger.js:24)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「[주인공]호칭: 이름: 성별·성 정체성: 외모: 설정:」",
-   "num": {
-    "글자": 31
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「[주인공]호칭: 이름: 성별·성 정체성: 외모: 설정:」 31자 (src/main/0260-new-game-draft.js:58)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「JSON만 출력: {\"pre\":\"\",\"post\":\"\"}」",
-   "num": {
-    "글자": 30
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「JSON만 출력: {\"pre\":\"\",\"post\":\"\"}」 30자 (src/main/0510-actions/040-story-and-authoring.js:89)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drPolish 「JSON만 출력: {\"text\":\"다듬은 전체 글\"}」",
-   "num": {
-    "글자": 29
-   },
-   "text": "src/main/0260-new-game-draft.js drPolish 「JSON만 출력: {\"text\":\"다듬은 전체 글\"}」 29자 (src/main/0260-new-game-draft.js:162)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/050-settings-and-audio.js handleSettingsAndAudioAction 「JSON만 출력: {\"queries\":[\"...\"]}」",
-   "num": {
-    "글자": 29
-   },
-   "text": "src/main/0510-actions/050-settings-and-audio.js handleSettingsAndAudioAction 「JSON만 출력: {\"queries\":[\"...\"]}」 29자 (src/main/0510-actions/050-settings-and-audio.js:59)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/090-characters.js handleCharactersAction 「JSON만 출력: {\"naiPrompt\":\"...\"}」",
-   "num": {
-    "글자": 29
-   },
-   "text": "src/main/0510-actions/090-characters.js handleCharactersAction 「JSON만 출력: {\"naiPrompt\":\"...\"}」 29자 (src/main/0510-actions/090-characters.js:17)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0535-content-audit.js auditAIFill 「「」(, ). 프로필: 지금 값:JSON만 출력:」",
-   "num": {
-    "글자": 29
-   },
-   "text": "src/main/0535-content-audit.js auditAIFill 「「」(, ). 프로필: 지금 값:JSON만 출력:」 29자 (src/main/0535-content-audit.js:59)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「세력(설정을 지키고, 관계 변화는 정해진 장에서만):」",
-   "num": {
-    "글자": 29
-   },
-   "text": "src/main/0445-factions.js factionCtx 「세력(설정을 지키고, 관계 변화는 정해진 장에서만):」 29자 (src/main/0445-factions.js:34)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「[주인공(플레이어)]호칭: / 이름: / 성별:」",
-   "num": {
-    "글자": 29
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「[주인공(플레이어)]호칭: / 이름: / 성별:」 29자 (src/main/0260-new-game-draft.js:157)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0040-sound.js jaBatch 「JSON만 출력: {\"ja\":[\"옮긴 대사 개\"]}」",
-   "num": {
-    "글자": 28
-   },
-   "text": "src/main/0040-sound.js jaBatch 「JSON만 출력: {\"ja\":[\"옮긴 대사 개\"]}」 28자 (src/main/0040-sound.js:78)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/050-bridge.js v2ConceptPrompt 「JSON만 출력: {\"prompt\":\"영어 태그\"}」",
-   "num": {
-    "글자": 28
-   },
-   "text": "src/modules/combat/050-bridge.js v2ConceptPrompt 「JSON만 출력: {\"prompt\":\"영어 태그\"}」 28자 (src/modules/combat/050-bridge.js:361)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxDeepen 「JSON만 출력: {\"text\":\"덧붙일 내용\"}」",
-   "num": {
-    "글자": 27
-   },
-   "text": "src/main/0300-codex.js cxDeepen 「JSON만 출력: {\"text\":\"덧붙일 내용\"}」 27자 (src/main/0300-codex.js:85)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0530-story-memory.js smExtract 「JSON만 출력: {\"text\":\"기록\"}[대본]」",
-   "num": {
-    "글자": 27
-   },
-   "text": "src/main/0530-story-memory.js smExtract 「JSON만 출력: {\"text\":\"기록\"}[대본]」 27자 (src/main/0530-story-memory.js:24)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcSummarize 「JSON만 출력: {\"summary\":\"요약\"}」",
-   "num": {
-    "글자": 26
-   },
-   "text": "src/main/0160-free-chat.js fcSummarize 「JSON만 출력: {\"summary\":\"요약\"}」 26자 (src/main/0160-free-chat.js:68)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「주인공(플레이어): 이름 , 성별·성 정체성 .」",
-   "num": {
-    "글자": 26
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「주인공(플레이어): 이름 , 성별·성 정체성 .」 26자 (src/main/0250-story-factory.js:239)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"prompt\":\"...\"}」",
-   "num": {
-    "글자": 26
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"prompt\":\"...\"}」 26자 (src/main/0510-actions/020-navigation-and-tools.js:96)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"prompt\":\"...\"}」 #2",
-   "num": {
-    "글자": 26
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"prompt\":\"...\"}」 #2 26자 (src/main/0510-actions/020-navigation-and-tools.js:97)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"prompt\":\"...\"}」 #3",
-   "num": {
-    "글자": 26
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「JSON만 출력: {\"prompt\":\"...\"}」 #3 26자 (src/main/0510-actions/020-navigation-and-tools.js:98)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/100-images-and-assets.js handleImagesAndAssetsAction 「JSON만 출력: {\"naiPrompt\":\"\"}」",
-   "num": {
-    "글자": 26
-   },
-   "text": "src/main/0510-actions/100-images-and-assets.js handleImagesAndAssetsAction 「JSON만 출력: {\"naiPrompt\":\"\"}」 26자 (src/main/0510-actions/100-images-and-assets.js:29)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0040-sound.js toJa 「JSON만 출력: {\"ja\":\"일본어 대사\"}」",
-   "num": {
-    "글자": 25
-   },
-   "text": "src/main/0040-sound.js toJa 「JSON만 출력: {\"ja\":\"일본어 대사\"}」 25자 (src/main/0040-sound.js:82)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js charSchema 「\"power\":0.8~3.0,\"cd\":2~4,」",
-   "num": {
-    "글자": 25
-   },
-   "text": "src/main/0450-relations-memory.js charSchema 「\"power\":0.8~3.0,\"cd\":2~4,」 25자 (src/main/0450-relations-memory.js:91)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「플레이어가 고른 분기(이후 이야기에 반영):」",
-   "num": {
-    "글자": 25
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「플레이어가 고른 분기(이후 이야기에 반영):」 25자 (src/main/0465-story-plan.js:18)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js heroTags 「JSON만 출력: {\"tags\":\"...\"}」",
-   "num": {
-    "글자": 24
-   },
-   "text": "src/main/0160-free-chat.js heroTags 「JSON만 출력: {\"tags\":\"...\"}」 24자 (src/main/0160-free-chat.js:21)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js relSeedAI 「이미 있는 관계 기록:JSON만 출력: {}」",
-   "num": {
-    "글자": 24
-   },
-   "text": "src/main/0450-relations-memory.js relSeedAI 「이미 있는 관계 기록:JSON만 출력: {}」 24자 (src/main/0450-relations-memory.js:65)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0488-stage-modes.js stageWhat 「— 전투 전(pre)과 전투 후(post)」",
-   "num": {
-    "글자": 24
-   },
-   "text": "src/main/0488-stage-modes.js stageWhat 「— 전투 전(pre)과 전투 후(post)」 24자 (src/main/0488-stage-modes.js:18)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「· 장부터 예정(, 아직 드러내지 않음)」",
-   "num": {
-    "글자": 24
-   },
-   "text": "src/main/0445-factions.js factionCtx 「· 장부터 예정(, 아직 드러내지 않음)」 24자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/110-economy.js handleEconomyAction 「이 인물은 이고 프로필은 다음과 같다:」",
-   "num": {
-    "글자": 23
-   },
-   "text": "src/main/0510-actions/110-economy.js handleEconomyAction 「이 인물은 이고 프로필은 다음과 같다:」 23자 (src/main/0510-actions/110-economy.js:35)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「캐릭터 아크(이번 장에서 조금씩 진행):」",
-   "num": {
-    "글자": 23
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「캐릭터 아크(이번 장에서 조금씩 진행):」 23자 (src/main/0465-story-plan.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0535-content-audit.js auditAIStage 「JSON만 출력: {\"pre\":\"대본\"}」",
-   "num": {
-    "글자": 22
-   },
-   "text": "src/main/0535-content-audit.js auditAIStage 「JSON만 출력: {\"pre\":\"대본\"}」 22자 (src/main/0535-content-audit.js:68)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js castPlanData 「등장 계획 — 처음부터 함께하는 동료:」",
-   "num": {
-    "글자": 22
-   },
-   "text": "src/main/0445-factions.js castPlanData 「등장 계획 — 처음부터 함께하는 동료:」 22자 (src/main/0445-factions.js:111)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxProgressText 「플레이어는 아직 스토리를 시작하지 않았다」",
-   "num": {
-    "글자": 22
-   },
-   "text": "src/main/0300-codex.js cxProgressText 「플레이어는 아직 스토리를 시작하지 않았다」 22자 (src/main/0300-codex.js:74)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「메인 플롯(작가용 비밀 설정 포함):」",
-   "num": {
-    "글자": 21
-   },
-   "text": "src/main/0440-ai-context.js ctx 「메인 플롯(작가용 비밀 설정 포함):」 21자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「(, , 속성 , 말투 예: \"\")」",
-   "num": {
-    "글자": 20
-   },
-   "text": "src/main/0440-ai-context.js ctx 「(, , 속성 , 말투 예: \"\")」 20자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js newcRule 「newCharacters는 빈 배열.」",
-   "num": {
-    "글자": 20
-   },
-   "text": "src/main/0250-story-factory.js newcRule 「newCharacters는 빈 배열.」 20자 (src/main/0250-story-factory.js:4)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcSend 「이 캐릭터가 이미 털어놓은 비밀:」",
-   "num": {
-    "글자": 19
-   },
-   "text": "src/main/0160-free-chat.js fcSend 「이 캐릭터가 이미 털어놓은 비밀:」 19자 (src/main/0160-free-chat.js:47)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0455-persona.js PROFILE_TPL_SCHEMA 「\"profileTemplate\":\"」",
-   "num": {
-    "글자": 19
-   },
-   "text": "src/main/0455-persona.js PROFILE_TPL_SCHEMA 「\"profileTemplate\":\"」 19자 (src/main/0455-persona.js:10)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js castPlanData 「/ 1장에서 처음 만나는 인물:」",
-   "num": {
-    "글자": 19
-   },
-   "text": "src/main/0445-factions.js castPlanData 「/ 1장에서 처음 만나는 인물:」 19자 (src/main/0445-factions.js:111)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxProgressText 「플레이어가 지금까지 깬 스테이지:」",
-   "num": {
-    "글자": 19
-   },
-   "text": "src/main/0300-codex.js cxProgressText 「플레이어가 지금까지 깬 스테이지:」 19자 (src/main/0300-codex.js:74)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「[설정: 세력·용어·규칙·비밀]\\n」",
-   "num": {
-    "글자": 19
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「[설정: 세력·용어·규칙·비밀]\\n」 19자 (src/main/0260-new-game-draft.js:153)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「[설정: 세력·용어·규칙·비밀]\\n」",
-   "num": {
-    "글자": 19
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「[설정: 세력·용어·규칙·비밀]\\n」 19자 (src/main/0260-new-game-draft.js:54)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「- [ · 지금 플레이어와 ]:」",
-   "num": {
-    "글자": 19
-   },
-   "text": "src/main/0445-factions.js factionCtx 「- [ · 지금 플레이어와 ]:」 19자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「공격력 배율 (피해의 30% 회복)」",
-   "num": {
-    "글자": 19
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「공격력 배율 (피해의 30% 회복)」 19자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「{\"debut\":\"start|1~」",
-   "num": {
-    "글자": 18
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「{\"debut\":\"start|1~」 18자 (src/main/0250-story-factory.js:251)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js stageSchema 「\"pre\":\"\",\"post\":\"\"」",
-   "num": {
-    "글자": 18
-   },
-   "text": "src/main/0250-story-factory.js stageSchema 「\"pre\":\"\",\"post\":\"\"」 18자 (src/main/0250-story-factory.js:6)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drPolish 「게임 설정(세력·용어·규칙·비밀)」",
-   "num": {
-    "글자": 18
-   },
-   "text": "src/main/0260-new-game-draft.js drPolish 「게임 설정(세력·용어·규칙·비밀)」 18자 (src/main/0260-new-game-draft.js:161)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0530-story-memory.js storyMemo 「\\n오래된 장의 미회수 사항:\\n」",
-   "num": {
-    "글자": 18
-   },
-   "text": "src/main/0530-story-memory.js storyMemo 「\\n오래된 장의 미회수 사항:\\n」 18자 (src/main/0530-story-memory.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「(지금은 적으로 나올 수 있음)」",
-   "num": {
-    "글자": 18
-   },
-   "text": "src/main/0445-factions.js factionCtx 「(지금은 적으로 나올 수 있음)」 18자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「작가 설정(세계관 참고용):\\n」",
-   "num": {
-    "글자": 17
-   },
-   "text": "src/main/0440-ai-context.js ctx 「작가 설정(세계관 참고용):\\n」 17자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0488-stage-modes.js stageWhat 「— 전투 없는 이야기 스테이지」",
-   "num": {
-    "글자": 17
-   },
-   "text": "src/main/0488-stage-modes.js stageWhat 「— 전투 없는 이야기 스테이지」 17자 (src/main/0488-stage-modes.js:18)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/050-bridge.js v2SkillText 「개인 SP 100 충전 시 ·」",
-   "num": {
-    "글자": 17
-   },
-   "text": "src/modules/combat/050-bridge.js v2SkillText 「개인 SP 100 충전 시 ·」 17자 (src/modules/combat/050-bridge.js:71)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcProgress 「아직 이야기를 시작하지 않았다」",
-   "num": {
-    "글자": 16
-   },
-   "text": "src/main/0160-free-chat.js fcProgress 「아직 이야기를 시작하지 않았다」 16자 (src/main/0160-free-chat.js:35)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0488-stage-modes.js finaleRule 「이 게임의 finale: .」",
-   "num": {
-    "글자": 16
-   },
-   "text": "src/main/0488-stage-modes.js finaleRule 「이 게임의 finale: .」 16자 (src/main/0488-stage-modes.js:15)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0290-season-rotation.js aiNewPickupChar 「의 인상적인 성인 캐릭터 1명」",
-   "num": {
-    "글자": 16
-   },
-   "text": "src/main/0290-season-rotation.js aiNewPickupChar 「의 인상적인 성인 캐릭터 1명」 16자 (src/main/0290-season-rotation.js:16)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「신뢰, 과거의 일부를 털어놓음」",
-   "num": {
-    "글자": 16
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「신뢰, 과거의 일부를 털어놓음」 16자 (src/main/0510-actions/040-story-and-authoring.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/060-generation.js v2DesignContext 「현재 캐릭터 설정에 맞게 결정」",
-   "num": {
-    "글자": 16
-   },
-   "text": "src/modules/combat/060-generation.js v2DesignContext 「현재 캐릭터 설정에 맞게 결정」 16자 (src/modules/combat/060-generation.js:96)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0280-live-ops.js dailyTalks 「(호감도 Lv., 말투: )」",
-   "num": {
-    "글자": 15
-   },
-   "text": "src/main/0280-live-ops.js dailyTalks 「(호감도 Lv., 말투: )」 15자 (src/main/0280-live-ops.js:33)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js relCtx 「(이번 인물들의 기록 없음)」",
-   "num": {
-    "글자": 15
-   },
-   "text": "src/main/0450-relations-memory.js relCtx 「(이번 인물들의 기록 없음)」 15자 (src/main/0450-relations-memory.js:37)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcSend 「최근 메인 스토리 요약:」",
-   "num": {
-    "글자": 14
-   },
-   "text": "src/main/0160-free-chat.js fcSend 「최근 메인 스토리 요약:」 14자 (src/main/0160-free-chat.js:47)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/050-bridge.js v2GenerateSkills 「직전 실패를 수정하세요:」",
-   "num": {
-    "글자": 14
-   },
-   "text": "src/modules/combat/050-bridge.js v2GenerateSkills 「직전 실패를 수정하세요:」 14자 (src/modules/combat/050-bridge.js:286)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0020-ai-connect.js llmWrap 「\\n\\n[제작자 지침]\\n」",
-   "num": {
-    "글자": 14
-   },
-   "text": "src/main/0020-ai-connect.js llmWrap 「\\n\\n[제작자 지침]\\n」 14자 (src/main/0020-ai-connect.js:352)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0275-expedition.js EXPEDITION_SCHEMA 「\"expedition\":\"」",
-   "num": {
-    "글자": 14
-   },
-   "text": "src/main/0275-expedition.js EXPEDITION_SCHEMA 「\"expedition\":\"」 14자 (src/main/0275-expedition.js:6)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/060-generation.js v2DesignContext 「치유·보호를 담당하는 힐러」",
-   "num": {
-    "글자": 14
-   },
-   "text": "src/modules/combat/060-generation.js v2DesignContext 「치유·보호를 담당하는 힐러」 14자 (src/modules/combat/060-generation.js:96)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/060-generation.js v2SlotPrompt 「직전 실패를 수정하세요:」",
-   "num": {
-    "글자": 14
-   },
-   "text": "src/modules/combat/060-generation.js v2SlotPrompt 「직전 실패를 수정하세요:」 14자 (src/modules/combat/060-generation.js:103)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0010-rules.js genderText 「플레이어()의 외모: .」",
-   "num": {
-    "글자": 14
-   },
-   "text": "src/main/0010-rules.js genderText 「플레이어()의 외모: .」 14자 (src/main/0010-rules.js:4)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js castLockCtx 「첫 등장 장면이 정해짐:」",
-   "num": {
-    "글자": 14
-   },
-   "text": "src/main/0445-factions.js castLockCtx 「첫 등장 장면이 정해짐:」 14자 (src/main/0445-factions.js:38)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「/ 성격·과거·관계:」",
-   "num": {
-    "글자": 13
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「/ 성격·과거·관계:」 13자 (src/main/0250-story-factory.js:251)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js weaponPromptAI 「\\n 지금 프롬프트:」",
-   "num": {
-    "글자": 13
-   },
-   "text": "src/main/0030-character-regen.js weaponPromptAI 「\\n 지금 프롬프트:」 13자 (src/main/0030-character-regen.js:168)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcSend 「(이(가) 사진을 보냄)」",
-   "num": {
-    "글자": 13
-   },
-   "text": "src/main/0160-free-chat.js fcSend 「(이(가) 사진을 보냄)」 13자 (src/main/0160-free-chat.js:46)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcSend 「(이(가) 사진을 보냄)」 #2",
-   "num": {
-    "글자": 13
-   },
-   "text": "src/main/0160-free-chat.js fcSend 「(이(가) 사진을 보냄)」 #2 13자 (src/main/0160-free-chat.js:46)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0530-story-memory.js storyMemo 「\\n최근 정사 외전:\\n」",
-   "num": {
-    "글자": 13
-   },
-   "text": "src/main/0530-story-memory.js storyMemo 「\\n최근 정사 외전:\\n」 13자 (src/main/0530-story-memory.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「호기심과 첫 사적인 대화」",
-   "num": {
-    "글자": 13
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「호기심과 첫 사적인 대화」 13자 (src/main/0510-actions/040-story-and-authoring.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「id= 질문 「」 보기」",
-   "num": {
-    "글자": 13
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「id= 질문 「」 보기」 13자 (src/main/0465-story-plan.js:19)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js castLockCtx 「아직 만나지 않은 —」",
-   "num": {
-    "글자": 13
-   },
-   "text": "src/main/0445-factions.js castLockCtx 「아직 만나지 않은 —」 13자 (src/main/0445-factions.js:38)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「(하면 가 더 공개돼요)」",
-   "num": {
-    "글자": 13
-   },
-   "text": "src/main/0300-codex.js cxEntries 「(하면 가 더 공개돼요)」 13자 (src/main/0300-codex.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0185-game-rules.js rulesPosAI 「JSON만 출력: {}」",
-   "num": {
-    "글자": 12
-   },
-   "text": "src/main/0185-game-rules.js rulesPosAI 「JSON만 출력: {}」 12자 (src/main/0185-game-rules.js:129)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js aiJSON 「\\n스킬 작성 규칙:」",
-   "num": {
-    "글자": 12
-   },
-   "text": "src/main/0450-relations-memory.js aiJSON 「\\n스킬 작성 규칙:」 12자 (src/main/0450-relations-memory.js:98)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「지금은 「」(~장):」",
-   "num": {
-    "글자": 12
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「지금은 「」(~장):」 12자 (src/main/0465-story-plan.js:13)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「\\n\\n알려진 소속:」",
-   "num": {
-    "글자": 12
-   },
-   "text": "src/main/0300-codex.js cxEntries 「\\n\\n알려진 소속:」 12자 (src/main/0300-codex.js:18)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「메인 스토리 진행:」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/main/0440-ai-context.js ctx 「메인 스토리 진행:」 11자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「설렘, 서로를 의식함」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「설렘, 서로를 의식함」 11자 (src/main/0510-actions/040-story-and-authoring.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「과거의 상처와 마주함」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「과거의 상처와 마주함」 11자 (src/main/0510-actions/040-story-and-authoring.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「스테이지 「」 :」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「스테이지 「」 :」 11자 (src/main/0510-actions/040-story-and-authoring.js:88)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js castLockCtx 「정해진 장면 없음:」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/main/0445-factions.js castLockCtx 「정해진 장면 없음:」 11자 (src/main/0445-factions.js:38)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「아군에게 치유의 기운」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「아군에게 치유의 기운」 11자 (src/modules/combat/030-core.js:188)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「아군을 보호하는 축복」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「아군을 보호하는 축복」 11자 (src/modules/combat/030-core.js:189)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「최대 체력 비례 회복」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「최대 체력 비례 회복」 11자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「필살기 대기시간 단축」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「필살기 대기시간 단축」 11자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcSend 「예전 대화 요약:」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0160-free-chat.js fcSend 「예전 대화 요약:」 10자 (src/main/0160-free-chat.js:47)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0020-ai-connect.js llmWrap 「[제작자 지침]\\n」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0020-ai-connect.js llmWrap 「[제작자 지침]\\n」 10자 (src/main/0020-ai-connect.js:352)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js castPlanData 「/ 나중 등장:」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0445-factions.js castPlanData 「/ 나중 등장:」 10자 (src/main/0445-factions.js:111)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drTheme 「2차 창작 원작:」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0260-new-game-draft.js drTheme 「2차 창작 원작:」 10자 (src/main/0260-new-game-draft.js:137)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「단둘이 위기를 넘김」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「단둘이 위기를 넘김」 10자 (src/main/0510-actions/040-story-and-authoring.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「연인 직전의 긴장감」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「연인 직전의 긴장감」 10자 (src/main/0510-actions/040-story-and-authoring.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0020-ai-connect.js llmWrap 「[제작자 지침]\\n」 #2",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0020-ai-connect.js llmWrap 「[제작자 지침]\\n」 #2 10자 (src/main/0020-ai-connect.js:351)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/050-bridge.js v2SkillText 「초 / 안전 대기」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/modules/combat/050-bridge.js v2SkillText 「초 / 안전 대기」 10자 (src/modules/combat/050-bridge.js:71)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「[스토리 개요]\\n」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「[스토리 개요]\\n」 10자 (src/main/0260-new-game-draft.js:154)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「[스토리 개요]\\n」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「[스토리 개요]\\n」 10자 (src/main/0260-new-game-draft.js:55)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「(호칭으로만 부름)」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「(호칭으로만 부름)」 10자 (src/main/0260-new-game-draft.js:58)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js sysDigest 「등장: . 흐름:」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/main/0450-relations-memory.js sysDigest 「등장: . 흐름:」 10자 (src/main/0450-relations-memory.js:54)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「침묵 · 스킬 봉쇄」",
-   "num": {
-    "글자": 10
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「침묵 · 스킬 봉쇄」 10자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0290-season-rotation.js aiNewPickupChar 「원작 설정 그대로」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/main/0290-season-rotation.js aiNewPickupChar 「원작 설정 그대로」 9자 (src/main/0290-season-rotation.js:17)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionAI 「\\n추가 지시:」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/main/0445-factions.js factionAI 「\\n추가 지시:」 9자 (src/main/0445-factions.js:48)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js castPlanData 「(번째 스테이지)」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/main/0445-factions.js castPlanData 「(번째 스테이지)」 9자 (src/main/0445-factions.js:111)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「[다른 인물]\\n」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「[다른 인물]\\n」 9자 (src/main/0260-new-game-draft.js:156)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「다른 세력과:」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/main/0445-factions.js factionCtx 「다른 세력과:」 9자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「저체력 아군 회복」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「저체력 아군 회복」 9자 (src/modules/combat/030-core.js:198)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0530-story-memory.js smCodex 「\\n추가 기록:」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/main/0530-story-memory.js smCodex 「\\n추가 기록:」 9자 (src/main/0530-story-memory.js:14)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「궁극기 SP 회복」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「궁극기 SP 회복」 9자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「초당 공격력 배율」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「초당 공격력 배율」 9자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「초당 공격력 배율」 #2",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「초당 공격력 배율」 #2 9자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「치명타 확률 증가」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「치명타 확률 증가」 9자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「해로운 효과 해제」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「해로운 효과 해제」 9자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「이로운 효과 해제」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「이로운 효과 해제」 9자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「(세계관 호칭)」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「(세계관 호칭)」 8자 (src/main/0250-story-factory.js:239)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js writeStages 「(전투 없음)」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/main/0250-story-factory.js writeStages 「(전투 없음)」 8자 (src/main/0250-story-factory.js:71)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drTheme 「장르·키워드:」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/main/0260-new-game-draft.js drTheme 「장르·키워드:」 8자 (src/main/0260-new-game-draft.js:137)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「일상 속 해프닝」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「일상 속 해프닝」 8자 (src/main/0510-actions/040-story-and-authoring.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「고백과 그 이후」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「고백과 그 이후」 8자 (src/main/0510-actions/040-story-and-authoring.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/050-bridge.js v2SkillText 「· 첫 대기」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/050-bridge.js v2SkillText 「· 첫 대기」 8자 (src/modules/combat/050-bridge.js:71)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js relName 「(지워진 인물)」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/main/0450-relations-memory.js relName 「(지워진 인물)」 8자 (src/main/0450-relations-memory.js:11)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「목표 결말:」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「목표 결말:」 8자 (src/main/0465-story-plan.js:12)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「(AI가 정함)」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「(AI가 정함)」 8자 (src/main/0260-new-game-draft.js:58)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「· AI 기록」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/main/0300-codex.js cxEntries 「· AI 기록」 8자 (src/main/0300-codex.js:27)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「자기 공격 강화」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「자기 공격 강화」 8자 (src/modules/combat/030-core.js:190)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「자기 방어 강화」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「자기 방어 강화」 8자 (src/modules/combat/030-core.js:191)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「단일 연속 공격」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「단일 연속 공격」 8자 (src/modules/combat/030-core.js:193)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「아군 지속 회복」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「아군 지속 회복」 8자 (src/modules/combat/030-core.js:199)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「아군 공격 강화」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「아군 공격 강화」 8자 (src/modules/combat/030-core.js:201)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「아군 SP 지원」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「아군 SP 지원」 8자 (src/modules/combat/030-core.js:202)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「방어 무시 피해」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「방어 무시 피해」 8자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「공격 속도 증가」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「공격 속도 증가」 8자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「공격 속도 감소」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「공격 속도 감소」 8자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「받는 피해 증가」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「받는 피해 증가」 8자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「받는 피해 감소」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「받는 피해 감소」 8자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js regenRun 「이전 실패:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0030-character-regen.js regenRun 「이전 실패:」 7자 (src/main/0030-character-regen.js:49)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcSummarize 「기존 요약:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0160-free-chat.js fcSummarize 「기존 요약:」 7자 (src/main/0160-free-chat.js:68)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0200-skin-shop.js skinAuto 「, 이벤트:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0200-skin-shop.js skinAuto 「, 이벤트:」 7자 (src/main/0200-skin-shop.js:16)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「/ 말투:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「/ 말투:」 7자 (src/main/0250-story-factory.js:251)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「/ 외모:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「/ 외모:」 7자 (src/main/0250-story-factory.js:251)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「/ 말투:」 #2",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「/ 말투:」 #2 7자 (src/main/0250-story-factory.js:258)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「/ 외모:」 #2",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「/ 외모:」 #2 7자 (src/main/0250-story-factory.js:258)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「/ 외모:」 #3",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「/ 외모:」 #3 7자 (src/main/0250-story-factory.js:264)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drHarmony 「(비어 있음)」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drHarmony 「(비어 있음)」 7자 (src/main/0260-new-game-draft.js:171)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drHarmony 「(비어 있음)」 #2",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drHarmony 「(비어 있음)」 #2 7자 (src/main/0260-new-game-draft.js:171)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0290-season-rotation.js aiNewPickupChar 「희귀도는 .」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0290-season-rotation.js aiNewPickupChar 「희귀도는 .」 7자 (src/main/0290-season-rotation.js:17)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0455-persona.js personaAI 「추가 지시:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0455-persona.js personaAI 「추가 지시:」 7자 (src/main/0455-persona.js:45)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planAI 「추가 지시:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0465-story-plan.js planAI 「추가 지시:」 7자 (src/main/0465-story-plan.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「상세 설정:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0440-ai-context.js ctx 「상세 설정:」 7자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「의 외전 모습」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0440-ai-context.js ctx 「의 외전 모습」 7자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drTheme 「게임 이름:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drTheme 「게임 이름:」 7자 (src/main/0260-new-game-draft.js:137)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/050-bridge.js v2SkillText 「최소 재사용」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/modules/combat/050-bridge.js v2SkillText 「최소 재사용」 7자 (src/modules/combat/050-bridge.js:71)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「로그라인:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「로그라인:」 7자 (src/main/0465-story-plan.js:12)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「설계 메모:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「설계 메모:」 7자 (src/main/0465-story-plan.js:21)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「[세계관]\\n」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「[세계관]\\n」 7자 (src/main/0260-new-game-draft.js:152)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「(이름 미정)」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「(이름 미정)」 7자 (src/main/0260-new-game-draft.js:156)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「/ 말투:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「/ 말투:」 7자 (src/main/0260-new-game-draft.js:156)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「/ 외모:」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「/ 외모:」 7자 (src/main/0260-new-game-draft.js:156)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「/ 외모:」 #2",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「/ 외모:」 #2 7자 (src/main/0260-new-game-draft.js:157)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「[세계관]\\n」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「[세계관]\\n」 7자 (src/main/0260-new-game-draft.js:53)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「(이름 미정)」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「(이름 미정)」 7자 (src/main/0260-new-game-draft.js:57)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「(비어 있음)」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「(비어 있음)」 7자 (src/main/0260-new-game-draft.js:57)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「(비어 있음)」 #2",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「(비어 있음)」 #2 7자 (src/main/0260-new-game-draft.js:57)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「(비어 있음)」 #3",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「(비어 있음)」 #3 7자 (src/main/0260-new-game-draft.js:57)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「(비어 있음)」 #4",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「(비어 있음)」 #4 7자 (src/main/0260-new-game-draft.js:58)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「(비어 있음)」 #5",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「(비어 있음)」 #5 7자 (src/main/0260-new-game-draft.js:58)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「최대 체력 %」",
-   "num": {
-    "글자": 7
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「최대 체력 %」 7자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0135-schedule.js spotTalkAI 「· 배경」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0135-schedule.js spotTalkAI 「· 배경」 6자 (src/main/0135-schedule.js:23)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js heroTags 「정하지 않음」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0160-free-chat.js heroTags 「정하지 않음」 6자 (src/main/0160-free-chat.js:21)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js writeStages 「(자유롭게)」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0250-story-factory.js writeStages 「(자유롭게)」 6자 (src/main/0250-story-factory.js:74)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js aiChapterGen0 「주요 등장」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0250-story-factory.js aiChapterGen0 「주요 등장」 6자 (src/main/0250-story-factory.js:134)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「정하지 않음」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「정하지 않음」 6자 (src/main/0250-story-factory.js:239)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「/ 등급」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「/ 등급」 6자 (src/main/0250-story-factory.js:251)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0290-season-rotation.js aiAltChar 「희귀도는 .」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0290-season-rotation.js aiAltChar 「희귀도는 .」 6자 (src/main/0290-season-rotation.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/090-characters.js handleCharactersAction 「(소속:」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0510-actions/090-characters.js handleCharactersAction 「(소속:」 6자 (src/main/0510-actions/090-characters.js:17)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/100-images-and-assets.js handleImagesAndAssetsAction 「\\n설정:」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0510-actions/100-images-and-assets.js handleImagesAndAssetsAction 「\\n설정:」 6자 (src/main/0510-actions/100-images-and-assets.js:29)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drPolish 「게임 세계관」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0260-new-game-draft.js drPolish 「게임 세계관」 6자 (src/main/0260-new-game-draft.js:161)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drPolish 「스토리 개요」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0260-new-game-draft.js drPolish 「스토리 개요」 6자 (src/main/0260-new-game-draft.js:161)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「질투나 오해」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「질투나 오해」 6자 (src/main/0510-actions/040-story-and-authoring.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js relName 「(플레이어)」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0450-relations-memory.js relName 「(플레이어)」 6자 (src/main/0450-relations-memory.js:11)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「(관련:」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「(관련:」 6자 (src/main/0465-story-plan.js:16)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「[테마]\\n」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「[테마]\\n」 6자 (src/main/0260-new-game-draft.js:151)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「정하지 않음」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「정하지 않음」 6자 (src/main/0260-new-game-draft.js:157)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「\\n설정:」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「\\n설정:」 6자 (src/main/0260-new-game-draft.js:157)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「[인물]\\n」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「[인물]\\n」 6자 (src/main/0260-new-game-draft.js:57)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「정하지 않음」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「정하지 않음」 6자 (src/main/0260-new-game-draft.js:58)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「지도자:」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0445-factions.js factionCtx 「지도자:」 6자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0530-story-memory.js smChunks 「[스테이지」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0530-story-memory.js smChunks 「[스테이지」 6자 (src/main/0530-story-memory.js:21)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「자기 보호막」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「자기 보호막」 6자 (src/modules/combat/030-core.js:196)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「아군 보호막」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「아군 보호막」 6자 (src/modules/combat/030-core.js:200)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js relLine 「(최근:」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/main/0450-relations-memory.js relLine 「(최근:」 6자 (src/main/0450-relations-memory.js:28)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「공격력 배율」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「공격력 배율」 6자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「공격력 배율」 #2",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「공격력 배율」 #2 6자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「공격력 배율」 #3",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「공격력 배율」 #3 6자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「공격력 배율」 #4",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「공격력 배율」 #4 6자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「공격력 증가」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「공격력 증가」 6자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「방어력 증가」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「방어력 증가」 6자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「공격력 감소」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「공격력 감소」 6자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「방어력 감소」",
-   "num": {
-    "글자": 6
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「방어력 감소」 6자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0185-game-rules.js rulesAIData 「\" 설명\"」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0185-game-rules.js rulesAIData 「\" 설명\"」 5자 (src/main/0185-game-rules.js:121)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「, 외모」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「, 외모」 5자 (src/main/0250-story-factory.js:239)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「, 설정」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「, 설정」 5자 (src/main/0250-story-factory.js:239)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「개성:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0440-ai-context.js ctx 「개성:」 5자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「표정:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0440-ai-context.js ctx 「표정:」 5자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「말투:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0440-ai-context.js ctx 「말투:」 5자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drTheme 「분위기:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0260-new-game-draft.js drTheme 「분위기:」 5자 (src/main/0260-new-game-draft.js:137)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/110-economy.js handleEconomyAction 「상점 주인」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0510-actions/110-economy.js handleEconomyAction 「상점 주인」 5자 (src/main/0510-actions/110-economy.js:34)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/060-generation.js v2DesignContext 「현재 역할」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/modules/combat/060-generation.js v2DesignContext 「현재 역할」 5자 (src/modules/combat/060-generation.js:96)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0465-story-plan.js planCtx 「주제:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0465-story-plan.js planCtx 「주제:」 5자 (src/main/0465-story-plan.js:12)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「, 등급」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「, 등급」 5자 (src/main/0260-new-game-draft.js:57)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「목적:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0445-factions.js factionCtx 「목적:」 5자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「거점:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0445-factions.js factionCtx 「거점:」 5자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「이념:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0445-factions.js factionCtx 「이념:」 5자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「정체:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0445-factions.js factionCtx 「정체:」 5자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「습성:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0445-factions.js factionCtx 「습성:」 5자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「약점:」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0445-factions.js factionCtx 「약점:」 5자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「· 보스」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0300-codex.js cxEntries 「· 보스」 5자 (src/main/0300-codex.js:24)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「단일 공격」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「단일 공격」 5자 (src/modules/combat/030-core.js:192)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「전체 공격」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「전체 공격」 5자 (src/modules/combat/030-core.js:194)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「지속 피해」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「지속 피해」 5자 (src/modules/combat/030-core.js:195)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「자기 회복」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「자기 회복」 5자 (src/modules/combat/030-core.js:197)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js effectSpec 「고정 수치」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/modules/combat/030-core.js effectSpec 「고정 수치」 5자 (src/modules/combat/030-core.js:39)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js relLine 「아는 사이」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/main/0450-relations-memory.js relLine 「아는 사이」 5자 (src/main/0450-relations-memory.js:28)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「지속 피해」 #2",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「지속 피해」 #2 5자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「지속 회복」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「지속 회복」 5자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「흡혈 공격」",
-   "num": {
-    "글자": 5
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「흡혈 공격」 5자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js aiEventGen0 「주연:」",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0250-story-factory.js aiEventGen0 「주연:」 4자 (src/main/0250-story-factory.js:166)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「요청:」",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「요청:」 4자 (src/main/0510-actions/020-navigation-and-tools.js:86)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「요청:」",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「요청:」 4자 (src/main/0510-actions/040-story-and-authoring.js:64)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「요청:」 #2",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「요청:」 #2 4자 (src/main/0510-actions/040-story-and-authoring.js:73)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/120-messenger.js handleMessengerAction 「요청:」",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0510-actions/120-messenger.js handleMessengerAction 「요청:」 4자 (src/main/0510-actions/120-messenger.js:24)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0010-rules.js elemLine 「에 강함」",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0010-rules.js elemLine 「에 강함」 4자 (src/main/0010-rules.js:14)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「(완료)」",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0440-ai-context.js ctx 「(완료)」 4자 (src/main/0440-ai-context.js:19)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「(미정)」",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「(미정)」 4자 (src/main/0260-new-game-draft.js:157)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drCtx 「(미정)」 #2",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0260-new-game-draft.js drCtx 「(미정)」 #2 4자 (src/main/0260-new-game-draft.js:157)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「소속」",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0445-factions.js factionCtx 「소속」 4자 (src/main/0445-factions.js:32)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「출현:」",
-   "num": {
-    "글자": 4
-   },
-   "text": "src/main/0300-codex.js cxEntries 「출현:」 4자 (src/main/0300-codex.js:24)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0160-free-chat.js fcSend 「무소속」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0160-free-chat.js fcSend 「무소속」 3자 (src/main/0160-free-chat.js:47)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0455-persona.js personaAI 「무소속」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0455-persona.js personaAI 「무소속」 3자 (src/main/0455-persona.js:40)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0535-content-audit.js auditAIFill 「무소속」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0535-content-audit.js auditAIFill 「무소속」 3자 (src/main/0535-content-audit.js:59)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js weaponPromptAI 「무소속」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0030-character-regen.js weaponPromptAI 「무소속」 3자 (src/main/0030-character-regen.js:168)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「무소속」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0440-ai-context.js ctx 「무소속」 3자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「첫인상」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「첫인상」 3자 (src/main/0510-actions/040-story-and-authoring.js:62)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/050-bridge.js v2SkillText 「초마다」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/modules/combat/050-bridge.js v2SkillText 「초마다」 3자 (src/modules/combat/050-bridge.js:71)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/050-bridge.js v2SkillText 「회마다」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/modules/combat/050-bridge.js v2SkillText 「회마다」 3자 (src/modules/combat/050-bridge.js:71)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「약점」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0445-factions.js factionCtx 「약점」 3자 (src/main/0445-factions.js:34)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「세계관」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0300-codex.js cxEntries 「세계관」 3자 (src/main/0300-codex.js:17)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「속성」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0300-codex.js cxEntries 「속성」 3자 (src/main/0300-codex.js:24)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「보호막」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「보호막」 3자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0460-script-engine.js parseScript 「소품끝」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0460-script-engine.js parseScript 「소품끝」 3자 (src/main/0460-script-engine.js:17)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0460-script-engine.js parseScript 「음악끝」",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0460-script-engine.js parseScript 「음악끝」 3자 (src/main/0460-script-engine.js:18)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0460-script-engine.js parseScript 「소품끝」 #2",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0460-script-engine.js parseScript 「소품끝」 #2 3자 (src/main/0460-script-engine.js:17)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0460-script-engine.js parseScript 「음악끝」 #2",
-   "num": {
-    "글자": 3
-   },
-   "text": "src/main/0460-script-engine.js parseScript 「음악끝」 #2 3자 (src/main/0460-script-engine.js:18)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0030-character-regen.js designAI 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0030-character-regen.js designAI 「없음」 2자 (src/main/0030-character-regen.js:162)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0135-schedule.js spotsAI 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0135-schedule.js spotsAI 「없음」 2자 (src/main/0135-schedule.js:19)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0200-skin-shop.js skinAuto 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0200-skin-shop.js skinAuto 「없음」 2자 (src/main/0200-skin-shop.js:16)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js aiChapterGen0 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0250-story-factory.js aiChapterGen0 「없음」 2자 (src/main/0250-story-factory.js:134)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「자유」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「자유」 2자 (src/main/0250-story-factory.js:239)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0280-live-ops.js dailyTalks 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0280-live-ops.js dailyTalks 「없음」 2자 (src/main/0280-live-ops.js:33)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0280-live-ops.js dailyTalks 「없음」 #2",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0280-live-ops.js dailyTalks 「없음」 #2 2자 (src/main/0280-live-ops.js:33)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxDiscover 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0300-codex.js cxDiscover 「없음」 2자 (src/main/0300-codex.js:77)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxDeepen 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0300-codex.js cxDeepen 「없음」 2자 (src/main/0300-codex.js:85)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionAI 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0445-factions.js factionAI 「없음」 2자 (src/main/0445-factions.js:49)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js relSeedAI 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0450-relations-memory.js relSeedAI 「없음」 2자 (src/main/0450-relations-memory.js:65)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0455-persona.js personaAI 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0455-persona.js personaAI 「없음」 2자 (src/main/0455-persona.js:44)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「없음」 2자 (src/main/0510-actions/020-navigation-and-tools.js:94)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「배경」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「배경」 2자 (src/main/0510-actions/020-navigation-and-tools.js:98)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「소품」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction 「소품」 2자 (src/main/0510-actions/020-navigation-and-tools.js:98)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「없음」 2자 (src/main/0510-actions/040-story-and-authoring.js:64)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「없음」 #2",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「없음」 #2 2자 (src/main/0510-actions/040-story-and-authoring.js:64)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「미정」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0440-ai-context.js ctx 「미정」 2자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「조연」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0440-ai-context.js ctx 「조연」 2자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0440-ai-context.js ctx 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0440-ai-context.js ctx 「없음」 2자 (src/main/0440-ai-context.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js castPlanData 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0445-factions.js castPlanData 「없음」 2자 (src/main/0445-factions.js:111)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「다음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「다음」 2자 (src/main/0510-actions/040-story-and-authoring.js:88)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「이전」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「이전」 2자 (src/main/0510-actions/040-story-and-authoring.js:88)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「시작」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction 「시작」 2자 (src/main/0510-actions/040-story-and-authoring.js:88)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0445-factions.js factionCtx 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0445-factions.js factionCtx 「없음」 2자 (src/main/0445-factions.js:34)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「없음」 2자 (src/main/0250-story-factory.js:271)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0260-new-game-draft.js drText 「동료」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0260-new-game-draft.js drText 「동료」 2자 (src/main/0260-new-game-draft.js:57)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/060-generation.js v2ElemNames 「속성」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/modules/combat/060-generation.js v2ElemNames 「속성」 2자 (src/modules/combat/060-generation.js:141)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0450-relations-memory.js sysDigest 「없음」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0450-relations-memory.js sysDigest 「없음」 2자 (src/main/0450-relations-memory.js:54)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「세력」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0300-codex.js cxEntries 「세력」 2자 (src/main/0300-codex.js:18)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「장소」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0300-codex.js cxEntries 「장소」 2자 (src/main/0300-codex.js:21)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「물건」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0300-codex.js cxEntries 「물건」 2자 (src/main/0300-codex.js:22)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0300-codex.js cxEntries 「기록」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0300-codex.js cxEntries 「기록」 2자 (src/main/0300-codex.js:27)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「피해」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「피해」 2자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「회복」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「회복」 2자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「기절」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「기절」 2자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「도발」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「도발」 2자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/modules/combat/030-core.js (최상위 문장) 「부활」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/modules/combat/030-core.js (최상위 문장) 「부활」 2자 (src/modules/combat/030-core.js:20)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0460-script-engine.js parseScript 「톡끝」",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0460-script-engine.js parseScript 「톡끝」 2자 (src/main/0460-script-engine.js:19)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/0460-script-engine.js parseScript 「톡끝」 #2",
-   "num": {
-    "글자": 2
-   },
-   "text": "src/main/0460-script-engine.js parseScript 「톡끝」 #2 2자 (src/main/0460-script-engine.js:19)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「lowres, artistic error, film grain, scan」",
-   "num": {
-    "글자": 238
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「lowres, artistic error, film grain, scan」 238자 (src/main/0020-ai-connect.js:276)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「detailed background, cinematic lighting,」",
-   "num": {
-    "글자": 114
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「detailed background, cinematic lighting,」 114자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js composeNai 「from above, from below, high angle, low 」",
-   "num": {
-    "글자": 108
-   },
-   "text": "src/main/0020-ai-connect.js composeNai 「from above, from below, high angle, low 」 108자 (src/main/0020-ai-connect.js:414)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「no humans, game item icon, single object」",
-   "num": {
-    "글자": 101
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「no humans, game item icon, single object」 101자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「simple background, white background, tra」",
-   "num": {
-    "글자": 81
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「simple background, white background, tra」 81자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「simple background, white background, tra」 #2",
-   "num": {
-    "글자": 81
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「simple background, white background, tra」 #2 81자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js composeNai 「feet out of frame, cowboy shot, upper bo」",
-   "num": {
-    "글자": 76
-   },
-   "text": "src/main/0020-ai-connect.js composeNai 「feet out of frame, cowboy shot, upper bo」 76자 (src/main/0020-ai-connect.js:412)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「no humans, scenery, map, from above, top」",
-   "num": {
-    "글자": 70
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「no humans, scenery, map, from above, top」 70자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「no humans, object focus, simple backgrou」",
-   "num": {
-    "글자": 60
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「no humans, object focus, simple backgrou」 60자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「text, gradient background, cast shadow, 」",
-   "num": {
-    "글자": 58
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「text, gradient background, cast shadow, 」 58자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_FRONT 「straight-on, standing, looking at viewer」",
-   "num": {
-    "글자": 55
-   },
-   "text": "src/main/0020-ai-connect.js NAI_FRONT 「straight-on, standing, looking at viewer」 55자 (src/main/0020-ai-connect.js:262)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「detailed background, depth of field, cin」",
-   "num": {
-    "글자": 55
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「detailed background, depth of field, cin」 55자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「straight-on, standing, looking at viewer」",
-   "num": {
-    "글자": 55
-   },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「straight-on, standing, looking at viewer」 55자 (src/main/0020-ai-connect.js:263)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「text, people, character, frame, border, 」",
-   "num": {
-    "글자": 54
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「text, people, character, frame, border, 」 54자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「gradient background, cast shadow, drop s」",
-   "num": {
-    "글자": 52
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「gradient background, cast shadow, drop s」 52자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「full body, simple background, white back」",
-   "num": {
-    "글자": 46
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「full body, simple background, white back」 46자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「teary eyes, trembling lips, about to cry」",
-   "num": {
-    "글자": 45
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「teary eyes, trembling lips, about to cry」 45자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「standing, hands together, looking away, 」",
-   "num": {
-    "글자": 45
-   },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「standing, hands together, looking away, 」 45자 (src/main/0020-ai-connect.js:263)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「standing, hand on own hip, looking at vi」",
-   "num": {
-    "글자": 44
-   },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「standing, hand on own hip, looking at vi」 44자 (src/main/0020-ai-connect.js:263)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「dynamic pose, action pose, looking at vi」",
-   "num": {
-    "글자": 44
-   },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「dynamic pose, action pose, looking at vi」 44자 (src/main/0020-ai-connect.js:263)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「standing, holding weapon, looking at vie」",
-   "num": {
-    "글자": 43
-   },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「standing, holding weapon, looking at vie」 43자 (src/main/0020-ai-connect.js:263)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「standing, waving, smile, looking at view」",
-   "num": {
-    "글자": 42
-   },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「standing, waving, smile, looking at view」 42자 (src/main/0020-ai-connect.js:263)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「people, character, text, watermark, fram」",
-   "num": {
-    "글자": 41
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「people, character, text, watermark, fram」 41자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「standing, crossed arms, looking at viewe」",
-   "num": {
-    "글자": 41
-   },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「standing, crossed arms, looking at viewe」 41자 (src/main/0020-ai-connect.js:263)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「kneeling, on one knee, looking at viewer」",
-   "num": {
-    "글자": 40
-   },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「kneeling, on one knee, looking at viewer」 40자 (src/main/0020-ai-connect.js:263)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「no humans, scenery, detailed background」",
-   "num": {
-    "글자": 39
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「no humans, scenery, detailed background」 39자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「detailed background, cinematic lighting」",
-   "num": {
-    "글자": 39
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「detailed background, cinematic lighting」 39자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「calm, relaxed, closed mouth, soft eyes」",
-   "num": {
-    "글자": 38
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「calm, relaxed, closed mouth, soft eyes」 38자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「determined, serious, v-shaped eyebrows」",
-   "num": {
-    "글자": 38
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「determined, serious, v-shaped eyebrows」 38자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「simple background, white background」",
-   "num": {
-    "글자": 35
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「simple background, white background」 35자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「text, speech bubble, multiple views」",
-   "num": {
-    "글자": 35
-   },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「text, speech bubble, multiple views」 35자 (src/main/0020-ai-connect.js:275)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「standing, looking back, from behind」",
-   "num": {
-    "글자": 35
-   },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「standing, looking back, from behind」 35자 (src/main/0020-ai-connect.js:263)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「gentle smile, closed mouth, happy」",
-   "num": {
-    "글자": 33
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「gentle smile, closed mouth, happy」 33자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「laughing, open mouth, closed eyes」",
-   "num": {
-    "글자": 33
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「laughing, open mouth, closed eyes」 33자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「nervous, sweatdrop, awkward smile」",
-   "num": {
-    "글자": 33
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「nervous, sweatdrop, awkward smile」 33자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「heart-shaped pupils, blush, smile」",
-   "num": {
-    "글자": 33
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「heart-shaped pupils, blush, smile」 33자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「surprised, open mouth, wide-eyed」",
-   "num": {
-    "글자": 32
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「surprised, open mouth, wide-eyed」 32자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「smile, playful, one eye closed」",
-   "num": {
-    "글자": 30
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「smile, playful, one eye closed」 30자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「embarrassed, blush, wavy mouth」",
-   "num": {
-    "글자": 30
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「embarrassed, blush, wavy mouth」 30자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「standing, v, looking at viewer」",
-   "num": {
-    "글자": 30
-   },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「standing, v, looking at viewer」 30자 (src/main/0020-ai-connect.js:263)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「smug, smirk, half-closed eyes」",
-   "num": {
-    "글자": 29
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「smug, smirk, half-closed eyes」 29자 (src/main/0050-default-content.js:170)"
-  },
-  {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「tired, half-closed eyes, sigh」",
-   "num": {
-    "글자": 29
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「tired, half-closed eyes, sigh」 29자 (src/main/0050-default-content.js:170)"
+   "key": "과잉 분할|src/main/0390-github-sync.js ↔ src/main/0400-publish-subscribe.js",
+   "num": {},
+   "text": "서로 강하게 묶임: src/main/0390-github-sync.js ↔ src/main/0400-publish-subscribe.js — 사이 17.99 · 안 12.31/12.35"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0260-new-game-draft.js faceDrawOne 「::::, 1.2::expressive face::」",
-   "num": {
-    "글자": 28
-   },
-   "text": "src/main/0260-new-game-draft.js faceDrawOne 「::::, 1.2::expressive face::」 28자 (src/main/0260-new-game-draft.js:240)"
+   "key": "과잉 분할|src/main/0250-story-factory.js ↔ src/main/0450-relations-memory.js",
+   "num": {},
+   "text": "서로 강하게 묶임: src/main/0250-story-factory.js ↔ src/main/0450-relations-memory.js — 사이 16.59 · 안 32.89/16.57"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「angry, frown, clenched teeth」",
-   "num": {
-    "글자": 28
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「angry, frown, clenched teeth」 28자 (src/main/0050-default-content.js:170)"
+   "key": "과잉 분할|src/main/0110-challenge-raid.js ↔ src/main/0120-abyss.js",
+   "num": {},
+   "text": "서로 강하게 묶임: src/main/0110-challenge-raid.js ↔ src/main/0120-abyss.js — 사이 14.8 · 안 9.49/57.13"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「expressionless, closed mouth」",
-   "num": {
-    "글자": 28
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「expressionless, closed mouth」 28자 (src/main/0050-default-content.js:170)"
+   "key": "과잉 분할|src/main/0480-battle.js ↔ src/modules/combat/050-bridge.js",
+   "num": {},
+   "text": "서로 강하게 묶임: src/main/0480-battle.js ↔ src/modules/combat/050-bridge.js — 사이 4.2 · 안 2.97/62.69"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js playerCast 「hair over eyes, covered eyes」",
-   "num": {
-    "글자": 28
-   },
-   "text": "src/main/0020-ai-connect.js playerCast 「hair over eyes, covered eyes」 28자 (src/main/0020-ai-connect.js:424)"
+   "key": "과잉 분할|src/main/0510-actions/ ↔ src/main/0520-backup-storage.js",
+   "num": {},
+   "text": "서로 강하게 묶임: src/main/0510-actions/ ↔ src/main/0520-backup-storage.js — 사이 3.91 · 안 2.81/8.32"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js composeNai 「1.3::full body::, standing」",
-   "num": {
-    "글자": 26
-   },
-   "text": "src/main/0020-ai-connect.js composeNai 「1.3::full body::, standing」 26자 (src/main/0020-ai-connect.js:412)"
+   "key": "과잉 분할|src/main/0420-app-update.js ↔ src/main/0430-update-guidance.js",
+   "num": {},
+   "text": "서로 강하게 묶임: src/main/0420-app-update.js ↔ src/main/0430-update-guidance.js — 사이 3.58 · 안 0/18.73"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「thinking, hand on own chin」",
-   "num": {
-    "글자": 26
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「thinking, hand on own chin」 26자 (src/main/0050-default-content.js:170)"
+   "key": "과잉 분할|src/main/0320-art-style.js ↔ src/main/0370-game-picker.js",
+   "num": {},
+   "text": "서로 강하게 묶임: src/main/0320-art-style.js ↔ src/main/0370-game-picker.js — 사이 3.41 · 안 0.79/2.26"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_POSES 「sitting, looking at viewer」",
+   "key": "기능 섞임|src/main/0160-free-chat.js",
    "num": {
-    "글자": 26
+    "묶음": 3
    },
-   "text": "src/main/0020-ai-connect.js NAI_POSES 「sitting, looking at viewer」 26자 (src/main/0020-ai-connect.js:263)"
+   "text": "src/main/0160-free-chat.js — 묶음 9·5·1"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「shy, blush, looking away」",
+   "key": "기능 섞임|src/main/0130-gift.js",
    "num": {
-    "글자": 24
+    "묶음": 3
    },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「shy, blush, looking away」 24자 (src/main/0050-default-content.js:170)"
+   "text": "src/main/0130-gift.js — 묶음 4·3·1"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「pain, wince, teary eyes」",
+   "key": "기능 섞임|src/main/0400-publish-subscribe.js",
    "num": {
-    "글자": 23
+    "묶음": 2
    },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「pain, wince, teary eyes」 23자 (src/main/0050-default-content.js:170)"
+   "text": "src/main/0400-publish-subscribe.js — 묶음 11·7"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「people, character, text」",
+   "key": "기능 섞임|src/main/0125-tower.js",
    "num": {
-    "글자": 23
+    "묶음": 3
    },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「people, character, text」 23자 (src/main/0020-ai-connect.js:275)"
+   "text": "src/main/0125-tower.js — 묶음 5·3·1"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js NAI_DEF 「people, character, text」 #2",
+   "key": "기능 섞임|src/main/0470-title-opening.js",
    "num": {
-    "글자": 23
+    "묶음": 3
    },
-   "text": "src/main/0020-ai-connect.js NAI_DEF 「people, character, text」 #2 23자 (src/main/0020-ai-connect.js:275)"
+   "text": "src/main/0470-title-opening.js — 묶음 6·3·1"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js composeNai 「eye level, straight-on」",
+   "key": "기능 섞임|src/main/0485-battle-rules.js",
    "num": {
-    "글자": 22
+    "묶음": 2
    },
-   "text": "src/main/0020-ai-connect.js composeNai 「eye level, straight-on」 22자 (src/main/0020-ai-connect.js:414)"
+   "text": "src/main/0485-battle-rules.js — 묶음 6·5"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「sad, frown, teary eyes」",
+   "key": "기능 섞임|src/main/0550-standalone-app.js",
    "num": {
-    "글자": 22
+    "묶음": 3
    },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「sad, frown, teary eyes」 22자 (src/main/0050-default-content.js:170)"
+   "text": "src/main/0550-standalone-app.js — 묶음 5·4·1"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「worried, frown, sweat」",
+   "key": "기능 섞임|src/main/0220-mail.js",
    "num": {
-    "글자": 21
+    "묶음": 3
    },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「worried, frown, sweat」 21자 (src/main/0050-default-content.js:170)"
+   "text": "src/main/0220-mail.js — 묶음 5·3·2"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0260-new-game-draft.js faceDrawOne 「portrait, face focus」",
+   "key": "기능 섞임|src/modules/app/020-construct.js",
    "num": {
-    "글자": 20
+    "묶음": 2
    },
-   "text": "src/main/0260-new-game-draft.js faceDrawOne 「portrait, face focus」 20자 (src/main/0260-new-game-draft.js:243)"
+   "text": "src/modules/app/020-construct.js — 묶음 10·5"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「annoyed, frown, pout」",
+   "key": "기능 섞임|src/modules/combat/030-core.js",
    "num": {
-    "글자": 20
+    "묶음": 2
    },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「annoyed, frown, pout」 20자 (src/main/0050-default-content.js:170)"
+   "text": "src/modules/combat/030-core.js — 묶음 88·38"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js composeNai 「looking at viewer」",
-   "num": {
-    "글자": 17
-   },
-   "text": "src/main/0020-ai-connect.js composeNai 「looking at viewer」 17자 (src/main/0020-ai-connect.js:410)"
+   "key": "기능 분산|src/main/0260-new-game-draft.js openSkin",
+   "num": {},
+   "text": "openSkin (src/main/0260-new-game-draft.js) — 연결 70%가 src/main/0020-ai-connect.js"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js composeNai 「pointy ears, elf」",
-   "num": {
-    "글자": 16
-   },
-   "text": "src/main/0020-ai-connect.js composeNai 「pointy ears, elf」 16자 (src/main/0020-ai-connect.js:418)"
+   "key": "기능 분산|src/main/0180-ui-scroll.js openNaiPrep",
+   "num": {},
+   "text": "openNaiPrep (src/main/0180-ui-scroll.js) — 연결 68%가 src/main/0020-ai-connect.js"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0050-default-content.js FACE_TAGS 「smile, happy」",
-   "num": {
-    "글자": 12
-   },
-   "text": "src/main/0050-default-content.js FACE_TAGS 「smile, happy」 12자 (src/main/0050-default-content.js:170)"
+   "key": "기능 분산|src/main/0180-ui-scroll.js apForm",
+   "num": {},
+   "text": "apForm (src/main/0180-ui-scroll.js) — 연결 61%가 src/main/0020-ai-connect.js"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0030-character-regen.js composeCG 「child, loli」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/main/0030-character-regen.js composeCG 「child, loli」 11자 (src/main/0030-character-regen.js:179)"
+   "key": "기능 분산|src/main/0020-ai-connect.js isV45",
+   "num": {},
+   "text": "isV45 (src/main/0020-ai-connect.js) — 연결 75%가 src/main/0030-character-regen.js"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js composeNai 「child, loli」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/main/0020-ai-connect.js composeNai 「child, loli」 11자 (src/main/0020-ai-connect.js:419)"
+   "key": "기능 분산|src/main/0180-ui-scroll.js passHTML",
+   "num": {},
+   "text": "passHTML (src/main/0180-ui-scroll.js) — 연결 77%가 src/main/0090-growth.js"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js composeNai 「cowboy shot」",
-   "num": {
-    "글자": 11
-   },
-   "text": "src/main/0020-ai-connect.js composeNai 「cowboy shot」 11자 (src/main/0020-ai-connect.js:409)"
+   "key": "기능 분산|src/main/0160-free-chat.js phPlay",
+   "num": {},
+   "text": "phPlay (src/main/0160-free-chat.js) — 연결 62%가 src/main/0100-messenger.js"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0030-character-regen.js composeCG 「no humans」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/main/0030-character-regen.js composeCG 「no humans」 9자 (src/main/0030-character-regen.js:178)"
+   "key": "기능 분산|src/main/0110-challenge-raid.js rgCount",
+   "num": {},
+   "text": "rgCount (src/main/0110-challenge-raid.js) — 연결 87%가 src/main/0120-abyss.js"
   },
   {
-   "key": "스튜디오 밖 이미지 프롬프트|src/main/0020-ai-connect.js composeNai 「full body」",
-   "num": {
-    "글자": 9
-   },
-   "text": "src/main/0020-ai-connect.js composeNai 「full body」 9자 (src/main/0020-ai-connect.js:409)"
+   "key": "기능 분산|src/main/0100-messenger.js phMode",
+   "num": {},
+   "text": "phMode (src/main/0100-messenger.js) — 연결 100%가 src/main/0160-free-chat.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/modules/combat/060-generation.js v2SlotPrompt 「캐릭터의 딱 하나를 설계하세요. 다른 두 스킬은 변경하지 않습니다. 먼저」",
-   "num": {
-    "글자": 1356
-   },
-   "text": "src/modules/combat/060-generation.js v2SlotPrompt 「캐릭터의 딱 하나를 설계하세요. 다른 두 스킬은 변경하지 않습니다. 먼저」 1356자 (src/modules/combat/060-generation.js:103)"
+   "key": "기능 분산|src/main/0020-ai-connect.js ILK",
+   "num": {},
+   "text": "ILK (src/main/0020-ai-connect.js) — 연결 67%가 src/main/0180-ui-scroll.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/modules/combat/060-generation.js v2PalettePrompt 「색상 해석은 당신(LLM)이 담당합니다. 캐릭터의 appearanceTa」",
-   "num": {
-    "글자": 1257
-   },
-   "text": "src/modules/combat/060-generation.js v2PalettePrompt 「색상 해석은 당신(LLM)이 담당합니다. 캐릭터의 appearanceTa」 1257자 (src/modules/combat/060-generation.js:99)"
+   "key": "기능 분산|src/main/0290-season-rotation.js cycLabel",
+   "num": {},
+   "text": "cycLabel (src/main/0290-season-rotation.js) — 연결 63%가 src/main/0180-ui-scroll.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/modules/combat/050-bridge.js v2GenerateSkills 「캐릭터의 패시브·액티브·궁극기를 한 주역할로 설계하세요. 참고 데이터는 」",
-   "num": {
-    "글자": 835
-   },
-   "text": "src/modules/combat/050-bridge.js v2GenerateSkills 「캐릭터의 패시브·액티브·궁극기를 한 주역할로 설계하세요. 참고 데이터는 」 835자 (src/modules/combat/050-bridge.js:286)"
+   "key": "기능 분산|src/main/0110-challenge-raid.js rgEnemies",
+   "num": {},
+   "text": "rgEnemies (src/main/0110-challenge-raid.js) — 연결 70%가 src/main/0240-growth-curve.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/modules/combat/070-equipment.js v2GearGenerate 「장비의 고유 패시브 하나를 설계하세요. 패시브와 액티브를 모두 분석하여 」",
-   "num": {
-    "글자": 352
-   },
-   "text": "src/modules/combat/070-equipment.js v2GearGenerate 「장비의 고유 패시브 하나를 설계하세요. 패시브와 액티브를 모두 분석하여 」 352자 (src/modules/combat/070-equipment.js:73)"
+   "key": "기능 분산|src/main/0470-title-opening.js logoStyle",
+   "num": {},
+   "text": "logoStyle (src/main/0470-title-opening.js) — 연결 76%가 src/main/0250-story-factory.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/main/0290-season-rotation.js aiNewPickupChar 「콜라보 : 다른 작품 「」이(가) 이 세계에 찾아온 콜라보 게스트로 만든」",
-   "num": {
-    "글자": 269
-   },
-   "text": "src/main/0290-season-rotation.js aiNewPickupChar 「콜라보 : 다른 작품 「」이(가) 이 세계에 찾아온 콜라보 게스트로 만든」 269자 (src/main/0290-season-rotation.js:16)"
+   "key": "기능 분산|src/main/0450-relations-memory.js nl",
+   "num": {},
+   "text": "nl (src/main/0450-relations-memory.js) — 연결 66%가 src/main/0250-story-factory.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/main/0030-character-regen.js illustrationScenePreparation 「세계관: 캐릭터: (, ) 프로필: 외모 태그(반복하지 말 것): 의 장」",
-   "num": {
-    "글자": 195
-   },
-   "text": "src/main/0030-character-regen.js illustrationScenePreparation 「세계관: 캐릭터: (, ) 프로필: 외모 태그(반복하지 말 것): 의 장」 195자 (src/main/0030-character-regen.js:142)"
+   "key": "기능 분산|src/main/0530-story-memory.js storyWrapUp",
+   "num": {},
+   "text": "storyWrapUp (src/main/0530-story-memory.js) — 연결 64%가 src/main/0250-story-factory.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「2차 창작: 원작 「」을(를) 바탕으로 한다. 세계관·세력·용어·인물을 」",
-   "num": {
-    "글자": 176
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「2차 창작: 원작 「」을(를) 바탕으로 한다. 세계관·세력·용어·인물을 」 176자 (src/main/0250-story-factory.js:231)"
+   "key": "기능 분산|src/main/0250-story-factory.js bondNote",
+   "num": {},
+   "text": "bondNote (src/main/0250-story-factory.js) — 연결 100%가 src/main/0290-season-rotation.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/modules/combat/060-generation.js v2ResolvePalette 「스킬의 성능·이름을 바꾸지 말고 색상 해석만 보완하세요. 참고 데이터는 」",
-   "num": {
-    "글자": 149
-   },
-   "text": "src/modules/combat/060-generation.js v2ResolvePalette 「스킬의 성능·이름을 바꾸지 말고 색상 해석만 보완하세요. 참고 데이터는 」 149자 (src/modules/combat/060-generation.js:132)"
+   "key": "기능 분산|src/main/0320-art-style.js bootCats",
+   "num": {},
+   "text": "bootCats (src/main/0320-art-style.js) — 연결 83%가 src/main/0370-game-picker.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/main/0250-story-factory.js aiEventGen0 「\\n이 이야기는 IF(만약에) 스토리다. 정사와 이어지지 않는 평행 세계」",
-   "num": {
-    "글자": 145
-   },
-   "text": "src/main/0250-story-factory.js aiEventGen0 「\\n이 이야기는 IF(만약에) 스토리다. 정사와 이어지지 않는 평행 세계」 145자 (src/main/0250-story-factory.js:159)"
+   "key": "기능 분산|src/main/0320-art-style.js bootPrepNeeded",
+   "num": {},
+   "text": "bootPrepNeeded (src/main/0320-art-style.js) — 연결 66%가 src/main/0370-game-picker.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「작가가 직접 쓴 설정(적힌 내용·고유명사·인물을 그대로 살리고, 비어 있」",
-   "num": {
-    "글자": 80
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「작가가 직접 쓴 설정(적힌 내용·고유명사·인물을 그대로 살리고, 비어 있」 80자 (src/main/0250-story-factory.js:228)"
+   "key": "기능 분산|src/main/0400-publish-subscribe.js syPush",
+   "num": {},
+   "text": "syPush (src/main/0400-publish-subscribe.js) — 연결 63%가 src/main/0390-github-sync.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「이미 그림이 있는 배경()과 소품()은 이름 그대로 backgrounds」",
-   "num": {
-    "글자": 80
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「이미 그림이 있는 배경()과 소품()은 이름 그대로 backgrounds」 80자 (src/main/0250-story-factory.js:271)"
+   "key": "기능 분산|src/main/0390-github-sync.js ghCreateBlob",
+   "num": {},
+   "text": "ghCreateBlob (src/main/0390-github-sync.js) — 연결 69%가 src/main/0400-publish-subscribe.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/modules/combat/060-generation.js v2GenerateSelected 「세대 기준 배로 너무 강합니다. 기존 이름과 컨셉은 유지하고 power와」",
-   "num": {
-    "글자": 79
-   },
-   "text": "src/modules/combat/060-generation.js v2GenerateSelected 「세대 기준 배로 너무 강합니다. 기존 이름과 컨셉은 유지하고 power와」 79자 (src/modules/combat/060-generation.js:193)"
+   "key": "기능 분산|src/main/0420-app-update.js verCmp",
+   "num": {},
+   "text": "verCmp (src/main/0420-app-update.js) — 연결 100%가 src/main/0430-update-guidance.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/main/0020-ai-connect.js aiOne 「\\n\\n다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안」",
-   "num": {
-    "글자": 75
-   },
-   "text": "src/main/0020-ai-connect.js aiOne 「\\n\\n다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안」 75자 (src/main/0020-ai-connect.js:216)"
+   "key": "기능 분산|src/main/0290-season-rotation.js baseChar",
+   "num": {},
+   "text": "baseChar (src/main/0290-season-rotation.js) — 연결 60%가 src/main/0450-relations-memory.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「플레이어가 직접 짠 스토리(이 줄거리를 그대로 따른다. 인물 이름·설정·」",
-   "num": {
-    "글자": 71
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「플레이어가 직접 짠 스토리(이 줄거리를 그대로 따른다. 인물 이름·설정·」 71자 (src/main/0250-story-factory.js:230)"
+   "key": "기능 분산|src/main/0445-factions.js castOk",
+   "num": {},
+   "text": "castOk (src/main/0445-factions.js) — 연결 69%가 src/main/0500-gacha.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/main/0250-story-factory.js aiEventGen0 「이 이야기는 이격 「」만의 외전이다. 여기서 생긴 일은 「」의 기록에만 」",
-   "num": {
-    "글자": 70
-   },
-   "text": "src/main/0250-story-factory.js aiEventGen0 「이 이야기는 이격 「」만의 외전이다. 여기서 생긴 일은 「」의 기록에만 」 70자 (src/main/0250-story-factory.js:159)"
+   "key": "기능 분산|src/main/0480-battle.js uel",
+   "num": {},
+   "text": "uel (src/main/0480-battle.js) — 연결 92%가 src/modules/combat/040-effects.js"
   },
   {
-   "key": "스튜디오 밖 프롬프트 글|src/main/0250-story-factory.js buildNewGameDraft 「규칙: 등장인물은 모두 성인이다. 서브컬처 수집형 RPG. 한국어로 쓴다」",
-   "num": {
-    "글자": 42
-   },
-   "text": "src/main/0250-story-factory.js buildNewGameDraft 「규칙: 등장인물은 모두 성인이다. 서브컬처 수집형 RPG. 한국어로 쓴다」 42자 (src/main/0250-story-factory.js:238)"
+   "key": "기능 분산|src/main/0480-battle.js pop",
+   "num": {},
+   "text": "pop (src/main/0480-battle.js) — 연결 87%가 src/modules/combat/050-bridge.js"
   },
   {
-   "key": "도구 복잡한 함수|tool:tools/lib/modules.mjs moduleMap",
-   "num": {
-    "복잡도": 40,
-    "줄": 25,
-    "중첩": 4
-   },
-   "text": "moduleMap (tools/lib/modules.mjs:11) 복잡도 40 · 25줄 · 중첩 4"
+   "key": "기능 분산|src/main/0480-battle.js blog",
+   "num": {},
+   "text": "blog (src/main/0480-battle.js) — 연결 60%가 src/modules/combat/050-bridge.js"
   },
   {
    "key": "도구 복잡한 함수|tool:tools/play/lib/qa.mjs runQA",
@@ -5086,33 +1928,33 @@
   {
    "key": "배선 P1|construct G.meta.variants",
    "num": {},
-   "text": "P1 construct G.meta.variants: 생성 단계가 만드는 키(ngWorldExtras)인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
+   "text": "P1 construct G.meta.variants: 생성 단계가 만드는 키([object Set])인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
   },
   {
    "key": "배선 P1|expedition G.meta.expedition",
    "num": {},
-   "text": "P1 expedition G.meta.expedition: 생성 단계가 만드는 키(ngWorldExtras)인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
+   "text": "P1 expedition G.meta.expedition: 생성 단계가 만드는 키([object Set])인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
   },
   {
    "key": "배선 P1|persona G.meta.persona",
    "num": {},
-   "text": "P1 persona G.meta.persona: 생성 단계가 만드는 키(ngWorldExtras)인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
+   "text": "P1 persona G.meta.persona: 생성 단계가 만드는 키([object Set])인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
   }
  ],
  "names": [
+  {
+   "key": "이름 모호|src/main/0015-prompt-studio/010-studio.js",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0015-prompt-studio/010-studio.js 1개"
+  },
   {
    "key": "이름 모호|src/main/0020-ai-connect.js",
    "num": {
     "개수": 2
    },
    "text": "src/main/0020-ai-connect.js 2개"
-  },
-  {
-   "key": "이름 모호|src/main/0025-prompt-studio.js",
-   "num": {
-    "개수": 1
-   },
-   "text": "src/main/0025-prompt-studio.js 1개"
   },
   {
    "key": "이름 모호|src/main/0030-character-regen.js",

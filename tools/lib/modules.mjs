@@ -8,30 +8,36 @@
 const fileOf = loc => String(loc || '').split(':')[0];
 const HUB = 25; // 이만큼 많은 함수가 부르면 공용 기반으로 봄
 
-export function moduleMap(units, fns, sf) {
+// opts.modOf: 파일 → 모듈(폴더 모듈은 폴더 전체 — tools/lib/scope.mjs moduleOf) · opts.layer: 설계상 여러 모듈의 데이터를 읽는 층(프롬프트 스튜디오 — 기능 데이터로 프롬프트를 만듦)은 영역 침범 판단에서 뺌
+// 상태 주인: 상태 키(G.meta.x·G.world.x·G.x·P().x)를 가장 많이 쓰는 모듈
+function stateOwners(sf, fileOf) { const owner = new Map(), keyFiles = new Map();
+  for (const k of sf.list) { if (!/^(G\.meta\.|G\.world\.|P\(\)\.|G\.)\w+$/.test(k.key) || /^G\.(meta|world|prog)$/.test(k.key)) continue; const c = new Map(); k.wl.forEach(l => { const f = fileOf(l); c.set(f, (c.get(f) || 0) + 1); });
+    if (!c.size) continue; owner.set(k.key, [...c].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))[0][0]); keyFiles.set(k.key, c); }
+  return { owner, keyFiles }; }
+// 영역 침범 후보: 참조(호출·상태 읽기/쓰기, 공용 기반 제외) 6↑ 중 자기 모듈 ≤25%이고 다른 한 모듈 ≥50%. 액션 분배기(원안 설계상 화면 동작을 기능으로 넘기는 층)·설계상 층(opts.layer)은 뺌
+function envyOf(top, refs, fileOf, layer) { const envy = [];
+  for (const f of top) { const m = refs.get(f.key); if (!m || /^handle\w+Action$/.test(f.name) || (layer && fileOf(f.loc) === layer)) continue; const own = fileOf(f.loc), tot = [...m.values()].reduce((x, y) => x + y, 0), [tm, tn] = [...m].filter(([x]) => x !== own).sort((x, y) => y[1] - x[1])[0] || [];
+    if (tot >= 6 && (m.get(own) || 0) / tot <= 0.25 && tn / tot >= 0.5) envy.push({ fn: f.name, file: own, to: tm, share: Math.round(100 * tn / tot), refs: tot }); }
+  return envy.sort((x, y) => y.share - x.share); }
+// opts.modOf: 파일 → 모듈(폴더 모듈은 폴더 전체 — tools/lib/scope.mjs moduleOf) · opts.layer: 설계상 여러 모듈의 데이터를 읽는 층(프롬프트 스튜디오 — 기능 데이터로 프롬프트를 만듦)은 영역 침범 판단에서 뺌
+export function moduleMap(units, fns, sf, opts = {}) { const fileOf = loc => (opts.modOf || (f => f))(String(loc || '').split(':')[0]);
   const title = new Map(), lines = new Map();
-  for (const u of units) for (const f of u.files || []) { const t = u.text.split('\n').slice(f.start, f.end), m = t.find(l => /^\/\*\s*=====\s*.+?\s*=====/.test(l)); title.set(f.path, m ? m.replace(/^\/\*\s*=====\s*|\s*=====.*$/g, '') : ''); lines.set(f.path, f.end - f.start); }
+  for (const u of units) for (const f of u.files || []) { const t = u.text.split('\n').slice(f.start, f.end), m = t.find(l => /^\/\*\s*=====\s*.+?\s*=====/.test(l)), k = fileOf(f.path); if (!title.get(k)) title.set(k, m ? m.replace(/^\/\*\s*=====\s*|\s*=====.*$/g, '') : ''); lines.set(k, (lines.get(k) || 0) + f.end - f.start); }
   const top = [...fns.values()].filter(f => f.top && !f.table), modOf = new Map(top.map(f => [f.key, fileOf(f.loc)])), breadth = new Map();
   for (const f of top) for (const [ck] of f.calls) { const b = modOf.get(ck), a = modOf.get(f.key); if (b && a !== b) { if (!breadth.has(b)) breadth.set(b, new Set()); breadth.get(b).add(a); } }
   const nMods = new Set(modOf.values()).size, infra = new Set([...breadth].filter(([, v]) => v.size >= nMods / 2).map(([k]) => k)), hub = new Set(top.filter(f => f.callers.size >= HUB || infra.has(modOf.get(f.key))).map(f => f.key));
-  // 상태 주인: 가장 많이 쓰는 모듈
-  const owner = new Map(), keyFiles = new Map();
-  for (const k of sf.list) { if (!/^(G\.meta\.|G\.world\.|P\(\)\.|G\.)\w+$/.test(k.key) || /^G\.(meta|world|prog)$/.test(k.key)) continue; const c = new Map(); k.wl.forEach(l => { const f = fileOf(l); c.set(f, (c.get(f) || 0) + 1); });
-    if (!c.size) continue; const best = [...c].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0][0]; owner.set(k.key, best); keyFiles.set(k.key, c); }
+  const { owner, keyFiles } = stateOwners(sf, fileOf);
   // 함수가 참조하는 모듈(공용 기반 제외)
   const refs = new Map(), add = (fk, mod, n = 1) => { if (!mod) return; const m = refs.get(fk) || new Map(); m.set(mod, (m.get(mod) || 0) + n); refs.set(fk, m); };
   for (const f of top) for (const [ck, n] of f.calls) if (modOf.has(ck) && !hub.has(ck) && ck !== f.key) add(f.key, modOf.get(ck), n); // 호출 횟수만큼
   for (const k of sf.list) { const o = owner.get(k.key); if (!o) continue; [...k.r, ...k.w].forEach(fk => { if (modOf.has(fk)) add(fk, o); }); }
-  const envy = [];
-  for (const f of top) { const m = refs.get(f.key); if (!m || /^handle\w+Action$/.test(f.name)) continue; /* 액션 분배기는 원안 설계상 화면 동작을 기능 모듈로 넘기는 층 */ const own = fileOf(f.loc), tot = [...m.values()].reduce((a, b) => a + b, 0), [tm, tn] = [...m].filter(([x]) => x !== own).sort((a, b) => b[1] - a[1])[0] || [];
-    if (tot >= 6 && (m.get(own) || 0) / tot <= 0.25 && tn / tot >= 0.5) envy.push({ fn: f.name, file: own, to: tm, share: Math.round(100 * tn / tot), refs: tot }); }
   // 모듈 지도: 부르는/불리는 모듈(공용 기반 제외)
   const mods = new Map(), M = p => { if (!mods.has(p)) mods.set(p, { file: p, title: title.get(p) || '', lines: lines.get(p) || 0, fns: 0, out: new Map(), in: new Map(), owns: 0 }); return mods.get(p); };
   for (const f of top) { const a = M(fileOf(f.loc)); a.fns++; for (const [ck] of f.calls) { const b = modOf.get(ck); if (!b || b === a.file || hub.has(ck)) continue; a.out.set(b, (a.out.get(b) || 0) + 1); M(b).in.set(a.file, (M(b).in.get(a.file) || 0) + 1); } }
   for (const [, o] of owner) M(o).owns++;
   const foreign = []; for (const [k, c] of keyFiles) { const o = owner.get(k); for (const [f, n] of c) if (f !== o) foreign.push({ key: k, owner: o, file: f, n }); }
-  const scattered = [...keyFiles].filter(([, c]) => c.size >= 3).map(([k, c]) => ({ key: k, owner: owner.get(k), files: [...c.keys()] })).sort((a, b) => b.files.length - a.files.length);
-  return { refs, infra: [...infra].sort(), mods: [...mods.values()].sort((a, b) => a.file.localeCompare(b.file)), envy: envy.sort((a, b) => b.share - a.share), foreign, scattered, hubs: [...hub].sort() };
+  const scattered = [...keyFiles].filter(([, c]) => c.size >= 3).map(([k, c]) => ({ key: k, owner: owner.get(k), files: [...c.keys()] })).sort((x, y) => y.files.length - x.files.length);
+  return { refs, infra: [...infra].sort(), mods: [...mods.values()].sort((x, y) => x.file.localeCompare(y.file)), envy: envyOf(top, refs, fileOf, opts.layer), foreign, scattered, hubs: [...hub].sort() };
 }
 // 기능 영역(docs/modules.md의 ## 절 — 절마다 적은 파일·함수 이름이 그 기능의 선언): 영역마다
 //   선언과 코드가 맞나(적힌 함수가 영역 파일 밖에 있음 = 흩어짐, 없음 = 문서 낡음) · 영역 상태(영역 파일이 주인인 키)를 영역 밖에서 씀 ·
@@ -102,11 +108,11 @@ function mixedOf(comm, modOf, name, byComm, byMod) {
     if (parts.length >= 2 && parts[1][1] >= 3 && parts[1][1] / ns.length >= 0.3) out.push({ mod: m, fns: ns.length, parts: parts.slice(0, 3).map(([c, k]) => ({ n: k, cluster: label(c), sample: byComm.get(c).filter(x => modOf.get(x) === m).slice(0, 4).map(x => name.get(x)) })) }); }
   return out; }
 // 기능 분산(제자리 아닌 함수): 함수의 연결 무게가 다른 한 모듈로 60%↑이고 자기 모듈 쪽의 2배↑(근거 무게 2↑)
-function displacedOf(adj, modOf, name) { const out = [];
-  for (const [n, nb] of adj) { const own = modOf.get(n), by = new Map(); let tot = 0; for (const [j, w] of nb) { by.set(modOf.get(j), (by.get(modOf.get(j)) || 0) + w); tot += w; }
+function displacedOf(adj, modOf, name, layer) { const out = [];
+  for (const [n, nb] of adj) { const own = modOf.get(n), by = new Map(); if (layer && own === layer) continue; /* 설계상 층(프롬프트 스튜디오)은 여러 기능 데이터를 읽음 */ let tot = 0; for (const [j, w] of nb) { by.set(modOf.get(j), (by.get(modOf.get(j)) || 0) + w); tot += w; }
     const [tm, tw] = [...by].filter(([m]) => m !== own).sort((a, b) => b[1] - a[1])[0] || []; if (tm && tot >= 2 && tw / tot >= 0.6 && tw >= 2 * (by.get(own) || 0)) out.push({ fn: name.get(n), mod: own, to: tm, share: Math.round(100 * tw / tot), weight: r2(tot) }); }
   return out.sort((a, b) => a.to.localeCompare(b.to) || b.share - a.share); }
-export function naturalBoundaries(fns, sf, M, modOfFile = f => f) {
+export function naturalBoundaries(fns, sf, M, modOfFile = f => f, layer = null) {
   const { adj, modOf, name } = fnGraph(fns, sf, M, modOfFile), comm = louvain(adj), byComm = groupBy(comm.keys(), n => comm.get(n)), byMod = groupBy(comm.keys(), n => modOf.get(n));
   const Qfile = modularity(adj, new Map([...adj.keys()].map(n => [n, modOf.get(n)]))), Qnat = modularity(adj, comm);
-  return { nodes: adj.size, clusters: byComm.size, Qfile: Math.round(Qfile * 1000) / 1000, Qnat: Math.round(Qnat * 1000) / 1000, overSplit: overSplitOf(adj, modOf, byMod), mixed: mixedOf(comm, modOf, name, byComm, byMod), displaced: displacedOf(adj, modOf, name) }; }
+  return { nodes: adj.size, clusters: byComm.size, Qfile: Math.round(Qfile * 1000) / 1000, Qnat: Math.round(Qnat * 1000) / 1000, overSplit: overSplitOf(adj, modOf, byMod), mixed: mixedOf(comm, modOf, name, byComm, byMod), displaced: displacedOf(adj, modOf, name, layer) }; }

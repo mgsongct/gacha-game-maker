@@ -18,3 +18,4 @@ jobs:
       - run: node tools/names.mjs --strict  # 이름 규칙(tools/naming.json): 모호한 지역 이름이 기준선보다 늘면 실패
       - run: node tools/wiring.mjs --strict # 포크 기능 배선 점검: 생성기 ↔ 기능 ↔ 생성된 게임(tools/play/games) 판정이 기준선보다 새로 생기면 실패
       - run: node tools/play/test.mjs      # 생성·QA·플레이 도구 자체 검사(playwright가 없으면 건너뜀)
+      - run: node tools/play/combos.mjs --quick  # 프롬프트 조합 검증(게임 하나·기본 상황): 실제 index.html이 보낸 프롬프트의 깨짐·과잉·과소 보고

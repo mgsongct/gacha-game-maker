@@ -26,16 +26,6 @@ function relApply(arr,src,quiet,lore){ let n=0; if(lore==='if') return 0; (Array
     if(ev) { r.hist=(r.hist||[]).concat([{src:String(src||''),text:ev,at:Date.now()}]).slice(-30); } r.at=Date.now(); n++; });
   if(n&&!quiet) mark('meta'); return n; }
 function relLine(r){ const last=(r.hist||[]).slice(-4).map(h=>(h.src?h.src+': ':'')+h.text).join(' / '); return `- ${relName(r.a)} ↔ ${relName(r.b)}: [${r.kind||'아는 사이'}] ${r.note||''}${last?' (최근: '+last+')':''}`; }
-// 로어북: text에 이름이 나온 인물(+extra)의 관계를 골라요. 바로 닿은 관계 먼저, 남으면 한 다리 건너(마인드맵처럼)
-function relCtx(text,extra,max){ const altOut=x=>{ const c=charById(x); return !!(c&&c.alt)&&!(extra||[]).includes(x); }, R=RELS().filter(r=>!altOut(r.a)&&!altOut(r.b)); max=Math.min(max||40,60); text=String(text||''); // 이격 전용 기록은 그 이격이 나올 때만 넣어요
-  const hit=new Set((extra||[]).filter(Boolean)); relKeys().forEach(([ref,ks])=>{ if(ks.some(k=>k&&text.includes(k))) hit.add(ref); });
-  if(!R.length){ return hit.size?pf('REL_NONE'):''; }
-  const core=R.filter(r=>(hit.has(r.a)||r.a===REL_ME)&&(hit.has(r.b)||r.b===REL_ME)&&(hit.has(r.a)||hit.has(r.b)));
-  const ring=R.filter(r=>!core.includes(r)&&(hit.has(r.a)||hit.has(r.b)));
-  const pri=r=>r.sys?1:0, rows=[...core.sort((x,y)=>pri(x)-pri(y)),...ring.sort((x,y)=>pri(x)-pri(y))].slice(0,max); if(!rows.length&&!hit.size) return '';
-  const meKnown=new Set(relOf(REL_ME).map(r=>relOther(r,REL_ME))), stranger=[...hit].filter(x=>x!==REL_ME&&relObj(x)&&!meKnown.has(x)&&!relOf(x).length);
-  return pf('REL_CTX',{rows:smRelationRows(rows)||'(이번 인물들의 기록 없음)'})+(stranger.length?pf('REL_STRANGER',{names:stranger.map(x=>relName(x)).join(', ')}):''); }
-const REL_SCHEMA=()=>`"relations":[{"a":"인물 이름","b":"인물 이름(플레이어는 ${T('player')})","kind":"관계 2~8자(예: 첫 만남, 동료, 라이벌, 스승과 제자, 짝사랑, 적대, 은인)","note":"지금 두 사람의 관계 1~2문장","event":"이번에 둘 사이에 있었던 일 한 줄"}]`;
 // 장별 요약(스토리 기억)
 /* 시스템이 맡는 기록: 대본·설정을 읽어 관계와 요약을 채워요(AI 호출 없이) */
 function stageCast(s,withMe){ const set=new Set(); parseScript((s.pre||'')+'\n'+(s.post||'')).forEach(L=>{ if(L.type!=='say'||isMe(L.who)) return; const r=relRef(L.who); if(r&&!r.startsWith('x:')) set.add(r); }); if(withMe&&set.size) set.add(REL_ME); return set; }
@@ -50,8 +40,6 @@ function relFromScripts(ch,src,quiet){ if(!ch||ch.relScan) return 0; let n=0; sr
 function relFromProfiles(quiet){ let n=0; const who=[...G.chars.filter(c=>!c.alt),...(G.npcs||[])];
   who.forEach(a=>{ const txt=String(a.profile||''); if(!txt) return; who.forEach(b=>{ if(a===b||String(b.name).length<2||!txt.includes(b.name)) return; const sen=(txt.split(/(?<=[.!?。])\s*/).find(x=>x.includes(b.name))||'').slice(0,160); n+=relNew(baseChar(a).id||a.id,baseChar(b).id||b.id,'아는 사이',sen,'설정',true); }); });
   if(n&&!quiet) mark('meta'); return n; }
-// 요약이 없는 장의 기본 기억: 등장 인물과 스테이지 흐름
-function sysDigest(ch){ const cast=new Set(); (ch.stages||[]).forEach(s=>stageCast(s,false).forEach(x=>cast.add(relName(x)))); return `${chLogline(ch)?chLogline(ch)+' ':''}등장: ${[...cast].slice(0,10).join(', ')||'없음'}. 흐름: ${ch.stages.map(s=>s.title).join(' → ')}`; }
 function memCatchUp(){ relGC(); if(!G.meta.relProf){ relFromProfiles(); G.meta.relProf=1; mark('meta'); } G.chapters.forEach(ch=>relFromScripts(ch,ch.kind==='event'?'외전 「'+ch.title+'」':ch.title)); }
 // 새 대원 능력치는 희귀도·역할로 시스템이 정해요(밸런스가 들쭉날쭉하지 않게)
 const SYS_BASE=GGMCombat.CHARACTER_BASE_STATS;
@@ -62,7 +50,7 @@ function sysStats(c){ const r=[1,2,3].includes(+c.rarity)?+c.rarity:1,i=r-1,B=SY
 // 적 기본 능력치를 만든 뒤 v2BalanceChapter에서 실제 전투 시뮬레이션으로 조정
 function sysEventFoes(ch){ (ch.stages||[]).forEach((s,i)=>(s.enemies||[]).forEach(e=>{ if(e.manual) return; const m=(1+0.08*i)*(e.boss?4.5:1); e.hp=Math.round(1100*m*(0.92+Math.random()*0.16)); e.atk=Math.round(85*(e.boss?1.3:1)*(1+0.05*i)); e.def=Math.round(42*(1+0.05*i)); e.spd=e.spd||95; })); }
 async function relSeedAI(btn){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return 0; }
-  const r=await aiJSON(`${RULES}\n${ctx()}${storyMemo()}\n\n이미 있는 관계 기록:\n${RELS().map(relLine).join('\n')||'없음'}\n\n${pf('REL_SEED')}\nJSON만 출력: {${REL_SCHEMA()}}`,btn,'default');
+  const r=await aiJSON(relSeedAIPrompt(),btn,'default');
   const n=r?relApply(r.relations,'정리'):0; return n; }
 function relNodeHTML(ref,x,y,big){ const o=relObj(ref), s=o&&imgSrc(o.upper&&imgSrc(o.upper)?o.upper:o), nm=relName(ref,true);
   return `<button class="rl-node ${big?'big':''} ${ref===REL_ME?'me':''} ${o&&o.npc?'npc':''}" style="left:${x}%;top:${y}%" data-act="relgo" data-r="${esc(ref)}"><span class="rl-av">${s?`<img src="${esc(s)}" alt="">`:`<i>${esc(ref===REL_ME?'나':nm.slice(0,1))}</i>`}</span><b>${esc(ref===REL_ME?T('player'):nm)}</b></button>`; }
@@ -88,14 +76,13 @@ function openRelEdit(id){ const r=RELS().find(x=>x.id===id); if(!r) return;
     <label class="f" for="rle_n">설명</label><textarea class="in" id="rle_n" maxlength="240">${esc(r.note||'')}</textarea>
     <label class="f" for="rle_h">있었던 일 (한 줄에 하나, 최근이 아래)</label><textarea class="in" id="rle_h">${esc((r.hist||[]).map(h=>(h.src?h.src+' · ':'')+h.text).join('\n'))}</textarea>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="relsave" data-id="${r.id}">저장</button><button class="btn ghost" data-act="reldel" data-id="${r.id}">이 관계 지우기</button><button class="btn ghost" data-act="relgo" data-r="${esc(RELC)}">돌아가기</button></div>`); }
-function charSchema(slim){return `{"skills":${JSON.stringify(GGMCombat.promptExample({role:"atk"}))},"name":"짧은 이름","faction":"소속 세력","rarity":1~3 정수(3=SSR),"pos":"${POSITIONS().map(p=>p.name).join('|')}","range":"melee(근접)|ranged(원거리)|support(지원) — 무기·전투 방식에 맞게","persona":{"traits":["서로 다른 축의 성격 3개"],"self":"1인칭","call":"플레이어를 부르는 말","ending":"말끝·어미","quirk":"말버릇","catch":"이 캐릭터만 할 대표 대사","gap":"겉과 다른 반전 매력","flaw":"결점","want":"원하는 것","fear":"두려워하는 것","likes":[""],"dislikes":[""],"hobby":"","motif":"상징"},"pfields":{${PERSONA_CFG().tpl.map(k=>`"${k}":""`).join(',')}},"role":"atk|def|sup(포지션의 기본형)","elem":"${ELEMS.join('|')}",${slim?'':'"hp":800~3000(방어형은2280~2820),"atk":80~180,"def":35~160(방어형은122~151),"spd":80~125,'}"skill":{"name":"","kind":"dmg|aoe|heal|shield|buff",${slim?'':'"power":0.8~3.0,"cd":2~4,'}"desc":"한 줄"},"profile":"2~3문장","intro":"${T('gacha')} 연출 첫마디","lines":["로비 인사 대사 8개${CHAR_LINES_RULE}"],"affLines":{"4":["호감도 4부터 나오는 대사"],"7":["호감도 7부터"]},"lvLines":["${T('enhance')} 시 대사 2개"],"dupLines":["${T('limit')} 시 대사 1개"],"touch":{"head":["머리 터치 반응 4개"],"body":["몸 터치 시 당황하거나 놀리는 반응 4개"],"pet":["머리를 쓰다듬어 줄 때 반응 4개"]},"files":[{"dup":1,"text":"${T('limit')} 1단계에 공개되는 비밀 설정"},{"dup":3,"text":"3단계 비밀 설정, 메인 플롯과 연결"}],"weapon":{"name":"${T('weapon')} 이름","desc":"한 줄","prompt":"NovelAI 영어 태그, no humans, object focus로 시작해 simple background, white background로 끝"},"naiPrompt":"..."}`;}
 function aiErrText(e){ const base=AIERR[e&&e.code]||'AI 호출에 실패했어요.'; const m=String((e&&e.message)||'').trim(); if(e&&e.code==='origin_block') return base+' '+m; return m?base+' (서버: '+m.slice(0,160)+')':base; }
 const AIERR={origin_block:'이 서비스가 브라우저에서 온 요청(Origin 헤더)을 막았어요(403).',el_nokey:'설정의 소리에서 ElevenLabs 키를 넣어 주세요.',fish_nokey:'설정의 소리에서 Fish Audio 키를 넣어 주세요.',no_ai:'설정의 글 AI에서 AI를 먼저 등록해 주세요.',model_not_found:'모델 이름이나 리전을 확인해 주세요.',sa_bad:'서비스 계정 JSON을 확인해 주세요. 파일 내용 전체를 붙여넣어야 해요.',bad_key:'키가 올바르지 않거나 권한이 없어요. 설정의 글 AI에서 확인해 주세요.',network:'인터넷 연결을 확인해 주세요.',low_credit:'API 크레딧이 부족해요. Claude Console에서 충전해 주세요.',not_granted:'AI 사용 권한이 꺼져 있어요. 앱의 권한 메뉴에서 켤 수 있어요.',rate_limited:'요청이 많아요. 잠시 후 다시 시도해 주세요.',refused:'AI가 이 요청은 쓰지 않았어요. 수위나 내용을 바꿔 다시 시도해 주세요.',invalid_json:'AI 응답을 읽지 못했어요. 다시 시도해 주세요.',cancelled:'취소했어요.'};
 let AI_QUIET=false,AI_QUIET_LAST=''; // 새 게임 단계 재시도 중에는 같은 오류 알림을 되풀이하지 않고 마지막 원인만 보여 줘요
 async function aiJSON(prompt,btn,tier,images){
   if(!SAMPLE){toast('설정의 글 AI에서 AI를 먼저 등록해 주세요');return null;}
   const label=btn?btn.textContent:'';let loadingTimer;if(btn){btn.disabled=true;btn.textContent='AI가 쓰는 중…';if(String(prompt).includes('skills')){let dots=0;loadingTimer=setInterval(()=>{if(btn.isConnected)btn.textContent='캐릭터와 스킬 생성중'+'.'.repeat(dots++%3+1);},400);}}
-  try{ const skillPrompt=String(prompt).includes('\"skills\"')&&!String(prompt).includes('스킬 JSON은 skills:')?prompt+'\n스킬 작성 규칙: '+pf('SKILL_RULE',GGMCombat.promptData()):prompt; const r=await SAMPLE.json(skillPrompt,{modelTier:tier||'default',cache:false,images});
+  try{ const skillPrompt=aiJSONSkillPromptText({prompt}); const r=await SAMPLE.json(skillPrompt,{modelTier:tier||'default',cache:false,images});
     // AI가 {"chars":[…]} 대신 배열 […]만 돌려주는 경우(Gemini 등): 요청한 형식의 첫 키로 감싸요
     if(Array.isArray(r)){ const m=String(prompt).match(/JSON만 출력[^{\[]*\{\s*"([A-Za-z_]+)"\s*:\s*\[/); if(m) return {[m[1]]:r}; }
     return r; }

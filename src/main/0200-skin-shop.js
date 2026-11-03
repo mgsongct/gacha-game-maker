@@ -13,7 +13,7 @@ async function skinAuto(notes,period){
   const c=rand(cand), evs=G.events.filter(ev=>ev.active!==false&&gateOpen(ev)).map(e=>e.title).join(', ');
   const originalPrompt=c.naiPrompt,skinBase=await naiSkinBase(c);
   if(G!==game||PJ().active!==project||charById(c.id)!==c||c.naiPrompt!==originalPrompt)throw Error('캐릭터나 게임이 바뀌어 스킨 생성을 중단했어요');
-  const r=await aiJSON(`${RULES}\n세계관: ${G.world.summary}\n캐릭터: ${c.name} / ${String(c.profile||'').slice(0,300)}\n변하지 않는 외형(재작성하지 말 것): ${skinBase.appearance}\n기본 의상(새 의상에 복사하지 말 것): ${skinBase.outfit}\n이미 있는 ${T('skin')}: ${(c.skins||[]).map(k=>k.name).join(', ')||'없음'}\n새 의상을 기획하세요. 현재 ${new Date().getMonth()+1}월${evs?', 이벤트: '+evs:''}. 세계관·성격·계절에 어울리게. outfit에는 새 옷·신발·착용 장식만, other에는 표정·자세·소품만 영어 태그로 쓰세요. 머리·눈·피부·체형·종족은 변경하지 마세요.\nJSON만 출력: {"name":"의상 이름","desc":"소개 한 줄","line":"대사 한 줄","outfit":"영어 의상 태그","other":"영어 표정·자세·소품 태그"}`,null,'quick');
+  const r=await aiJSON(skinAutoPrompt({c,skinBase,evs}),null,'quick');
   if(G!==game||PJ().active!==project||charById(c.id)!==c||c.naiPrompt!==originalPrompt)throw Error('캐릭터나 게임이 바뀌어 스킨 생성을 중단했어요');
   if(!r)return null;
   const parts=naiSkinParts(skinBase,r),k={id:'k'+uid(),name:String(r.name||'새 '+T('skin')).slice(0,16),desc:String(r.desc||'').slice(0,80),line:String(r.line||'').slice(0,80),prompt:'',img:null,shop:true,price:SKIN_PRICE,at:Date.now(),period:period||''};

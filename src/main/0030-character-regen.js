@@ -22,7 +22,6 @@ function openRegen(cid){
  <label class="f" for="rg_all">전체 요구사항</label><textarea class="in" id="rg_all" style="min-height:52px" placeholder="선택한 항목에 함께 반영할 컨셉"></textarea><div class="row"><button class="btn" data-act="regengo" data-id="${c.id}">✦ 다시 만들기</button><button class="btn ghost" data-act="regencancel" data-id="${c.id}">취소</button></div>`);
  document.querySelectorAll('#modal [data-rgsel]').forEach(ch=>ch.addEventListener('change',()=>{const row=ch.closest('.rg-row');row.querySelectorAll('input.in,select').forEach(el=>el.hidden=!ch.checked);}));
 }
-function regenSchema(c,sel){const schema={};if(sel.name){schema.name='캐릭터 이름';schema.faction='소속';}if(sel.profile){schema.profile='프로필';schema.intro='첫 인사';schema.files=[{dup:1,text:'비밀 기록'}];}if(sel.look)schema.naiPrompt='NovelAI 영어 외형 태그';if(sel.weapon)schema.weapon={name:'무기 이름',desc:'무기 설명',prompt:'no humans, object focus, weapon, simple background, white background'};if(sel.lines){schema.lines=['로비 대사'];schema.affLines={'4':['호감도 대사']};schema.lvLines=['강화 대사'];schema.dupLines=['돌파 대사'];schema.touch={head:['머리 터치'],body:['몸 터치'],pet:['쓰다듬기']};}return schema;}
 function regenWeaponPrompt(prompt){return joinTags('no humans, object focus',tagList(prompt).filter(t=>!(/\b(1girl|1boy|1other|2girls|2boys|solo|holding)\b/i.test(tagKey(t)))).join(', '),'simple background, white background');}
 function regenParseCharacter(c,response,sel){
  const raw=response&&(Array.isArray(response.chars)?response.chars[0]:Array.isArray(response)?response[0]:response);if(!raw||typeof raw!=='object')throw new Error('캐릭터 응답이 객체가 아니에요.');const nc=clone(c);
@@ -46,7 +45,7 @@ async function regenRun(c,sel,reqs={},global='',slot='active'){
   const nonSkill=Object.keys(sel).some(k=>k!=='skill'&&sel[k]);
   if(nonSkill){let last;for(let attempt=1;attempt<=3;attempt++){v2CheckCancelled(job.controller.signal);regenProgress(job,{kind:'phase',text:`캐릭터 설정 응답 대기 · ${attempt}/3`});try{
     const context={character:{name:c.name,faction:c.faction,profile:c.profile,appearance:c.naiPrompt,weapon:{name:c.weapon?.name,description:c.weapon?.desc},lines:c.lines},selected:Object.keys(sel).filter(k=>k!=='skill'&&sel[k]),requests:reqs,concept:global};
-    const response=await v2SkillRequest(SAMPLE,`${RULES}\n${NAI_CHAR}\n다음 참고 데이터의 선택한 항목만 다시 작성하세요. 선택하지 않은 항목, 스탯, 스킬, 장비 고유 효과는 출력하지 마세요. 세계관: ${G.world.summary}. 참고 ${JSON.stringify(context)}. ${last?'이전 실패: '+last:''} JSON만 출력: ${JSON.stringify(regenSchema(c,sel))}`,job.controller.signal);
+    const response=await v2SkillRequest(SAMPLE,regenRunPrompt({context,last,c,sel}),job.controller.signal);
     state.nc=regenParseCharacter(c,response,sel);last=null;break;
    }catch(e){v2CheckCancelled(job.controller.signal);last=v2FailureText(e);regenProgress(job,{kind:'failure',text:`설정 생성 ${attempt}회 실패: ${last}`});if(['bad_key','no_ai','quota','low_credit','not_granted','payment_required','refused','insufficient_quota','model_not_found','sa_bad'].includes(e?.code)||attempt===3)throw e;}}
   }
@@ -114,7 +113,7 @@ function ultimateSceneSnapshot(c){return JSON.stringify([v2Ensure(c).ultimate,c.
 async function requestUltimateScene(c,instructions='',signal){
  if(!SAMPLE)throw new Error('기술 컷인 장면을 구성하려면 설정 → 글 AI를 먼저 등록해 주세요.');
  const s=v2Ensure(c).ultimate,context={name:c.name,profile:c.profile,appearance:c.naiPrompt,weapon:{name:c.weapon?.name,description:c.weapon?.desc,prompt:c.weapon?.prompt},ultimate:{name:s.name,description:v2SkillText(s,'ultimate'),effects:s.effects,fx:s.fx}};
- const response=await v2SkillRequest(SAMPLE,`${RULES}\n현재 캐릭터의 궁극기 컷인 장면을 NovelAI 영어 태그 10~16개로 작성하세요. 궁극기의 실제 효과와 캐릭터 컨셉을 표현하고 설정에 있는 무기만 사용하세요. 치유·보호 궁극기에 공격 동작을 강요하지 마세요. 외모·화풍·노출 태그는 쓰지 마세요. 세계관: ${G.world.summary}. 참고 자료 ${JSON.stringify(context)}. 사용자의 장면 요청(실제 궁극기 효과를 우선): ${instructions}. JSON만 출력: {"tags":"장면 태그"}`,signal);
+ const response=await v2SkillRequest(SAMPLE,requestUltimateScenePrompt({context,instructions}),signal);
  if(typeof response?.tags!=='string'||!response.tags.trim())throw new Error('AI가 기술 컷인 장면을 비워서 반환했어요. 다시 뽑기를 눌러 주세요.');
  return response.tags.trim().slice(0,2000);
 }
@@ -138,8 +137,8 @@ function illustrationScenePreparation(c,kind,custom){
  const prepare=async(cfg,progress,signal)=>{
   check();if(cfg.sceneReady)return;if(!SAMPLE)throw new Error('설정 → 글 AI를 먼저 등록해 주세요.');
   progress(kind==='lbcg'?'캐릭터·세계관을 바탕으로 최대 돌파 CG 장면 구성 중':'캐릭터·세계관을 바탕으로 일러스트 장면 구성 중');
-  const purpose=kind==='lbcg'?`${T('limit')}를 끝까지 해서 플레이어와 가장 가까워진 순간을 담은 특별 일러스트. 감정이 터지는 한 장면, 드라마틱한 빛과 배경`:'로비와 타이틀·픽업 화면에 쓸 대표 일러스트. 캐릭터의 개성과 세계관이 드러나는 배경';
-  const response=await v2SkillRequest(SAMPLE,`${RULES}\n세계관: ${G.world.summary}\n캐릭터: ${c.name} (${c.faction||''}, ${ROLE[c.role]}) 프로필: ${c.profile}\n외모 태그(반복하지 말 것): ${c.naiPrompt}\n${purpose}의 장면을 NovelAI 영어 태그 10~16개로 써라. 장소, 시간, 날씨, 빛, 표정, 동작, 소품만 포함한다. 외모·화풍·구도·품질 태그는 쓰지 않는다. 노출이나 성적인 태그는 쓰지 않는다. 사용자의 요청과 준비 프롬프트: ${cfg.prompt}. JSON만 출력: {"tags":"태그, 태그"}`,signal);
+  const purpose=illustrationScenePreparationPurposeText({kind});
+  const response=await v2SkillRequest(SAMPLE,illustrationScenePreparationPrompt({c,purpose,cfg}),signal);
   check();if(typeof response?.tags!=='string'||!response.tags.trim())throw new Error('AI가 장면을 비워서 반환했어요. 다시 뽑기를 눌러 주세요.');
   cfg.sceneTags=response.tags.trim().slice(0,2000);
   cfg.prompt=composeNai(kind,joinTags(c.naiPrompt,designTags(c),cfg.sceneTags),{pose:custom.scenePose??'',frame:custom.sceneFrame||target.naiFrame,styleId:custom.sceneStyle||target.naiStyle||c.naiStyle}).input;
@@ -159,26 +158,18 @@ function openDesign(){ const d=G.meta.design||{}, facs=designFacs();
     <div class="row" style="margin-top:12px"><button class="btn" data-act="dssave">저장</button>${SAMPLE?'<button class="btn ghost" data-act="dsai">✦ AI로 제안 받기</button>':''}</div>`); }
 function designRead(){ const fac={}; document.querySelectorAll('#modal [data-fac]').forEach(e=>{ const v=stripMinor(stripAge(e.value.trim())); if(v) fac[e.dataset.fac]=v; }); return {all:stripMinor(stripAge(($('#ds_all')||{}).value?$('#ds_all').value.trim():'')),fac}; }
 async function designAI(btn){ const facs=designFacs(), w=G.world||{};
-  const r=await aiJSON(`${pf('DESIGN_TAGS',{summary:String(w.summary||'').slice(0,600),factions:(w.factions||[]).map(f=>f.name+'('+String(f.desc||'').slice(0,80)+')').join(', ')||'없음',chars:facs.map(f=>'- '+f+': '+G.chars.filter(c=>c.faction===f).slice(0,3).map(c=>String(c.naiPrompt||'').slice(0,120)).join(' / ')).join('\n')})}JSON만 출력: {"all":"","factions":[{"name":"세력 이름 그대로","tags":""}]}`,btn,'quick');
+  const r=await aiJSON(designAIPrompt({w,facs}),btn,'quick');
   if(!r||typeof r!=='object') return; if(r.all&&$('#ds_all')) $('#ds_all').value=stripMinor(String(r.all));
   (Array.isArray(r.factions)?r.factions:[]).forEach(x=>{ const el=[...document.querySelectorAll('#modal [data-fac]')].find(e=>e.dataset.fac===String(x&&x.name||'').trim()); if(el&&x.tags) el.value=stripMinor(String(x.tags)); });
   toast('제안을 채웠어요. 고친 뒤 저장을 눌러 주세요'); }
 // 무기 프롬프트 검사: 사람 태그가 섞였거나 '물건 사진'으로 시작하지 않으면 정리가 필요해요 (PR #3 LTXY12님 아이디어)
 function wpBad(p){ const s=String(p||'').trim(); if(!s) return false; return /\b(1girl|1boy|1other|2girls|2boys|solo|holding)\b/i.test(s)||!/^(no humans|object focus)/i.test(s); }
-async function weaponPromptAI(list,btn,world){ const w=world||G.world; const v=list.map(x=>`- ${T('crew')} "${x.c.name}"(${x.c.faction||'무소속'})의 ${T('weapon')} "${x.name||'?'}"${x.desc?' — '+x.desc:''}${x.cur?'\n  지금 프롬프트: '+String(x.cur).slice(0,220):''}`).join('\n');
-  const r=await aiJSON(`${pf('WEAPON_ART',{name:w.name,summary:String(w.summary||'').slice(0,500),weapon:T('weapon'),list:v})}\nJSON만 출력: {"weapons":[{"name":"캐릭터 이름","prompt":"no humans, object focus, ..."}]}`,btn||null,'quick');
+async function weaponPromptAI(list,btn,world){ const w=world||G.world; const v=weaponPromptAIVText({list});
+  const r=await aiJSON(weaponPromptAIPrompt({w,v}),btn||null,'quick');
   const out=list.map(()=>''); (r&&Array.isArray(r.weapons)?r.weapons:[]).forEach(x=>{ const i=list.findIndex(y=>y.c.name===String(x&&x.name||'').trim()), p=String((x&&x.prompt)||'').trim(); const k=i>=0?i:(list.length===1?0:-1); if(k>=0&&p&&!wpBad(p)) out[k]=p; }); return out; }
 async function fixWeaponPrompts(chars,world){ try{ const bad=(chars||[]).filter(c=>c&&c.weapon&&wpBad(c.weapon.prompt)); if(!bad.length) return 0; const out=await weaponPromptAI(bad.map(c=>({c,name:c.weapon.name,desc:c.weapon.desc,cur:c.weapon.prompt})),null,world); let n=0; bad.forEach((c,i)=>{ if(out[i]){ c.weapon.prompt=out[i]; try{ mark('c:'+c.id); }catch(e){} n++; } }); return n; }catch(e){ return 0; } }
 function allyTags(s){ const L=tagList(s), en=L.some(t=>/^faceless$/i.test(tagKey(t))); return en?L.filter(t=>!/^(faceless|1other|no humans)$/i.test(tagKey(t))).join(', '):String(s||''); }
 function charCaption(c,act){return joinTags(tagList(c.naiPrompt).filter(t=>{const k=tagKey(t);return !COMPO_TAGS.test(k)&&!FRAME_TAGS.test(k)&&!/^(1girl|1boy|solo|\d+girls|\d+boys|mature female|adult woman)$/.test(k);}).join(', '),designTags(c),act);}
-function composeCG(l,opt){
-  opt=opt||{}; const c=naiCfg(), st=naiStyle(c,opt.styleId||l.naiStyle), cast=cgCast(l), n=cast.length;
-  // 인원 태그는 각 인물 프롬프트의 1girl/1boy를 세어 만들어요(남성·혼성 게임에서 1girl로 고정되던 문제)
-  const sx=cast.map(x=>{ const k=tagList(x.c.naiPrompt).map(tagKey); return k.includes('1boy')?'b':k.includes('1other')?'o':'g'; }), ng=sx.filter(x=>x==='g').length, nb=sx.filter(x=>x==='b').length, no=sx.filter(x=>x==='o').length;
-  const count=n?[ng?(ng===1?'1girl':ng+'girls'):'',nb?(nb===1?'1boy':nb+'boys'):'',no?(no===1?'1other':no+'others'):'',n===1?'solo':''].filter(Boolean).join(', '):'no humans';
-  return {input:joinTags(st.tags,c.prefix,count,l.prompt,c.parts.cg.suffix),neg:joinTags(c.neg,st.neg,c.parts.cg.neg,n?'child, loli':''),
-    chars:cast.map(x=>({name:x.c.name,id:x.c.id,prompt:charCaption(x.c,x.act),uc:'',pos:x.pos}))};
-}
 function naiDraw(kind,base,opt){
   opt=opt||{};
   if(kind==='cg'){ const p=composeCG(opt.item||{},opt); return naiGenerate(p.input,'cg',Object.assign({},opt,{neg:p.neg,chars:p.chars})); }
@@ -461,7 +452,7 @@ async function cutoutWhite(blob,o){
 
 /* ---- ComfyUI (local / remote server) ---- */
 function imgProvider(){return naiCfg().provider==='comfy'?'comfy':'nai';}
-function comfyCfg(){return Object.assign({url:'',wf:'',timeoutSec:300,qtags:'masterpiece, best quality, amazing quality',neg:'lowres, bad anatomy, worst quality, low quality, watermark, text'},naiCfg().comfy||{});}
+function comfyCfg(){return Object.assign({url:'',wf:'',timeoutSec:300,qtags:COMFY_TAGS_DEF.qtags,neg:COMFY_TAGS_DEF.neg},naiCfg().comfy||{});}
 function imgReady(){return imgProvider()==='comfy'?!!(comfyCfg().url&&comfyCfg().wf):!!naiCfg().key;}
 function imgNeed(){return imgProvider()==='comfy'?'설정의 그림 AI에서 ComfyUI 주소와 워크플로를 넣어 주세요':'설정의 그림 AI에 NovelAI 토큰을 넣어 주세요';}
 function sdTags(s){return String(s||'').replace(/(-?\d+(?:\.\d+)?)::\s*([^:]+?)\s*::/g,(m,w,t)=>`(${t}:${(+w).toFixed(2)})`);}
@@ -538,7 +529,7 @@ async function naiGenerate0(prompt,kind,opts){
   const ql=''; // Quality is already part of the composed style prompt.
   let input=ql?joinTags(prompt,ql):String(prompt||''), neg=opts.neg!=null?opts.neg:(c.neg||'');
   if(['char','enemy'].includes(kind)) neg=joinTags(neg,'drop shadow, cast shadow');
-  if(tp){ input=joinTags(tagList(prompt).filter(t=>!BGTAG.test(tagKey(t))).join(', '),'transparent background',ql); neg=tagList(neg).filter(t=>!/^(gradient background|simple background)$/i.test(tagKey(t))).join(', '); }
+  if(tp){ input=joinTags(tagList(prompt).filter(t=>!BGTAG.test(tagKey(t))).join(', '),TP_BG_TAG,ql); neg=tagList(neg).filter(t=>!/^(gradient background|simple background)$/i.test(tagKey(t))).join(', '); }
   const rnd=()=>{try{return crypto.getRandomValues(new Uint32Array(1))[0];}catch(e){return Math.floor(Math.random()*4294967295);}};
   const seed=opts.seed!=null&&String(opts.seed).trim()!==''?(Math.floor(+opts.seed)>>>0):rnd(); opts.usedSeed=seed;
   const P={params_version:3,width:w,height:h,scale:num(c.scale,0,10,6),sampler:c.sampler||'k_euler_ancestral',steps:Math.round(num(c.steps,1,50,28)),n_samples:1,ucPreset:0,qualityToggle:false,

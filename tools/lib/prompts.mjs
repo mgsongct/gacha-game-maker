@@ -3,6 +3,8 @@
 // 범위: 글 AI 호출(aiJSON·aiJSONRetry·aiCall·SAMPLE.json과, 받은 인자를 그대로 넘기는 감싸기 함수)의 프롬프트 인자,
 //       그 안에서 부르거나 가리키는 최상위 함수·상수(프롬프트 조립 — ctx·charSchema 등, 5단계까지). 화면 글·샘플 이야기는 프롬프트로 가지 않으면 셈하지 않음.
 // 지시문은 해라체(…한다·…쓴다·…않는다·…하라·JSON만 출력)라 데이터 글과 갈림. pfDef에 등록된 기본값(getter가 가리키는 함수·상수)은 스튜디오 조각이라 뺌.
+import { readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { walk } from './source.mjs';
 import { moduleOf, inModule, localDefs } from './scope.mjs';
 
@@ -41,6 +43,7 @@ function resolveArg(a0) { if (a0?.type === 'member_expression' && a0.childForFie
 const DATA_CALL = /^(includes|startsWith|endsWith|indexOf|lastIndexOf|test|split|match|matchAll|search|has|get|set|delete|getItem|setItem|removeItem|querySelector|querySelectorAll|getElementById|addEventListener|removeEventListener|closest|getAttribute|setAttribute|T|pf|promptFrag|mark|parseInt|parseFloat|Number)$/;
 export function outputPos(n) { const p = n.parent; if (!p) return true;
   if (p.type === 'binary_expression' && /^(===|!==|==|!=|<|>|<=|>=|in|instanceof)$/.test(p.childForFieldName('operator')?.text || '')) return false;
+  if (p.type === 'arguments' && p.parent?.type === 'new_expression' && /Error$/.test(p.parent.childForFieldName('constructor')?.text || '')) return false; // 오류 문구는 실행 중 데이터
   if (p.type === 'switch_case' || (p.type === 'pair' && p.childForFieldName('key')?.id === n.id) || (p.type === 'subscript_expression' && p.childForFieldName('index')?.id === n.id)) return false;
   if (p.type === 'arguments') { const c = p.parent, f = c?.childForFieldName('function'), nm = f?.type === 'member_expression' ? f.childForFieldName('property')?.text : f?.text; if (DATA_CALL.test(nm || '')) return false; if (nm === 'replace' || nm === 'replaceAll') return p.namedChildren[0]?.id !== n.id; }
   return true; }
@@ -52,32 +55,35 @@ function outputs(d) { let f = d;
   const out = []; walk(body, n => { if (n.id !== body.id && FN.has(n.type)) return false; if (n.type === 'return_statement' && n.namedChildren[0]) out.push(n.namedChildren[0]); }); return out; }
 // 오류 처리(catch) 안에서 정한 값은 실행 중 데이터(오류 설명을 다음 요청에 피드백) — 프롬프트 글이 아님
 const inCatch = n => { for (let p = n.parent; p && !FN.has(p.type); p = p.parent) if (p.type === 'catch_clause') return true; return false; };
+const PURE = /^\s*\/\*[^*]*?(순수|DOM-free|Pure)/;
+// 공용 글 도구(tools/prompt-shared.json): 게임 데이터를 글로 나타내 화면과 프롬프트가 같이 쓰는 함수 — 스튜디오 밖에 두기로 정한 것(이유와 함께 적음). 프롬프트 흐름은 이 함수 안으로 들어가지 않음
+export const sharedHelpers = root => { const f = join(root, 'tools/prompt-shared.json'); return existsSync(f) ? Object.keys(JSON.parse(readFileSync(f, 'utf8')).shared || {}) : []; };
 const TEXT_METHOD = /^(join|trim|slice|replace|replaceAll|concat|toString|padStart|padEnd|toUpperCase|toLowerCase|repeat)$/;
 // 프롬프트 흐름(정적): 받는 호출(글 AI — 감싸기 함수 포함, 또는 opts.sinks)마다 프롬프트 인자 식(site.root)과,
 //   그 식에서 닿는 식들 — 글로 쓰는 지역 변수의 값(선언·대입·push), 부르거나 가리키는 최상위 함수가 돌려주는 식·글 상수(5단계), GGM 모듈 함수가 돌려주는 식.
 //   flow(seeds, visit): seeds에서 닿는 식을 차례로 visit(node, u, depth) — 프롬프트 조합 도구(tools/lib/combos.mjs)와 스튜디오 밖 글 셈이 같이 씀
 export function promptFlow(units, opts = {}) {
-  const bases = fragBases(units), calls = aiCallees(units, opts.sinks), tops = new Map();
+  const shared = new Set(opts.shared || []), bases = fragBases(units), calls = aiCallees(units, opts.sinks), tops = new Map();
   for (const u of units) { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const nm = declName(r.child(i)); if (nm && !tops.has(nm)) tops.set(nm, { u, node: r.child(i) }); } }
   // 창 게터: Object.defineProperty(window,'RULES',{get:rulesText}) → RULES는 rulesText처럼 따라감 / 모듈 이름공간(GGM…)의 함수: GGMCombat.promptData → 모듈 안 function promptData
   const getters = new Map(), modFns = new Map();
   for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'call_expression' && callee(n) === 'Object.defineProperty') { const a = n.childForFieldName('arguments')?.namedChildren || []; const nm = a[1]?.text.replace(/^['"]|['"]$/g, ''), get = a[2]?.namedChildren.find(c => c.type === 'pair' && c.childForFieldName('key')?.text === 'get')?.childForFieldName('value'); if (a[0]?.text === 'window' && nm && get?.type === 'identifier' && tops.has(get.text)) getters.set(nm, get.text); }
-    if (u.name.startsWith('module:') && n.type === 'function_declaration') { const nm = n.childForFieldName('name')?.text; if (nm && !modFns.has(nm)) modFns.set(nm, { u, node: n }); } });
+    if (u.name.startsWith('module:') && !PURE.test(u.text) && n.type === 'function_declaration') { const nm = n.childForFieldName('name')?.text; if (nm && !modFns.has(nm)) modFns.set(nm, { u, node: n }); } }); // 순수 모듈(규칙 엔진)의 글은 엔진 데이터 — 원칙상 프롬프트를 둘 수 없는 곳
   const sites = []; for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression') return; const ai = calls.idx(n); if (ai >= 0) { /* 인자를 받는 .json(…)도(넘겨받은 글 AI — fetch 응답의 .json()은 인자 없음) */ const root = resolveArg(n.childForFieldName('arguments')?.namedChildren[ai]); if (root) sites.push({ u, call: n, root, sink: callee(n), owner: ownerOf(n) || '(최상위 문장)', loc: u.loc(n) }); } });
   // 연결 층: 받는 호출(aiCall·aiJSON …)이 받은 프롬프트를 넘겨받는 함수(인자 자리로 따라감)에서 그 프롬프트에 덧붙이는 글(P2=prompt+'…JSON만 출력한다' 등) — 모든 요청에 붙는 글
   const carry = new Map(); for (const [k, i] of calls) if (tops.has(k)) carry.set(k, new Set([i]));
   const paramsOf = t => { let f = t.node; if (f.type !== 'function_declaration') f = f.namedChildren.find(c => c.type === 'variable_declarator')?.childForFieldName('value'); const ps = f?.childForFieldName('parameters'); return ps ? ps.namedChildren.map(c => c.type === 'identifier' ? c.text : c.type === 'assignment_pattern' ? c.childForFieldName('left')?.text : null) : []; };
   for (let grew = true; grew;) { grew = false; for (const [k, idx] of [...carry]) { const t = tops.get(k), names = paramsOf(t).filter((x, i) => idx.has(i));
     walk(t.node, n => { if (n.type !== 'call_expression') return; const f = callee(n); if (!tops.has(f) || f === k) return; (n.childForFieldName('arguments')?.namedChildren || []).forEach((a, i) => { if (a.type === 'identifier' && names.includes(a.text)) { const s2 = carry.get(f) || new Set(); if (!s2.has(i)) { s2.add(i); carry.set(f, s2); grew = true; } } }); }); } }
-  for (const [k, idx] of carry) { const t = tops.get(k), names = paramsOf(t).filter((x, i) => idx.has(i)), mentions = v => { let hit = false; walk(v, m => { if (m.type === 'identifier' && names.includes(m.text)) hit = true; }); return hit; };
+  for (const [k, idx] of carry) { const t = tops.get(k), names = paramsOf(t).filter((x, i) => idx.has(i)), mentions = v => { let hit = false; walk(v, m => { if ((m.type === 'identifier' || m.type === 'shorthand_property_identifier') && names.includes(m.text)) hit = true; }); return hit; };
     walk(t.node, n => { const v = n.type === 'variable_declarator' ? n.childForFieldName('value') : (n.type === 'assignment_expression' || n.type === 'augmented_assignment_expression') ? n.childForFieldName('right') : null;
-      if (v && /^(binary_expression|template_string|ternary_expression)$/.test(v.type) && mentions(v)) sites.push({ u: t.u, call: n, root: v, sink: '(연결 층)', owner: k, loc: t.u.loc(n), layer: true }); }); }
+      if (v && /^(binary_expression|template_string|ternary_expression|call_expression)$/.test(v.type) && mentions(v)) sites.push({ u: t.u, call: n, root: v, sink: '(연결 층)', owner: k, loc: t.u.loc(n), layer: true }); }); }
   const flow = (seeds, visit, onExpr) => { const done = new Set(), seen = new Set(), q = seeds.map(x => ({ ...x, depth: 0 }));
     while (q.length) { const { u, node, depth } = q.shift(); if (!node || done.has(node.id)) continue; done.add(node.id); if (onExpr) onExpr(node, u, depth); /* 흐름에 든 식 하나(인자·지역 변수 값·돌려주는 식) */
-      walk(node, n => { if (n.type === 'call_expression' && callee(n) === 'pfDef') return false; visit(n, u, depth);
+      walk(node, n => { if (n.type === 'call_expression' && callee(n) === 'pfDef') return false; if (/^(arrow_function|function_expression)$/.test(n.type) && n.parent?.type === 'pair') return false; /* 객체 속성에 넣은 콜백(onProgress 등)은 값이 아님 */ visit(n, u, depth);
         if (n.type === 'identifier' || n.type === 'shorthand_property_identifier') { const p = n.parent, asCallee = p?.type === 'call_expression' && p.childForFieldName('function')?.id === n.id, asObj = !opts.tables && p?.type === 'member_expression' && p.childForFieldName('object')?.id === n.id && !TEXT_METHOD.test(p.childForFieldName('property')?.text || ''); /* 그림 태그는 설정 객체의 필드(C.quality)로도 감 */
           const defs = asCallee || asObj ? [] : localDefs(n).filter(d => !inCatch(d)); if (defs.length) { defs.forEach(d => q.push({ u, node: d, depth })); return; } // 글로 쓰는 지역 변수
-          const name = getters.get(n.text) || n.text; if (depth < 5 && tops.has(name) && !bases.has(name) && !seen.has(name) && (getters.has(n.text) || opts.tables || assembles(n, tops.get(name)))) { seen.add(name); const t = tops.get(name); (opts.tables && !asCallee ? [t.node] : outputs(t.node)).forEach(o => q.push({ u: t.u, node: o, depth: depth + 1 })); } }
+          const name = getters.get(n.text) || n.text; if (depth < 5 && tops.has(name) && !bases.has(name) && !shared.has(name) && !seen.has(name) && (getters.has(n.text) || opts.tables || assembles(n, tops.get(name)))) { seen.add(name); const t = tops.get(name); (opts.tables && !asCallee ? [t.node] : outputs(t.node)).forEach(o => q.push({ u: t.u, node: o, depth: depth + 1 })); } }
         if (n.type === 'member_expression' && /^GGM\w+$/.test(n.childForFieldName('object')?.text || '') && depth < 5) { const p = n.childForFieldName('property')?.text, k = 'mod:' + p; if (modFns.has(p) && !seen.has(k)) { seen.add(k); const t = modFns.get(p); outputs(t.node).forEach(o => q.push({ u: t.u, node: o, depth: depth + 1 })); } } }); }
     return seen; };
   return { sites, flow, tops, getters, bases, calls }; }
@@ -106,9 +112,18 @@ export function fragmentFiles(units) { const files = new Map(), mods = new Map()
 // DOM·브라우저 전역·앱 상태(G·P()·render·toast·aiJSON 등)를 참조하면 안 됨(docs/build.md §3, docs/modules.md §6·§8-1·§8-2)
 const APP_GLOBALS = new Set(['document', 'window', 'localStorage', 'sessionStorage', 'navigator', 'G', 'P', 'render', 'toast', 'mark', 'flush', 'appStorage', 'SAMPLE', 'aiJSON', 'T', 'ctx', 'openModal', 'closeModal', 'esc', '$']);
 export function pureModules(units) { const out = [];
-  for (const u of units) { if (!u.name.startsWith('module:') || !/^\s*\/\*[^*]*?(순수|DOM-free|Pure)/.test(u.text)) continue; const local = new Set();
+  for (const u of units) { if (!u.name.startsWith('module:') || !PURE.test(u.text)) continue; const local = new Set();
     walk(u.tree.rootNode, n => { if (n.type === 'variable_declarator' || n.type === 'function_declaration') { const nm = n.childForFieldName('name'); if (nm?.type === 'identifier') local.add(nm.text); }
       if (n.type === 'formal_parameters') walk(n, m => { if (m.type === 'identifier') local.add(m.text); });
       if (n.type === 'arrow_function' && n.childForFieldName('parameter')) local.add(n.childForFieldName('parameter').text); });
     walk(u.tree.rootNode, n => { if (n.type === 'identifier' && APP_GLOBALS.has(n.text) && !local.has(n.text)) out.push({ loc: u.loc(n), name: n.text, unit: u.name }); }); }
   return out; }
+// 프롬프트 조립 함수가 스튜디오 밖: 프롬프트 흐름에 든 최상위 함수 중 돌려주는 글에 스튜디오 조각(pf('ID')·promptFrag('ID')·조각 게터)을 넣는 함수 —
+//   글자는 없어도 조각을 고르고 잇는 프롬프트 조립(규칙 글·성별·출연 규칙 등)이라 스튜디오 일. 조각을 데이터와 함께 바로 보내는 기능 코드(aiJSON(pf('ID',{…})))는 셈하지 않음(요청 지점 식)
+// 불러올 때 조각을 읽음: 함수 밖(불러올 때)에서 pf()·promptFrag()를 부르면 게임별 수정(G.meta.prompts)이 그 뒤로 반영되지 않음
+export function promptBuilders(units, opts = {}) { const F = promptFlow(units, opts), ids = new Set(); for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'call_expression' && callee(n) === 'pfDef') { const a = n.childForFieldName('arguments')?.namedChildren[0]; if (a?.type === 'string') ids.add(a.text.slice(1, -1)); } });
+  const isFrag = n => (n.type === 'call_expression' && /^(pf|promptFrag)$/.test(callee(n) || '')) || ((n.type === 'identifier' || n.type === 'shorthand_property_identifier') && ids.has(n.text) && n.parent?.type !== 'variable_declarator');
+  const out = new Map(), siteRoots = new Set(F.sites.map(s => s.root.id));
+  F.flow(F.sites.map(s => ({ u: s.u, node: s.root })), (n, u, depth) => { if (depth < 1 || !isFrag(n)) return; const loc = u.loc(n); if (inModule(loc, opts.home)) return; const own = ownerOf(n); if (own && !out.has(own)) out.set(own, loc); });
+  const loadTime = []; for (const u of units) { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type === 'function_declaration') continue; walk(c, n => { if (/^(arrow_function|function_expression|method_definition)$/.test(n.type)) return false; if (n.type === 'call_expression' && /^(pf|promptFrag)$/.test(callee(n) || '') && !inModule(u.loc(n), opts.home)) loadTime.push({ loc: u.loc(n), text: n.text.slice(0, 60) }); }); } }
+  void siteRoots; return { builders: [...out].map(([fn, loc]) => ({ fn, loc })), loadTime }; }

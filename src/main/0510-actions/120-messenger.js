@@ -21,7 +21,7 @@ case 'phmenuclose': { if(t.classList.contains('ph-menu')&&e.target!==t) break; $
 case 'phadd': phAddView(id,PH&&PH.fc?'room':'list'); break;
 case 'phaddback': { const a=PH&&PH.add, fr=PH&&PH.from; if(a&&fr==='room') openRoom(a); else phNewList(); break; }
 case 'phaddai': { const c=charById(id); if(!c) break; const hint=$('#pa_hint').value.trim();
-      const r=await aiJSON(`${pf('THREAD_REPLY',{RULES,ctx:ctx(),THREAD_FMT,crew:T('crew'),name:c.name,profile:c.profile||'',lines:(c.lines||[]).join(' / '),own:own(c.id)?affLv(own(c.id)):1,fcProgress:fcProgress(),hint:hint?'요청: '+hint:'요청: 지금 이 캐릭터가 보낼 법한 일상적인 메신저 대화',roomLog:roomLog(c.id).slice(-10).map(l=>l.w==='me'?playerName()+': '+l.t:l.w==='c'?c.name+': '+l.t:'').filter(Boolean).join('\n'),player:T('player')})}\nJSON만 출력: {"title":"대화방 미리보기 제목","script":"대화"}`,t);
+      const r=await aiJSON(phaddaiPrompt({c,hint}),t);
       if(r&&$('#pa_script')){ if(r.title) $('#pa_title').value=String(r.title); if(r.script) $('#pa_script').value=nl(r.script); toast('대화를 채웠어요. 고칠 곳이 있으면 고치고 받기를 누르세요'); } break; }
 case 'phaddsend': { const c=charById(id); if(!c) break; const sc=$('#pa_script').value.trim(); if(!sc){ toast(SAMPLE?'대화를 쓰거나 AI로 대화 쓰기를 눌러 주세요':'대화를 써 주세요'); break; }
       const now=Date.now(), th={id:uid(),charId:c.id,title:$('#pa_title').value.trim()||'메시지',trigger:{type:'start'},needOwn:!!own(c.id),script:sc,added:true};
