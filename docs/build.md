@@ -3,7 +3,7 @@
 TiddlyWiki처럼 **배포물은 HTML 하나**이고, 개발은 파트·모듈 파일로 나눠서 합니다. `build/`는 Node 기본 모듈만 써서 의존성 설치(`npm install`)가 필요 없습니다(Node 18+).
 
 ```bash
-node build/build.mjs          # src/ → www/index.html, version.json의 build·sha256 맞춤
+node build/build.mjs          # src/ → www/index.html, version.json의 build·sha256 맞춤 (스크립트 블록마다 JS 구문 검사 — 오류면 빌드 안 함, 오류 줄의 src 파일 표시)
 ```
 
 ```bash

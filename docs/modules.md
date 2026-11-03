@@ -205,7 +205,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8-2-2. 밸런스 관리
 
-- `src/main/0187-balance.js`: `BAL()`(G.meta.balance), `balanceGeneration`(v2CurrentGeneration이 먼저 물어봄), `balanceOptions`(전투 보정 → rulesOptions → v2Options), `balInfo/balNormalize/balRemaster`, 생성 시 `balanceOnCreate`(cleanChar)
+- `src/main/0187-balance.js`: `BAL()`(G.meta.balance), `balanceGeneration`(v2CurrentGeneration이 먼저 물어봄), `balanceOptions`(전투 보정 → rulesOptions → v2Options), `balInfo/balNormalize/balRemaster`, 구캐릭터 AS AI 리마스터 `balRemasterAI`(저장된 스킬 설계 의도 `c.skillPlan`·이름을 지키며 새 세대 예산으로 다시 설계 — 세대 맞추기·점검 `c_genlag`), 생성 시 `balanceOnCreate`(cleanChar)
 - 엔진 `genBoost`: 세대 차이당 보정(아군만)
 - 설계: [research/balance.md](research/balance.md)
 

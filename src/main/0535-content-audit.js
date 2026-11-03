@@ -84,7 +84,7 @@ async function auditFixOne(rule,o){ const m=rule.fix.mode;
   if(m==='ai-run') return !!(await rule.fix.run(o));
   if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); return true; }
   if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); return true; }
-  if(m==='skills-remaster'&&balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); return true; }
+  if(m==='skills-remaster'&&await balRemasterAI(o)){ auditMarkObj(o); return true; }
   return false; }
 async function auditFix(rule,items){
   if(AUDIT_JOB){ toast('점검 작업이 진행 중이에요'); return; } const m=rule.fix.mode;

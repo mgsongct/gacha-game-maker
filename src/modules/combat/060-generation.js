@@ -136,11 +136,13 @@ async function v2SkillRequest(provider,prompt,signal){
  catch(e){if(timedOut&&!signal?.aborted){const err=new Error('AI 응답을 받지 못했습니다.');err.code='timeout';throw err;}throw e;}
  finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);}
 }
+/* 스킬 설계 의도(원안부터 AI에 먼저 쓰게 한 것 — 세트 설계 designPlan 글, 슬롯 재설계 plan{theme,role,nameReason}) → 저장·표시용 한 줄 */
+function v2SkillPlanText(p){ if(!p) return ''; if(typeof p==='string') return p.trim().slice(0,300); if(typeof p==='object') return [p.theme,p.role,p.nameReason].filter(x=>typeof x==='string'&&x.trim()).map(x=>x.trim()).join(' · ').slice(0,300); return ''; }
 function v2RecoverySlot(c,slot,concept,base,plan){
  const C=GGMCombat,types=[];
  if(!types.length)types.push(c.role==='sup'?'heal':c.role==='def'?'shield':/연타|난사/.test(concept)?'multi':'damage');
  const effects=types.map(type=>C.defaultEffect(type,{condition:'always'}));
- const raw={name:v2ConceptName(c,slot),description:'응답 복구 초안: '+String(plan?.theme||concept||c.profile||C.SLOTS[slot]).slice(0,200),cooldown:slot==='ultimate'?22:slot==='passive'?12:8,initial:slot==='passive'?0:8,trigger:'interval',effects};
+ const raw={name:v2ConceptName(c,slot),description:'응답 복구 초안: '+String((typeof plan==='string'?plan:plan?.theme)||concept||c.profile||C.SLOTS[slot]).slice(0,200),cooldown:slot==='ultimate'?22:slot==='passive'?12:8,initial:slot==='passive'?0:8,trigger:'interval',effects};
  const recipe=Object.keys(C.aiRecipes(c,slot))[0];return v2CompileGenerated({...raw,recipe,extras:[]},slot,base,c);
 }
 async function v2GenerateSelected(c,slot,concept,base,{signal,onEvent=()=>{}}={}){
@@ -197,7 +199,7 @@ async function v2GenerateSelected(c,slot,concept,base,{signal,onEvent=()=>{}}={}
   if(r.report.status==='strong')throw new Error('세대 기준에 맞는 스킬을 완성하지 못했어요. 기존 스킬은 유지했어요.');
   onEvent({kind:'fallback',text:'약화 재설계 후에도 기준을 초과하여 같은 세대의 기본 초안을 구성했습니다. 내용을 확인하고 저장해 주세요.'});
  }
- v2CheckCancelled(signal);onEvent({kind:'final',attempt:requestsUsed,slot,skill:GGMCombat.clone(r.kit[slot]),fallback,report:GGMCombat.clone(r.report),text:'최종 완성 스킬 · '+r.kit[slot].name});onEvent({kind:'success',text:fallback?'복구 초안 검사 완료. 확인 후 저장해 주세요.':'선택한 스킬의 생성·검사 완료. 확인 후 저장해 주세요.'});return {...r,fallback,repairs:compiled.repairs};
+ v2CheckCancelled(signal);onEvent({kind:'final',attempt:requestsUsed,slot,skill:GGMCombat.clone(r.kit[slot]),fallback,report:GGMCombat.clone(r.report),text:'최종 완성 스킬 · '+r.kit[slot].name});onEvent({kind:'success',text:fallback?'복구 초안 검사 완료. 확인 후 저장해 주세요.':'선택한 스킬의 생성·검사 완료. 확인 후 저장해 주세요.'});return {...r,fallback,repairs:compiled.repairs,plan};
 }
 function v2PaletteLog(c,slot,raw,compiled,attempt){
  const C=GGMCombat,skill=compiled.skill,decision=compiled.paletteDecision||C.skillPaletteDecision(c,slot,{...raw,type:skill.effects[0]?.type});

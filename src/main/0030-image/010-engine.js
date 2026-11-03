@@ -52,7 +52,7 @@ async function regenRun(c,sel,reqs={},global='',slot='active'){
   regenAssertCurrent(state);
   if(sel.skill){const concept=[global,reqs.skill].filter(Boolean).join('\n'),nc=state.nc;nc.skillConcept=concept||c.skillConcept||'';nc.generation=GGMCombat.generation(c);const base=clone(v2Ensure(c));
    const result=await v2GenerateSelected(nc,slot,concept,base,{signal:job.controller.signal,onEvent:e=>regenProgress(job,e)});v2CheckCancelled(job.controller.signal);
-   nc.skills={...base,[slot]:clone(result.kit[slot])};state.report=clone(result.report);state.fallback=!!result.fallback;
+   nc.skills={...base,[slot]:clone(result.kit[slot])};nc.skillPlan={...(c.skillPlan||{}),[slot]:v2SkillPlanText(result.plan)};state.report=clone(result.report);state.fallback=!!result.fallback;
   }
   v2CheckCancelled(job.controller.signal);regenAssertCurrent(state);if(REGEN_JOB!==job)return;state.history=clone(job.history);clearInterval(job.timer);REGEN_JOB=null;closeModal();REGEN=state;regenPreview();
  }catch(e){if(REGEN_JOB===job){job.status=e.name==='AbortError'?'작업을 중단했어요. 기존 캐릭터는 유지돼요.':v2FailureText(e);job.history.push({kind:'failure',text:job.status});const el=document.getElementById('regen-job-status');if(el)el.textContent=job.status;regenProgress(job,{kind:'phase',text:job.status});const b=document.querySelector('[data-act=regencancel]');if(b)b.textContent='닫기';}}
@@ -82,6 +82,8 @@ function regenPreview(){const R=REGEN,c=R&&charById(R.cid);if(!R||!c)return;cons
   (R.history.length?'<details>'+v2GenerationHistoryHTML(R.history)+'</details>':'')+
   '<p id="regen-apply-status" role="status" aria-live="polite"></p><div class="row"><button class="btn" data-act="regenapply">이대로 적용</button><button class="btn ghost" data-act="regenedit">✎ 고치기</button><button class="btn ghost" data-act="regenretry">다시 만들기</button><button class="btn ghost" data-act="regencancel">취소</button></div>');
 }
+/* 다시 만들기로 바꾼 스킬의 설계 의도(슬롯 재설계 plan)를 캐릭터에 */
+function regenKeepPlan(c,nc){ if(nc.skillPlan) c.skillPlan=clone(nc.skillPlan); }
 async function regenApply(){const R=REGEN;if(!R||R.busy)return;const c=charById(R.cid);if(!c)return;try{regenAssertCurrent(R);regenReadPreview(R);}catch(e){toast(e.message);return;}R.busy=true;R.controller=new AbortController();
  const status=t=>{const el=document.getElementById('regen-apply-status');if(el)el.textContent=t;};document.querySelectorAll('[data-act=regenapply],[data-act=regenretry],[data-act=regenedit]').forEach(b=>b.disabled=true);
  try{const nc=R.nc,S=R.sel;let report=R.report;
@@ -91,7 +93,7 @@ async function regenApply(){const R=REGEN;if(!R||R.busy)return;const c=charById(
   if(S.profile)for(const k of ['profile','intro','files'])if(nc[k]!==undefined)c[k]=clone(nc[k]);
   if(S.look&&nc.naiPrompt!==c.naiPrompt){c.naiPrompt=stripMinor(stripAge(nc.naiPrompt));if(nc.naiBlocks?.naiPrompt)c.naiBlocks={...c.naiBlocks,naiPrompt:clone(nc.naiBlocks.naiPrompt)};for(const o of [c,c.upper,c.illust,c.lbcg,c.pose,c.lbbg,c.scg,...(c.faces||[]),...(c.faces||[]).map(f=>f.up)])if(o&&o.img)cleanup.push(imgClear(o));delete c.faceMask;charCGs(c).forEach(l=>{if(l.img){l.redraw=true;mark('l:'+l.id);}});}
   if(S.weapon){if(oldWeapon?.img)cleanup.push(imgClear(oldWeapon));c.weapon={...oldWeapon,name:nc.weapon.name,desc:nc.weapon.desc,prompt:nc.weapon.prompt,id:'w_'+c.id,img:null};delete c.weapon.seed;const ow=oldWeapon?.name||'',nw=nc.weapon.name;if(weaponRenameOk(ow,nw))renameEverywhere(ow,nw);}
-  if(S.skill){c.skills={...base,[R.slot]:clone(nc.skills[R.slot])};c.skillConcept=nc.skillConcept||c.skillConcept||'';c.skillTuning='manual';v2EquipmentSkillSaved(c,R.slot,base[R.slot],c.skills[R.slot],true);c.skillDesignLog=clone(R.history);if(R.fallback)c.skillGenerationWarning='검사한 복구 초안을 사용 중입니다.';else delete c.skillGenerationWarning;delete c.skillGenerationNotice;c.skillBalance={...report,fingerprint:v2Fingerprint(c)};}
+  if(S.skill){c.skills={...base,[R.slot]:clone(nc.skills[R.slot])};c.skillConcept=nc.skillConcept||c.skillConcept||'';regenKeepPlan(c,nc);c.skillTuning='manual';v2EquipmentSkillSaved(c,R.slot,base[R.slot],c.skills[R.slot],true);c.skillDesignLog=clone(R.history);if(R.fallback)c.skillGenerationWarning='검사한 복구 초안을 사용 중입니다.';else delete c.skillGenerationWarning;delete c.skillGenerationNotice;c.skillBalance={...report,fingerprint:v2Fingerprint(c)};}
   if(S.lines)for(const k of ['lines','affLines','lvLines','dupLines','touch'])if(nc[k]!==undefined)c[k]=clone(nc[k]);
   v2SyncEquipment(c);mark('c:'+c.id);await Promise.allSettled(cleanup);if(REGEN!==R||PJ().active!==R.project)return;REGEN=null;closeModal();render();openChar(c.id);toast('선택한 항목을 적용했어요. 강화 단계는 유지돼요.');
  }catch(e){if(REGEN===R){status(e.name==='AbortError'?'적용을 중단했어요.':e.message);toast(e.message);}}

@@ -317,10 +317,14 @@ try {
     const kit = GGMCombat.normalize(GGMCombat.generationDefaults({ role: 'atk' })), u = (c, gen) => ({ name: 'u', role: 'atk', elem: G.meta.elems[0].n, hp: 1000, atk: 100, def: 50, spd: 100, kit, baseKit: kit, ready: {}, c: { ...c, generation: gen } });
     const sim = GGMCombat.create([u(old, 1), u(old, 3)], [{ ...u(old, 3), c: null }], { ...op, seed: 2 }); o.boost = sim.allies[0].maxhp === 1200 && sim.allies[1].maxhp === 1000;
     G.meta.balance = Object.assign(G.meta.balance, { catchUp: 'remaster', lag: 1 }); o.lagDetect = auditScan().some(gr => gr.rule.id === 'c_genlag' && gr.items.includes(old)); o.remaster = balRemaster(old) && old.generation === 2 && !old.skillBalance;
+    /* 구캐릭터 AS AI 리마스터: 저장된 설계 의도(skillPlan)·스킬 이름을 지키며 새 세대 예산으로 다시 설계 — 가짜 글 AI는 프롬프트의 형식 견본을 이름만 바꿔 답함(이름은 코드가 지킴) */
+    const o2 = { ...clone(old), id: 'oldgen2', name: '구캐' }; G.chars.push(o2); o2.generation = 1; /* cleanChar(mkc)는 다음 틱에 AI 스킬 설계를 예약해 가짜 AI로 덮어씀 — 이미 있던 캐릭터처럼 복사 */ o2.skills = GGMCombat.normalize(GGMCombat.generationDefaults(o2)); o2.skills.passive.name = '별빛 맹세'; o2.skills.active.name = '유성 베기'; o2.skills.ultimate.name = '낙성'; o2.skillPlan = { kit: '별 모티프 연계' }; o2.skillBalance = null;
+    const rps = [], rpOf = () => rps.find(p => /구캐릭터 리마스터/.test(p)) || ''; SAMPLE = { json: async p => { rps.push(p); /* 앞서 만든 캐릭터들의 예약된 스킬 설계도 이 가짜 AI로 돌 수 있어 모아서 봄 */ const j = JSON.parse(p.match(/JSON만 출력:\s*(\{[\s\S]*\})\s*$/)[1]); j.designPlan = '새 세대 의도'; for (const x of Object.values(j.skills)) x.name = '바뀐 이름'; return j; } };
+    o.aiRemaster = (await balRemasterAI(o2)) && o2.generation === 2 && ['별빛 맹세', '유성 베기', '낙성'].join() === ['passive', 'active', 'ultimate'].map(s => o2.skills[s].name).join() && /별 모티프 연계/.test(rpOf()) && /1세대 예산/.test(rpOf()) && /2세대 예산/.test(rpOf()) && /유성 베기/.test(rpOf()) && o2.skillPlan.kit === '새 세대 의도' && !!o2.skillBalance && (o2.skillDesignLog || []).some(x => /리마스터/.test(x.text)) && /스킬 설계 의도/.test(v2SkillSummary(o2));
     tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="balopen"]'); openBalance(); o.modal = !!document.querySelector('#bal_creep') && document.querySelectorAll('[data-bal]').length >= 8; closeModal();
     return o; });
   assert.ok(Object.values(r14).every(v => v === true), JSON.stringify(r14)); assert.deepEqual(err14, [], '페이지 오류');
-  console.log('ok 14 밸런스: 능력치 편차 점검·보수(성향 유지·기준값)·생성 시 자동 보정, 세대 고정·자동 상승, 구캐릭터 AS 전투 보정(엔진)·리마스터, 점검 규칙, 되돌리기');
+  console.log('ok 14 밸런스: 능력치 편차 점검·보수(성향 유지·기준값)·생성 시 자동 보정, 세대 고정·자동 상승, 구캐릭터 AS 전투 보정(엔진)·리마스터(AI — 설계 의도·이름 유지, 새 세대 예산), 점검 규칙, 되돌리기');
 
   // 15) 캐릭터 개성·매력: 개성 시트·프로필 템플릿·검수(빠짐·흔함·겹침·말투), AI 채우기·다듬기, 인연 톡(호감도 해금), 메모리얼(로비 대사), 상속, 점검 규칙
   const p15 = await browser.newPage(), err15 = []; p15.on('pageerror', e => err15.push(String(e)));

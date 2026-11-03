@@ -47,13 +47,17 @@ function v2QueueCharacter(c){
  const fingerprint=v2Fingerprint(c);
  const promise=(async()=>{
   const r=await v2Job(c.skillTuning==='manual'?'inspectSkill':'balanceSkill',[v2CharacterInput(c),v2Options()]);
-  if(v2Fingerprint(c)===fingerprint){c.skills=r.kit;if(r.report.fallbackReason){c.skillGenerationNotice=r.report.fallbackReason;for(const slot of Object.keys(GGMCombat.SLOTS))c.skills[slot].name=v2ConceptName(c,slot);(c.skillDesignLog||=[]).push({kind:'fallback',text:r.report.fallbackReason});}c.skillBalance={...r.report,fingerprint:v2Fingerprint(c)};if(G.chars.includes(c))mark('c:'+c.id);}
+  if(v2Fingerprint(c)===fingerprint){const prevNames=Object.fromEntries(Object.keys(GGMCombat.SLOTS).map(s=>[s,c.skills?.[s]?.name]));c.skills=r.kit;if(r.report.fallbackReason){c.skillGenerationNotice=r.report.fallbackReason+' 스킬 이름과 설계 의도는 유지했어요.';for(const slot of Object.keys(GGMCombat.SLOTS))c.skills[slot].name=prevNames[slot]||v2ConceptName(c,slot);(c.skillDesignLog||=[]).push({kind:'fallback',text:r.report.fallbackReason});}c.skillBalance={...r.report,fingerprint:v2Fingerprint(c)};if(G.chars.includes(c))mark('c:'+c.id);}
   return r;
  })().finally(()=>V2PENDING.delete(c));
  V2PENDING.set(c,promise);return promise;
 }
 async function v2ReadyChars(chars){for(const c of chars){v2Ensure(c);if(!c.skillBalance||c.skillBalance.ruleset!==GGMCombat.RULESET||c.skillBalance.fingerprint!==v2Fingerprint(c))await v2QueueCharacter(c);}}
-function v2SkillSummary(c){const kit=GGMCombat.trainedKit(v2Ensure(c),v2OwnedTraining(c));return `${v2TrainingSummary(c)}${c.skillGenerationNotice?'<p class="muted">'+esc(c.skillGenerationNotice)+'</p>':''}${c.skillDesignLog?.length?'<details><summary>최근 스킬 생성 기록</summary><ol>'+c.skillDesignLog.slice(-20).map(x=>'<li>'+esc((x.attempt?x.attempt+'차 · ':'')+x.text)+'</li>').join('')+'</ol></details>':''}${c.skillGenerationWarning?'<p class="muted">'+esc(c.skillGenerationWarning)+'</p>':''}${Object.entries(GGMCombat.SLOTS).map(([key,label])=>`<div class="cs-card" data-skill-card="${key}"><div class="wthumb">${imgSrc(c.skillIcons?.[key])?`<img src="${esc(imgSrc(c.skillIcons[key]))}" alt="${label} 아이콘">`:'<span>✦</span>'}</div><div class="t"><b>${label} · ${esc(kit[key].name)} <span class="badge">${esc(v2TrainingLabel(v2OwnedTraining(c),key))}</span></b><p class="muted">${esc(v2SkillText(kit[key],key))}${key==='ultimate'?' · 전투 시작 SP '+Math.round(GGMCombat.trainingInitialSP(v2OwnedTraining(c))*100)/100:''}</p><button class="btn sm ghost" data-act="v2edit" data-id="${esc(c.id)}" data-slot="${key}">${label} 편집 · AI 생성</button> ${v2MasteryButton(c,key)}</div></div>`).join('')}`;}
+/* 슬롯 재설계의 설계 의도: 생성 때 편집 상태에 두고(v2KeepPlan), 저장할 때 캐릭터에(v2SavePlan) */
+function v2KeepPlan(state,slot,plan){(state.plans||={})[slot]=plan;}
+function v2SavePlan(c,state,slot){if(!state.plans?.[slot])return;c.skillPlan={...(c.skillPlan||{}),[slot]:v2SkillPlanText(state.plans[slot])};delete state.plans[slot];}
+function v2PlanHTML(c){const p=c.skillPlan||{},rows=[['kit','세트'],...Object.entries(GGMCombat.SLOTS)].filter(([k])=>p[k]);return rows.length?'<details><summary>스킬 설계 의도</summary>'+rows.map(([k,l])=>'<p class="muted" style="margin:2px 0"><b>'+esc(l)+'</b> '+esc(p[k])+'</p>').join('')+'</details>':'';}
+function v2SkillSummary(c){const kit=GGMCombat.trainedKit(v2Ensure(c),v2OwnedTraining(c));return `${v2TrainingSummary(c)}${v2PlanHTML(c)}${c.skillGenerationNotice?'<p class="muted">'+esc(c.skillGenerationNotice)+'</p>':''}${c.skillDesignLog?.length?'<details><summary>최근 스킬 생성 기록</summary><ol>'+c.skillDesignLog.slice(-20).map(x=>'<li>'+esc((x.attempt?x.attempt+'차 · ':'')+x.text)+'</li>').join('')+'</ol></details>':''}${c.skillGenerationWarning?'<p class="muted">'+esc(c.skillGenerationWarning)+'</p>':''}${Object.entries(GGMCombat.SLOTS).map(([key,label])=>`<div class="cs-card" data-skill-card="${key}"><div class="wthumb">${imgSrc(c.skillIcons?.[key])?`<img src="${esc(imgSrc(c.skillIcons[key]))}" alt="${label} 아이콘">`:'<span>✦</span>'}</div><div class="t"><b>${label} · ${esc(kit[key].name)} <span class="badge">${esc(v2TrainingLabel(v2OwnedTraining(c),key))}</span></b><p class="muted">${esc(v2SkillText(kit[key],key))}${key==='ultimate'?' · 전투 시작 SP '+Math.round(GGMCombat.trainingInitialSP(v2OwnedTraining(c))*100)/100:''}</p><button class="btn sm ghost" data-act="v2edit" data-id="${esc(c.id)}" data-slot="${key}">${label} 편집 · AI 생성</button> ${v2MasteryButton(c,key)}</div></div>`).join('')}`;}
 function v2TriggerSettings(s){
  const help={always:'전투 중 조건을 계속 확인합니다. 재사용 대기와 발동 제한을 함께 설정하세요.',battle_start:'전투 시작 시 한 번 발동합니다. 첫 사용 대기를 설정하면 그 시간이 지난 뒤 한 번 발동합니다.',interval:'설정한 간격과 재사용 대기를 모두 충족하면 자동 발동합니다.',after_basic:'일반 공격을 지정한 횟수만큼 사용할 때마다 발동합니다.',attack_hit:'공격이 적중한 횟수를 셉니다. 여러 타격은 각각 계산합니다.',hp_below:'자신의 HP가 기준 비율 이하인 동안 재사용 대기마다 발동할 수 있습니다.',mark_threshold:'자신 또는 마지막 대상에게 지정 표식이 쌓일 때 기준 중첩을 확인합니다. 표식은 자동 소모되지 않습니다.'};
  let fields='';
@@ -162,13 +166,13 @@ async function v2EditorAction(action,button){
   if(action==='v2generate'){
    r=await v2GenerateSelected({...c,generation:state.generation},slot,state.concept,base,{signal:controller.signal,onEvent});v2CheckCancelled(controller.signal);
    if(V2EDIT!==state||charById(state.id)!==c)return;
-   state.kit[slot]=GGMCombat.clone(r.kit[slot]);state.report=r.report;state.reports[slot]=r.report;state.fallbacks[slot]=r.fallback;(state.generatedSlots||={})[slot]=true;
+   state.kit[slot]=GGMCombat.clone(r.kit[slot]);v2KeepPlan(state,slot,r.plan);state.report=r.report;state.reports[slot]=r.report;state.fallbacks[slot]=r.fallback;(state.generatedSlots||={})[slot]=true;
    state.status=(r.fallback?'AI 응답을 복구한 초안입니다. 내용을 확인하고 저장해 주세요. ':'선택한 스킬을 생성했어요. 저장 전에는 캐릭터가 바뀌지 않습니다. ')+v2Report(r.report);state.busy=false;state.progress='';v2DrawEditor(true);return;
   }
   r=await v2Job('inspectSkill',[{...v2CharacterInput(c),generation:state.generation,skills:candidate},v2Options()],{signal:controller.signal,onProgress:p=>{phase='기준 편성 모의 전투 검사 · 비교 '+Math.round((p.progress||0)*27)+'/27';progress();}});
   v2CheckCancelled(controller.signal);if(V2EDIT!==state||charById(state.id)!==c)return;state.report=r.report;state.reports[slot]=r.report;
   if(action==='v2save'){
-   c.generation=state.generation;c.skillConcept=state.concept.trim()||c.skillConcept||'';c.skills=candidate;c.skillTuning='manual';v2EquipmentSkillSaved(c,slot,base[slot],candidate[slot],!!state.generatedSlots?.[slot]);if(state.generatedSlots)delete state.generatedSlots[slot];if(state.histories[slot]?.length){c.skillDesignLog=GGMCombat.clone(state.histories[slot]);delete c.skillGenerationNotice;}if(state.fallbacks[slot])c.skillGenerationWarning='AI 응답 문제로 복구한 '+GGMCombat.SLOTS[slot]+' 초안을 사용 중입니다.';else delete c.skillGenerationWarning;
+   c.generation=state.generation;c.skillConcept=state.concept.trim()||c.skillConcept||'';c.skills=candidate;c.skillTuning='manual';v2SavePlan(c,state,slot);v2EquipmentSkillSaved(c,slot,base[slot],candidate[slot],!!state.generatedSlots?.[slot]);if(state.generatedSlots)delete state.generatedSlots[slot];if(state.histories[slot]?.length){c.skillDesignLog=GGMCombat.clone(state.histories[slot]);delete c.skillGenerationNotice;}if(state.fallbacks[slot])c.skillGenerationWarning='AI 응답 문제로 복구한 '+GGMCombat.SLOTS[slot]+' 초안을 사용 중입니다.';else delete c.skillGenerationWarning;
    c.skillBalance={...r.report,fingerprint:v2Fingerprint(c)};mark('c:'+c.id);setStatus(GGMCombat.SLOTS[slot]+'만 저장했어요. '+v2Report(r.report));toast('선택한 스킬을 저장했어요');
   }else setStatus(v2Report(r.report));
  }catch(e){if(V2EDIT===state)setStatus(e.name==='AbortError'?e.message:v2FailureText(e));}
@@ -274,7 +278,7 @@ function v2PrepareGenerated(raw,c={}){
  const C=GGMCombat;if(Array.isArray(raw)&&raw.length===3)raw=Object.fromEntries(Object.keys(C.SLOTS).map((slot,i)=>[slot,raw.find(x=>x?.slot===slot)||raw[i]]));if(raw&&!Array.isArray(raw)){raw={...raw,passive:raw.passive||raw['패시브'],active:raw.active||raw['액티브'],ultimate:raw.ultimate||raw['궁극기']};for(const slot of Object.keys(C.SLOTS))if(raw[slot]?.effects?.type)raw[slot]={...raw[slot],effects:[raw[slot].effects]};}if(!raw||!Object.keys(C.SLOTS).every(slot=>raw[slot]?.recipe||raw[slot]?.effects?.length))throw new Error('패시브·액티브·궁극기의 설계를 하나씩 넣어 주세요.');
  let kit=C.generationDefaults(c);for(const slot of Object.keys(C.SLOTS))kit=v2CompileGenerated(raw[slot],slot,kit,c).kit;return kit;
 }
-async function v2GenerateSkills(c,concept='',onProgress=()=>{}){
+async function v2GenerateSkills(c,concept='',onProgress=()=>{},opt={}){ /* opt.remaster={from,to,kit,plan}: 구캐릭터 리마스터(설계 의도·이름 유지, 새 세대 예산) */
  if(!SAMPLE)throw new Error('설정의 글 AI를 먼저 등록해 주세요. 기존 스킬은 유지했어요.');
  const C=GGMCombat,controller=new AbortController(),indicator=document.createElement('div'),label=document.createElement('span'),cancel=document.createElement('button');
  indicator.className='v2-generation-progress';label.setAttribute('role','status');label.setAttribute('aria-live','polite');cancel.className='btn sm ghost';cancel.textContent='작업 중단';cancel.onclick=()=>controller.abort();indicator.append(label,cancel);document.body.append(indicator);
@@ -283,11 +287,11 @@ async function v2GenerateSkills(c,concept='',onProgress=()=>{}){
  try{
  for(let attempt=1;attempt<=6;attempt++){
   v2CheckCancelled(controller.signal);message=`${C.generation(c)}세대 캐릭터 역할과 세 스킬 설계 응답 대기 · ${attempt}/6`;tick();onProgress(message);
-  const prompt=v2GenerateSkillsPromptText({menus,designC,concept,base,feedback});
+  const prompt=v2GenerateSkillsPromptText({menus,designC,concept,base,feedback,remaster:opt.remaster});
   try{
    let response=await v2SkillRequest(SAMPLE,prompt,controller.signal);if(typeof response==='string')response=parseLoose(response);response=response?.data||response?.result||response;
    message='응답 해석 · 역할·효과 개수·수치·발동 조건 검사';tick();onProgress(message);
-   const kit=v2PrepareGenerated(response?.skills,designC);c.skillDesignLog.push({kind:'success',attempt,text:`${C.generation(c)}세대 역할·효과 개수·전력 예산 검사 완료`});onProgress('스킬 설계 완료 · 기준 편성 모의 전투 검사 준비');return kit;
+   const kit=v2PrepareGenerated(response?.skills,designC);c.skillPlan={kit:v2SkillPlanText(response?.designPlan)||c.skillPlan?.kit||''};/* 설계 의도 저장 — 리마스터·재설계 때 이름·컨셉을 지키는 근거 */c.skillDesignLog.push({kind:'success',attempt,text:`${C.generation(c)}세대 역할·효과 개수·전력 예산 검사 완료`});onProgress('스킬 설계 완료 · 기준 편성 모의 전투 검사 준비');return kit;
   }catch(e){
    v2CheckCancelled(controller.signal);const why=v2FailureText(e);if(!['network','timeout','rate_limited','upstream_error','overloaded','server_error'].includes(e?.code))feedback=why;/* 서버·네트워크 같은 일시 오류는 모델 잘못이 아니라 다음 프롬프트 피드백에 넣지 않음 */c.skillDesignLog.push({kind:'failure',attempt,text:why});onProgress(`${attempt}차 실패: ${why}`);
    if(['bad_key','no_ai','model_not_found','refused','low_credit','not_granted','quota','payment_required','insufficient_quota','sa_bad'].includes(e?.code)||(!e?.code&&!(e instanceof SyntaxError)&&!responseFormatError(e)))throw e;
