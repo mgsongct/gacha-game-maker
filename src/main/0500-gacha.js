@@ -17,14 +17,14 @@ function gateCheck(){ if(!G.meta.gated) return; const p=P(); p.gateSeen=p.gateSe
 function curBanner(){const bs=G.banners.filter(bnOpen);return bs.find(b=>b.id===P().curBanner)||bs[0]||null;}
 function bannerPool(b){
   // 건조 전용 바리에이션(c.cvar)은 건조/영입이 켜져 있으면 뽑기에 안 나와요(픽업으로 직접 넣은 건 예외)
-  let pool=G.chars.filter(c=>(!c.limited||(b.pickup||[]).includes(c.id))&&(debutOk(c)||(b.pickup||[]).includes(c.id))&&!(c.cvar&&conOn()&&!(b.pickup||[]).includes(c.id)));
+  let pool=G.chars.filter(c=>(!c.limited||(b.pickup||[]).includes(c.id))&&(castOk(c)||(!castCfg().pickupGate&&!c.monster&&(b.pickup||[]).includes(c.id)))&&!(c.cvar&&conOn()&&!(b.pickup||[]).includes(c.id)));
   if(b.pool.mode==='faction') pool=pool.filter(c=>(b.pool.factions||[]).includes(c.faction));
   if(b.pool.mode==='list') pool=pool.filter(c=>(b.pool.ids||[]).includes(c.id));
-  (b.pickup||[]).map(charById).filter(Boolean).forEach(c=>{if(!pool.includes(c))pool.push(c);});
+  (b.pickup||[]).map(charById).filter(c=>c&&(castOk(c)||(!castCfg().pickupGate&&!c.monster))).forEach(c=>{if(!pool.includes(c))pool.push(c);}); // 첫 등장 전·적대 중·몬스터는 픽업도 잠금(0445)
   // SSR이 하나도 없는 배너(소속 한정 등)에는 상시 SSR을 넣어 SSR이 항상 나올 수 있게
-  if(pool.length&&!pool.some(c=>c.rarity===3)) G.chars.filter(c=>c.rarity===3&&!c.limited&&debutOk(c)).forEach(c=>pool.push(c));
+  if(pool.length&&!pool.some(c=>c.rarity===3)) G.chars.filter(c=>c.rarity===3&&!c.limited&&castOk(c)).forEach(c=>pool.push(c));
   // R·SR이 없는 배너(픽업 캐릭터만 있는 배너, 소속 한정 등)도 상시 R·SR을 넣어 낮은 등급 자리에 SSR이 끼지 않게
-  if(pool.length) [1,2].forEach(r=>{ if(!pool.some(c=>c.rarity===r)) G.chars.filter(c=>c.rarity===r&&!c.limited&&debutOk(c)).forEach(c=>pool.push(c)); });
+  if(pool.length) [1,2].forEach(r=>{ if(!pool.some(c=>c.rarity===r)) G.chars.filter(c=>c.rarity===r&&!c.limited&&castOk(c)).forEach(c=>pool.push(c)); });
   return pool.length?pool:G.chars;
 }
 const SPARK=200;

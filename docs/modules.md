@@ -216,6 +216,11 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - `src/main/0487-formation-sortie.js`: `charRange`·`rowWarn`(편성), `routeOf/routeAuto`·`nodeStage`, `sortieBegin`(startBattle)·`sortieMap`·`sortieFight`·`sortieNodeEnd`(bEnd), `P().sortie`, 설정 `battleSysPanel`(G.meta.rules.formation·sortie)
 - 설계: [research/formation-sortie.md](research/formation-sortie.md)
 
+## 8-2-9. 세력 · 적 도감 · 등장/영입
+
+- `src/main/0445-factions.js`: `factions()`(kind·rel·stance 정리), `stanceAt`·`stanceApply`(장 생성 `stance`), `factionCtx`(ctx), `factionReview`·`factionAI`, `monsterNames`·`isMonsterLike`·`monsterFromGen`(addNewChars·addNpcs)·`charToMonster`, `castLock/castOk`(bannerPool·conPool), `metInStory`·`firstSpeak`, 화면 `openWorldDesign`
+- 점검 `w_faction`·`c_monster`·`c_debut` · 설계: [research/factions-cast.md](research/factions-cast.md)
+
 ## 8-3. 콘텐츠 점검·업그레이드
 
 - `src/main/0535-content-audit.js`: 규칙 `AUDIT_RULES`(감지 `test` + 고치기 `fix.mode`), `auditScan`, `auditFix`, 지정 변환 `auditConvert`, 되돌리기 `auditUndo`, 생성 버전 `auditGenVer()`(새 캐릭터 `cleanChar0`에서 `genVer`로 찍힘)

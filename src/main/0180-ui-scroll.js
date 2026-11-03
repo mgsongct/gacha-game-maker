@@ -581,6 +581,7 @@ function studioHTML(){
   ${battleSysPanel()}
   ${balancePanel()}
   ${personaPanel()}
+  ${factionPanel()}
   ${planPanel()}
   ${assetPanel()}
   ${promptPanel()}

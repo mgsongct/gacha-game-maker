@@ -10,7 +10,7 @@ function spots(){ return Array.isArray(G.meta.spots)?G.meta.spots:[]; }
 function spotsAuto(){ const L=[]; G.lib.filter(l=>l.kind==='bg'&&l.name).slice(0,7).forEach(l=>L.push({id:uid(),name:l.name,desc:'',bg:l.name,tags:[]}));
   if(!L.length) ['광장','카페','훈련장','도서관'].forEach(n=>L.push({id:uid(),name:n,desc:'',bg:'',tags:[n]})); G.meta.spots=L; mark('meta'); return L.length; }
 function spotFav(c,s){ const p=c.persona||{}, likes=[...(p.likes||[]),p.hobby||''].join(' '); return !!likes&&[s.name,...(s.tags||[])].some(t=>t&&(likes.includes(t)||t.split(/\s+/).some(w=>w.length>1&&likes.includes(w)))); }
-function spotWho(s){ const owned=G.chars.filter(c=>own(c.id)&&!c.alt), h=hashN(today()+s.id); if(!owned.length) return [];
+function spotWho(s){ const owned=G.chars.filter(c=>own(c.id)&&!c.alt&&!c.monster), h=hashN(today()+s.id); if(!owned.length) return [];
   const fav=owned.filter(c=>spotFav(c,s)), rest=owned.filter(c=>!fav.includes(c)), out=[]; if(fav.length) out.push(fav[h%fav.length]);
   const pool=[...rest,...fav.filter(c=>!out.includes(c))]; for(let i=0;out.length<2&&pool.length;i++) out.push(pool.splice((h>>(i+2))%pool.length,1)[0]); return out; }
 function spotTemplate(c,s){ const p=c.persona||{}, L=(c.lines||[]).filter(Boolean), r=i=>L.length?L[(hashN(s.id+c.id)+i)%L.length]:'…', n=c.name;

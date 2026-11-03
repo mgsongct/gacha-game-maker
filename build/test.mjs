@@ -514,6 +514,37 @@ try {
     return o; });
   assert.ok(Object.values(r22).every(v => v === true), JSON.stringify(r22)); assert.deepEqual(err22, [], '페이지 오류');
   console.log('ok 22 대열·출격 경로: 근접은 전열만 공격·엄호·후열 회복(엔진), 사거리·편성 경고, 전초전→갈림길(지원형 조건)→보스, 체력 유지·진격·퇴각·이어 하기, 생성(route·range)·점검');
+  // 23) 세력·몬스터·등장: 세력 종류·장별 관계(stance)·AI 컨텍스트, 깊이 점검·AI 채우기, 몬스터가 캐릭터·NPC로 생성되지 않음·톡 제외·전환, 첫 등장 전 픽업 잠금·적대 세력 잠금, 만나지 않은 보유 캐릭터 안내, 점검 규칙
+  const p23 = await browser.newPage(), err23 = []; p23.on('pageerror', e => err23.push(String(e)));
+  await p23.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p23.goto(`http://127.0.0.1:${server.address().port}/?t=23`);
+  await p23.waitForFunction(() => typeof factionReview === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r23 = await p23.evaluate(async () => {
+    const o = {}; P().seenOpening = true; closeModal(); closeOv();
+    const F = factions(); o.sample = F.find(f => f.name === '잔광').kind === 'monster' && F.find(f => f.name === '헬릭스 컨소시엄').kind === 'hostile' && factionReview().score >= 70 && monsterNames().some(l => l.desc);
+    const hx = facByName('헬릭스 컨소시엄'); hx.stance = [{ ch: 1, s: 'neutral', why: '' }, { ch: 3, s: 'ally', why: '내분' }];
+    o.stance = stanceAt(hx, 1) === 'neutral' && stanceAt(hx, 2) === 'neutral' && stanceAt(hx, 3) === 'ally' && stanceAt(facByName('잔광'), 1) === 'hostile';
+    const cx = ctx(); o.ctx = cx.includes('적대 세력') && cx.includes('3장부터 우호 예정') && cx.includes('몬스터 도감') && cx.includes('잔광 하운드');
+    stanceApply([{ faction: '회색구 시민회', s: 'hostile', why: '오해' }], 2); o.apply = stanceAt(facByName('회색구 시민회'), 2) === 'hostile' && stanceAt(facByName('회색구 시민회'), 1) === 'neutral';
+    const ch = G.chapters.find(c => c.kind === 'main'), st = ch.stages[ch.stages.length - 1];
+    const n0 = G.chars.length; addNewChars([{ name: '빛의 늑대', role: 'atk', naiPrompt: 'no humans, monster, wolf' }, { name: '잔광 하운드', role: 'atk', naiPrompt: '1girl, solo' }, { name: '새 동료', role: 'atk', naiPrompt: '1girl, solo', faction: '새벽등대', debutStage: 4 }], 3, ch.stages, { src: 't' });
+    const nc = G.chars.find(c => c.name === '새 동료'); o.noMonster = G.chars.length === n0 + 1 && !!nc && G.lib.some(l => l.kind === 'enemy' && l.name === '빛의 늑대');
+    const nn = (G.npcs || []).length; addNpcs([{ name: '그림자 마수', role: '마수', profile: '' }, { name: '상인 라오', role: '상인', profile: '', naiPrompt: '1boy, solo' }]); o.noMonsterNpc = (G.npcs || []).length === nn + 1 && G.npcs.some(n => n.name === '상인 라오');
+    nc.debut = st.id; delete P().cleared[st.id]; const bn = { id: 'bt', name: 't', type: 'pickup', pool: { mode: 'all' }, pickup: [nc.id], rate: 50 };
+    o.pickupLock = !bannerPool(bn).includes(nc) && castLock(nc).includes('깨면 열려요'); G.meta.cast = { pickupGate: false }; o.pickupOff = bannerPool(bn).includes(nc); G.meta.cast = {};
+    P().cleared[st.id] = true; o.debutOpen = bannerPool(bn).includes(nc);
+    const fx = facByName('새벽등대'); fx.stance = [{ ch: 1, s: 'hostile', why: '처음엔 적' }]; o.hostile = castLock(nc).includes('적대') && !bannerPool({ ...bn, pickup: [] }).includes(nc); fx.stance = [];
+    const sera = charById('sera'); if (!own(sera.id)) grantOwned(sera, 't'); o.unmet = typeof metInStory === 'function' && (metInStory(sera) ? true : ctx().includes('이미 계약으로 합류'));
+    const mc = cleanChar({ name: '잔광 파수꾼', role: 'def' }); G.chars.push(mc); o.auditMon = auditScan().some(g => g.rule.id === 'c_monster' && g.items.includes(mc));
+    grantOwned(mc, 't'); G.threads.push({ id: 'tm', charId: mc.id, title: 'x', script: '잔광 파수꾼: …', trigger: { type: 'start' } }); charToMonster(mc); o.toMonster = mc.monster && !trigOk(G.threads.at(-1)) && !castOk(mc) && !spotWho({ id: 's', name: 'x', tags: [] }).includes(mc) && !ctx().includes('잔광 파수꾼(');
+    const mid = G.chars.find(c => !own(c.id) && !c.debut && !c.alt); const ch2 = G.chapters.filter(c => c.kind === 'main')[1] || ch; if (mid) { const s2 = ch2.stages[0]; s2.pre = (s2.pre || '') + `\n${mid.name}: 처음 뵙겠습니다`; o.debutAudit = G.chapters.filter(c => c.kind === 'main').indexOf(ch2) > 0 ? auditScan().some(g => g.rule.id === 'c_debut' && g.items.includes(mid)) : true; } else o.debutAudit = true;
+    G.world.factions = [{ name: '얕은 세력', desc: '짧음' }]; o.shallow = factionReview().score < 70 && auditScan().some(g => g.rule.id === 'w_faction');
+    SAMPLE = { json: async p => /세력과 몬스터 설정을 깊이/.test(p) ? { factions: [{ name: '얕은 세력', kind: 'hostile', desc: '도시의 지하를 장악한 밀수 조직. 성핵 파편을 몰래 사고판다.', goal: '성핵 시장 장악', leader: '그림자 회장', base: '지하 수로', ideology: '돈이 곧 법', rel: { '새벽등대': '적대' }, stance: [{ ch: 2, s: 'neutral', why: '휴전' }] }, { name: '새벽등대', kind: 'playable', desc: '작은 계약사무소. 회색구를 지킨다.', goal: '주민 보호', leader: '관리관', base: '등대', ideology: '사람이 먼저' }], bestiary: [{ name: '잔광 하운드', faction: '얕은 세력', desc: '실험체', nature: '무리', weak: '코어' }] } : {} };
+    await factionAI(); const sh = facByName('얕은 세력'); o.ai = sh.kind === 'hostile' && sh.goal === '성핵 시장 장악' && sh.stance.some(s => s.ch === 2) && !!facByName('새벽등대').goal;
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="fwopen"]');
+    openWorldDesign('cast'); const sel = document.querySelector(`[data-fw="c.${nc.id}.debut"]`); sel.value = ''; document.querySelector('[data-act="fwsave"]').click(); o.ui = !nc.debut; openWorldDesign('mon'); o.ui2 = !!document.querySelector('[data-fw^="m."]'); openWorldDesign('fac'); o.ui3 = !!document.querySelector('[data-fw="f.0.stance"]'); closeModal();
+    return o; });
+  assert.ok(Object.values(r23).every(v => v === true), JSON.stringify(r23)); assert.deepEqual(err23, [], '페이지 오류');
+  console.log('ok 23 세력·몬스터·등장: 세력 종류·장별 관계·AI 컨텍스트, 깊이 점검·AI 채우기, 몬스터의 캐릭터·NPC 생성 차단·톡 제외·전환, 첫 등장 전 픽업 잠금·적대 잠금, 점검 규칙');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);

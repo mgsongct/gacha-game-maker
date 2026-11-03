@@ -4,7 +4,7 @@
 const threadById=id=>G.threads.find(t=>t.id===id);
 const threadChar=t=>t&&charById(t.charId);
 function trigOk(t){
-  const c=threadChar(t); if(!c) return false;
+  const c=threadChar(t); if(!c||c.monster) return false;
   if(t.needOwn!==false&&!own(c.id)) return false;
   const g=t.trigger||{type:'start'};
   if(g.type==='start') return true;

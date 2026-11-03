@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.12'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.13'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -6037,10 +6037,11 @@ const DEFAULT_WORLD = {
   lore:'낙성의 밤 이후 에덴포트는 둘로 갈라졌다. 기업이 지배하는 상층 구역과, 잔광이 출몰하는 회색구. 별의 파편인 성핵은 사람에게 힘을 주지만 오래 쓰면 정신을 갉아먹는다. 성흔자는 계약사무소에 소속되어 의뢰를 받고 싸우며, 관리관은 그들의 계약과 성흔 안정도를 관리한다. 거대 기업 헬릭스 컨소시엄은 성핵을 독점하려 하고, 회색구 시민회는 사무소들에 의지해 하루하루를 버틴다. 새벽등대는 그 사이에서 살아남은, 가난하지만 시끄러운 사무소다.',
   plot:'1부의 축: 헬릭스는 분화구 아래 잠든 "첫 번째 별"을 깨워 성핵을 무한히 생산하려 한다. 계획의 책임자는 세라의 옛 상관 바넷 소장. 관리관은 낙성의 밤의 유일한 생존자로, 기억은 없지만 성핵과 공명하는 체질이라 곁에 있는 성흔자의 폭주를 가라앉힌다. 헬릭스가 관리관을 노리는 이유이자, 대원들이 관리관에게 끌리는 이유. 이브는 이 사실을 처음부터 알고 있었다.',
   factions:[
-    {name:'새벽등대',desc:'회색구의 작은 계약사무소. 관리관과 대원들의 집.'},
-    {name:'헬릭스 컨소시엄',desc:'성핵 연구와 거래를 독점하려는 거대 기업.'},
-    {name:'잔광',desc:'성핵에 잠식되어 빛의 괴물이 된 존재들.'},
-    {name:'회색구 시민회',desc:'버려진 구역 주민들의 자치 조직이자 주요 의뢰인.'}
+    {name:'새벽등대',kind:'playable',desc:'회색구의 작은 계약사무소. 관리관과 대원들의 집. 성핵 사건을 맡는 몇 안 되는 독립 계약사로, 의뢰비보다 사람을 먼저 챙긴다는 평판 때문에 늘 적자다.',goal:'회색구 주민을 잔광에게서 지키고, 낙성의 진실을 밝힌다',leader:'관리관(플레이어)',base:'회색구 폐역 위 등대 건물',ideology:'계약은 지키되, 사람을 버리는 계약은 받지 않는다',secret:'창립자는 헬릭스의 전직 연구원이었다',rel:{'헬릭스 컨소시엄':'긴장 — 의뢰를 받지만 믿지 않는다','회색구 시민회':'동맹 — 주요 의뢰인','잔광':'적대'},stance:[]},
+    {name:'헬릭스 컨소시엄',kind:'hostile',desc:'성핵 연구와 거래를 독점하려는 거대 기업. 겉으로는 도시 재건의 후원자지만, 잔광 발생 구역을 실험장으로 쓴다는 소문이 끊이지 않는다.',goal:'성핵 기술 독점과 낙성 지구 재개발',leader:'이사회(얼굴을 드러내지 않음)',base:'중앙구 헬릭스 타워',ideology:'효율과 계약, 손실은 숫자로만 센다',secret:'잔광 일부는 헬릭스 실험에서 새어 나왔다',rel:{'새벽등대':'이용 — 쓰고 버릴 하청','회색구 시민회':'적대 — 재개발 반대','잔광':'연구 대상'},stance:[{ch:1,s:'neutral',why:'표면상 의뢰인'}]},
+    {name:'잔광',kind:'monster',desc:'성핵에 잠식되어 빛의 괴물이 된 존재들. 사람·동물·기계를 가리지 않고 빛에 먹히면 형체가 일그러진다.',origin:'낙성의 밤 쏟아진 성핵 파편이 생물에 스며들어 생긴 변이체',nature:'빛과 소리에 몰려들고, 밤이 깊을수록 무리 지어 움직인다. 잠식이 깊을수록 말을 잃는다',weakness:'성핵 핵(코어)을 부수면 흩어진다. 홍 속성 열에 약하다',goal:'없음(본능)',base:'폐선로·낙성 분화구',rel:{'새벽등대':'적대','헬릭스 컨소시엄':'포획 대상'},stance:[]},
+    {name:'회색구 시민회',kind:'neutral',desc:'버려진 구역 주민들의 자치 조직이자 주요 의뢰인. 배급과 순찰을 스스로 꾸리며, 바깥 기업을 믿지 않는다.',goal:'회색구를 재개발에서 지키고 주민을 먹여 살린다',leader:'시민회 의장',base:'회색구 시장 골목',ideology:'우리 구역은 우리가 지킨다',rel:{'새벽등대':'동맹','헬릭스 컨소시엄':'적대','회색구 연합':'후원'},stance:[]},
+    {name:'회색구 연합',kind:'playable',desc:'시민회가 꾸린 자경단 겸 구조대. 정식 계약사가 아니라 장비는 낡았지만 회색구 골목을 누구보다 잘 안다.',goal:'잔광 출몰 구역의 주민 구조와 순찰',leader:'연합 대장(시민회 의장의 조카)',base:'회색구 소방서 터',ideology:'먼저 달려가고, 나중에 따진다',rel:{'새벽등대':'협력 — 현장에서 손발을 맞춤','회색구 시민회':'소속','헬릭스 컨소시엄':'적대'},stance:[]}
   ]
 };
 
@@ -6078,6 +6079,16 @@ const DEFAULT_BGM = [
  LI('bgm_flirt','bgm','설렘','Romantic sultry lounge jazz, slow tenor saxophone, soft piano, muted trumpet, late night bar, flirty and teasing mood, 75 bpm, instrumental, seamless loop')
 ];
 const DEFAULT_LIB=[...DEFAULT_LIB_IMG,...DEFAULT_BGM];
+// 샘플 적 도감(정체·습성·약점) — 샘플 게임에서만(0070 syncEnemies)
+const ENEMY_INFO={
+ '잔광 하운드':{faction:'잔광',desc:'성핵 파편에 잠식된 들개 무리가 빛의 짐승이 된 것',nature:'소리를 쫓아 무리로 사냥한다',weak:'코어를 노린 집중 공격, 홍 속성'},
+ '잔광 파수꾼':{faction:'잔광',desc:'무너진 건물 잔해가 성핵에 엉겨 붙어 생긴 거인',nature:'한 구역을 떠나지 않고 다가오는 것을 부순다',weak:'가슴의 코어, 느린 움직임'},
+ '헬릭스 경비병':{faction:'헬릭스 컨소시엄',desc:'헬릭스가 고용한 무장 경비 인력(사람)',nature:'명령대로만 움직이고 퇴각이 빠르다',weak:'지휘관을 먼저 쓰러뜨리면 흩어진다'},
+ '헬릭스 감시드론':{faction:'헬릭스 컨소시엄',desc:'헬릭스의 무인 감시 기체',nature:'발견한 대상을 표시해 경비병을 부른다',weak:'로터, 청 속성 전류'},
+ '적색 잔광체':{faction:'잔광',desc:'낙성 분화구 깊은 곳에서 깨어난 거대 잔광',nature:'주변의 잔광을 끌어당겨 몸을 키운다',weak:'흩어진 코어를 하나씩 부숴야 한다'},
+ '떠도는 등불':{faction:'잔광',desc:'축제 등불에 스며든 작은 잔광',nature:'사람의 그리움에 이끌려 떠돈다',weak:'빛을 가리면 약해진다'},
+ '등불 잔광':{faction:'잔광',desc:'등불 잔광이 모여 불꽃 형체가 된 것',nature:'무리 지어 맴돌며 불씨를 퍼뜨린다',weak:'녹 속성 바람'},
+ '거대 등불 잔광':{faction:'잔광',desc:'축제의 밤에 모인 등불 잔광이 하나로 뭉친 괴물',nature:'축제의 소원 등불을 삼켜 커진다',weak:'입 안의 코어'}};
 const ENEMY_LOOKS={
  '잔광 하운드':'no humans, monster, wolf made of glowing green light, translucent crystalline body, sharp light shards on back, snarling, glowing eyes, creature focus',
  '잔광 파수꾼':'no humans, monster, tall humanoid golem of red light and rubble, glowing core in chest, cracked stone armor, menacing, creature focus',
@@ -6611,6 +6622,7 @@ function syncEnemies(g,looks){ g=g||G; let n=0; const lk=looks||{}, rz=lk.__reus
         const want=rz[nm]&&pool.find(x=>x.name===rz[nm]); if(want) alias=want.id; else if(pool.length&&(!lk[nm]||pool.length>=ENEMY_KEEP)) alias=pool[hashN(nm)%pool.length].id; }
       l={id:'n'+Math.random().toString(36).slice(2,10),kind:'enemy',name:nm,prompt:alias?'':String(lk[nm]||EL[nm]||''),img:null}; if(alias) l.alias=alias; g.lib.push(l); n++; if(typeof mark==='function'&&g===G) mark('l:'+l.id); }
     else if(!l.prompt&&(lk[nm]||EL[nm])){ l.prompt=String(lk[nm]||EL[nm]); if(typeof mark==='function'&&g===G) mark('l:'+l.id); }
+    if(EL===ENEMY_LOOKS&&ENEMY_INFO[nm]&&!l.desc) Object.assign(l,ENEMY_INFO[nm]); // 샘플 적 도감
     const ch=(g.chars||[]).find(c=>c.name===nm); if(ch&&ch.naiPrompt&&l.prompt!==ch.naiPrompt&&!l.img){ l.prompt=ch.naiPrompt; l.charId=ch.id; if(typeof mark==='function'&&g===G) mark('l:'+l.id); } });
   return n; }
 function defaultShop(ev,g){
@@ -7031,7 +7043,7 @@ function stageCode(id){const m=mainStages().find(s=>s.id===id);if(m)return m.cod
 const threadById=id=>G.threads.find(t=>t.id===id);
 const threadChar=t=>t&&charById(t.charId);
 function trigOk(t){
-  const c=threadChar(t); if(!c) return false;
+  const c=threadChar(t); if(!c||c.monster) return false;
   if(t.needOwn!==false&&!own(c.id)) return false;
   const g=t.trigger||{type:'start'};
   if(g.type==='start') return true;
@@ -7697,7 +7709,7 @@ function spots(){ return Array.isArray(G.meta.spots)?G.meta.spots:[]; }
 function spotsAuto(){ const L=[]; G.lib.filter(l=>l.kind==='bg'&&l.name).slice(0,7).forEach(l=>L.push({id:uid(),name:l.name,desc:'',bg:l.name,tags:[]}));
   if(!L.length) ['광장','카페','훈련장','도서관'].forEach(n=>L.push({id:uid(),name:n,desc:'',bg:'',tags:[n]})); G.meta.spots=L; mark('meta'); return L.length; }
 function spotFav(c,s){ const p=c.persona||{}, likes=[...(p.likes||[]),p.hobby||''].join(' '); return !!likes&&[s.name,...(s.tags||[])].some(t=>t&&(likes.includes(t)||t.split(/\s+/).some(w=>w.length>1&&likes.includes(w)))); }
-function spotWho(s){ const owned=G.chars.filter(c=>own(c.id)&&!c.alt), h=hashN(today()+s.id); if(!owned.length) return [];
+function spotWho(s){ const owned=G.chars.filter(c=>own(c.id)&&!c.alt&&!c.monster), h=hashN(today()+s.id); if(!owned.length) return [];
   const fav=owned.filter(c=>spotFav(c,s)), rest=owned.filter(c=>!fav.includes(c)), out=[]; if(fav.length) out.push(fav[h%fav.length]);
   const pool=[...rest,...fav.filter(c=>!out.includes(c))]; for(let i=0;out.length<2&&pool.length;i++) out.push(pool.splice((h>>(i+2))%pool.length,1)[0]); return out; }
 function spotTemplate(c,s){ const p=c.persona||{}, L=(c.lines||[]).filter(Boolean), r=i=>L.length?L[(hashN(s.id+c.id)+i)%L.length]:'…', n=c.name;
@@ -8517,6 +8529,7 @@ function studioHTML(){
   ${battleSysPanel()}
   ${balancePanel()}
   ${personaPanel()}
+  ${factionPanel()}
   ${planPanel()}
   ${assetPanel()}
   ${promptPanel()}
@@ -9475,11 +9488,11 @@ function stageSchema(deep){ return `[{"title":"","battle":true,${deep?'"beats":[
 function genStep(t,key,label){ return m=>{ if(t){ if(t.isConnected) t.textContent=m; return; } const j=typeof BGJOBS!=='undefined'&&BGJOBS.find(x=>x.key===key); if(j){ j.sub=m; bgJobsDraw(); } else liveBar(label+' · '+m); }; }
 function nameTaken(n){ n=String(n||'').trim(); return G.chars.some(c=>c.name===n)||(G.npcs||[]).some(c=>c.name===n); }
 function mkNpc(d){ const o=npcNew(String(d.name||'').trim().slice(0,20)); return Object.assign(o,{role:String(d.role||'').slice(0,40),profile:String(d.profile||'').slice(0,600),speech:String(d.speech||'').slice(0,120),look:String(d.look||''),naiPrompt:stripAge(String(d.naiPrompt||''))}); }
-function addNpcs(arr){ const out=[]; (Array.isArray(arr)?arr:[]).slice(0,3).forEach(d=>{ if(!d||!String(d.name||'').trim()||nameTaken(d.name)) return; const n=mkNpc(d); G.npcs=G.npcs||[]; G.npcs.push(n); out.push(n); }); if(out.length) mark('meta'); return out; }
+function addNpcs(arr){ const out=[]; (Array.isArray(arr)?arr:[]).slice(0,3).forEach(d=>{ if(!d||!String(d.name||'').trim()||nameTaken(d.name)) return; if(isMonsterLike(d)){ monsterFromGen(d); return; } const n=mkNpc(d); G.npcs=G.npcs||[]; G.npcs.push(n); out.push(n); }); if(out.length) mark('meta'); return out; }
 function addLib(kind,arr){ let n=0; (Array.isArray(arr)?arr:[]).forEach(b=>{ if(b&&b.name&&!G.lib.some(l=>l.name===String(b.name))){ const l={id:'l'+uid(),kind,name:String(b.name),prompt:String(b.prompt||''),img:null}; G.lib.push(l); mark('l:'+l.id); shAdopt(l); n++; } }); return n; }
 // 새 대원: 그 장에서 처음 만나는 '인연'. 데뷔 스테이지를 깨면 상시 계약에 합류해요
 function addNewChars(arr,max,stages,opt){ opt=opt||{}; const out=[]; let list=Array.isArray(arr)?arr:(arr&&typeof arr==='object'?[arr]:[]);
-  list.slice(0,max).forEach((x,i)=>{ if(!x||!String(x.name||'').trim()||nameTaken(x.name)) return; const c=sysStats(cleanChar(x)); if(!c.name) return; c.ord=G.chars.length;
+  list.slice(0,max).forEach((x,i)=>{ if(!x||!String(x.name||'').trim()||nameTaken(x.name)) return; if(isMonsterLike(x)){ monsterFromGen(x); return; } /* 몬스터는 캐릭터로 만들지 않고 적으로(0445) */ const c=sysStats(cleanChar(x)); if(!c.name) return; c.ord=G.chars.length;
     const st=stages[Math.min(stages.length,Math.max(1,+x.debutStage||1))-1]; if(st) c.debut=st.id; c.bond=String(opt.src||''); c.limited=false;
     if(opt.giftFirst&&!out.length){ c.rarity=Math.min(2,c.rarity||1); sysStats(c); } // 이벤트 배포: 끝까지 깨면 무료 합류(R·SR)
     else if(opt.ch&&c.rarity<3) (opt.ch.recruits=opt.ch.recruits||[]).push(c.id); // R·SR 인연은 장을 끝까지 깨면 무료 합류
@@ -9569,12 +9582,12 @@ async function aiChapterGen0(dir,n,cast,t){
     memCatchUp();
     const castRefs=cast.map(relRef).filter(Boolean), memo=storyMemo(), rel=relCtx([dir,cast.join(' '),lastPost.slice(-6000)].join('\n'),castRefs,50);
     step(deep?'장 구성을 짜는 중…':'대본을 쓰는 중…');
-    const r=await aiJSON(`【스토리 참조: 메인 장 구성】\n${RULES}\n${ctx(false,dir+' '+cast.join(' '))}${memo}${rel}${planCtx(k+1)}\n${SCRIPT_FMT}\n${deep?'':THREAD_FMT}\n\n직전 장면: ${lastPost.slice(-6000)}\n\n다음 메인 챕터(${k+1}장)를 ${deep?'구성하라. 대본은 뒤에서 스테이지마다 따로 쓰니 지금은 쓰지 않는다. 대신 스테이지마다 장면 구성(beats)을 촘촘하고 구체적으로 짠다(누가 나와서 무엇을 하고, 무엇을 느끼고, 무엇이 드러나는지)':'써라'}. 추가로 JSON에 "codex" 배열을 넣어, 이 장에서 새로 드러나는 설정·장소·인물 기록 1~3개를 쓴다: [{"cat":"place|term|history|person|faction|item","title":"","body":"백과사전 말투 3~5문장"}]. 보유 중인 ${T('crew')}(${G.chars.filter(c=>own(c.id)).map(c=>c.name).join(', ')||'없음'})에게 활약할 장면을 주되, 같은 인물만 맴돌지 않게 아직 비중이 적었던 ${T('crew')}·NPC·새로 만나는 인물에게도 장면을 고르게 나눈다. 등장하는 ${T('crew')}의 ${T('files')}에 적힌 비밀 하나를 이야기에 엮는다. 스토리 중 한 번은 [톡: 이름]~[톡 끝] 메신저 장면을 넣는다. 방향: "${dir}". ${cast.length?'주요 등장 '+T('crew')+': '+cast.join(', ')+'.':''}\n메인 플롯을 한 걸음 진전시키고, 복선을 하나 회수하거나 새로 깐다. 인물 관계 기록을 이어받아 관계가 한 걸음씩 변하게 한다(이미 만난 사이를 처음 만난 것처럼 쓰지 않는다). ${npcRule()}\n${newcRule(SC.newc)}\n${talkOnlyRule(n)}\n${deep?'':`각 스테이지 pre는 ${LS.pre}줄, post는 ${LS.post}줄. 스테이지마다 선택지 1개 이상. ${DETAIL_RULE}`} 마지막 스테이지는 보스전과 다음 장으로 이어지는 반전.\n스테이지 ${n}개. 적은 이름·속성·보스 여부·외형만 정한다(능력치는 시스템이 성장 곡선에 맞춘다).${enemyReuseHint()}${BATTLE_FLOW}\n스테이지마다 가장 인상적인 장면 하나씩을 CG로 정하고(스테이지 수만큼) ${deep?'그 장면의 beats에 "(CG: 이름)"이라고 표시한다':'대본의 그 지점에 [CG: 이름]과 [CG 끝]을 넣는다'}. cgs에는 CG 이름, NovelAI 영어 장면 태그(인물 외모 제외, 장소·구도·행동·분위기만), 등장 인물 이름 1~3명(플레이어가 장면에 나오면 "${T('player')}"도 넣는다)을 넣는다. 새로 필요한 배경이 있으면 backgrounds에 이름과 NovelAI 영어 프롬프트("no humans, scenery"로 시작)를 넣는다. 클로즈업할 새 소품이 있으면 props에 이름과 NovelAI 영어 프롬프트("no humans, object focus"로 시작)를 넣는다([소품: 이름]에는 소품 목록이나 props의 이름만 쓴다). 장면에 맞게 [음악: 이름]을 쓰고, 기존 음악 목록에 없는 곡이 꼭 필요하면 music에 이름과 영어 음악 프롬프트(instrumental, seamless loop 명시)를 넣는다. ${deep?'':`${T('talk')} 대화 1~2개도 만든다(afterStage는 그 대화가 도착하는 스테이지 번호, 1부터). ${THREAD_DUP_RULE}\n${REL_RULE} summary에는 이 장 줄거리를 사건·관계·종료 상태·인지·미회수 복선으로 구분해 2,000~3,000자 내외(최대 6,000자)로(누가 누구를 처음 만났고 무슨 약속·비밀·갈등 변화가 있었는지).`}\nJSON만 출력: {"title":"${k+1}장 제목","logline":"이 장의 한 줄 줄거리(40자 안팎, 스포일러 없이 궁금하게)","stages":${stageSchema(deep)},"backgrounds":[{"name":"","prompt":""}],"props":[{"name":"","prompt":""}],"music":[{"name":"","prompt":""}],"cgs":[{"name":"","prompt":"","cast":["등장 인물 이름"]}],"codex":[],"newCharacters":[],${NPC_SCHEMA}${deep?'':`,"threads":[{"char":"${T('crew')} 이름","title":"","afterStage":1,"script":""}],"summary":"",${REL_SCHEMA()}`}}`,null,'complex');
+    const r=await aiJSON(`【스토리 참조: 메인 장 구성】\n${RULES}\n${ctx(false,dir+' '+cast.join(' '))}${memo}${rel}${planCtx(k+1)}\n${SCRIPT_FMT}\n${deep?'':THREAD_FMT}\n\n직전 장면: ${lastPost.slice(-6000)}\n\n다음 메인 챕터(${k+1}장)를 ${deep?'구성하라. 대본은 뒤에서 스테이지마다 따로 쓰니 지금은 쓰지 않는다. 대신 스테이지마다 장면 구성(beats)을 촘촘하고 구체적으로 짠다(누가 나와서 무엇을 하고, 무엇을 느끼고, 무엇이 드러나는지)':'써라'}. 추가로 JSON에 "codex" 배열을 넣어, 이 장에서 새로 드러나는 설정·장소·인물 기록 1~3개를 쓴다: [{"cat":"place|term|history|person|faction|item","title":"","body":"백과사전 말투 3~5문장"}]. 보유 중인 ${T('crew')}(${G.chars.filter(c=>own(c.id)).map(c=>c.name).join(', ')||'없음'})에게 활약할 장면을 주되, 같은 인물만 맴돌지 않게 아직 비중이 적었던 ${T('crew')}·NPC·새로 만나는 인물에게도 장면을 고르게 나눈다. 등장하는 ${T('crew')}의 ${T('files')}에 적힌 비밀 하나를 이야기에 엮는다. 스토리 중 한 번은 [톡: 이름]~[톡 끝] 메신저 장면을 넣는다. 방향: "${dir}". ${cast.length?'주요 등장 '+T('crew')+': '+cast.join(', ')+'.':''}\n메인 플롯을 한 걸음 진전시키고, 복선을 하나 회수하거나 새로 깐다. 인물 관계 기록을 이어받아 관계가 한 걸음씩 변하게 한다(이미 만난 사이를 처음 만난 것처럼 쓰지 않는다). ${npcRule()}\n${newcRule(SC.newc)}\n${talkOnlyRule(n)}\n${deep?'':`각 스테이지 pre는 ${LS.pre}줄, post는 ${LS.post}줄. 스테이지마다 선택지 1개 이상. ${DETAIL_RULE}`} 마지막 스테이지는 보스전과 다음 장으로 이어지는 반전.\n스테이지 ${n}개. 적은 이름·속성·보스 여부·외형만 정한다(능력치는 시스템이 성장 곡선에 맞춘다).${enemyReuseHint()}${BATTLE_FLOW}\n스테이지마다 가장 인상적인 장면 하나씩을 CG로 정하고(스테이지 수만큼) ${deep?'그 장면의 beats에 "(CG: 이름)"이라고 표시한다':'대본의 그 지점에 [CG: 이름]과 [CG 끝]을 넣는다'}. cgs에는 CG 이름, NovelAI 영어 장면 태그(인물 외모 제외, 장소·구도·행동·분위기만), 등장 인물 이름 1~3명(플레이어가 장면에 나오면 "${T('player')}"도 넣는다)을 넣는다. 새로 필요한 배경이 있으면 backgrounds에 이름과 NovelAI 영어 프롬프트("no humans, scenery"로 시작)를 넣는다. 클로즈업할 새 소품이 있으면 props에 이름과 NovelAI 영어 프롬프트("no humans, object focus"로 시작)를 넣는다([소품: 이름]에는 소품 목록이나 props의 이름만 쓴다). 장면에 맞게 [음악: 이름]을 쓰고, 기존 음악 목록에 없는 곡이 꼭 필요하면 music에 이름과 영어 음악 프롬프트(instrumental, seamless loop 명시)를 넣는다. ${deep?'':`${T('talk')} 대화 1~2개도 만든다(afterStage는 그 대화가 도착하는 스테이지 번호, 1부터). ${THREAD_DUP_RULE}\n${REL_RULE} summary에는 이 장 줄거리를 사건·관계·종료 상태·인지·미회수 복선으로 구분해 2,000~3,000자 내외(최대 6,000자)로(누가 누구를 처음 만났고 무슨 약속·비밀·갈등 변화가 있었는지).`}\nJSON만 출력: {"title":"${k+1}장 제목","logline":"이 장의 한 줄 줄거리(40자 안팎, 스포일러 없이 궁금하게)","stages":${stageSchema(deep)},"backgrounds":[{"name":"","prompt":""}],"props":[{"name":"","prompt":""}],"music":[{"name":"","prompt":""}],"cgs":[{"name":"","prompt":"","cast":["등장 인물 이름"]}],"codex":[],"newCharacters":[],"stance":[{"faction":"이 장에서 플레이어와의 관계가 바뀌는 세력(없으면 빈 배열)","s":"ally|neutral|hostile","why":""}],${NPC_SCHEMA}${deep?'':`,"threads":[{"char":"${T('crew')} 이름","title":"","afterStage":1,"script":""}],"summary":"",${REL_SCHEMA()}`}}`,null,'complex');
     if(!(r&&Array.isArray(r.stages)&&r.stages.length)){ if(r&&t) toast('AI 응답에 스테이지가 없어요. 다시 시도해 주세요.'); return null; }
     const ch={id:uid(),ord:k,kind:'main',title:String(r.title||`${k+1}장`),logline:String(r.logline||'').slice(0,120),stages:buildStages(r.stages,{max:12,reward:i=>300+150*k+100*i,elem:'홍',hp:hl,atk:al,def:dl,foe:'잔광'})};
     await v2BalanceChapter(ch,k);
     // 새 인물·자료를 먼저 넣어야 집필할 때 AI가 알아요
-    const newc=addNewChars(r.newCharacters,SC.newc,ch.stages,{src:ch.title,ch}), npcs=addNpcs(r.newNpcs);
+    const newc=addNewChars(r.newCharacters,SC.newc,ch.stages,{src:ch.title,ch}), npcs=addNpcs(r.newNpcs); stanceApply(r.stance,k+1); // 세력 관계 변화(0445)
     let nb=addLib('bg',r.backgrounds)+addLib('bgm',r.music)+addLib('prop',r.props)+addCGs(r.cgs), nt=0;
     G.chapters.push(ch); mark('ch:'+ch.id); syncEnemies(G,lookMap(r.stages)); try{ cxFromChapter(r,ch); }catch(e){}
     if(deep){ await writeStages(ch,{head:`메인 스토리 ${k+1}장. 방향: "${dir}".${newc.length?' 이 장에서 처음 만나는 신규 '+T('crew')+': '+newc.map(c=>c.name+'('+String(c.profile).slice(0,60)+')').join(', ')+'.':''}`,LS,step,memo,castRefs,castText:dir+' '+cast.join(' ')+' '+newc.map(c=>c.name).join(' '),prevTail:lastPost.split('\n').slice(-80).join('\n').slice(-6000)});
@@ -11518,8 +11531,108 @@ function readStoryForm(){ return {plot:($('#ng_story')?$('#ng_story').value.trim
 function ctx(side,focus){ // side: 외전·이벤트용. 메인 플롯·비밀·진행 상황을 빼요(이벤트가 메인 떡밥을 끌어오지 않게)
   const w=G.world, sd=[], wS=dedupText(w.summary,sd).text, wL=dedupText(w.lore,sd).text, wP=side?'':dedupText(w.plot||'',sd).text, bib=G.meta.bible?dedupText(side?String(G.meta.bible).split('\n').filter(l=>!/^\s*비밀/.test(l)).join('\n'):String(G.meta.bible),sd).text:''; // 세계관 요약·상세·플롯·작가 설정에 겹치는 문장은 한 번만 보내요
   const prog=G.chapters.filter(c=>c.kind==='main').map(ch=>ch.title+': '+ch.stages.map(s=>s.title+(P().cleared[s.id]?'(완료)':'')).join(', ')).join(' / ');
-  return `게임 "${G.meta.title}". ${w.source?'원작(2차 창작): '+w.source+' — 원작 설정을 따른다. 원작에서 미성년자·학생인 캐릭터는 쓰지 않는다.\n':''}세계관 "${w.name}": ${wS}\n${wL?'상세 설정: '+wL+'\n':''}${side?'':`메인 플롯(작가용 비밀 설정 포함): ${wP||w.plot||'미정'}\n${storyCfg().plot?'플레이어가 직접 짠 스토리 개요(이 흐름을 반드시 따른다): '+storyCfg().plot+'\n':''}`}${bib?(side?'작가 설정(세계관 참고용):\n'+bib.slice(0,8000):'작가 설정(이 설정을 그대로 따른다. 비밀은 이야기 흐름에 맞게 천천히 드러낸다):\n'+bib.slice(0,12000))+'\n':''}세력: ${w.factions.map(f=>f.name+'('+f.desc+')').join(', ')}\n${side?'':`메인 스토리 진행: ${prog}\n`}${T('crew')}: ${G.chars.filter(c=>!(c.alt&&!c.altCanon)).map(c=>`${c.name}(${c.alt&&charById(c.alt)?'「'+charById(c.alt).name+'」이(가) 정사에서 변한 모습. 메인 스토리에서는 이제 이 모습으로 나오고 원래 모습과 같은 장면에 함께 나오지 않는다. ':''}${RL[c.rarity]}, ${c.faction||'무소속'}, ${c.elem}속성 ${ROLE[c.role]}, ${smProfile(c,focus)}${personaBrief(c)?' 개성: '+personaBrief(c)+'.':''} 말투 예: "${smVoice(c,focus)}"${c.faces.length?' 표정: '+c.faces.map(f=>f.name).join('/'):''})`).join('; ')}${G.chars.some(c=>c.alt&&!c.altCanon)?'\n외전 전용 이격(메인 스토리에는 쓰지 않는다. 메인 스토리에서는 원래 모습으로 쓴다): '+G.chars.filter(c=>c.alt&&!c.altCanon).map(c=>c.name+'='+((charById(c.alt)||{}).name||'')+'의 외전 모습').join(', '):''}${(G.npcs||[]).length?'\nNPC(조연, '+T('crew')+'가 아님. 스토리에 등장할 수 있고 대사 이름은 그대로 쓴다): '+G.npcs.map(n=>`${n.name}(${n.role||'조연'}, ${String(n.profile||'').slice(0,focus&&smFocused(n,focus)?1000:200)}${n.speech?' 말투: '+String(n.speech).slice(0,60):''})`).join('; '):''}\n배경 목록: ${G.lib.filter(l=>l.kind==='bg').map(l=>l.name).join(', ')}${(()=>{ const L=shList().filter(x=>x.kind==='bg'&&!G.lib.some(l=>l.kind==='bg'&&l.name===x.name)).slice(0,20).map(x=>x.name); return L.length?'\n공유 보관함 배경(이 이름을 쓰면 그림을 바로 재사용): '+L.join(', '):''; })()}\n소품 목록: ${G.lib.filter(l=>l.kind==='prop').map(l=>l.name).join(', ')}\n음악 목록: ${G.lib.filter(l=>l.kind==='bgm').map(l=>l.name).join(', ')}\n효과음 목록: ${G.lib.filter(l=>l.kind==='sfx').map(l=>l.name).join(', ')}\nCG 목록: ${G.lib.filter(l=>l.kind==='cg').map(l=>l.name).join(', ')||'없음'}`+smNotes(side)+smCodex(focus,side);
+  return `게임 "${G.meta.title}". ${w.source?'원작(2차 창작): '+w.source+' — 원작 설정을 따른다. 원작에서 미성년자·학생인 캐릭터는 쓰지 않는다.\n':''}세계관 "${w.name}": ${wS}\n${wL?'상세 설정: '+wL+'\n':''}${side?'':`메인 플롯(작가용 비밀 설정 포함): ${wP||w.plot||'미정'}\n${storyCfg().plot?'플레이어가 직접 짠 스토리 개요(이 흐름을 반드시 따른다): '+storyCfg().plot+'\n':''}`}${bib?(side?'작가 설정(세계관 참고용):\n'+bib.slice(0,8000):'작가 설정(이 설정을 그대로 따른다. 비밀은 이야기 흐름에 맞게 천천히 드러낸다):\n'+bib.slice(0,12000))+'\n':''}${factionCtx()}${side?'':`메인 스토리 진행: ${prog}\n`}${T('crew')}: ${G.chars.filter(c=>!(c.alt&&!c.altCanon)&&!c.monster).map(c=>`${c.name}(${c.alt&&charById(c.alt)?'「'+charById(c.alt).name+'」이(가) 정사에서 변한 모습. 메인 스토리에서는 이제 이 모습으로 나오고 원래 모습과 같은 장면에 함께 나오지 않는다. ':''}${RL[c.rarity]}, ${c.faction||'무소속'}, ${c.elem}속성 ${ROLE[c.role]}, ${smProfile(c,focus)}${personaBrief(c)?' 개성: '+personaBrief(c)+'.':''} 말투 예: "${smVoice(c,focus)}"${c.faces.length?' 표정: '+c.faces.map(f=>f.name).join('/'):''})`).join('; ')}${G.chars.some(c=>c.alt&&!c.altCanon)?'\n외전 전용 이격(메인 스토리에는 쓰지 않는다. 메인 스토리에서는 원래 모습으로 쓴다): '+G.chars.filter(c=>c.alt&&!c.altCanon).map(c=>c.name+'='+((charById(c.alt)||{}).name||'')+'의 외전 모습').join(', '):''}${(G.npcs||[]).length?'\nNPC(조연, '+T('crew')+'가 아님. 스토리에 등장할 수 있고 대사 이름은 그대로 쓴다): '+G.npcs.map(n=>`${n.name}(${n.role||'조연'}, ${String(n.profile||'').slice(0,focus&&smFocused(n,focus)?1000:200)}${n.speech?' 말투: '+String(n.speech).slice(0,60):''})`).join('; '):''}\n배경 목록: ${G.lib.filter(l=>l.kind==='bg').map(l=>l.name).join(', ')}${(()=>{ const L=shList().filter(x=>x.kind==='bg'&&!G.lib.some(l=>l.kind==='bg'&&l.name===x.name)).slice(0,20).map(x=>x.name); return L.length?'\n공유 보관함 배경(이 이름을 쓰면 그림을 바로 재사용): '+L.join(', '):''; })()}\n소품 목록: ${G.lib.filter(l=>l.kind==='prop').map(l=>l.name).join(', ')}\n음악 목록: ${G.lib.filter(l=>l.kind==='bgm').map(l=>l.name).join(', ')}\n효과음 목록: ${G.lib.filter(l=>l.kind==='sfx').map(l=>l.name).join(', ')}\nCG 목록: ${G.lib.filter(l=>l.kind==='cg').map(l=>l.name).join(', ')||'없음'}`+smNotes(side)+smCodex(focus,side);
 }
+/* ===== 세력 설계 · 몬스터 도감 · 등장/영입(캐스팅) 관리 ===== */
+/* 1) 세력 G.world.factions[]: {name,desc,kind,goal,leader,base,ideology,secret,origin,nature,weakness,rel:{세력:관계},stance:[{ch,s,why}]}
+      kind: playable(플레이어블 소속) | hostile(적대 세력) | neutral(중립) | monster(괴물·마물 무리)
+      stance: 플레이어와의 관계가 장마다 바뀜(ally·neutral·hostile). 예: 1~3장 적대 → 4장부터 동맹. 장 생성 때 AI가 바꿀 수 있음
+   2) 몬스터 도감: 자료실 적(kind 'enemy', 캐릭터가 아닌 것)마다 faction·desc(정체)·nature(습성)·weak(약점)
+      몬스터는 메신저·일정·인연 같은 커뮤 대상이 아님 → 새 캐릭터·NPC로 만들어지지 않게 막고(isMonsterLike), 예전 데이터는 점검
+   3) 등장·영입: c.debut(첫 등장 스테이지)를 깨기 전에는 상시·픽업 뽑기·건조에 안 나옴, 소속 세력이 지금 적대면 잠금(설정).
+      AI에는 "보유했지만 스토리에서 아직 안 만남 → 이미 계약해 함께 작전 중인 동료"를 알려 첫 만남처럼 쓰지 않게 함
+   문서: docs/research/factions-cast.md */
+const FKIND={playable:'플레이어블 소속',hostile:'적대 세력',neutral:'중립',monster:'괴물·마물'}, FSTANCE={ally:'우호',neutral:'중립',hostile:'적대'};
+const F_FIELDS=[['desc','개요'],['goal','목적'],['leader','지도자·핵심 인물'],['base','거점·영역'],['ideology','이념·규칙'],['secret','숨겨진 사실(작가용)']], M_FIELDS=[['origin','정체·기원'],['nature','습성·행동'],['weakness','약점']];
+function castCfg(){ const c=G.meta.cast||{}; return {pickupGate:c.pickupGate!==false,hostileGate:c.hostileGate!==false}; }
+function factions(){ const w=G.world; if(!Array.isArray(w.factions)) w.factions=[]; G.chars.forEach(c=>{ if(c.faction&&!c.monster&&!c.collab&&!w.factions.some(f=>f.name===c.faction)) w.factions.push({name:c.faction,desc:'',kind:'playable',rel:{},stance:[]}); }); /* 캐릭터 소속인데 목록에 없는 세력 */ w.factions.forEach(f=>{ if(!FKIND[f.kind]) f.kind=G.chars.some(c=>c.faction===f.name&&!c.monster)?'playable':G.lib.some(l=>l.kind==='enemy'&&!l.charId&&l.name.includes(f.name))?'monster':'neutral'; if(!Array.isArray(f.stance)) f.stance=[]; if(!f.rel||typeof f.rel!=='object') f.rel={}; }); return w.factions; }
+function facByName(n){ return factions().find(f=>f.name===n); }
+function mainNow(){ return Math.max(1,G.chapters.filter(c=>c.kind==='main'&&(c.stages||[]).some(s=>P().cleared[s.id])).length+1); } // 지금 진행 중인 장(1부터)
+function stanceAt(f,ch){ if(!f) return 'neutral'; const L=(f.stance||[]).filter(x=>+x.ch<=ch).sort((a,b)=>a.ch-b.ch); return L.length?L.at(-1).s:f.kind==='playable'?'ally':f.kind==='neutral'?'neutral':'hostile'; }
+// 몬스터: 자료실 적 중 캐릭터·NPC가 아닌 것
+const SYS_ENEMY=/^(훈련 |강화 표적|탑의 )/; // 훈련·탑의 표적은 시스템 적
+function monsterNames(){ const nm=new Set([...G.chars.map(c=>c.name),...(G.npcs||[]).map(n=>n.name)]); return G.lib.filter(l=>l.kind==='enemy'&&!l.charId&&!l.alias&&!nm.has(l.name)&&!SYS_ENEMY.test(l.name)); }
+function enemyFaction(l){ return l.faction||((factions().find(f=>f.kind!=='playable'&&l.name.includes(f.name))||{}).name)||''; }
+function isMonsterLike(x){ if(!x) return false; const name=String(x.name||'').trim(), t=String(x.role||''), np=String(x.naiPrompt||x.look||'').trim();
+  return G.lib.some(l=>l.kind==='enemy'&&!l.charId&&l.name===name&&(/^no humans/i.test(l.prompt||'')||(facByName(enemyFaction(l))||{}).kind==='monster'))||/^no humans/i.test(np)||/(^|[\s(])(몬스터|괴물|마물|마수|짐승|야수|괴수|언데드|슬라임|기계 병기)/.test(t)||(facByName(x.faction)||{}).kind==='monster'; }
+// 등장·영입
+function metInStory(c){ if(c.debut&&P().cleared[c.debut]) return true; if(typeof relPair==='function'&&relPair(REL_ME,c.id)) return true;
+  return G.chapters.some(ch=>(ch.stages||[]).some(s=>P().cleared[s.id]&&new RegExp('(^|\\n)'+String(c.name).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(\\s*\\[[^\\]]*\\])?\\s*[:：]').test((s.pre||'')+'\n'+(s.post||'')))); }
+function castLock(c){ if(c.monster) return '몬스터는 영입할 수 없어요'; if(!debutOk(c)){ const s=stageById(c.debut); return `스토리 「${s?s.title:'?'}」을(를) 깨면 열려요`; }
+  if(castCfg().hostileGate&&!own(c.id)){ const f=facByName(c.faction); if(f&&stanceAt(f,mainNow())==='hostile') return `${f.name}이(가) 지금 적대 중이라 영입할 수 없어요`; } return ''; }
+function castOk(c){ return !castLock(c); }
+// AI 컨텍스트
+function factionCtx(){ const F=factions(), now=mainNow(), L=[];
+  F.forEach(f=>{ const st=stanceAt(f,now), nxt=(f.stance||[]).filter(x=>+x.ch>now).sort((a,b)=>a.ch-b.ch)[0], mem=G.chars.filter(c=>c.faction===f.name&&!c.monster).map(c=>c.name);
+    L.push(`- ${f.name} [${FKIND[f.kind]} · 지금 플레이어와 ${FSTANCE[st]}${nxt?` · ${nxt.ch}장부터 ${FSTANCE[nxt.s]} 예정(${nxt.why||''}, 아직 드러내지 않음)`:''}]: ${f.desc||''}${f.goal?' 목적: '+f.goal+'.':''}${f.leader?' 지도자: '+f.leader+'.':''}${f.base?' 거점: '+f.base+'.':''}${f.ideology?' 이념: '+f.ideology+'.':''}${f.kind==='monster'?`${f.origin?' 정체: '+f.origin+'.':''}${f.nature?' 습성: '+f.nature+'.':''}${f.weakness?' 약점: '+f.weakness+'.':''}`:''}${Object.keys(f.rel).length?' 다른 세력과: '+Object.entries(f.rel).map(([k,v])=>k+' '+v).join(', ')+'.':''}${mem.length?' 소속 '+T('crew')+': '+mem.join(', ')+(st==='hostile'?' (지금은 적으로 나올 수 있음)':''):''}`); });
+  const M=monsterNames().filter(l=>l.desc||enemyFaction(l)); const crew=G.chars.filter(c=>!c.monster&&!c.npc&&!c.alt), unmet=crew.filter(c=>own(c.id)&&!metInStory(c)), lock=crew.filter(c=>!own(c.id)&&c.debut&&!debutOk(c));
+  return `\n세력(설정을 지키고, 관계 변화는 정해진 장에서만):\n${L.join('\n')||'없음'}\n${M.length?'몬스터 도감(말하는 동료·NPC·메신저 상대가 아니다. 대사는 울음·짧은 위협 정도): '+M.map(l=>`${l.name}${enemyFaction(l)?'('+enemyFaction(l)+')':''}: ${[l.desc,l.nature,l.weak&&'약점 '+l.weak].filter(Boolean).join(' / ')}`).join('; ')+'\n':''}${unmet.length?`이미 계약으로 합류해 함께 작전 중인 ${T('crew')}(스토리에서 첫 만남처럼 쓰지 않는다): ${unmet.map(c=>c.name).join(', ')}\n`:''}${lock.length?`아직 이야기에 등장하지 않은 ${T('crew')}(정해진 첫 등장 장면에서만 처음 만난다): ${lock.map(c=>c.name).join(', ')}\n`:''}`; }
+// 깊이 점검
+function factionReview(){ const out=[], F=factions(); if(F.length<2) out.push({w:15,msg:'세력이 2개 미만이에요'}); if(!F.some(f=>f.kind==='hostile'||f.kind==='monster')) out.push({w:8,msg:'적대 세력·몬스터 무리가 없어요'});
+  F.forEach(f=>{ const miss=F_FIELDS.slice(0,5).filter(([k])=>!(f.kind==='monster'&&['leader','ideology'].includes(k))&&!String(f[k]||'').trim()).map(x=>x[1]); if(String(f.desc||'').length<20) out.push({w:6,msg:`「${f.name}」 개요가 너무 짧아요`}); if(miss.length) out.push({w:Math.min(8,miss.length*2),msg:`「${f.name}」에 ${miss.join('·')}이(가) 없어요`});
+    if(f.kind==='monster'){ const mm=M_FIELDS.filter(([k])=>!String(f[k]||'').trim()).map(x=>x[1]); if(mm.length) out.push({w:mm.length*3,msg:`몬스터 「${f.name}」의 ${mm.join('·')}이(가) 없어요`}); }
+    if(F.length>1&&!Object.keys(f.rel).length) out.push({w:3,msg:`「${f.name}」과 다른 세력의 관계가 없어요`}); });
+  const M=monsterNames(), nod=M.filter(l=>!l.desc); if(nod.length) out.push({w:Math.min(20,nod.length*2),msg:`정체가 정해지지 않은 적 ${nod.length}종: ${nod.slice(0,6).map(l=>l.name).join(', ')}${nod.length>6?' …':''}`});
+  const bad=[...G.chars.filter(c=>!c.monster&&isMonsterLike(c)),...(G.npcs||[]).filter(n=>!n.monster&&isMonsterLike(n))]; if(bad.length) out.push({w:10,msg:`몬스터로 보이는 캐릭터·NPC: ${bad.map(x=>x.name).join(', ')}`});
+  const score=Math.max(0,100-out.reduce((a,x)=>a+x.w,0)); return {score,issues:out}; }
+async function factionAI(btn,instruction){ const F=factions(), M=monsterNames();
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 게임의 세력과 몬스터 설정을 깊이 있게 ${F.length?'다듬고 빈 곳을 채워라(이미 있는 이름·사실은 바꾸지 않는다)':'만들어라'}. 세력은 3~6개: 플레이어블 소속(kind playable), 적대 세력(hostile), 중립(neutral), 괴물·마물 무리(monster)를 세계관에 맞게. 세력마다 개요(3~4문장)·목적·지도자·거점·이념·숨겨진 사실, 다른 세력과의 관계(동맹·적대·긴장·중립·종속 등 한 단어+이유). 몬스터 무리는 정체·기원, 습성·행동, 약점(속성·전술). 플레이어와의 관계가 이야기 중에 바뀌는 세력이 있으면 stance에 [{"ch":장 번호,"s":"ally|neutral|hostile","why":"이유"}]. 지금 메인 스토리는 ${mainNow()}장 진행 중(이미 지난 장의 관계는 지금 대본과 어긋나지 않게).${instruction?'\n추가 지시: '+instruction:''}
+적(몬스터) 목록: ${M.map(l=>l.name).join(', ')||'없음'} — 각각 어느 무리(faction)인지, 정체(desc)·습성(nature)·약점(weak)을 한 줄씩. 사람·캐릭터인 적은 넣지 않는다.
+기존 세력: ${JSON.stringify(F.map(f=>({name:f.name,kind:f.kind,desc:f.desc}))).slice(0,3000)}
+JSON만 출력: {"factions":[{"name":"","kind":"playable|hostile|neutral|monster","desc":"","goal":"","leader":"","base":"","ideology":"","secret":"","origin":"","nature":"","weakness":"","rel":{"다른 세력 이름":"관계"},"stance":[]}],"bestiary":[{"name":"적 이름 그대로","faction":"","desc":"","nature":"","weak":""}]}`,btn,'complex');
+  if(!r) return false; const S=(v,n)=>String(v||'').trim().slice(0,n||300);
+  (Array.isArray(r.factions)?r.factions:[]).slice(0,8).forEach(x=>{ const name=S(x.name,30); if(!name) return; let f=facByName(name); if(!f){ f={name,desc:''}; F.push(f); }
+    if(FKIND[x.kind]) f.kind=x.kind; [...F_FIELDS,...M_FIELDS].forEach(([k])=>{ const v=S(x[k]); if(v&&(!f[k]||String(f[k]).length<v.length||instruction)) f[k]=v; });
+    if(x.rel&&typeof x.rel==='object') Object.entries(x.rel).forEach(([k,v])=>{ if(k!==name&&facByName(k)) f.rel[k]=S(v,40); });
+    if(Array.isArray(x.stance)) x.stance.forEach(s=>{ const ch=Math.max(1,Math.round(+s.ch||0)); if(ch&&FSTANCE[s.s]&&!f.stance.some(y=>+y.ch===ch)) f.stance.push({ch,s:s.s,why:S(s.why,80)}); }); });
+  (Array.isArray(r.bestiary)?r.bestiary:[]).forEach(x=>{ const l=M.find(y=>y.name===S(x.name,40)); if(!l) return; ['desc','nature','weak'].forEach(k=>{ const v=S(x[k],200); if(v&&!l[k]) l[k]=v; }); const fn=S(x.faction,30); if(fn&&facByName(fn)) l.faction=fn; mark('l:'+l.id); });
+  mark('world'); return true; }
+// 장 생성이 돌려준 관계 변화 반영: [{faction,s,why}] → 그 장부터
+function stanceApply(arr,ch){ (Array.isArray(arr)?arr:[]).forEach(x=>{ const f=facByName(String(x&&x.faction||'').trim()); if(f&&FSTANCE[x.s]&&stanceAt(f,ch)!==x.s){ f.stance=f.stance.filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); mark('world'); } }); }
+// 몬스터를 캐릭터에서 빼기(뽑기·톡·일정·인연에서 제외, 적으로 등록)
+function charToMonster(c){ c.monster=true; c.limited=true; if(!G.lib.some(l=>l.kind==='enemy'&&l.name===c.name)) G.lib.push({id:'l'+uid(),kind:'enemy',name:c.name,prompt:String(c.naiPrompt||''),img:null,desc:String(c.profile||'').slice(0,200)}); mark('c:'+c.id); }
+
+/* 화면 */
+let FW_TAB='fac';
+function factionPanel(){ const r=factionReview(); return `<div class="panel pm-hide"><h3>세력·몬스터·등장 관리 <span class="badge">${r.score}점</span></h3><p class="muted" style="margin:0 0 6px">세력 ${factions().length}개 · 몬스터 ${monsterNames().length}종 · 점검 ${r.issues.length}건. 세력의 종류·목적·관계와 장마다 바뀌는 적대/우호, 몬스터의 정체, ${T('crew')}의 첫 등장·${T('gacha')} 잠금을 관리해요.</p><button class="btn sm" data-act="fwopen">세력·몬스터·등장 관리</button></div>`; }
+function openWorldDesign(tab){ if(tab) FW_TAB=tab; const F=factions(), now=mainNow(), rv=factionReview(), t=(k,v,ph)=>`<input class="in" data-fw="${k}" value="${esc(v??'')}" placeholder="${esc(ph||'')}">`, ta=(k,v,ph)=>`<textarea class="in" rows="2" data-fw="${k}" placeholder="${esc(ph||'')}">${esc(v||'')}</textarea>`;
+  const tabs=[['fac','세력'],['mon','적·몬스터 도감'],['cast','등장·영입']]; let body='';
+  if(FW_TAB==='fac') body=F.map((f,i)=>`<details class="panel" style="padding:8px;margin:6px 0"><summary><b>${esc(f.name)}</b> <span class="muted">${FKIND[f.kind]} · 지금 ${FSTANCE[stanceAt(f,now)]}</span></summary>
+    <div class="g2"><div><label class="f">종류</label><select class="in" data-fw="f.${i}.kind">${opt(Object.entries(FKIND),f.kind)}</select></div><div><label class="f">이름</label>${t(`f.${i}.name`,f.name)}</div></div>
+    ${F_FIELDS.map(([k,l])=>`<label class="f">${l}</label>${k==='desc'||k==='secret'?ta(`f.${i}.${k}`,f[k]):t(`f.${i}.${k}`,f[k])}`).join('')}
+    ${f.kind==='monster'?M_FIELDS.map(([k,l])=>`<label class="f">${l}</label>${t(`f.${i}.${k}`,f[k])}`).join(''):''}
+    <label class="f">다른 세력과의 관계 (세력 | 관계, 줄마다)</label>${ta(`f.${i}.rel`,Object.entries(f.rel).map(([k,v])=>k+' | '+v).join('\n'))}
+    <label class="f">플레이어와의 관계 변화 (장 | ally·neutral·hostile | 이유, 줄마다 · 비우면 종류대로)</label>${ta(`f.${i}.stance`,f.stance.map(s=>`${s.ch} | ${s.s} | ${s.why||''}`).join('\n'),'예: 1 | hostile | 처음엔 적\n4 | ally | 진실을 알고 손잡음')}
+    <div class="muted" style="font-size:.78rem">소속: ${esc(G.chars.filter(c=>c.faction===f.name).map(c=>c.name).join(', ')||'없음')}${monsterNames().filter(l=>enemyFaction(l)===f.name).length?' · 몬스터: '+esc(monsterNames().filter(l=>enemyFaction(l)===f.name).map(l=>l.name).join(', ')):''}</div></details>`).join('')+`<button class="btn sm ghost" data-act="fwadd">+ 세력</button>`;
+  else if(FW_TAB==='mon'){ const M=monsterNames(); body=`<p class="muted" style="font-size:.82rem">캐릭터가 아닌 적(몬스터·적 병력)이에요. 정체·습성·약점을 정하면 스토리·도감에 쓰이고, AI가 몬스터를 동료·NPC·메신저 상대로 만들지 않아요.</p>${M.map((l,i)=>`<div class="panel" style="padding:8px;margin:6px 0"><b>${esc(l.name)}</b> <select class="in" data-fw="m.${l.id}.faction" style="max-width:150px;display:inline-block"><option value="">무리 없음</option>${F.map(f=>`<option ${enemyFaction(l)===f.name?'selected':''}>${esc(f.name)}</option>`).join('')}</select>${t(`m.${l.id}.desc`,l.desc,'정체 (무엇인가)')}${t(`m.${l.id}.nature`,l.nature,'습성·행동')}${t(`m.${l.id}.weak`,l.weak,'약점')}</div>`).join('')||'<p class="muted">적이 없어요</p>'}`; }
+  else { const L=G.chars.filter(c=>!c.alt&&!c.npc), stg=G.chapters.flatMap(ch=>(ch.stages||[]).map(s=>[s.id,`${ch.kind==='main'?stageCode(s.id):ch.title} ${s.title}`]));
+    body=`<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-fw="cast.pickupGate" ${castCfg().pickupGate?'checked':''}>픽업 배너도 첫 등장 스테이지를 깨기 전엔 잠금</label><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-fw="cast.hostileGate" ${castCfg().hostileGate?'checked':''}>소속 세력이 지금 적대면 ${T('gacha')}·건조에서 잠금</label>
+    <p class="muted" style="font-size:.8rem">첫 등장을 정하면 그 스테이지를 깨기 전까지 ${T('gacha')}에 안 나오고, 스토리에서 처음 만나는 장면이 돼요. "처음부터"인 ${T('crew')}는 뽑아서 합류하면 AI가 이미 함께 작전 중인 동료로 다뤄요.</p>
+    ${L.map(c=>{ const lk=castLock(c); return `<div class="ep"><span class="t"><b>${esc(c.name)}${c.monster?' (몬스터)':''}</b><span class="muted">${esc(c.faction||'무소속')} · ${own(c.id)?'보유':'미보유'} · ${metInStory(c)?'스토리에서 만남':'아직 안 만남'}${lk?' · 🔒 '+esc(lk):''}</span></span><select class="in" data-fw="c.${c.id}.debut" style="max-width:170px"><option value="">처음부터</option>${stg.map(([id,l])=>`<option value="${id}" ${c.debut===id?'selected':''}>${esc(l)}</option>`).join('')}</select>${!c.monster&&isMonsterLike(c)?`<button class="btn sm ghost" data-act="fwmon" data-id="${c.id}">몬스터로 전환</button>`:''}</div>`; }).join('')}`; }
+  openModal(`${head('세력·몬스터·등장 관리',`<span class="muted">점수 ${rv.score}</span>`)}${rv.issues.length?`<div class="panel" style="border-color:var(--gold)"><b>점검</b><ul style="margin:4px 0;padding-left:18px;font-size:.8rem">${rv.issues.map(x=>`<li>${esc(x.msg)}</li>`).join('')}</ul></div>`:''}
+  <div class="row" style="gap:4px;margin:6px 0">${tabs.map(([k,l])=>`<button class="btn sm ${FW_TAB===k?'':'ghost'}" data-act="fwtab" data-k="${k}">${l}</button>`).join('')}</div>${body}
+  <label class="f" style="margin-top:8px">AI 추가 지시 (선택)</label><input class="in" id="fw_ins" placeholder="예: 헬릭스는 3장 이후 내분으로 일부가 우리 편이 된다">
+  <div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><button class="btn" data-act="fwsave">저장</button><button class="btn ghost" data-act="fwai">AI로 깊이 채우기</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
+function fwRead(){ const F=factions(), lines=v=>String(v||'').split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(x=>x[0]);
+  document.querySelectorAll('#modal [data-fw]').forEach(el=>{ const k=el.dataset.fw.split('.'), v=el.type==='checkbox'?el.checked:el.value;
+    if(k[0]==='cast'){ G.meta.cast=Object.assign({},G.meta.cast,{[k[1]]:v}); return; }
+    if(k[0]==='m'){ const l=G.lib.find(x=>x.id===k[1]); if(l){ l[k[2]]=String(v).trim(); mark('l:'+l.id); } return; }
+    if(k[0]==='c'){ const c=charById(k[1]); if(c&&(c.debut||'')!==v){ if(v) c.debut=v; else delete c.debut; mark('c:'+c.id); } return; }
+    const f=F[+k[1]]; if(!f) return;
+    if(k[2]==='rel'){ f.rel={}; lines(v).forEach(([a,b])=>{ if(a&&a!==f.name) f.rel[a]=b||''; }); }
+    else if(k[2]==='stance'){ f.stance=lines(v).map(([ch,s,why])=>({ch:Math.max(1,+ch||1),s:FSTANCE[s]?s:'neutral',why:why||''})); }
+    else if(k[2]==='name'){ const n=String(v).trim(); if(n&&n!==f.name){ const old=f.name; G.chars.forEach(c=>{ if(c.faction===old){ c.faction=n; mark('c:'+c.id); } }); F.forEach(o=>{ if(o.rel[old]!=null){ o.rel[n]=o.rel[old]; delete o.rel[old]; } }); f.name=n; } }
+    else f[k[2]]=String(v).trim(); }); mark('world','meta'); }
+document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+  if(a==='fwopen') openWorldDesign();
+  else if(a==='fwtab'){ fwRead(); openWorldDesign(b.dataset.k); }
+  else if(a==='fwsave'){ fwRead(); toast('세력·등장 설정을 저장했어요'); openWorldDesign(); }
+  else if(a==='fwadd'){ fwRead(); factions().push({name:'새 세력 '+(factions().length+1),desc:'',kind:'neutral',rel:{},stance:[]}); openWorldDesign('fac'); }
+  else if(a==='fwmon'){ const c=charById(b.dataset.id); if(c&&(await appConfirm(`「${c.name}」을(를) 몬스터(적)로 바꿀까요? ${T('gacha')}·톡·일정·인연에서 빠져요.`))){ charToMonster(c); toast('몬스터로 바꿨어요'); openWorldDesign('cast'); } }
+  else if(a==='fwai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } fwRead(); if(await factionAI(b,($('#fw_ins')||{}).value||'')){ toast('세력·몬스터 설정을 채웠어요'); openWorldDesign(); } } });
+function monsterFromGen(x){ const name=String(x.name||'').trim(); if(!name||G.lib.some(l=>l.kind==='enemy'&&l.name===name)) return; G.lib.push({id:'l'+uid(),kind:'enemy',name,prompt:String(x.naiPrompt||x.look||''),img:null,desc:String(x.profile||x.desc||'').slice(0,200),faction:String(x.faction||'')}); }
+// 메인 스토리에서 처음 말하는 스테이지 {k: 장 순서(0부터), s}
+function firstSpeak(c){ const re=new RegExp('(^|\\n)'+String(c.name).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(\\s*\\[[^\\]]*\\])?\\s*[:：]'), M=G.chapters.filter(ch=>ch.kind==='main'); for(let k=0;k<M.length;k++) for(const s of M[k].stages||[]) if(re.test((s.pre||'')+'\n'+(s.post||''))) return {k,s}; return null; }
 /* ===== 인물 관계도 · 스토리 기억 =====
    관계는 두 사람(대원·NPC·플레이어) 사이의 기록이에요. 로어북처럼 글에 이름이 나오면 그 사람의 관계만 골라 AI에 넣어요. */
 const REL_ME='me';
@@ -12348,14 +12461,14 @@ function gateCheck(){ if(!G.meta.gated) return; const p=P(); p.gateSeen=p.gateSe
 function curBanner(){const bs=G.banners.filter(bnOpen);return bs.find(b=>b.id===P().curBanner)||bs[0]||null;}
 function bannerPool(b){
   // 건조 전용 바리에이션(c.cvar)은 건조/영입이 켜져 있으면 뽑기에 안 나와요(픽업으로 직접 넣은 건 예외)
-  let pool=G.chars.filter(c=>(!c.limited||(b.pickup||[]).includes(c.id))&&(debutOk(c)||(b.pickup||[]).includes(c.id))&&!(c.cvar&&conOn()&&!(b.pickup||[]).includes(c.id)));
+  let pool=G.chars.filter(c=>(!c.limited||(b.pickup||[]).includes(c.id))&&(castOk(c)||(!castCfg().pickupGate&&!c.monster&&(b.pickup||[]).includes(c.id)))&&!(c.cvar&&conOn()&&!(b.pickup||[]).includes(c.id)));
   if(b.pool.mode==='faction') pool=pool.filter(c=>(b.pool.factions||[]).includes(c.faction));
   if(b.pool.mode==='list') pool=pool.filter(c=>(b.pool.ids||[]).includes(c.id));
-  (b.pickup||[]).map(charById).filter(Boolean).forEach(c=>{if(!pool.includes(c))pool.push(c);});
+  (b.pickup||[]).map(charById).filter(c=>c&&(castOk(c)||(!castCfg().pickupGate&&!c.monster))).forEach(c=>{if(!pool.includes(c))pool.push(c);}); // 첫 등장 전·적대 중·몬스터는 픽업도 잠금(0445)
   // SSR이 하나도 없는 배너(소속 한정 등)에는 상시 SSR을 넣어 SSR이 항상 나올 수 있게
-  if(pool.length&&!pool.some(c=>c.rarity===3)) G.chars.filter(c=>c.rarity===3&&!c.limited&&debutOk(c)).forEach(c=>pool.push(c));
+  if(pool.length&&!pool.some(c=>c.rarity===3)) G.chars.filter(c=>c.rarity===3&&!c.limited&&castOk(c)).forEach(c=>pool.push(c));
   // R·SR이 없는 배너(픽업 캐릭터만 있는 배너, 소속 한정 등)도 상시 R·SR을 넣어 낮은 등급 자리에 SSR이 끼지 않게
-  if(pool.length) [1,2].forEach(r=>{ if(!pool.some(c=>c.rarity===r)) G.chars.filter(c=>c.rarity===r&&!c.limited&&debutOk(c)).forEach(c=>pool.push(c)); });
+  if(pool.length) [1,2].forEach(r=>{ if(!pool.some(c=>c.rarity===r)) G.chars.filter(c=>c.rarity===r&&!c.limited&&castOk(c)).forEach(c=>pool.push(c)); });
   return pool.length?pool:G.chars;
 }
 const SPARK=200;
@@ -12486,7 +12599,7 @@ function conDispReward(hours,need){ const pts=Math.pow(hours,0.85)*(1+0.35*(need
 function conVariantOf(b,tpl){ return G.chars.find(x=>x.alt===b.id&&x.cvar===tpl.id); }
 function conTargets(tpl){ return G.chars.filter(b=>!b.alt&&!b.cvar&&own(b.id)&&GGMConstruct.condMatch(tpl.cond,b,{own:own(b.id),affLv:affLv(own(b.id)),cleared:P().cleared})); }
 function conVariantChoices(input){ return VARIANTS().filter(t=>t.on!==false&&GGMConstruct.matches(t.recipe,input)).map(tpl=>({tpl,bases:conTargets(tpl).filter(b=>{ const v=conVariantOf(b,tpl); return !(v&&own(v.id)); })})); }
-function conPool(){ return G.chars.filter(c=>!c.limited&&!c.cvar&&!c.alt&&debutOk(c)).map(c=>({id:c.id,rarity:c.rarity,role:c.role,faction:c.faction,elem:c.elem})); }
+function conPool(){ return G.chars.filter(c=>!c.limited&&!c.cvar&&!c.alt&&castOk(c)).map(c=>({id:c.id,rarity:c.rarity,role:c.role,faction:c.faction,elem:c.elem})); }
 
 async function conMakeVariant(b,tpl){
   const rr=tpl.rarity==='same'||!tpl.rarity?String(b.rarity):String(tpl.rarity); let c=null;
@@ -13900,7 +14013,7 @@ document.addEventListener('input',e=>{if(e.target.id==='ng_story'){const count=d
    고치는 방법: auto(규칙 변환, AI 없이) · ai(빠진 항목만 AI로 채움) · image(그림 생성) · open(기존 편집 화면 열기)
    생성 버전: 새로 만드는 캐릭터에 genVer가 찍혀요(cleanChar0). genVer가 없거나 낮으면 구버전 생성물이에요.
    지정 변환: 고른 캐릭터·항목을 지시문대로 AI가 바꿔요. 마지막 일괄 작업은 되돌릴 수 있어요. 문서: docs/research/content-audit.md */
-function auditGenVer(){ return 7; } // 7: 사거리(근접·원거리·지원)·출격 경로 // 6: 연출(감정 아이콘·동작·화면 효과) // 5: 전장 규칙·별 조건·일정 장면 // 4: 개성 시트·인연 톡·메모리얼 // 생성 규칙이 바뀌면 올려요(2: 상징 컬러·아이템, 3: 바리에이션·상속 시대)
+function auditGenVer(){ return 8; } // 8: 세력 깊이·몬스터 도감·첫 등장 // 7: 사거리(근접·원거리·지원)·출격 경로 // 6: 연출(감정 아이콘·동작·화면 효과) // 5: 전장 규칙·별 조건·일정 장면 // 4: 개성 시트·인연 톡·메모리얼 // 생성 규칙이 바뀌면 올려요(2: 상징 컬러·아이템, 3: 바리에이션·상속 시대)
 const AUDIT_FIELDS={profile:['프로필','"profile":"성격·배경·비밀을 담은 3~5문장"'],intro:['첫 대사','"intro":"첫 만남 대사 1줄"'],lines:['평소 대사','"lines":["로비·평소 대사 5개"]'],
   touch:['터치 반응','"touch":{"head":["머리 쓰다듬기 반응 3개"],"body":["몸 터치 반응 3개"],"pet":["쓰다듬기 반응 3개"]}'],affLines:['호감도 대사','"affLines":{"3":["대사 1~2개"],"5":["대사 1~2개"],"8":["대사 1~2개"]}'],
   lvLines:['레벨업 대사','"lvLines":["2개"]'],dupLines:['돌파 대사','"dupLines":["2개"]'],naiPrompt:['외모 태그','"naiPrompt":"NovelAI 영어 태그"']};
@@ -13930,6 +14043,9 @@ const AUDIT_RULES=[
  {id:'c_memorial',scope:'char',kind:'missing',since:4,label:'메모리얼(높은 호감도 특별 장면·로비 대사)이 없어요',test:c=>!c.alt&&!(c.memorial&&c.memorial.script),fix:{mode:'ai-memo'}},
  {id:'g_rules',scope:'game',kind:'upgrade',since:3,label:'속성·역할 설명이 없어요(게임 규칙·도감에 표시돼요)',test:()=>rulesMissingDesc(),fix:{mode:'ai-rules'}},
  {id:'g_codex',scope:'game',kind:'upgrade',since:3,label:'도감에 게임 규칙(상성·역할)이 기록되지 않았어요',test:()=>rulesNotInCodex(),fix:{mode:'auto',run:()=>{ rulesCodex(); }}},
+ {id:'w_faction',scope:'game',kind:'upgrade',since:8,label:'세력·몬스터 설정이 얕아요(종류·목적·관계·정체가 비어 있음)',test:()=>factionReview().score<70,fix:{mode:'ai-run',run:()=>factionAI()}},
+ {id:'c_monster',scope:'char',kind:'missing',since:1,label:'몬스터로 보이는 캐릭터예요(톡·일정·인연 대상이 되면 안 돼요 → 적으로 전환)',test:c=>!c.monster&&!c.alt&&isMonsterLike(c),fix:{mode:'auto',run:c=>charToMonster(c)}},
+ {id:'c_debut',scope:'char',kind:'upgrade',since:8,label:'스토리 중간에 처음 나오는데 처음부터 뽑을 수 있는 캐릭터예요(첫 등장 스테이지 전엔 잠그기)',test:c=>!c.debut&&!own(c.id)&&!c.alt&&!c.monster&&!!firstSpeak(c)&&firstSpeak(c).k>0,fix:{mode:'auto',run:c=>{ const f=firstSpeak(c); if(f) c.debut=f.s.id; }}},
  {id:'c_range',scope:'char',kind:'upgrade',since:7,label:'사거리(근접·원거리·지원)가 정해지지 않았어요(무기·포지션으로 추정해 정해요)',test:c=>!c.npc&&!RANGE[c.range],fix:{mode:'auto',run:c=>{ c.range=charRange(c); }}},
  {id:'s_direct',scope:'stage',kind:'upgrade',since:6,label:'대본에 연출(감정 아이콘·동작·화면 효과)이 없어요(AI로 대사는 그대로 두고 연출만 더해요)',test:s=>!s.dirV&&String((s.pre||'')+(s.post||'')).split('\n').length>=6&&dirCount((s.pre||'')+'\n'+(s.post||''))===0,fix:{mode:'ai-run',run:s=>directStage(s)}},
  {id:'s_rules',scope:'stage',kind:'upgrade',since:5,label:'전장 규칙·별 조건이 없는 스테이지예요(예전 생성물)',test:s=>!s.story&&!s.farm&&(s.enemies||[]).length>0&&!s.rulesV,fix:{mode:'auto',run:s=>{ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)), L=ch?ch.stages:[s]; stageAutoRules(s,L.indexOf(s),L.length); }}},
