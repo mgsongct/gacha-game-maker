@@ -12,11 +12,11 @@ function planCtx(n){ if(!planHas()) return ''; const p=PLAN(), act=planActOf(n),
   L.push(`\n【시나리오 설계 — 작가 전용, 대사로 그대로 말하지 않는다】${p.logline?' 로그라인: '+p.logline+'.':''}${p.theme?' 주제: '+p.theme+'.':''}${p.ending?' 목표 결말: '+p.ending+'.':''}`);
   if(act) L.push(`지금은 「${act.name}」(~${act.upto}장): ${act.goal}`);
   const now=p.twists.filter(t=>+t.reveal===n), later=p.twists.filter(t=>+t.reveal>n), clues=p.twists.flatMap(t=>(t.clues||[]).filter(c=>+c.ch===n).map(c=>({t,c})));
-  if(clues.length) L.push('이번 장에 자연스럽게 심을 복선(눈치챌 듯 말 듯, 정답을 말하지 않는다): '+clues.map(({c})=>c.hint).join(' / '));
-  if(now.length) L.push('이번 장에서 밝힐 반전: '+now.map(t=>`${t.truth}${t.who?' (관련: '+t.who+')':''}`).join(' / ')+' — 앞서 심은 복선을 회수하며 밝힌다');
+  if(clues.length) L.push(pf('PLAN_CLUES',{list:clues.map(({c})=>c.hint).join(' / ')}));
+  if(now.length) L.push(pf('PLAN_REVEAL',{list:now.map(t=>`${t.truth}${t.who?' (관련: '+t.who+')':''}`).join(' / ')}));
   if(later.length) L.push('아직 밝히지 말 진실(이번 장에서는 숨기고 어긋나지 않게만): '+later.map(t=>t.truth).join(' / '));
   const done=p.branches.filter(b=>F[b.id]&&+b.at<n); if(done.length) L.push('플레이어가 고른 분기(이후 이야기에 반영): '+done.map(b=>{ const o=(b.options||[])[F[b.id].n-1]||{}; return `${b.question} → 「${o.label||F[b.id].label}」${o.result?': '+o.result:''}`; }).join(' / '));
-  const here=p.branches.filter(b=>+b.at===n); if(here.length) L.push('이번 장의 분기: 해당 장면에 "[분기: id]" 줄을 쓰고 바로 다음 줄에 "선택: 보기1 | 보기2" 선택지를 둔다. '+here.map(b=>`id=${b.id} 질문 「${b.question}」 보기 ${(b.options||[]).map(o=>o.label).join(' | ')}`).join(' / '));
+  const here=p.branches.filter(b=>+b.at===n); if(here.length) L.push(pf('PLAN_BRANCH_HERE')+here.map(b=>`id=${b.id} 질문 「${b.question}」 보기 ${(b.options||[]).map(o=>o.label).join(' | ')}`).join(' / '));
   const arcs=p.arcs.filter(a=>a.name); if(arcs.length) L.push('캐릭터 아크(이번 장에서 조금씩 진행): '+arcs.map(a=>`${a.name}: ${a.start} → ${a.change} → ${a.end}`).join(' / '));
   if(p.notes) L.push('설계 메모: '+p.notes);
   return L.join('\n')+'\n'; }
@@ -29,8 +29,7 @@ function planCheck(){ const p=PLAN(), main=G.chapters.filter(ch=>ch.kind==='main
   const last=p.acts.length?+p.acts.at(-1).upto:0; if(last&&n>last) out.push(`지금 ${n}장으로 설계한 막(~${last}장)을 넘었어요 — 다음 막을 설계해 주세요`);
   return out; }
 async function planAI(mode,btn,instruction){ const p=PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').length;
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 게임의 메인 시나리오를 ${mode==='extend'?`지금 설계(${JSON.stringify(p).slice(0,3000)})를 이어서 다음 막을 덧붙여`:mode==='improve'?`지금 설계(${JSON.stringify(p).slice(0,3000)})를 더 짜임새 있게 다듬어`:'처음부터'} 설계하라. 지금 메인 스토리는 ${n}장까지 있다(이미 쓴 장의 내용과 어긋나지 않게).
-${instruction?'추가 지시: '+instruction+'\n':''}규칙: 막(act)마다 목표가 있고 장 번호 범위(upto)로 나눈다(한 막 3~5장). 숨겨진 반전 2~4개: 각 반전은 진실·공개 장·그 전에 심을 복선 2~3개(장 번호와 힌트). 공개 장은 복선보다 뒤. 분기 1~3개: 몇 장에서 플레이어가 고르고(보기 2~3개), 고른 보기가 이후 이야기에 무엇을 바꾸는지(result). 주요 ${T('crew')} 3~5명의 아크(시작 → 변화 → 끝). 결말은 하나로 정하되 분기에 따라 과정이 달라진다.
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${pf('PLAN_AI',{how:pf(mode==='extend'?'PLAN_AI_EXTEND':mode==='improve'?'PLAN_AI_IMPROVE':'PLAN_AI_NEW',{plan:JSON.stringify(p).slice(0,3000)}),n,extra:instruction?'추가 지시: '+instruction+'\n':'',crew:T('crew')})}
 JSON만 출력: {"logline":"","theme":"","ending":"","acts":[{"name":"1막 이름","upto":4,"goal":""}],"twists":[{"id":"t1","truth":"","reveal":5,"who":"관련 인물","clues":[{"ch":2,"hint":""}]}],"branches":[{"id":"b1","at":3,"question":"","options":[{"label":"","result":""}]}],"arcs":[{"name":"캐릭터 이름","start":"","change":"","end":""}]}`,btn,'complex');
   if(!r) return false; const old=PLAN(), clean=planClean(r);
   if(mode==='extend'){ old.acts.push(...clean.acts.filter(a=>+a.upto>(+(old.acts.at(-1)||{}).upto||0))); old.twists.push(...clean.twists.filter(t=>!old.twists.some(x=>x.id===t.id))); old.branches.push(...clean.branches.filter(b=>!old.branches.some(x=>x.id===b.id))); clean.arcs.forEach(a=>{ if(!old.arcs.some(x=>x.name===a.name)) old.arcs.push(a); }); }

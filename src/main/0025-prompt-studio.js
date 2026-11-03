@@ -103,6 +103,49 @@ pfDef('NG_FILL_MISSING','작가가 정한 대원 중 빠진 사람 채우기(새
 pfDef('NG_NPC_ART','작가가 정한 NPC 그림 태그(새 게임)',()=>`다음 NPC들의 NovelAI 그림 프롬프트를 써라. 적힌 외모를 그대로 살리고, 의상은 세계관에 맞춘다. 등장인물은 모두 성인이다.`);
 pfDef('NG_OPENING','새 게임 3/4 오프닝·자료·배너',()=>`이 게임의 시작 부분을 만들어라.\nopening.lines: 검은 화면에 한 줄씩 뜨는 오프닝 문구 5~7개, 마지막은 게임 제목.\nopening.prologue: 프롤로그 대본 {pro}줄. 세계관 소개, 첫 동료들과의 강렬한 만남, 플레이어가 특별한 이유의 복선, 선택지 1개.\n{castPlan}\nbackgrounds: 프롤로그와 1장에 쓸 배경 이름과 NovelAI 프롬프트("no humans, scenery"로 시작) 8~12개. props: 소품 3~6개("no humans, object focus"로 시작). music: 배경음 7~9개(타이틀, 로비, 일상, 긴장, 전투, 보스전, 뽑기 연출, 감성 포함, 영어 프롬프트, instrumental, seamless loop).\nbanners: 상시 배너 이름 1개, 확률 업 배너 1개(SSR 1명), 세력 한정 배너 1개.`,'자리: {pro} {castPlan}');
 pfDef('NG_CHAPTER1','새 게임 4/4 1장·메신저·관계',()=>`프롤로그 다음으로 이어지는 1장을 만들어라. 배경은 이 이름만 쓴다: {bgs}. 소품: {props}.\nchapter: 스테이지 {n}개(pre {pre}줄, post {post}줄, {finale}). 적 체력 700~1300, 공격 70~100, 방어 25~55, 보스 체력 4배. {talkOnly} {modes} {detail} {npc}\nthreads: 메신저 대화 3개. {dup}\nsummary: 프롤로그와 1장 줄거리 4~6문장(누가 누구를 처음 만났는지 포함). relations: 인물 설정과 프롤로그·1장을 보고 인물들 사이(플레이어 포함)의 관계 8~16쌍. 설정상 원래 아는 사이와 이야기에서 처음 만난 사이를 모두 쓴다.\n{castPlan}\n{bestiary}`,'자리: {bgs} {props} {n} {pre} {post} {finale} {talkOnly} {modes} {detail} {npc} {dup} {castPlan} {bestiary}');
+// ── 공통 규칙·AI 컨텍스트·관계·세력·설계·스킬 규칙
+pfDef('PLAYER_BIO','플레이어 설정 지키기',()=>`플레이어({player})의 설정: {bio}. 이 설정과 어긋나게 쓰지 않는다. `,'자리: {player} {bio}');
+pfDef('PLAYER_GENDER_TEXT','플레이어 성별·성 정체성(직접 적음)',()=>`플레이어({player})의 성별·성 정체성: {gender}. 호칭과 반응을 이에 맞추고 임의로 바꾸지 않는다. `,'자리: {player} {gender}');
+pfDef('PLAYER_MALE','플레이어 성별: 남성',()=>`플레이어({player})는 남성이다. 호칭과 반응을 그에 맞춘다. `,'자리: {player}');
+pfDef('PLAYER_FEMALE','플레이어 성별: 여성',()=>`플레이어({player})는 여성이다. 호칭과 반응을 그에 맞춘다. `,'자리: {player}');
+pfDef('PLAYER_GENDER_OPEN','플레이어 성별: 정하지 않음',()=>`플레이어({player})의 성별은 정하지 않는다. 성별이 드러나는 호칭은 피한다. `,'자리: {player}');
+pfDef('CALL_NAME','플레이어 부르는 법(호칭·이름)',()=>`{crew}들은 플레이어를 보통 호칭 "{call}"(으)로 부른다. 이름 "{name}"은(는) 친밀한 순간이나 꼭 필요할 때만 부른다. `,'자리: {crew} {call} {name}');
+pfDef('CALL_TERM','플레이어 부르는 법(호칭)',()=>`{crew}들은 플레이어를 호칭 "{call}"(으)로 부른다. `,'자리: {crew} {call}');
+pfDef('CAST_SEX_F','등장인물 성별: 여성만',()=>`등장인물 성별: 아군과 주요 인물은 모두 여성이다(naiPrompt는 1girl로 시작). `);
+pfDef('CAST_SEX_M','등장인물 성별: 남성만',()=>`등장인물 성별: 아군과 주요 인물은 모두 남성이다(naiPrompt는 1boy로 시작). `);
+pfDef('CAST_SEX_MIX','등장인물 성별: 혼성',()=>`등장인물 성별: 아군과 주요 인물은 여성과 남성을 고르게 섞는다(대략 반반. 여성은 1girl, 남성은 1boy로 시작). 새 인물을 만들 때 지금 아군의 성비를 보고 적은 쪽을 채운다. `);
+pfDef('TONE_RULE','글의 톤(게임 분위기)',()=>`이 게임의 분위기: {tone}. 글의 톤은 이 분위기를 따른다. `,'자리: {tone}');
+pfDef('COMMON_RULES','공통 규칙(모든 요청 — 성인·한국어·용어·속성)',()=>`규칙: 등장인물은 모두 성인이다. {tone}모든 글은 한국어로 쓴다. 이 게임의 용어: 플레이어 호칭 "{player}", 유료 재화 "{currency}", 뽑기 "{gacha}", 전투 "{ops}", 탐사 콘텐츠 "{abyss}", 아군 "{crew}", 메신저 "{talk}". 속성: {elems}.`,'자리: {tone} {player} {currency} {gacha} {ops} {abyss} {crew} {talk} {elems}');
+pfDef('EV_PAST','지난 이벤트 소재 반복 피하기',()=>`\n지금까지 나온 이벤트(소재·사건·결말을 반복하지 않고 새로운 소재로 쓴다): {list}`,'자리: {list}');
+pfDef('CTX_SOURCE','원작 설정 따르기(2차 창작)',()=>`원작(2차 창작): {source} — 원작 설정을 따른다. 원작에서 미성년자·학생인 캐릭터는 쓰지 않는다.\n`,'자리: {source}');
+pfDef('CTX_PLAYER_PLOT','플레이어가 짠 스토리 개요 따르기',()=>`플레이어가 직접 짠 스토리 개요(이 흐름을 반드시 따른다): {plot}\n`,'자리: {plot}');
+pfDef('CTX_BIBLE','작가 설정 따르기(메인 스토리)',()=>`작가 설정(이 설정을 그대로 따른다. 비밀은 이야기 흐름에 맞게 천천히 드러낸다):\n{bible}`,'자리: {bible}');
+pfDef('CTX_ALT_CANON','정사가 된 이격 다루기',()=>`「{name}」이(가) 정사에서 변한 모습. 메인 스토리에서는 이제 이 모습으로 나오고 원래 모습과 같은 장면에 함께 나오지 않는다. `,'자리: {name}');
+pfDef('CTX_ALT_SIDE','외전 전용 이격 다루기',()=>`\n외전 전용 이격(메인 스토리에는 쓰지 않는다. 메인 스토리에서는 원래 모습으로 쓴다): {list}`,'자리: {list}');
+pfDef('CTX_NPCS','NPC 목록 머리말',()=>`\nNPC(조연, {crew}가 아님. 스토리에 등장할 수 있고 대사 이름은 그대로 쓴다): `,'자리: {crew}');
+pfDef('REL_NONE','관계 기록이 없을 때',()=>`\n인물 관계 기록이 아직 없다. 설정과 지금까지의 이야기에서 함께 나온 적이 있으면 아는 사이로, 아니면 처음 만나는 사이로 자연스럽게 쓴다.`);
+pfDef('REL_CTX','인물 관계 기록(로어북) 반영',()=>`\n인물 관계 기록(로어북. 지금까지의 이야기에서 쌓인 사실이다. 이미 아는 사이를 처음 보는 사이처럼 쓰지 않고, 관계와 최근 일을 대사·행동에 자연스럽게 반영한다):\n{rows}`,'자리: {rows}');
+pfDef('REL_STRANGER','관계 기록이 없는 인물',()=>`\n아직 관계 기록이 없는 인물: {names} — 설정상 아는 사이가 아니면 처음 만나는 사이로 쓴다.`,'자리: {names}');
+pfDef('REL_RULE','관계 기록 쓰기(장·이벤트 마무리)',()=>`relations에는 이번 이야기에서 처음 만났거나 관계가 바뀌었거나 의미 있는 일이 있었던 두 사람만 3~15쌍 쓴다(플레이어와의 관계 포함).`);
+pfDef('REL_SEED','인물 관계도 넓히기',()=>`인물 설정과 지금까지의 이야기를 보고 인물 관계도를 넓혀라. 기존 기록과 겹치지 않는 새 쌍을 10~20개 쓰고, 기존 쌍도 이야기에 비해 낡았으면 고쳐 쓴다. 아는 사이, 처음 보는 사이(아직 만나지 않았지만 서로 엮일 사이는 kind를 "아직 모름"으로), 플레이어와의 관계를 고르게.`);
+pfDef('CHAR_LINES_RULE','로비 대사 쓰기(대원 스키마)',()=>`(아침·밤·오랜만·일상·감정 등 상황을 다양하게). 다른 인물의 이름이나 아직 드러나지 않은 사건·적대 관계는 쓰지 않는다(플레이어가 아직 모를 수 있다)`);
+pfDef('CTX_BESTIARY','몬스터 도감 머리말(실행 중 컨텍스트)',()=>`몬스터 도감(말하는 동료·NPC·메신저 상대가 아니다. 대사는 울음·짧은 위협 정도): `);
+pfDef('CTX_UNMET','뽑았지만 스토리에서 아직 안 만난 대원',()=>`이미 계약으로 합류해 함께 작전 중인 {crew}(스토리에서 첫 만남처럼 쓰지 않는다): {names}\n`,'자리: {crew} {names}');
+pfDef('FACTION_AI_IMPROVE','세력·몬스터 다듬기(AI 채우기)',()=>`이 게임의 세력과 몬스터 설정을 깊이 있게 다듬고 빈 곳을 채워라(이미 있는 이름·사실은 바꾸지 않는다). {rule} 지금 메인 스토리는 {now}장 진행 중(이미 지난 장의 관계는 지금 대본과 어긋나지 않게).`,'자리: {rule} {now}');
+pfDef('FACTION_AI_NEW','세력·몬스터 만들기(AI 채우기)',()=>`이 게임의 세력과 몬스터 설정을 깊이 있게 만들어라. {rule} 지금 메인 스토리는 {now}장 진행 중(이미 지난 장의 관계는 지금 대본과 어긋나지 않게).`,'자리: {rule} {now}');
+pfDef('BESTIARY_AI_RULE','적 도감 채우기(AI 채우기)',()=>`각각 어느 무리(faction)인지, 정체(desc)·습성(nature)·약점(weak)을 한 줄씩. 사람·캐릭터인 적은 넣지 않는다.`);
+pfDef('PLAN_CLUES','이번 장에 심을 복선(시나리오 설계)',()=>`이번 장에 자연스럽게 심을 복선(눈치챌 듯 말 듯, 정답을 말하지 않는다): {list}`,'자리: {list}');
+pfDef('PLAN_REVEAL','이번 장에서 밝힐 반전(시나리오 설계)',()=>`이번 장에서 밝힐 반전: {list} — 앞서 심은 복선을 회수하며 밝힌다`,'자리: {list}');
+pfDef('PLAN_BRANCH_HERE','이번 장의 분기 쓰기(시나리오 설계)',()=>`이번 장의 분기: 해당 장면에 "[분기: id]" 줄을 쓰고 바로 다음 줄에 "선택: 보기1 | 보기2" 선택지를 둔다. `);
+pfDef('PLAN_AI_EXTEND','시나리오 설계 잇기',()=>`지금 설계({plan})를 이어서 다음 막을 덧붙여`,'자리: {plan}');
+pfDef('PLAN_AI_IMPROVE','시나리오 설계 다듬기',()=>`지금 설계({plan})를 더 짜임새 있게 다듬어`,'자리: {plan}');
+pfDef('PLAN_AI_NEW','시나리오 설계 새로',()=>`처음부터`);
+pfDef('PLAN_AI','시나리오 설계(AI)',()=>`이 게임의 메인 시나리오를 {how} 설계하라. 지금 메인 스토리는 {n}장까지 있다(이미 쓴 장의 내용과 어긋나지 않게).
+{extra}규칙: 막(act)마다 목표가 있고 장 번호 범위(upto)로 나눈다(한 막 3~5장). 숨겨진 반전 2~4개: 각 반전은 진실·공개 장·그 전에 심을 복선 2~3개(장 번호와 힌트). 공개 장은 복선보다 뒤. 분기 1~3개: 몇 장에서 플레이어가 고르고(보기 2~3개), 고른 보기가 이후 이야기에 무엇을 바꾸는지(result). 주요 {crew} 3~5명의 아크(시작 → 변화 → 끝). 결말은 하나로 정하되 분기에 따라 과정이 달라진다.`,'자리: {how} {n} {extra} {crew}');
+pfDef('USER_TAG_GUIDE_HEAD','제작자 그림 태그 지침 머리말',()=>`[그림 태그 지침] NovelAI 영어 태그(naiPrompt, prompt, CG·배경·소품·의상 태그 등)를 쓸 때 반드시 따른다:`);
+pfDef('LESSON_HEAD','프롬프트 교훈 머리말',()=>`[프롬프트 교훈] 이전에 고친 실수를 되풀이하지 않는다:`);
+pfDef('PF_POLISH','조각 AI로 다듬기(프롬프트 스튜디오)',()=>`다음은 가챠 게임 제작 앱이 AI에 보내는 프롬프트 조각 「{label}」이다. 성능이 낮은 AI도 오해 없이 따르도록 다듬어라: 모호한 말을 구체적으로, 금지와 허용을 분명히, 예시는 짧게, 같은 말 반복은 줄이고, 원래 의도와 규칙은 모두 지킨다.{lessons}{fails}`,'자리: {label} {lessons} {fails}');
+pfDef('SKILL_RULE','스킬 작성 규칙(스킬 스키마가 든 요청에 자동으로 붙음)',()=>`스킬 JSON은 skills:{version:2,passive,active,ultimate}. 슬롯은 {name,description,cooldown,initial,trigger,triggerEvery,threshold,triggerMark,limit,lockout,auto,fx,color,effects:[...]}. 시간은 초 기준, active는 interval,after_basic,on_hit,attack_hit,critical,hp_below 중 선택. ultimate는 SP100 충전 발동. passive 조건 {triggers}. 추가 효과 sp는 studio:false, value1~30 SP를 아군에게 회복. AI 효과 1~3개, 단순한 주효과와 보조효과만. 무한 자원/피해 비례 증폭/기록 연계 금지. {effects}. 효과 기본 형식 {effect}. target {targets}, priority {priority}, condition {conditions}, basis {basis}, stat {stats}. studio:true 필수, value는 기준값의 백분율(고정 수치 기준이면 절대값). duration .1~180초, chance1~100, stacks1~99,hits1~30, interval .1~180초, cooldown .17~180초(패시브0가능). skillSlot은 액티브|필살기|액티브와 필살기. replace는 sourceSlot passive|active|ultimate에서 대상 슬롯과 다른 하나를 선택. mark/record/mode 이름과 조건 이름을 일치시켜 연계. 공격은 적, 지원은 아군 대상. BURST는 제거됐으므로 생성 금지. 예시 {example}`,'자리: {triggers} {effects} {effect} {targets} {priority} {conditions} {basis} {stats} {example}');
 
 /* 그림 프롬프트 가드: 사람이 나오면 안 되는 그림에서 사람 태그를 빼요 */
 const IMG_NOHUMAN={bg:'no humans, scenery',map:'no humans, scenery',prop:'no humans, object focus',icon:'no humans, object focus'};
@@ -123,7 +166,7 @@ function plSave(a){ try{ appStorage.setItem(PL_KEY,JSON.stringify(a.slice(0,60))
 function plHit(id,ex){ const a=plList(); let x=a.find(l=>l.id===id); if(!x){ const s=PL_SEED[id]; if(!s) return; x={id,scope:s.scope,rule:s.rule,on:true,hits:0,at:Date.now(),auto:true}; a.unshift(x); } x.hits=(x.hits||0)+1; x.last=Date.now(); if(ex) x.ex=String(ex).slice(0,160); plSave(a); }
 function plAdd(rule,scope){ const a=plList(); a.unshift({id:'u'+uid().slice(0,6),scope:scope==='all'?'all':'img',rule:String(rule).trim().slice(0,400),on:true,hits:0,at:Date.now()}); plSave(a); }
 // llmWrap에서 씀: 그림 태그 요청이면 그림 가이드 + 그림 교훈, 모든 요청에 scope:'all' 교훈
-function plInject(isTag){ const on=plList().filter(l=>l.on&&(l.scope==='all'||isTag)); const g=isTag?IMG_GUIDE:''; if(!on.length&&!g) return ''; return `[프롬프트 교훈] 이전에 고친 실수를 되풀이하지 않는다:\n${g?g+'\n':''}${on.map(l=>'- '+l.rule).join('\n')}\n`; }
+function plInject(isTag){ const on=plList().filter(l=>l.on&&(l.scope==='all'||isTag)); const g=isTag?IMG_GUIDE:''; if(!on.length&&!g) return ''; return `${pf('LESSON_HEAD')}\n${g?g+'\n':''}${on.map(l=>'- '+l.rule).join('\n')}\n`; }
 pfDef('IMG_GUIDE','그림 태그 공통 가이드(그림 태그를 쓰는 모든 요청에 자동으로 들어감)',()=>'- 그림 종류마다 태그 대상이 다르다. 캐릭터(naiPrompt)=외모만. CG=장소·구도·행동·분위기(외모 제외). 배경=사람 없는 풍경("no humans, scenery"로 시작). 소품·아이템·무기·아이콘=물건 하나("no humans, object focus"로 시작, 사람·손·holding 금지).\n- 태그는 쉼표로 나눈 영어 Danbooru 태그. 문장·한국어·설명을 쓰지 않는다.','llmWrap');
 
 /* 그림 프롬프트 점검: 자료실(배경·소품)과 무기 프롬프트에서 사람 태그 찾기 */
@@ -159,7 +202,7 @@ document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act
   else if(a==='pstsave'){ pfSet(id,{text:v('text').trim(),add:v('add').trim()}); toast('조각을 저장했어요'); openStudio(); }
   else if(a==='pstreset'){ pfSet(id,null); toast('기본으로 되돌렸어요'); openStudio(); }
   else if(a==='pstai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } const f=window.__PF[id], fails=aiLogStats().filter(s=>s.fail).slice(0,3).map(s=>s.stage+': '+Object.keys(s.errs).join('/')).join('; '), less=plList().filter(l=>l.on).map(l=>l.rule).join(' / ');
-    const r=await aiJSON(`다음은 가챠 게임 제작 앱이 AI에 보내는 프롬프트 조각 「${f.label}」이다. 성능이 낮은 AI도 오해 없이 따르도록 다듬어라: 모호한 말을 구체적으로, 금지와 허용을 분명히, 예시는 짧게, 같은 말 반복은 줄이고, 원래 의도와 규칙은 모두 지킨다.${less?' 지금까지 쌓인 교훈: '+less+'.':''}${fails?' 최근 실패: '+fails+'.':''}\n\n원문:\n${promptFrag(id)}\n\nJSON만 출력: {"text":"다듬은 조각 전체","why":"무엇을 왜 바꿨는지 한두 문장"}`,b,'complex');
+    const r=await aiJSON(`${pf('PF_POLISH',{label:f.label,lessons:less?' 지금까지 쌓인 교훈: '+less+'.':'',fails:fails?' 최근 실패: '+fails+'.':''})}\n\n원문:\n${promptFrag(id)}\n\nJSON만 출력: {"text":"다듬은 조각 전체","why":"무엇을 왜 바꿨는지 한두 문장"}`,b,'complex');
     if(r&&r.text){ const el=document.querySelector(`#modal [data-pf="${id}"][data-k="text"]`); if(el){ el.value=String(r.text); el.closest('details').open=true; } toast('제안을 덮어쓰기 칸에 넣었어요. 확인 후 저장하세요'+(r.why?' — '+String(r.why).slice(0,80):'')); } }
   else if(a==='pstimgfix'){ const n=imgAuditFix(imgAuditScan()); toast(`그림 프롬프트 ${n}개를 정리하고 교훈으로 기록했어요`); openStudio(); }
   else if(a==='pstundo'){ auditUndo(); G.lib.forEach(l=>mark('l:'+l.id)); openStudio(); }

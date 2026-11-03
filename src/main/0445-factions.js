@@ -31,7 +31,7 @@ function factionCtx(){ const F=factions(), now=mainNow(), L=[];
   F.forEach(f=>{ const st=stanceAt(f,now), nxt=(f.stance||[]).filter(x=>+x.ch>now).sort((a,b)=>a.ch-b.ch)[0], mem=G.chars.filter(c=>c.faction===f.name&&!c.monster).map(c=>c.name);
     L.push(`- ${f.name} [${FKIND[f.kind]} · 지금 플레이어와 ${FSTANCE[st]}${nxt?` · ${nxt.ch}장부터 ${FSTANCE[nxt.s]} 예정(${nxt.why||''}, 아직 드러내지 않음)`:''}]: ${f.desc||''}${f.goal?' 목적: '+f.goal+'.':''}${f.leader?' 지도자: '+f.leader+'.':''}${f.base?' 거점: '+f.base+'.':''}${f.ideology?' 이념: '+f.ideology+'.':''}${f.kind==='monster'?`${f.origin?' 정체: '+f.origin+'.':''}${f.nature?' 습성: '+f.nature+'.':''}${f.weakness?' 약점: '+f.weakness+'.':''}`:''}${Object.keys(f.rel).length?' 다른 세력과: '+Object.entries(f.rel).map(([k,v])=>k+' '+v).join(', ')+'.':''}${mem.length?' 소속 '+T('crew')+': '+mem.join(', ')+(st==='hostile'?' (지금은 적으로 나올 수 있음)':''):''}`); });
   const M=monsterNames().filter(l=>l.desc||enemyFaction(l)); const crew=G.chars.filter(c=>!c.monster&&!c.npc&&!c.alt), unmet=crew.filter(c=>own(c.id)&&!metInStory(c)), lock=crew.filter(c=>!own(c.id)&&((c.debut&&!debutOk(c))||c.debutLater));
-  return `\n세력(설정을 지키고, 관계 변화는 정해진 장에서만):\n${L.join('\n')||'없음'}\n${M.length?'몬스터 도감(말하는 동료·NPC·메신저 상대가 아니다. 대사는 울음·짧은 위협 정도): '+M.map(l=>`${l.name}${enemyFaction(l)?'('+enemyFaction(l)+')':''}: ${[l.desc,l.nature,l.weak&&'약점 '+l.weak].filter(Boolean).join(' / ')}`).join('; ')+'\n':''}${unmet.length?`이미 계약으로 합류해 함께 작전 중인 ${T('crew')}(스토리에서 첫 만남처럼 쓰지 않는다): ${unmet.map(c=>c.name).join(', ')}\n`:''}${castLockCtx(lock)}`; }
+  return `\n세력(설정을 지키고, 관계 변화는 정해진 장에서만):\n${L.join('\n')||'없음'}\n${M.length?pf('CTX_BESTIARY')+M.map(l=>`${l.name}${enemyFaction(l)?'('+enemyFaction(l)+')':''}: ${[l.desc,l.nature,l.weak&&'약점 '+l.weak].filter(Boolean).join(' / ')}`).join('; ')+'\n':''}${unmet.length?pf('CTX_UNMET',{crew:T('crew'),names:unmet.map(c=>c.name).join(', ')}):''}${castLockCtx(lock)}`; }
 // 아직 등장하지 않은 대원(실행 중 장·이벤트·톡의 AI 컨텍스트): 명단은 여기서, 지시문은 프롬프트 스튜디오의 CAST_LOCK_RULE
 // "나중 등장" 대원은 정해진 장면이 없어 새 장을 쓸 때 흐름에 맞으면 첫 등장(debutResolve가 첫 등장 스테이지를 정해 잠금이 풀림)
 function castLockCtx(lock){ if(!lock.length) return ''; const N=L=>L.map(c=>c.name).join(', '), fixed=lock.filter(c=>c.debut), later=lock.filter(c=>!c.debut);
@@ -45,8 +45,8 @@ function factionReview(){ const out=[], F=factions(); if(F.length<2) out.push({w
   const bad=[...G.chars.filter(c=>!c.monster&&isMonsterLike(c)),...(G.npcs||[]).filter(n=>!n.monster&&isMonsterLike(n))]; if(bad.length) out.push({w:10,msg:`몬스터로 보이는 캐릭터·NPC: ${bad.map(x=>x.name).join(', ')}`});
   const score=Math.max(0,100-out.reduce((a,x)=>a+x.w,0)); return {score,issues:out}; }
 async function factionAI(btn,instruction){ const F=factions(), M=monsterNames();
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 게임의 세력과 몬스터 설정을 깊이 있게 ${F.length?'다듬고 빈 곳을 채워라(이미 있는 이름·사실은 바꾸지 않는다)':'만들어라'}. ${FACTION_RULE} 지금 메인 스토리는 ${mainNow()}장 진행 중(이미 지난 장의 관계는 지금 대본과 어긋나지 않게).${instruction?'\n추가 지시: '+instruction:''}
-적(몬스터) 목록: ${M.map(l=>l.name).join(', ')||'없음'} — 각각 어느 무리(faction)인지, 정체(desc)·습성(nature)·약점(weak)을 한 줄씩. 사람·캐릭터인 적은 넣지 않는다.
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${pf(F.length?'FACTION_AI_IMPROVE':'FACTION_AI_NEW',{rule:FACTION_RULE,now:mainNow()})}${instruction?'\n추가 지시: '+instruction:''}
+적(몬스터) 목록: ${M.map(l=>l.name).join(', ')||'없음'} — ${BESTIARY_AI_RULE}
 기존 세력: ${JSON.stringify(F.map(f=>({name:f.name,kind:f.kind,desc:f.desc}))).slice(0,3000)}
 JSON만 출력: {"factions":[{"name":"","kind":"playable|hostile|neutral|monster","desc":"","goal":"","leader":"","base":"","ideology":"","secret":"","origin":"","nature":"","weakness":"","rel":{"다른 세력 이름":"관계"},"stance":[]}],"bestiary":[{"name":"적 이름 그대로","faction":"","desc":"","nature":"","weak":""}]}`,btn,'complex');
   if(!r) return false; const S=(v,n)=>String(v||'').trim().slice(0,n||300);

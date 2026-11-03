@@ -20,7 +20,7 @@ for (const dir of dirs) {
   const game = JSON.stringify(readGame(PC_DIR, gidOf(dir)).game), input = existsSync(join(dir, 'input.json')) ? JSON.parse(readFileSync(join(dir, 'input.json'), 'utf8')) : {};
   const { out: env } = await withPage(page => page.evaluate(game => { G = fix(JSON.parse(game)); applyMeta();
     const frags = Object.values(window.__PF || {}).map(f => ({ id: f.id, label: f.label, text: promptFrag(f.id) }));
-    return { frags, rules: String(RULES), skill: String(GGMCombat.prompt()), sample: [...new Set([...(DEFAULT_WORLD.factions || []).map(f => f.name), ...(typeof DEFAULT_LIB !== 'undefined' ? DEFAULT_LIB : []).filter(l => ['bg', 'prop', 'bgm'].includes(l.kind)).map(l => l.name)])].filter(n => n && n.length >= 2) }; }, game), { tag: 'prompts' });
+    return { frags, rules: String(RULES), skill: String(pf('SKILL_RULE', GGMCombat.promptData())), sample: [...new Set([...(DEFAULT_WORLD.factions || []).map(f => f.name), ...(typeof DEFAULT_LIB !== 'undefined' ? DEFAULT_LIB : []).filter(l => ['bg', 'prop', 'bgm'].includes(l.kind)).map(l => l.name)])].filter(n => n && n.length >= 2) }; }, game), { tag: 'prompts' });
   const lineSet = t => new Set(t.split('\n').map(l => l.trim()).filter(l => l.length >= 30));
   const rows = Object.entries(texts).map(([k, t]) => {
     const used = env.frags.filter(f => f.text && f.text.length >= 20 && t.includes(f.text.trim().slice(0, 200))), fragChars = used.reduce((a, f) => a + Math.min(f.text.length, t.length), 0);

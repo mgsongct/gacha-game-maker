@@ -346,7 +346,7 @@ function openPresetCode(kind,code){
 const TAG_REQ=/NovelAI|naiPrompt|Danbooru|영어 태그|장면 태그/;
 function llmWrap(pr){ const L=llmEff(); let s=String(pr);
   { const isTag=TAG_REQ.test(s), pl=plInject(isTag); if(pl){ let i=s.lastIndexOf('JSON만 출력'); if(i<0) i=s.length; s=s.slice(0,i)+pl+s.slice(i); } } // 프롬프트 스튜디오(0025) 교훈·그림 가이드
-  if(L.tag&&TAG_REQ.test(s)){ let i=s.lastIndexOf('JSON만 출력'); if(i<0) i=s.length; s=s.slice(0,i)+'[그림 태그 지침] NovelAI 영어 태그(naiPrompt, prompt, CG·배경·소품·의상 태그 등)를 쓸 때 반드시 따른다:\n'+L.tag.trim()+'\n'+s.slice(i); }
+  if(L.tag&&TAG_REQ.test(s)){ let i=s.lastIndexOf('JSON만 출력'); if(i<0) i=s.length; s=s.slice(0,i)+pf('USER_TAG_GUIDE_HEAD')+'\n'+L.tag.trim()+'\n'+s.slice(i); }
   if(!L.top&&!L.mid&&!L.bot) return s;
   if(L.mid){ let i=s.lastIndexOf('JSON만 출력'); if(i<0){ const j=s.lastIndexOf('\n'); i=j>0?j+1:s.length; } s=s.slice(0,i)+'[제작자 지침]\n'+L.mid.trim()+'\n'+s.slice(i); }
   return (L.top?'[제작자 지침]\n'+L.top.trim()+'\n\n':'')+s+(L.bot?'\n\n[제작자 지침]\n'+L.bot.trim():''); }
