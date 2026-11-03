@@ -2,8 +2,8 @@
 /* 화면 방향(휴대폰): auto=기기 회전 따라, portrait=세로 고정, landscape=가로 고정. 앱은 화면 방향 플러그인, 웹은 브라우저 기능으로 잠가요 */
 function orientPref(){ try{ return appStorage.getItem('ggm-orient')||'auto'; }catch(e){ return 'auto'; } }
 async function applyOrient(){ const v=orientPref(), SO=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.ScreenOrientation;
-  try{ if(SO){ if(v==='auto') await SO.unlock(); else await SO.lock({orientation:v}); return true; } }catch(e){}
-  try{ if(screen.orientation){ if(v==='auto') screen.orientation.unlock(); else await screen.orientation.lock(v); return true; } }catch(e){} return v==='auto'; }
+  try{ if(SO){ if(v==='auto') await SO.unlock(); else await SO.lock({orientation:v}); return true; } }catch(e){ quietErr(e,'0410-desktop.js:5'); }
+  try{ if(screen.orientation){ if(v==='auto') screen.orientation.unlock(); else await screen.orientation.lock(v); return true; } }catch(e){ quietErr(e,'0410-desktop.js:6'); } return v==='auto'; }
 function deskMode(){ const def=Math.min(screen.width||innerWidth,screen.height||innerHeight)<600?'auto':'wide'; let v=def; try{ v=appStorage.getItem('ggm-desk')||def; }catch(e){} return v; }
 function applyDesk(){ const W=window.innerWidth, H=window.innerHeight, land=W>H*1.15, wantW=deskMode()==='wide', small=Math.min(W,H)<600;
   // 휴대폰도 'PC 화면: 가로로 넓게'를 직접 고르면 가로로 돌렸을 때 PC 화면으로 보여요

@@ -21,7 +21,7 @@ function conDispReward(hours,need){ const pts=Math.pow(hours,0.85)*(1+0.35*(need
 function conVariantOf(b,tpl){ return G.chars.find(x=>x.alt===b.id&&x.cvar===tpl.id); }
 function conTargets(tpl){ return G.chars.filter(b=>!b.alt&&!b.cvar&&own(b.id)&&GGMConstruct.condMatch(tpl.cond,b,{own:own(b.id),affLv:affLv(own(b.id)),cleared:P().cleared})); }
 function conVariantChoices(input){ return VARIANTS().filter(t=>t.on!==false&&GGMConstruct.matches(t.recipe,input)).map(tpl=>({tpl,bases:conTargets(tpl).filter(b=>{ const v=conVariantOf(b,tpl); return !(v&&own(v.id)); })})); }
-function conPool(){ return G.chars.filter(c=>!c.limited&&!c.cvar&&!c.alt&&debutOk(c)).map(c=>({id:c.id,rarity:c.rarity,role:c.role,faction:c.faction,elem:c.elem})); }
+function conPool(){ return G.chars.filter(c=>!c.limited&&!c.cvar&&!c.alt&&castOk(c)).map(c=>({id:c.id,rarity:c.rarity,role:c.role,faction:c.faction,elem:c.elem})); }
 
 async function conMakeVariant(b,tpl){
   const rr=tpl.rarity==='same'||!tpl.rarity?String(b.rarity):String(tpl.rarity); let c=null;
@@ -58,7 +58,7 @@ async function conBuild(){
     if(res.kind==='variant'&&imgReady()&&!imgSrc(c)) setTimeout(()=>runPrep(['char'],it=>it.c&&it.c.id===c.id),1500);
   } finally{ CONJOB=false; }
 }
-function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems){ toast(`${T('currency')}이(가) 모자라요`); return; } p.gems-=cfg.buy.gems; CRES()[k]+=cfg.buy.amt; mark('prog'); render(); }
+function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems){ toast(`${T('currency')}이(가) 모자라요`); return; } pay({gems:cfg.buy.gems}); CRES()[k]+=cfg.buy.amt; mark('prog'); render(); }
 
 function conNeedText(n){ const out=[]; (n.min||[]).forEach((v,i)=>{ if(v>GGMConstruct.DEFAULTS.min&&v>CON().min) out.push(`${T(CON_RES[i])} ${nf(v)}↑`); }); (n.max||[]).forEach((v,i)=>{ if(v!=null) out.push(`${T(CON_RES[i])} ${nf(v)}↓`); }); if(n.total) out.push(`총 ${nf(n.total)}↑`); Object.entries(n.share||{}).forEach(([i,[lo,hi]])=>out.push(`${T(CON_RES[i])} 비율 ${Math.round((lo||0)*100)}~${Math.round((hi==null?1:hi)*100)}%`)); return out.join(' · ')||'조건 없음'; }
 function conInfoHTML(input){

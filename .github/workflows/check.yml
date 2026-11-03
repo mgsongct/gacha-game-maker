@@ -12,3 +12,6 @@ jobs:
       - run: python3 pc/test_store.py
       - run: node build/test.mjs            # playwright가 없으면 4~6(브라우저) 건너뜀
       - run: node build/compare.mjs         # 원본 대비 바뀐 모듈 목록 (로그 확인용)
+      - run: npm ci --prefix tools --no-audit --no-fund   # 정적분석 도구(tree-sitter·ast-grep)
+      - run: node tools/test.mjs           # 점검 도구 자체 검사(심어 둔 문제를 잡는지)
+      - run: node tools/check.mjs --strict # 자기점검: 파싱 오류·이름 충돌·처리기 없는 액션이 있으면 실패, 보고서는 tools/out/

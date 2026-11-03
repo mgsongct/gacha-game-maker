@@ -192,7 +192,7 @@ function naiDraw(kind,base,opt){
 const SKILL_TAGS={dmg:'attacking, slashing, weapon swing',aoe:'casting spell, magic circle, explosion, energy wave',heal:'casting spell, healing light, sparkles',shield:'magic barrier, shield, defensive stance',buff:'raising hand, aura, cheering, light rays'};
 // 스탠딩 레퍼런스: 설정에서 켜면 일러스트·CG(+스킬 컷인·상반신)를 그릴 때 그 캐릭터의 스탠딩을 캐릭터 레퍼런스로 넣어 얼굴·머리를 맞춰요(V4.5로 그려요)
 function autoRefOn(k){ const m=naiCfg().autoRef; if(imgProvider()==='comfy'||!m||m==='off') return false; return ['illust','lbcg','cg'].includes(k)||(m==='all'&&['scg','upper'].includes(k)); }
-async function standRefs(cs){ const rf=naiCfg().ref||NAI_DEF.ref, out=[]; for(const c of cs){ const src=c&&imgSrc(c); if(!src) continue; try{ out.push({image:await refImage(src),type:rf.type||'character',strength:rf.strength!=null?rf.strength:1,fidelity:rf.fidelity!=null?rf.fidelity:1}); }catch(e){} if(out.length>=4) break; } return out; }
+async function standRefs(cs){ const rf=naiCfg().ref||NAI_DEF.ref, out=[]; for(const c of cs){ const src=c&&imgSrc(c); if(!src) continue; try{ out.push({image:await refImage(src),type:rf.type||'character',strength:rf.strength!=null?rf.strength:1,fidelity:rf.fidelity!=null?rf.fidelity:1}); }catch(e){ quietErr(e,'0030-character-regen.js:195'); } if(out.length>=4) break; } return out; }
 async function naiDrawItem(it){
   const candidateEligible=imageCandidateEligible(it.k,it.o,it.c,it.generationMode||'automatic'),originalSrc=imgSrcRaw(it.o)||'';
   if(autoRefOn(it.k)){ const cs=it.k==='cg'?cgCast(it.o).map(x=>x.c):[it.c], refs=await standRefs(cs); if(refs.length) return naiDrawItem0(it,{refs,candidateEligible,originalSrc}); }
@@ -329,12 +329,6 @@ function eraseColorData(id,W,H,px,py,o){
   }
   return {removed,color:[r,g,b]};
 }
-async function eraseColorAt(blob,px,py,o){
-  const bmp=await createImageBitmap(blob), W=bmp.width, H=bmp.height, cv=document.createElement('canvas'); cv.width=W; cv.height=H;
-  const x=cv.getContext('2d',{willReadFrequently:true}); x.drawImage(bmp,0,0); const id=x.getImageData(0,0,W,H);
-  const r=eraseColorData(id,W,H,px,py,o); if(!r.removed) return {blob,removed:0,color:r.color};
-  x.putImageData(id,0,0); return {blob:await new Promise(res=>cv.toBlob(bb=>res(bb||blob),'image/png')),removed:r.removed,color:r.color};
-}
 /* ---- cut tool canvas helpers ---- */
 const CUT_ZOOMS=[1,2,3,5,8];
 function cutCtx(){const j=CUTJOB;return j&&j.cv?j.cv.getContext('2d',{willReadFrequently:true}):null;}
@@ -469,7 +463,6 @@ async function cutoutWhite(blob,o){
     return await new Promise(r=>cv.toBlob(b=>r(b||blob),'image/png'));
   }catch(e){ return blob; }
 }
-async function srcToBlob(src){ return await (await fetch(src)).blob(); }
 
 /* ---- ComfyUI (local / remote server) ---- */
 function imgProvider(){return naiCfg().provider==='comfy'?'comfy':'nai';}

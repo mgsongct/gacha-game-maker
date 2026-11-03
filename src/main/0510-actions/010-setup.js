@@ -3,8 +3,6 @@
    ========================================================= */
 async function handleSetupAction(a,t,id,p,e){
   switch(a){
-case 'gateyes': $('.gate')?.remove(); showTitle(); break;
-case 'gateno': $('.gate').innerHTML='<div class="mark">19</div><p>만 19세 이상만 이용할 수 있어요.</p>'; break;
 case 'titletap': if(!p.seenOpening&&!p.nameAsked){ p.nameAsked=true; mark('prog'); }
     if(!p.seenOpening) playOpening(); else {closeOv(); render(); checkTriggers(); setTimeout(()=>liveTick(false),1200); setTimeout(prepAsk,2600);} break;
 case 'swnext': swRead(); if(SW.step===1) swAddAI(); SW.step=Math.min(5,SW.step+1); renderSetup(); break;
@@ -12,15 +10,7 @@ case 'swaddai': swRead(); if(!swAddAI()){toast('키와 모델 정보를 확인�
 case 'swprev': swRead(); SW.step=Math.max(0,SW.step-1); renderSetup(); break;
 case 'swlink': openUrl(t.dataset.url); break;
 case 'swskipall': appStorage.setItem(SETUP_KEY,'1'); if(PJ().active!=='main'){ await flush(); const pj=PJ(); if(!pj.list.some(x=>x.id==='main')) pj.list.unshift({id:'main',title:DEFAULT_META.title}); pj.active='main'; appStorage.setItem(PJKEY,JSON.stringify(pj)); reloadGame(); break; } SW=null; showStart(); break;
-case 'swgenre': { const k=$('#ng_kw'); if(k){ k.value=t.dataset.v+(k.value.trim()?'. '+k.value.trim():'. '); k.focus({preventScroll:true}); } break; }
 case 'swgo1': swRead(); SW.step=1; renderSetup(); break;
-case 'swpjgo': case 'swpjnew': { swRead(); swSave(); appStorage.setItem(SETUP_KEY,'1'); const pj=PJ(), pid=id;
-      if(a==='swpjnew'){ if(!(await appConfirm('이 게임의 진행(보유 '+T('crew')+'·재화·클리어 기록)을 지우고 처음부터 시작할까요? 만들어 둔 세계관·'+T('crew')+'·스토리·그림은 그대로예요.'))) break;
-        await flush(); window.__NOFLUSH=1; let g=null; try{ g=JSON.parse(appStorage.getItem(pjKey(pid))||'null'); }catch(e){} if(!g){ window.__NOFLUSH=0; toast('게임을 읽지 못했어요'); break; }
-        const o=g.prog||{}, keep={}; ['player','genderTxt','gender','look','bio','hideEyes','avatar','nameAsked','settings','scene','lobbyMode','csFull'].forEach(k=>{ if(o[k]!==undefined) keep[k]=o[k]; });
-        g.prog=Object.assign(clone(DEFAULT_PROG),keep,{seenOpening:false,castDone:0,bootPrep:0}); appStorage.setItem(pjKey(pid),JSON.stringify(g)); }
-      else await flush();
-      try{ sessionStorage.setItem('ggm-picked','1'); }catch(e){} pj.active=pid; appStorage.setItem(PJKEY,JSON.stringify(pj)); reloadGame(); break; }
 case 'swsub': { const a=($('#sw_sub')||{}).value; if(!String(a||'').trim()){ toast('구독 주소를 붙여 넣어 주세요'); break; } swRead(); swSave(); appStorage.setItem(SETUP_KEY,'1'); try{ sessionStorage.setItem('ggm-picked','1'); }catch(e){} await subscribe(String(a).trim(),t); break; }
 case 'swdone': swRead(); swSave(); if(PJ().active!=='main'){ appStorage.setItem(SETUP_KEY,'1'); await flush(); try{ sessionStorage.setItem('ggm-picked','1'); }catch(e){} const pj=PJ(); if(!pj.list.some(x=>x.id==='main')) pj.list.unshift({id:'main',title:DEFAULT_META.title}); pj.active='main'; appStorage.setItem(PJKEY,JSON.stringify(pj)); reloadGame(); break; } { const hr=readHero(); if(hr){ const pp=P(); pp.player=hr.name; if(hr.call&&hr.call!==T('player')){ G.meta.terms.player=hr.call; mark('meta'); } pp.genderTxt=hr.gender; pp.gender=genderCode(hr.gender); pp.look=hr.look; pp.hideEyes=hr.hide; pp.nameAsked=true; mark('prog'); } } { const v=$('#ng_style')?$('#ng_style').value.trim():''; if(v){ G.meta.artTags=v; mark('meta'); } } appStorage.setItem(SETUP_KEY,'1'); SW=null; render(); showStart(); toast('설정을 저장했어요'); break;
 case 'swstytest': { swRead(); swSave(); if(!imgReady()){ toast(imgNeed()); break; } const r0=$('#sw_sres'); t.disabled=true; if(r0) r0.textContent='그리는 중… 20초쯤 걸려요';

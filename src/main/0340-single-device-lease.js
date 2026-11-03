@@ -57,7 +57,7 @@ async function lkTake(btn){ if(LK.busy) return; LK.busy=true; const box=$('#devl
   }catch(e){ if(box) box.insertAdjacentHTML('beforeend','<p style="color:var(--rose)">연결에 실패했어요. 잠시 뒤 다시 눌러 주세요.</p><button class="btn" data-act="lktake">다시 시도</button>'); }
   finally{ if(!pulled) LK.busy=false; } }
 document.addEventListener('visibilitychange',async()=>{ if(!LKMODE()) return;
-  if(document.visibilityState==='hidden'){ if(LK.claimed&&!LK.locked){ clearInterval(LK.t); try{ await lkSave(true); await lkOp('away'); }catch(e){} } }
+  if(document.visibilityState==='hidden'){ if(LK.claimed&&!LK.locked){ clearInterval(LK.t); try{ await lkSave(true); await lkOp('away'); }catch(e){ quietErr(e,'0340-single-device-lease.js:60'); } } }
   else setTimeout(lkActivate,600); });
 document.addEventListener('keydown',e=>{ if(LK.locked){ e.stopImmediatePropagation(); if(e.key!=='Tab') e.preventDefault(); } },true);
 

@@ -81,7 +81,7 @@ async function checkUpdatePrivate(manual){
   o.checked=Date.now(); saveLV(o);
   let html='';
   try{ if(j.content&&j.encoding==='base64') html=new TextDecoder().decode(b64ToBytes(j.content.replace(/\s/g,'')));
-    else { const r=await http(base,{headers:Object.assign({},h,{Accept:'application/vnd.github.raw+json'}),timeout:60000}); html=r.text||''; } }catch(e){}
+    else { const r=await http(base,{headers:Object.assign({},h,{Accept:'application/vnd.github.raw+json'}),timeout:60000}); html=r.text||''; } }catch(e){ quietErr(e,'0430-update-guidance.js:84'); }
   if(!/APP_BUILD/.test(html)||!/<\/html>/i.test(html)){ if(manual) toast('받은 파일이 게임 파일이 아니에요. 경로를 확인해 주세요.'); return; }
   const build=(html.match(/var BUILT='([^']+)'/)||[])[1]||'';
   const man={build,apk:{url:'https://github.com/'+RELEASE_REPO+'/releases/latest/download/gacha-game-maker.apk'}};
@@ -99,9 +99,9 @@ async function checkUpdatePrivate(manual){
 function onPcServer(){ const pc=PCS(); return !!(pc&&location.origin===pc.base); }
 let WEBUPD=null;
 async function checkWebUpdate(manual){ if(IS_NATIVE) return; const o=LV(); let man=null;
-  try{ const r=await fetch(`https://raw.githubusercontent.com/${updRepo(o)}/main/version.json?t=${Date.now()}`,{cache:'no-store'}); if(r.ok) man=await r.json(); }catch(e){}
+  try{ const r=await fetch(`https://raw.githubusercontent.com/${updRepo(o)}/main/version.json?t=${Date.now()}`,{cache:'no-store'}); if(r.ok) man=await r.json(); }catch(e){ quietErr(e,'0430-update-guidance.js:102'); }
   if(!man||!man.build){ if(manual) toast('업데이트 정보를 받지 못했어요. 인터넷 연결을 확인해 주세요'); return; }
-  let srvOld=false; if(onPcServer()){ try{ const h=await pcApi('/api/hello'); srvOld=!h.ver||verCmp(String(h.ver),'2026.10.22.2')<0; }catch(e){} }
+  let srvOld=false; if(onPcServer()){ try{ const h=await pcApi('/api/hello'); srvOld=!h.ver||verCmp(String(h.ver),'2026.10.22.2')<0; }catch(e){ quietErr(e,'0430-update-guidance.js:104'); } }
   if(verCmp(man.build,APP_BUILD)<=0){ if(manual) toast('이미 최신 버전이에요 ('+APP_BUILD+')'+(srvOld?' · PC 서버 프로그램은 새로 받아 주세요':'')); return; }
   if(!manual&&o.webSkip===man.build) return; WEBUPD=man;
   const show=()=>{ if(!manual&&(!$('#modal').hidden||($('#ov')&&!$('#ov').hidden&&!$('#ov').querySelector('.title'))||(typeof B!=='undefined'&&B&&!B.over))) return setTimeout(show,4000);
@@ -110,16 +110,16 @@ async function checkWebUpdate(manual){ if(IS_NATIVE) return; const o=LV(); let m
       <div class="row" style="margin-top:12px"><button class="btn" data-act="webupdgo">지금 업데이트</button><button class="btn ghost" data-act="webupdskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`); };
   show(); }
 async function applyWebUpdate(btn){ if(btn){ btn.disabled=true; btn.textContent='받는 중…'; }
-  try{ await flush(); }catch(e){}
-  try{ if(LKMODE()&&LK.claimed&&!LK.locked) await lkSave(true); }catch(e){}
-  try{ if(onPcServer()) await pcApi('/api/update',{method:'POST',body:{},timeout:90000}); }catch(e){}
-  try{ if(window.caches){ const ks=await caches.keys(); await Promise.all(ks.map(k=>caches.delete(k))); } }catch(e){}
-  try{ await fetch('./index.html',{cache:'reload'}); await fetch('./',{cache:'reload'}); await fetch('./sw.js',{cache:'reload'}); }catch(e){}
-  try{ const rg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration(); if(rg) await rg.update(); }catch(e){}
+  try{ await flush(); }catch(e){ quietErr(e,'0430-update-guidance.js:113'); }
+  try{ if(LKMODE()&&LK.claimed&&!LK.locked) await lkSave(true); }catch(e){ quietErr(e,'0430-update-guidance.js:114'); }
+  try{ if(onPcServer()) await pcApi('/api/update',{method:'POST',body:{},timeout:90000}); }catch(e){ quietErr(e,'0430-update-guidance.js:115'); }
+  try{ if(window.caches){ const ks=await caches.keys(); await Promise.all(ks.map(k=>caches.delete(k))); } }catch(e){ quietErr(e,'0430-update-guidance.js:116'); }
+  try{ await fetch('./index.html',{cache:'reload'}); await fetch('./',{cache:'reload'}); await fetch('./sw.js',{cache:'reload'}); }catch(e){ quietErr(e,'0430-update-guidance.js:117'); }
+  try{ const rg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration(); if(rg) await rg.update(); }catch(e){ quietErr(e,'0430-update-guidance.js:118'); }
   reloadGame(); }
 if(!IS_NATIVE){ setInterval(()=>{ if(document.visibilityState==='visible') checkWebUpdate(false); },30*60000); }
 async function checkNoticeWeb(){
-  const o=LV(); let man=null; try{ const r=await fetch(`https://raw.githubusercontent.com/${updRepo(o)}/main/version.json?t=${Date.now()}`); if(r.ok) man=await r.json(); }catch(e){} if(!man) return;
+  const o=LV(); let man=null; try{ const r=await fetch(`https://raw.githubusercontent.com/${updRepo(o)}/main/version.json?t=${Date.now()}`); if(r.ok) man=await r.json(); }catch(e){ quietErr(e,'0430-update-guidance.js:122'); } if(!man) return;
   if(man.feedback){ o.feedback=String(man.feedback); saveLV(o); }
   if(man.notice&&man.notice.id&&man.notice.title&&o.noticeSeen!==String(man.notice.id)){ o.noticeSeen=String(man.notice.id); saveLV(o); const nb=String(man.notice.body||''); sendMail({kind:'notice',from:'운영팀',title:String(man.notice.title).slice(0,60),body:nb,days:30}); const L=P().live; L.notices=L.notices.filter(x=>!x.dev); L.notices.unshift({dev:true,at:Date.now(),title:String(man.notice.title).slice(0,60),lines:nb.split('\n').map(x=>x.trim()).filter(Boolean)}); mark('prog'); if(tab==='lobby') render(); }
 }
@@ -141,12 +141,6 @@ function openUpdSet(){
     </details>
     <div class="row" style="margin-top:14px"><button class="btn" data-act="upsave">저장하고 확인</button><button class="btn ghost" data-act="relnotes">배포 페이지</button></div>
     <div class="row" style="margin-top:8px">${hasPrev?'<button class="btn sm ghost" data-act="uprollback">이전 버전으로 되돌리기</button>':''}${o.on?'<button class="btn sm ghost" data-act="upbuiltin">설치 버전으로 돌아가기</button>':''}</div>`);
-}
-function openAiChar(){
-  openModal(`${head('AI로 새 '+T('crew')+' 만들기')}
-    <label class="f" for="ai_c">어떤 ${esc(T('crew'))}인가요?</label><textarea class="in" id="ai_c" placeholder="예: 헬릭스에서 도망친 연구원 출신. 겁이 많지만 성핵 폭주를 다룰 줄 안다. 청 속성 지원형, SSR. 실험복 아래 의외로 대담한 옷차림."></textarea>
-    <div class="row" style="margin-top:12px"><button class="btn" data-act="aichar">만들기</button></div>
-    <p class="muted">능력치, 스킬, 대사, 터치 반응, 계약 대사, NAI 프롬프트까지 채워져요.</p>`);
 }
 function openAiChapter(){
   openModal(`${head(`AI로 ${G.chapters.length+1}장 만들기`)}

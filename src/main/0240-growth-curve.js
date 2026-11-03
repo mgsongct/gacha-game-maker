@@ -14,23 +14,24 @@ async function openFormation(stage,ctx,startAct){
   try{await v2PrepareStage(stage,ctx);}catch(e){toast(e.message);return;}
   FORM=FORM&&FORM.key===(stage.id||stage.title)?FORM:{key:stage.id||stage.title,stage,ctx,startAct,filter:'all',sort:'power'};
   FORM.stage=stage; FORM.ctx=ctx; FORM.startAct=startAct;
-  const busy=busyIds(), owned=G.chars.filter(c=>own(c.id));
-  if(!squadSel) squadSel=P().squad.filter(id=>own(id)&&charById(id)&&!busy.has(id)).slice(0,4);
+  const busy=busyIds(), owned=G.chars.filter(c=>own(c.id)&&(!ctx.allow||ctx.allow(c)));
+  if(!squadSel) squadSel=P().squad.filter(id=>own(id)&&charById(id)&&!busy.has(id)&&(!ctx.allow||ctx.allow(charById(id)))).slice(0,4);
   const en=stage.enemies, need=stagePower(stage), tp0=teamPower(squadSel), tp=effPower(squadSel,en), ratio=need?tp/need:1, fb=factionBonus(squadSel);
   const elemCount={}; en.forEach(e=>{elemCount[e.elem]=(elemCount[e.elem]||0)+1;});
   let list=owned.filter(c=>FORM.filter==='all'||c.elem===FORM.filter||c.role===FORM.filter);
   list.sort((a,b)=>FORM.sort==='lv'?own(b.id).lv-own(a.id).lv:FORM.sort==='match'?(matchup(b,en).good-matchup(b,en).bad)-(matchup(a,en).good-matchup(a,en).bad)||charPower(b)-charPower(a):charPower(b)-charPower(a));
   const slot=i=>{const c=charById(squadSel[i]); if(!c) return `<button class="fslot empty" data-act="fsl" data-i="${i}"><span>+</span><i>${i<2?'전열':'후열'}</i></button>`;
-    const m=matchup(c,en), o=own(c.id);
-    return `<button class="fslot r${c.rarity}" data-act="fpick" data-id="${c.id}" style="--ec:${ECOL[c.elem]}"><div class="fs-art">${art(c)}</div><span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${m.good>m.bad?'<em class="adv">유리</em>':m.bad>m.good?'<em class="dis">불리</em>':''}<div class="fs-t"><b>${esc(c.name)}</b><span>Lv.${o.lv} · ${esc(ROLE[c.role])}</span><span class="pw">${nf(charPower(c))}</span></div></button>`;};
-  const head2=FORM.ctx.kind==='raid'?`<span class="muted">이번 주 누적 피해로 보상을 받아요 · 오늘 ${raidTriesLeft()}/3</span>`:FORM.ctx.kind==='rogue'?`<span class="muted">이 4명으로 끝까지 가요. 체력은 이어져요.</span>`:FORM.ctx.kind==='farm'?`<span class="muted">보상: ${rewardText(farmReward(stage.farm.key,stage.farm.lv))}</span>`:FORM.ctx.kind==='event'?`<span class="muted">이벤트 스테이지</span>`:`<span class="muted">보상 ◆${nf(stage.reward)}${P().cleared[stage.id]?'':' (첫 클리어 2배)'}</span>`;
+    const m=matchup(c,en), o=own(c.id), rw=rowWarn(c,i,squadSel.length);
+    return `<button class="fslot r${c.rarity} ${rw?'rowbad':''}" title="${esc(rw)}" data-act="fpick" data-id="${c.id}" style="--ec:${ECOL[c.elem]}"><div class="fs-art">${art(c)}</div><span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${formOn()?`<em class="rgi" title="${RANGE[charRange(c)]}">${RANGE_ICO[charRange(c)]}</em>`:''}${rw?`<em class="rww">${esc(rw)}</em>`:''}${m.good>m.bad?'<em class="adv">유리</em>':m.bad>m.good?'<em class="dis">불리</em>':''}<div class="fs-t"><b>${esc(c.name)}</b><span>Lv.${o.lv} · ${esc(ROLE[c.role])}</span><span class="pw">${nf(charPower(c))}</span></div></button>`;};
+  const head2=FORM.ctx.kind==='tower'?`<span class="muted">첫 돌파 보상: ${rewardText(towerReward(FORM.ctx.floor))}</span>`:FORM.ctx.kind==='raid'?`<span class="muted">이번 주 누적 피해로 보상을 받아요 · 오늘 ${raidTriesLeft()}/3</span>`:FORM.ctx.kind==='rogue'?`<span class="muted">이 4명으로 끝까지 가요. 체력은 이어져요.</span>`:FORM.ctx.kind==='farm'?`<span class="muted">보상: ${rewardText(farmReward(stage.farm.key,stage.farm.lv))}</span>`:FORM.ctx.kind==='event'?`<span class="muted">이벤트 스테이지</span>`:`<span class="muted">보상 ◆${nf(stage.reward)}${P().cleared[stage.id]?'':' (첫 클리어 2배)'}</span>`;
   openModal(`${head(esc(FORM.ctx.code?FORM.ctx.code+' ':'')+esc(stage.title),head2)}
     <div class="fenemy">${en.map(e=>`<div class="fe ${e.boss?'boss':''}" style="--ec:${ECOL[e.elem]}"><div class="fe-art">${enemyArt(e)}</div><span class="el" style="--ec:${ECOL[e.elem]}">${esc(e.elem)}</span><b>${esc(e.name)}</b><span>${e.boss?'BOSS · ':''}${nf(e.hp)}</span></div>`).join('')}</div>
+    ${stage.enemies.length&&!stage.story?rulesHTML(stage):''}
     ${en.filter(e=>e.boss).map(e=>`<p class="boss-pat"><b>보스 패턴</b> ${esc(e.name)}: ${esc(bossPatText(e,FORM.ctx.kind==='raid'))}</p>`).join('')}
     <p class="muted" style="margin:6px 0 0">적 속성: ${Object.entries(elemCount).map(([k,v])=>`${esc(k)}×${v}`).join(' ')} → ${Object.keys(elemCount).map(k=>{const w=ELEMS.find(x=>BEATS[x]===k);return w?`<b style="color:${ECOL[w]}">${esc(w)}</b> 유리`:'';}).filter(Boolean).join(', ')}</p>
     <div class="fpower"><div><i>편성 능력치 <small style="opacity:.7">상성 반영</small></i><b class="${ratio>=1?'ok':ratio>=0.8?'warn':'bad'}">${nf(tp)}</b>${tp!==tp0?`<small class="muted" style="display:block;font-size:.7rem">기본 ${nf(tp0)}</small>`:''}</div><div><i>적 능력치 (참고)</i><b>${nf(need)}</b></div><div class="fbar"><span style="width:${Math.min(100,ratio*100)}%" class="${ratio>=1?'ok':ratio>=0.8?'warn':'bad'}"></span></div></div>
     <div class="frow"><i>전열</i><i>후열</i></div><div class="fslots">${[0,1,2,3].map(slot).join('')}</div>
-    <p class="muted" style="margin:4px 0 0">전열은 적의 공격을 두 배로 더 받아요. 방어형은 어디에 있든 공격을 끌어요.</p>
+    <p class="muted" style="margin:4px 0 0">${formOn()?esc(formHelp()):'전열은 적의 공격을 두 배로 더 받아요. 방어형은 어디에 있든 공격을 끌어요.'}</p>
     ${Object.keys(fb).length?`<p class="fbonus">${Object.entries(fb).map(([f,v])=>`${esc(f)} 소속 보너스 공격 +${v}%`).join(' · ')}</p>`:`<p class="muted" style="margin:6px 0 0">같은 소속 2명 이상이면 공격 보너스 (2명 5%, 3명 10%, 4명 15%)</p>`}
     <div class="row" style="margin-top:8px"><button class="btn sm" data-act="fauto">자동 편성</button><button class="btn sm ghost" data-act="fclear">비우기</button>${[0,1,2].map(i=>{const pr=(P().presets||[])[i];return `<button class="btn sm ghost" data-act="fpre" data-i="${i}">${pr&&pr.length?'편성 '+(i+1):'빈 '+(i+1)}</button>`;}).join('')}<button class="btn sm ghost" data-act="fsave">현재 편성 저장</button></div>
     <div class="ftools"><div class="chips">${[['all','전체'],...ELEMS.map(e=>[e,e]),...Object.entries(ROLE)].map(([v,l])=>`<button class="chip ${FORM.filter===v?'on':''}" data-act="ffil" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div>
@@ -41,7 +42,7 @@ async function openFormation(stage,ctx,startAct){
 }
 function refreshForm(){ if(FORM) openFormation(FORM.stage,FORM.ctx,FORM.startAct); }
 function autoSquad(stage){
-  const busy=busyIds(), en=stage.enemies, pool=G.chars.filter(c=>own(c.id)&&!busy.has(c.id));
+  const busy=busyIds(), en=stage.enemies, pool=G.chars.filter(c=>own(c.id)&&!busy.has(c.id)&&(!(FORM&&FORM.ctx&&FORM.ctx.allow)||FORM.ctx.allow(c)));
   const score=c=>{const m=matchup(c,en);return charPower(c)*(1+0.25*m.good-0.2*m.bad);};
   pool.sort((a,b)=>score(b)-score(a));
   const pick=[]; const need=['def','sup'];
@@ -178,7 +179,6 @@ function openBanner(id){
     <div class="row" style="margin-top:16px"><button class="btn" data-act="bnsave">저장</button>${id&&id!=='std'?'<button class="btn ghost" data-act="bndel">삭제</button>':''}</div>`);
 }
 let BD=null;
-function openBanner2(){ const keep=BD; const id=keep.id; G.__tmpB=keep; openBannerFrom(keep); }
 function openBannerFrom(b){ const real=G.banners; const bak=BD; BD=b; const orig=G.banners.find(x=>x.id===b.id); const saved=JSON.stringify(b);
   // render from draft
   const facs=[...new Set(G.chars.map(c=>c.faction).filter(Boolean))];

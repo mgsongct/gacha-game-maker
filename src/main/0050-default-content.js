@@ -7,10 +7,11 @@ const DEFAULT_WORLD = {
   lore:'낙성의 밤 이후 에덴포트는 둘로 갈라졌다. 기업이 지배하는 상층 구역과, 잔광이 출몰하는 회색구. 별의 파편인 성핵은 사람에게 힘을 주지만 오래 쓰면 정신을 갉아먹는다. 성흔자는 계약사무소에 소속되어 의뢰를 받고 싸우며, 관리관은 그들의 계약과 성흔 안정도를 관리한다. 거대 기업 헬릭스 컨소시엄은 성핵을 독점하려 하고, 회색구 시민회는 사무소들에 의지해 하루하루를 버틴다. 새벽등대는 그 사이에서 살아남은, 가난하지만 시끄러운 사무소다.',
   plot:'1부의 축: 헬릭스는 분화구 아래 잠든 "첫 번째 별"을 깨워 성핵을 무한히 생산하려 한다. 계획의 책임자는 세라의 옛 상관 바넷 소장. 관리관은 낙성의 밤의 유일한 생존자로, 기억은 없지만 성핵과 공명하는 체질이라 곁에 있는 성흔자의 폭주를 가라앉힌다. 헬릭스가 관리관을 노리는 이유이자, 대원들이 관리관에게 끌리는 이유. 이브는 이 사실을 처음부터 알고 있었다.',
   factions:[
-    {name:'새벽등대',desc:'회색구의 작은 계약사무소. 관리관과 대원들의 집.'},
-    {name:'헬릭스 컨소시엄',desc:'성핵 연구와 거래를 독점하려는 거대 기업.'},
-    {name:'잔광',desc:'성핵에 잠식되어 빛의 괴물이 된 존재들.'},
-    {name:'회색구 시민회',desc:'버려진 구역 주민들의 자치 조직이자 주요 의뢰인.'}
+    {name:'새벽등대',kind:'playable',desc:'회색구의 작은 계약사무소. 관리관과 대원들의 집. 성핵 사건을 맡는 몇 안 되는 독립 계약사로, 의뢰비보다 사람을 먼저 챙긴다는 평판 때문에 늘 적자다.',goal:'회색구 주민을 잔광에게서 지키고, 낙성의 진실을 밝힌다',leader:'관리관(플레이어)',base:'회색구 폐역 위 등대 건물',ideology:'계약은 지키되, 사람을 버리는 계약은 받지 않는다',secret:'창립자는 헬릭스의 전직 연구원이었다',rel:{'헬릭스 컨소시엄':'긴장 — 의뢰를 받지만 믿지 않는다','회색구 시민회':'동맹 — 주요 의뢰인','잔광':'적대'},stance:[]},
+    {name:'헬릭스 컨소시엄',kind:'hostile',desc:'성핵 연구와 거래를 독점하려는 거대 기업. 겉으로는 도시 재건의 후원자지만, 잔광 발생 구역을 실험장으로 쓴다는 소문이 끊이지 않는다.',goal:'성핵 기술 독점과 낙성 지구 재개발',leader:'이사회(얼굴을 드러내지 않음)',base:'중앙구 헬릭스 타워',ideology:'효율과 계약, 손실은 숫자로만 센다',secret:'잔광 일부는 헬릭스 실험에서 새어 나왔다',rel:{'새벽등대':'이용 — 쓰고 버릴 하청','회색구 시민회':'적대 — 재개발 반대','잔광':'연구 대상'},stance:[{ch:1,s:'neutral',why:'표면상 의뢰인'}]},
+    {name:'잔광',kind:'monster',desc:'성핵에 잠식되어 빛의 괴물이 된 존재들. 사람·동물·기계를 가리지 않고 빛에 먹히면 형체가 일그러진다.',origin:'낙성의 밤 쏟아진 성핵 파편이 생물에 스며들어 생긴 변이체',nature:'빛과 소리에 몰려들고, 밤이 깊을수록 무리 지어 움직인다. 잠식이 깊을수록 말을 잃는다',weakness:'성핵 핵(코어)을 부수면 흩어진다. 홍 속성 열에 약하다',goal:'없음(본능)',base:'폐선로·낙성 분화구',rel:{'새벽등대':'적대','헬릭스 컨소시엄':'포획 대상'},stance:[]},
+    {name:'회색구 시민회',kind:'neutral',desc:'버려진 구역 주민들의 자치 조직이자 주요 의뢰인. 배급과 순찰을 스스로 꾸리며, 바깥 기업을 믿지 않는다.',goal:'회색구를 재개발에서 지키고 주민을 먹여 살린다',leader:'시민회 의장',base:'회색구 시장 골목',ideology:'우리 구역은 우리가 지킨다',rel:{'새벽등대':'동맹','헬릭스 컨소시엄':'적대','회색구 연합':'후원'},stance:[]},
+    {name:'회색구 연합',kind:'playable',desc:'시민회가 꾸린 자경단 겸 구조대. 정식 계약사가 아니라 장비는 낡았지만 회색구 골목을 누구보다 잘 안다.',goal:'잔광 출몰 구역의 주민 구조와 순찰',leader:'연합 대장(시민회 의장의 조카)',base:'회색구 소방서 터',ideology:'먼저 달려가고, 나중에 따진다',rel:{'새벽등대':'협력 — 현장에서 손발을 맞춤','회색구 시민회':'소속','헬릭스 컨소시엄':'적대'},stance:[]}
   ]
 };
 
@@ -48,6 +49,16 @@ const DEFAULT_BGM = [
  LI('bgm_flirt','bgm','설렘','Romantic sultry lounge jazz, slow tenor saxophone, soft piano, muted trumpet, late night bar, flirty and teasing mood, 75 bpm, instrumental, seamless loop')
 ];
 const DEFAULT_LIB=[...DEFAULT_LIB_IMG,...DEFAULT_BGM];
+// 샘플 적 도감(정체·습성·약점) — 샘플 게임에서만(0070 syncEnemies)
+const ENEMY_INFO={
+ '잔광 하운드':{faction:'잔광',desc:'성핵 파편에 잠식된 들개 무리가 빛의 짐승이 된 것',nature:'소리를 쫓아 무리로 사냥한다',weak:'코어를 노린 집중 공격, 홍 속성'},
+ '잔광 파수꾼':{faction:'잔광',desc:'무너진 건물 잔해가 성핵에 엉겨 붙어 생긴 거인',nature:'한 구역을 떠나지 않고 다가오는 것을 부순다',weak:'가슴의 코어, 느린 움직임'},
+ '헬릭스 경비병':{faction:'헬릭스 컨소시엄',desc:'헬릭스가 고용한 무장 경비 인력(사람)',nature:'명령대로만 움직이고 퇴각이 빠르다',weak:'지휘관을 먼저 쓰러뜨리면 흩어진다'},
+ '헬릭스 감시드론':{faction:'헬릭스 컨소시엄',desc:'헬릭스의 무인 감시 기체',nature:'발견한 대상을 표시해 경비병을 부른다',weak:'로터, 청 속성 전류'},
+ '적색 잔광체':{faction:'잔광',desc:'낙성 분화구 깊은 곳에서 깨어난 거대 잔광',nature:'주변의 잔광을 끌어당겨 몸을 키운다',weak:'흩어진 코어를 하나씩 부숴야 한다'},
+ '떠도는 등불':{faction:'잔광',desc:'축제 등불에 스며든 작은 잔광',nature:'사람의 그리움에 이끌려 떠돈다',weak:'빛을 가리면 약해진다'},
+ '등불 잔광':{faction:'잔광',desc:'등불 잔광이 모여 불꽃 형체가 된 것',nature:'무리 지어 맴돌며 불씨를 퍼뜨린다',weak:'녹 속성 바람'},
+ '거대 등불 잔광':{faction:'잔광',desc:'축제의 밤에 모인 등불 잔광이 하나로 뭉친 괴물',nature:'축제의 소원 등불을 삼켜 커진다',weak:'입 안의 코어'}};
 const ENEMY_LOOKS={
  '잔광 하운드':'no humans, monster, wolf made of glowing green light, translucent crystalline body, sharp light shards on back, snarling, glowing eyes, creature focus',
  '잔광 파수꾼':'no humans, monster, tall humanoid golem of red light and rubble, glowing core in chest, cracked stone armor, menacing, creature focus',
@@ -160,7 +171,7 @@ const FACE_TAGS={calm:'calm, relaxed, closed mouth, soft eyes',smile:'gentle smi
 const FACE_BASIC=['평온','미소','슬픔','화남','놀람','당황'];
 const FACE_PRESETS=[['평온','calm'],['미소','smile'],['울먹','teary'],['웃음','happy'],['폭소','laughing'],['윙크','playful'],['슬픔','sad'],['화남','angry'],['놀람','surprised'],['부끄럼','embarrassed'],['수줍음','shy'],['의기양양','smug'],['걱정','worried'],['결의','determined'],['생각','thinking'],['당황','nervous'],['짜증','irritated'],['피곤','tired'],['반함','love'],['무표정','neutral'],['아픔','hurt']];
 const DEFAULT_CHARS = [
- C({id:'sera',ord:0,name:'세라',age:27,rarity:3,role:'atk',elem:'홍',hp:1100,atk:170,def:45,spd:100,
+ C({id:'sera',persona:{"traits": ["말수 적은 프로", "동료를 몰래 챙김", "과거를 숨김"], "self": "나", "call": "관리관", "ending": "~해. / ~야. (짧은 반말)", "quirk": "\"…보고는 짧게.\"", "catch": "표적이 보이면 끝난 거야.", "gap": "무뚝뚝하지만 관리관의 커피 취향은 한 번도 틀린 적이 없다", "flaw": "도움을 청하지 못한다", "want": "다시는 동료를 잃지 않는 것", "fear": "혼자 살아 돌아오는 것", "likes": ["진한 커피", "새벽 옥상"], "dislikes": ["긴 보고", "변명"], "hobby": "총기 손질", "motif": "붉은 조준경"},ord:0,name:'세라',age:27,rarity:3,role:'atk',elem:'홍',hp:1100,atk:170,def:45,spd:100,
   skill:{name:'적색 일섬',kind:'dmg',power:2.8,cd:3,desc:'체력이 가장 낮은 적 하나에게 큰 피해'},
   profile:'헬릭스 특수부대 출신 저격수. 회사를 떠난 이유는 말하지 않는다. 무뚝뚝하지만 관리관의 커피 취향은 정확히 기억한다.',
   intro:'계약? 좋아. 대신 내 사선 앞엔 서지 마.',
@@ -177,7 +188,7 @@ const DEFAULT_CHARS = [
 1) 세라: …그래서 여기가 마음에 들어. 귀찮지만.
 2) 세라: 잔소리는 이브 하나로 충분해. …한 대만 더 피우고 끊을게. 진짜로.
 그녀는 처음으로 웃었다. 아주 짧게.`}]}),
- C({id:'eve',ord:1,name:'이브',age:29,rarity:3,role:'sup',elem:'청',hp:1300,atk:120,def:60,spd:95,
+ C({id:'eve',persona:{"traits": ["느긋한 살림꾼", "장난스러운 어른", "냉철한 군의관"], "self": "나", "call": "관리관", "ending": "~요. / ~려나? (느긋한 존댓말)", "quirk": "\"어머.\"", "catch": "아픈 데 생기면… 아니, 안 생겨도 와요.", "gap": "느긋하게 웃다가도 수술대 앞에서는 한 치의 망설임도 없다", "flaw": "자기 몸은 잘 돌보지 않는다", "want": "모두가 무사히 돌아오는 밤", "fear": "손쓸 수 없는 환자", "likes": ["와인", "관리관 놀리기"], "dislikes": ["무리하는 사람"], "hobby": "허브 화분 가꾸기", "motif": "청진기와 와인잔"},ord:1,name:'이브',age:29,rarity:3,role:'sup',elem:'청',hp:1300,atk:120,def:60,spd:95,
   skill:{name:'청람의 숨결',kind:'heal',power:1.6,cd:3,desc:'아군 전체의 체력을 회복'},
   profile:'새벽등대의 의무관이자 실질적인 살림꾼. 느긋한 말투 뒤에 전직 군의관의 냉철함이 숨어 있다. 와인과 관리관 놀리기를 좋아한다.',
   intro:'의무관 이브예요. 아픈 데 생기면… 아니, 안 생겨도 와요.',
@@ -193,7 +204,7 @@ const DEFAULT_CHARS = [
 선택: 그럼 매일 물어볼게 | 지금 어디 보고 있었는지 묻지 마
 1) 이브: 그 말, 기록해 둘게요. 진료 기록 말고, 내 기록에.
 2) 이브: 어머~ 안 물어봤는데 자백하네요? 귀엽다, 진짜.`}]}),
- C({id:'kaya',ord:2,name:'카야',age:24,rarity:2,role:'def',elem:'녹',hp:1600,atk:95,def:95,spd:85,
+ C({id:'kaya',persona:{"traits": ["힘 자랑하는 맏언니", "고기 애호가", "동료 바보"], "self": "나", "call": "관리관 / 너", "ending": "~다! / ~자! (시원한 반말)", "quirk": "\"앞은 맡겨!\"", "catch": "앞은 내가 맡는다!", "gap": "동료가 다치면 누구보다 먼저 울먹인다", "flaw": "앞뒤 안 보고 뛰어든다", "want": "모두가 배불리 먹는 식탁", "fear": "뒤에서 동료가 쓰러지는 소리", "likes": ["고기", "항구 노을"], "dislikes": ["동료가 다치는 것", "채소"], "hobby": "팔씨름", "motif": "거대한 방패"},ord:2,name:'카야',age:24,rarity:2,role:'def',elem:'녹',hp:1600,atk:95,def:95,spd:85,
   skill:{name:'강철 방벽',kind:'shield',power:1.5,cd:3,desc:'아군 전체에 보호막'},
   profile:'거대한 방패를 휘두르는 전직 항만 노동자. 힘자랑과 고기를 좋아하고, 동료가 다치는 걸 가장 싫어한다.',
   intro:'카야다! 앞은 맡겨! 고기는 네가 사고!',
@@ -206,7 +217,7 @@ const DEFAULT_CHARS = [
 카야: 응. 그래서 내가 시끄럽게 사는 거야. 누군가는 떠들어야지.
 카야는 바다에 돌을 던진다. 생각보다 멀리 날아간다.
 카야: 봤지? 방패 말고도 잘하는 거 많다니까.`}]}),
- C({id:'luna',ord:3,name:'루나',age:22,rarity:2,role:'atk',elem:'청',hp:950,atk:140,def:40,spd:120,
+ C({id:'luna',persona:{"traits": ["말 빠른 장난꾸러기", "천재 해커", "외로움 많음"], "self": "나", "call": "관리관~", "ending": "~지롱 / ~거든? (빠른 반말)", "quirk": "\"농담… 반쯤.\"", "catch": "관리관 폰 이미 해킹했어. 농담… 반쯤.", "gap": "장난 뒤에 혼자 남는 게 무서워 늘 누군가에게 말을 건다", "flaw": "진지한 얘기를 장난으로 피한다", "want": "쫓기지 않고 쉴 수 있는 집", "fear": "연락이 끊기는 것", "likes": ["에너지 드링크", "보안 뚫기"], "dislikes": ["지루함", "기다리기"], "hobby": "게임 스피드런", "motif": "쌍권총과 노트북"},ord:3,name:'루나',age:22,rarity:2,role:'atk',elem:'청',hp:950,atk:140,def:40,spd:120,
   skill:{name:'체인 버스트',kind:'aoe',power:1.3,cd:3,desc:'적 전체에 연속 사격'},
   profile:'쌍권총과 해킹을 동시에 다루는 프리랜서. 말이 빠르고 장난이 많다. 헬릭스 서버를 털다 쫓기던 중 새벽등대에 굴러들어왔다.',
   intro:'루나 등장~ 관리관 폰 이미 해킹했어. 농담… 반쯤.',
@@ -221,7 +232,7 @@ const DEFAULT_CHARS = [
 루나: 그냥. 서버 털 때보다 이게 더 떨려서.
 루나: …아냐, 잊어. 내일 커피 사.
 화면 너머로 그녀가 웃는 것 같았다.`}]}),
- C({id:'miho',ord:4,name:'미호',age:26,rarity:2,role:'sup',elem:'홍',hp:1000,atk:115,def:50,spd:110,
+ C({id:'miho',persona:{"traits": ["여유로운 승부사", "사람을 읽는 눈", "마음을 숨김"], "self": "저", "call": "당신", "ending": "~죠. / ~거든요. (나긋한 존댓말)", "quirk": "\"한 판 걸어볼래요?\"", "catch": "패는 숨기는 게 예의예요. 마음도요.", "gap": "확률도 사람도 안 믿는다면서 관리관에게만은 전부를 건다", "flaw": "진심을 농담처럼 말해 버린다", "want": "질 걱정 없는 승부 한 번", "fear": "누군가를 믿었다가 잃는 것", "likes": ["카드 섞는 소리", "달콤한 칵테일"], "dislikes": ["속임수 쓰는 사람"], "hobby": "동전 마술", "motif": "뒤집힌 카드"},ord:4,name:'미호',age:26,rarity:2,role:'sup',elem:'홍',hp:1000,atk:115,def:50,spd:110,
   skill:{name:'올인',kind:'buff',power:1.2,cd:4,desc:'아군 전체 공격력 상승'},
   profile:'회색구 카지노의 딜러였던 도박사. 확률은 믿지 않고 사람을 믿는다고 말하지만, 실은 둘 다 믿지 않는다.',
   intro:'판돈이 큰 계약이네요. 좋아요, 걸어보죠.',
@@ -236,7 +247,7 @@ const DEFAULT_CHARS = [
 [소품: 하트 에이스]
 미호: 이건 속임수 아니에요. …이번만은.
 [소품 끝]`}]}),
- C({id:'hanna',ord:5,name:'한나',age:25,rarity:1,role:'atk',elem:'녹',hp:1000,atk:120,def:50,spd:105,
+ C({id:'hanna',persona:{"traits": ["근성의 신입", "선배 동경", "과하게 성실함"], "self": "저", "call": "관리관님", "ending": "~습니다! (군기 든 존댓말)", "quirk": "\"확인했습니다!\"", "catch": "언젠가 세라 선배처럼 될 거예요.", "gap": "완벽해 보이려 밤새 연습하다 아침에 졸아 버린다", "flaw": "실수를 혼자 끌어안는다", "want": "선배들에게 인정받는 것", "fear": "짐이 되는 것", "likes": ["보고서 체크리스트", "선배들 무용담"], "dislikes": ["대충 하는 것"], "hobby": "훈련 일지 쓰기", "motif": "새 군화"},ord:5,name:'한나',age:25,rarity:1,role:'atk',elem:'녹',hp:1000,atk:120,def:50,spd:105,
   skill:{name:'돌격',kind:'dmg',power:1.9,cd:2,desc:'체력이 가장 낮은 적 하나에게 피해'},
   profile:'새벽등대에 가장 최근 들어온 신입 용병. 성실함과 근성은 사무소 최고. 선배들을 동경한다.',
   intro:'신입 한나, 오늘부터 잘 부탁드립니다!',
@@ -249,7 +260,7 @@ const DEFAULT_CHARS = [
 한나: 네! 누군가한테 한턱내는 게 꿈이었거든요.
 한나: …사실 고향에 보낼 돈 빼면 국수 두 그릇이 한계지만요.
 두 사람은 김이 나는 국수를 앞에 두고 웃었다.`}]}),
- C({id:'odelle',ord:6,name:'오델',age:31,rarity:1,role:'def',elem:'청',hp:1500,atk:85,def:85,spd:80,
+ C({id:'odelle',persona:{"traits": ["원칙주의자", "과묵한 보호자", "은근한 다정함"], "self": "저", "call": "관리관", "ending": "~입니다. (딱딱한 존댓말)", "quirk": "\"규정에 따라.\"", "catch": "규칙은 지키라고 있는 겁니다, 관리관.", "gap": "규칙에 엄격하면서 고양이 앞에서는 목소리가 반 옥타브 올라간다", "flaw": "융통성이 없다", "want": "모두가 제시간에 퇴근하는 사무소", "fear": "규칙이 사람을 지키지 못하는 순간", "likes": ["고양이", "정시 퇴근"], "dislikes": ["연장 근무", "무단 행동"], "hobby": "고양이 사진 정리", "motif": "경비대 배지"},ord:6,name:'오델',age:31,rarity:1,role:'def',elem:'청',hp:1500,atk:85,def:85,spd:80,
   skill:{name:'경비대 진형',kind:'shield',power:1.1,cd:3,desc:'아군 전체에 보호막'},
   profile:'은퇴한 시 경비대장. 원칙주의자이며 사무소의 규칙을 혼자 지킨다. 의외로 고양이를 키운다.',
   intro:'오델 크레인. 규정에 따라 계약에 응합니다.',
@@ -262,7 +273,7 @@ const DEFAULT_CHARS = [
 오델: 이름은 규칙입니다. 제 인생의 유일한 예외라서요.
 관리관: 그럼 나는?
 오델: …그건 아직 검토 중입니다.`}]}),
- C({id:'jia',ord:7,name:'지아',age:23,rarity:1,role:'sup',elem:'녹',hp:950,atk:100,def:45,spd:115,
+ C({id:'jia',persona:{"traits": ["과묵한 정비사", "기계에 이름 붙임", "은근히 세심함"], "self": "저", "call": "관리관", "ending": "…~요. (짧고 조용한 존댓말)", "quirk": "\"…고쳐 놨어요.\"", "catch": "고장 나면 가져와요. 사람도요.", "gap": "말은 없지만 관리관의 총 조준경이 1도 틀어진 것까지 알아챈다", "flaw": "사람보다 기계가 편하다", "want": "모두가 고장 나지 않는 것", "fear": "고칠 수 없는 고장", "likes": ["기름 냄새", "드론 뭉치"], "dislikes": ["시끄러운 곳"], "hobby": "고물 수집", "motif": "렌치와 드론"},ord:7,name:'지아',age:23,rarity:1,role:'sup',elem:'녹',hp:950,atk:100,def:45,spd:115,
   skill:{name:'수리 드론',kind:'heal',power:1.0,cd:3,desc:'아군 전체의 체력을 회복'},
   profile:'드론과 장비를 고치는 정비사. 말수가 적고 기계에게 이름을 붙인다. 손이 늘 기름투성이다.',
   intro:'…지아. 고장 난 거 있으면 가져와요.',

@@ -88,7 +88,6 @@ const CARD_DEF={
 const KW={연계:'직전에 쓴 카드도 공격이면 더 강해져요.',낙인:'적에게 쌓여요. 처형 카드가 낙인 수만큼 피해를 더하고 낙인을 없애요.',출혈:'적의 턴이 올 때마다 출혈 수치만큼(×리더 공격 일부) 피해를 받고 1씩 줄어요.',약화:'약화된 적은 공격이 30% 약해져요.',보존:'다음 턴이 와도 보호막의 절반이 남아요.',반격:'이번 적 턴에 공격을 받을 때마다 공격한 적에게 피해를 돌려줘요.',소멸:'한 번 쓰면 이번 전투에서는 다시 나오지 않아요.',충전:'쌓아 두었다가 해방 카드로 한 번에 터뜨려요. 전투가 끝나면 사라져요.'};
 const CARD_REWARD=['heavy','sweep','wall','aid','focus','expose','rally','combo','revive','surge','twin','slash','brand','finisher','bleed','bulwark','counter','weaken','plan','echo','charge','release','sacrifice','burnout','shieldbash','entrench','hemorrhage','flurry','spread','overdrive','rage'];
 const ROLE_CARDS={atk:['slash','brand','finisher','bleed'],def:['bulwark','counter','wall','taunt'],sup:['plan','weaken','aid','expose']};
-const CARD_ROLE={atk:'twin',def:'taunt',sup:'tactic'};
 const SK_TXT={dmg:'적 1명에게 큰 피해',aoe:'모든 적에게 피해',heal:'리더 체력 회복',shield:'큰 보호막',buff:'이번 전투 공격 증가'};
 const LEAD_AB={atk:['맹공','공격 카드를 3장 쓸 때마다 리더가 추가로 한 번 더 공격해요.'],def:['불굴','턴을 시작할 때 리더 최대 체력의 6%만큼 보호막을 얻어요.'],sup:['통찰','턴마다 카드를 1장 더 뽑아요.']};
 const ULT_MAX=6;
@@ -168,7 +167,6 @@ function cbStart(kind){ const run=RG().run; const en=rgEnemies({k:run.k,floor:rg
     <div class="cb-detail" id="cbDet" hidden></div>
     <div class="cb-hand fan" id="cbHand"></div></div>`;
   $('#ov').hidden=false; sceneBgm(); cbIntents(); cbTurn(true); }
-function cbAliveA(){ return CB.allies.filter(a=>a.hp>0); }
 function cbAliveE(){ return CB.enemies.filter(e=>e.hp>0); }
 function cbLog(t){ CB.log.push(t); CB.log=CB.log.slice(-3); const l=$('#cbLog'); if(l) l.innerHTML=CB.log.map(x=>`<p>${esc(x)}</p>`).join(''); }
 function cbDraw(n){ for(let k=0;k<n;k++){ if(CB.hand.length>=10) break; if(!CB.draw.length){ if(!CB.disc.length) break; CB.draw=cbShuffle(CB.disc); CB.disc=[]; } CB.hand.push(CB.draw.pop()); } }
@@ -402,7 +400,7 @@ function challengeHTML(){
       <div class="rg-sq">${run.squad.map(id=>{ const c=charById(id), h=run.hp[id]||0; return c?`<div class="rg-u ${h<=0?'down':''}"><div class="rg-a">${art(c)}</div><b>${esc(c.name)}</b><span class="hpb"><i style="width:${Math.round(h*100)}%"></i></span></div>`:''; }).join('')}</div>
       ${run.relics.length?`<div class="rg-rel">${[...new Set(run.relics)].map(k=>`<span title="${esc(RELICS[k][1])}">${esc(RELICS[k][0])}${rgCount(k)>1?' ×'+rgCount(k):''}</span>`).join('')}</div>`:''}
       ${nodes}<div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="rgquit">탐사 끝내기</button></div></section>`; }
-  return `${pageHead('도전','CHALLENGE','lobby')}${raid}${rog}`;
+  return `${pageHead('도전','CHALLENGE','lobby')}${raid}${towerHTML()}${rog}`;
 }
 
 

@@ -34,7 +34,7 @@ case 'rgsave': { const run=RG().run; if(!run||!run.rest) break; run.saved=Date.n
 case 'rgleave': { const run=RG().run; if(!run){ tab='challenge'; render(); break; } if(!(await appConfirm('지금 나가면 이번 탐사가 끝나요(지금까지 간 만큼 보상은 받아요).\n저장은 야영지의 \'저장하고 나가기\'로만 할 수 있어요. 나갈까요?'))) break; const html=rgFinish(false); tab='challenge'; render(); openModal(`<div class="result" style="position:static">${html.replace('data-act="bdone"','data-act="close"')}</div>`); break; }
 case 'rgquit': { if(!(await appConfirm('탐사를 끝낼까요? 지금까지의 진척에 따라 보상을 받아요.'))) break; const html=rgFinish(false); openModal(`<div class="result" style="position:static">${html.replace('data-act="bdone"','data-act="close"')}</div>`); render(); break; }
 case 'opskip': e.stopPropagation(); opEnd(); break;
-case 'stage': { const ch0=G.chapters.find(x=>x.id===t.dataset.ch), s0=ch0&&ch0.stages.find(x=>x.id===t.dataset.st); if(s0&&s0.story){ openStoryStage(ch0,s0); break; } squadSel=null; FORM=null; openStage(t.dataset.ch,t.dataset.st); break; }
+case 'stage': { const ch0=G.chapters.find(x=>x.id===t.dataset.ch), s0=ch0&&ch0.stages.find(x=>x.id===t.dataset.st); if(s0&&s0.story){ openStoryStage(ch0,s0); break; } if(s0&&(s0.mode==='debate'||s0.mode==='contest')){ openModeStage(ch0,s0); break; } if(s0&&SORTIE()&&SORTIE().st===s0.id){ sortieMap('진행 중인 출격을 이어 가요'); break; } squadSel=null; FORM=null; openStage(t.dataset.ch,t.dataset.st); break; }
 case 'sortie': { p.squad=[...squadSel]; mark('prog'); const ch=G.chapters.find(x=>x.id===t.dataset.ch),s=ch.stages.find(x=>x.id===t.dataset.st); closeModal();
       if(!p.cleared[s.id]&&s.pre) playStory(s.title,s.pre,()=>startBattle(ch.id,s.id)); else startBattle(ch.id,s.id); break; }
 case 'bauto': B.auto=!B.auto; t.classList.toggle('on',B.auto); break;
@@ -44,7 +44,6 @@ case 'bdone': { if(B&&(B.ctx.kind==='raid'||B.ctx.kind==='rogue')){ const rg=B.c
       if(win&&first&&s.post) playStory(s.title,s.post,()=>{render();checkTriggers();}); else checkTriggers(); break; }
 case 'opsch': OPS_CH=t.dataset.ch; render(); $('#view').scrollTop=0; break;
 case 'opsback': OPS_CH=null; render(); break;
-case 'fsq': refreshForm(); break;
 case 'fpick': { const i=squadSel.indexOf(id), added=i<0; const x=e.clientX||innerWidth/2, y=e.clientY||innerHeight/2;
       if(i>=0) squadSel.splice(i,1); else if(squadSel.length<4) squadSel.push(id); else {toast('최대 4명까지 편성할 수 있어요');break;}
       const sh=$('#modal .sheet'), st=sh?sh.scrollTop:0; refreshForm(); const sh2=$('#modal .sheet'); if(sh2) sh2.scrollTop=st; ripple(x,y,false);

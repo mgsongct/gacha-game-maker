@@ -16,6 +16,9 @@ const libById=id=>G.lib.find(l=>l.id===id);
 const playerName=()=>P().player||T('player');
 const sub=t=>{ const n=playerName(); let s=String(t??''); if(s.indexOf('{')<0) return s; new Set(['관리관','플레이어','주인공','이름','player',T('player'),DEFAULT_META.terms.player]).forEach(k=>{ if(k) s=s.split('{'+k+'}').join(n); }); return s; };
 const isMe=w=>w==='나'||w==='관리관'||w===T('player')||(!!P().player&&w===P().player&&!G.chars.some(c=>c.name===w));
+// 조용히 넘어가는 오류 기록: 비동기 작업(AI·그림·스킬 생성 등)이 실패해도 흐름은 이어 가되, 원인을 잃지 않게 남겨요(프롬프트 스튜디오 → AI 기록)
+const QUIET=[];
+function quietErr(e,where){ QUIET.unshift({at:Date.now(),where:String(where||''),msg:String(e&&e.message||e||'오류').slice(0,200)}); if(QUIET.length>60) QUIET.length=60; try{ console.debug('[quiet]',where,e); }catch(_){ /* 콘솔이 없어도 괜찮음 */ } }
 function toast(m){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
 function ripple(x,y,big){const r=document.createElement('div');r.className='ripple'+(big?' big':'');r.style.left=x+'px';r.style.top=y+'px';r.innerHTML='<i></i><i></i><i></i>';document.body.appendChild(r);setTimeout(()=>r.remove(),1000);}
 function hearts(x,y,n){for(let i=0;i<n;i++){const h=document.createElement('div');h.className='hrt';h.textContent='♥';h.style.left=(x-8)+'px';h.style.top=(y-10)+'px';h.style.setProperty('--dx',(Math.random()*70-35).toFixed(0)+'px');h.style.animationDelay=(i*0.08)+'s';document.body.appendChild(h);setTimeout(()=>h.remove(),1300);}}
@@ -54,6 +57,5 @@ document.addEventListener('pointerdown',e=>{ if(e.button>0) return; const el=e.t
 document.addEventListener('click',e=>{ if(PET.swallow&&Date.now()-PET.swallow<400){ PET.swallow=0; e.stopPropagation(); e.preventDefault(); } },true);
 document.addEventListener('contextmenu',e=>{ if(PET.on||(e.target.closest&&e.target.closest('[data-act=poke],[data-act=cspoke],[data-act=evspoke]'))) e.preventDefault(); },true);
 function charReact(el,lv,zone){ if(!el) return; const k=zone==='body'?(lv>=6?'shy':'flinch'):lv>=7?'hop':lv>=4?'nod':'flinch'; ['r-hop','r-nod','r-flinch','r-shy'].forEach(c=>el.classList.remove(c)); void el.offsetWidth; el.classList.add('r-'+k); clearTimeout(el._rt); el._rt=setTimeout(()=>el.classList.remove('r-'+k),950); }
-function floatAt(x,y,t){const f=document.createElement('div');f.className='float';f.textContent=t;f.style.left=(x-12)+'px';f.style.top=(y-16)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),800);}
 function shootHTML(n){let s='';for(let i=0;i<n;i++)s+=`<i class="shoot" style="top:${Math.round(Math.random()*45)}%;left:${50+Math.round(Math.random()*60)}%;animation-delay:${(i*0.9+Math.random()).toFixed(1)}s"></i>`;return s;}
 

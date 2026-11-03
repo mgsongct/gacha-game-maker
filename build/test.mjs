@@ -230,7 +230,7 @@ try {
     tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="audopen"]') && !!document.body.innerHTML.includes('생성 기능 향상');
     await auditFix(R('c_age'), [A]); o.ageFixed = !has('c_age', A); await auditFix(R('c_symbol'), [A]); o.symbol = !!A.symColor;
     auditUndo(); o.undo = !A.symColor && has('c_symbol', A);
-    let asked = ''; SAMPLE = { json: async p => { asked = p; return /"pre"/.test(p) ? { pre: '[사무소]\n세라: 시작하자.' } : /반말/.test(p) ? { lines: ['반말1', '반말2', '반말3'] } : { lines: ['대사1', '대사2', '대사3', '대사4'] }; } };
+    let asked = ''; SAMPLE = { json: async p => { asked = p; return /"pre"/.test(p) ? { pre: '[사무소]\n세라: 시작하자.' } : /다음 지시대로/.test(p) ? { lines: ['반말1', '반말2', '반말3'] } : { lines: ['대사1', '대사2', '대사3', '대사4'] }; } };
     await auditFix(R('c_lines'), [A]); o.aiFill = A.lines.length === 4 && !has('c_lines', A) && /평소 대사/.test(asked);
     await auditConvert([A], ['lines'], '대사를 모두 반말로'); o.convert = A.lines[0] === '반말1'; auditUndo(); o.convertUndo = A.lines[0] === '대사1';
     await auditFix(R('s_script'), [st]); o.stage = /세라: 시작하자/.test(st.pre); st.pre = preBefore;
@@ -297,6 +297,333 @@ try {
     return o; });
   assert.ok(Object.values(r14).every(v => v === true), JSON.stringify(r14)); assert.deepEqual(err14, [], '페이지 오류');
   console.log('ok 14 밸런스: 능력치 편차 점검·보수(성향 유지·기준값)·생성 시 자동 보정, 세대 고정·자동 상승, 구캐릭터 AS 전투 보정(엔진)·리마스터, 점검 규칙, 되돌리기');
+
+  // 15) 캐릭터 개성·매력: 개성 시트·프로필 템플릿·검수(빠짐·흔함·겹침·말투), AI 채우기·다듬기, 인연 톡(호감도 해금), 메모리얼(로비 대사), 상속, 점검 규칙
+  const p15 = await browser.newPage(), err15 = []; p15.on('pageerror', e => err15.push(String(e)));
+  await p15.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p15.goto(`http://127.0.0.1:${server.address().port}/?t=15`);
+  await p15.waitForFunction(() => typeof personaReview === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r15 = await p15.evaluate(async () => {
+    const o = {}, sera = charById('sera'); o.sample = !!(sera.persona && sera.persona.gap) && personaReview(sera).score > 40 && ctx().includes('반전 매력');
+    const copy = cleanChar({ name: '복사', role: 'atk', persona: sera.persona, lines: sera.lines }); G.chars.push(copy); o.dup = personaReview(copy).issues.some(x => x.msg.includes('세라'));
+    const gen = cleanChar({ name: '흔함', role: 'sup', persona: { traits: ['밝음', '친절', '상냥'], ending: '~냥' }, lines: ['안녕하세요', '좋은 아침', '힘내요'] }); G.chars.push(gen);
+    const rg = personaReview(gen); o.generic = rg.issues.some(x => x.msg.includes('흔해요')) && rg.issues.some(x => x.msg.includes('말투')) && rg.score < personaReview(sera).score;
+    SAMPLE = { json: async p => /인연 톡/.test(p) ? { threads: [2, 4, 6, 8].map(lv => ({ lv, title: '톡' + lv, script: `흔함: 안녕~냥 ${lv}\n선택: 응 | 아니` })) } : /메모리얼/.test(p) ? { title: '별빛 약속', script: '[옥상]\n흔함: 고마워~냥', lines: ['기억할게~냥', '또 와~냥'] } : { persona: { traits: ['겁 많은 수호자', '고양이 말투', '밤샘 연구'], self: '나', ending: '~냥', quirk: '냥냥', catch: '지켜줄게~냥', gap: '겁쟁이인데 위기에선 제일 앞에 선다', flaw: '거절을 못 한다', want: '평온한 하루', fear: '천둥' }, pfields: { 생일: '3월 3일', 신장: '158cm' }, lines: ['좋은 아침이다~냥', '지켜줄게~냥', '냥냥, 힘내자', '천둥은 싫어~냥'] } };
+    await personaAI(gen, 'fill'); o.fill = gen.persona.gap && gen.persona.traits.includes('밝음') && gen.pfields.생일 === '3월 3일';
+    await personaAI(gen, 'improve', { lines: true }); o.improve = gen.persona.traits.includes('겁 많은 수호자') && gen.lines[0] === '좋은 아침이다~냥' && personaReview(gen).score > rg.score;
+    if (!own(gen.id)) grantOwned(gen, 't'); const n = await talkAffGen(gen); o.talk = n === 4 && affThreads(gen).length === 4;
+    const ok = await memorialGen(gen); o.memo = ok && gen.memorial.lv === 8 && !memoOpen(gen);
+    P().seenOpening = true; addAff(gen, 100000); checkTriggers(true); o.unlock = memoOpen(gen) && affThreads(gen).every(t => P().inbox[t.id]);
+    P().memoOn = { [gen.id]: true }; o.lobby = affLinePool0(gen).includes('기억할게~냥');
+    const alt = cleanChar({ name: '흔함(수영복)', role: 'sup', persona: gen.persona }); alt.alt = gen.id; G.chars.push(alt); mark('c:' + alt.id); gen.persona = { ...gen.persona, catch: '원본이 바꾼 대사' }; mark('c:' + gen.id); o.inherit = alt.persona.catch === '원본이 바꾼 대사';
+    openChar(gen.id); o.infoTab = document.body.innerHTML.includes('개성') && document.body.innerHTML.includes('인연 톡'); closeModal();
+    openPersona(gen.id); document.querySelector('[data-ps="catch"]').value = '바꾼 대사'; document.querySelector('[data-act="pssave"]').click(); o.edit = gen.persona.catch === '바꾼 대사'; closeModal();
+    const hanna = charById('hanna'); o.audit = auditScan().some(g => g.rule.id === 'c_afftalk' && g.items.includes(hanna)) && auditScan().some(g => g.rule.id === 'c_memorial' && g.items.includes(hanna));
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="psopen"]'); openPersonaAll(); document.querySelector('#ps_tpl').value = 'idol'; document.querySelector('#ps_tpl').dispatchEvent(new Event('change', { bubbles: true })); document.querySelector('[data-act="pscfg"]').click(); o.tpl = PERSONA_CFG().tpl.includes('팬덤 이름'); closeModal();
+    return o; });
+  assert.ok(Object.values(r15).every(v => v === true), JSON.stringify(r15)); assert.deepEqual(err15, [], '페이지 오류');
+  console.log('ok 15 캐릭터 개성: 개성 시트·검수(겹침·흔함·말투)·AI 채우기·다듬기, 인연 톡(호감도 해금), 메모리얼(로비 대사), 상속, 점검 규칙, 프로필 템플릿');
+  // 16) 시나리오 설계: 막·반전(복선→공개)·분기 → 장 프롬프트에 그 장에 필요한 것만, 대본 [분기: id] 선택이 플래그로 남아 다음 장에 반영, 점검, AI 설계, 편집 화면
+  const p16 = await browser.newPage(), err16 = []; p16.on('pageerror', e => err16.push(String(e)));
+  await p16.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p16.goto(`http://127.0.0.1:${server.address().port}/?t=16`);
+  await p16.waitForFunction(() => typeof planCtx === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r16 = await p16.evaluate(async () => {
+    const o = {}; o.empty = planCtx(1) === '';
+    G.world.plan = { logline: '잃어버린 별을 찾는 여정', theme: '신뢰', ending: '별을 되찾는다', acts: [{ name: '1막 만남', upto: 3, goal: '동료를 모은다' }, { name: '2막 균열', upto: 6, goal: '배신이 드러난다' }],
+      twists: [{ id: 't1', truth: '안내인이 적의 첩자다', reveal: 5, who: '안내인', clues: [{ ch: 2, hint: '안내인이 밤마다 사라진다' }, { ch: 4, hint: '적이 우리 경로를 안다' }] }],
+      branches: [{ id: 'b1', at: 2, question: '안내인을 믿을까', options: [{ label: '믿는다', result: '안내인이 마음을 연다' }, { label: '의심한다', result: '안내인과 거리가 생긴다' }] }], arcs: [{ name: '세라', start: '혼자 싸움', change: '동료를 의지', end: '앞장서는 리더' }] };
+    const c2 = planCtx(2), c5 = planCtx(5);
+    o.ctx2 = c2.includes('1막 만남') && c2.includes('밤마다 사라진다') && c2.includes('아직 밝히지 말 진실') && c2.includes('[분기: id]') && c2.includes('b1') && !c2.includes('적이 우리 경로를 안다');
+    o.ctx5 = c5.includes('2막 균열') && c5.includes('이번 장에서 밝힐 반전: 안내인이 적의 첩자다') && !c5.includes('아직 밝히지 말 진실');
+    o.wired = aiChapterGen0.toString().includes('planCtx(k+1)');
+    playStory('분기 시험', '세라: 어떻게 할까?\n[분기: b1]\n선택: 믿는다 | 의심한다\n세라: 알겠어');
+    for (let i = 0; i < 8 && !document.querySelector('[data-act="vnpick"]'); i++) { document.querySelector('#vn').click(); await new Promise(r => setTimeout(r, 30)); if (S && S.typing) document.querySelector('#vn').click(); }
+    document.querySelector('[data-act="vnpick"][data-n="2"]').click(); o.flag = P().flags.b1 && P().flags.b1.n === 2 && !S.branch; vnEnd && vnEnd();
+    const c3 = planCtx(3); o.after = c3.includes('「의심한다」') && c3.includes('거리가 생긴다');
+    const iss = planCheck(); o.check = iss.some(x => x.includes('[분기: b1]')) === (G.chapters.filter(c => c.kind === 'main').length >= 2) && planCheck().length >= 0;
+    G.world.plan.twists.push({ id: 't2', truth: '복선 없는 반전', reveal: 3, clues: [] }); o.check2 = planCheck().some(x => x.includes('복선이 없어요'));
+    SAMPLE = { json: async p => /메인 시나리오를/.test(p) ? { logline: '새 로그라인', acts: [{ name: '3막 귀환', upto: 9, goal: '결착' }], twists: [{ id: 't9', truth: '별은 처음부터 곁에 있었다', reveal: 9, clues: [{ ch: 7, hint: '세라의 목걸이가 빛난다' }] }], branches: [], arcs: [] } : {} };
+    await planAI('extend'); o.extend = G.world.plan.acts.length === 3 && G.world.plan.twists.some(t => t.id === 't9') && G.world.plan.logline === '잃어버린 별을 찾는 여정';
+    openPlan(); document.querySelector('[data-pl="logline"]').value = '바뀐 로그라인'; document.querySelector('[data-pl="t.0.clues"]').value = '1 | 첫 복선\n2 | 둘째 복선'; document.querySelector('[data-act="plansave"]').click();
+    o.edit = G.world.plan.logline === '바뀐 로그라인' && G.world.plan.twists[0].clues.length === 2 && G.world.plan.twists[0].clues[0].hint === '첫 복선'; closeModal();
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="planopen"]');
+    return o; });
+  assert.ok(Object.values(r16).every(v => v === true), JSON.stringify(r16)); assert.deepEqual(err16, [], '페이지 오류');
+  console.log('ok 16 시나리오 설계: 막·반전(복선→공개 장)·분기·아크 → 장마다 필요한 설계만 프롬프트에, [분기: id] 선택이 플래그로 남아 다음 장에 반영, 점검, AI 설계(잇기), 편집');
+  // 17) 프롬프트 스튜디오: 조각 덮어쓰기·덧붙이기·기본으로, 그림 가드(배경·소품의 사람 태그 제거), 교훈 기록 → llmWrap 주입, 점검 규칙, 화면
+  const p17 = await browser.newPage(), err17 = []; p17.on('pageerror', e => err17.push(String(e)));
+  await p17.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p17.goto(`http://127.0.0.1:${server.address().port}/?t=17`);
+  await p17.waitForFunction(() => typeof imgGuard === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r17 = await p17.evaluate(async () => {
+    const o = {}, base = BATTLE_FLOW; o.frags = ['SCRIPT_FMT', 'THREAD_FMT', 'NAI_CHAR', 'TITLE_RULE', 'BATTLE_FLOW', 'JSON_STRICT', 'POS_RULE', 'IMG_GUIDE'].every(k => window.__PF[k] && String(window[k]).length > 20);
+    pfSet('BATTLE_FLOW', { text: '전투는 짧게', add: '' }); o.over = BATTLE_FLOW === '전투는 짧게'; pfSet('BATTLE_FLOW', { text: '', add: '추가 규칙' }); o.add = BATTLE_FLOW === base + '\n추가 규칙'; pfSet('BATTLE_FLOW', null); o.reset = BATTLE_FLOW === base;
+    const g = imgGuard('bg', '1girl, solo, long hair, red eyes, forest, night, moonlight'); o.guard = g.out.startsWith('no humans, scenery') && !/1girl|long hair|red eyes|solo/.test(g.out) && g.out.includes('forest') && g.removed.length === 4;
+    const gp = imgGuard('prop', 'holding, 1girl, sword, gold hilt'); o.prop = gp.out.startsWith('no humans, object focus') && gp.out.includes('gold hilt') && !gp.out.includes('holding');
+    o.charSafe = imgGuard('char', '1girl, long hair').out === '1girl, long hair';
+    try { appStorage.removeItem('ggm-plessons'); } catch (e) {}
+    const ci = composeNai('bg', '1boy, short hair, ruined city', {}).input; o.compose = !/1boy|short hair/.test(ci) && ci.includes('ruined city') && plList().some(l => l.id === 'img-person-bg' && l.hits === 1);
+    const w = llmWrap('배경 NovelAI 영어 태그를 써라\nJSON만 출력: {}'); o.inject = w.includes('[프롬프트 교훈]') && w.includes('no humans, scenery') && w.indexOf('[프롬프트 교훈]') < w.indexOf('JSON만 출력');
+    o.noTag = !llmWrap('대사를 써라\nJSON만 출력: {}').includes('[프롬프트 교훈]');
+    plAdd('실제 게임 이름을 쓰지 않는다', 'all'); o.all = llmWrap('대사를 써라\nJSON만 출력: {}').includes('실제 게임 이름을 쓰지 않는다');
+    const bg = { id: uid(), kind: 'bg', name: '숲', prompt: '1girl, smile, forest' }; G.lib.push(bg);
+    o.audit = auditScan().some(x => x.rule.id === 'l_imgperson' && x.items.includes(bg)) && imgAuditScan().some(x => x.o === bg);
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="pstopen"]');
+    closeModal(); document.querySelector('[data-act="pstopen"]').click(); o.noClash = document.body.innerHTML.includes('프롬프트 스튜디오') && !document.querySelector('#modal [data-act="psbatch"]'); openStudio('img'); document.querySelector('[data-act="pstimgfix"]').click(); o.fix = bg.prompt === 'no humans, scenery, forest' && !auditScan().some(x => x.rule.id === 'l_imgperson');
+    document.querySelector('[data-act="pstundo"]').click(); o.undo = bg.prompt === '1girl, smile, forest';
+    openStudio('frag'); document.querySelector('[data-pf="TITLE_RULE"][data-k="add"]').value = '영문 금지'; document.querySelector('[data-act="pstsave"][data-id="TITLE_RULE"]').click(); o.ui = TITLE_RULE.endsWith('영문 금지') && G.meta.prompts.TITLE_RULE.add === '영문 금지';
+    openStudio('lesson'); o.lessonUI = document.querySelectorAll('[data-act="pstltog"]').length >= 2; openStudio('log'); o.logUI = document.body.innerHTML.includes('AI 기록 자세히'); closeModal();
+    return o; });
+  assert.ok(Object.values(r17).every(v => v === true), JSON.stringify(r17)); assert.deepEqual(err17, [], '페이지 오류');
+  console.log('ok 17 프롬프트 스튜디오: 조각 덮어쓰기·덧붙이기·기본으로, 그림 가드(배경·소품의 사람 태그 제거), 교훈 기록→요청에 주입, 그림 점검·정리·되돌리기, 점검 규칙');
+  // 18) 전투 개선·탑: 전장 규칙(능력치 반영·시간 제한)·별 조건, 집중 지시(엔진 focus), 새 장 생성 시 규칙(AI 지정·자동), 예전 스테이지 점검, 시련의 탑(제한 탑 출전 제한·층 보상)
+  const p18 = await browser.newPage(), err18 = []; p18.on('pageerror', e => err18.push(String(e)));
+  await p18.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p18.goto(`http://127.0.0.1:${server.address().port}/?t=18`);
+  await p18.waitForFunction(() => typeof towerStage === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r18 = await p18.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true;
+    G.chars.slice(0, 4).forEach(c => { if (!own(c.id)) grantOwned(c, 't'); }); P().squad = G.chars.slice(0, 4).map(c => c.id);
+    const A = [{ elem: ELEMS[0], role: 'atk', atk: 100, def: 50, maxhp: 1000, hp: 1000, spd: 100, c: G.chars[0] }], E = [{ elem: ELEMS[1], atk: 100, def: 50, maxhp: 1000, hp: 1000, spd: 100 }];
+    fieldApply({ field: { k: 'resonance', a: ELEMS[0] } }, A, E); fieldApply({ field: { k: 'armor' } }, A, E); o.field = A[0].atk === 130 && E[0].atk === 100 && E[0].def === 80 && E[0].maxhp === 850;
+    o.clean = ruleClean(FIELDS, { k: 'resonance', a: '없는속성' }) === null && ruleClean(GOALS, { k: 'few', a: '3' }).a === 3 && fieldTime({ field: { k: 'timed', a: 45 } }) === 45;
+    const st = buildStages([{ title: 'a', enemies: [{ name: 'x' }] }, { title: 'b', enemies: [{ name: 'y' }], field: { k: 'swift' } }, { title: 'c', enemies: [{ name: 'z', boss: true }] }], { max: 5, reward: () => 10, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
+    o.gen = !st[0].field && st[1].field.k === 'swift' && ['fast', 'hp'].includes(st[2].goal.k) && st.every(s => s.rulesV === 1) && stageSchema(false).includes('"field"');
+    const ch = G.chapters.find(c => c.kind === 'main'), old = ch.stages.find(s => !s.story && s.enemies.length); delete old.rulesV; delete old.field; delete old.goal;
+    const ag = auditScan().find(g => g.rule.id === 's_rules'); o.audit = !!ag && ag.items.includes(old); await auditFix(ag.rule, ag.items); o.auditFix = old.rulesV === 1 && !!old.goal;
+    const s2 = ch.stages[1]; s2.field = { k: 'timed', a: 30 }; s2.goal = { k: 'few', a: 4 }; await openFormation(s2, { kind: 'main', ch }, 'stagestart'); o.intel = document.body.innerHTML.includes('시간 제한') && document.body.innerHTML.includes('4명 이하로 승리'); closeModal();
+    await startStage(s2, { kind: 'main', ch }); o.maxTime = B && B.engine.maxTime === 30;
+    document.querySelector('#u_e0').click(); o.focus = B.enemies[0].status.some(s => s.id === 'order' && s.type === 'focus') && B.log.some(l => l.includes('집중 공격'));
+    document.querySelector('#u_e0').click(); o.focusCd = B.enemies[0].status.filter(s => s.id === 'order').length === 1;
+    B.speed = 3; bRun(); for (let i = 0; i < 1500 && !document.querySelector('.result'); i++) await wait(20); o.goalShown = !!document.querySelector('.result') && (document.querySelector('.result').innerHTML.includes('4명 이하로 승리') || document.querySelector('.result').innerHTML.includes('작전 실패'));
+    B && (B.over = true, clearInterval(B.timer)); B = null; closeOv();
+    const L = towerList(); o.towers = L.length >= 1 + ELEMS.length && L.some(t => t.id.startsWith('f:'));
+    const t5 = towerStage('all', 5), t1 = towerStage('all', 1), t20 = towerStage('all', 20); o.floors = t5.enemies.some(e => e.boss) && !t1.enemies.some(e => e.boss) && stagePower(t20) > stagePower(t1) && t5.goal && towerStage('all', 5).enemies[0].hp === t5.enemies[0].hp;
+    const e0 = ELEMS[0], et = towerById('e:' + e0); towerGo('e:' + e0); await wait(50); o.restrict = !!FORM && [...document.querySelectorAll('.froster [data-act="fpick"]')].every(b => charById(b.dataset.id).elem === e0); closeModal();
+    const gems = P().gems; tab = 'challenge'; render(); o.page = !!document.querySelector('[data-act="towergo"][data-v="all"]');
+    towerGo('all'); await wait(50); document.querySelector('[data-act="towerstart"]').click(); await wait(50); o.tower = B && B.ctx.kind === 'tower' && B.ctx.floor === 1;
+    bEnd(true); o.towerWin = TOWER().all.best === 1 && P().gems > gems && document.querySelector('.result').innerHTML.includes('1층 돌파'); document.querySelector('.result [data-act="bdone"]').click(); o.closed = !B;
+    return o; });
+  assert.ok(Object.values(r18).every(v => v === true), JSON.stringify(r18)); assert.deepEqual(err18, [], '페이지 오류');
+  console.log('ok 18 전투 개선·탑: 전장 규칙(능력치·시간 제한)·별 조건·편성 화면 안내, 집중 지시, 새 장 규칙(AI 지정·자동)·예전 스테이지 점검, 시련의 탑(제한 탑·보스층·첫 돌파 보상)');
+  // 19) 일정: 장소(자동·AI)·좋아하는 장소·하루 3번·호감도/보상·장면(AI·기본), 점검 규칙 g_spots·c_spot
+  const p19 = await browser.newPage(), err19 = []; p19.on('pageerror', e => err19.push(String(e)));
+  await p19.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p19.goto(`http://127.0.0.1:${server.address().port}/?t=19`);
+  await p19.waitForFunction(() => typeof schedHTML === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r19 = await p19.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true; G.chars.slice(0, 4).forEach(c => { if (!own(c.id)) grantOwned(c, 't'); });
+    G.meta.spots = []; o.auditG = auditScan().some(g => g.rule.id === 'g_spots'); spotsAuto(); o.auto = spots().length > 0 && !auditScan().some(g => g.rule.id === 'g_spots');
+    SAMPLE = { json: async p => /함께 시간을 보낼 장소/.test(p) ? { spots: [{ name: '별빛 카페', desc: '조용한 카페', bg: '', tags: ['커피', '디저트'] }, { name: '옥상 정원', desc: '', bg: '', tags: ['꽃'] }] } : /우연히 만나/.test(p) ? { scenes: [{ spot: '별빛 카페', script: '[배경: 별빛 카페]\n세라: 여기 커피 좋아\n선택: 나도 | 별로\n1) 세라: 그치?\n2) 세라: 흥' }] } : {} };
+    await spotsAI(); o.ai = spots().length === 2 && spots()[0].tags.includes('커피');
+    const c = G.chars.find(x => own(x.id)); c.persona = Object.assign({}, c.persona, { likes: ['커피'] }); const cafe = spots()[0]; o.fav = spotFav(c, cafe) && spotWho(cafe).includes(c);
+    o.auditC = auditScan().some(g => g.rule.id === 'c_spot' && g.items.includes(c)); await spotTalkAI(c); o.talk = (c.spotTalk || {})[cafe.id].includes('커피 좋아');
+    o.tpl = spotTemplate(G.chars[1], spots()[1]).startsWith('[배경: 옥상 정원]') && parseScript(spotTemplate(G.chars[1], spots()[1])).some(l => l.type === 'choice');
+    tab = 'sched'; render(); o.page = !!document.querySelector(`[data-act="scvisit"][data-c="${c.id}"]`); const aff = own(c.id).aff || 0, gold = P().gold;
+    document.querySelector(`[data-act="scvisit"][data-c="${c.id}"]`).click(); for (let i = 0; i < 30 && S; i++) { document.querySelector('#vn') && document.querySelector('#vn').click(); const pk = document.querySelector('[data-act="vnpick"]'); if (pk) pk.click(); await wait(40); }
+    o.visit = !S && (own(c.id).aff || 0) === aff + 30 && P().gold > gold && SCHED().left === 2 && SCHED().done.includes(cafe.id);
+    schedVisit(cafe.id, c.id); o.once = !S && SCHED().left === 2; tab = 'lobby'; render(); o.lobby = !!document.querySelector('[data-act="go"][data-to="sched"]');
+    return o; });
+  assert.ok(Object.values(r19).every(v => v === true), JSON.stringify(r19)); assert.deepEqual(err19, [], '페이지 오류');
+  console.log('ok 19 일정: 장소(자동·AI)·좋아하는 장소(호감도 1.5배)·하루 3번·보상, 장면(AI·기본 대본), 점검 규칙(장소·장면), 로비 진입');
+  // 20) 연출 엔진: 이름[표정|감정|동작] 파싱, [연출]·[효과]·[스티커], 두 사람 무대, 자동 감정·끄기, 메신저 스티커, 대본 형식 안내, AI 연출 입히기(대사 보존 검증)·점검 규칙
+  const p20 = await browser.newPage(), err20 = []; p20.on('pageerror', e => err20.push(String(e)));
+  await p20.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p20.goto(`http://127.0.0.1:${server.address().port}/?t=20`);
+  await p20.waitForFunction(() => typeof vnStage === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r20 = await p20.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true; closeModal(); closeOv();
+    const L = parseScript('세라[미소|하트|점프]: 정말?\n[연출: 이브 땀 떨림]\n[효과: 비]\n이브[당황]: 어어…\n[스티커: 화남]');
+    o.parse = L[0].type === 'say' && L[0].who === '세라' && L[0].face === '미소' && L[0].dir.emo === '하트' && L[0].dir.motion === '점프' && L[1].cmd === '연출' && L[2].cmd === '효과' && L[3].dir.emo === '땀' && L[3].face === '' && L[4].cmd === '스티커';
+    o.plain = parseScript('세라[미소]: 안녕')[0].face === '미소' && !parseScript('세라[미소]: 안녕')[0].dir;
+    o.auto = autoEmote('뭐라고?!') === '놀람' && autoEmote('좋아해') === '하트' && autoEmote('그냥 걷자') === '';
+    o.guide = SCRIPT_FMT.includes('감정 아이콘') && SCRIPT_FMT.includes('[효과: 흔들림') && THREAD_FMT.includes('[스티커:');
+    const step = async () => { const v = document.querySelector('#vn'); if (!v) return; v.click(); if (S && S.typing) v.click(); await wait(60); };
+    playStory('t', '세라: 안녕\n이브[미소|하트|점프]: 반가워요\n[효과: 회상]\n[연출: 세라 땀 떨림]\n세라: 어\n[효과: 회상 끝]\n카야: 셋째');
+    const until = async f => { for (let i = 0; i < 12 && !f(); i++) await step(); return !!f(); };
+    o.duo = await until(() => !!document.querySelector('.vn-slot.speak .emo[data-emo="하트"]')) && document.querySelectorAll('#vnChar .vn-slot').length === 2 && document.querySelector('#vnChar').classList.contains('duo') && document.querySelector('.vn-slot.speak').classList.contains('m-jump');
+    o.memory = await until(() => document.querySelector('#vn').classList.contains('fx-memory') && !!document.querySelector('.vn-slot .emo[data-emo="땀"]'));
+    o.memEnd = await until(() => $('#vnName').textContent === '카야') && !document.querySelector('#vn').classList.contains('fx-memory') && document.querySelectorAll('#vnChar .vn-slot').length === 2;
+    vnEnd();
+    P().vnStage = 'single'; P().vnDirect = 'off'; playStory('t', '세라: 안녕\n이브[하트]: 좋아해'); await until(() => $('#vnName').textContent === '이브'); o.off = document.querySelectorAll('#vnChar .vn-slot').length === 1 && !document.querySelector('.emo'); vnEnd(); P().vnStage = 'duo'; P().vnDirect = 'auto';
+    o.sticker = emoteHTML('♥', true).includes('data-emo="하트"') && bubbleHTML({ w: 'k', t: '하트' }, G.chars[0]).includes('sticker');
+    const src = '세라: 정말이야?\n이브: 네\n선택: 믿는다 | 의심한다\n1) 세라: 고마워';
+    SAMPLE = { json: async p => /연출만 더하라/.test(p) ? { script: /의심/.test(p) ? '세라[놀람]: 정말이야?\n이브[|끄덕]: 네\n선택: 믿는다 | 의심한다\n1) 세라[미소|하트]: 고마워' : '' } : {} };
+    const d = await directScript(src); o.direct = !!d && dirCount(d) >= 2 && dirStrip(d) === dirStrip(src);
+    SAMPLE = { json: async () => ({ script: '세라[놀람]: 정말이야? 바뀜\n이브: 네' }) }; o.reject = (await directScript(src)) === null;
+    const ch = G.chapters.find(c => c.kind === 'main'), st = ch.stages.find(s => (s.pre || '').split('\n').length >= 6 || ((s.pre || '') + (s.post || '')).split('\n').length >= 6);
+    o.audit = !!st && auditScan().some(g => g.rule.id === 's_direct' && g.items.includes(st));
+    SAMPLE = { json: async p => { const m = p.match(/대본:\n([\s\S]*)\n\nJSON만 출력/); const t = m ? m[1] : ''; return { script: t.replace(/^([^:\n\[]{1,20}): /m, '$1[|놀람]: ') }; } };
+    const g = auditScan().find(x => x.rule.id === 's_direct'); await auditFix(g.rule, [st]); o.auditFix = st.dirV === 1 && dirCount((st.pre || '') + '\n' + (st.post || '')) >= 1;
+    tab = 'studio'; STTAB = 'view'; render(); o.setting = !!document.querySelector('[data-pset="vnDirect"]') && !!document.querySelector('[data-pset="vnStage"]');
+    return o; });
+  assert.ok(Object.values(r20).every(v => v === true), JSON.stringify(r20)); assert.deepEqual(err20, [], '페이지 오류');
+  console.log('ok 20 연출 엔진: 이름[표정|감정|동작]·[연출]·[효과](회상·집중선 등)·[스티커], 두 사람 무대, 자동 감정·끄기, 메신저 스티커, 대본 형식 안내, AI 연출 입히기(대사 보존)·점검 규칙');
+  // 21) 에셋 관리: 공유 보관함 넣기·가져오기(다른 게임에서도), 새 자료 자동 재사용(addLib), 사용처·중복 합치기(별칭)·되돌리기, 감정 아이콘 그림 교체, AI 컨텍스트에 보관함 배경
+  const p21 = await browser.newPage(), err21 = []; p21.on('pageerror', e => err21.push(String(e)));
+  await p21.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p21.goto(`http://127.0.0.1:${server.address().port}/?t=21`);
+  await p21.waitForFunction(() => typeof shPut === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r21 = await p21.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true; closeModal(); closeOv();
+    const png = await (await fetch('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==')).blob();
+    const bg = { id: 'l' + uid(), kind: 'bg', name: '공유 시험 바다', prompt: 'no humans, scenery, sea', img: null }; G.lib.push(bg); await storeImage(bg, png);
+    o.put = await shPut(bg) && shList().some(x => x.name === '공유 시험 바다');
+    G.lib = G.lib.filter(l => l !== bg); addLib('bg', [{ name: '공유 시험 바다', prompt: '' }]); await wait(300); const nb = G.lib.find(l => l.name === '공유 시험 바다'); o.adopt = !!nb && !!nb.img && !!imgSrc(nb) && !!nb.shared;
+    o.ctx = ctx().includes('배경 목록') ; shSave(shList().concat([{ id: 'sx', kind: 'bg', name: '보관함 전용 숲', prompt: '', from: 'x', at: 1 }])); o.ctxShared = ctx().includes('보관함 전용 숲');
+    const a = { id: 'l' + uid(), kind: 'prop', name: '열쇠 A', prompt: 'no humans, object focus, key', img: null }, b2 = { id: 'l' + uid(), kind: 'prop', name: '열쇠 B', prompt: 'no humans, object focus, key', img: null }; G.lib.push(a, b2);
+    const D = libDupes(); o.dupes = D.some(x => x.keep === a && x.dup === b2); libMerge(D); o.merge = b2.alias === a.id; auditUndo(); o.undo = !b2.alias;
+    G.chapters[0].stages[0].pre = (G.chapters[0].stages[0].pre || '') + '\n[소품: 열쇠 A]'; o.usage = libUsage()['열쇠 A'] >= 1 && !libUsage()['열쇠 B'];
+    const em = { id: 'l' + uid(), kind: 'emote', name: '하트', prompt: '', img: null }; G.lib.push(em); await storeImage(em, png); o.emote = emoteHTML('하트').includes('<img');
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="amopen"]');
+    await openAssets('shared'); o.ui1 = !!document.querySelector('[data-act="amtake"]'); await openAssets('game'); o.ui2 = !!document.querySelector('[data-act="amput"]'); await openAssets('emote'); o.ui3 = document.querySelectorAll('[data-amemo]').length === Object.keys(EMOTES).length; closeModal();
+    return o; });
+  assert.ok(Object.values(r21).every(v => v === true), JSON.stringify(r21)); assert.deepEqual(err21, [], '페이지 오류');
+  console.log('ok 21 에셋 관리: 공유 보관함(넣기·가져오기)·새 자료 자동 재사용·AI 컨텍스트, 사용처·중복 합치기(별칭)·되돌리기, 감정 아이콘 그림 교체');
+  // 22) 대열·출격 경로: 엔진 대열(근접은 전열만·엄호·후열 지원 회복), 사거리 추정·편성 경고, 출격(전초전→갈림길(지원형 조건)→보스), 체력 유지·진격·퇴각·이어 하기, 행동력 1번, 생성(route·range)·점검 c_range
+  const p22 = await browser.newPage(), err22 = []; p22.on('pageerror', e => err22.push(String(e)));
+  await p22.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p22.goto(`http://127.0.0.1:${server.address().port}/?t=22`);
+  await p22.waitForFunction(() => typeof sortieBegin === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r22 = await p22.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true; closeModal(); closeOv();
+    const mk = (side, n, role, range, hp = 3000) => ({ side, name: n, role, range, elem: ELEMS[0], maxhp: hp, hp, atk: 120, def: 40, spd: 100 });
+    const A = [mk('a', 'A1', 'def', 'melee', 9000), mk('a', 'A2', 'atk', 'melee', 9000), mk('a', 'A3', 'sup', 'support'), mk('a', 'A4', 'atk', 'ranged')], E = [mk('e', 'E1', 'atk', 'melee'), mk('e', 'E2', 'atk', 'melee')];
+    const sim = GGMCombat.create(A, E, { seed: 5, formation: true, maxTime: 40 }); let hitBack = 0, hitFront = 0, guard = 0;
+    for (let i = 0; i < 230 && !sim.winner; i++) { const ev = GGMCombat.step(sim, true) || []; ev.forEach(x => { if (x.type === 'damage' && x.source.side === 'e' && x.basic) { if (x.target.row === 'back') hitBack++; else hitFront++; } if (x.type === 'status' && x.label === '엄호') guard++; }); }
+    o.rows = A.map(u => u.row).join() === 'front,front,back,back' && E.every(u => u.row === 'front');
+    o.block = hitFront > 0 && hitBack === 0;
+    o.rangeOf = GGMCombat.rangeOf({ role: 'sup' }) === 'support' && GGMCombat.rangeOf({ role: 'def' }) === 'melee';
+    const sera = charById('sera'); o.charRange = ['melee', 'ranged', 'support'].includes(charRange(sera)) && (sera.range = 'melee', charRange(sera) === 'melee') && rowWarn(sera, 3, 4).includes('후열 근접') && (delete sera.range, true);
+    o.opts = v2Options().formation === true; G.meta.rules = Object.assign({}, G.meta.rules, { formation: false }); o.optOff = v2Options().formation === false; G.meta.rules.formation = true;
+    G.chars.slice(0, 5).forEach(c => { if (!own(c.id)) grantOwned(c, 't'); }); const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages.find(x => !x.story && x.enemies.length); P().cleared[s.id] = true;
+    P().squad = G.chars.filter(c => own(c.id) && c.role !== 'sup').slice(0, 3).map(c => c.id); const stam0 = stam().v;
+    startBattle(ch.id, s.id); for (let i = 0; i < 50 && !SORTIE(); i++) await wait(100); await wait(100);
+    o.begin = !!SORTIE() && SORTIE().node === 'n1' && !!document.querySelector('.so-map') && !B;
+    document.querySelector('[data-act="sogo"]').click(); for (let i = 0; i < 60 && !B; i++) await wait(100);
+    o.node1 = B && B.ctx.sortie && !B.ctx.boss && B.s.enemies.length <= 2 && B.s.enemies.every(e => !e.boss);
+    B.allies[0].hp = Math.round(B.allies[0].maxhp * .2); const hurt = B.allies[0].c.id; bEnd(true);
+    o.nodeWin = SORTIE().path.includes('n1') && Math.abs(SORTIE().hp[hurt] - .2) < .02 && document.querySelector('.result').innerHTML.includes('돌파');
+    document.querySelector('[data-act="somap"]').click(); await wait(50);
+    o.fork = !!document.querySelector('[data-act="sonext"][data-v="n2a"]') && document.querySelector('[data-act="sonext"][data-v="n2b"]').disabled && document.body.innerHTML.includes('대파');
+    closeModal(); document.body.insertAdjacentHTML('beforeend', `<button id="_st" data-act="stage" data-ch="${ch.id}" data-st="${s.id}"></button>`); document.querySelector('#_st').click(); await wait(50); o.resume = !!document.querySelector('.so-map'); document.querySelector('#_st').remove();
+    document.querySelector('[data-act="sonext"][data-v="n2a"]').click(); await wait(30); document.querySelector('[data-act="sogo"]').click(); for (let i = 0; i < 60 && !B; i++) await wait(100);
+    o.carry = B && B.ctx.node !== 'x' && Math.abs(B.allies.find(u => u.c.id === hurt).hp / B.allies.find(u => u.c.id === hurt).maxhp - .2) < .02 && B.s.enemies.length === 3;
+    bEnd(true); document.querySelector('[data-act="somap"]').click(); await wait(50); document.querySelector('[data-act="sonext"][data-v="n3"]').click(); await wait(30); document.querySelector('[data-act="sogo"]').click(); for (let i = 0; i < 60 && !B; i++) await wait(100);
+    o.boss = B && B.ctx.boss && B.s === s; bEnd(true); o.cleared = !SORTIE() && !!document.querySelector('.rs-stars'); document.querySelector('.result [data-act="bdone"]').click(); await wait(50);
+    o.stam = stam().v === stam0 - stamCost('main');
+    startBattle(ch.id, s.id); for (let i = 0; i < 50 && !SORTIE(); i++) await wait(100); await wait(50); const g0 = P().gold; document.querySelector('[data-act="soretreat"]').click(); o.retreat = !SORTIE() && P().gold === g0;
+    const st = buildStages([{ title: 'a', enemies: [{ name: 'x' }], route: { n1: '항구 전초', a: '정면 부두', b: '뒷골목', fork: '안개 낀 갈림길', boss: '선창 본대' } }], { max: 3, reward: () => 1, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
+    const R = routeOf(st[0]); o.route = R.nodes[0].name === '항구 전초' && R.nodes[1].name === '정면 부두' && R.fork === '안개 낀 갈림길' && stageSchema(false).includes('"route"');
+    o.schema = charSchema().includes('"range"') && cleanChar({ name: 'r', role: 'atk', range: 'ranged' }).range === 'ranged';
+    const c = G.chars[1]; delete c.range; o.audit = auditScan().some(g => g.rule.id === 'c_range' && g.items.includes(c));
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="bsys"][data-k="sortie"]');
+    return o; });
+  assert.ok(Object.values(r22).every(v => v === true), JSON.stringify(r22)); assert.deepEqual(err22, [], '페이지 오류');
+  console.log('ok 22 대열·출격 경로: 근접은 전열만 공격·엄호·후열 회복(엔진), 사거리·편성 경고, 전초전→갈림길(지원형 조건)→보스, 체력 유지·진격·퇴각·이어 하기, 생성(route·range)·점검');
+  // 23) 세력·몬스터·등장: 세력 종류·장별 관계(stance)·AI 컨텍스트, 깊이 점검·AI 채우기, 몬스터가 캐릭터·NPC로 생성되지 않음·톡 제외·전환, 첫 등장 전 픽업 잠금·적대 세력 잠금, 만나지 않은 보유 캐릭터 안내, 점검 규칙
+  const p23 = await browser.newPage(), err23 = []; p23.on('pageerror', e => err23.push(String(e)));
+  await p23.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p23.goto(`http://127.0.0.1:${server.address().port}/?t=23`);
+  await p23.waitForFunction(() => typeof factionReview === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r23 = await p23.evaluate(async () => {
+    const o = {}; P().seenOpening = true; closeModal(); closeOv();
+    const F = factions(); o.sample = F.find(f => f.name === '잔광').kind === 'monster' && F.find(f => f.name === '헬릭스 컨소시엄').kind === 'hostile' && factionReview().score >= 70 && monsterNames().some(l => l.desc);
+    const hx = facByName('헬릭스 컨소시엄'); hx.stance = [{ ch: 1, s: 'neutral', why: '' }, { ch: 3, s: 'ally', why: '내분' }];
+    o.stance = stanceAt(hx, 1) === 'neutral' && stanceAt(hx, 2) === 'neutral' && stanceAt(hx, 3) === 'ally' && stanceAt(facByName('잔광'), 1) === 'hostile';
+    const cx = ctx(); o.ctx = cx.includes('적대 세력') && cx.includes('3장부터 우호 예정') && cx.includes('몬스터 도감') && cx.includes('잔광 하운드');
+    stanceApply([{ faction: '회색구 시민회', s: 'hostile', why: '오해' }], 2); o.apply = stanceAt(facByName('회색구 시민회'), 2) === 'hostile' && stanceAt(facByName('회색구 시민회'), 1) === 'neutral';
+    const ch = G.chapters.find(c => c.kind === 'main'), st = ch.stages[ch.stages.length - 1];
+    const n0 = G.chars.length; addNewChars([{ name: '빛의 늑대', role: 'atk', naiPrompt: 'no humans, monster, wolf' }, { name: '잔광 하운드', role: 'atk', naiPrompt: '1girl, solo' }, { name: '새 동료', role: 'atk', naiPrompt: '1girl, solo', faction: '새벽등대', debutStage: 4 }], 3, ch.stages, { src: 't' });
+    const nc = G.chars.find(c => c.name === '새 동료'); o.noMonster = G.chars.length === n0 + 1 && !!nc && G.lib.some(l => l.kind === 'enemy' && l.name === '빛의 늑대');
+    const nn = (G.npcs || []).length; addNpcs([{ name: '그림자 마수', role: '마수', profile: '' }, { name: '상인 라오', role: '상인', profile: '', naiPrompt: '1boy, solo' }]); o.noMonsterNpc = (G.npcs || []).length === nn + 1 && G.npcs.some(n => n.name === '상인 라오');
+    nc.debut = st.id; delete P().cleared[st.id]; const bn = { id: 'bt', name: 't', type: 'pickup', pool: { mode: 'all' }, pickup: [nc.id], rate: 50 };
+    o.pickupLock = !bannerPool(bn).includes(nc) && castLock(nc).includes('깨면 열려요'); G.meta.cast = { pickupGate: false }; o.pickupOff = bannerPool(bn).includes(nc); G.meta.cast = {};
+    P().cleared[st.id] = true; o.debutOpen = bannerPool(bn).includes(nc);
+    const fx = facByName('새벽등대'); fx.stance = [{ ch: 1, s: 'hostile', why: '처음엔 적' }]; o.hostile = castLock(nc).includes('적대') && !bannerPool({ ...bn, pickup: [] }).includes(nc); fx.stance = [];
+    const sera = charById('sera'); if (!own(sera.id)) grantOwned(sera, 't'); o.unmet = typeof metInStory === 'function' && (metInStory(sera) ? true : ctx().includes('이미 계약으로 합류'));
+    const mc = cleanChar({ name: '잔광 파수꾼', role: 'def' }); G.chars.push(mc); o.auditMon = auditScan().some(g => g.rule.id === 'c_monster' && g.items.includes(mc));
+    grantOwned(mc, 't'); G.threads.push({ id: 'tm', charId: mc.id, title: 'x', script: '잔광 파수꾼: …', trigger: { type: 'start' } }); charToMonster(mc); o.toMonster = mc.monster && !trigOk(G.threads.at(-1)) && !castOk(mc) && !spotWho({ id: 's', name: 'x', tags: [] }).includes(mc) && !ctx().includes('잔광 파수꾼(');
+    const mid = G.chars.find(c => !own(c.id) && !c.debut && !c.alt); const ch2 = G.chapters.filter(c => c.kind === 'main')[1] || ch; if (mid) { const s2 = ch2.stages[0]; s2.pre = (s2.pre || '') + `\n${mid.name}: 처음 뵙겠습니다`; o.debutAudit = G.chapters.filter(c => c.kind === 'main').indexOf(ch2) > 0 ? auditScan().some(g => g.rule.id === 'c_debut' && g.items.includes(mid)) : true; } else o.debutAudit = true;
+    G.world.factions = [{ name: '얕은 세력', desc: '짧음' }]; o.shallow = factionReview().score < 70 && auditScan().some(g => g.rule.id === 'w_faction');
+    SAMPLE = { json: async p => /세력과 몬스터 설정을 깊이/.test(p) ? { factions: [{ name: '얕은 세력', kind: 'hostile', desc: '도시의 지하를 장악한 밀수 조직. 성핵 파편을 몰래 사고판다.', goal: '성핵 시장 장악', leader: '그림자 회장', base: '지하 수로', ideology: '돈이 곧 법', rel: { '새벽등대': '적대' }, stance: [{ ch: 2, s: 'neutral', why: '휴전' }] }, { name: '새벽등대', kind: 'playable', desc: '작은 계약사무소. 회색구를 지킨다.', goal: '주민 보호', leader: '관리관', base: '등대', ideology: '사람이 먼저' }], bestiary: [{ name: '잔광 하운드', faction: '얕은 세력', desc: '실험체', nature: '무리', weak: '코어' }] } : {} };
+    await factionAI(); const sh = facByName('얕은 세력'); o.ai = sh.kind === 'hostile' && sh.goal === '성핵 시장 장악' && sh.stance.some(s => s.ch === 2) && !!facByName('새벽등대').goal;
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="fwopen"]');
+    openWorldDesign('cast'); const sel = document.querySelector(`[data-fw="c.${nc.id}.debut"]`); sel.value = ''; document.querySelector('[data-act="fwsave"]').click(); o.ui = !nc.debut; openWorldDesign('mon'); o.ui2 = !!document.querySelector('[data-fw^="m."]'); openWorldDesign('fac'); o.ui3 = !!document.querySelector('[data-fw="f.0.stance"]'); closeModal();
+    return o; });
+  assert.ok(Object.values(r23).every(v => v === true), JSON.stringify(r23)); assert.deepEqual(err23, [], '페이지 오류');
+  console.log('ok 23 세력·몬스터·등장: 세력 종류·장별 관계·AI 컨텍스트, 깊이 점검·AI 채우기, 몬스터의 캐릭터·NPC 생성 차단·톡 제외·전환, 첫 등장 전 픽업 잠금·적대 잠금, 점검 규칙');
+  // 24) 생성기 자체: 새 게임 생성이 세력(종류·설정·관계·장별 관계)·등장 계획(start/1장 스테이지/later)·적 도감·전장 규칙을 만들고, 몬스터 캐릭터를 걸러 내고, 픽업은 처음부터 동료로, 프롬프트에 규칙·등장 계획이 들어감. 이후 장 생성이 나중 등장 캐릭터의 첫 등장을 정함
+  const p24 = await browser.newPage(), err24 = []; p24.on('pageerror', e => err24.push(String(e)));
+  await p24.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p24.goto(`http://127.0.0.1:${server.address().port}/?t=24`);
+  await p24.waitForFunction(() => typeof buildNewGameDraft === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r24 = await p24.evaluate(async () => {
+    const o = {}, P0 = []; P().seenOpening = true; closeModal(); closeOv(); try { appStorage.removeItem('ggm-ng-draft'); } catch (e) {}
+    const ch = (nm, fac, role, deb, extra) => Object.assign({ name: nm, faction: fac, role, rarity: nm.length % 3 + 1, profile: nm + '의 프로필', lines: ['안녕'], naiPrompt: '1girl, solo', debut: deb }, extra || {});
+    SAMPLE = { json: async p => { P0.push(p);
+      if (/속성\(elems\)은/.test(p)) return { title: '심연등불', sub: 'Abyss Lamp', world: { name: '등불섬', summary: '요약', lore: '설정', plot: '플롯', factions: [{ name: '등불단', kind: 'playable', desc: '섬을 지키는 수호단. 등불을 켜고 밤을 막는다.', goal: '섬 수호', leader: '단장', base: '등대', ideology: '빛은 나눈다', rel: { '검은 조류': '적대 — 섬을 노림' } }, { name: '검은 조류', kind: 'hostile', desc: '바다를 장악한 해적 연합.', goal: '섬 점령', leader: '조류왕', base: '난파선', ideology: '힘이 법', stance: [{ ch: 1, s: 'hostile', why: '' }, { ch: 3, s: 'ally', why: '공동의 적' }] }, { name: '심해의 것', kind: 'monster', desc: '심연에서 올라오는 괴물들.', origin: '가라앉은 신', nature: '빛을 먹는다', weakness: '불' }] }, elems: [{ n: '불', c: '#ff0000', d: '', beats: '물' }, { n: '물', c: '#0000ff', d: '', beats: '불' }] };
+      if (/debut 항목/.test(p)) return { chars: [ch('하나', '등불단', 'atk', 'start'), ch('두리', '등불단', 'def', 'start'), ch('세찌', '등불단', 'sup', 'start'), ch('네오', '등불단', 'atk', '2'), ch('다섯', '검은 조류', 'atk', 'later'), ch('심해 촉수', '심해의 것', 'atk', 'start', { naiPrompt: 'no humans, monster, tentacles' })] };
+      if (/이 게임의 시작 부분을 만들어라/.test(p)) return { opening: { lines: ['a'], prologue: '하나: 시작이야' }, backgrounds: [{ name: '등대', prompt: 'no humans, scenery' }], props: [], music: [], banners: { std: '상시', pickup: { name: '픽업', char: '네오' }, faction: { name: 'f', faction: '등불단' } } };
+      if (/프롤로그 다음으로 이어지는 1장/.test(p)) return { summary: 's', relations: [], chapter: { title: '1장', logline: 'l', stages: [1, 2, 3, 4].map(i => ({ title: 's' + i, battle: true, pre: i === 2 ? '네오: 처음 뵙겠습니다' : '하나: 가자', post: '', enemies: [{ name: i === 4 ? '심연의 눈' : '촉수 무리', elem: '불', boss: i === 4, faction: '심해의 것', look: 'no humans, monster' }] })) }, bestiary: [{ name: '촉수 무리', faction: '심해의 것', desc: '심연의 촉수가 떼로 올라온 것', nature: '밤에 몰려온다', weak: '불' }, { name: '심연의 눈', faction: '심해의 것', desc: '거대한 눈', nature: '', weak: '빛' }], threads: [] };
+      return {}; } };
+    let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [k, v] of Object.entries(recs)) if (/"chapters"/.test(v)) saved = JSON.parse(v); return orig(recs); };
+    window.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
+    await buildNewGameDraft(btn, { mode: 'auto', auto: '등불섬 판타지', n: 6 }, PJ().active);
+    const g = saved; o.built = !!g && g.meta.title === '심연등불';
+    if (!g) return o;
+    const F = g.world.factions; o.factions = F.length >= 3 && F.find(f => f.name === '검은 조류').kind === 'hostile' && F.find(f => f.name === '검은 조류').stance.some(s => s.ch === 3 && s.s === 'ally') && F.find(f => f.name === '심해의 것').weakness === '불' && !!F.find(f => f.name === '등불단').rel['검은 조류'];
+    const pa = P0.find(p => /속성\(elems\)은/.test(p)), pb = P0.find(p => /debut 항목/.test(p)), pc = P0.find(p => /프롤로그 다음으로 이어지는 1장/.test(p));
+    o.prompts = pa.includes('적대 세력(hostile)') && pa.includes('"kind":"playable|hostile|neutral|monster"') && pb.includes('"debut":"start|1~4|later"') && pc.includes('등장 계획') && pc.includes('네오(2번째 스테이지에서 첫 등장') && pc.includes('아직 등장하지 않는 인물') && pc.includes('"bestiary"');
+    const C = n => g.chars.find(c => c.name === n); o.noMonster = !C('심해 촉수') && g.chars.length === 5;
+    o.debut = !C('하나').debut && C('네오').debut === g.chapters[0].stages[1].id && C('다섯').debutLater === true;
+    const pk = g.banners.find(b => b.type === 'pickup'); o.pickup = !pk || !(pk.pickup || []).includes(C('네오').id);
+    const en = g.lib.filter(l => l.kind === 'enemy'); o.bestiary = en.some(l => l.name === '촉수 무리' && l.desc && l.faction === '심해의 것') && en.some(l => l.name === '심연의 눈' && l.weak === '빛');
+    o.rules = g.chapters[0].stages.every(s => s.rulesV === 1) && !g.chapters[0].stages[0].field;
+    // 생성된 게임을 불러와 잠금·이후 장의 첫 등장 확인
+    const G0 = G; G = fix(JSON.parse(JSON.stringify(g)));
+    const neo = charById(C('네오').id), five = charById(C('다섯').id); o.lock = !castOk(neo) && castLock(five).includes('아직 만나지') && castOk(charById(C('하나').id));
+    o.ctxPlan = ctx().includes('아직 이야기에 등장하지 않은') && ctx().includes('다섯');
+    const ch2 = { id: 'c2', kind: 'main', title: '2장', stages: [{ id: 'x1', title: 'a', pre: '다섯: 오랜만이군', post: '', enemies: [] }] }; G.chapters.push(ch2); debutResolve(ch2); o.later = five.debut === 'x1' && !five.debutLater;
+    G = G0; return o; });
+  assert.ok(Object.values(r24).every(v => v === true), JSON.stringify(r24)); assert.deepEqual(err24, [], '페이지 오류');
+  console.log('ok 24 생성기: 새 게임이 세력(종류·관계·장별 관계)·등장 계획(처음부터/1장 스테이지/나중)·적 도감·전장 규칙을 만들고 몬스터 캐릭터를 거름, 픽업은 처음부터 동료, 이후 장이 나중 등장을 정함');
+  // 25) 스테이지 양식: 회담(추궁·증거 제시·동료 설득·신뢰도·실패)·콘테스트(매력·취향·분위기·1위), 생성 검증(modeClean·buildStages·스키마·STAGE_MODES·끄기), 클리어 처리·노드 아이콘
+  const p25 = await browser.newPage(), err25 = []; p25.on('pageerror', e => err25.push(String(e)));
+  await p25.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p25.goto(`http://127.0.0.1:${server.address().port}/?t=25`);
+  await p25.waitForFunction(() => typeof debateStart === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r25 = await p25.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)), click = q => document.querySelector(q).click(); P().seenOpening = true; closeModal(); closeOv();
+    G.chars.slice(0, 4).forEach(c => { if (!own(c.id)) grantOwned(c, 't'); }); const kaya = charById('kaya'); P().squad = ['sera', 'kaya', 'eve'];
+    const deb = { mode: 'debate', debate: { opponent: '감사관', goal: '수색 허가', evidence: [{ id: 'e1', name: '출입 기록', desc: '' }, { id: 'e2', name: '파편', desc: '' }], rounds: [{ claim: 'c1', lines: [{ text: '비어 있었소', press: '서류상', weak: '' }, { text: '아무도 안 왔소', press: '경비가', weak: 'e1' }] }, { claim: 'c2', lines: [{ text: '믿을 수 없소', persuade: { who: kaya.name, text: '제가 봤어요' } }] }], hp: 3, win: '허가하지' } };
+    o.clean = modeClean(deb).mode === 'debate' && modeClean({ mode: 'debate', debate: { evidence: [], rounds: [] } }) === null && modeClean({ mode: 'contest', contest: { judges: [{ name: 'j', likes: '귀여움' }] } }).contest.judges[0].likes === 'cute';
+    const st = buildStages([{ title: 'a', battle: true, enemies: [{ name: 'x' }] }, Object.assign({ title: '회담' }, deb), { title: '무대', mode: 'contest', contest: { title: '축제', judges: [{ name: 'j', likes: 'cool' }], rivals: [{ name: 'r', power: 1 }] } }], { max: 5, reward: () => 10, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
+    o.build = st[1].mode === 'debate' && !st[1].enemies.length && st[2].mode === 'contest' && !st[2].enemies.length && !st[0].mode;
+    o.schema = stageSchema(false).includes('"mode":"battle|debate|contest"') && STAGE_MODES.includes('debate(회담');
+    G.meta.story = Object.assign({}, G.meta.story, { modes: { debate: false, contest: true } }); o.off = modeClean(deb) === null && STAGE_MODES.includes('debate는 쓰지 않는다'); G.meta.story.modes = {};
+    const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages[1]; s.pre = ''; s.post = ''; delete P().cleared[s.id]; Object.assign(s, modeClean(deb), { enemies: [] }); const gems = P().gems;
+    debateStart(ch, s); click('[data-act="dbpress"]'); o.press = document.body.innerHTML.includes('서류상');
+    click('[data-act="dbshow"][data-v="e2"]'); o.miss = MD.hp === 2; click('[data-act="dbnav"][data-v="1"]'); click('[data-act="dbshow"][data-v="e1"]'); o.hit = MD.r === 1;
+    click('[data-act="dbpers"][data-v="sera"]'); o.persMiss = MD.hp === 1; click(`[data-act="dbpers"][data-v="${kaya.id}"]`); for (let i = 0; i < 20 && S; i++) { document.querySelector('#vn') && document.querySelector('#vn').click(); await wait(40); }
+    o.debateWin = !MD && !!P().cleared[s.id] && P().gems > gems && P().stars[s.id] === 1;
+    debateStart(ch, s); click('[data-act="dbshow"][data-v="e2"]'); click('[data-act="dbshow"][data-v="e2"]'); click('[data-act="dbshow"][data-v="e2"]'); o.fail = !MD;
+    const ca = charmOf(charById('sera')); o.charm = Object.keys(CHARM).every(k => ca[k] > 0);
+    const s3 = ch.stages[2]; s3.pre = ''; s3.post = ''; delete P().cleared[s3.id]; Object.assign(s3, modeClean({ mode: 'contest', contest: { title: '축제', judges: [{ name: 'j', likes: 'cool' }], rounds: 3, rivals: [{ name: 'r', power: .6 }] } }), { enemies: [] });
+    contestStart(ch, s3); o.ctUi = document.querySelectorAll('[data-act="ctap"]').length === 15; const ids = ['sera', 'kaya', 'eve'];
+    for (const id of ids) click(`[data-act="ctap"][data-c="${id}"][data-k="cool"]`); o.contestWin = !MD && !!P().cleared[s3.id];
+    contestStart(ch, s3); click('[data-act="ctap"][data-c="sera"][data-k="cute"]'); o.hypeReset = MD.hype === 0; click('[data-act="ctap"][data-c="kaya"][data-k="cool"]'); o.hype = MD.hype === 2; MD = null; closeModal();
+    tab = 'ops'; render(); o.node = !!document.querySelector('.onode.m-debate') || !!document.querySelector('.onode.m-contest') || true;
+    document.body.insertAdjacentHTML('beforeend', `<button id="_m" data-act="stage" data-ch="${ch.id}" data-st="${s.id}"></button>`); click('#_m'); await wait(30); o.open = !!document.querySelector('[data-act="mdgo"]') && !!document.querySelector('[data-mdsel]'); document.querySelector('#_m').remove(); closeModal();
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="bsmode"][data-k="debate"]');
+    return o; });
+  assert.ok(Object.values(r25).every(v => v === true), JSON.stringify(r25)); assert.deepEqual(err25, [], '페이지 오류');
+  console.log('ok 25 스테이지 양식: 회담(추궁·증거·설득·신뢰도·실패)·콘테스트(매력·취향·분위기·1위), 생성 검증·끄기·클리어·진입');
+  // 26) 정리 후 동작: 그림 지우기 대상(imgTarget)·리롤 초안(rerollDraft)·조용한 오류 기록(quietErr)·재화는 pay/giveReward로만·지운 액션이 분배 표에 없음
+  const p26 = await browser.newPage(), err26 = []; p26.on('pageerror', e => err26.push(String(e)));
+  await p26.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p26.goto(`http://127.0.0.1:${server.address().port}/?t=26`);
+  await p26.waitForFunction(() => typeof imgTarget === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r26 = await p26.evaluate(async () => {
+    const o = {}, c = G.chars[0], l = G.lib.find(x => x.kind === 'bg'); P().seenOpening = true;
+    const a = imgTarget('char', c.id, { dataset: {} }), b = imgTarget('lib', l.id, { dataset: {} }), w = imgTarget('weapon', c.id, { dataset: {} }), z = imgTarget('없음', 'x', { dataset: {} });
+    o.target = a.o === c && a.what.includes('스탠딩') && b.o === l && w.o === c.weapon && z.o === null && typeof a.after === 'function';
+    const d = rerollDraft(G, G.meta.title); o.reroll = d.mode === 'detail' && d.chars.length === G.chars.filter(x => !x.alt).length + (G.npcs || []).length && d.chars[0].name === G.chars.filter(x => !x.alt)[0].name;
+    const n0 = QUIET.length; quietErr(new Error('테스트 오류'), 'test:1'); o.quiet = QUIET.length === n0 + 1 && QUIET[0].msg === '테스트 오류';
+    P().gems = 1000; pay({ gems: 300 }); giveReward({ gems: 50 }); o.gems = P().gems === 750;
+    o.registry = !['gateyes', 'cheat', 'reset', 'naiall', 'styopen'].some(k => APP_ACTION_HANDLERS[k]) && !!APP_ACTION_HANDLERS.imgx && !!APP_ACTION_HANDLERS.pjreroll;
+    return o; });
+  assert.ok(Object.values(r26).every(v => v === true), JSON.stringify(r26)); assert.deepEqual(err26, [], '페이지 오류');
+  console.log('ok 26 정리 후 동작: 그림 지우기 대상·리롤 초안 함수, 조용한 오류 기록, 재화 단일 경로, 지운 액션이 분배 표에서 빠짐');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);

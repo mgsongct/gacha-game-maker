@@ -4,7 +4,7 @@
 const threadById=id=>G.threads.find(t=>t.id===id);
 const threadChar=t=>t&&charById(t.charId);
 function trigOk(t){
-  const c=threadChar(t); if(!c) return false;
+  const c=threadChar(t); if(!c||c.monster) return false;
   if(t.needOwn!==false&&!own(c.id)) return false;
   const g=t.trigger||{type:'start'};
   if(g.type==='start') return true;
@@ -33,7 +33,7 @@ function closePhone(){ PH=null; $('#phone').hidden=true; $('#phone').innerHTML='
 function phoneList(){
   PH=null; const rooms=phRooms();
   $('#phone').innerHTML=`<div class="phone"><div class="ph-top"><button data-act="phclose" aria-label="닫기">✕</button><b>${esc(T('talk'))}</b><button data-act="phnew" aria-label="대화 추가">＋</button></div><div class="ph-list">${
-    rooms.length?rooms.map(x=>{ const l=x.last; return `<button class="ph-row" data-act="openfc" data-id="${esc(x.c.id)}"><div class="av">${art(x.c)}</div><div class="t"><b>${esc(x.c.name)}</b><span>${esc(l?(l.w==='p'?'사진을 보냈어요':(l.w==='me'?'나: ':'')+(l.t||(l.img?'사진':''))):(x.title||'대화를 시작해 보세요'))}</span></div>${x.unread?'<i class="dot"></i>':''}</button>`; }).join('')
+    rooms.length?rooms.map(x=>{ const l=x.last; return `<button class="ph-row" data-act="openfc" data-id="${esc(x.c.id)}"><div class="av">${art(x.c)}</div><div class="t"><b>${esc(x.c.name)}</b><span>${esc(l?(l.w==='k'?'스티커를 보냈어요':l.w==='p'?'사진을 보냈어요':(l.w==='me'?'나: ':'')+(l.t||(l.img?'사진':''))):(x.title||'대화를 시작해 보세요'))}</span></div>${x.unread?'<i class="dot"></i>':''}</button>`; }).join('')
     :`<p class="muted" style="text-align:center;padding:40px 16px">아직 대화가 없어요. ${esc(T('crew'))}과(와) 친해지거나 ${esc(T('ops'))}을(를) 진행하면 연락이 와요.<br><br><button class="btn sm" data-act="phnew">＋ 대화 추가</button></p>`}</div></div>`;
 }
 function phRooms(){ const m={};
@@ -70,7 +70,7 @@ async function hydrateChatImgs(){ let ch=false;
 function bubbleHTML(l,c){
   if(l.w==='s') return `<div class="sys">${esc(l.t)}</div>`;
   if(l.w==='me') return `<div class="msg me">${l.img?`<div class="bub photo">${chatImgHTML(l.img)}</div>`:''}${l.t||!l.img?`<div class="bub">${esc(l.t)}</div>`:''}</div>`;
-  const inner=l.w==='p'?`<div class="bub photo">${l.img?chatImgHTML(l.img):libArt(l.t)}</div>`:`<div class="bub">${esc(l.t)}</div>`;
+  const inner=l.w==='k'?`<div class="bub sticker">${emoteHTML(l.t,true)}</div>`:l.w==='p'?`<div class="bub photo">${l.img?chatImgHTML(l.img):libArt(l.t)}</div>`:`<div class="bub">${esc(l.t)}</div>`;
   return `<div class="msg"><div class="av sm">${art(c)}</div>${inner}</div>`;
 }
 function chatImgView(k){ const u=chatImgCache[k], ph=$('.phone'); if(!u||!ph) return; const old=$('.ph-menu'); if(old) old.remove();

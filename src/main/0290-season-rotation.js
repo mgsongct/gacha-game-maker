@@ -14,10 +14,10 @@ function seasonNext(){ const L=P().live, en=SEASONS.filter(x=>L.seasons[x[0]]!==
 async function aiNewPickupChar(con,rr,btn,col,alt){
   if(alt) return aiAltChar(alt,con,rr,btn);
   const COL=col&&col.src?`\n콜라보 ${T('crew')}: 다른 작품 「${col.src}」${col.who?'의 「'+col.who+'」':'의 인상적인 성인 캐릭터 1명'}이(가) 이 세계에 찾아온 콜라보 게스트로 만든다. 이름·외모·성격·말투·능력은 원작에 충실하게 쓰고, 원작에서 미성년자이거나 학생인 캐릭터라면 만들지 말고 대신 그 작품의 성인 캐릭터를 고른다. 학교 배경은 쓰지 않는다. profile에 이 세계에 오게 된 계기(차원 이동·초대·사고 등)를 쓰고, faction은 "콜라보"로 한다. naiPrompt에는 원작 외모 특징을 영어 태그로 자세히 쓴다(성인 체형, mature 등 나이 태그는 넣지 않는다).`:'';
-  const r=await aiJSON(`${RULES}\n${ctx()}${COL}\n\n새 픽업 배너의 주인공이 될 신규 ${T('crew')} 1명을 만들어라. 요청: "${con||(COL?'원작 설정 그대로':'지금 세계관과 이야기 흐름에 어울리는 새 얼굴. 기존 인물과 다른 매력')}"${rr&&rr!=='ai'?` 희귀도는 ${rr}.`:''} 기존 ${T('crew')}과 이름·외모·역할이 겹치지 않게 하고, 메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다. 첫 등장(intro) 대사는 픽업 연출에 어울리게 인상적으로.\nJSON 객체만 출력: ${charSchema()}\n희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. ${NAI_CHAR}`,btn);
+  const r=await aiJSON(`${RULES}\n${ctx()}${COL}\n\n새 픽업 배너의 주인공이 될 신규 ${T('crew')} 1명을 만들어라. 요청: "${con||(COL?'원작 설정 그대로':'지금 세계관과 이야기 흐름에 어울리는 새 얼굴. 기존 인물과 다른 매력')}"${rr&&rr!=='ai'?` 희귀도는 ${rr}.`:''} 기존 ${T('crew')}과 이름·외모·역할이 겹치지 않게 하고, 메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다. 첫 등장(intro) 대사는 픽업 연출에 어울리게 인상적으로.\nJSON 객체만 출력: ${charSchema()}\n${CHAR_STAT_RULE}`,btn);
   if(!r) return null; const c=cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr; if(!c.name) c.name='이름 없음'; if(col&&col.src){ c.collab=col.src; if(!c.faction) c.faction='콜라보'; } G.chars.push(c); mark('c:'+c.id); return c; }
 async function aiAltChar(b,con,rr,btn){ const canon=!!b.__canon; b=charById(b.id)||b;
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n이격(異格) ${T('crew')} 1명을 만들어라. 기존 ${T('crew')} 「${b.name}」의 다른 모습이다. 같은 사람이라서 기억·관계·성격·말투는 그대로다.\n${canon?'이 모습은 정사다: 메인 스토리 속 성장·각성·결단으로 생긴 변화이고, 이후 메인 스토리에서는 이 모습이 이어진다. profile에 어떤 사건으로 이렇게 바뀌었는지 쓴다.':'이 모습은 외전이다: 메인 스토리와 상관없는 단발성 사건(황당한 소동, 휴가, 꿈 같은 일)이고, 이야기가 끝나면 원래대로 돌아간다. 메인 플롯을 바꾸지 않는다.'}\n이번 테마: "${con||'AI가 어울리는 테마(계절 의상, 정장, 각성, 과거의 모습 등)를 하나 고른다'}"\nname은 정확히 "${b.name}(테마를 나타내는 2~5글자)" 형식으로 쓴다. profile에는 이 모습이 된 사연과 이 모습일 때만 보이는 매력을 쓴다. 외모 묘사, 무기, 속성, 역할, 스킬은 테마에 맞게 새로 정해서 원래 모습과 다르게 플레이되도록 한다. ${T('files')}에는 이 모습과 관련된 새 비밀을 넣는다. 첫 등장(intro) 대사는 원래 말투로, 새 모습을 보여 주는 설렘이 느껴지게.\nnaiPrompt는 원래 외모 태그 "${b.naiPrompt||''}"에서 머리색·눈색·머리 모양·체형 같은 신체 특징은 그대로 두고 의상과 소품만 테마에 맞게 바꾼다.\n원래 프로필: ${String(b.profile||'').slice(0,400)}\n원래 말투: ${(b.lines||[]).slice(0,3).join(' / ')}${rr&&rr!=='ai'?`\n희귀도는 ${rr}.`:''}\nJSON 객체만 출력: ${charSchema()}\n희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. ${NAI_CHAR}`,btn);
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n이격(異格) ${T('crew')} 1명을 만들어라. 기존 ${T('crew')} 「${b.name}」의 다른 모습이다. 같은 사람이라서 기억·관계·성격·말투는 그대로다.\n${canon?'이 모습은 정사다: 메인 스토리 속 성장·각성·결단으로 생긴 변화이고, 이후 메인 스토리에서는 이 모습이 이어진다. profile에 어떤 사건으로 이렇게 바뀌었는지 쓴다.':'이 모습은 외전이다: 메인 스토리와 상관없는 단발성 사건(황당한 소동, 휴가, 꿈 같은 일)이고, 이야기가 끝나면 원래대로 돌아간다. 메인 플롯을 바꾸지 않는다.'}\n이번 테마: "${con||'AI가 어울리는 테마(계절 의상, 정장, 각성, 과거의 모습 등)를 하나 고른다'}"\nname은 정확히 "${b.name}(테마를 나타내는 2~5글자)" 형식으로 쓴다. profile에는 이 모습이 된 사연과 이 모습일 때만 보이는 매력을 쓴다. 외모 묘사, 무기, 속성, 역할, 스킬은 테마에 맞게 새로 정해서 원래 모습과 다르게 플레이되도록 한다. ${T('files')}에는 이 모습과 관련된 새 비밀을 넣는다. 첫 등장(intro) 대사는 원래 말투로, 새 모습을 보여 주는 설렘이 느껴지게.\nnaiPrompt는 원래 외모 태그 "${b.naiPrompt||''}"에서 머리색·눈색·머리 모양·체형 같은 신체 특징은 그대로 두고 의상과 소품만 테마에 맞게 바꾼다.\n원래 프로필: ${String(b.profile||'').slice(0,400)}\n원래 말투: ${(b.lines||[]).slice(0,3).join(' / ')}${rr&&rr!=='ai'?`\n희귀도는 ${rr}.`:''}\nJSON 객체만 출력: ${charSchema()}\n${CHAR_STAT_RULE}`,btn);
   if(!r) return null; const c=cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr;
   if(!c.name||c.name.indexOf(b.name)!==0) c.name=`${b.name}(${String(con||'이격').replace(/[()]/g,'').slice(0,6)})`;
   c.alt=b.id; c.altCanon=canon; c.faction=b.faction||c.faction; if(b.voiceId) c.voiceId=b.voiceId; if(b.naiStyle) c.naiStyle=b.naiStyle; if(b.age&&!c.age) c.age=b.age; if(!c.lines||!c.lines.length) c.lines=(b.lines||[]).slice(0,3);
@@ -170,16 +170,6 @@ async function runPrep(cats,filter,opt){
     }catch(e){ toast(naiErr(e,it.label+' 실패')); if(e&&['image_cancelled','image_busy','nai_nokey','bad_key','low_credit','network','nai_locked','comfy_nourl','comfy_nowf'].includes(e.code)){ toast('그림 준비를 멈췄어요. 연결을 확인한 뒤 그림 준비실에서 이어서 그려 주세요'); break; } await wait(1500); }
   }
   PREPJOB=null; prepChip(); render(); toast(`그림 ${j.done}장을 준비했어요`); if(opt.done) opt.done(j);
-}
-async function naiAll(btn){
-  const list=drawTodo(); if(!list.length){toast('그릴 것이 없어요');return;}
-  if(!imgReady()){toast(imgNeed());return;}
-  if(!(await appConfirm(`${list.length}장을 차례로 그려요. Opus 구독이 아니면 Anlas가 들어요. 진행할까요?`))) return;
-  btn.disabled=true; let n=0;
-  for(const it of list){ if(btn.isConnected) btn.textContent=`그리는 중 ${n}/${list.length} · ${it.label}`;
-    try{ const b=await naiDrawItem(it); await wait(600); await storeImage(it.o,b,it.k==='char'?'c:':(it.k==='weapon'||it.k==='upper'||it.k==='pose'||it.k==='lbbg'||it.k==='scg')?'':'l:'); if(it.k==='weapon'||it.k==='upper'||it.k==='pose'||it.k==='lbbg'||it.k==='scg') mark('c:'+it.c.id); n++; }
-    catch(e){ toast(naiErr(e)); break; } }
-  toast(`${n}장을 그렸어요`); render();
 }
 function noticeHTML(){
   const L=P().live; L.seen=Date.now(); mark('prog'); const todo=drawTodo();

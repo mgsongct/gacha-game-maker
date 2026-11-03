@@ -37,10 +37,10 @@ function render(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewS
   if(tab==='lobby'&&typeof cashTick==='function') cashTick();
   updStam(); $('#gems').textContent=nf(P().gems); try{ $('#ic_gold').innerHTML=rIco('gold'); $('#ic_gems').innerHTML=rIco('gems'); }catch(e){} $('#gold').textContent=nf(P().gold); dm();
   $('#tb_ops').textContent=T('ops'); $('#tb_gacha').textContent=T('gacha'); $('#tb_crew').textContent=T('crew');
-  const navTab={evshop:'lobby',abyss:'lobby',challenge:'lobby',codex:'lobby',notice:'lobby',event:'lobby',evd:'lobby',farm:'lobby',disp:'lobby',construct:'contract',pass:'lobby',shop:'lobby',cash:'lobby'}[tab]||tab;
+  const navTab={evshop:'lobby',abyss:'lobby',challenge:'lobby',codex:'lobby',notice:'lobby',event:'lobby',evd:'lobby',farm:'lobby',disp:'lobby',sched:'lobby',construct:'contract',pass:'lobby',shop:'lobby',cash:'lobby'}[tab]||tab;
   if(tab!=='lobby') document.body.classList.remove('lb-hidden');
   document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===navTab?'true':'false'));
-  const F={evshop:evShopHTML,abyss:abyssHTML,challenge:challengeHTML,codex:codexHTML,shop:shopHTML,cash:cashHTML,lobby:lobbyHTML,ops:opsHTML,contract:()=>conEntryHTML()+contractHTML(),construct:constructHTML,crew:crewHTML,studio:studioHTML,event:eventsHTML,evd:eventDetailHTML,notice:noticeHTML,farm:farmHTML,disp:dispPageHTML,pass:passHTML};
+  const F={sched:schedHTML,evshop:evShopHTML,abyss:abyssHTML,challenge:challengeHTML,codex:codexHTML,shop:shopHTML,cash:cashHTML,lobby:lobbyHTML,ops:opsHTML,contract:()=>conEntryHTML()+contractHTML(),construct:constructHTML,crew:crewHTML,studio:studioHTML,event:eventsHTML,evd:eventDetailHTML,notice:noticeHTML,farm:farmHTML,disp:dispPageHTML,pass:passHTML};
   $('#view').innerHTML=(F[tab]||lobbyHTML)();
   document.body.classList.toggle('on-lobby',tab==='lobby'); document.body.classList.toggle('abyss-full',tab==='abyss');
   if(typeof applyDesk==='function') applyDesk();
@@ -93,6 +93,7 @@ function lobbyHTML(){
       <div class="lb-right">
         ${ico('mailopen','','mail','우편함',mailCount()||'',mailCount()>0)}
         ${ico('go','disp','disp',T('dispatch'),dispDone()||'')}
+        ${ico('go','sched','talk','일정',G.chars.some(c=>own(c.id))&&SCHED().left?SCHED().left:'')}
         ${ico('go','farm','farm',T('farm'),'')}
         ${ico('go','challenge','raid','도전',RG().run?'!':(raidTriesLeft()&&!RAID().killed?raidTriesLeft():''))}
         ${ill||has?ico('lbhide','','eye','숨기기',''):''}
@@ -135,7 +136,7 @@ function opsHTML(){ if(!OPS_CH||!G.chapters.some(c=>c.id===OPS_CH)) return opsLi
     let firstOpen=true;
     const nodes=ch.stages.map((s,si)=>{const cl=!!P().cleared[s.id],open=prev; prev=cl; const cur=open&&!cl&&firstOpen; if(cur) firstOpen=false;
       const boss=!s.story&&(s.enemies.some(e=>e.boss)||si===n-1), p=pts[si];
-      return `<button class="onode ${cl?'clear':''} ${open?'':'lock'} ${cur?'cur':''} ${boss?'boss':''} ${s.story?'story':''}" style="left:${p.x}%;top:${p.y}px" data-act="${open?'stage':'locked'}" data-ch="${ch.id}" data-st="${s.id}"><span class="dia"><span>${cl?'✓':open?(boss?'★':s.story?'📖':''):'🔒'}</span></span><span class="ont"><i>${ci+1}-${si+1}</i><b>${esc(s.title)}</b>${P().stars&&P().stars[s.id]?`<small class="ost">${'★'.repeat(P().stars[s.id])}${'☆'.repeat(3-P().stars[s.id])}</small>`:''}<em>${s.enemies.slice(0,4).map(e=>`<u style="--ec:${ECOL[e.elem]}"></u>`).join('')}</em></span></button>`;}).join('');
+      return `<button class="onode ${cl?'clear':''} ${open?'':'lock'} ${cur?'cur':''} ${boss?'boss':''} ${s.story?'story':''} ${s.mode?'m-'+s.mode:''}" style="left:${p.x}%;top:${p.y}px" data-act="${open?'stage':'locked'}" data-ch="${ch.id}" data-st="${s.id}"><span class="dia"><span>${cl?'✓':open?(modeIcon(s)||(boss?'★':s.story?'📖':'')):'🔒'}</span></span><span class="ont"><i>${ci+1}-${si+1}</i><b>${esc(s.title)}</b>${P().stars&&P().stars[s.id]?`<small class="ost">${'★'.repeat(P().stars[s.id])}${'☆'.repeat(3-P().stars[s.id])}</small>`:''}<em>${s.enemies.slice(0,4).map(e=>`<u style="--ec:${ECOL[e.elem]}"></u>`).join('')}</em></span></button>`;}).join('');
     out+=`<section class="omap">
       <div class="omap-h"><div><i>CHAPTER ${ci+1}</i><h3>${esc(ch.title)}</h3></div><span>${done}/${n}</span><button class="btn sm ghost" data-act="mapedit" data-ch="${ch.id}">지도</button><button class="btn sm ghost" data-act="chedit" data-ch="${ch.id}">편집</button></div>
       <div class="omap-b" style="height:${Hh}px;${ms?`background-image:url('${esc(ms)}');background-size:cover;background-position:center`:bgStyle(ch.title)}">
@@ -378,23 +379,6 @@ function readNai(){
 
 function naiTarget(kind,id){if(ILK(kind)){const c=charById(id);return c&&c[kind];}if(kind==='weapon'){const c=charById(id);return c&&c.weapon;}return kind==='char'?charById(id):libById(id);}
 /* 화풍 프리셋 편집 */
-let STYBACK='';
-function styRow(x){return `<div class="styrow" data-sid="${esc(x.id)}"><div class="styhead"><input class="in sty-n" value="${esc(x.name)}" placeholder="프리셋 이름" maxlength="30"><button class="btn sm ghost" data-act="stydel" aria-label="삭제">삭제</button></div>
-  <label class="f">화풍 태그 (작가 태그, 연도, 채색 등)</label><textarea class="in sty-t" placeholder="artist:이름, 0.8::artist:이름2::, year 2024">${esc(x.tags)}</textarea>
-  <label class="f">네거티브 추가 (선택)</label><input class="in sty-g" value="${esc(x.neg||'')}"></div>`;}
-function openStyles(back){
-  STYBACK=back||''; const c=naiCfg();
-  openModal(`${head('화풍 프리셋')}
-    <p class="muted" style="margin:0 0 10px">그림체 태그를 묶어서 이름을 붙여 두면, 그릴 때 이름만 골라 쓸 수 있어요. 고른 프리셋의 태그가 프롬프트 맨 앞에 들어가요.</p>
-    <div id="styList">${c.styles.map(styRow).join('')}</div>
-    <button class="btn ghost block" data-act="styadd" style="margin-top:8px">＋ 새 프리셋</button>
-    <label class="f" for="sty_def">기본으로 쓸 프리셋</label><select class="in" id="sty_def">${c.styles.map(x=>`<option value="${esc(x.id)}" ${x.id===c.styleId?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
-    <div class="row" style="margin-top:14px"><button class="btn" data-act="stysave">저장</button></div>`);
-}
-function readStyles(){
-  const out=[]; document.querySelectorAll('#styList .styrow').forEach((r,i)=>{const name=r.querySelector('.sty-n').value.trim()||('화풍 '+(i+1)); out.push({id:r.dataset.sid,name,tags:r.querySelector('.sty-t').value.trim(),neg:r.querySelector('.sty-g').value.trim()});});
-  return out;
-}
 let CUTJOB=null;
 function openCut(kind,id){
   const o=naiTarget(kind,id); const src=o&&imgSrc(o); if(!src){toast('먼저 이미지를 등록해 주세요');return;}
@@ -577,7 +561,13 @@ function studioHTML(){
   ${exSettingsPanel()}
   ${auditPanel()}
   ${rulesPanel()}
+  ${battleSysPanel()}
   ${balancePanel()}
+  ${personaPanel()}
+  ${factionPanel()}
+  ${planPanel()}
+  ${assetPanel()}
+  ${promptPanel()}
   <div class="panel pm-hide"><h3>게임</h3><p class="muted" style="margin:0 0 10px">지금 게임: <b>${esc(G.meta.title)}</b>. 세계관, 용어, 속성, 화면 테마를 바꾸거나, AI로 완전히 다른 가챠 게임을 새로 만들 수 있어요. 게임은 여러 개 만들어 두고 오갈 수 있어요.</p>
     <div class="row"><button class="btn sm" data-act="meta-open">게임 정의 편집</button><button class="btn sm" data-act="draft-open">AI로 새 게임 만들기</button><button class="btn sm ghost" data-act="pj-open">게임 목록 (${pj.list.length})</button></div></div>
   <div class="panel"><h3>게시·구독</h3><p class="muted" style="margin:0 0 10px">${G.meta.subscr?`구독 중인 게임이에요 · v${G.meta.subscr.ver||0}${G.meta.subscr.at?' · '+esc(new Date(G.meta.subscr.at).toLocaleDateString())+' 받음':''}. 만든 사람이 업데이트하면 켤 때 알려 줘요.`:G.meta.pub&&G.meta.pub.ver?`게시 중 · v${G.meta.pub.ver}. 새 장·이벤트를 만든 뒤 다시 게시하면 구독한 사람에게 업데이트가 가요.`:'내 게임을 GitHub 공개 저장소에 올려 다른 사람이 구독하게 하거나, 다른 사람이 게시한 게임을 주소로 받아요.'}</p>
@@ -597,6 +587,7 @@ function studioHTML(){
     <div class="g2"><div><label class="f">타이틀 ${T('crew')}</label><select class="in" data-pset="titleChar"><option value="">자동</option>${G.chars.map(c=>`<option value="${c.id}" ${P().titleChar===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
     <div><label class="f">타이틀 배경</label><select class="in" data-pset="titleBg">${bgOptions(P().titleBg)}</select></div></div>
     <div class="g2"><div><label class="f">로비 표시 (타이틀은 일러스트 우선)</label><select class="in" data-pset="lobbyMode">${opt([['auto','자동 (포즈 → 상반신 → 스탠딩)'],['illust','일러스트 표시'],['layer','항상 배경 + 캐릭터 따로 (캐릭터만 움직임)'],['stand','항상 스탠딩 + 배경']],P().lobbyMode||'auto')}</select></div><div><label class="f">로비 캐릭터 크기</label><select class="in" data-pset="lbSize">${opt([['fit','위 배너에 안 가리게 (기본)'],['big','크게 (머리가 가려질 수 있어요)'],['small','작게']],P().lbSize||'fit')}</select></div></div>
+    <div class="g2"><div><label class="f">대본 연출 (감정 아이콘·동작·화면 효과)</label><select class="in" data-pset="vnDirect">${opt([['auto','대본 + 대사에 맞춰 자동 감정 (기본)'],['script','대본에 쓴 것만'],['off','끄기']],P().vnDirect||'auto')}</select></div><div><label class="f">대화 무대</label><select class="in" data-pset="vnStage">${opt([['duo','최근 두 사람 (기본)'],['single','말하는 사람만']],P().vnStage||'duo')}</select></div></div>
     <label class="f">전투 애니메이션</label><select class="in" data-pset="battleMotion">${opt([['full','일반 — 타격 동작·투사체·스피드라인'],['reduced','간소화 — 이동과 스피드라인 생략'],['system','기기의 동작 줄이기 설정에 맞춤']],P().battleMotion||'full')}</select>
     <p class="muted" style="font-size:.8rem;margin:5px 0 12px">일반 모드는 기기의 애니메이션 배율과 별도로 전투 연출을 재생해요. 움직임을 줄이고 싶으면 간소화를 선택하세요.</p>
     <label class="f">기술 컷인 (전투에서 스킬 쓸 때)</label><select class="in" data-pset="skillCut">${opt([['auto','직접 쓴 스킬과 컷인 그림이 있는 '+T('crew')+'는 크게'],['big','항상 크게 (없으면 스탠딩)'],['small','작은 띠만'],['off','끄기']],P().skillCut||'auto')}</select>
@@ -606,7 +597,7 @@ function studioHTML(){
   ${IS_NATIVE?'':`<div class="panel"><h3>아이폰·웹 연결</h3><p class="muted" style="margin:0 0 10px">웹 버전은 열 때마다 최신이에요. 일부 AI 서비스는 브라우저에서 직접 부르는 걸 막아서(CORS), 막히면 중계 서버를 거쳐요. ${webProxy()?'지금 중계 서버: <b>'+esc(webProxy())+'</b>':'중계 서버 없음'}</p>
     <label class="f" for="orient_sel">화면 방향 (휴대폰)</label><select class="in" id="orient_sel">${opt([['auto','기기 회전 따라'],['portrait','세로로 고정'],['landscape','가로로 고정']],orientPref())}</select>
     <p class="muted" style="margin:4px 0 8px;font-size:.78rem">세로로 고정하면 휴대폰을 눕혀도 세로 화면으로 해요. 앱은 새 APK부터 고정돼요(지금 앱이 지원하지 않으면 알려 드려요).</p>
-    <label class="f" for="desk_mode">PC 화면 (넓은 화면에서)</label><select class="in" id="desk_mode" data-act="deskmode">${opt([['wide','가로로 넓게 (PC 게임처럼, 추천 · 휴대폰은 가로로 돌려서)'],['auto','가운데 세로로 (휴대폰처럼) + 옆 안내'],['off','끄기 (창 전체를 씀)']],deskMode())}</select>
+    <label class="f" for="desk_mode">PC 화면 (넓은 화면에서)</label><select class="in" id="desk_mode">${opt([['wide','가로로 넓게 (PC 게임처럼, 추천 · 휴대폰은 가로로 돌려서)'],['auto','가운데 세로로 (휴대폰처럼) + 옆 안내'],['off','끄기 (창 전체를 씀)']],deskMode())}</select>
     <div class="row" style="margin-top:10px"><button class="btn sm" data-act="pxopen">중계 서버 설정</button>${IS_IOS&&!IS_STANDALONE?'<button class="btn sm ghost" data-act="a2hs">홈 화면에 추가하는 법</button>':''}</div></div>`}`,
   sound:`<div class="panel"><h3>소리</h3><p class="muted" style="margin:0 0 10px">${SND().fishKey?'Fish Audio 연결됨':'Fish Audio 미연결'} · ${SND().elKey?'ElevenLabs 연결됨':'ElevenLabs 미연결'}</p>
     <div class="row"><button class="btn sm" data-act="sndopen">소리 설정</button><button class="btn sm ghost" data-act="lib" data-k="bgm">배경음 ${done(G.lib.filter(l=>l.kind==='bgm'))}/${G.lib.filter(l=>l.kind==='bgm').length}</button><button class="btn sm ghost" data-act="lib" data-k="sfx">효과음 ${done(nx)}/${nx.length}</button><button class="btn sm ghost" data-act="bgmall">🎵 배경음 한꺼번에 작곡</button></div></div>`,

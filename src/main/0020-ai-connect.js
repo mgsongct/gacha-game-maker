@@ -60,7 +60,7 @@ function pcOrigin(){ const pc=PCS(); return !!(pc&&pc.base===location.origin); }
 // PC 서버 주소인데 연결 키가 없어요(키 없이 다시 열었거나, 홈 화면 앱처럼 저장 공간이 따로인 경우) → 빈 게임으로 시작하지 않고 다시 연결하게 해요
 function pcLostKey(){ if(IS_NATIVE||PCS()) return false; return /\.trycloudflare\.com$/i.test(location.hostname)||location.port==='8790'; }
 (function(){ try{ const pc=PCS(); if(!pc||pc.base!==location.origin||!window.fetch||!URL.createObjectURL) return; const l=document.querySelector('link[rel=manifest]'); if(!l) return;
-  fetch(l.href).then(r=>r.json()).then(m=>{ m.start_url=location.origin+'/?pc='+encodeURIComponent(pc.key); m.scope=location.origin+'/'; m.icons=(m.icons||[]).map(i=>Object.assign({},i,{src:new URL(i.src,l.href).href})); l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'})); }).catch(()=>{}); }catch(e){} })();
+  fetch(l.href).then(r=>r.json()).then(m=>{ m.start_url=location.origin+'/?pc='+encodeURIComponent(pc.key); m.scope=location.origin+'/'; m.icons=(m.icons||[]).map(i=>Object.assign({},i,{src:new URL(i.src,l.href).href})); l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'})); }).catch(()=>{}); }catch(e){ quietErr(e,'0020-ai-connect.js:63'); } })();
 const isLocalHost=h=>/^(localhost|127\.0\.0\.1|\[::1\]|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(h);
 function webProxy(){ if(IS_NATIVE) return ''; try{ return String(appStorage.getItem('ggm-proxy')||'').trim(); }catch(e){ return ''; } }
 function b64ToBytes(b){const s=atob(b);const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
@@ -163,7 +163,8 @@ function jsonRepair(t){ let out='', inS=false, esc=false; const st=[];
   while(st.length){ out=out.replace(/[\s,]+$/,''); out+=st.pop(); }
   return out; }
 const TMO={quick:60000,default:300000,complex:600000};
-const JSON_STRICT='\n\n[중요] 응답 전체가 올바른 JSON 하나여야 한다. 문자열 안의 줄바꿈은 \\n으로, 큰따옴표는 \\"로 쓴다. 마지막 항목 뒤에 쉼표를 두지 않는다. JSON 앞뒤에 설명을 붙이지 않는다.';
+const JSON_STRICT_BASE='\n\n[중요] 응답 전체가 올바른 JSON 하나여야 한다. 문자열 안의 줄바꿈은 \\n으로, 큰따옴표는 \\"로 쓴다. 마지막 항목 뒤에 쉼표를 두지 않는다. JSON 앞뒤에 설명을 붙이지 않는다.';
+pfDef('JSON_STRICT','JSON 출력 강조(모든 JSON 요청 끝)',()=>JSON_STRICT_BASE);
 
 /* Vertex 서비스 계정 토큰 */
 const TOKC={};
@@ -346,6 +347,7 @@ function openPresetCode(kind,code){
 // 그림 태그 지침: AI가 NovelAI(그림) 태그를 쓰는 요청에만 출력 형식 바로 앞에 넣어요
 const TAG_REQ=/NovelAI|naiPrompt|Danbooru|영어 태그|장면 태그/;
 function llmWrap(pr){ const L=llmEff(); let s=String(pr);
+  { const isTag=TAG_REQ.test(s), pl=plInject(isTag); if(pl){ let i=s.lastIndexOf('JSON만 출력'); if(i<0) i=s.length; s=s.slice(0,i)+pl+s.slice(i); } } // 프롬프트 스튜디오(0025) 교훈·그림 가이드
   if(L.tag&&TAG_REQ.test(s)){ let i=s.lastIndexOf('JSON만 출력'); if(i<0) i=s.length; s=s.slice(0,i)+'[그림 태그 지침] NovelAI 영어 태그(naiPrompt, prompt, CG·배경·소품·의상 태그 등)를 쓸 때 반드시 따른다:\n'+L.tag.trim()+'\n'+s.slice(i); }
   if(!L.top&&!L.mid&&!L.bot) return s;
   if(L.mid){ let i=s.lastIndexOf('JSON만 출력'); if(i<0){ const j=s.lastIndexOf('\n'); i=j>0?j+1:s.length; } s=s.slice(0,i)+'[제작자 지침]\n'+L.mid.trim()+'\n'+s.slice(i); }
@@ -404,6 +406,7 @@ const AGE_TAGS=/^(mature female|mature male|mature woman|mature man|milf|mature|
 function stripAge(s){ return tagList(s).filter(t=>!AGE_TAGS.test(tagKey(t))).join(', '); }
 function composeNai(kind,base,opt){
   opt=opt||{}; const c=naiCfg(), part=c.parts[kind]||c.parts.prop, st=naiStyle(c,opt.styleId);
+  if(IMG_NOHUMAN[kind]){ const g=imgGuard(kind,base); if(g.removed.length){ base=g.out; plHit('img-person-'+kind,g.removed.join(', ')); } } // 그림 가드(0025): 배경·소품에 사람 태그가 섞이면 빼요
   let body=tagList(base), suffix=part.suffix, frame='';
   if(kind==='char'||ILK(kind)){ body=body.filter(t=>!COMPO_TAGS.test(tagKey(t))); frame=opt.frame||(ILK(kind)?'cowboy shot':'full body'); suffix=tagList(suffix).filter(t=>!FRAME_TAGS.test(tagKey(t))).join(', '); }
   const pose=kind==='char'?(opt.pose!=null?opt.pose:NAI_FRONT):ILK(kind)?(opt.pose!=null?opt.pose:'looking at viewer'):kind==='enemy'?'straight-on':'';

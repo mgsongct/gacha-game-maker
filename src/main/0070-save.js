@@ -16,6 +16,7 @@ function syncEnemies(g,looks){ g=g||G; let n=0; const lk=looks||{}, rz=lk.__reus
         const want=rz[nm]&&pool.find(x=>x.name===rz[nm]); if(want) alias=want.id; else if(pool.length&&(!lk[nm]||pool.length>=ENEMY_KEEP)) alias=pool[hashN(nm)%pool.length].id; }
       l={id:'n'+Math.random().toString(36).slice(2,10),kind:'enemy',name:nm,prompt:alias?'':String(lk[nm]||EL[nm]||''),img:null}; if(alias) l.alias=alias; g.lib.push(l); n++; if(typeof mark==='function'&&g===G) mark('l:'+l.id); }
     else if(!l.prompt&&(lk[nm]||EL[nm])){ l.prompt=String(lk[nm]||EL[nm]); if(typeof mark==='function'&&g===G) mark('l:'+l.id); }
+    { const BI=(g.meta&&g.meta.bestiary)||{}, info=BI[nm]||(EL===ENEMY_LOOKS&&ENEMY_INFO[nm]); if(info&&!l.desc&&!l.charId) Object.assign(l,info); } // 적 도감: 생성기가 만든 것(meta.bestiary) · 샘플
     const ch=(g.chars||[]).find(c=>c.name===nm); if(ch&&ch.naiPrompt&&l.prompt!==ch.naiPrompt&&!l.img){ l.prompt=ch.naiPrompt; l.charId=ch.id; if(typeof mark==='function'&&g===G) mark('l:'+l.id); } });
   return n; }
 function defaultShop(ev,g){

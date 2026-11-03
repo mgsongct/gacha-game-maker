@@ -5,7 +5,6 @@ case 'pxsave': { const v=$('#px_url').value.trim(); if(v&&!/^https:\/\//.test(v)
 case 'pxtest': { const v=$('#px_url').value.trim(); if(!v){toast('주소를 넣어 주세요');break;} t.disabled=true; try{ const r=await fetch(v.replace(/\/+$/,'')+'/?u='+encodeURIComponent('https://raw.githubusercontent.com/'+RELEASE_REPO+'/main/version.json')); toast(r.ok?'중계 서버가 잘 동작해요':'중계 서버 응답: '+r.status); }catch(e){ toast('중계 서버에 연결하지 못했어요'); } t.disabled=false; break; }
 case 'appre': { readAp(); const x=OAI_PRESETS[+t.dataset.i]; if(!x) break; APD.base=x[1]; if(x[2]&&!APD.model) APD.model=x[2]; if(!APD.name||APD.name===AITYPE.openai||OAI_PRESETS.some(y=>y[0]===APD.name)) APD.name=x[0]; if($('.sw-card')) renderSetup(); else openAp(); break; }
 case 'setupopen': closeModal(); showSetup(); break;
-case 'setname0': readPlayerForm(); p.nameAsked=true; mark('prog'); closeModal(); playOpening(); break;
 case 'setname': p.player=($('#nm_in').value.trim()||'').slice(0,12); { const cv=$('#nm_call')&&$('#nm_call').value.trim().slice(0,12); if(cv&&cv!==T('player')){ G.meta.terms.player=cv; mark('meta'); } } mark('prog'); closeModal(); playStory('프롤로그',G.opening.prologue,afterPrologue); break;
 case 'playmode': { if(subLocked()){ toast('구독한 게임은 플레이 전용이에요. 고치려면 설정 → 게임에서 구독 끊기를 하세요'); break; } const on=!playMode(); try{ appStorage.setItem('ggm-play',on?'1':'0'); }catch(e){} render(); toast(on?'플레이 모드를 켰어요. 만들기·편집 메뉴가 숨겨져요':'플레이 모드를 껐어요'); break; }
 case 'sttab': settingsNavigate(t.dataset.k||''); break;
@@ -72,7 +71,7 @@ case 'vsplay': stopVoice(); VOICE.src=t.dataset.u; VOICE.volume=SND().voiceVol; 
 case 'vstry': { const c=charById(VS.cid); t.disabled=true; await speak(Object.assign({},c,{voiceId:id}),c.intro||c.lines[0]||c.name); if(t.isConnected) t.disabled=false; break; }
 case 'vspick': { const c=charById(VS.cid), m=VS.results.find(x=>x._id===id), tg=(VS.sid&&(c.skins||[]).find(x=>x.id===VS.sid))||c; tg.voiceId=id; tg.voiceName=m?m.title:id; mark('c:'+c.id); toast(tg===c?`${c.name}의 목소리를 정했어요`:`${T('skin')} 「${tg.name}」의 목소리를 정했어요`); openChar(c.id); break; }
 case 'vsetid': { const v=$('#vs_id').value.trim(), m=v.match(/[0-9a-f]{32}/i); if(!m){toast('보이스 ID를 찾지 못했어요');break;} const c0=charById(VS.cid), c=(VS.sid&&(c0.skins||[]).find(x=>x.id===VS.sid))||c0; c.voiceId=m[0].toLowerCase(); c.voiceName='';
-      try{ const j=okJSON(await http('https://api.fish.audio/model/'+c.voiceId,{headers:{Authorization:'Bearer '+SND().fishKey},timeout:20000})); c.voiceName=j.title||''; }catch(e){}
+      try{ const j=okJSON(await http('https://api.fish.audio/model/'+c.voiceId,{headers:{Authorization:'Bearer '+SND().fishKey},timeout:20000})); c.voiceName=j.title||''; }catch(e){ quietErr(e,'0510-actions/050-settings-and-audio.js:74'); }
       mark('c:'+c.id); toast('목소리를 연결했어요'); openChar(c.id); break; }
 case 'elcompose': { const l=libById(id), s=SND(); if(!s.elKey){toast('설정의 소리에서 ElevenLabs 키를 넣어 주세요');break;}
       const pr=(($('#li_prompt')&&$('#li_prompt').value.trim())||l.prompt||'').trim(); if(!pr){toast('음악 프롬프트를 먼저 채워 주세요');break;}

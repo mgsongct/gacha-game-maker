@@ -103,7 +103,7 @@ function pickTouchLine(pool,current=''){
   // different: use a bounded selection, keeping original lines for speech.
   return rand(different.length?different:lines)||'…';
 }
-function affLinePool0(c){const o=own(c.id),lv=affLv(o),k=skinOf(c);let pool=k&&(k.lines||[]).length?[...k.lines,...k.lines,...c.lines]:[...c.lines];Object.entries(c.affLines||{}).forEach(([k,v])=>{if(lv>=+k)pool.push(...(v||[]));});return pool;}
+function affLinePool0(c){const o=own(c.id),lv=affLv(o),k=skinOf(c);let pool=k&&(k.lines||[]).length?[...k.lines,...k.lines,...c.lines]:[...c.lines];Object.entries(c.affLines||{}).forEach(([k,v])=>{if(lv>=+k)pool.push(...(v||[]));});if(typeof memoOn==='function'&&memoOn(c))pool.push(...c.memorial.lines,...c.memorial.lines);return pool;} // 메모리얼 로비를 켜면 메모리얼 대사가 자주 나와요
 function affLv(o){return Math.min(10,Math.floor((o?.aff||0)/GGMCombat.AFFINITY.step)+1);}
 const AFF_MAX=GGMCombat.AFFINITY.max; function affFull(o){return !!o&&(o.aff||0)>=AFF_MAX;}
 const RMUL={1:1,2:1.15,3:1.3};
@@ -111,7 +111,7 @@ function stats(c){v2ApplyRoleSpeed(c);const o=own(c.id)||{lv:1,dup:0,wlv:0};cons
 function gainExp(o,x){o.exp+=x;while(o.lv<levelCap(o)&&o.exp>=GGMCombat.levelExperience(o.lv)){o.exp-=GGMCombat.levelExperience(o.lv);o.lv++;}if(o.lv>=levelCap(o))o.exp=Math.min(o.exp,GGMCombat.levelExperience(o.lv)-1);}
 function addAff(c,n){
   const o=own(c.id); if(!o) return; const b=affLv(o); o.aff=Math.min(AFF_MAX,o.aff+n); const a=affLv(o);
-  if(a>b){ const ep=c.episodes.find(e=>e.lv>b&&e.lv<=a); toast(ep?`${c.name} 호감도 Lv.${a}! 에피소드 「${ep.title}」가 열렸어요`:`${c.name} 호감도 Lv.${a}`); checkTriggers(); }
+  if(a>b){ const ep=c.episodes.find(e=>e.lv>b&&e.lv<=a); toast(ep?`${c.name} 호감도 Lv.${a}! 에피소드 「${ep.title}」가 열렸어요`:`${c.name} 호감도 Lv.${a}`); checkTriggers(); memoCheck(c,b,a); }
 }
 function stageCode(id){const m=mainStages().find(s=>s.id===id);if(m)return m.code;let ei=0;for(const ch of G.chapters){if(ch.kind==='main')continue;ei++;const si=ch.stages.findIndex(s=>s.id===id);if(si>=0)return `EV${ei}-${si+1}`;}return '?';}
 

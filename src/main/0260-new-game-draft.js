@@ -19,8 +19,8 @@ function draftFrom(t){ t=String(t||'').trim(); let o=null; const m=t.match(/GGMD
   return null; }
 async function saveTextFile(text,name){ const b=new Blob([text],{type:'application/json'});
   if(IS_NATIVE&&CAP&&CAP.Filesystem){ const FS=CAP.Filesystem, path='가챠게임메이커/초안/'+name;
-    try{ try{ if(FS.requestPermissions) await FS.requestPermissions(); }catch(e){} await FS.writeFile({path,data:text,directory:'DOCUMENTS',encoding:'utf8',recursive:true}); toast('Documents/'+path+' 에 저장했어요'); return; }
-    catch(e){ try{ await FS.writeFile({path:name,data:text,directory:'CACHE',encoding:'utf8'}); const u=await FS.getUri({path:name,directory:'CACHE'}); if(CAP.Share){ await CAP.Share.share({title:name,files:[u.uri]}); return; } }catch(e2){} toast('파일을 저장하지 못했어요. 코드 복사를 써 주세요'); return; } }
+    try{ try{ if(FS.requestPermissions) await FS.requestPermissions(); }catch(e){ quietErr(e,'0260-new-game-draft.js:22'); } await FS.writeFile({path,data:text,directory:'DOCUMENTS',encoding:'utf8',recursive:true}); toast('Documents/'+path+' 에 저장했어요'); return; }
+    catch(e){ try{ await FS.writeFile({path:name,data:text,directory:'CACHE',encoding:'utf8'}); const u=await FS.getUri({path:name,directory:'CACHE'}); if(CAP.Share){ await CAP.Share.share({title:name,files:[u.uri]}); return; } }catch(e2){ quietErr(e2,'0260-new-game-draft.js:23'); } toast('파일을 저장하지 못했어요. 코드 복사를 써 주세요'); return; } }
   const file=new File([b],name,{type:'application/json'});
   if(/iPhone|iPad|Android/i.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],title:name}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
   const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000); toast('다운로드 폴더에 저장했어요 · '+name); }
@@ -202,7 +202,7 @@ let FACESEL=new Set();
 function fitDims(iw,ih){ const A=832*1216, r=iw/ih; let w=Math.sqrt(A*r), h=w/r; w=Math.max(512,Math.round(w/64)*64); h=Math.max(512,Math.round(h/64)*64); return [w,h]; }
 async function openMaskPainter(src,prev,cb,po){ po=po||{}; const im=await loadImg(src), [W,H]=fitDims(im.naturalWidth||im.width,im.naturalHeight||im.height);
   const mk=document.createElement('canvas'); mk.width=W; mk.height=H; const mx=mk.getContext('2d'); mx.fillStyle='#000'; mx.fillRect(0,0,W,H);
-  if(prev){ try{ const pm=await loadImg(prev); mx.drawImage(pm,0,0,W,H); }catch(e){} }
+  if(prev){ try{ const pm=await loadImg(prev); mx.drawImage(pm,0,0,W,H); }catch(e){ quietErr(e,'0260-new-game-draft.js:205'); } }
   const d=document.createElement('div'); d.className='mpaint';
   d.innerHTML=`<div class="mp-bar"><b>${esc(po.title||'얼굴 범위 칠하기')}</b><button type="button" data-m="brush" class="on">✎ 칠하기</button><button type="button" data-m="erase">⌫ 지우개</button><label>크기 <input type="range" min="8" max="120" value="40"></label><button type="button" data-m="auto">얼굴 자동</button><button type="button" data-m="clear">비우기</button><span class="mp-sp"></span><button type="button" data-m="cancel">취소</button><button type="button" data-m="save" class="ok">저장</button></div>
     <div class="mp-stage"><canvas></canvas></div><p class="mp-tip">바꾸고 싶은 얼굴 부분(눈·눈썹·입)을 빨갛게 칠해 주세요. 머리카락·옷은 칠하지 않는 게 좋아요. 한 번 저장하면 모든 표정에 같이 써요.</p>`;
@@ -227,12 +227,6 @@ async function openMaskPainter(src,prev,cb,po){ po=po||{}; const im=await loadIm
     else if(m==='cancel'){ d.remove(); if(po.onCancel) po.onCancel(); }
     else if(m==='save'){ const id=mx.getImageData(0,0,W,H).data; let n=0; for(let i=0;i<id.length;i+=4) if(id[i]>127) n++; if(!n){ toast('얼굴 부분을 먼저 칠해 주세요'); return; } d.remove(); cb(mk.toDataURL('image/png')); } });
   addEventListener('resize',fit,{once:false}); setTimeout(fit,30); }
-async function maskB64(dataUrl,W,H){ const im=await loadImg(dataUrl), cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d'); x.fillStyle='#000'; x.fillRect(0,0,W,H); x.imageSmoothingEnabled=false; x.drawImage(im,0,0,W,H);
-  const d=x.getImageData(0,0,W,H), on=new Uint8Array(Math.ceil(W/8)*Math.ceil(H/8)), BW=Math.ceil(W/8);
-  for(let y=0;y<H;y++) for(let q=0;q<W;q++) if(d.data[(y*W+q)*4]>127) on[(y>>3)*BW+(q>>3)]=1;
-  // NAI 인페인팅은 8픽셀 칸 단위라서, 칠한 칸은 칸 전체를 다시 그리게 맞춰요
-  for(let y=0;y<H;y++) for(let q=0;q<W;q++){ const i=(y*W+q)*4, v=on[(y>>3)*BW+(q>>3)]?255:0; d.data[i]=d.data[i+1]=d.data[i+2]=v; d.data[i+3]=255; }
-  x.putImageData(d,0,0); return cv.toDataURL('image/png').split(',')[1]; }
 // 얼굴 집중 인페인팅: 칠한 곳 주변만 잘라 크게 키워 다시 그리고, 줄여서 원본에 부드럽게 섞어요(원본의 투명 배경·흰 옷은 그대로)
 async function focusedInpaint(src,maskUrl,draw){ const o=await loadImg(src), W=o.naturalWidth||o.width, H=o.naturalHeight||o.height, cv=(w,h)=>{ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; };
   const M=cv(W,H), mx=M.getContext('2d'); mx.fillStyle='#000'; mx.fillRect(0,0,W,H); mx.drawImage(await loadImg(maskUrl),0,0,W,H);
@@ -255,15 +249,6 @@ async function focusedInpaint(src,maskUrl,draw){ const o=await loadImg(src), W=o
     ax.putImageData(ad,0,0); return await new Promise(res2=>A.toBlob(res2,'image/png')); }
   finally{ URL.revokeObjectURL(ru); } }
 // 인페인팅 결과에서 칠한 얼굴 부분만 원본에 부드럽게 붙여요(원본의 투명 배경·흰 옷은 그대로)
-async function inpaintMerge(origSrc,resBlob,maskUrl){ const o=await loadImg(origSrc), W=o.naturalWidth||o.width, H=o.naturalHeight||o.height, ru=URL.createObjectURL(resBlob);
-  try{ const r=await loadImg(ru), m=await loadImg(maskUrl), cv=n=>{ const c=document.createElement('canvas'); c.width=W; c.height=H; return c; };
-    const A=cv(), a=A.getContext('2d'); a.drawImage(o,0,0,W,H);
-    const B=cv(), b=B.getContext('2d'); b.drawImage(r,0,0,W,H);
-    const M=cv(), mm=M.getContext('2d'); mm.fillStyle='#000'; mm.fillRect(0,0,W,H); mm.filter=`blur(${Math.max(2,Math.round(W/160))}px)`; mm.drawImage(m,0,0,W,H); mm.filter='none';
-    const ad=a.getImageData(0,0,W,H), bd=b.getImageData(0,0,W,H).data, md=mm.getImageData(0,0,W,H).data;
-    for(let i=0;i<ad.data.length;i+=4){ const k=md[i]/255; if(k<=0) continue; ad.data[i]=ad.data[i]*(1-k)+bd[i]*k; ad.data[i+1]=ad.data[i+1]*(1-k)+bd[i+1]*k; ad.data[i+2]=ad.data[i+2]*(1-k)+bd[i+2]*k; }
-    a.putImageData(ad,0,0); return await new Promise(res=>A.toBlob(res,'image/png')); }
-  finally{ URL.revokeObjectURL(ru); } }
 /* 표정 한 장 그리기 (b: 'full'|'up') — 표정 창과 새 게임 자동 표정이 같이 써요 */
 async function faceDrawOne(c,F,f,ko,b,O,x,generationMode='automatic'){const game=G,project=PJ().active;x=x||''; const en=(FACE_PRESETS.find(p=>p[0]===ko)||[])[1]||'happy', ft=FACE_TAGS[en]||en, ew=[1.7,1.5,1.35,1.2][O.lv]||1.5, i2s=[0.72,0.64,0.56,0.48][O.lv]||0.6, emph=`${ew}::${ft}::, 1.2::expressive face::`;
   const basePr=F===c?c.naiPrompt:(F.prompt||c.naiPrompt), upO=faceUpperObj(c,F), srcO=b==='up'?upO:F, src=imgSrcRaw(srcO), frame=b==='up'?'cowboy shot':c.naiFrame, candidateEligible=imageCandidateEligible('face',b==='up'?f.up:f,c,generationMode),originalSrc=imgSrcRaw(b==='up'?f.up:f)||''; let blob;
