@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { loadUnits } from './lib/source.mjs';
 import { buildGraph, unused, unusedVars, cycles, deepest } from './lib/graph.mjs';
 import { actions, mutations, stateFlow } from './lib/flow.mjs';
-import { parseErrors, dupBodies, repeatedStrings, sgRules } from './lib/quality.mjs';
+import { parseErrors, dupBodies, repeatedStrings, sgRules, commentedCode } from './lib/quality.mjs';
 import { domIds, htmlInject, saveKeys, listenerLeaks, cssCheck, sideFiles, relayHosts, spaCheck } from './lib/extra.mjs';
 import { analyze } from './lib/analyze.mjs';
 import { findings, compare } from './lib/ratchet.mjs';
@@ -129,6 +129,10 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   assert.ok(g5.get('fixOne').calls.has('RULE_T.run') && g5.get('RULE_T.run').calls.has('doFix'), '멤버 호출(rule.fix.run) → 표 안 함수 → doFix');
   assert.ok(!g5.get('ver').calls.has('RULE_T.run'), '표를 참조만(map·since) 하면 잇지 않음'); assert.ok(!unused(g5, "RULE_T fixOne ver doFix doFix").some(f => f.table), '표 의사 함수는 안 쓰는 함수가 아님');
   rmSync(r5, { recursive: true, force: true }); }
+// 주석 속 코드: 한 줄 코드 중간 // 주석으로 뒤 문장이 빠진 경우(내가 실제로 두 번 낸 실수)는 잡고, 평범한 주석은 통과
+{ const r6 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r6, 'src/main'), { recursive: true });
+  writeFileSync(join(r6, 'src/main/010-c.js'), "function f(o){ o.a = 1; // 미션 확인 o.b = 2; const j = g(o); h(j);\n  return o; } // 이 함수는 o를 돌려줘요 — 예: \"f(o);\"처럼 따옴표 안 코드 예시는 통과\nfunction g(x){ return x; } function h(x){ return x; }\n");
+  const C = commentedCode(await loadUnits(r6)); assert.equal(C.length, 1, '주석 속 코드 1건(평범한 주석은 통과): ' + JSON.stringify(C)); rmSync(r6, { recursive: true, force: true }); }
 // SPA 단일 파일 전제: 빌드 결과가 로컬 스크립트·스타일시트를 따로 불러오면 오류(외부 글꼴·manifest·아이콘은 통과)
 { w('www/index.html', '<link rel="manifest" href="manifest.webmanifest"><link href="https://fonts.googleapis.com/css2" rel="stylesheet"><script>1</script><script src="app.js"></script><link rel="stylesheet" href="style.css">');
   const S = spaCheck(root).errors.map(e => e.text); assert.ok(S.length === 2 && /app\.js/.test(S[0]) && /style\.css/.test(S[1]), 'SPA 단일 파일: ' + JSON.stringify(S)); w('www/index.html', '<script>1</script>'); }
@@ -153,4 +157,4 @@ function featA(){ return [G.meta.made, G.meta.never, G.world.lore, G.world.plot2
   assert.equal(fl.zzNew, 'P1', '캐릭터 콜백에서 읽는 새 필드가 어디에도 없음 → P1'); assert.equal(fl.zzMade, undefined, '생성물에 있는 필드는 통과: ' + JSON.stringify(fl));
   rmSync(r3, { recursive: true, force: true }); }
 rmSync(root, { recursive: true, force: true });
-console.log('ok tools: 함수를 담은 표(멤버 호출 연결) · 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');
+console.log('ok tools: 주석 속 코드 · 함수를 담은 표(멤버 호출 연결) · 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');

@@ -26,6 +26,7 @@ export function findings(J) {
   J.actions.deadHandlers.forEach(x => add('발신 없는 처리기', x.act, `${x.act}`));
   J.css.dead.forEach(x => add('안 쓰는 CSS 클래스', x.cls, `.${x.cls} (${x.loc})`));
   const T = J.tools; if (T) { // 메타 점검(도구 코드)
+    (T.cmt || []).forEach(c => add('도구 주석 속 코드', noLoc(`${c.loc} ${c.text}`), `${c.loc} ${c.text}`));
     T.parse.forEach(p => add('도구 파싱 오류', noLoc(`${p.loc} ${p.text}`), `${p.loc} ${p.text}`));
     T.complex.forEach(f => add('도구 복잡한 함수', `${f.unit} ${f.name}`, `${f.name} (${f.loc}) 복잡도 ${f.cc} · ${f.lines}줄 · 중첩 ${f.depth}`, { 복잡도: f.cc, 줄: f.lines, 중첩: f.depth }));
     T.dup.forEach(d => add('도구 같은 본문 함수', d.join('='), d.join(' = ')));

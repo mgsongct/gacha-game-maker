@@ -13,7 +13,7 @@ function exJobOf(id){ const J=EXS().jobs; return Object.keys(J).find(k=>J[k].cha
 function exResting(id){ const st=EXS().cond[id]; return !!(st&&st.rest&&st.rest>Date.now()); }
 // 전투에 못 나가는 캐릭터(일하는 중·쉬는 중·경영 배치). busyIds(0090)가 함께 써요
 function exBusyIds(){ if(exMode()==='combat'||!P().exped) return []; const s=EXS(); return [...Object.values(s.jobs).flatMap(j=>j.chars),...Object.values(s.biz.assign).flat(),...Object.keys(s.cond).filter(exResting)]; }
-function exGive(gold,label){ const r={gold:Math.max(0,Math.round(gold))}; if(conOn()){ const ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2); ks.forEach(k=>{ r[k]=Math.max(10,Math.round(gold/20/10)*10); }); } giveReward(r); return r; }
+function exGive(gold,label){ if(seasonIs('train')) gold*=1.5; /* 훈련 시즌 보너스 — 전투형 파견(dispClaim)과 같게 */ const r={gold:Math.max(0,Math.round(gold))}; if(conOn()){ const ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2); ks.forEach(k=>{ r[k]=Math.max(10,Math.round(gold/20/10)*10); }); } giveReward(r); return r; }
 function exFameName(){ const m=exMode(); return m==='streamer'?EXC().streamer.fameName:EXC().idol.fameName; }
 
 /* 방송 출연(idol): 하루 단위로 캐릭터마다 일정이 들어와요. 등급이 낮으면 배정된 1건뿐이고, 높으면 골라서·거절도 자유 */
@@ -21,7 +21,7 @@ function exOffers(id){ const s=EXS(), day=today(); let o=s.offers[id]; if(!o||o.
 function exStart(id,job){ const c=charById(id), cur=exCond(id), k=EXC().cond; if(!c||exJobOf(id)||exResting(id)||exBizOf(id)) return;
   if(cur<k.min){ toast(`${c.name}의 컨디션이 너무 낮아요. 쉬게 해 주세요`); return; }
   const end=Date.now()+job.hours*3600e3, jid='x'+uid(); EXS().jobs[jid]={chars:[id],start:Date.now(),hours:job.hours,job,mode:exMode()};
-  exSetCond(id,cur-job.cond,end); mark('prog'); render(); }
+  exSetCond(id,cur-job.cond,end); bump('dispatch'); mark('prog'); render(); } // 일일 미션 "파견"은 원정 방식과 상관없이 셈
 function exRest(id,hours){ const cur=exCond(id), now=Date.now(); exSetCond(id,cur,now,now+hours*3600e3); EXS().streak[id]=0; mark('prog'); render(); }
 function exClaim(jid){ const s=EXS(), j=s.jobs[jid]; if(!j||Date.now()<j.start+j.hours*3600e3) return null; const id=j.chars[0], c=charById(id), cfg=EXC(), condV=(s.cond[id]||{}).v??100; let res, msg;
   if(j.mode==='streamer'){ res=GGMExpedition.streamResult(j.job,s.fame[id]||0,condV+j.job.cond,cfg); if(res.lib) s.lib.push({at:Date.now(),base:res.lib,id}); msg=res.viral?'🔥 영상이 터졌어요! ':''; }
@@ -35,7 +35,7 @@ function exLibSettle(){ const s=EXS(), now=Date.now(), g=GGMExpedition.libIncome
 function exBizState(){ const s=EXS(), chars={}, conds={}; Object.values(s.biz.assign).flat().forEach(id=>{ const c=charById(id); if(c){ chars[id]=c; conds[id]=exCond(id); } }); return GGMExpedition.bizPerformance(s.biz.assign,chars,conds,EXC()); }
 function exBizSettle(quiet){ const s=EXS(), now=Date.now(), b=s.biz; if(!b.at){ b.at=now; return null; } const h=(now-b.at)/3600e3, p=exBizState(), r0=GGMExpedition.bizSettle(p.perf,b.rep,h,EXC());
   Object.values(b.assign).flat().forEach(id=>exSetCond(id,exCond(id),now)); b.rep=r0.rep; b.at=now; const r=r0.gold>0?exGive(r0.gold):null; if(!quiet) toast(r?`정산: ${rewardText(r)} · ${EXC().business.repName} ${Math.round(b.rep)}`:'정산할 수익이 아직 없어요'); mark('prog'); return r; }
-function exAssign(part,slot,id){ const b=EXS().biz; exBizSettle(true); Object.keys(b.assign).forEach(k=>{ b.assign[k]=(b.assign[k]||[]).filter(x=>x&&x!==id); }); const a=b.assign[part]=b.assign[part]||[]; if(id){ a[slot]=id; b.assign[part]=a.filter(Boolean); exSetCond(id,exCond(id),Date.now()); } else { a.splice(slot,1); } if(!b.at) b.at=Date.now(); mark('prog'); render(); }
+function exAssign(part,slot,id){ const b=EXS().biz; exBizSettle(true); Object.keys(b.assign).forEach(k=>{ b.assign[k]=(b.assign[k]||[]).filter(x=>x&&x!==id); }); const a=b.assign[part]=b.assign[part]||[]; if(id){ a[slot]=id; b.assign[part]=a.filter(Boolean); exSetCond(id,exCond(id),Date.now()); bump('dispatch'); } else { a.splice(slot,1); } if(!b.at) b.at=Date.now(); mark('prog'); render(); }
 
 const exIco=k=>`<span style="display:inline-flex;width:1em;height:1em;vertical-align:-.15em">${rIco(k)}</span>`; // 아이콘 그림을 글자 크기로
 const exBar=v=>`<span style="display:inline-block;width:60px;height:6px;background:var(--line);border-radius:3px;vertical-align:middle;overflow:hidden"><i style="display:block;height:100%;width:${v}%;background:${v>=60?'#4fd18b':v>=30?'#ffd35a':'#ff5a5a'}"></i></span> ${v}`;
@@ -67,9 +67,9 @@ function openExSet(){ const cfg=EXC(), m=exMode(), adv={cond:cfg.cond,tiers:cfg.
     <details style="margin-top:8px"><summary>상세 설정 JSON (방송국·플랫폼·파트·등급·컨디션)</summary><textarea class="in" id="ex_adv" rows="12" style="font-family:monospace;font-size:.75rem">${esc(JSON.stringify(adv,null,1))}</textarea></details>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="exsave">저장</button><button class="btn ghost" data-act="close">취소</button></div>`); }
 async function exSave(){ let adv; try{ adv=JSON.parse($('#ex_adv').value); }catch(e){ toast('설정 JSON을 확인해 주세요: '+e.message); return; }
-  const mode=(document.querySelector('[name=ex_mode]:checked')||{}).value||'combat', s=P().exped, busy=s&&(Object.keys(s.jobs||{}).length||Object.values((s.biz||{}).assign||{}).flat().length);
+  const mode=(document.querySelector('[name=ex_mode]:checked')||{}).value||'combat', s=P().exped, busy=Object.keys(P().disp||{}).length||s&&(Object.keys(s.jobs||{}).length||Object.values((s.biz||{}).assign||{}).flat().length); // 전투형 파견도 진행 중이면 확인
   if(mode!==exMode()&&busy&&!(await appConfirm('진행 중인 일정·배치가 있어요. 방식을 바꾸면 진행 중인 일정은 보상 없이 끝나고 배치가 풀려요. 바꿀까요?'))) return;
-  if(mode!==exMode()&&s){ s.jobs={}; s.biz.assign={}; s.biz.at=0; s.offers={}; }
+  if(mode!==exMode()){ if(s){ s.jobs={}; s.biz.assign={}; s.biz.at=0; s.offers={}; } P().disp={}; if(P().dboard) P().dboard.list=[]; } // 바꾸면 전투형 파견도 끝냄(남으면 대원이 계속 바쁨)
   Object.assign(exMeta(),adv,{mode}); mark('meta','prog'); closeModal(); render(); }
 
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act, id=el.dataset.id;

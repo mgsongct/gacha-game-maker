@@ -221,7 +221,7 @@ try {
     const c = G.chars.filter(x => !x.alt)[0]; if (!own(c.id)) grantOwned(c, 't'); const id = c.id, back = (jid, h) => { EXS().jobs[jid].start -= h * 3600e3; };
     await setMode('idol'); tab = 'disp'; render(); o.idolPage = !!document.querySelector('[data-act="exjob"]');
     const off = exOffers(id); o.assigned = off.offers.length === 1 && !off.choice; const g0 = P().gold, c0 = exCond(id);
-    exStart(id, off.offers[0]); o.busy = busyIds().has(id); o.condDrop = c0 - (EXS().cond[id].v); const jid = Object.keys(EXS().jobs)[0]; back(jid, 10); exClaim(jid);
+    const dm0 = (dm().cnt || {}).dispatch || 0; exStart(id, off.offers[0]); o.busy = busyIds().has(id); o.mission = ((dm().cnt || {}).dispatch || 0) === dm0 + 1; /* 일일 미션 "파견"이 다른 방식에서도 오름 */ o.condDrop = c0 - (EXS().cond[id].v); const jid = Object.keys(EXS().jobs)[0]; back(jid, 10); o.badge = dispDone() >= 1; exClaim(jid);
     o.gold = P().gold > g0; o.fame = EXS().fame[id] > 0; exRest(id, 4); o.resting = exResting(id) && busyIds().has(id);
     EXS().fame[id] = 5000; delete EXS().offers[id]; EXS().cond[id] = { v: 90, at: Date.now() }; const top = exOffers(id); o.top = top.choice && top.offers.length > 1; render(); o.topPage = document.querySelectorAll('[data-act="exjob"]').length > 1;
     await setMode('streamer'); render(); o.streamPage = !!document.querySelector('[data-act="exstream"]');
@@ -230,6 +230,7 @@ try {
     await setMode('business'); render(); o.bizPage = !!document.querySelector('[data-exassign]');
     exAssign('floor', 0, id); o.bizBusy = busyIds().has(id); EXS().biz.at -= 5 * 3600e3; EXS().cond[id].at -= 5 * 3600e3; EXS().biz.rep = 500; const g2 = P().gold, rep0 = EXS().biz.rep;
     exBizSettle(true); o.bizGold = P().gold > g2; o.repMoved = EXS().biz.rep !== rep0; o.bizCond = exCond(id) < 100;
+    P().disp = { dz: { chars: [id], start: Date.now(), hours: 2 } }; appConfirm = async () => true; await setMode('idol'); o.dispCleared = !Object.keys(P().disp).length; // 방식을 바꾸면 전투형 파견도 끝남
     await setMode('combat'); render(); o.combatPage = !!document.querySelector('[data-act="dispset"],[data-act="dispredo"]'); o.freed = !busyIds().has(id);
     return o; });
   assert.ok(Object.values(r11).every(v => v === true || (typeof v === 'number' && v > 0)), JSON.stringify(r11)); assert.deepEqual(err11, [], '페이지 오류');

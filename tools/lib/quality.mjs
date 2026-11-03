@@ -15,3 +15,8 @@ export function sgRules(units) { const R = { listeners: [], emptyCatch: [] };
 export function complexFns(fns, cc = 40, lines = 120) { return [...fns.values()].filter(f => !f.cases && !f.table && (f.cc >= cc || f.lines >= lines || f.depth >= 7)).sort((a, b) => b.cc - a.cc); }
 // 분배기의 case 중 복잡한 것(case 하나가 함수 하나만큼 커지면 따로 빼는 게 좋음)
 export function complexCases(fns, cc = 20) { return [...fns.values()].filter(f => f.cases).flatMap(f => f.cases.map(c => ({ ...c, fn: f.name }))).filter(c => c.cc >= cc || c.depth >= 5).sort((a, b) => b.cc - a.cc); }
+// 주석 속 코드: 한 줄에 여러 문장을 쓰는 코드 중간에 // 주석을 넣으면 그 뒤 문장이 통째로 주석이 됨(문법 오류가 아니라 조용히 빠짐).
+// 주석 글에 문장 모양(세미콜론 뒤 대입·호출, 닫는 괄호 뒤 세미콜론)이 있으면 의심으로 표시 — 따옴표·백틱 안(코드 예시)은 빼고 봄
+export function commentedCode(units) { const out = [], CODE = /;\s*(const |let |var |if\s*\(|return\b|await |[\w$.\[\]'"]+\s*(=[^=]|\())|\)\s*;\s*\S|\}\s*\)\s*;/;
+  for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'comment' || !n.text.startsWith('//')) return; if (CODE.test(n.text.slice(2).replace(/`[^`]*`|"[^"]*"|'[^']*'/g, ''))) out.push({ loc: u.loc(n), text: n.text.slice(0, 80) }); });
+  return out; }
