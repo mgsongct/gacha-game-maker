@@ -1,50 +1,10 @@
 {
- "at": "2026-11-03T15:33:57.114Z",
- "ref": "6f687b4cf69c15f7d38e59646a1ecf8c10e9305d",
+ "at": "2026-11-03T17:21:18.706Z",
+ "ref": "59cd3f99b1d534c1acc10e2f0636d77140c7f095",
  "sites": [
   {
-   "key": "(지점 모름) (최상위 문장)",
-   "n": 30,
-   "situations": [
-    "idol-audition · 기본",
-    "idol-audition · 마지막 스테이지: 전투",
-    "idol-audition · 마지막 스테이지: 콘테스트",
-    "idol-audition · 마지막 스테이지: 회담",
-    "idol-audition · 이야기 빠르게",
-    "idol-audition · 플레이어가 쓴 플롯",
-    "idol-audition · 대화만 스테이지 없음",
-    "idol-audition · 파견: 아이돌",
-    "idol-audition · 파견: 방송",
-    "idol-audition · 파견: 경영",
-    "idol-audition · 출연 성별: 여성만",
-    "idol-audition · 출연 성별: 남성만",
-    "idol-audition · 2차 창작",
-    "idol-audition · 개성 시트 없음",
-    "idol-audition · 세력 없음",
-    "sky-knights · 기본",
-    "sky-knights · 마지막 스테이지: 전투",
-    "sky-knights · 마지막 스테이지: 콘테스트",
-    "sky-knights · 마지막 스테이지: 회담",
-    "sky-knights · 이야기 빠르게",
-    "sky-knights · 플레이어가 쓴 플롯",
-    "sky-knights · 대화만 스테이지 없음",
-    "sky-knights · 파견: 아이돌",
-    "sky-knights · 파견: 방송",
-    "sky-knights · 파견: 경영",
-    "sky-knights · 출연 성별: 여성만",
-    "sky-knights · 출연 성별: 남성만",
-    "sky-knights · 2차 창작",
-    "sky-knights · 개성 시트 없음",
-    "sky-knights · 세력 없음"
-   ],
-   "combos": {
-    "BATTLE_FLOW,JSON_ONLY_SUFFIX,PF_POLISH": 30
-   },
-   "switches": []
-  },
-  {
    "key": "(지점 모름) aiAltChar",
-   "n": 30,
+   "n": 180,
    "situations": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
@@ -78,13 +38,13 @@
     "sky-knights · 세력 없음"
    ],
    "combos": {
-    "JSON_ONLY_SUFFIX,SKILL_KIT_DESIGN,SKILL_PALETTE": 30
+    "JSON_ONLY_SUFFIX,SKILL_KIT_DESIGN,SKILL_PALETTE": 180
    },
    "switches": []
   },
   {
    "key": "(지점 모름) aiNewPickupChar",
-   "n": 30,
+   "n": 180,
    "situations": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
@@ -118,7 +78,7 @@
     "sky-knights · 세력 없음"
    ],
    "combos": {
-    "JSON_ONLY_SUFFIX,SKILL_KIT_DESIGN,SKILL_PALETTE": 30
+    "JSON_ONLY_SUFFIX,SKILL_KIT_DESIGN,SKILL_PALETTE": 180
    },
    "switches": []
   },
@@ -283,6 +243,62 @@
    "switches": []
   },
   {
+   "key": "0015-prompt-studio/010-studio.js pstPolish",
+   "n": 30,
+   "situations": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 이야기 빠르게",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 이야기 빠르게",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ],
+   "combos": {
+    "BATTLE_FLOW,JSON_ONLY_SUFFIX,PF_POLISH": 30
+   },
+   "switches": [
+    {
+     "cond": "less",
+     "vars": [
+      "less"
+     ],
+     "yes": [
+      "「지금까지 쌓인 교훈:」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/010-studio.js:360",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    }
+   ]
+  },
+  {
    "key": "0020-ai-connect.js naiBlocksSeparate",
    "n": 90,
    "situations": [
@@ -323,7 +339,7 @@
    "switches": []
   },
   {
-   "key": "0030-character-regen.js designAI",
+   "key": "0030-image/010-engine.js designAI",
    "n": 30,
    "situations": [
     "idol-audition · 기본",
@@ -363,8 +379,8 @@
    "switches": []
   },
   {
-   "key": "0030-character-regen.js weaponPromptAI",
-   "n": 30,
+   "key": "0030-image/010-engine.js weaponPromptAI",
+   "n": 32,
    "situations": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
@@ -381,6 +397,7 @@
     "idol-audition · 2차 창작",
     "idol-audition · 개성 시트 없음",
     "idol-audition · 세력 없음",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
     "sky-knights · 기본",
     "sky-knights · 마지막 스테이지: 전투",
     "sky-knights · 마지막 스테이지: 콘테스트",
@@ -395,10 +412,11 @@
     "sky-knights · 출연 성별: 남성만",
     "sky-knights · 2차 창작",
     "sky-knights · 개성 시트 없음",
-    "sky-knights · 세력 없음"
+    "sky-knights · 세력 없음",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC"
    ],
    "combos": {
-    "IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,WEAPON_ART": 30
+    "IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,WEAPON_ART": 32
    },
    "switches": [
     {
@@ -412,7 +430,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/020-requests.js:12",
      "seen": {
-      "yes": 30,
+      "yes": 32,
       "no": 0
      }
     }
@@ -555,7 +573,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -741,7 +759,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 4,
       "no": 4
@@ -756,7 +774,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 4,
       "no": 0
@@ -771,7 +789,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -814,7 +832,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -928,49 +946,7 @@
    ]
   },
   {
-   "key": "0160-free-chat.js heroTags",
-   "n": 32,
-   "situations": [
-    "idol-audition · 기본",
-    "idol-audition · 마지막 스테이지: 전투",
-    "idol-audition · 마지막 스테이지: 콘테스트",
-    "idol-audition · 마지막 스테이지: 회담",
-    "idol-audition · 이야기 빠르게",
-    "idol-audition · 플레이어가 쓴 플롯",
-    "idol-audition · 대화만 스테이지 없음",
-    "idol-audition · 파견: 아이돌",
-    "idol-audition · 파견: 방송",
-    "idol-audition · 파견: 경영",
-    "idol-audition · 출연 성별: 여성만",
-    "idol-audition · 출연 성별: 남성만",
-    "idol-audition · 2차 창작",
-    "idol-audition · 개성 시트 없음",
-    "idol-audition · 세력 없음",
-    "idol-audition · 새 게임 · 자동",
-    "sky-knights · 기본",
-    "sky-knights · 마지막 스테이지: 전투",
-    "sky-knights · 마지막 스테이지: 콘테스트",
-    "sky-knights · 마지막 스테이지: 회담",
-    "sky-knights · 이야기 빠르게",
-    "sky-knights · 플레이어가 쓴 플롯",
-    "sky-knights · 대화만 스테이지 없음",
-    "sky-knights · 파견: 아이돌",
-    "sky-knights · 파견: 방송",
-    "sky-knights · 파견: 경영",
-    "sky-knights · 출연 성별: 여성만",
-    "sky-knights · 출연 성별: 남성만",
-    "sky-knights · 2차 창작",
-    "sky-knights · 개성 시트 없음",
-    "sky-knights · 세력 없음",
-    "sky-knights · 새 게임 · 자동"
-   ],
-   "combos": {
-    "HERO_TAGS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD": 32
-   },
-   "switches": []
-  },
-  {
-   "key": "0185-game-rules.js rulesAIData",
+   "key": "0135-schedule.js spotTalkAI",
    "n": 30,
    "situations": [
     "idol-audition · 기본",
@@ -1005,16 +981,16 @@
     "sky-knights · 세력 없음"
    ],
    "combos": {
-    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 11,
-    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_PLAYER_PLOT,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
-    "CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
-    "CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
-    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_SOURCE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
-    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 11,
-    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
-    "CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
-    "CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
-    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,SPOT_TALK": 11,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_PLAYER_PLOT,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,SPOT_TALK": 1,
+    "CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,SCRIPT_FMT,SPOT_TALK": 1,
+    "CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,SCRIPT_FMT,SPOT_TALK": 1,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_SOURCE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,SPOT_TALK": 1,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,SPOT_TALK": 11,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,SPOT_TALK": 1,
+    "CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,SCRIPT_FMT,SPOT_TALK": 1,
+    "CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,SCRIPT_FMT,SPOT_TALK": 1,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,SPOT_TALK": 1
    },
    "switches": [
     {
@@ -1026,7 +1002,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -1212,7 +1188,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -1227,7 +1203,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -1242,7 +1218,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -1285,7 +1261,484 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "out.length",
+     "vars": [
+      "out"
+     ],
+     "yes": [
+      "「이번 장과 관련된 도감 기록(출처: 도감, 작가 확정 규칙과 충돌하면 규」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:69",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "bio",
+     "vars": [
+      "bio"
+     ],
+     "yes": [
+      "PLAYER_BIO"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:39",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "nxt",
+     "vars": [
+      "nxt"
+     ],
+     "yes": [
+      "「, 아직 드러내지 않음)」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:52",
+     "seen": {
+      "yes": 28,
+      "no": 0
+     }
+    },
+    {
+     "cond": "mem.length",
+     "vars": [
+      "mem"
+     ],
+     "yes": [
+      "「(지금은 적으로 나올 수 있음)」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:52",
+     "seen": {
+      "yes": 14,
+      "no": 0
+     }
+    },
+    {
+     "cond": "st==='hostile'",
+     "vars": [
+      "hostile"
+     ],
+     "yes": [
+      "「(지금은 적으로 나올 수 있음)」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:52",
+     "seen": {
+      "yes": 14,
+      "no": 0
+     }
+    },
+    {
+     "cond": "fixed.length",
+     "vars": [
+      "fixed"
+     ],
+     "yes": [
+      "「첫 등장 장면이 정해짐:」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:58",
+     "seen": {
+      "yes": 30,
+      "no": 0
+     }
+    },
+    {
+     "cond": "later.length",
+     "vars": [
+      "later"
+     ],
+     "yes": [
+      "「정해진 장면 없음:」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:58",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    }
+   ]
+  },
+  {
+   "key": "0160-free-chat.js heroTags",
+   "n": 38,
+   "situations": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 이야기 빠르게",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "idol-audition · 새 게임 · 자동",
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 이야기 빠르게",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
+   ],
+   "combos": {
+    "HERO_TAGS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD": 38
+   },
+   "switches": []
+  },
+  {
+   "key": "0185-game-rules.js rulesAIData",
+   "n": 30,
+   "situations": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 이야기 빠르게",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 이야기 빠르게",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ],
+   "combos": {
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 11,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_PLAYER_PLOT,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
+    "CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
+    "CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_SOURCE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 11,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
+    "CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
+    "CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,RULES_AI_DESC": 1
+   },
+   "switches": [
+    {
+     "cond": "tone",
+     "vars": [
+      "tone"
+     ],
+     "yes": [
+      "TONE_RULE"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "w.source",
+     "vars": [
+      "w.source"
+     ],
+     "yes": [
+      "CTX_SOURCE"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:46",
+     "seen": {
+      "yes": 2,
+      "no": 0
+     }
+    },
+    {
+     "cond": "side",
+     "vars": [
+      "side"
+     ],
+     "yes": [],
+     "no": [
+      "CTX_PLAYER_PLOT",
+      "「메인 플롯(작가용 비밀 설정 포함):」"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:46",
+     "seen": {
+      "yes": 0,
+      "no": 30
+     }
+    },
+    {
+     "cond": "storyCfg().plot",
+     "vars": [
+      "storyCfg().plot"
+     ],
+     "yes": [
+      "CTX_PLAYER_PLOT"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:46",
+     "seen": {
+      "yes": 2,
+      "no": 0
+     }
+    },
+    {
+     "cond": "bib",
+     "vars": [
+      "bib"
+     ],
+     "yes": [
+      "CTX_BIBLE",
+      "「작가 설정(세계관 참고용):」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:46",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "side",
+     "vars": [
+      "side"
+     ],
+     "yes": [
+      "「작가 설정(세계관 참고용):」"
+     ],
+     "no": [
+      "CTX_BIBLE"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:46",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "side",
+     "vars": [
+      "side"
+     ],
+     "yes": [],
+     "no": [
+      "「메인 스토리 진행:」"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:46",
+     "seen": {
+      "yes": 0,
+      "no": 30
+     }
+    },
+    {
+     "cond": "c.alt&&charById(c.alt)",
+     "vars": [
+      "c.alt",
+      "charById"
+     ],
+     "yes": [
+      "CTX_ALT_CANON"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:46",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "G.chars.some(c=>c.alt&&!c.altCanon)",
+     "vars": [
+      "G.chars",
+      "c.alt",
+      "c.altCanon"
+     ],
+     "yes": [
+      "CTX_ALT_SIDE"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:46",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "(G.npcs||[]).length",
+     "vars": [
+      "G.npcs"
+     ],
+     "yes": [
+      "CTX_NPCS"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:46",
+     "seen": {
+      "yes": 15,
+      "no": 0
+     }
+    },
+    {
+     "cond": "L.length",
+     "vars": [],
+     "yes": [
+      "「공유 보관함 배경(이 이름을 쓰면 그림을 바로 재사용):」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:46",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "(t&&!/^(정하지 ?않음|없음|모름|비밀)$/.test(t))",
+     "vars": [
+      "test"
+     ],
+     "yes": [
+      "PLAYER_GENDER_TEXT"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:40",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "k==='f'",
+     "vars": [],
+     "yes": [
+      "CAST_SEX_F"
+     ],
+     "no": [
+      "CAST_SEX_M",
+      "CAST_SEX_MIX"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
+     "seen": {
+      "yes": 2,
+      "no": 2
+     }
+    },
+    {
+     "cond": "k==='m'",
+     "vars": [],
+     "yes": [
+      "CAST_SEX_M"
+     ],
+     "no": [
+      "CAST_SEX_MIX"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
+     "seen": {
+      "yes": 2,
+      "no": 0
+     }
+    },
+    {
+     "cond": "k==='mix'",
+     "vars": [
+      "mix"
+     ],
+     "yes": [
+      "CAST_SEX_MIX"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "M.length",
+     "vars": [],
+     "yes": [
+      "CTX_BESTIARY"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:54",
+     "seen": {
+      "yes": 30,
+      "no": 0
+     }
+    },
+    {
+     "cond": "unmet.length",
+     "vars": [
+      "unmet"
+     ],
+     "yes": [
+      "CTX_UNMET"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:54",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "notes",
+     "vars": [
+      "notes"
+     ],
+     "yes": [
+      "SM_NOTES"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -1455,7 +1908,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -1641,7 +2094,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -1656,7 +2109,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -1671,7 +2124,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -1714,7 +2167,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -1863,20 +2316,20 @@
     "sky-knights · 세력 없음"
    ],
    "combos": {
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 18,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_SCRIPT,CHAR_LINES_RULE,CH_REQUEST,CH_THREADS,COMMON_RULES,CTX_BESTIARY,DETAIL_RULE,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,REL_CTX,REL_RULE,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_PLAYER_PLOT,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ALL_BATTLE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_SOURCE,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 18,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_SCRIPT,CHAR_LINES_RULE,CH_REQUEST,CH_THREADS,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,REL_CTX,REL_RULE,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ALL_BATTLE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAN_CLUES,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 18,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_SCRIPT,CHAR_LINES_RULE,CH_REQUEST,CH_THREADS,COMMON_RULES,CTX_BESTIARY,DETAIL_RULE,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAN_CLUES,PLAYER_GENDER_OPEN,REL_CTX,REL_RULE,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_PLAYER_PLOT,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAN_CLUES,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAN_CLUES,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ALL_BATTLE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAN_CLUES,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAN_CLUES,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_SOURCE,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,PLAN_CLUES,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAN_BRANCH_HERE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 18,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_SCRIPT,CHAR_LINES_RULE,CH_REQUEST,CH_THREADS,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAN_BRANCH_HERE,PLAYER_GENDER_OPEN,REL_CTX,REL_RULE,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAN_BRANCH_HERE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAN_BRANCH_HERE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ALL_BATTLE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAN_BRANCH_HERE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAN_BRANCH_HERE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,CH_HOW_DEEP,CH_REQUEST,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DIRECTION_GUIDE,ENEMY_REUSE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_MAIN,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAN_BRANCH_HERE,PLAYER_GENDER_OPEN,REL_CTX,SCRIPT_FMT,SKILL_RULE,SM_MEMO,STAGE_MODES,TALK_ONLY_RULE": 2
    },
    "switches": [
     {
@@ -1987,7 +2440,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -2155,7 +2608,7 @@
       "NPC_RULE"
      ],
      "no": [],
-     "loc": "src/main/0250-story-factory.js:2",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:197",
      "seen": {
       "yes": 30,
       "no": 0
@@ -2170,7 +2623,7 @@
      "no": [
       "NPC_NEW_RULE"
      ],
-     "loc": "src/main/0250-story-factory.js:2",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:197",
      "seen": {
       "yes": 0,
       "no": 60
@@ -2216,7 +2669,7 @@
       "TALK_ALL_BATTLE"
      ],
      "no": [],
-     "loc": "src/main/0250-story-factory.js:3",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:198",
      "seen": {
       "yes": 4,
       "no": 0
@@ -2229,7 +2682,7 @@
       "ENEMY_REUSE"
      ],
      "no": [],
-     "loc": "src/main/0290-season-rotation.js:118",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:200",
      "seen": {
       "yes": 60,
       "no": 0
@@ -2381,7 +2834,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 4,
       "no": 4
@@ -2396,7 +2849,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 4,
       "no": 0
@@ -2411,7 +2864,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -2454,7 +2907,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -2486,7 +2939,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:106",
      "seen": {
-      "yes": 0,
+      "yes": 30,
       "no": 0
      }
     },
@@ -2516,7 +2969,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:108",
      "seen": {
-      "yes": 0,
+      "yes": 60,
       "no": 0
      }
     },
@@ -2546,7 +2999,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:110",
      "seen": {
-      "yes": 0,
+      "yes": 30,
       "no": 0
      }
     },
@@ -2738,13 +3191,13 @@
    "combos": {
     "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ONLY_RULE": 10,
     "BATTLE_FLOW,CAST_LOCK_RULE,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,DETAIL_RULE,DIRECTION_GUIDE,ENEMY_REUSE,EV_CG_MARK_SCRIPT,EV_REQUEST,EV_THREADS,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,REL_RULE,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 1,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ALL_BATTLE": 1,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ALL_BATTLE": 1,
     "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ONLY_RULE": 1,
     "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ONLY_RULE": 1,
     "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,CTX_SOURCE,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ONLY_RULE": 1,
     "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ONLY_RULE": 10,
     "BATTLE_FLOW,CAST_LOCK_RULE,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,ENEMY_REUSE,EV_CG_MARK_SCRIPT,EV_REQUEST,EV_THREADS,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,REL_RULE,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 1,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ALL_BATTLE": 1,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ALL_BATTLE": 1,
     "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ONLY_RULE": 1,
     "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ONLY_RULE": 1,
     "BATTLE_FLOW,CAST_LOCK_RULE,CG_MARK_BEATS,CHAR_LINES_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DIRECTION_GUIDE,ENEMY_REUSE,EV_HOW_DEEP,EV_REQUEST,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NEWC_RARITY_EVENT,NEWC_RULE,NPC_NEW_RULE,NPC_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,SKILL_RULE,STAGE_MODES,TALK_ONLY_RULE": 1
@@ -2871,7 +3324,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -3039,7 +3492,7 @@
       "EV_PAST"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:15",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:195",
      "seen": {
       "yes": 0,
       "no": 0
@@ -3052,7 +3505,7 @@
       "NPC_RULE"
      ],
      "no": [],
-     "loc": "src/main/0250-story-factory.js:2",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:197",
      "seen": {
       "yes": 15,
       "no": 0
@@ -3067,7 +3520,7 @@
      "no": [
       "NPC_NEW_RULE"
      ],
-     "loc": "src/main/0250-story-factory.js:2",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:197",
      "seen": {
       "yes": 0,
       "no": 30
@@ -3080,7 +3533,7 @@
       "TALK_ALL_BATTLE"
      ],
      "no": [],
-     "loc": "src/main/0250-story-factory.js:3",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:198",
      "seen": {
       "yes": 2,
       "no": 0
@@ -3126,7 +3579,7 @@
       "ENEMY_REUSE"
      ],
      "no": [],
-     "loc": "src/main/0290-season-rotation.js:118",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:200",
      "seen": {
       "yes": 30,
       "no": 0
@@ -3265,7 +3718,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -3280,7 +3733,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -3295,7 +3748,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -3338,7 +3791,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -3487,339 +3940,6 @@
      ],
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:58",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    }
-   ]
-  },
-  {
-   "key": "0250-story-factory.js buildNewGameDraft",
-   "n": 10,
-   "situations": [
-    "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
-   ],
-   "combos": {
-    "EXPEDITION_RULE,EXPLORATION_NAME_RULE,FACTION_RULE,FINALE_RULE,JSON_ONLY_SUFFIX,NG_AUTO_HINT,NG_BASE_RULE,NG_HERO_ASK,NG_TERMS_NEW,NG_TITLE_KEYWORD,NG_WORLD,POS_RULE,PROFILE_TPL_RULE,TITLE_RULE,VARIANT_RULE": 2,
-    "CAST_DEBUT_RULE,CAST_RARITY_RULE,CHAR_LINES_RULE,COMMON_RULES,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NG_CAST,PLAYER_GENDER_OPEN,SKILL_RULE": 2,
-    "CAST_PLAN_RULE,COMMON_RULES,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_OPENING,PLAYER_GENDER_OPEN,SCRIPT_FMT": 1,
-    "BESTIARY_RULE,CAST_PLAN_RULE,COMMON_RULES,DETAIL_RULE,DIRECTION_GUIDE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_CHAPTER1,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 1,
-    "": 2,
-    "CAST_LOCK_RULE,CAST_PLAN_RULE,COMMON_RULES,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_OPENING,PLAYER_GENDER_OPEN,SCRIPT_FMT": 1,
-    "BESTIARY_RULE,CAST_LOCK_RULE,CAST_PLAN_RULE,COMMON_RULES,DETAIL_RULE,DIRECTION_GUIDE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_CHAPTER1,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 1
-   },
-   "switches": [
-    {
-     "cond": "auto",
-     "vars": [
-      "auto"
-     ],
-     "yes": [
-      "NG_AUTO_HINT"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
-     "seen": {
-      "yes": 2,
-      "no": 0
-     }
-    },
-    {
-     "cond": "heroBlank",
-     "vars": [
-      "heroBlank"
-     ],
-     "yes": [
-      "NG_HERO_ASK"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
-     "seen": {
-      "yes": 2,
-      "no": 0
-     }
-    },
-    {
-     "cond": "hero.call",
-     "vars": [
-      "hero.call"
-     ],
-     "yes": [
-      "NG_PLAYER_TERM"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "String(draft.crewTerm||'').trim()",
-     "vars": [
-      "draft.crewTerm",
-      "trim()"
-     ],
-     "yes": [
-      "NG_CREW_TERM"
-     ],
-     "no": [
-      "NG_TERMS_NEW"
-     ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
-     "seen": {
-      "yes": 0,
-      "no": 2
-     }
-    },
-    {
-     "cond": "!DT&&(hero.name||hero.gender||hero.look||hero.bio)",
-     "vars": [
-      "hero.name",
-      "hero.gender",
-      "hero.look",
-      "hero.bio"
-     ],
-     "yes": [
-      "「주인공(플레이어): 이름」",
-      "「(세계관 호칭)」",
-      "「, 성별·성 정체성」"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "없으면: hero.name",
-     "vars": [
-      "hero.name"
-     ],
-     "yes": [],
-     "no": [
-      "「(세계관 호칭)」"
-     ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "userTitle",
-     "vars": [
-      "userTitle"
-     ],
-     "yes": [
-      "NG_TITLE_FIXED"
-     ],
-     "no": [
-      "TITLE_RULE",
-      "NG_TITLE_KEYWORD"
-     ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
-     "seen": {
-      "yes": 0,
-      "no": 2
-     }
-    },
-    {
-     "cond": "th==='auto'",
-     "vars": [
-      "auto"
-     ],
-     "yes": [
-      "「tactical, fantasy, neon, pastel, noir 중 」"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
-     "seen": {
-      "yes": 2,
-      "no": 0
-     }
-    },
-    {
-     "cond": "src",
-     "vars": [
-      "src"
-     ],
-     "yes": [
-      "NG_FANFIC"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:38",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "SC.plot",
-     "vars": [
-      "SC.plot"
-     ],
-     "yes": [
-      "NG_PLAYER_PLOT"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:39",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "DT",
-     "vars": [],
-     "yes": [
-      "NG_AUTHOR_BIBLE"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:40",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "k==='f'",
-     "vars": [],
-     "yes": [
-      "CAST_SEX_F"
-     ],
-     "no": [
-      "CAST_SEX_M",
-      "CAST_SEX_MIX"
-     ],
-     "loc": "src/main/0010-rules.js:8",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "k==='m'",
-     "vars": [],
-     "yes": [
-      "CAST_SEX_M"
-     ],
-     "no": [
-      "CAST_SEX_MIX"
-     ],
-     "loc": "src/main/0010-rules.js:8",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "k==='mix'",
-     "vars": [
-      "mix"
-     ],
-     "yes": [
-      "CAST_SEX_MIX"
-     ],
-     "no": [],
-     "loc": "src/main/0010-rules.js:8",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "(d.setting.trim())",
-     "vars": [
-      "d.setting"
-     ],
-     "yes": [
-      "「[설정: 세력·용어·규칙·비밀]」"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:132",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "(d.story.trim())",
-     "vars": [
-      "d.story"
-     ],
-     "yes": [
-      "「[스토리 개요]」"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:133",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "(cs.length)",
-     "vars": [],
-     "yes": [
-      "「성격·과거·관계:」"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:135",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "(hr.name||hr.call||hr.gender||hr.look||hr.bio)",
-     "vars": [
-      "hr.name",
-      "hr.call",
-      "hr.gender",
-      "hr.look",
-      "hr.bio"
-     ],
-     "yes": [
-      "「(AI가 정함)」",
-      "「(호칭으로만 부름)」",
-      "「성별·성 정체성:」"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:136",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "없으면: hr.call",
-     "vars": [
-      "hr.call"
-     ],
-     "yes": [],
-     "no": [
-      "「(AI가 정함)」"
-     ],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:136",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "없으면: hr.name",
-     "vars": [
-      "hr.name"
-     ],
-     "yes": [],
-     "no": [
-      "「(호칭으로만 부름)」"
-     ],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:136",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4061,7 +4181,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4161,7 +4281,7 @@
   },
   {
    "key": "0250-story-factory.js writeStages",
-   "n": 84,
+   "n": 336,
    "situations": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
@@ -4193,24 +4313,48 @@
     "sky-knights · 세력 없음"
    ],
    "combos": {
-    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 20,
-    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 11,
-    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_PLAYER_PLOT,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 1,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 1,
-    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 1,
-    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 20,
-    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 11,
-    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 1,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 1,
-    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
-    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 1
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE": 20,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 40,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 20,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_WRITE_GUIDE": 22,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 44,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 22,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_CLUES,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE": 20,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 40,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 20,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_F,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,CAST_SEX_M,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE": 2,
+    "CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_WRITE_GUIDE,STAGE_WRITE_RULE": 4,
+    "BATTLE_FLOW,CAST_LOCK_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,JSON_ONLY_SUFFIX,PLAN_BRANCH_HERE,PLAN_WRITE_RULE,PLAYER_GENDER_OPEN,PREV_TAIL,SCRIPT_FMT,SM_MEMO,STAGE_LAST_ENDING,STAGE_WRITE_GUIDE": 2
    },
    "switches": [
     {
@@ -4224,7 +4368,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/020-requests.js:30",
      "seen": {
-      "yes": 56,
+      "yes": 224,
       "no": 0
      }
     },
@@ -4239,7 +4383,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/020-requests.js:30",
      "seen": {
-      "yes": 56,
+      "yes": 308,
       "no": 0
      }
     },
@@ -4257,7 +4401,7 @@
      "loc": "src/main/0015-prompt-studio/020-requests.js:30",
      "seen": {
       "yes": 0,
-      "no": 84
+      "no": 168
      }
     },
     {
@@ -4272,7 +4416,7 @@
      "loc": "src/main/0015-prompt-studio/020-requests.js:30",
      "seen": {
       "yes": 0,
-      "no": 84
+      "no": 168
      }
     },
     {
@@ -4297,7 +4441,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4314,7 +4458,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:46",
      "seen": {
-      "yes": 6,
+      "yes": 24,
       "no": 0
      }
     },
@@ -4331,7 +4475,7 @@
      "loc": "src/main/0015-prompt-studio/030-builders.js:46",
      "seen": {
       "yes": 0,
-      "no": 56
+      "no": 224
      }
     },
     {
@@ -4345,7 +4489,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:46",
      "seen": {
-      "yes": 4,
+      "yes": 16,
       "no": 0
      }
     },
@@ -4394,7 +4538,7 @@
      "loc": "src/main/0015-prompt-studio/030-builders.js:46",
      "seen": {
       "yes": 0,
-      "no": 56
+      "no": 224
      }
     },
     {
@@ -4441,7 +4585,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:46",
      "seen": {
-      "yes": 42,
+      "yes": 336,
       "no": 0
      }
     },
@@ -4532,7 +4676,7 @@
      "loc": "src/main/0015-prompt-studio/030-builders.js:97",
      "seen": {
       "yes": 0,
-      "no": 84
+      "no": 336
      }
     },
     {
@@ -4549,8 +4693,8 @@
      ],
      "loc": "src/main/0015-prompt-studio/030-builders.js:97",
      "seen": {
-      "yes": 0,
-      "no": 84
+      "yes": 168,
+      "no": 168
      }
     },
     {
@@ -4578,10 +4722,10 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
-      "yes": 6,
-      "no": 6
+      "yes": 24,
+      "no": 24
      }
     },
     {
@@ -4593,9 +4737,9 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
-      "yes": 6,
+      "yes": 24,
       "no": 0
      }
     },
@@ -4608,7 +4752,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4623,7 +4767,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:54",
      "seen": {
-      "yes": 84,
+      "yes": 336,
       "no": 0
      }
     },
@@ -4651,7 +4795,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4711,7 +4855,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:52",
      "seen": {
-      "yes": 78,
+      "yes": 312,
       "no": 0
      }
     },
@@ -4726,7 +4870,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:52",
      "seen": {
-      "yes": 39,
+      "yes": 156,
       "no": 0
      }
     },
@@ -4741,7 +4885,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:52",
      "seen": {
-      "yes": 39,
+      "yes": 156,
       "no": 0
      }
     },
@@ -4756,7 +4900,7 @@
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:58",
      "seen": {
-      "yes": 84,
+      "yes": 336,
       "no": 0
      }
     },
@@ -4778,7 +4922,7 @@
    ]
   },
   {
-   "key": "0260-new-game-draft.js drHarmony",
+   "key": "0260-new-game/010-draft.js drHarmony",
    "n": 30,
    "situations": [
     "idol-audition · 기본",
@@ -4961,7 +5105,7 @@
    ]
   },
   {
-   "key": "0260-new-game-draft.js drPolishHero",
+   "key": "0260-new-game/010-draft.js drPolishHero",
    "n": 30,
    "situations": [
     "idol-audition · 기본",
@@ -5101,6 +5245,365 @@
    ]
   },
   {
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
+   "n": 46,
+   "situations": [
+    "idol-audition · 새 게임 · 자동",
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
+   ],
+   "combos": {
+    "EXPEDITION_RULE,EXPLORATION_NAME_RULE,FACTION_RULE,FINALE_RULE,JSON_ONLY_SUFFIX,NG_AUTO_HINT,NG_BASE_RULE,NG_HERO_ASK,NG_TERMS_NEW,NG_TITLE_KEYWORD,NG_WORLD,POS_RULE,PROFILE_TPL_RULE,TITLE_RULE,VARIANT_RULE": 2,
+    "CAST_DEBUT_RULE,CAST_RARITY_RULE,CHAR_LINES_RULE,COMMON_RULES,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NG_CAST,PLAYER_GENDER_OPEN,SKILL_RULE": 2,
+    "CAST_PLAN_RULE,COMMON_RULES,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_OPENING,PLAYER_GENDER_OPEN,SCRIPT_FMT": 1,
+    "BESTIARY_RULE,CAST_PLAN_RULE,COMMON_RULES,DETAIL_RULE,DIRECTION_GUIDE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_CHAPTER1,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 1,
+    "": 8,
+    "EXPEDITION_RULE,EXPLORATION_NAME_RULE,FACTION_RULE,FINALE_RULE,JSON_ONLY_SUFFIX,NG_AUTHOR_BIBLE,NG_BASE_RULE,NG_FANFIC,NG_PLAYER_PLOT,NG_PLAYER_TERM,NG_TERMS_NEW,NG_TITLE_KEYWORD,NG_WORLD,POS_RULE,PROFILE_TPL_RULE,TITLE_RULE,VARIANT_RULE": 2,
+    "CALL_NAME,CAST_DEBUT_RULE,CAST_RARITY_RULE,CHAR_LINES_RULE,COMMON_RULES,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NG_AUTHOR_BIBLE,NG_CAST,NG_FANFIC,NG_PLAYER_PLOT,NG_SOURCE_TAGS,NG_STORY_CAST,PLAYER_GENDER_TEXT,SKILL_RULE": 2,
+    "CALL_NAME,CAST_PLAN_RULE,COMMON_RULES,CTX_BIBLE,CTX_PLAYER_PLOT,CTX_SOURCE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_FANFIC,NG_OPENING,PLAYER_GENDER_TEXT": 1,
+    "BESTIARY_RULE,CALL_NAME,CAST_PLAN_RULE,COMMON_RULES,CTX_BIBLE,CTX_PLAYER_PLOT,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_CHAPTER1,NG_FANFIC,PLAYER_GENDER_TEXT,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 1,
+    "EXPEDITION_RULE,EXPLORATION_NAME_RULE,FACTION_RULE,FINALE_RULE,JSON_ONLY_SUFFIX,NG_AUTHOR_BIBLE,NG_BASE_RULE,NG_HERO_ASK,NG_TERMS_NEW,NG_TITLE_KEYWORD,NG_WORLD,POS_RULE,PROFILE_TPL_RULE,TITLE_RULE,VARIANT_RULE": 2,
+    "CAST_DEBUT_RULE,CAST_RARITY_RULE,CHAR_LINES_RULE,COMMON_RULES,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NG_AUTHOR_BIBLE,NG_AUTHOR_CAST,NG_CAST,PLAYER_GENDER_OPEN,SKILL_RULE": 2,
+    "CHAR_LINES_RULE,COMMON_RULES,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NG_FILL_MISSING,PLAYER_GENDER_OPEN,SKILL_RULE": 4,
+    "IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NG_NPC_ART": 2,
+    "CAST_PLAN_RULE,COMMON_RULES,CTX_BIBLE,CTX_NPCS,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_OPENING,PLAYER_GENDER_OPEN,SCRIPT_FMT": 1,
+    "BESTIARY_RULE,CAST_PLAN_RULE,COMMON_RULES,CTX_BIBLE,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_CHAPTER1,NPC_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 1,
+    "CAST_SEX_F,EXPEDITION_RULE,EXPLORATION_NAME_RULE,FACTION_RULE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_BASE_RULE,NG_HERO_ASK,NG_TERMS_NEW,NG_TITLE_KEYWORD,NG_WORLD,POS_RULE,PROFILE_TPL_RULE,TITLE_RULE,VARIANT_RULE": 2,
+    "CAST_DEBUT_RULE,CAST_RARITY_RULE,CAST_SEX_F,CHAR_LINES_RULE,COMMON_RULES,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,NG_CAST,PLAYER_GENDER_OPEN,SKILL_RULE": 2,
+    "CAST_PLAN_RULE,CAST_SEX_F,COMMON_RULES,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_OPENING,PLAYER_GENDER_OPEN,SCRIPT_FMT": 1,
+    "BESTIARY_RULE,CAST_PLAN_RULE,CAST_SEX_F,COMMON_RULES,DETAIL_RULE,DIRECTION_GUIDE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_CHAPTER1,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_MODES,TALK_ALL_BATTLE,THREAD_DUP_RULE,THREAD_FMT": 1,
+    "CAST_LOCK_RULE,CAST_PLAN_RULE,COMMON_RULES,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_OPENING,PLAYER_GENDER_OPEN,SCRIPT_FMT": 1,
+    "BESTIARY_RULE,CAST_LOCK_RULE,CAST_PLAN_RULE,COMMON_RULES,DETAIL_RULE,DIRECTION_GUIDE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_CHAPTER1,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 1,
+    "CALL_NAME,CAST_LOCK_RULE,CAST_PLAN_RULE,COMMON_RULES,CTX_BIBLE,CTX_PLAYER_PLOT,CTX_SOURCE,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_FANFIC,NG_OPENING,PLAYER_GENDER_TEXT": 1,
+    "BESTIARY_RULE,CALL_NAME,CAST_LOCK_RULE,CAST_PLAN_RULE,COMMON_RULES,CTX_BIBLE,CTX_PLAYER_PLOT,CTX_SOURCE,DETAIL_RULE,DIRECTION_GUIDE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_CHAPTER1,NG_FANFIC,PLAYER_GENDER_TEXT,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 1,
+    "CAST_LOCK_RULE,CAST_PLAN_RULE,COMMON_RULES,CTX_BIBLE,CTX_NPCS,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_OPENING,PLAYER_GENDER_OPEN,SCRIPT_FMT": 1,
+    "BESTIARY_RULE,CAST_LOCK_RULE,CAST_PLAN_RULE,COMMON_RULES,CTX_BIBLE,CTX_NPCS,DETAIL_RULE,DIRECTION_GUIDE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_CHAPTER1,NPC_RULE,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_MODES,TALK_ONLY_RULE,THREAD_DUP_RULE,THREAD_FMT": 1,
+    "CAST_LOCK_RULE,CAST_PLAN_RULE,CAST_SEX_F,COMMON_RULES,DIRECTION_GUIDE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_OPENING,PLAYER_GENDER_OPEN,SCRIPT_FMT": 1,
+    "BESTIARY_RULE,CAST_LOCK_RULE,CAST_PLAN_RULE,CAST_SEX_F,COMMON_RULES,DETAIL_RULE,DIRECTION_GUIDE,FINALE_RULE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NG_CHAPTER1,PLAYER_GENDER_OPEN,SCRIPT_FMT,STAGE_MODES,TALK_ALL_BATTLE,THREAD_DUP_RULE,THREAD_FMT": 1
+   },
+   "switches": [
+    {
+     "cond": "auto",
+     "vars": [
+      "auto"
+     ],
+     "yes": [
+      "NG_AUTO_HINT"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "seen": {
+      "yes": 2,
+      "no": 0
+     }
+    },
+    {
+     "cond": "heroBlank",
+     "vars": [
+      "heroBlank"
+     ],
+     "yes": [
+      "NG_HERO_ASK"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "seen": {
+      "yes": 6,
+      "no": 0
+     }
+    },
+    {
+     "cond": "hero.call",
+     "vars": [
+      "hero.call"
+     ],
+     "yes": [
+      "NG_PLAYER_TERM"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "seen": {
+      "yes": 2,
+      "no": 0
+     }
+    },
+    {
+     "cond": "String(draft.crewTerm||'').trim()",
+     "vars": [
+      "draft.crewTerm",
+      "trim()"
+     ],
+     "yes": [
+      "NG_CREW_TERM"
+     ],
+     "no": [
+      "NG_TERMS_NEW"
+     ],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "seen": {
+      "yes": 0,
+      "no": 8
+     }
+    },
+    {
+     "cond": "!DT&&(hero.name||hero.gender||hero.look||hero.bio)",
+     "vars": [
+      "hero.name",
+      "hero.gender",
+      "hero.look",
+      "hero.bio"
+     ],
+     "yes": [
+      "「주인공(플레이어): 이름」",
+      "「(세계관 호칭)」",
+      "「, 성별·성 정체성」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "없으면: hero.name",
+     "vars": [
+      "hero.name"
+     ],
+     "yes": [],
+     "no": [
+      "「(세계관 호칭)」"
+     ],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "userTitle",
+     "vars": [
+      "userTitle"
+     ],
+     "yes": [
+      "NG_TITLE_FIXED"
+     ],
+     "no": [
+      "TITLE_RULE",
+      "NG_TITLE_KEYWORD"
+     ],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "seen": {
+      "yes": 0,
+      "no": 8
+     }
+    },
+    {
+     "cond": "th==='auto'",
+     "vars": [
+      "auto"
+     ],
+     "yes": [
+      "「tactical, fantasy, neon, pastel, noir 중 」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "seen": {
+      "yes": 8,
+      "no": 0
+     }
+    },
+    {
+     "cond": "src",
+     "vars": [
+      "src"
+     ],
+     "yes": [
+      "NG_FANFIC"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:38",
+     "seen": {
+      "yes": 8,
+      "no": 0
+     }
+    },
+    {
+     "cond": "SC.plot",
+     "vars": [
+      "SC.plot"
+     ],
+     "yes": [
+      "NG_PLAYER_PLOT"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:39",
+     "seen": {
+      "yes": 4,
+      "no": 0
+     }
+    },
+    {
+     "cond": "t",
+     "vars": [],
+     "yes": [
+      "NG_AUTHOR_BIBLE"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:40",
+     "seen": {
+      "yes": 8,
+      "no": 0
+     }
+    },
+    {
+     "cond": "k==='f'",
+     "vars": [],
+     "yes": [
+      "CAST_SEX_F"
+     ],
+     "no": [
+      "CAST_SEX_M",
+      "CAST_SEX_MIX"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
+     "seen": {
+      "yes": 8,
+      "no": 0
+     }
+    },
+    {
+     "cond": "k==='m'",
+     "vars": [],
+     "yes": [
+      "CAST_SEX_M"
+     ],
+     "no": [
+      "CAST_SEX_MIX"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "k==='mix'",
+     "vars": [
+      "mix"
+     ],
+     "yes": [
+      "CAST_SEX_MIX"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "(d.setting.trim())",
+     "vars": [
+      "d.setting"
+     ],
+     "yes": [
+      "「[설정: 세력·용어·규칙·비밀]」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:132",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "(d.story.trim())",
+     "vars": [
+      "d.story"
+     ],
+     "yes": [
+      "「[스토리 개요]」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:133",
+     "seen": {
+      "yes": 4,
+      "no": 0
+     }
+    },
+    {
+     "cond": "(cs.length)",
+     "vars": [],
+     "yes": [
+      "「성격·과거·관계:」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:135",
+     "seen": {
+      "yes": 8,
+      "no": 0
+     }
+    },
+    {
+     "cond": "(hr.name||hr.call||hr.gender||hr.look||hr.bio)",
+     "vars": [
+      "hr.name",
+      "hr.call",
+      "hr.gender",
+      "hr.look",
+      "hr.bio"
+     ],
+     "yes": [
+      "「(AI가 정함)」",
+      "「(호칭으로만 부름)」",
+      "「성별·성 정체성:」"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:136",
+     "seen": {
+      "yes": 8,
+      "no": 0
+     }
+    },
+    {
+     "cond": "없으면: hr.call",
+     "vars": [
+      "hr.call"
+     ],
+     "yes": [],
+     "no": [
+      "「(AI가 정함)」"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:136",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "없으면: hr.name",
+     "vars": [
+      "hr.name"
+     ],
+     "yes": [],
+     "no": [
+      "「(호칭으로만 부름)」"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:136",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    }
+   ]
+  },
+  {
    "key": "0270-skin-proposal.js skinLinesAI",
    "n": 30,
    "situations": [
@@ -5157,7 +5660,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -5343,7 +5846,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -5358,7 +5861,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -5373,7 +5876,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -5416,7 +5919,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -5618,7 +6121,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -5834,7 +6337,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -5849,7 +6352,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -5864,7 +6367,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -5907,7 +6410,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -6056,16 +6559,16 @@
     "sky-knights · 세력 없음"
    ],
    "combos": {
-    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PICKUP_NEW_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 11,
-    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_PLAYER_PLOT,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PICKUP_NEW_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
-    "CAST_LOCK_RULE,CAST_SEX_F,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PICKUP_NEW_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
-    "CAST_LOCK_RULE,CAST_SEX_M,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PICKUP_NEW_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
-    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_SOURCE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PICKUP_NEW_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
-    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PICKUP_NEW_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 11,
-    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PICKUP_NEW_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
-    "CAST_LOCK_RULE,CAST_SEX_F,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PICKUP_NEW_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
-    "CAST_LOCK_RULE,CAST_SEX_M,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PICKUP_NEW_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
-    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PICKUP_NEW_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1
+    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 11,
+    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_PLAYER_PLOT,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
+    "CAST_LOCK_RULE,CAST_SEX_F,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
+    "CAST_LOCK_RULE,CAST_SEX_M,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
+    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_SOURCE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
+    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 11,
+    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_PLAYER_PLOT,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
+    "CAST_LOCK_RULE,CAST_SEX_F,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
+    "CAST_LOCK_RULE,CAST_SEX_M,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1,
+    "CAST_LOCK_RULE,CHAR_LINES_RULE,CHAR_STAT_RULE,COMMON_RULES,CTX_BESTIARY,CTX_NPCS,CTX_SOURCE,IMG_GUIDE,JSON_ONLY_SUFFIX,LESSON_HEAD,NAI_CHAR,PLAYER_GENDER_OPEN,SKILL_RULE": 1
    },
    "switches": [
     {
@@ -6110,7 +6613,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -6358,7 +6861,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -6373,7 +6876,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -6388,7 +6891,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -6431,7 +6934,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -6601,7 +7104,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -6804,7 +7307,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -6819,7 +7322,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -6834,7 +7337,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -6877,7 +7380,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -7063,7 +7566,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -7266,7 +7769,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -7281,7 +7784,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -7296,7 +7799,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -7339,7 +7842,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -7504,7 +8007,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 1,
       "no": 1
@@ -7519,7 +8022,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 1,
       "no": 0
@@ -7534,7 +8037,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -7599,7 +8102,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -7785,7 +8288,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -7800,7 +8303,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -7815,7 +8318,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -7858,7 +8361,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -8028,7 +8531,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -8259,7 +8762,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -8274,7 +8777,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -8289,7 +8792,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -8332,7 +8835,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -8502,7 +9005,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -8688,7 +9191,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -8703,7 +9206,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -8718,7 +9221,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -8761,7 +9264,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -8979,7 +9482,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -9165,7 +9668,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -9180,7 +9683,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -9195,7 +9698,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -9238,7 +9741,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -9408,7 +9911,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -9594,7 +10097,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -9609,7 +10112,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -9624,7 +10127,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -9667,7 +10170,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -9837,7 +10340,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10023,7 +10526,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -10038,7 +10541,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -10053,7 +10556,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10096,7 +10599,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10259,7 +10762,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10290,7 +10793,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -10305,7 +10808,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -10320,7 +10823,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10400,7 +10903,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10586,7 +11089,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 6,
       "no": 6
@@ -10601,7 +11104,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 6,
       "no": 0
@@ -10616,7 +11119,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10659,7 +11162,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10830,7 +11333,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11016,7 +11519,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -11031,7 +11534,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -11046,7 +11549,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11089,7 +11592,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11300,7 +11803,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11486,7 +11989,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 6,
       "no": 6
@@ -11501,7 +12004,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 6,
       "no": 0
@@ -11516,7 +12019,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11559,7 +12062,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11814,7 +12317,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11845,7 +12348,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -11860,7 +12363,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -11875,7 +12378,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11962,6 +12465,26 @@
      }
     },
     {
+     "cond": "없으면: roomLog(c.id).slice(-10).map(l=>l.w==='me'?playerName()+': '+l.t:",
+     "vars": [
+      "roomLog",
+      "c.id",
+      "l.w",
+      "playerName()",
+      "l.t",
+      "c.name"
+     ],
+     "yes": [],
+     "no": [
+      "「(아직 대화 없음)」"
+     ],
+     "loc": "src/main/0015-prompt-studio/020-requests.js:123",
+     "seen": {
+      "yes": 0,
+      "no": 30
+     }
+    },
+    {
      "cond": "tone",
      "vars": [
       "tone"
@@ -11970,7 +12493,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -12169,7 +12692,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -12184,7 +12707,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -12199,7 +12722,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -12242,7 +12765,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -12357,7 +12880,7 @@
   },
   {
    "key": "0530-story-memory.js smExtract",
-   "n": 480,
+   "n": 750,
    "situations": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
@@ -12391,7 +12914,7 @@
     "sky-knights · 세력 없음"
    ],
    "combos": {
-    "JSON_ONLY_SUFFIX,SM_EXTRACT": 330,
+    "JSON_ONLY_SUFFIX,SM_EXTRACT": 600,
     "JSON_ONLY_SUFFIX,SM_EXTRACT_FINAL": 150
    },
    "switches": []
@@ -12446,7 +12969,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -12477,7 +13000,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 8,
       "no": 8
@@ -12492,7 +13015,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 8,
       "no": 0
@@ -12507,7 +13030,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -12587,7 +13110,7 @@
       "TONE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:9",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
      "seen": {
       "yes": 0,
       "no": 0
@@ -12773,7 +13296,7 @@
       "CAST_SEX_M",
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 2
@@ -12788,7 +13311,7 @@
      "no": [
       "CAST_SEX_MIX"
      ],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 2,
       "no": 0
@@ -12803,7 +13326,7 @@
       "CAST_SEX_MIX"
      ],
      "no": [],
-     "loc": "src/main/0010-rules.js:8",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
      "seen": {
       "yes": 0,
       "no": 0
@@ -12846,7 +13369,7 @@
       "SM_NOTES"
      ],
      "no": [],
-     "loc": "src/main/0530-story-memory.js:11",
+     "loc": "src/main/0015-prompt-studio/030-builders.js:202",
      "seen": {
       "yes": 0,
       "no": 0
@@ -12960,8 +13483,8 @@
    ]
   },
   {
-   "key": "그림 0030-character-regen.js naiDraw",
-   "n": 182,
+   "key": "그림 0030-image/010-engine.js naiDraw",
+   "n": 188,
    "situations": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
@@ -12979,6 +13502,9 @@
     "idol-audition · 개성 시트 없음",
     "idol-audition · 세력 없음",
     "idol-audition · 새 게임 · 자동",
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
     "sky-knights · 기본",
     "sky-knights · 마지막 스테이지: 전투",
     "sky-knights · 마지막 스테이지: 콘테스트",
@@ -12994,10 +13520,13 @@
     "sky-knights · 2차 창작",
     "sky-knights · 개성 시트 없음",
     "sky-knights · 세력 없음",
-    "sky-knights · 새 게임 · 자동"
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ],
    "combos": {
-    "": 182
+    "": 188
    },
    "switches": [
     {
@@ -13059,7 +13588,7 @@
    ]
   },
   {
-   "key": "0030-character-regen.js designAI",
+   "key": "0030-image/010-engine.js designAI",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」",
@@ -13097,7 +13626,7 @@
    ]
   },
   {
-   "key": "0030-character-regen.js weaponPromptAI",
+   "key": "0030-image/010-engine.js weaponPromptAI",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」",
@@ -13117,6 +13646,7 @@
     "idol-audition · 2차 창작",
     "idol-audition · 개성 시트 없음",
     "idol-audition · 세력 없음",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
     "sky-knights · 기본",
     "sky-knights · 마지막 스테이지: 전투",
     "sky-knights · 마지막 스테이지: 콘테스트",
@@ -13131,7 +13661,8 @@
     "sky-knights · 출연 성별: 남성만",
     "sky-knights · 2차 창작",
     "sky-knights · 개성 시트 없음",
-    "sky-knights · 세력 없음"
+    "sky-knights · 세력 없음",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC"
    ]
   },
   {
@@ -13249,6 +13780,44 @@
    ]
   },
   {
+   "key": "0135-schedule.js spotTalkAI",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 이야기 빠르게",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 이야기 빠르게",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
    "key": "0160-free-chat.js heroTags",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
@@ -13270,6 +13839,9 @@
     "idol-audition · 개성 시트 없음",
     "idol-audition · 세력 없음",
     "idol-audition · 새 게임 · 자동",
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
     "sky-knights · 기본",
     "sky-knights · 마지막 스테이지: 전투",
     "sky-knights · 마지막 스테이지: 콘테스트",
@@ -13285,7 +13857,10 @@
     "sky-knights · 2차 창작",
     "sky-knights · 개성 시트 없음",
     "sky-knights · 세력 없음",
-    "sky-knights · 새 게임 · 자동"
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
@@ -13626,7 +14201,7 @@
    "key": "0530-story-memory.js smExtract",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
-   "msg": "견본 뒤에 「[대본] [스테이지 1 작전] 대본 대본 다른 설명이나 코드 블록 없이 JSON만 출력한다」",
+   "msg": "견본 뒤에 「[대본] [스테이지 1 값 59] 대본 228 대본 229 다른 설명이나 코드 블록 없이 」",
    "sits": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
@@ -13662,13 +14237,12 @@
    "key": "0530-story-memory.js smExtract",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
-   "msg": "견본 뒤에 「기록 다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하」",
+   "msg": "견본 뒤에 「[대본] [스테이지 2 값 95] 대본 230 대본 231 다른 설명이나 코드 블록 없이 」",
    "sits": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
     "idol-audition · 마지막 스테이지: 콘테스트",
     "idol-audition · 마지막 스테이지: 회담",
-    "idol-audition · 이야기 빠르게",
     "idol-audition · 플레이어가 쓴 플롯",
     "idol-audition · 대화만 스테이지 없음",
     "idol-audition · 파견: 아이돌",
@@ -13683,7 +14257,114 @@
     "sky-knights · 마지막 스테이지: 전투",
     "sky-knights · 마지막 스테이지: 콘테스트",
     "sky-knights · 마지막 스테이지: 회담",
-    "sky-knights · 이야기 빠르게",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 3 값 131] 대본 232 대본 233 다른 설명이나 코드 블록 없이」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 4 값 167] 대본 234 대본 235 다른 설명이나 코드 블록 없이」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 236 기록 237 기록 238 기록 239 다른 설명이나 코드 블록 없이 JSON만」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
     "sky-knights · 플레이어가 쓴 플롯",
     "sky-knights · 대화만 스테이지 없음",
     "sky-knights · 파견: 아이돌",
@@ -13722,6 +14403,186 @@
     "sky-knights · 마지막 스테이지: 콘테스트",
     "sky-knights · 마지막 스테이지: 회담",
     "sky-knights · 이야기 빠르게",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 1 값 270] 대본 439 대본 440 다른 설명이나 코드 블록 없이」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 2 값 306] 대본 441 대본 442 다른 설명이나 코드 블록 없이」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 3 값 342] 대본 443 대본 444 다른 설명이나 코드 블록 없이」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 4 값 378] 대본 445 대본 446 다른 설명이나 코드 블록 없이」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 447 기록 448 기록 449 기록 450 다른 설명이나 코드 블록 없이 JSON만」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
     "sky-knights · 플레이어가 쓴 플롯",
     "sky-knights · 대화만 스테이지 없음",
     "sky-knights · 파견: 아이돌",
@@ -13884,7 +14745,7 @@
    "key": "0530-story-memory.js smExtract",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
-   "msg": "견본 뒤에 「[대본] [스테이지 1 스테이지] 대본 대본 다른 설명이나 코드 블록 없이 JSON만 출력」",
+   "msg": "견본 뒤에 「[대본] [스테이지 1 값 479] 대본 632 대본 633 다른 설명이나 코드 블록 없이」",
    "sits": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
@@ -13917,7 +14778,151 @@
    ]
   },
   {
-   "key": "0260-new-game-draft.js drPolishHero",
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 2 값 515] 대본 634 대본 635 다른 설명이나 코드 블록 없이」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 3 값 551] 대본 636 대본 637 다른 설명이나 코드 블록 없이」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 4 값 587] 대본 638 대본 639 다른 설명이나 코드 블록 없이」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 640 기록 641 기록 642 기록 643 다른 설명이나 코드 블록 없이 JSON만」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음",
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0260-new-game/010-draft.js drPolishHero",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」",
@@ -13955,7 +14960,7 @@
    ]
   },
   {
-   "key": "0260-new-game-draft.js drHarmony",
+   "key": "0260-new-game/010-draft.js drHarmony",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「— chars는 위 인물 순서 그대로, 같은 수로. 다른 설명이나 코드 블록 없이 JSON」",
@@ -14032,9 +15037,9 @@
   },
   {
    "key": "0290-season-rotation.js aiNewPickupChar",
-   "kind": "과소",
-   "code": "형식 지시 없음",
-   "msg": "JSON으로 답을 받는데 \"JSON만 출력\" 표식·견본이 없음",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체」",
    "sits": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
@@ -14146,9 +15151,9 @@
   },
   {
    "key": "0290-season-rotation.js aiAltChar",
-   "kind": "과소",
-   "code": "형식 지시 없음",
-   "msg": "JSON으로 답을 받는데 \"JSON만 출력\" 표식·견본이 없음",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체」",
    "sits": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
@@ -14795,13 +15800,12 @@
    "key": "0530-story-memory.js smExtract",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
-   "msg": "견본 뒤에 「기록 기록 기록 기록 다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서」",
+   "msg": "견본 뒤에 「기록 1109 기록 1110 기록 1111 기록 1112 다른 설명이나 코드 블록 없이 J」",
    "sits": [
     "idol-audition · 기본",
     "idol-audition · 마지막 스테이지: 전투",
     "idol-audition · 마지막 스테이지: 콘테스트",
     "idol-audition · 마지막 스테이지: 회담",
-    "idol-audition · 이야기 빠르게",
     "idol-audition · 플레이어가 쓴 플롯",
     "idol-audition · 대화만 스테이지 없음",
     "idol-audition · 파견: 아이돌",
@@ -14811,22 +15815,29 @@
     "idol-audition · 출연 성별: 남성만",
     "idol-audition · 2차 창작",
     "idol-audition · 개성 시트 없음",
-    "idol-audition · 세력 없음",
-    "sky-knights · 기본",
-    "sky-knights · 마지막 스테이지: 전투",
-    "sky-knights · 마지막 스테이지: 콘테스트",
-    "sky-knights · 마지막 스테이지: 회담",
-    "sky-knights · 이야기 빠르게",
-    "sky-knights · 플레이어가 쓴 플롯",
-    "sky-knights · 대화만 스테이지 없음",
-    "sky-knights · 파견: 아이돌",
-    "sky-knights · 파견: 방송",
-    "sky-knights · 파견: 경영",
-    "sky-knights · 출연 성별: 여성만",
-    "sky-knights · 출연 성별: 남성만",
-    "sky-knights · 2차 창작",
-    "sky-knights · 개성 시트 없음",
-    "sky-knights · 세력 없음"
+    "idol-audition · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 1116 기록 1117 기록 1118 기록 1119 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "idol-audition · 기본",
+    "idol-audition · 마지막 스테이지: 전투",
+    "idol-audition · 마지막 스테이지: 콘테스트",
+    "idol-audition · 마지막 스테이지: 회담",
+    "idol-audition · 플레이어가 쓴 플롯",
+    "idol-audition · 대화만 스테이지 없음",
+    "idol-audition · 파견: 아이돌",
+    "idol-audition · 파견: 방송",
+    "idol-audition · 파견: 경영",
+    "idol-audition · 출연 성별: 여성만",
+    "idol-audition · 출연 성별: 남성만",
+    "idol-audition · 2차 창작",
+    "idol-audition · 개성 시트 없음",
+    "idol-audition · 세력 없음"
    ]
   },
   {
@@ -14868,45 +15879,7 @@
    ]
   },
   {
-   "key": "(지점 모름) (최상위 문장)",
-   "kind": "깨짐",
-   "code": "빈 머리말",
-   "msg": "「원문:」 뒤에 내용이 없음",
-   "sits": [
-    "idol-audition · 기본",
-    "idol-audition · 마지막 스테이지: 전투",
-    "idol-audition · 마지막 스테이지: 콘테스트",
-    "idol-audition · 마지막 스테이지: 회담",
-    "idol-audition · 이야기 빠르게",
-    "idol-audition · 플레이어가 쓴 플롯",
-    "idol-audition · 대화만 스테이지 없음",
-    "idol-audition · 파견: 아이돌",
-    "idol-audition · 파견: 방송",
-    "idol-audition · 파견: 경영",
-    "idol-audition · 출연 성별: 여성만",
-    "idol-audition · 출연 성별: 남성만",
-    "idol-audition · 2차 창작",
-    "idol-audition · 개성 시트 없음",
-    "idol-audition · 세력 없음",
-    "sky-knights · 기본",
-    "sky-knights · 마지막 스테이지: 전투",
-    "sky-knights · 마지막 스테이지: 콘테스트",
-    "sky-knights · 마지막 스테이지: 회담",
-    "sky-knights · 이야기 빠르게",
-    "sky-knights · 플레이어가 쓴 플롯",
-    "sky-knights · 대화만 스테이지 없음",
-    "sky-knights · 파견: 아이돌",
-    "sky-knights · 파견: 방송",
-    "sky-knights · 파견: 경영",
-    "sky-knights · 출연 성별: 여성만",
-    "sky-knights · 출연 성별: 남성만",
-    "sky-knights · 2차 창작",
-    "sky-knights · 개성 시트 없음",
-    "sky-knights · 세력 없음"
-   ]
-  },
-  {
-   "key": "(지점 모름) (최상위 문장)",
+   "key": "0015-prompt-studio/010-studio.js pstPolish",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」",
@@ -15325,44 +16298,6 @@
   },
   {
    "key": "0510-actions/120-messenger.js handleMessengerAction",
-   "kind": "깨짐",
-   "code": "빈 머리말",
-   "msg": "「최근 대화 일부:」 뒤에 내용이 없음",
-   "sits": [
-    "idol-audition · 기본",
-    "idol-audition · 마지막 스테이지: 전투",
-    "idol-audition · 마지막 스테이지: 콘테스트",
-    "idol-audition · 마지막 스테이지: 회담",
-    "idol-audition · 이야기 빠르게",
-    "idol-audition · 플레이어가 쓴 플롯",
-    "idol-audition · 대화만 스테이지 없음",
-    "idol-audition · 파견: 아이돌",
-    "idol-audition · 파견: 방송",
-    "idol-audition · 파견: 경영",
-    "idol-audition · 출연 성별: 여성만",
-    "idol-audition · 출연 성별: 남성만",
-    "idol-audition · 2차 창작",
-    "idol-audition · 개성 시트 없음",
-    "idol-audition · 세력 없음",
-    "sky-knights · 기본",
-    "sky-knights · 마지막 스테이지: 전투",
-    "sky-knights · 마지막 스테이지: 콘테스트",
-    "sky-knights · 마지막 스테이지: 회담",
-    "sky-knights · 이야기 빠르게",
-    "sky-knights · 플레이어가 쓴 플롯",
-    "sky-knights · 대화만 스테이지 없음",
-    "sky-knights · 파견: 아이돌",
-    "sky-knights · 파견: 방송",
-    "sky-knights · 파견: 경영",
-    "sky-knights · 출연 성별: 여성만",
-    "sky-knights · 출연 성별: 남성만",
-    "sky-knights · 2차 창작",
-    "sky-knights · 개성 시트 없음",
-    "sky-knights · 세력 없음"
-   ]
-  },
-  {
-   "key": "0510-actions/120-messenger.js handleMessengerAction",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」",
@@ -15403,7 +16338,7 @@
    "key": "0530-story-memory.js smExtract",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
-   "msg": "견본 뒤에 「[대본] [스테이지 1 작전] 다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 」",
+   "msg": "견본 뒤에 「[대본] [스테이지 1 값 59] 값 60 값 61 다른 설명이나 코드 블록 없이 JSON」",
    "sits": [
     "idol-audition · 이야기 빠르게",
     "sky-knights · 이야기 빠르게"
@@ -15413,230 +16348,414 @@
    "key": "0530-story-memory.js smExtract",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
-   "msg": "견본 뒤에 「[대본] [스테이지 1 스테이지] 다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자」",
+   "msg": "견본 뒤에 「[대본] [스테이지 2 값 96] 값 97 값 98 다른 설명이나 코드 블록 없이 JSON」",
    "sits": [
     "idol-audition · 이야기 빠르게",
     "sky-knights · 이야기 빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js aiChapterGen0",
-   "kind": "과잉",
-   "code": "같은 조각 되풀이",
-   "msg": "CAST_SEX_F가 2번 들어감",
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 3 값 133] 값 134 값 135 다른 설명이나 코드 블록 없이 J」",
    "sits": [
-    "idol-audition · 출연 성별: 여성만",
-    "sky-knights · 출연 성별: 여성만"
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js aiEventGen0",
-   "kind": "과잉",
-   "code": "같은 조각 되풀이",
-   "msg": "CAST_SEX_F가 2번 들어감",
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 4 값 170] 값 171 값 172 다른 설명이나 코드 블록 없이 J」",
    "sits": [
-    "idol-audition · 출연 성별: 여성만",
-    "sky-knights · 출연 성별: 여성만"
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js aiChapterGen0",
-   "kind": "과잉",
-   "code": "같은 조각 되풀이",
-   "msg": "CAST_SEX_M가 2번 들어감",
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 241 기록 242 기록 243 기록 244 다른 설명이나 코드 블록 없이 JSON만」",
    "sits": [
-    "idol-audition · 출연 성별: 남성만",
-    "sky-knights · 출연 성별: 남성만"
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js aiEventGen0",
-   "kind": "과잉",
-   "code": "같은 조각 되풀이",
-   "msg": "CAST_SEX_M가 2번 들어감",
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 1 값 267] 값 268 값 269 다른 설명이나 코드 블록 없이 J」",
    "sits": [
-    "idol-audition · 출연 성별: 남성만",
-    "sky-knights · 출연 성별: 남성만"
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 2 값 304] 값 305 값 306 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 3 값 341] 값 342 값 343 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 4 값 378] 값 379 값 380 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 449 기록 450 기록 451 기록 452 다른 설명이나 코드 블록 없이 JSON만」",
+   "sits": [
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 1 값 473] 값 474 값 475 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 2 값 510] 값 511 값 512 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 3 값 547] 값 548 값 549 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「[대본] [스테이지 4 값 584] 값 585 값 586 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 639 기록 640 기록 641 기록 642 다른 설명이나 코드 블록 없이 JSON만」",
+   "sits": [
+    "idol-audition · 이야기 빠르게",
+    "sky-knights · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 1100 기록 1101 기록 1102 기록 1103 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "idol-audition · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 1107 기록 1108 기록 1109 기록 1110 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "idol-audition · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「파견은 6개 — 이름·설명만 쓴다(실제 의뢰의 시간·인원·보상은 게임의 파견 게시판이 매일」",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「naiPrompt는 NovelAI용 영어 태그 문자열. \"1girl, solo\"(남자는 \"」",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"accent\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"elems\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"finale\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"hero\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"positions\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"reactions\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"roleDesc\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"roles\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"sub\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"terms\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"theme\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"title\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "요구하지 않은 키 읽을 수 있음",
    "msg": "코드가 응답의 \"world\"를 읽을 수 있는데 이 프롬프트에 그 키가 없음(정적 추정 — 다른 모드의 키일 수 있음)",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
-   "key": "0250-story-factory.js buildNewGameDraft",
-   "kind": "깨짐",
-   "code": "빈 머리말",
-   "msg": "「배경 목록:」 뒤에 내용이 없음",
-   "sits": [
-    "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
-   ]
-  },
-  {
-   "key": "0250-story-factory.js buildNewGameDraft",
+   "key": "0260-new-game/020-build.js buildNewGameDraft",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」",
    "sits": [
     "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
-   ]
-  },
-  {
-   "key": "0250-story-factory.js buildNewGameDraft",
-   "kind": "과잉",
-   "code": "같은 조각 되풀이",
-   "msg": "FINALE_RULE가 2번 들어감",
-   "sits": [
-    "idol-audition · 새 게임 · 자동",
-    "sky-knights · 새 게임 · 자동"
+    "idol-audition · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "idol-audition · 새 게임 · 직접: 초안 대원·NPC",
+    "idol-audition · 새 게임 · 직접: 여성만·빠르게",
+    "sky-knights · 새 게임 · 자동",
+    "sky-knights · 새 게임 · 직접: 플롯·2차 창작·주인공",
+    "sky-knights · 새 게임 · 직접: 초안 대원·NPC",
+    "sky-knights · 새 게임 · 직접: 여성만·빠르게"
    ]
   },
   {
@@ -15732,6 +16851,50 @@
    ]
   },
   {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 1105 기록 1106 기록 1107 기록 1108 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 1112 기록 1113 기록 1114 기록 1115 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "sky-knights · 기본",
+    "sky-knights · 마지막 스테이지: 전투",
+    "sky-knights · 마지막 스테이지: 콘테스트",
+    "sky-knights · 마지막 스테이지: 회담",
+    "sky-knights · 플레이어가 쓴 플롯",
+    "sky-knights · 대화만 스테이지 없음",
+    "sky-knights · 파견: 아이돌",
+    "sky-knights · 파견: 방송",
+    "sky-knights · 파견: 경영",
+    "sky-knights · 출연 성별: 여성만",
+    "sky-knights · 출연 성별: 남성만",
+    "sky-knights · 2차 창작",
+    "sky-knights · 개성 시트 없음",
+    "sky-knights · 세력 없음"
+   ]
+  },
+  {
    "key": "0510-actions/100-images-and-assets.js handleImagesAndAssetsAction",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
@@ -15753,25 +16916,42 @@
     "sky-knights · 개성 시트 없음",
     "sky-knights · 세력 없음"
    ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 1096 기록 1097 기록 1098 기록 1099 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "sky-knights · 이야기 빠르게"
+   ]
+  },
+  {
+   "key": "0530-story-memory.js smExtract",
+   "kind": "정보",
+   "code": "형식 견본 뒤 글",
+   "msg": "견본 뒤에 「기록 1103 기록 1104 기록 1105 기록 1106 다른 설명이나 코드 블록 없이 J」",
+   "sits": [
+    "sky-knights · 이야기 빠르게"
+   ]
   }
  ],
  "requestsFile": "tools/out/combos/requests.json",
  "uncovered": [
-  "0015-prompt-studio/010-studio.js (최상위 문장)",
-  "0030-character-regen.js regenRun",
-  "0030-character-regen.js requestUltimateScene",
-  "0030-character-regen.js illustrationScenePreparation",
-  "0135-schedule.js spotTalkAI",
+  "0030-image/010-engine.js regenRun",
+  "0030-image/010-engine.js requestUltimateScene",
+  "0030-image/010-engine.js illustrationScenePreparation",
   "0160-free-chat.js fcSend",
   "0160-free-chat.js fcSummarize",
+  "0185-game-rules.js posAI",
   "0200-skin-shop.js skinAuto",
-  "0250-story-factory.js buildNewGameDraft#2",
-  "0250-story-factory.js buildNewGameDraft#3",
-  "0250-story-factory.js buildNewGameDraft#4",
-  "0250-story-factory.js buildNewGameDraft#5",
-  "0250-story-factory.js buildNewGameDraft#6",
-  "0260-new-game-draft.js drPolish",
-  "0260-new-game-draft.js drFillChar",
+  "0260-new-game/010-draft.js drPolish",
+  "0260-new-game/010-draft.js drFillChar",
+  "0260-new-game/020-build.js buildNewGameDraft#2",
+  "0260-new-game/020-build.js buildNewGameDraft#3",
+  "0260-new-game/020-build.js buildNewGameDraft#4",
+  "0260-new-game/020-build.js buildNewGameDraft#5",
+  "0260-new-game/020-build.js buildNewGameDraft#6",
   "0280-live-ops.js dailyTalks",
   "0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#2",
   "0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#3",
@@ -15798,9 +16978,9 @@
   "modules/combat/060-generation.js v2GenerateSelected",
   "modules/combat/060-generation.js v2GenerateSelected#2",
   "modules/combat/070-equipment.js v2GearGenerate",
-  "그림 0030-character-regen.js naiDraw#2",
-  "그림 0180-ui-scroll.js openNaiGen",
-  "그림 0260-new-game-draft.js faceDrawOne"
+  "그림 0030-image/010-engine.js naiDraw#2",
+  "그림 0030-image/010-engine.js openNaiGen",
+  "그림 0030-image/010-engine.js faceDrawOne"
  ],
  "errors": [
   {
@@ -17154,24 +18334,6 @@
    "err": "Cannot set properties of null (setting 'value')"
   },
   {
-   "game": "idol-audition",
-   "sit": "새 게임 · 직접: 플롯·2차 창작·주인공",
-   "flow": "새 게임",
-   "err": "Cannot read properties of undefined (reading 'trim')"
-  },
-  {
-   "game": "idol-audition",
-   "sit": "새 게임 · 직접: 초안 대원·NPC",
-   "flow": "새 게임",
-   "err": "Cannot read properties of undefined (reading 'trim')"
-  },
-  {
-   "game": "idol-audition",
-   "sit": "새 게임 · 직접: 여성만·빠르게",
-   "flow": "새 게임",
-   "err": "Cannot read properties of undefined (reading 'trim')"
-  },
-  {
    "game": "sky-knights",
    "sit": "기본",
    "flow": "naiBlocksSeparate",
@@ -18520,24 +19682,6 @@
    "sit": "세력 없음",
    "flow": "handleEconomyAction:shkai",
    "err": "Cannot set properties of null (setting 'value')"
-  },
-  {
-   "game": "sky-knights",
-   "sit": "새 게임 · 직접: 플롯·2차 창작·주인공",
-   "flow": "새 게임",
-   "err": "Cannot read properties of undefined (reading 'trim')"
-  },
-  {
-   "game": "sky-knights",
-   "sit": "새 게임 · 직접: 초안 대원·NPC",
-   "flow": "새 게임",
-   "err": "Cannot read properties of undefined (reading 'trim')"
-  },
-  {
-   "game": "sky-knights",
-   "sit": "새 게임 · 직접: 여성만·빠르게",
-   "flow": "새 게임",
-   "err": "Cannot read properties of undefined (reading 'trim')"
   }
  ],
  "diffs": []
