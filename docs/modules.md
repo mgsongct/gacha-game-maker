@@ -153,6 +153,37 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - `bannerPool(b)`: `pool.mode`(all/factions/ids)로 후보 결정.
 - `discover()`: 재화를 써서 AI가 **새 캐릭터를 즉석 생성**하고 바로 획득.
 
+## 8-1. 건조/영입 · 원정 · 바리에이션
+
+- 엔진 `GGMConstruct`(`src/modules/app/020-construct.js`, 순수): `rates`(분류 개방·비중, 희귀도 캡) → `table`(캐릭터별 확률) → `roll`. `condMatch`(바리에이션 적용 조건), `variantPrompt`/`designBrief`(디자인 프롬프트)
+- 화면·상태 `src/main/0505-construct.js`: `constructHTML`(탭 `construct`, 계약 화면 위 진입), `conBuild`, `conBuy`, `conDispReward`(파견 보상에 자원), `conMakeVariant`(AI `aiAltChar` 또는 규칙), 설정 `openConSet`
+- 이격 상속 `src/main/0065-inherit.js`: `mark()`에서 `inheritOnMark`, `fix()`에서 `inheritAll`, `flush()`에서 `inheritStore`
+- 설계·수치: [research/construction.md](research/construction.md), [research/variants.md](research/variants.md)
+
+## 8-2. 원정 모드
+
+- 엔진 `GGMExpedition`(`src/modules/app/030-expedition.js`, 순수): `tierOf`, `condNow`, `idolOffers`/`idolResult`, `streamResult`/`libIncome`, `bizPerformance`/`bizSettle`
+- 화면·상태 `src/main/0275-expedition.js`: 탭 `disp`가 `dispPageHTML()` → 전투형이면 기존 `dispHTML`, 아니면 `exHTML`. `exBusyIds`를 `busyIds`(0090)에 합쳐 일하는 캐릭터는 전투 불가. 설정 `openExSet`
+- 설계·수치: [research/expedition.md](research/expedition.md)
+
+## 8-2-1. 게임 규칙 (상성·능력치)
+
+- `src/main/0185-game-rules.js`: `G.meta.rules` 편집(`openRules`), `rulesApply`(applyMeta에서 BEATS·`GGMCombat.applyRules`), `rulesOptions`(v2Options로 전투·밸런스 검사에 전달), 캐릭터 화면 `rulesCharHTML`, 도감 `rulesCodex`
+- 전투 엔진: `damage()`의 속성 배율 = `sim.elemAdv/elemDis × relMul`, `create()`에서 `synergy()`. 역할 기본 능력치·속도·희귀도 배율은 `CHARACTER_BASE_STATS`·`ROLE_SPEED`·`RARITY_STAT_MUL` 표(기본값 `RULE_DEFAULTS`)
+- 설계: [research/game-rules.md](research/game-rules.md)
+
+## 8-2-2. 밸런스 관리
+
+- `src/main/0187-balance.js`: `BAL()`(G.meta.balance), `balanceGeneration`(v2CurrentGeneration이 먼저 물어봄), `balanceOptions`(전투 보정 → rulesOptions → v2Options), `balInfo/balNormalize/balRemaster`, 생성 시 `balanceOnCreate`(cleanChar)
+- 엔진 `genBoost`: 세대 차이당 보정(아군만)
+- 설계: [research/balance.md](research/balance.md)
+
+## 8-3. 콘텐츠 점검·업그레이드
+
+- `src/main/0535-content-audit.js`: 규칙 `AUDIT_RULES`(감지 `test` + 고치기 `fix.mode`), `auditScan`, `auditFix`, 지정 변환 `auditConvert`, 되돌리기 `auditUndo`, 생성 버전 `auditGenVer()`(새 캐릭터 `cleanChar0`에서 `genVer`로 찍힘)
+- 기존 기능 재사용: `openRegen`, `runPrep`, `fixWeaponPrompts`, `v2ReadyChars`, `stripAge`
+- 설계·규칙 추가 방법: [research/content-audit.md](research/content-audit.md)
+
 ## 9. 성장 · 경제 · 콘텐츠
 
 - 성장(성장·성장 곡선 섹션): 레벨(최대 120, 71~ 초월승급), 돌파, 스킬 강화, 전용 무기, 호감도(`addAff`, 레벨별 대사·에피소드 해금). 비용 공식은 `GGMCombat.growthCost/limitBreakCost` 등.

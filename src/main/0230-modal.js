@@ -88,7 +88,7 @@ function openChar(id){
   const old=$('#modal .sheet.cs-sheet'), keep=old&&old.dataset.cid===id?old.scrollTop:0;
   const list=crewOrder(), i=list.findIndex(x=>x.id===id), prev=list[(i-1+list.length)%list.length], next=list[(i+1)%list.length];
   const lbs=imgSrcRaw(c.lbcg), cgOpen=!!(o&&o.dup>=5), skinSel=o&&o.skin, ill=c.illust?imgSrcRaw(c.illust):null, wearing=skinOf(c), sec=(k,h)=>`<section data-cs="${k}" ${CS_TAB===k?'':'hidden'}>${h}</section>`;
-  const equip=`
+  const equip=`${rulesCharHTML(c)}
     ${v2EquipmentCard(c,o)}
     ${v2SkillSummary(c)}
     <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="wnai" data-id="${c.id}">NAI로 ${T('weapon')} 그리기</button><button class="btn sm ghost" data-act="v2icons" data-id="${c.id}">스킬 이미지 생성</button></div>`;
@@ -139,8 +139,8 @@ function openChar(id){
     <div class="row" style="margin-top:8px"><button class="btn sm" data-act="scggen" data-id="${c.id}">NAI로 기술 컷인</button><button class="btn sm ghost" data-act="upload" data-k="scg" data-id="${c.id}">올리기</button><button class="btn sm ghost" data-act="scgtest" data-id="${c.id}">미리 보기</button>${imgSrc(c.scg)?`<button class="btn sm ghost" data-act="scgdel" data-id="${c.id}">지우기</button>`:''}</div>
     <h3 class="sec">표정과 ${T('skin')}</h3>
     <div class="facegrid">${c.faces.map(f=>`<button class="fc" data-act="faceview" data-id="${c.id}" data-f="${f.id}">${imgSrc(f)?`<img src="${esc(imgSrc(f))}" alt="">`:''}<span>${esc(f.name)}</span></button>`).join('')}</div>
-    <div class="row" style="margin:8px 0"><button class="btn sm ghost" data-act="faces-open" data-id="${c.id}">표정 만들기</button><button class="btn sm ghost" data-act="skin-open" data-id="${c.id}">${T('skin')} 만들기</button>${c.alt?'':`<button class="btn sm ghost" data-act="altnew" data-id="${c.id}">이격 만들기</button>`}</div>
-    ${c.alt&&charById(c.alt)?`<p class="muted" style="margin:4px 0">이격: <button class="linkb" data-act="char" data-id="${c.alt}">${esc(charById(c.alt).name)}</button>의 다른 모습이에요.</p>`:altsOf(c).length?`<p class="muted" style="margin:4px 0">이격: ${altsOf(c).map(x=>`<button class="linkb" data-act="char" data-id="${x.id}">${esc(x.name)}</button>${own(x.id)?'':' (미보유)'}`).join(' · ')}</p>`:''}
+    <div class="row" style="margin:8px 0"><button class="btn sm ghost" data-act="faces-open" data-id="${c.id}">표정 만들기</button><button class="btn sm ghost" data-act="audopen" data-id="${c.id}">점검·변환</button><button class="btn sm ghost" data-act="skin-open" data-id="${c.id}">${T('skin')} 만들기</button>${c.alt?'':`<button class="btn sm ghost" data-act="altnew" data-id="${c.id}">이격 만들기</button>`}</div>
+    ${c.alt&&charById(c.alt)?`<p class="muted" style="margin:4px 0">이격: <button class="linkb" data-act="char" data-id="${c.alt}">${esc(charById(c.alt).name)}</button>의 다른 모습이에요.</p>${inheritHTML(c)}`:altsOf(c).length?`<p class="muted" style="margin:4px 0">이격: ${altsOf(c).map(x=>`<button class="linkb" data-act="char" data-id="${x.id}">${esc(x.name)}</button>${own(x.id)?'':' (미보유)'}`).join(' · ')}</p>`:''}
     ${charImgList(c).length?`<h3 class="sec">그림 저장 <span class="muted" style="font-size:.75rem">${charImgList(c).length}장 · 묶음을 눌러 펼쳐요</span></h3><p class="muted" style="margin:0 0 6px;font-size:.8rem">${IS_NATIVE?'Documents/가챠게임메이커/그림 폴더에 저장돼요.':'휴대폰은 공유하기로 사진 앱에, PC는 다운로드 폴더에 저장돼요.'}</p>${(()=>{ const L=charImgList(c), gs=[...new Set(L.map(x=>x[2]))]; return gs.map(g=>{ const it=L.filter(x=>x[2]===g); return `<details class="isv"><summary>${esc(g)} <span class="muted">${it.length}장</span></summary><div class="isv-grid">${it.map(([o,l])=>`<button class="isv-it" data-act="imgsave" data-id="${c.id}" data-o="${esc(o.id)}"><img src="${esc(imgSrcRaw(o))}" alt="" loading="lazy"><span>⬇ ${esc(l)}</span></button>`).join('')}</div></details>`; }).join(''); })()}`:''}`);
   const info=`
     <div class="row" style="margin-top:4px">${o&&P().sec!==c.id?`<button class="btn sm" data-act="setsec" data-id="${c.id}">로비에 세우기</button>`:''}${o?`<button class="btn sm ghost" data-act="gift" data-id="${c.id}">🎁 선물하기</button>`:''}<button class="btn sm ghost" data-act="charedit" data-id="${c.id}">✏️ 이름·대사 편집</button><button class="btn sm ghost" data-act="puexist" data-id="${c.id}">★ 픽업 배너</button></div>
@@ -182,7 +182,7 @@ function openCharEdit(id){
     <div class="g2"><div><label class="f" for="f_name">이름</label><input class="in" id="f_name" value="${esc(c.name)}" maxlength="20"></div>
     <div><label class="f" for="f_fac">소속</label><input class="in" id="f_fac" value="${esc(c.faction)}" list="faclist"><datalist id="faclist">${[...new Set(G.chars.map(x=>x.faction).filter(Boolean))].map(f=>`<option value="${esc(f)}">`).join('')}</datalist></div></div>
     <div class="g2"><div><label class="f" for="f_rar">등급</label><select class="in" id="f_rar">${opt([[3,'SSR'],[2,'SR'],[1,'R']],c.rarity)}</select></div>
-    <div><label class="f" for="f_role">역할</label><select class="in" id="f_role">${opt(Object.entries(ROLE),c.role)}</select></div></div>
+    <div><label class="f" for="f_pos">포지션 <span class="muted" style="font-size:.75rem">(전투 기본형)</span></label><select class="in" id="f_pos">${opt(POSITIONS().map(p=>[p.id,`${p.name} (${ROLE[p.base]}형)`]),posOf(c).id)}</select></div></div>
     <div class="g2"><div><label class="f" for="f_elem">속성</label><select class="in" id="f_elem">${opt(ELEMS.map(e=>[e,e]),c.elem)}</select></div>
     <div><label class="f" for="f_lim">한정 여부</label><select class="in" id="f_lim">${opt([['0','상시'],['1','한정 (이벤트 배너에서만)']],c.limited?'1':'0')}</select></div></div>
     <div class="g4"><div><label class="f" for="f_hp">기본 체력</label><input class="in" id="f_hp" type="number" value="${c.hp}"></div><div><label class="f" for="f_atk">공격</label><input class="in" id="f_atk" type="number" value="${c.atk}"></div><div><label class="f" for="f_def">기본 방어력</label><input class="in" id="f_def" type="number" value="${c.def}"></div><div><label class="f" for="f_spd">속도</label><input class="in" id="f_spd" type="number" value="${c.spd}"></div></div>
@@ -220,7 +220,7 @@ function readCharForm(c){
   const name=$('#f_name').value.trim(); if(!name){toast('이름을 입력해 주세요');return false;}
   const aff={}; lines($('#f_aff').value).forEach(l=>{const m=l.match(/^(\d+)\s*[:：]\s*(.+)$/); if(m)(aff[m[1]]=aff[m[1]]||[]).push(m[2]);});
   const files=lines($('#f_files').value).map(l=>{const m=l.match(/^(\d)\s*[:：]\s*(.+)$/);return m?{dup:+m[1],text:m[2]}:{dup:1,text:l};});
-  Object.assign(c,{baseStatsVersion:1,name,faction:$('#f_fac').value.trim(),rarity:+$('#f_rar').value,role:$('#f_role').value,elem:$('#f_elem').value,limited:$('#f_lim').value==='1',
+  Object.assign(c,{baseStatsVersion:1,name,faction:$('#f_fac').value.trim(),rarity:+$('#f_rar').value,role:(posById($('#f_pos').value)||posOf(c)).base,pos:(posById($('#f_pos').value)||posOf(c)).id,elem:$('#f_elem').value,limited:$('#f_lim').value==='1',
     hp:num($('#f_hp').value,100,1e10,1000),atk:num($('#f_atk').value,10,9999,100),def:num($('#f_def').value,0,1e8,50),spd:num($('#f_spd').value,30,300,100),
     profile:$('#f_prof').value.trim(),intro:$('#f_intro').value.trim(),lines:lines($('#f_lines').value),affLines:aff,files,
     lvLines:lines($('#f_lv').value),dupLines:lines($('#f_dup').value),

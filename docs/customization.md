@@ -48,6 +48,10 @@ case 'myact': { const c = charById(id); /* ... */ mark('c:'+c.id); render(); bre
 3. 진입 버튼: `data-act="go" data-to="my"`.
 4. 하단 탭 자체를 늘리려면 `<nav class="tabs">` 버튼 추가 + CSS 그리드 칸 수 조정.
 
+### 2.2-1 생성 규칙을 바꿨을 때
+
+생성 프롬프트·스키마를 바꾸면 `auditGenVer()`를 올리고, 예전 생성물을 감지·고치는 규칙을 `AUDIT_RULES`에 추가하세요([research/content-audit.md §3](research/content-audit.md#3-생성-기능이-좋아졌을-때-개발자가-할-일)). 구조가 바뀌어 불러오기가 깨지는 경우는 `fix()`에 넣습니다.
+
 ### 2.3 게임 상태에 새 필드
 
 1. 사용하는 곳에서 그냥 읽고 쓰되, **`fix()`에 기본값**을 넣어 예전 저장본도 안전하게:

@@ -2,9 +2,9 @@
 let V2EDIT=null;
 const V2PENDING=new WeakMap();
 // The season setting controls future releases; a character keeps its release generation.
-function v2CurrentGeneration(){return GGMCombat.generation({generation:typeof G!=='undefined'&&G?.prog?.live?.skillGeneration});}
+function v2CurrentGeneration(){if(typeof balanceGeneration==='function'){const g=balanceGeneration();if(g)return GGMCombat.generation({generation:g});}return GGMCombat.generation({generation:typeof G!=='undefined'&&G?.prog?.live?.skillGeneration});} // 밸런스 설정(세대 고정·자동 상승)이 있으면 그걸 따라요
 function v2SeasonGenerationHTML(){const g=v2CurrentGeneration();return `<div class="panel" id="v2-season-generation-panel"><h3>캐릭터 출시 세대</h3><label class="f" for="v2-season-generation">새 캐릭터에게 적용할 세대<select class="in" id="v2-season-generation">${[1,2,3,4,5].map(n=>`<option value="${n}" ${g===n?'selected':''}>${n}세대</option>`).join('')}</select></label><p class="muted">선택하면 바로 저장됩니다. 이후 새로 추가되는 캐릭터(신규 픽업·이벤트·직접 추가 포함)는 이 세대로 만들어집니다. 세대가 높을수록 AI가 사용할 수 있는 스킬 전력 예산이 늘어납니다. 세대는 직접 바꾸며 시즌이 넘어가도 자동으로 올라가지 않습니다.</p><p class="muted">기존 캐릭터의 세대와 스킬은 그대로 유지됩니다. 기존 캐릭터의 스킬을 다시 생성할 때도 그 캐릭터의 출시 세대를 사용합니다. 복각 픽업도 기존 세대를 유지합니다.</p></div>`;}
-function v2Options(){return {elems:[...ELEMS],beats:{...BEATS}};}
+function v2Options(){return {elems:[...ELEMS],beats:{...BEATS},...(typeof rulesOptions==='function'?rulesOptions():{})};} // 게임 규칙의 상성 배율·시너지·관계
 let V2JOBS=Promise.resolve();
 function v2Job(type,args,options={}){
  const snapshot=GGMCombat.clone(args);
@@ -40,7 +40,7 @@ function v2Ensure(c){
  if(typeof v2SyncEquipment==='function')v2SyncEquipment(c);
  return c.skills;
 }
-function v2CharacterInput(c){v2ApplyRoleSpeed(c);return {name:c.name,profile:c.profile,skillConcept:c.skillConcept,generation:GGMCombat.generation(c),role:c.role,elem:c.elem,faction:c.faction,hp:c.hp,atk:c.atk,def:c.def,spd:c.spd,skills:v2Ensure(c)};}
+function v2CharacterInput(c){v2ApplyRoleSpeed(c);return {name:c.name,profile:c.profile,skillConcept:c.skillConcept,generation:GGMCombat.generation(c),role:c.role,pos:c.pos,elem:c.elem,faction:c.faction,hp:c.hp,atk:c.atk,def:c.def,spd:c.spd,skills:v2Ensure(c)};}
 function v2Fingerprint(c){return JSON.stringify(v2CharacterInput(c));}
 function v2QueueCharacter(c){
  v2Ensure(c);if(V2PENDING.has(c))return V2PENDING.get(c);

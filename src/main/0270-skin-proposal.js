@@ -58,6 +58,7 @@ function dispOffer(taken){ const pool=(G.dispatches&&G.dispatches.length?G.dispa
   let focus=rand(['gold','gold','exp','exp','wmat','core']); if(focus==='core'&&hours<4) focus='exp';
   const pts=Math.pow(hours,0.85)*(1+0.35*(need-1)), r={}; r[focus]=Math.max(1,Math.round(DISP_FOCUS[focus][1]*pts*(focus==='gold'?1:1)));
   if(focus!=='gold') r.gold=Math.round(600*pts/100)*100; if(focus==='gold') r.gold=Math.round(r.gold/100)*100;
+  if(conOn()) Object.assign(r,conDispReward(hours,need)); // 건조/영입이 켜져 있으면 원정으로 건조 자원도 모아 와요
   return {id:'o'+uid(),name:String(tpl.name||'파견'),desc:String(tpl.desc||''),hours,need,reward:r}; }
 function DBOARD(){ const p=P(); let b=p.dboard; if(!b||!Array.isArray(b.list)) b=p.dboard={day:'',list:[],rr:0};
   // 예전 방식으로 보낸 파견은 그대로 이어서 보여 줘요
