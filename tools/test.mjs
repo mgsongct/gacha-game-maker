@@ -146,7 +146,7 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   writeFileSync(join(r7, 'src/modules/app/020-eng.js'), "/* 엔진 — 순수 함수(DOM·G 없음) */\n(function(root){ const f=(G)=>G+1; function h(){ return document.title + P().x; } root.E={f,h}; })(globalThis);\n");
   const U = await loadUnits(r7), IP = [...new Set(inlinePrompts(U).map(p => p.site.split(' ')[1]))].sort(), PM = pureModules(U).map(x => x.name);
   assert.deepEqual(IP, ['build', 'g2', 'part'], '프롬프트 흐름 속 지시문만: ' + IP); assert.deepEqual(PM, ['document', 'P'], '순수 모듈의 DOM·앱 상태 참조(매개변수 G는 지역): ' + PM);
-  assert.ok(imperative('처음 만난다)') && imperative('보스전이다.') && !imperative('저장했어요.'), '해라체 판별');
+  assert.ok(imperative('처음 만난다)') && imperative('보스전이다.') && !imperative('저장했어요.') && imperative('BURST 생성 금지.') && !imperative('JSON만 출력: {}'), '해라체 판별(…금지도 지시, JSON만 출력은 표식)');
   writeFileSync(join(r7, 'src/main/020-q.js'), "pfDef('B','다른 곳',()=>'흩어진 조각은 안 된다.');\n"); const FF = fragmentFiles(await loadUnits(r7));
   assert.ok(FF.home === 'src/main/010-p.js' && FF.stray.length === 1 && FF.stray[0].file === 'src/main/020-q.js', '조각이 두 파일에 흩어지면 잡음: ' + JSON.stringify(FF)); rmSync(r7, { recursive: true, force: true }); }
 // 위반 래칫: 줄만 밀린 것은 같은 항목, 새 빈 catch·복잡도 증가는 잡음

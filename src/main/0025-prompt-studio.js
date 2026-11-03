@@ -8,6 +8,8 @@
    문서: docs/research/prompts.md */
 function pfDef(id,label,get,where){ const R=window.__PF||(window.__PF={}); R[id]={id,label,get,where:where||''}; Object.defineProperty(window,id,{get:()=>promptFrag(id),configurable:true}); }
 function promptOv(){ try{ return (G&&G.meta&&G.meta.prompts)||{}; }catch(e){ return {}; } } // G는 0070에서 생겨요(그 전 호출은 기본값)
+// 자리 채우기: 조각 글의 {이름} 자리를 호출 지점이 준 값으로(덮어쓴 글도 같은 자리를 쓰면 채워짐). 쓸 수 있는 자리는 pfDef의 where에 적고 화면에 보여요
+function pf(id,vars){ const t=promptFrag(id); return vars?t.replace(/\{([A-Za-z]\w*)\}/g,(m,k)=>k in vars?String(vars[k]??''):m):t; }
 function promptFrag(id){ const f=(window.__PF||{})[id]; if(!f) return ''; const base=f.get(), o=promptOv()[id]; if(!o) return base; const t=o.text&&o.text.trim()?o.text:base; return o.add&&o.add.trim()?t+'\n'+o.add.trim():t; }
 /* ===== 조각 모음: 글 AI에 보내는 지시문은 모두 여기 한곳에(파편화 방지) =====
    고칠 때는 여기서 고치고, 게임마다 다르게 할 것은 스튜디오 화면(덮어쓰기·덧붙이기·AI 다듬기)에서. 호출 지점은 ${ID}로 넣기만 하고,
@@ -56,6 +58,51 @@ pfDef('FINALE_RULE','장의 마지막 스테이지 형식(장르에 따라)',()=
 const STAGE_WRITE_RULE_BASE='회담·콘테스트 스테이지는 그 전(pre)과 후(post)만 대본으로 쓴다. 회담 자체(추궁·증거·설득)와 콘테스트의 무대 경연(매력 어필·심사)은 게임이 진행하므로 대본에 쓰지 않는다.';
 pfDef('STAGE_WRITE_RULE','회담·콘테스트 스테이지의 대본 범위(스테이지 집필)',()=>STAGE_WRITE_RULE_BASE);
 pfDef('STAGE_MODES','스테이지 양식(전투·이야기·회담·콘테스트) 고르기',()=>{ const m=modesCfg(); if(!m.debate&&!m.contest) return '스테이지는 battle(전투) 또는 이야기 스테이지만 쓴다.'; return `스테이지 양식(mode): 대부분은 battle(전투). 이야기에 맞으면 한 장에 0~2개를 다른 양식으로${m.debate?'':'(debate는 쓰지 않는다)'}${m.contest?'':'(contest는 쓰지 않는다)'}: debate(회담 — 협상·재판·심문·설득·거짓말 들추기 장면. 상대의 주장 줄 3~5개 중 모순이 있는 줄에 weak=그 모순을 밝히는 증거 id, 또는 persuade={who:설득할 수 있는 ${T('crew')} 이름,text}. 증거는 앞선 이야기에서 얻은 물건·증언·기록으로 3~5개. 라운드 1~3개), contest(콘테스트 — 축제·오디션·무대·대회·사교 파티. 심사위원 1~3명과 각자 좋아하는 매력 likes(${Object.keys(CHARM).join('|')}), 경쟁자 1~3명 power 0.8~1.3). battle:false인 이야기 스테이지도 섞을 수 있다. 회담·콘테스트 스테이지는 enemies를 빈 배열로 둔다.`; });
+// ── 생성기(새 게임·장·이벤트·집필 — 0250)
+pfDef('DETAIL_RULE','장면 묘사 지침(대본 집필)',()=>`장면마다 장소의 분위기(빛·소리·온도), 인물의 표정과 몸짓, 속마음이 드러나는 짧은 나레이션을 넣는다. 대사는 인물마다 말투가 확실히 다르고 주고받는 리듬이 살아 있게 쓴다. 한 장면에서 두 사람 이상이 서로에게 반응하게 하고, 관계 기록(누가 누구와 어떤 사이인지, 최근에 무슨 일이 있었는지)이 대사와 행동에 묻어나게 한다. 설명으로 때우지 말고 행동과 대화로 보여 준다. 긴장 사이에 숨 고르는 작은 순간(농담, 버릇, 사소한 배려)을 한 번은 넣는다. 표정 지시([표정])와 효과·음악 지시를 장면에 맞게 쓴다.`);
+pfDef('THREAD_DUP_RULE','메신저와 본편 대본 겹치지 않기',()=>`threads는 본편 대본 속 [톡] 장면과 다른 별개의 메신저 대화다. 본편에서 이미 나눈 말을 되풀이하지 말고, 그 스테이지가 끝난 뒤의 후일담·사적인 속마음·다음 일에 대한 이야기로 쓴다.`);
+pfDef('NPC_RULE','이 세계의 NPC 등장시키기',()=>`NPC({npcs})는 이 세계에 사는 조연이다. 이야기에 어울리는 NPC를 1명 이상 장면에 등장시켜 대사를 준다(대사 이름은 NPC 이름 그대로). `,'자리: {npcs}');
+pfDef('NPC_NEW_RULE','새 조연(NPC) 만들기',()=>`이름과 대사가 있는 새 조연(의뢰인, 상인, 적 간부, 옛 지인 등)이 필요하면 newNpcs에 넣는다({crew}가 아니다. 이미 있는 인물은 다시 만들지 않는다. 0~2명).`,'자리: {crew}');
+pfDef('NEWC_RARITY_EVENT','장 신규 대원 희귀도(이벤트 배포)',()=>`첫 번째는 이벤트를 끝까지 깨면 무료로 합류하는 배포 {crew}(등급 R 또는 SR)이고, 나머지는 SR이나 R이다.`,'자리: {crew}');
+pfDef('NEWC_RARITY_MAIN','장 신규 대원 희귀도(메인 장)',()=>`희귀도를 섞는다: 1명은 SSR 또는 SR, 나머지는 SR이나 R(저랭크도 사연과 매력이 있게). R·SR은 이 장을 끝까지 깨면 무료로 합류한다.`);
+pfDef('NEWC_RULE','장·이벤트의 신규 대원',()=>`이 이야기에서 처음 등장하는 신규 {crew} {n}명을 newCharacters에 만든다. {cast}{rarity} 이야기 속에서 {player} 일행과 인연을 맺는 인물로 비중 있게 등장시키고(대사 이름은 그대로), debutStage에 처음 나오는 스테이지 번호(1부터)를 쓴다. 기존 인물과 이름·외모·역할·속성이 겹치지 않게 한다. 각 항목 스키마(끝에 "debutStage":숫자 추가, 능력치는 시스템이 정한다): {schema} {nai}`,'자리: {crew} {n} {cast} {rarity} {player} {schema} {nai}');
+pfDef('TALK_ALL_BATTLE','모든 스테이지 전투(이야기 스테이지 없음)',()=>`모든 스테이지는 전투가 있다(battle:true).`);
+pfDef('TALK_ONLY_RULE','이야기만 있는 스테이지 수',()=>`스테이지 중 {m}개 정도는 전투 없이 이야기만 있는 스테이지(battle:false, enemies는 빈 배열)로 만든다. 일상, 대화, 조사, 관계가 깊어지는 장면에 쓴다. {finale}`,'자리: {m} {finale}');
+pfDef('PREV_TAIL','이어 쓰기(바로 앞 장면)',()=>`바로 앞 장면(여기서 이어서 쓴다):`);
+pfDef('STAGE_LINES_STORY','이야기 스테이지 대본 분량(집필)',()=>`전투가 없으니 pre 하나에 이 스테이지 이야기를 모두 담는다({pre}줄 + {post}줄 정도). post는 빈 문자열.`,'자리: {pre} {post}');
+pfDef('STAGE_LAST_ENDING','장의 마지막 스테이지 끝맺음(집필)',()=>`마지막 스테이지라서 {finale} 다음으로 이어지는 여운(또는 반전)으로 끝낸다.`,'자리: {finale}');
+pfDef('STAGE_WRITE_GUIDE','스테이지 집필 지침',()=>`집필 지침: {detail} 장면 구성의 장면을 빠짐없이, 하나하나 충분히 길게 쓴다. {lines} 선택지 1개 이상. {ending} 장면 구성에 "(CG: 이름)" 표시가 있으면 그 지점에 [CG: 이름]을 넣고 장면이 끝나면 [CG 끝]으로 닫는다. 장면 구성에 없는 큰 사건은 새로 만들지 않는다.`,'자리: {detail} {lines} {ending}');
+pfDef('CH_HOW_DEEP','메인 장 요청(구성만 — 대본은 뒤에서)',()=>`구성하라. 대본은 뒤에서 스테이지마다 따로 쓰니 지금은 쓰지 않는다. 대신 스테이지마다 장면 구성(beats)을 촘촘하고 구체적으로 짠다(누가 나와서 무엇을 하고, 무엇을 느끼고, 무엇이 드러나는지)`);
+pfDef('CH_HOW_FAST','메인 장 요청(대본까지)',()=>`써라`);
+pfDef('CG_MARK_BEATS','CG 표시(장면 구성에)',()=>`그 장면의 beats에 "(CG: 이름)"이라고 표시한다`);
+pfDef('CG_MARK_SCRIPT','CG 표시(대본에)',()=>`대본의 그 지점에 [CG: 이름]과 [CG 끝]을 넣는다`);
+pfDef('CH_THREADS','메인 장의 메신저·요약(대본까지 쓸 때)',()=>`{talk} 대화 1~2개도 만든다(afterStage는 그 대화가 도착하는 스테이지 번호, 1부터). {dup}\n{rel} summary에는 이 장 줄거리를 사건·관계·종료 상태·인지·미회수 복선으로 구분해 2,000~3,000자 내외(최대 6,000자)로(누가 누구를 처음 만났고 무슨 약속·비밀·갈등 변화가 있었는지).`,'자리: {talk} {dup} {rel}');
+pfDef('CH_REQUEST','메인 장 만들기(구성·대본)',()=>`다음 메인 챕터({chapter}장)를 {how}. 추가로 JSON에 "codex" 배열을 넣어, 이 장에서 새로 드러나는 설정·장소·인물 기록 1~3개를 쓴다: [{"cat":"place|term|history|person|faction|item","title":"","body":"백과사전 말투 3~5문장"}]. 보유 중인 {crew}({owned})에게 활약할 장면을 주되, 같은 인물만 맴돌지 않게 아직 비중이 적었던 {crew}·NPC·새로 만나는 인물에게도 장면을 고르게 나눈다. 등장하는 {crew}의 {files}에 적힌 비밀 하나를 이야기에 엮는다. 스토리 중 한 번은 [톡: 이름]~[톡 끝] 메신저 장면을 넣는다. 방향: "{dir}". {castLine}\n메인 플롯을 한 걸음 진전시키고, 복선을 하나 회수하거나 새로 깐다. 인물 관계 기록을 이어받아 관계가 한 걸음씩 변하게 한다(이미 만난 사이를 처음 만난 것처럼 쓰지 않는다). {npc}\n{newc}\n{talkOnly} {modes}\n{lines} 마지막 스테이지는 {finale} 다음 장으로 이어지는 반전.\n스테이지 {n}개. 적은 이름·속성·보스 여부·외형만 정한다(능력치는 시스템이 성장 곡선에 맞춘다).{reuse}{battleFlow}\n스테이지마다 가장 인상적인 장면 하나씩을 CG로 정하고(스테이지 수만큼) {cgMark}. cgs에는 CG 이름, NovelAI 영어 장면 태그(인물 외모 제외, 장소·구도·행동·분위기만), 등장 인물 이름 1~3명(플레이어가 장면에 나오면 "{player}"도 넣는다)을 넣는다. 새로 필요한 배경이 있으면 backgrounds에 이름과 NovelAI 영어 프롬프트("no humans, scenery"로 시작)를 넣는다. 클로즈업할 새 소품이 있으면 props에 이름과 NovelAI 영어 프롬프트("no humans, object focus"로 시작)를 넣는다([소품: 이름]에는 소품 목록이나 props의 이름만 쓴다). 장면에 맞게 [음악: 이름]을 쓰고, 기존 음악 목록에 없는 곡이 꼭 필요하면 music에 이름과 영어 음악 프롬프트(instrumental, seamless loop 명시)를 넣는다. {threads}`,'자리: {chapter} {how} {crew} {owned} {files} {dir} {castLine} {npc} {newc} {talkOnly} {modes} {lines} {finale} {n} {reuse} {battleFlow} {cgMark} {player} {threads}');
+pfDef('EV_HOW_DEEP','이벤트 요청(구성만 — 대본은 뒤에서)',()=>`구성하라. 대본은 뒤에서 스테이지마다 따로 쓰니 지금은 쓰지 않고, 스테이지마다 장면 구성(beats)을 촘촘하고 구체적으로 짠다`);
+pfDef('EV_HOW_FAST','이벤트 요청(대본까지)',()=>`만들어라`);
+pfDef('EV_LINES','이벤트 스테이지 대본 분량(대본까지 쓸 때)',()=>`, 각 pre {pre}줄, post {post}줄(줄 수를 꼭 채운다). {detail}`,'자리: {pre} {post} {detail}');
+pfDef('EV_CG_MARK_SCRIPT','이벤트 CG 표시(대본에)',()=>`대본에 [CG: 이름]과 [CG 끝]을 넣는다`);
+pfDef('EV_GIFT_FIRST','이벤트 배포 대원을 이야기 중심에',()=>` 첫 번째 인물(배포 {crew})은 이야기의 중심에 등장시킨다.`,'자리: {crew}');
+pfDef('EV_THREADS','이벤트의 메신저·요약(대본까지 쓸 때)',()=>`\n{talk} 대화 1~2개(afterStage는 도착하는 스테이지 번호). {dup}\n{rel} summary에는 이벤트 줄거리를 4~6문장으로.`,'자리: {talk} {dup} {rel}');
+pfDef('EV_REQUEST','기간 한정 이벤트 만들기(구성·대본)',()=>`기간 한정 이벤트를 {how}. 내용: "{dir}". {castLine}\n메인 스토리와 무관한 독립된 외전이다. 메인 플롯의 비밀·반전·떡밥은 쓰지 않고, 이 이벤트 안에서 시작하고 끝나는 이야기로 쓴다.{lore}{past}{battleFlow} 인물 관계 기록을 이어받는다(이미 아는 사이를 처음 보는 사이처럼 쓰지 않는다). {npc}\n이벤트 스토리 스테이지 {n}개{lines}, 마지막은 보스전. {talkOnly} {modes} 음악과 표정 지시를 쓴다. 스테이지마다 가장 인상적인 장면 하나씩을 CG로 정하고(스테이지 수만큼) {cgMark}. cgs에 CG 이름, NovelAI 영어 장면 태그(인물 외모 제외), 등장 인물 이름을 넣는다. 클로즈업할 새 소품이 있으면 props에 이름과 NovelAI 영어 프롬프트("no humans, object focus"로 시작)를 넣는다.\n{newc}{giftFirst}{reuse}\n적은 이름·속성·보스 여부·외형만 정한다(능력치는 시스템이 정한다).{threads}`,'자리: {how} {dir} {castLine} {lore} {past} {battleFlow} {npc} {n} {lines} {talkOnly} {modes} {cgMark} {newc} {giftFirst} {reuse} {threads}');
+pfDef('LIB_ART','배경·소품·적 그림 태그(자료 그림 프롬프트 채우기)',()=>`다음 자료의 NovelAI 영어 태그 프롬프트를 써라. 소품(prop)은 "no humans, object focus"로 시작하고 물건의 생김새·재질·색을 쓴다. 배경(bg)은 "no humans, scenery"로 시작한다. 적(enemy)은 괴물·기계면 "no humans"로, 사람형이면 "1other, faceless"로 시작하고 생김새·재질·색·무기·위압감을 쓴다. 모두 이 세계관 설정과 분위기에 꼭 맞게 만들고, 어울리지 않는 디자인은 쓰지 않는다.`);
+pfDef('NG_AUTO_HINT','짧은 요청 상상해 채우기(새 게임)',()=>`\n짧은 요청이다. 요청의 핵심은 지키고 나머지(세계관·세력·갈등·분위기)는 자유롭게 상상해서 구체적으로 채운다.`);
+pfDef('NG_HERO_ASK','주인공 성별·외모 묻기(새 게임)',()=>`\nJSON에 "hero":{"gender":"주인공(플레이어) 성별·성 정체성. 세계관에 어울리게 정하거나, 정하지 않으려면 빈 문자열","look":"주인공 외모 한 줄(성인)"}도 넣는다.`);
+pfDef('NG_PLAYER_TERM','플레이어 호칭 고정(새 게임)',()=>`\n플레이어 호칭(terms.player)은 반드시 "{call}"(으)로 한다.`,'자리: {call}');
+pfDef('NG_CREW_TERM','아군 호칭 고정(새 게임)',()=>`\n아군 호칭(terms.crew)은 반드시 "{crew}"(으)로 한다.`,'자리: {crew}');
+pfDef('NG_TERMS_NEW','용어 새로 짓기(새 게임)',()=>`\nterms(아군 호칭 등 용어)는 이 게임의 세계관에 맞게 새로 짓는다. 다른 게임에서 쓰던 용어를 가져오지 않는다.`);
+pfDef('NG_TITLE_FIXED','게임 이름 고정(새 게임)',()=>`게임 이름은 반드시 "{title}"로 한다(그대로). `,'자리: {title}');
+pfDef('NG_TITLE_KEYWORD','게임 이름을 키워드에서(새 게임)',()=>`키워드에서 떠올린 고유한 이름으로 짓는다.`);
+pfDef('NG_WORLD','새 게임 1/4 세계관·게임 정의',()=>`속성(elems)은 세계관에 맞게 3~5개, 각 속성의 beats(이기는 속성)가 서로 맞물리게 정한다. reactions는 두 속성이 겹칠 때 생기는 반응 0~4개. {pos}\nterms.core·terms.gearMat·terms.transcMat에는 이 세계관에서 실제로 쓰는 고유한 재료 이름을 지어 넣는다. 승급(Lv1~70) 재료·장비 강화 재료·초월승급(Lv71~120) 재료는 용도를 설명하는 항목 제목이며, 이 제목을 재료 이름으로 그대로 복사하지 않는다.{autoHint}{heroAsk}{playerTerm}{crewTerm}{heroLine}\n새 가챠 게임을 기획한다. 장르와 키워드: "{kw}". 분위기: "{tone}".\n{title} 샘플 게임 이름(낙성계약)과 비슷하게 짓지 말고, '계약'이라는 단어는 쓰지 않는다.\n화면 테마는 {theme}.`,'자리: {pos} {autoHint} {heroAsk} {playerTerm} {crewTerm} {heroLine} {kw} {tone} {title} {theme}');
+pfDef('NG_STORY_CAST','스토리에 나온 인물은 대원으로(새 게임)',()=>`\n스토리에 이름이 나온 인물은 그 이름과 설정 그대로 {crew}으로 만든다(적·악역 제외).`,'자리: {crew}');
+pfDef('NG_AUTHOR_CAST','작가가 정한 대원 넣기(새 게임)',()=>`\n작가가 정한 {crew}(반드시 모두 포함하고, 이름·성격·과거·말투·외모를 그대로 살린다. 빈 칸만 채운다):\n{list}\n나머지 인원은 세계관에 맞게 새로 만든다.`,'자리: {crew} {list}');
+pfDef('NG_NPC_NOT_CREW','작가가 정한 NPC는 대원이 아님(새 게임)',()=>`\n다음 인물은 NPC(조연)라서 {crew}으로 만들지 않는다: {names}`,'자리: {crew} {names}');
+pfDef('NG_CAST','새 게임 2/4 대원 만들기',()=>`이 게임의 {crew} {n}명을 만들어라. SSR {ssrMin}~{third}명, SR {third}명, 나머지 R. {rarity} 역할(atk/def/sup)과 속성도 고르게. 각자 플롯과 연결된 비밀을 files에 넣는다. 이름은 세계관에 어울리게.`,'자리: {crew} {n} {ssrMin} {third} {rarity}');
+pfDef('NG_SOURCE_TAGS','원작 캐릭터 그림 태그(2차 창작)',()=>` 원작 캐릭터라면 naiPrompt 앞부분에 Danbooru 캐릭터 태그와 작품 태그(예: 이름 (작품명), 작품명)를 넣는다.`);
+pfDef('NG_FILL_MISSING','작가가 정한 대원 중 빠진 사람 채우기(새 게임)',()=>`다음 인물을 {crew}으로 만들어라. 이름·성격·과거·말투·외모는 그대로 살리고 빈 칸만 채운다:`,'자리: {crew}');
+pfDef('NG_NPC_ART','작가가 정한 NPC 그림 태그(새 게임)',()=>`다음 NPC들의 NovelAI 그림 프롬프트를 써라. 적힌 외모를 그대로 살리고, 의상은 세계관에 맞춘다. 등장인물은 모두 성인이다.`);
+pfDef('NG_OPENING','새 게임 3/4 오프닝·자료·배너',()=>`이 게임의 시작 부분을 만들어라.\nopening.lines: 검은 화면에 한 줄씩 뜨는 오프닝 문구 5~7개, 마지막은 게임 제목.\nopening.prologue: 프롤로그 대본 {pro}줄. 세계관 소개, 첫 동료들과의 강렬한 만남, 플레이어가 특별한 이유의 복선, 선택지 1개.\n{castPlan}\nbackgrounds: 프롤로그와 1장에 쓸 배경 이름과 NovelAI 프롬프트("no humans, scenery"로 시작) 8~12개. props: 소품 3~6개("no humans, object focus"로 시작). music: 배경음 7~9개(타이틀, 로비, 일상, 긴장, 전투, 보스전, 뽑기 연출, 감성 포함, 영어 프롬프트, instrumental, seamless loop).\nbanners: 상시 배너 이름 1개, 확률 업 배너 1개(SSR 1명), 세력 한정 배너 1개.`,'자리: {pro} {castPlan}');
+pfDef('NG_CHAPTER1','새 게임 4/4 1장·메신저·관계',()=>`프롤로그 다음으로 이어지는 1장을 만들어라. 배경은 이 이름만 쓴다: {bgs}. 소품: {props}.\nchapter: 스테이지 {n}개(pre {pre}줄, post {post}줄, {finale}). 적 체력 700~1300, 공격 70~100, 방어 25~55, 보스 체력 4배. {talkOnly} {modes} {detail} {npc}\nthreads: 메신저 대화 3개. {dup}\nsummary: 프롤로그와 1장 줄거리 4~6문장(누가 누구를 처음 만났는지 포함). relations: 인물 설정과 프롤로그·1장을 보고 인물들 사이(플레이어 포함)의 관계 8~16쌍. 설정상 원래 아는 사이와 이야기에서 처음 만난 사이를 모두 쓴다.\n{castPlan}\n{bestiary}`,'자리: {bgs} {props} {n} {pre} {post} {finale} {talkOnly} {modes} {detail} {npc} {dup} {castPlan} {bestiary}');
 
 /* 그림 프롬프트 가드: 사람이 나오면 안 되는 그림에서 사람 태그를 빼요 */
 const IMG_NOHUMAN={bg:'no humans, scenery',map:'no humans, scenery',prop:'no humans, object focus',icon:'no humans, object focus'};
@@ -93,7 +140,7 @@ function promptPanel(){ const ov=Object.keys(promptOv()).length, pl=plList().fil
   return `<div class="panel pm-hide"><h3>프롬프트 스튜디오 ${bad?`<span class="badge">그림 ${bad}</span>`:''}</h3><p class="muted" style="margin:0 0 6px">AI에 보내는 프롬프트 조각 ${Object.keys(window.__PF||{}).length}개${ov?` · 고친 조각 ${ov}`:''} · 교훈 ${pl}개. 조각을 고치고 다듬거나, 그림 프롬프트(배경·소품에 사람이 나오는 문제 등)를 점검·정정하고, 고친 내용을 교훈으로 쌓아 반복을 막아요.</p><button class="btn sm" data-act="pstopen">프롬프트 스튜디오</button></div>`; }
 function openStudio(tab){ if(tab) PS_TAB=tab; const tabs=[['frag','조각'],['img','그림 점검'],['lesson','교훈'],['log','AI 기록']], ov=promptOv();
   let body='';
-  if(PS_TAB==='frag') body=Object.values(window.__PF||{}).map(f=>{ const o=ov[f.id]||{}; return `<details class="panel" style="padding:8px;margin:6px 0"><summary><b>${esc(f.label)}</b> <span class="muted">${esc(f.id)}${o.text?' · 덮어씀':''}${o.add?' · 덧붙임':''}</span></summary>
+  if(PS_TAB==='frag') body=Object.values(window.__PF||{}).map(f=>{ const o=ov[f.id]||{}; return `<details class="panel" style="padding:8px;margin:6px 0"><summary><b>${esc(f.label)}</b> <span class="muted">${esc(f.id)}${f.where?' · '+esc(f.where):''}${o.text?' · 덮어씀':''}${o.add?' · 덧붙임':''}</span></summary>
     <div style="font-size:.78rem;margin:6px 0 2px">기본</div><pre style="white-space:pre-wrap;font-size:.75rem;max-height:140px;overflow:auto;margin:0">${esc(f.get())}</pre>
     <label class="f">덮어쓰기 (비우면 기본)</label><textarea class="in" rows="3" data-pf="${f.id}" data-k="text">${esc(o.text||'')}</textarea>
     <label class="f">덧붙이기 (기본 뒤에 추가)</label><textarea class="in" rows="2" data-pf="${f.id}" data-k="add">${esc(o.add||'')}</textarea>
