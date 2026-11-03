@@ -18,7 +18,7 @@ function readPlayerForm(){ const p=P(); if($('#pf_name')) p.player=$('#pf_name')
   if($('#pf_gsel')){ p.gender=$('#pf_gsel').value; p.genderTxt=''; }
   if($('#pf_look')) p.look=$('#pf_look').value.trim().slice(0,400); if($('#pf_bio')) p.bio=$('#pf_bio').value.trim().slice(0,1500); if($('#pf_hide')) p.hideEyes=$('#pf_hide').checked;if($('#pf_nai'))naiBlocksSave(avatarObj(),'prompt','pf_nai'); mark('prog'); }
 const genderCode=g=>/^(남|남성|남자|male|man)$/i.test(g||'')?'m':/^(여|여성|여자|female|woman)$/i.test(g||'')?'f':'';
-async function heroTags(hr){ const r=await aiJSON(`플레이어 캐릭터의 외모 설명을 NovelAI 영어 태그로 바꿔라.\n성별·성 정체성: ${hr.gender||'정하지 않음'}\n외모: ${hr.look}\n규칙: 설명에 맞는 인원 태그(1boy, 1girl, 1other 중 하나)와 solo로 시작한다. 성인이다. 머리, ${hr.hide?'':'눈, '}체형, 옷, 장신구 같은 외모 태그만 쓴다. 자세·구도·배경·화풍 태그는 쓰지 않는다.\nJSON만 출력: {"tags":"..."}`,null,'quick');
+async function heroTags(hr){ const r=await aiJSON(`${pf('HERO_TAGS',{v:hr.gender||'정하지 않음',look:hr.look,v2:hr.hide?'':'눈, '})}\nJSON만 출력: {"tags":"..."}`,null,'quick');
   let tags=String((r&&r.tags)||'').trim(); if(!tags) return '';
   if(hr.hide) tags=joinTags(tagList(tags).filter(t=>!EYE_TAG.test(tagKey(t))).join(', '),'hair over eyes, bangs covering eyes, long bangs');
   return tags; }
@@ -44,22 +44,7 @@ async function fcSend(opt){
     const o=own(c.id), lv=affLv(o), files=(c.files||[]).filter(x=>o&&o.dup>=(x.dup||0)).map(x=>x.text).filter(Boolean);
     const pool=typeof affLinePool==='function'?affLinePool(c).slice(0,8):(c.lines||[]).slice(0,6);
     const recent=roomLog(cid).slice(-24).map(l=>l.w==='me'?(l.img?`(${playerName()}이(가) 사진을 보냄${l.t?': '+l.t:''})`:`${playerName()}: ${l.t}`):l.w==='c'?`${c.name}: ${l.t}`:l.w==='p'?`(${c.name}이(가) 사진을 보냄)`:`(${l.t})`).join('\n');
-    const r=await aiJSON(`${RULES}
-${ctx()}
-
-너는 지금 「${c.name}」이다. ${T('talk')} 메신저로 ${playerName()}(${T('player')})와(과) 1:1 개인 채팅을 하고 있다.
-${c.name}: 소속 ${c.faction||'무소속'}, ${ROLE[c.role]||''}. 프로필: ${c.profile||''}
-말투 예시: ${pool.map(x=>'"'+x+'"').join(' / ')}
-호감도 Lv.${lv} (1~10). 호감도에 맞는 거리감으로 대한다(낮으면 조금 서먹하게, 높으면 편하고 다정하게).
-${files.length?'이 캐릭터가 이미 털어놓은 비밀: '+files.join(' / '):''}
-플레이어가 지금까지 겪은 이야기: ${fcProgress()}
-${(()=>{ const m=G.chapters.filter(ch=>ch.kind==='main'&&ch.summary).slice(-2); return m.length?'최근 메인 스토리 요약: '+m.map(x=>x.title+' — '+x.summary).join(' / '):''; })()}${relCtx(recent+'\n'+text,[baseChar(c).id,REL_ME],30)}
-${f.sum?'예전 대화 요약: '+f.sum:''}
-최근 대화:
-${recent}
-
-${opt.img?`방금 ${playerName()}이(가) 사진을 보냈다(첨부한 이미지). 사진 속 내용을 보고 ${c.name}답게 반응한다. 사진이 보이지 않으면 내용을 지어내지 말고 무슨 사진인지 물어본다.\n`:''}${fcPhotoOn()?`사진: 대화 흐름상 자연스러울 때만(셀카를 부탁받았거나, 지금 있는 곳이나 물건을 보여 줄 때) 가끔 사진 1장을 보낼 수 있다. 보낼 때는 "photo"에 사진 장면을 영어 Danbooru 태그로 쓴다(예: "selfie, cafe, holding cup, smile, indoors"). 대부분의 답장에는 사진을 보내지 않는다.\n`:''}규칙: 실제 메신저처럼 짧은 말풍선 1~3개로 답한다. 너는 ${c.name}의 말만 쓴다. ${playerName()}의 대사, 생각, 행동을 절대 대신 쓰지 않는다. 지문, 괄호 속 행동 묘사, 이름표 없이 대사만 쓴다. ${c.name}의 말투와 성격을 지킨다. 플레이어가 아직 보지 못한 메인 플롯의 비밀이나 반전은 말하지 않고 모르는 척하거나 얼버무린다. 대화가 부적절한 방향으로 가면 캐릭터답게 화제를 돌린다. 가끔 먼저 질문을 던지거나 최근 사건을 언급해도 좋다.
-JSON만 출력: {"replies":["말풍선1","말풍선2"],"aff":0~2 정수(대화가 즐겁거나 의미 있었으면 1~2)${fcPhotoOn()?',"photo":"사진을 보낼 때만, 장면 태그. 안 보내면 빈 문자열"':''}}`,null,'default',opt.img?await chatImgB64(opt.img):undefined);
+    const r=await aiJSON(`${pf('FREE_CHAT',{RULES,ctx:ctx(),name:c.name,talk:T('talk'),playerName:playerName(),player:T('player'),v:c.faction||'무소속',v2:ROLE[c.role]||'',v3:c.profile||'',v4:pool.map(x=>'"'+x+'"').join(' / '),lv,v5:files.length?'이 캐릭터가 이미 털어놓은 비밀: '+files.join(' / '):'',fcProgress:fcProgress(),v6:(()=>{ const m=G.chapters.filter(ch=>ch.kind==='main'&&ch.summary).slice(-2); return m.length?'최근 메인 스토리 요약: '+m.map(x=>x.title+' — '+x.summary).join(' / '):''; })(),relCtx:relCtx(recent+'\n'+text,[baseChar(c).id,REL_ME],30),v7:f.sum?'예전 대화 요약: '+f.sum:'',recent,v8:opt.img?pf('FREE_CHAT_PHOTO_RECV',{playerName:playerName(),name:c.name}):'',fcPhotoOn:fcPhotoOn()?pf('FREE_CHAT_PHOTO'):''})}JSON만 출력: {"replies":["말풍선1","말풍선2"],"aff":0~2 정수(대화가 즐겁거나 의미 있었으면 1~2)${fcPhotoOn()?',"photo":"사진을 보낼 때만, 장면 태그. 안 보내면 빈 문자열"':''}}`,null,'default',opt.img?await chatImgB64(opt.img):undefined);
     ty.remove(); const pn=playerName(), reps=(r&&Array.isArray(r.replies)?r.replies:r&&r.reply?[r.reply]:[]).map(x=>String(x||'').trim()).map(x=>x.replace(new RegExp('^'+c.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*[:：]\\s*'),'')).filter(x=>x&&!new RegExp('^(나|'+pn.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'|'+T('player')+')\\s*[:：]').test(x)).slice(0,4);
     if(!reps.length){ if(r) toast('답장을 받지 못했어요. 다시 보내 주세요'); return; }
     for(let i=0;i<reps.length;i++){
@@ -80,10 +65,7 @@ async function fcNpcPhoto(c,f,tags,alive,ty){
   }catch(e){ }finally{ t2.remove(); } }
 async function fcSummarize(cid){
   const c=charById(cid), f=fcOf(cid); const end=f.log.length-24, part=f.log.slice(f.sumTo||0,end); if(part.length<20) return;
-  try{ const r=await aiJSON(`${c.name}와(과) ${playerName()}의 메신저 대화를 다음 대화에서 참고할 수 있게 요약하라. 약속, 서로 알게 된 사실, 감정 변화, 별명, 농담을 중심으로 6문장 이내.
-${f.sum?'기존 요약: '+f.sum+'\n':''}새 대화:
-${part.map(l=>(l.w==='me'?playerName():l.w==='c'?c.name:'')+': '+l.t).join('\n')}
-JSON만 출력: {"summary":"요약"}`,null,'quick'); if(r&&r.summary){ f.sum=String(r.summary).slice(0,1200); f.sumTo=end; mark('prog'); } }catch(e){ quietErr(e,'0160-free-chat.js:87'); }
+  try{ const r=await aiJSON(`${pf('FREE_CHAT_SUMMARY',{name:c.name,playerName:playerName(),v:f.sum?'기존 요약: '+f.sum+'\n':'',v2:part.map(l=>(l.w==='me'?playerName():l.w==='c'?c.name:'')+': '+l.t).join('\n')})}JSON만 출력: {"summary":"요약"}`,null,'quick'); if(r&&r.summary){ f.sum=String(r.summary).slice(0,1200); f.sumTo=end; mark('prog'); } }catch(e){ quietErr(e,'0160-free-chat.js:87'); }
 }
 document.addEventListener('keydown',e=>{ if(e.target&&e.target.id==='fcIn'&&e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); if(e.isComposing||e.keyCode===229) return; fcSend(); } });
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='fcIn'){ const t=e.target; t.style.height='auto'; t.style.height=Math.min(120,t.scrollHeight)+'px'; } });

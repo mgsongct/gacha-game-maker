@@ -34,7 +34,7 @@ function aiCallees(units) { const set = new Set(AI_CALLS); let grew = true;
 function resolveArg(a0) { if (a0?.type !== 'identifier') return a0; let f = a0.parent; while (f && !FN.has(f.type)) f = f.parent; let hit = null;
   if (f) walk(f, n => { if (hit) return false; if (n.type === 'variable_declarator' && n.childForFieldName('name')?.text === a0.text) hit = n.childForFieldName('value'); }); return hit || a0; }
 const ownText = n => n.type === 'template_string' ? n.namedChildren.filter(c => c.type === 'string_fragment').map(c => c.text).join('') : n.text.slice(1, -1);
-export function inlinePrompts(units) { const bases = fragBases(units), calls = aiCallees(units), tops = new Map(), roots = [];
+export function inlinePrompts(units, opts = {}) { /* opts.nodes: 원문(text)도 돌려줌(tools/prompts-move.mjs) */ const bases = fragBases(units), calls = aiCallees(units), tops = new Map(), roots = [];
   for (const u of units) { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const nm = declName(r.child(i)); if (nm && !tops.has(nm)) tops.set(nm, { u, node: r.child(i) }); } }
   // 창 게터: Object.defineProperty(window,'RULES',{get:rulesText}) → RULES는 rulesText처럼 따라감 / 모듈 이름공간(GGM…)의 함수: GGMCombat.prompt → 모듈 안 function prompt
   const getters = new Map(), modFns = new Map();
@@ -49,7 +49,7 @@ export function inlinePrompts(units) { const bases = fragBases(units), calls = a
   // 지시문 글 하나가 한 항목(최상위 선언 + 글 머리로 키) — 새로 넣은 문장은 새 항목으로, 늘린 문장은 글자 수로 드러남
   const unitOf = new Map(), out = [], dup = new Map(); units.forEach(u => walk(u.tree.rootNode, n => { if (n.type === 'string' || n.type === 'template_string') unitOf.set(n.id, u); }));
   for (const n of lits) { const t = ownText(n); if (!imperative(t)) continue; const u = unitOf.get(n.id), loc = u.loc(n), file = loc.split(':')[0], top = ownerOf(n) || '(최상위 문장)', head = t.replace(/\s+/g, ' ').trim().slice(0, 40), base = `${file} ${top} 「${head}」`, k = (dup.get(base) || 0) + 1; dup.set(base, k);
-    out.push({ key: k > 1 ? `${base} #${k}` : base, site: `${file} ${top}`, head, chars: t.length, loc }); }
+    out.push({ key: k > 1 ? `${base} #${k}` : base, site: `${file} ${top}`, head, chars: t.length, loc, ...(opts.nodes ? { text: n.text } : {}) }); }
   return out.sort((a, b) => b.chars - a.chars); }
 // 위치(최상위 선언)별로 모음 — 보고서 표
 export const promptSites = rows => [...rows.reduce((m, r) => { const x = m.get(r.site) || { site: r.site, n: 0, chars: 0 }; x.n++; x.chars += r.chars; return m.set(r.site, x); }, new Map()).values()].sort((a, b) => b.chars - a.chars);

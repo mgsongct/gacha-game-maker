@@ -56,7 +56,7 @@ function auditMarkObj(o){ if(o===G.meta){ mark('meta','world'); return; } if(G.c
 
 async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(instruction 없음) 또는 지정 변환(instruction 있음)
   const schema='{'+fields.map(f=>AUDIT_FIELDS[f][1]).join(',')+'}', cur=fields.map(f=>`${AUDIT_FIELDS[f][0]}: ${JSON.stringify(c[f]??'')}`).join('\n');
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」(${ROLE[c.role]||''}, ${c.faction||'무소속'}). 프로필: ${String(c.profile||'').slice(0,400)}\n지금 값:\n${cur}\n\n${instruction?`다음 지시대로 위 항목을 고쳐 써라: "${instruction}". 지시와 관계없는 설정·말투는 유지한다.`:'비었거나 부족한 항목을 이 캐릭터의 성격·말투·설정에 맞게 채워라. 이미 있는 내용은 살리고 어긋나지 않게 한다.'}${fields.includes('naiPrompt')?' '+NAI_CHAR:''}\nJSON만 출력: ${schema}`,null,'default');
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」(${ROLE[c.role]||''}, ${c.faction||'무소속'}). 프로필: ${String(c.profile||'').slice(0,400)}\n지금 값:\n${cur}\n\n${instruction?pf('AUDIT_CONVERT',{instruction}):pf('AUDIT_FILL')}${fields.includes('naiPrompt')?' '+NAI_CHAR:''}\nJSON만 출력: ${schema}`,null,'default');
   if(!r) return false;
   for(const f of fields){ const v=r[f]; if(v==null) continue;
     if(f==='touch'&&typeof v==='object') c.touch={head:auditStrs(v.head).slice(0,8),body:auditStrs(v.body).slice(0,8),pet:auditStrs(v.pet).slice(0,8)};
@@ -65,7 +65,7 @@ async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(ins
     else if(f==='naiPrompt') c.naiPrompt=stripAge(tagList(String(v)).filter(t=>!MINOR_TAGS.test(tagKey(t))).join(', '));
     else c[f]=String(v).trim(); }
   mark('c:'+c.id); return true; }
-async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(`${RULES}\n${ctx()}\n\n${SCRIPT_FMT}\n「${ch?ch.title:''}」의 스테이지 「${s.title||''}」 전투 직전 장면 대본을 써라. 앞뒤 스테이지 흐름과 이어지게, 12~25줄.\nJSON만 출력: {"pre":"대본"}`,null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
+async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(`${pf('AUDIT_STAGE',{RULES,ctx:ctx(),SCRIPT_FMT,v:ch?ch.title:'',v2:s.title||''})}\nJSON만 출력: {"pre":"대본"}`,null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
 
 // 한 항목 고치기 — 점검 화면의 일괄 고치기(auditFix)와 실행 중 자동 채움(liveFill, 0537)이 같이 씀. 고쳤으면 true
 // 규칙 고치기 중 글 AI로 더 잘 채울 수 있는 것(fix.ai — 일정 장소는 AI가 좋아하는 것 태그까지 붙여 "좋아하는 장소 ♥"가 맞음)은 AI가 있으면 AI로, 없거나 실패하면 규칙으로

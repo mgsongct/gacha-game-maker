@@ -32,10 +32,7 @@ case 'shopswap': { const x=SHOP_SWAP().find(q=>q.id===id); if(!x) break; const n
 case 'shkedit': openShk(); break;
 case 'shksave': { const m=G.meta.shop; m.name=$('#sk_name').value.trim()||'상점 주인'; m.charId=$('#sk_char').value; if($('#sk_prompt'))naiBlocksSave(shkSelf(),'naiPrompt','sk_prompt'); ['hello','buy','poor'].forEach(k=>{const v=lines($('#sk_'+k).value); if(v.length) m[k]=v;}); mark('meta'); SHOP_LINE=''; closeModal(); render(); toast('상점 주인을 저장했어요'); break; }
 case 'shkai': { const c=$('#sk_char').value?charById($('#sk_char').value):null, nm=$('#sk_name').value.trim()||'상점 주인';
-      const r=await aiJSON(`${RULES}
-세계관: ${G.world.summary}
-상점 주인 "${nm}"의 대사를 써라.${c?` 이 인물은 ${c.name}이고 프로필은 다음과 같다: ${c.profile}`:''} 플레이어(${T('player')})에게 재료를 파는 가게 주인이다. 짧고 개성 있게, 세계관 용어를 섞는다.
-JSON만 출력: {"hello":["인사 5개"],"buy":["구매 감사 5개"],"poor":["돈이 모자랄 때 3개"]}`,t);
+      const r=await aiJSON(`${pf('SHOP_LINES',{RULES,summary:G.world.summary,nm,v:c?` 이 인물은 ${c.name}이고 프로필은 다음과 같다: ${c.profile}`:'',player:T('player')})}JSON만 출력: {"hello":["인사 5개"],"buy":["구매 감사 5개"],"poor":["돈이 모자랄 때 3개"]}`,t);
       if(r){ ['hello','buy','poor'].forEach(k=>{ if(Array.isArray(r[k])&&r[k].length) $('#sk_'+k).value=r[k].map(String).join('\n'); }); toast('대사를 채웠어요. 저장을 눌러 주세요'); } break; }
 case 'cashbuy': { const k=CASH_PACKS.find(x=>x.id===id); if(!k) break; const first=!p.cash.first[k.id], n=k.gems+(first?k.gems:k.bonus); p.cash.first[k.id]=true; p.cash.total+=n; giveReward({gems:n}); mark('prog'); render(); buyFx('+'+nf(n),`◆ ${T('currency')}${first?' · 첫 구매 2배':''}`); break; }
 case 'cashmonth': { const mo=p.cash.month, base=Math.max(Date.now(),mo.until||0); mo.until=base+30*864e5; giveReward({gems:300}); mark('prog'); render(); buyFx('+300','월간 보급 카드 · 30일'); cashTick(); render(); break; }

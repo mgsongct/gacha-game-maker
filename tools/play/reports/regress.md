@@ -1,6 +1,6 @@
 # 생성 회귀 시험
 
-생성: `node tools/play/regress.mjs --ref HEAD` · 2026-11-03T12:31 · 같은 글 AI 응답을 `HEAD`(cc1a0e8) 빌드와 지금 빌드에 넣어 새 게임을 다시 만든 결과의 QA 발견 비교
+생성: `node tools/play/regress.mjs --ref HEAD` · 2026-11-03T12:39 · 같은 글 AI 응답을 `HEAD`(5bb51bc) 빌드와 지금 빌드에 넣어 새 게임을 다시 만든 결과의 QA 발견 비교
 
 ## idol-audition — 앙코르 시그널
 

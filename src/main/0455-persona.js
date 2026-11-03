@@ -37,7 +37,7 @@ function personaReview(c){ const p=c.persona||{}, issues=[], add=(w,k,msg)=>issu
 /* AI: 개성 채우기·다듬기(mode fill|improve), 대사도 말투에 맞게 다시 쓰기(lines) */
 async function personaAI(c,mode='fill',opt={}){
   const cfg=PERSONA_CFG(), others=G.chars.filter(x=>x!==c&&!x.alt&&x.persona).slice(0,12).map(x=>`${x.name}: ${personaBrief(x)}`).join(' / ');
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」(${RL[c.rarity]}, ${c.faction||'무소속'}, ${c.elem}, ${(posOf(c)||{}).name||ROLE[c.role]})의 개성 시트를 ${mode==='improve'?'더 매력적으로 다듬어라. 흔한 키워드는 구체적인 습관·반전으로 바꾸고, 결점과 반전 매력이 서로 이어지게 한다':'채워라. 이미 있는 값은 살린다'}.
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」(${RL[c.rarity]}, ${c.faction||'무소속'}, ${c.elem}, ${(posOf(c)||{}).name||ROLE[c.role]})의 개성 시트를 ${mode==='improve'?pf('PERSONA_IMPROVE'):pf('PERSONA_FILL')}.
 프로필: ${String(c.profile||'').slice(0,500)}
 지금 개성: ${JSON.stringify(c.persona||{})}
 지금 대사: ${(c.lines||[]).slice(0,6).join(' / ')}
@@ -50,26 +50,16 @@ JSON만 출력: {"persona":{"traits":["","",""],"self":"","call":"","ending":"",
   c.pfields=Object.assign({},pfieldsClean(r.pfields),mode==='fill'?pfieldsClean(c.pfields):{});
   if(opt.lines){ const L=strs(r.lines); if(L.length>=3) c.lines=L.slice(0,12); if(r.affLines&&typeof r.affLines==='object'){ const a={...(c.affLines||{})}; Object.entries(r.affLines).forEach(([k,v])=>{ const n=parseInt(k,10); if(n>=1&&n<=10&&strs(v).length) a[n]=strs(v).slice(0,4); }); c.affLines=a; } }
   mark('c:'+c.id); return true; }
-async function personaAIReview(c,btn){ const r=await aiJSON(`${RULES}\n${ctx()}\n\n서브컬처 수집형 게임 기획자로서 ${T('crew')} 「${c.name}」의 매력을 냉정하게 평가하라. 기준: 첫인상 훅, 말투의 개성, 반전 매력, 다른 캐릭터와의 차별성, 팬이 생길 포인트, 관계가 깊어질 여지.
-프로필: ${String(c.profile||'').slice(0,500)}
-개성: ${JSON.stringify(c.persona||{})}
-대사: ${(c.lines||[]).slice(0,8).join(' / ')}
-JSON만 출력: {"score":0~100,"strengths":["2~3개"],"weaknesses":["2~3개"],"suggestions":["바로 고칠 수 있는 구체적인 제안 3개"]}`,btn,'quick'); if(!r) return null; c.personaAIReview={at:Date.now(),score:Math.max(0,Math.min(100,+r.score||0)),strengths:strs(r.strengths).slice(0,4),weaknesses:strs(r.weaknesses).slice(0,4),suggestions:strs(r.suggestions).slice(0,5)}; mark('c:'+c.id); return c.personaAIReview; }
+async function personaAIReview(c,btn){ const r=await aiJSON(`${pf('PERSONA_REVIEW',{RULES,ctx:ctx(),crew:T('crew'),name:c.name,String:String(c.profile||'').slice(0,500),v:JSON.stringify(c.persona||{}),v2:(c.lines||[]).slice(0,8).join(' / ')})}JSON만 출력: {"score":0~100,"strengths":["2~3개"],"weaknesses":["2~3개"],"suggestions":["바로 고칠 수 있는 구체적인 제안 3개"]}`,btn,'quick'); if(!r) return null; c.personaAIReview={at:Date.now(),score:Math.max(0,Math.min(100,+r.score||0)),strengths:strs(r.strengths).slice(0,4),weaknesses:strs(r.weaknesses).slice(0,4),suggestions:strs(r.suggestions).slice(0,5)}; mark('c:'+c.id); return c.personaAIReview; }
 
 /* 인연 톡: 호감도 단계마다 메신저 대화(모모톡처럼 관계가 깊어지는 흐름) */
 async function talkAffGen(c,btn){ const cfg=PERSONA_CFG(), have=new Set(affThreads(c).map(t=>+t.trigger.value)), levels=cfg.affLv.filter(l=>!have.has(+l)); if(!levels.length){ toast('이미 모든 단계의 인연 톡이 있어요'); return 0; }
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」이(가) ${T('talk')}으로 플레이어에게 보내는 인연 톡을 호감도 ${levels.join(', ')} 단계마다 하나씩 써라. 단계가 오를수록 관계가 깊어진다(가벼운 안부 → 개인적인 이야기 → 약점·고민을 털어놓음 → 특별한 약속). 개성: ${personaBrief(c)}. 프로필: ${String(c.profile||'').slice(0,300)}.
-${THREAD_FMT}
-각 톡은 8~16줄, 선택지 1~2번. 이 캐릭터의 1인칭·어미·말버릇을 지킨다.
-JSON만 출력: {"threads":[{"lv":${levels[0]},"title":"알림에 뜰 짧은 제목","script":"대화"}]}`,btn,'default');
+  const r=await aiJSON(`${pf('AFF_TALK',{RULES,ctx:ctx(),crew:T('crew'),name:c.name,talk:T('talk'),v:levels.join(', '),personaBrief:personaBrief(c),String:String(c.profile||'').slice(0,300),THREAD_FMT})}JSON만 출력: {"threads":[{"lv":${levels[0]},"title":"알림에 뜰 짧은 제목","script":"대화"}]}`,btn,'default');
   const L=(r&&Array.isArray(r.threads)?r.threads:[]).filter(x=>x&&x.script&&levels.includes(+x.lv)); let n=0;
   for(const x of L){ const th={id:uid(),charId:c.id,title:String(x.title||'메시지').slice(0,30),trigger:{type:'aff',value:+x.lv},needOwn:true,script:String(x.script)}; G.threads.push(th); mark('t:'+th.id); n++; }
   if(n) checkTriggers(true); return n; }
 /* 메모리얼: 호감도 memoLv에서 열리는 특별 장면 + 메모리얼 로비 대사 */
-async function memorialGen(c,btn){ const cfg=PERSONA_CFG(); const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」의 메모리얼(호감도 ${cfg.memoLv}에서 열리는 특별한 장면)을 써라. 둘만의 조용한 순간, 이 캐릭터의 반전 매력과 속마음이 드러난다. 개성: ${personaBrief(c)}. 프로필: ${String(c.profile||'').slice(0,300)}.
-${SCRIPT_FMT}
-대본은 15~30줄. lines는 메모리얼 로비에서 터치하면 나오는 대사 4개(그 장면의 여운).
-JSON만 출력: {"title":"메모리얼 제목","script":"대본","lines":["4개"]}`,btn,'default'); if(!r||!r.script) return false;
+async function memorialGen(c,btn){ const cfg=PERSONA_CFG(); const r=await aiJSON(`${pf('MEMORIAL',{RULES,ctx:ctx(),crew:T('crew'),name:c.name,memoLv:cfg.memoLv,personaBrief:personaBrief(c),String:String(c.profile||'').slice(0,300),SCRIPT_FMT})}JSON만 출력: {"title":"메모리얼 제목","script":"대본","lines":["4개"]}`,btn,'default'); if(!r||!r.script) return false;
   c.memorial={lv:+cfg.memoLv||8,title:String(r.title||'메모리얼').slice(0,30),script:String(r.script),lines:strs(r.lines).slice(0,6)}; mark('c:'+c.id); return true; }
 function memoOpen(c){ const o=own(c.id); return !!(c.memorial&&c.memorial.script&&o&&affLv(o)>=(+c.memorial.lv||8)); }
 function memoOn(c){ return !!((P().memoOn||{})[c.id]&&memoOpen(c)); }

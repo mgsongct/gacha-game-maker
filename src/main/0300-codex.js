@@ -74,12 +74,7 @@ function codeToStage(code){ code=String(code||'').trim(); if(!code||/^start|처�
 function cxProgressText(){ const st=mainStages(), done=st.filter(s=>P().cleared[s.id]); return done.length?`플레이어가 지금까지 깬 스테이지: ${done.map(s=>s.code+' '+s.title).join(', ')}`:'플레이어는 아직 스토리를 시작하지 않았다'; }
 async function cxDiscover(t){
   const st=mainStages(), have=cxEntries().map(e=>e.title);
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 게임의 도감(로어북)에 실을 새 기록 6개를 써라. 세계관을 더 깊게 만드는 내용으로: 장소, 용어(기술·제도·현상), 역사적 사건, 아직 등장하지 않은 주요 인물(NPC), 세력의 이면, 물건 등을 고루 섞는다.
-이미 있는 항목과 제목이 겹치지 않게: ${have.join(', ')}
-스테이지 목록: ${st.map(s=>s.code+' '+s.title).join(', ')||'없음'}
-${cxProgressText()}
-규칙: 메인 플롯의 비밀이나 반전에 닿는 기록은 "after"에 그 비밀이 드러나는 스테이지 코드를 넣는다. "start" 기록에는 비밀을 쓰지 않는다. 기록은 게임 속 문서처럼 3인칭 백과사전 말투로 4~6문장. 대원 이름은 기존 이름을 그대로 쓴다.
-JSON만 출력: {"entries":[{"cat":"place|term|history|person|faction|item","title":"짧은 제목","body":"내용","after":"start 또는 1-3 같은 스테이지 코드"}]}`,t);
+  const r=await aiJSON(`${pf('CODEX_DISCOVER',{RULES,ctx:ctx(),v:have.join(', '),v2:st.map(s=>s.code+' '+s.title).join(', ')||'없음',cxProgressText:cxProgressText()})}JSON만 출력: {"entries":[{"cat":"place|term|history|person|faction|item","title":"짧은 제목","body":"내용","after":"start 또는 1-3 같은 스테이지 코드"}]}`,t);
   if(!r||!Array.isArray(r.entries)) return 0;
   let n=0; r.entries.slice(0,8).forEach(x=>{ if(!x||!x.title||!x.body) return; const cat=CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term'; const sid=codeToStage(x.after);
     cxStore().push({id:'cx'+uid(),cat,title:String(x.title).slice(0,40),body:String(x.body),unlock:sid?{type:'clear',value:sid}:{type:'start'},src:'ai',at:Date.now()}); n++; });
@@ -87,12 +82,7 @@ JSON만 출력: {"entries":[{"cat":"place|term|history|person|faction|item","tit
 }
 async function cxDeepen(key,t){
   const e=cxEntries().find(x=>x.key===key); if(!e) return false;
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n도감 항목 「${e.title}」(${CX_LABEL[e.cat]||''})에 새 기록을 한 단락 덧붙여라.
-지금 기록: ${String(e.body||'').slice(0,800)}
-이미 덧붙인 기록: ${e.notes.map(n=>n.text).join(' / ').slice(0,800)||'없음'}
-${cxProgressText()}
-규칙: 플레이어가 아직 깨지 않은 스테이지에서 밝혀질 비밀이나 반전은 쓰지 않는다. 대신 아직 풀리지 않은 의문을 암시하는 건 좋다. 앞의 기록과 겹치지 않는 새 사실, 일화, 소문, 문서 인용 중 하나로 4~6문장. 게임 속 문서 말투.
-JSON만 출력: {"text":"덧붙일 내용"}`,t);
+  const r=await aiJSON(`${pf('CODEX_DEEPEN',{RULES,ctx:ctx(),title:e.title,v:CX_LABEL[e.cat]||'',String:String(e.body||'').slice(0,800),v2:e.notes.map(n=>n.text).join(' / ').slice(0,800)||'없음',cxProgressText:cxProgressText()})}JSON만 출력: {"text":"덧붙일 내용"}`,t);
   if(!r||!r.text) return false;
   const N=cxNotes(); (N[key]=N[key]||[]).push({text:String(r.text),at:mainStages().filter(s=>P().cleared[s.id]).map(s=>s.code).pop()||'시작 전'}); mark('world'); return true;
 }

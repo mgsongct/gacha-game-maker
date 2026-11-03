@@ -83,7 +83,7 @@ case 'sdelgo': { if(!SDEL) break; const {o,L}=SDEL, pick={}; document.querySelec
       const n=['threads','codex','libs','rels','chars'].filter(k=>pick[k]).reduce((a,k)=>a+L[k].length,0); toast(`「${o.title}」을(를) 지웠어요${n?` · 연결된 것 ${n}개도 함께`:''}`); break; }
 case 'saveopening': G.opening.lines=lines($('#op_lines').value); G.opening.prologue=$('#op_pro').value; mark('opening'); closeModal(); toast('오프닝을 저장했어요'); break;
 case 'aiopening': { const hint=$('#op_hint').value.trim();
-      const r=await aiJSON(`${RULES}\n${ctx()}\n${SCRIPT_FMT}\n\n이 게임의 오프닝을 써라. lines는 검은 화면에 한 줄씩 떠오르는 오프닝 영상 문구 5~7개로, 마지막 줄은 게임 제목. prologue는 플레이어가 처음 보는 프롤로그 대본 30~45줄로, 세계관을 소개하고 첫 대원들과의 강렬한 만남, 플레이어가 특별한 존재라는 복선, 선택지 1개를 넣는다. 배경 전환과 효과를 적극적으로 쓴다.\n${hint?'요청: '+hint:''}\nJSON만 출력: {"lines":[],"prologue":"대본"}`,t,'complex');
+      const r=await aiJSON(`${pf('OPENING_REWRITE',{RULES,ctx:ctx(),SCRIPT_FMT,v:hint?'요청: '+hint:''})}\nJSON만 출력: {"lines":[],"prologue":"대본"}`,t,'complex');
       if(r&&$('#op_lines')){ $('#op_lines').value=strs(r.lines).join('\n'); $('#op_pro').value=nl(r.prologue); toast('입력칸을 채웠어요. 확인 후 저장하세요.'); } break; }
 case 'savelib': { const name=$('#li_name').value.trim(); if(!name){toast('이름을 입력해 주세요');break;}
       let l=id?libById(id):null; if(!l){l={id:'l'+uid(),kind:t.dataset.k,name,prompt:'',img:null};G.lib.push(l);}
@@ -91,11 +91,11 @@ case 'savelib': { const name=$('#li_name').value.trim(); if(!name){toast('이름
 case 'dellib': { const l=libById(id); if((await appConfirm('삭제할까요?'))){G.lib=G.lib.filter(x=>x.id!==id);mark('l:'+id);openLib(l.kind);render();} break; }
 case 'ailib': { const k=t.dataset.k,nm=$('#li_name').value.trim(),ds=$('#li_desc').value.trim();
       if(k==='cg'){ const ids=[0,1,2,3].map(i=>$('#cg_c'+i).value).filter(Boolean).map(charById).filter(Boolean);
-        const r=await aiJSON(`세계관: ${G.world.summary}\nCG "${nm}"${ds?' ('+ds+')':''}. 등장: ${ids.map(c=>c.name).join(', ')||'없음'}.\n이 장면의 NovelAI 영어 태그를 써라. 인물의 외모(머리, 눈, 옷)는 쓰지 말고 장소, 시간대, 구도(from side, from above 등), 인물들의 행동과 상호작용, 조명, 분위기만 쓴다. 인원수 태그(2girls 등)도 쓰지 않는다. 각 인물에게 어울리는 행동 태그도 따로 준다.\nJSON만 출력: {"prompt":"...","acts":["1번 인물 행동 태그","2번 ..."]}`,t,'quick');
+        const r=await aiJSON(`${pf('CG_ART',{summary:G.world.summary,nm,v:ds?' ('+ds+')':'',v2:ids.map(c=>c.name).join(', ')||'없음'})}\nJSON만 출력: {"prompt":"...","acts":["1번 인물 행동 태그","2번 ..."]}`,t,'quick');
         if(r&&$('#li_prompt')){ if(r.prompt)$('#li_prompt').value=String(r.prompt); strs(r.acts).forEach((a2,i)=>{const e2=$('#cg_a'+i); if(e2&&!e2.value.trim()) e2.value=a2;}); } break; }
-      if(k==='bgm'){ const r=await aiJSON(`세계관: ${G.world.summary}\n게임 배경음 "${nm}"${ds?' ('+ds+')':''}를 만들 음악 생성 AI용 영어 프롬프트를 써라. 장르, 주요 악기, 템포(bpm), 분위기를 넣고, 보컬 없는 instrumental이며 자연스럽게 반복되는 seamless loop라고 명시한다. 2~3문장.\nJSON만 출력: {"prompt":"..."}`,t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
-      if(k==='enemy'){ const r=await aiJSON(`세계관: ${G.world.summary}\n${G.world.lore}\n적 "${nm}"${ds?' ('+ds+')':''}의 NovelAI 외형 프롬프트를 영어 태그로 써라. 괴물이나 기계면 "no humans"로, 사람형 적이면 "1other, faceless"나 성별 태그로 시작한다. 생김새, 재질, 색, 빛, 무기, 위압감을 넣고 자세·배경·화풍 태그는 쓰지 않는다.\nJSON만 출력: {"prompt":"..."}`,t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
-      const r=await aiJSON(`세계관: ${G.world.summary}\n${k==='bg'?'배경':'소품'} "${nm}"${ds?' ('+ds+')':''}의 NovelAI 이미지 프롬프트를 영어 태그로 써라. ${k==='bg'?'"no humans, scenery"로 시작하고 장소, 시간대, 날씨, 조명, 분위기 태그를 넣고 "anime background, highly detailed"로 끝낸다.':'"no humans, object focus"로 시작하고 물건의 모양, 재질, 디테일 태그를 넣고 "simple background, white background"로 끝낸다.'}\nJSON만 출력: {"prompt":"..."}`,t,'quick');
+      if(k==='bgm'){ const r=await aiJSON(`${pf('BGM_PROMPT',{summary:G.world.summary,nm,v:ds?' ('+ds+')':''})}\nJSON만 출력: {"prompt":"..."}`,t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
+      if(k==='enemy'){ const r=await aiJSON(`${pf('ENEMY_ART',{summary:G.world.summary,lore:G.world.lore,nm,v:ds?' ('+ds+')':''})}\nJSON만 출력: {"prompt":"..."}`,t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
+      const r=await aiJSON(`${pf('LIB_ITEM_ART',{summary:G.world.summary,v:k==='bg'?'배경':'소품',nm,v2:ds?' ('+ds+')':'',v3:k==='bg'?pf('LIB_ITEM_BG'):pf('LIB_ITEM_PROP')})}\nJSON만 출력: {"prompt":"..."}`,t,'quick');
       if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
 case 'newpu': openNewPickup(); break;
 case 'newpu-hand': { NEWPU=$('#pu_lim').value==='limited'?'limited':'pickup'; window.__PUSTORY=!!($('#pu_story')&&$('#pu_story').checked); closeModal(); openCharEdit(null); break; }
@@ -130,7 +130,7 @@ case 'skvclear': { const c=charById(id), k=c&&(c.skins||[]).find(x=>x.id===t.dat
 case 'aiskin': { const c=charById(id),idea=$('#sk_idea').value.trim(),field=$('#sk_prompt'),project=PJ().active,old=field.value,original=c.naiPrompt;
       if(!idea){toast('의상 아이디어를 적어 주세요');break;}
       const base=await naiSkinBase(c,t);
-      const r=await aiJSON(`세계관: ${G.world.summary}\n캐릭터: ${c.name} / ${c.profile}\n고정 외형(재작성 금지): ${base.appearance}\n기본 의상(복사 금지): ${base.outfit}\n새 의상 요청: ${idea}\noutfit에는 의상·신발·착용 장식, other에는 표정·동작·소품만 NovelAI 영어 태그로 작성하세요. 머리·눈·체형은 넣지 마세요.\nJSON만 출력: {"outfit":"","other":""}`,t,'quick');
+      const r=await aiJSON(`${pf('OUTFIT_ART',{summary:G.world.summary,name:c.name,profile:c.profile,appearance:base.appearance,outfit:base.outfit,idea})}\nJSON만 출력: {"outfit":"","other":""}`,t,'quick');
       if(r&&field.isConnected&&PJ().active===project&&charById(id)===c&&c.naiPrompt===original&&field.value===old){naiBlocksSeed(field,naiSkinParts(base,r));if(!$('#sk_name').value.trim())$('#sk_name').value=idea.slice(0,16);}break; }
 case 'skpredo': skinPropRead(); skinPropDraw(t); break;
 case 'skpcancel': if(SKPROP){ if(SKPROP.url) URL.revokeObjectURL(SKPROP.url); const cid=SKPROP.cid; SKPROP=null; openSkin(cid); } else closeModal(); break;

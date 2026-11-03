@@ -58,6 +58,6 @@ function lobbyEmote(el,line,zone){ if(dirMode()==='off'||!el) return; const k=au
 function dirStrip(t){ return parseScript(t).filter(L=>L.type==='say'||L.type==='nar'||L.type==='choice').map(L=>L.type==='choice'?L.opts.join('|'):(L.who||'')+':'+L.text).join('\n'); }
 function dirCount(t){ return parseScript(t).filter(L=>(L.type==='say'&&L.dir&&(L.dir.emo||L.dir.motion))||(L.type==='cmd'&&(L.cmd==='연출'||(L.cmd==='효과'&&!/흔들림|플래시|암전/.test(L.arg))))).length; }
 async function directScript(text,btn){ const src=String(text||''); if(!src.trim()) return null;
-  const r=await aiJSON(`${RULES}\n${DIRECTION_GUIDE}\n\n아래 대본에 연출만 더하라. 대사·나레이션·선택지 글자는 한 글자도 바꾸지 않고, 줄을 지우거나 순서를 바꾸지 않는다. 더할 수 있는 것: 이름 뒤 [표정|감정|동작], 줄 사이 [연출: 이름 감정 동작], [효과: …]. 감정이 크게 움직이는 줄에만(전체 줄의 20~35%) 넣고, 같은 감정을 연달아 쓰지 않는다.\n\n대본:\n${src}\n\nJSON만 출력: {"script":"연출을 더한 대본 전체"}`,btn,'complex');
+  const r=await aiJSON(`${pf('DIRECT_SCRIPT',{RULES,DIRECTION_GUIDE,src})}\n\nJSON만 출력: {"script":"연출을 더한 대본 전체"}`,btn,'complex');
   const out=r&&nl(r.script); if(!out) return null; if(dirStrip(out)!==dirStrip(src)) return null; return out; }
 async function directStage(s){ let ok=false; for(const k of ['pre','post']){ if(!s[k]) continue; const o=await directScript(s[k]); if(o){ s[k]=o; ok=true; } } if(ok){ s.dirV=1; auditMarkObj(s); } return ok; }

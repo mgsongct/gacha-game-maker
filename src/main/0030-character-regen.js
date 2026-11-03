@@ -159,19 +159,14 @@ function openDesign(){ const d=G.meta.design||{}, facs=designFacs();
     <div class="row" style="margin-top:12px"><button class="btn" data-act="dssave">저장</button>${SAMPLE?'<button class="btn ghost" data-act="dsai">✦ AI로 제안 받기</button>':''}</div>`); }
 function designRead(){ const fac={}; document.querySelectorAll('#modal [data-fac]').forEach(e=>{ const v=stripMinor(stripAge(e.value.trim())); if(v) fac[e.dataset.fac]=v; }); return {all:stripMinor(stripAge(($('#ds_all')||{}).value?$('#ds_all').value.trim():'')),fac}; }
 async function designAI(btn){ const facs=designFacs(), w=G.world||{};
-  const r=await aiJSON(`가챠 게임 캐릭터 그림의 디자인 통일성을 위한 NovelAI 영어 태그를 제안하라.
-세계관: ${String(w.summary||'').slice(0,600)}
-세력: ${(w.factions||[]).map(f=>f.name+'('+String(f.desc||'').slice(0,80)+')').join(', ')||'없음'}
-세력별 캐릭터 외형 예시:\n${facs.map(f=>'- '+f+': '+G.chars.filter(c=>c.faction===f).slice(0,3).map(c=>String(c.naiPrompt||'').slice(0,120)).join(' / ')).join('\n')}
-규칙: all에는 모든 캐릭터가 공유할 디자인 요소(복장 계열, 공통 상징, 색 조합, 소재) 3~6개, 세력마다 그 세력만의 디자인 요소(제복·상징 색·문장·장식) 3~6개. 머리·눈·체형·나이·표정·구도·배경 태그는 쓰지 않는다. 노출이 많은 의상 태그는 쓰지 않는다. 태그는 쉼표로 구분.
-JSON만 출력: {"all":"","factions":[{"name":"세력 이름 그대로","tags":""}]}`,btn,'quick');
+  const r=await aiJSON(`${pf('DESIGN_TAGS',{String:String(w.summary||'').slice(0,600),v:(w.factions||[]).map(f=>f.name+'('+String(f.desc||'').slice(0,80)+')').join(', ')||'없음',v2:facs.map(f=>'- '+f+': '+G.chars.filter(c=>c.faction===f).slice(0,3).map(c=>String(c.naiPrompt||'').slice(0,120)).join(' / ')).join('\n')})}JSON만 출력: {"all":"","factions":[{"name":"세력 이름 그대로","tags":""}]}`,btn,'quick');
   if(!r||typeof r!=='object') return; if(r.all&&$('#ds_all')) $('#ds_all').value=stripMinor(String(r.all));
   (Array.isArray(r.factions)?r.factions:[]).forEach(x=>{ const el=[...document.querySelectorAll('#modal [data-fac]')].find(e=>e.dataset.fac===String(x&&x.name||'').trim()); if(el&&x.tags) el.value=stripMinor(String(x.tags)); });
   toast('제안을 채웠어요. 고친 뒤 저장을 눌러 주세요'); }
 // 무기 프롬프트 검사: 사람 태그가 섞였거나 '물건 사진'으로 시작하지 않으면 정리가 필요해요 (PR #3 LTXY12님 아이디어)
 function wpBad(p){ const s=String(p||'').trim(); if(!s) return false; return /\b(1girl|1boy|1other|2girls|2boys|solo|holding)\b/i.test(s)||!/^(no humans|object focus)/i.test(s); }
 async function weaponPromptAI(list,btn,world){ const w=world||G.world; const v=list.map(x=>`- ${T('crew')} "${x.c.name}"(${x.c.faction||'무소속'})의 ${T('weapon')} "${x.name||'?'}"${x.desc?' — '+x.desc:''}${x.cur?'\n  지금 프롬프트: '+String(x.cur).slice(0,220):''}`).join('\n');
-  const r=await aiJSON(`세계관: ${w.name} — ${String(w.summary||'').slice(0,500)}\n아래 ${T('weapon')}의 NovelAI 프롬프트를 쓴다. ${T('weapon')} 물건만 단독으로 찍은 사진용 태그: "no humans, object focus"로 시작하고 형태·재질·색·디테일을 쓰고 "simple background, white background"으로 끝낸다. 사람·캐릭터 태그(1girl, 1boy, 1other, solo, holding, face 따위)는 절대 쓰지 않는다. 지금 프롬프트가 잘못됐으면 실제 형태(whip, sword, staff, rifle 따위)를 살려 세계관과 캐릭터 설정에 맞게 완성한다.\n${v}\nJSON만 출력: {"weapons":[{"name":"캐릭터 이름","prompt":"no humans, object focus, ..."}]}`,btn||null,'quick');
+  const r=await aiJSON(`${pf('WEAPON_ART',{name:w.name,String:String(w.summary||'').slice(0,500),weapon:T('weapon'),v})}\nJSON만 출력: {"weapons":[{"name":"캐릭터 이름","prompt":"no humans, object focus, ..."}]}`,btn||null,'quick');
   const out=list.map(()=>''); (r&&Array.isArray(r.weapons)?r.weapons:[]).forEach(x=>{ const i=list.findIndex(y=>y.c.name===String(x&&x.name||'').trim()), p=String((x&&x.prompt)||'').trim(); const k=i>=0?i:(list.length===1?0:-1); if(k>=0&&p&&!wpBad(p)) out[k]=p; }); return out; }
 async function fixWeaponPrompts(chars,world){ try{ const bad=(chars||[]).filter(c=>c&&c.weapon&&wpBad(c.weapon.prompt)); if(!bad.length) return 0; const out=await weaponPromptAI(bad.map(c=>({c,name:c.weapon.name,desc:c.weapon.desc,cur:c.weapon.prompt})),null,world); let n=0; bad.forEach((c,i)=>{ if(out[i]){ c.weapon.prompt=out[i]; try{ mark('c:'+c.id); }catch(e){} n++; } }); return n; }catch(e){ return 0; } }
 function allyTags(s){ const L=tagList(s), en=L.some(t=>/^faceless$/i.test(tagKey(t))); return en?L.filter(t=>!/^(faceless|1other|no humans)$/i.test(tagKey(t))).join(', '):String(s||''); }

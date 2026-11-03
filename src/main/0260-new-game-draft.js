@@ -135,7 +135,7 @@ document.addEventListener('change',e=>{ if(e.target.closest&&e.target.closest('#
 // 장르·키워드와 분위기에 같은 글이 들어 있으면(한쪽이 다른 쪽을 품으면) 분위기는 한 번만 써요
 const dupTxt=(a,b)=>{ const n=x=>String(x||'').replace(/[\s"'“”‘’.,!?~·…]/g,''); a=n(a); b=n(b); return !!(a&&b&&(a.includes(b)||b.includes(a))); };
 function drTheme(d){ return [d.gtitle&&'게임 이름: '+d.gtitle,d.kw&&'장르·키워드: '+d.kw,d.tone&&!dupTxt(d.kw,d.tone)&&'분위기: '+d.tone,d.fan&&d.src&&'2차 창작 원작: '+d.src].filter(Boolean); }
-const DR_NODUP='모든 항목(세계관·설정·스토리 개요·인물·주인공)에서 같은 문장·소개 문구·설명을 두 번 쓰지 않는다. 항목마다 자기 역할의 내용만 쓰고, 다른 항목에 이미 있는 문장·소개 문구를 그대로 되풀이하지 않는다(세계관은 무대와 역사, 설정은 세력·용어·규칙, 스토리 개요는 사건의 흐름, 인물은 그 사람 이야기).';
+const DR_NODUP=pf('DR_NODUP');
 /* 중복 문장 정리(시스템, AI 없이): 앞 칸에 이미 나온 문장과 같거나 그 문장 안에 통째로 들어 있는 문장은 뒤 칸에서 지워요.
    같은 칸 안에서 되풀이된 문장도 지워요. 더 긴 문장이 짧은 문장을 품으면 긴 문장은 남겨요(내용이 줄지 않게) */
 const sentKey=x=>String(x||'').replace(/[\s"'“”‘’「」『』()\[\].,!?~·…:;\-–—]/g,'').toLowerCase();
@@ -147,7 +147,7 @@ function drDedup(d){ d=d||DR2; const seen=[]; let n=0; const run=(o,k)=>{ if(!o|
   return n; }
 // 초안의 다른 칸을 함께 보여 줘서 서로 맞춰 다듬어요(skip: 'world'|'setting'|'story'|'c:번호')
 function drCtx(skip){ const d=DR2, L=[];
-  const th=drTheme(d).map(x=>x.startsWith('2차 창작')?x+' (원작 설정을 따르고, 원작의 미성년자·학생 캐릭터는 쓰지 않는다)':x);
+  const th=drTheme(d).map(x=>x.startsWith('2차 창작')?x+pf('DR_SOURCE'):x);
   if(th.length) L.push('[테마]\n'+th.join('\n'));
   if(skip!=='world'&&d.world.trim()) L.push('[세계관]\n'+d.world.trim().slice(0,6000));
   if(skip!=='setting'&&d.setting.trim()) L.push('[설정: 세력·용어·규칙·비밀]\n'+d.setting.trim().slice(0,4000));
@@ -155,33 +155,20 @@ function drCtx(skip){ const d=DR2, L=[];
   const cs=d.chars.map((c,i)=>[c,i]).filter(([c,i])=>skip!=='c:'+i&&(String(c.name||'').trim()||String(c.profile||'').trim()));
   if(cs.length) L.push('[다른 인물]\n'+cs.map(([c])=>`- ${c.name||'(이름 미정)'}${c.role?' — '+c.role:''}: ${String(c.profile||'').slice(0,300)}${c.speech?' / 말투: '+c.speech:''}${c.look?' / 외모: '+c.look:''}`).join('\n'));
   const hr=d.hero; if(skip!=='hero'&&(hr.name||hr.call||hr.gender||hr.look||hr.bio)) L.push(`[주인공(플레이어)]\n호칭: ${hr.call||'(미정)'} / 이름: ${hr.name||'(미정)'} / 성별: ${hr.gender||'정하지 않음'}${hr.look?' / 외모: '+hr.look:''}${hr.bio?'\n설정: '+hr.bio:''}`);
-  return L.length?'\n초안의 다른 항목(이것들과 어긋나지 않게 맞추고, 여기 나온 고유명사·세력·인물 관계를 적극적으로 엮는다. 다른 항목은 고치지 않는다):\n'+L.join('\n\n')+'\n':''; }
+  return L.length?pf('DR_OTHER')+L.join('\n\n')+'\n':''; }
 function drSnap(label){ const d=DR2; d.undo={label,kw:d.kw,tone:d.tone,world:d.world,setting:d.setting,story:d.story,chars:JSON.parse(JSON.stringify(d.chars)),hero:JSON.parse(JSON.stringify(Object.assign({},d.hero,{av:undefined})))}; }
 async function drPolish(k,btn){ drRead(); if(k==='hero') return drPolishHero(btn); const cur=String(DR2[k]||'').trim(); if(!cur){ toast('먼저 내용을 조금 적어 주세요'); return; }
   const what=k==='world'?'게임 세계관':k==='story'?'스토리 개요':'게임 설정(세력·용어·규칙·비밀)';
-  const r=await aiJSON(`다음은 작가가 직접 쓴 ${what}이다. 적힌 내용, 고유명사, 설정은 그대로 살린다. 모순을 고치고, 빈약한 부분을 구체적인 디테일로 채우고, 읽기 좋게 정리한다. 같은 문장·소개 문구가 되풀이되면 한 번만 남기고, 다른 항목에 이미 있는 문장을 그대로 옮겨 쓰지 않는다. 작가가 정하지 않은 큰 설정을 새로 바꾸지는 않는다. 등장인물은 모두 성인이다. 한국어로 쓴다.
-${k==='setting'?"'비밀:'로 시작하는 줄은 그 표시를 유지한다.\n":''}${drCtx(k)}원문(다듬을 글):
-${cur}
-JSON만 출력: {"text":"다듬은 전체 글"}`,btn,'default');
+  const r=await aiJSON(`${pf('DR_POLISH',{what,v:k==='setting'?pf('DR_POLISH_SECRET'):'',drCtx:drCtx(k),cur})}JSON만 출력: {"text":"다듬은 전체 글"}`,btn,'default');
   if(r&&r.text){ drRead(); drSnap(what); DR2[k]=String(r.text); const dn=drDedup(); drSave(); drRerender(); toast('다른 항목에 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); } }
 async function drPolishHero(btn){ const h=DR2.hero;
-  const r=await aiJSON(`새 게임의 주인공(플레이어)을 다듬어라. 호칭·이름·성별·외모·설정이 서로 맞물리고, 세계관 안에서 주인공의 자리(직책, 소속, 사연)와 인물들과의 관계가 드러나게 한다. 적힌 내용과 이름은 살리고, 어색한 곳을 고치고, 빈 칸은 다른 항목에 맞춰 채운다. 성별을 비워 두었으면 비워 둔다. 성인이다. 한국어로 쓴다.
-${drCtx('hero')}지금 주인공: ${JSON.stringify({call:h.call||'',name:h.name||'',gender:h.gender||'',look:h.look||'',bio:h.bio||''})}
-JSON만 출력: {"call":"호칭(2~4자)","name":"이름(비어 있었으면 빈 문자열)","look":"외모","bio":"설정 3~5문장"}`,btn,'default');
+  const r=await aiJSON(`${pf('DR_POLISH_HERO',{drCtx:drCtx('hero'),v:JSON.stringify({call:h.call||'',name:h.name||'',gender:h.gender||'',look:h.look||'',bio:h.bio||''})})}JSON만 출력: {"call":"호칭(2~4자)","name":"이름(비어 있었으면 빈 문자열)","look":"외모","bio":"설정 3~5문장"}`,btn,'default');
   if(!r||typeof r!=='object') return; drRead(); drSnap('주인공'); const S=v=>typeof v==='string'?v.trim():''; const H=DR2.hero;
   if(S(r.call)) H.call=S(r.call).slice(0,12); if(S(r.name)&&!String(H.name||'').trim()) H.name=S(r.name).slice(0,12); if(S(r.look)) H.look=S(r.look).slice(0,400); if(S(r.bio)) H.bio=S(r.bio).slice(0,1500);
   drDedup(); drSave(); drRerender(); toast('주인공을 다듬었어요. 마음에 안 들면 「되돌리기」'); }
 /* 전체 맞추기: 세계관·설정·스토리·인물·주인공 설정을 한꺼번에 보고, 서로 어긋난 곳을 고치고 관계를 엮어요. 적힌 내용은 살리고, 한 번 되돌릴 수 있어요 */
 async function drHarmony(btn){ drRead(); const d=DR2; if(!drText(d).trim()){ toast('먼저 세계관이나 인물을 조금 적어 주세요'); return; }
-  const r=await aiJSON(`다음은 작가가 쓴 새 게임 초안이다. 세계관·설정·스토리 개요·인물·주인공이 서로를 참고해 하나의 이야기로 맞물리도록 다듬어라.
-규칙: 작가가 적은 내용·고유명사·이름은 그대로 살린다. 항목끼리 어긋나는 곳(세력 이름, 지명, 연표, 관계)은 맞춘다. 인물은 세계관의 세력·사건에 자리를 잡게 하고, 인물끼리·주인공과의 관계를 서로 맞게(한쪽에 적힌 관계는 상대 쪽에도) 넣는다. 비어 있는 칸은 다른 항목에 맞춰 채운다. 비어 있던 항목(세계관·설정·스토리)은 빈 문자열로 둔다. 큰 설정을 새로 바꾸지 않는다. 설정의 '비밀:' 줄은 유지한다. 등장인물은 모두 성인이다. 한국어로 쓴다.
-${DR_NODUP}
-테마도 정리한다: kw(장르와 키워드)는 장르와 핵심 키워드만 짧게(예: "학원 판타지 활극. 기숙사 대항전, 검술, 우정"), tone(분위기)은 글의 톤과 감정선만 한 줄로(예: "밝고 떠들썩하게, 때때로 뭉클하게") 쓴다. 두 칸에 같은 문장을 넣지 않고, 홍보 문구 같은 긴 소개 문장은 세계관 쪽으로 옮긴다. 작가가 적은 핵심 단어는 살린다.
-장르와 키워드(지금): ${d.kw||'(비어 있음)'}
-분위기(지금): ${!d.tone?'(비어 있음)':dupTxt(d.kw,d.tone)?'(장르와 키워드와 같은 글이 들어 있음 — 분위기만 새로 뽑아 쓴다)':d.tone}
-${drTheme(d).filter(x=>!/^장르|^분위기/.test(x)).join('\n')}
-${drText(d).slice(0,20000)}
-JSON만 출력: {"kw":"장르와 키워드","tone":"분위기","world":"세계관 전체 글","setting":"설정 전체 글","story":"스토리 개요 전체 글","chars":[{"name":"","role":"","profile":"","speech":"","look":""}],"heroBio":"주인공 설정"} — chars는 위 인물 순서 그대로, 같은 수로.`,btn,'complex');
+  const r=await aiJSON(`${pf('DR_HARMONY',{DR_NODUP,v:d.kw||'(비어 있음)',tone:!d.tone?'(비어 있음)':dupTxt(d.kw,d.tone)?pf('DR_HARMONY_TONE'):d.tone,drTheme:drTheme(d).filter(x=>!/^장르|^분위기/.test(x)).join('\n'),drText:drText(d).slice(0,20000)})}JSON만 출력: {"kw":"장르와 키워드","tone":"분위기","world":"세계관 전체 글","setting":"설정 전체 글","story":"스토리 개요 전체 글","chars":[{"name":"","role":"","profile":"","speech":"","look":""}],"heroBio":"주인공 설정"} — chars는 위 인물 순서 그대로, 같은 수로.`,btn,'complex');
   if(!r||typeof r!=='object'){ return; } drRead();
   drSnap('전체 맞추기');
   const S=v=>typeof v==='string'?v.trim():'';
@@ -191,9 +178,7 @@ JSON만 출력: {"kw":"장르와 키워드","tone":"분위기","world":"세계�
   if(String(d.hero.bio||'').trim()&&S(r.heroBio)) d.hero.bio=S(r.heroBio);
   const dn=drDedup(d); drSave(); drRerender(); toast('서로 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); }
 async function drFillChar(i,btn){ drRead(); const c=DR2.chars[i]; if(!c) return;
-  const r=await aiJSON(`게임에 들어갈 인물 한 명을 다듬어라. 이름·역할·성격·과거·관계·말투·외모가 서로 맞물려 한 사람으로 읽히게 한다(예: 과거가 성격과 말투를 만들고, 역할과 외모가 그 과거를 드러낸다). 세계관의 세력·사건 안에 자리를 잡게 하고, 다른 인물·주인공과의 관계를 구체적으로 넣는다(다른 인물 쪽에 이 인물과의 관계가 적혀 있으면 그것과 맞춘다). 다른 인물과 역할·말투·외모가 겹치지 않게 하고, 세계관·설정이나 다른 인물 칸에 이미 있는 문장을 그대로 옮겨 쓰지 않는다. 작가가 적은 이름과 핵심 설정은 그대로 살리고, 어색한 곳을 고치고, 빈 칸은 채운다. 등장인물은 모두 성인이다. 한국어로 쓴다.
-${drCtx('c:'+i)}지금 인물: ${JSON.stringify({name:c.name||'',role:c.role||'',profile:c.profile||'',speech:c.speech||'',look:c.look||''})}
-JSON만 출력: {"name":"","role":"한 줄 소개","profile":"성격·과거·관계 3~5문장","speech":"말투 설명과 예시 한 마디","look":"외모"}`,btn,'default');
+  const r=await aiJSON(`${pf('DR_FILL_CHAR',{drCtx:drCtx('c:'+i),v:JSON.stringify({name:c.name||'',role:c.role||'',profile:c.profile||'',speech:c.speech||'',look:c.look||''})})}JSON만 출력: {"name":"","role":"한 줄 소개","profile":"성격·과거·관계 3~5문장","speech":"말투 설명과 예시 한 마디","look":"외모"}`,btn,'default');
   if(!r) return; let o=Array.isArray(r)?r[0]:r; if(o&&!o.profile&&!o.role){ const v=Object.values(o).find(x=>x&&typeof x==='object'&&!Array.isArray(x)); if(v) o=v; } if(!o||typeof o!=='object'){ toast('AI 응답을 읽지 못했어요. 다시 눌러 주세요'); return; }
   drRead(); const c2=DR2.chars[i]||c; drSnap((c2.name||'인물')+' 다듬기'); const S=v=>Array.isArray(v)?v.join(' ').trim():typeof v==='string'?v.trim():'';
   const RK=/\s*[\[(【]\s*(SSR|SR|R)\s*[\])】]\s*/gi; let rk=''; ['role','profile','speech','look'].forEach(k=>{ let v=S(o[k]); if(!v) return; v=v.replace(RK,(m,g)=>{ rk=rk||g.toUpperCase(); return ' '; }).replace(/\s{2,}/g,' ').trim(); if(v) c2[k]=v; }); if(rk&&!c2.rank&&c2.kind!=='npc') c2.rank=({SSR:3,SR:2,R:1})[rk]; if(!String(c2.name||'').trim()&&S(o.name)) c2.name=S(o.name).replace(RK,' ').trim();
