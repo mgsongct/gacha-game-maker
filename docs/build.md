@@ -41,7 +41,8 @@ src/
 │ └ combat/010-catalog.js … 090-practice.js  → ggm-combat-catalog … (전투 v2)
 └ main/                 앱 본체 ggm-main. 파일 이름순으로 이어 붙여 <script> 하나가 됨
   ├ 0010-rules.js  0020-ai-connect.js  …  0500-gacha.js  0520-backup-storage.js  0525-data-folder.js  …  0570-modal-nav.js
-  └ 0510-actions/        클릭 액션: 010-setup.js … 120-messenger.js (handle*Action 하나씩), 130-dispatch.js(APP_ACTION_HANDLERS·전역 리스너), 140-share-export.js
+  ├ 0015-prompt-studio/ · 0030-image/ · 0260-new-game/ · 0360-sync/   폴더 모듈(한 기능을 여러 파일로 — 폴더 전체가 모듈 하나): 프롬프트 스튜디오 · 그림(엔진·화면·후보) · 새 게임(초안·만들기) · 동기화(공통·PC 서버·GitHub·시작 시 받기·한 기기 플레이)
+  └ 0510-actions/        클릭 액션: 010-setup.js … 120-messenger.js (handle*Action 하나씩), 130-dispatch.js(APP_ACTION_HANDLERS·전역 리스너)
 ```
 
 `main/` 파일과 원래 섹션의 대응은 [architecture.md §2 섹션 지도](architecture.md#ggm-main-섹션-지도)와 같습니다(파일 이름은 `build/split.mjs`의 `NAMES` 표).

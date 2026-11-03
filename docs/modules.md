@@ -14,14 +14,14 @@
 | 규칙 엔진(순수 모듈)은 DOM·앱 상태를 참조하지 않음 | `tools/check.mjs`(`pureModules`) | 오류 |
 | 프롬프트(LLM·그림)는 프롬프트 스튜디오 한 모듈(`src/main/0015-prompt-studio/`)에: 조각 등록(`pfDef`)은 스튜디오만, 지시문은 조각, 프롬프트 글·그림 태그는 스튜디오 밖에 없음(화면과 같이 쓰는 글 도구는 `tools/prompt-shared.json`에 이유와 함께) | `tools/check.mjs`(`tools/lib/prompts.mjs` 프롬프트 흐름) | 오류 |
 | 모듈 경계: 영역 침범 후보·남의 상태 쓰기·상태 파편화(3모듈 이상이 쓰는 키) | `tools/modules.mjs` · `tools/check.mjs` 래칫 | 늘면 실패 |
-| 자연 경계(함수 그래프 모듈성 최대화): 과잉 분할(서로 강하게 묶인 모듈·위성 모듈)·기능 섞임·기능 분산(다른 한 모듈의 일을 하는 함수) | `tools/modules.mjs` · `tools/check.mjs` 래칫 | 늘면 실패 |
+| 자연 경계(함수 그래프 모듈성 최대화): 과잉 분할(서로 강하게 묶인 모듈·위성 모듈 — 지금 0)·기능 섞임(순서를 바꿔 묶어도 과반에서 나오는 것)·기능 분산(다른 한 모듈의 일을 하는 함수). 한 기능이 여러 파일이면 폴더 모듈(폴더 전체가 모듈 하나: `0015-prompt-studio/`·`0030-image/`·`0260-new-game/`·`0360-sync/`·`0510-actions/`) | `tools/modules.mjs` · `tools/check.mjs` 래칫 | 늘면 실패 |
 | 기능 영역(이 문서 절마다 적은 파일): 영역 함수가 영역 밖에·영역 상태를 밖에서 씀 | `tools/modules.mjs` | 보고 |
 | 포크 기능이 생성기 ↔ 기능 ↔ 생성물로 이어짐 | `tools/wiring.mjs --strict` | 늘면 실패 |
 | 상황별 실제 프롬프트 조합에 깨짐·과잉·과소 없음, 코드를 옮겨도 보낸 프롬프트(글·그림)가 같음 | `node tools/play/combos.mjs [--ref <git>]` | 보고 · --ref는 다르면 실패 |
 | 지금 빌드로 생성한 게임을 플레이할 때 기능이 이어짐(가챠·장 진행·세력·관계·파견·원정·건조) | `node tools/play/link.mjs` | 실패 있으면 실패 |
 | 예전 빌드로 만든·빠진 데 있는 게임을 지금 앱이 감지·보완(불러오기 이전·점검 규칙·자동 채움·기본값) | `node tools/wiring.mjs`(정적 표 — 경로 없음이 늘면 실패) · `node tools/play/upgrade.mjs`(동적 — 놓침이 있으면 실패) | 늘면 실패 · 보고 |
 
-새 기능은 새 파일로(`docs/build.md` §4), 그 기능의 절을 이 문서에 두고 파일을 적어요. 코드를 다른 파일로 옮길 때는 `tools/prompts-move.mjs`(프롬프트 — 원문 그대로, 지역 값·화면 입력은 인자로)처럼 뜻이 같게 옮기고 위 도구로 확인해요.
+새 기능은 새 파일로(`docs/build.md` §4), 그 기능의 절을 이 문서에 두고 파일을 적어요. 코드를 다른 파일로 옮길 때는 `tools/move.mjs`(선언을 설명 주석째 원문 그대로, 불러올 때 아직 없는 이름이 생기면 되돌림)·`tools/prompts-move.mjs`(프롬프트 — 원문 그대로, 지역 값·화면 입력은 인자로)처럼 뜻이 같게 옮기고 위 도구로 확인해요.
 
 ## 0. 연계 지도
 
@@ -91,6 +91,8 @@ document.addEventListener('click', async e => {
 
 ## 3. AI 연결 (글 AI)
 
+파일: `src/main/0020-ai-connect.js`(글 AI·NovelAI 설정·`aiJSON`·그림체 직접 입력 — 공용 기반)
+
 ```
 aiJSON(prompt, btn, tier, images)       // UI용: 버튼 로딩 표시, 오류 토스트, 스킬 규칙 자동 첨부
  └ SAMPLE.json  (setupAI()가 프로필 있으면 만듦; 없으면 null → "AI 등록" 안내)
@@ -119,6 +121,8 @@ aiJSON(prompt, btn, tier, images)       // UI용: 버튼 로딩 표시, 오류 �
 - 결과는 IndexedDB `img` 스토어에 저장, 객체의 `img` 필드는 키 참조. 표시용 URL은 `imgSrc(obj)`(`loadIdbImages()`가 Blob URL 캐시).
 - `IMAGE_CANDIDATES_MODULE`: 후보 여러 장 중 고르기·미리보기.
 
+파일: 그림 폴더 모듈 `src/main/0030-image/` — 010-engine(앞부분 `CHARACTER_REGEN_MODULE` 캐릭터 다시 만들기, 그림 엔진 `naiDraw`·`naiGenerate`·ComfyUI·컷 도구, NovelAI 설정·준비·생성·일괄 화면, 표정·의상 그리기 `openFaces`·`faceDrawOne`·`openMaskPainter`·`openSkin`) · 020-candidates(`IMAGE_CANDIDATES_MODULE` 후보 고르기·미리보기)
+
 ## 5. 소리
 
 - `SND()`(키 `starfall-sound`): 볼륨, Fish Audio 키/모델, ElevenLabs 키/모델.
@@ -146,6 +150,8 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - 무거운 밸런스 검사는 `catalog + visual-catalog + core` 스크립트 텍스트를 Blob으로 묶어 **Web Worker**에서 실행(실패 시 메인 스레드 제너레이터로 폴백). 그래서 이 세 모듈은 **DOM·전역 앱 상태를 참조하면 안 됩니다.**
 - 진입: `startBattle(chId, stId)` → `startStage(stage, ctx)` (`ctx.kind`: `main|event|farm|raid|rogue|practice` …) → 편성 확인 → `v2PrepareStage` → 전투 화면.
 - 속성 상성: `BEATS`(meta.elems 순환: 0→1→2→0), 역할 `atk/def/sup`.
+
+파일: 전투 화면·진행(`startBattle`·`bUpdate`·`bCheck`·`bEnd`) `src/main/0480-battle.js` · 보스 패턴·훈련 `src/main/0490-boss-patterns.js` · 엔진↔화면 다리(이벤트 연출 `v2DrainBattleEvents`, 표시 `pop`·`blog`) `src/modules/combat/050-bridge.js`
 
 ## 7. 대본 엔진 (VN)
 
@@ -264,7 +270,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 9. 성장 · 경제 · 콘텐츠
 
-파일: `src/main/0090-growth.js` `src/main/0240-growth-curve.js` `src/main/0190-shop.js` `src/main/0110-challenge-raid.js` `src/main/0120-abyss.js` · 라이브 운영 `src/main/0280-live-ops.js` `src/main/0290-season-rotation.js`
+파일: `src/main/0090-growth.js` `src/main/0240-growth-curve.js` `src/main/0190-shop.js` 레이드 `src/main/0110-challenge-raid.js` · 심연 탐사(런·던전·카드 전투) `src/main/0120-abyss.js` · 라이브 운영 `src/main/0280-live-ops.js` `src/main/0290-season-rotation.js`
 
 - 성장(성장·성장 곡선 섹션): 레벨(최대 120, 71~ 초월승급), 돌파, 스킬 강화, 전용 무기, 호감도(`addAff`, 레벨별 대사·에피소드 해금). 비용 공식은 `GGMCombat.growthCost/limitBreakCost` 등.
 - 일일/주간 카운터: `dm()` / `bump(key)`(미션·패스 진행).
@@ -281,7 +287,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 11. 스토리 공장 · 새 게임 · 기억
 
-파일: `src/main/0250-story-factory.js` `src/main/0260-new-game-draft.js` `src/main/0330-casting.js` · 관계·기억 `src/main/0450-relations-memory.js` `src/main/0530-story-memory.js` · 도감 `src/main/0300-codex.js`
+파일: 스토리 공장(집필·새 대원 만들기 `cleanChar`·`sysStats`) `src/main/0250-story-factory.js` · 새 게임 `src/main/0260-new-game/`(010-draft 초안 화면 · 020-build 만들기 `buildNewGameDraft`·`newGame`·그림 유지 리롤) `src/main/0330-casting.js` · 관계·기억 `src/main/0450-relations-memory.js` `src/main/0530-story-memory.js` · 도감 `src/main/0300-codex.js`
 
 - 새 게임 초안(`openDraft`)·장르 마법사(`showSetup`): 세계관 → 캐릭터 → 오프닝(배경·소품·음악·배너 포함) → 1장 순서로 AI 다단계 생성(`buildNewGameDraft`, 단계별 `ngStep`이 최대 3회 시도·초안에 저장해 이어 쓰기). 1장은 이후 장과 달리 한 번의 호출로 대본까지 씀. 생성 중에는 `NEW_GAME_SOURCE`가 설정되어 저장·탭 이동이 막힘. 계측과 개선 안건은 [research/generation-pipeline.md](research/generation-pipeline.md).
 - 스토리 공장: 챕터 구성 → 스테이지마다 집필 → 요약·관계(`rels`)·톡 생성.
@@ -289,6 +295,8 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - 캐스팅: 오프닝 전 캐릭터 그림을 확정.
 
 ## 12. 동기화 · 백업 · 공유
+
+파일: 동기화 `src/main/0360-sync/`(010-common 공통: 설정·저장 키·합치기·진행 막대 · 020-pc-server · 030-github PC·폰 연동 · 040-boot 시작 시 받기 · 050-single-device 한 기기 플레이) · GitHub API 클라이언트 `src/main/0335-github-api.js`(동기화·게시가 같이 씀) · 게시·구독 `src/main/0400-publish-subscribe.js` · 백업·공유 팩·백업 파일 내보내기 `src/main/0520-backup-storage.js` · 데이터 폴더 `src/main/0525-data-folder.js`
 
 | 기능 | 함수 | 저장소 |
 |---|---|---|
@@ -301,6 +309,8 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 | 시작 시 자동 받기 | `bootSync()` | PC 또는 GitHub |
 
 ## 13. 앱 업데이트
+
+파일: `src/main/0420-app-update.js`(업데이트 채널·확인·안내·적용·설정 — `UPDATE_GUIDANCE_MODULE` 포함)
 
 ```
 version.json(GitHub raw, RELEASE_REPO/main) ─▶ build > APP_BUILD ?

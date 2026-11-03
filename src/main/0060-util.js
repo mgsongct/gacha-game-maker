@@ -58,4 +58,9 @@ document.addEventListener('click',e=>{ if(PET.swallow&&Date.now()-PET.swallow<40
 document.addEventListener('contextmenu',e=>{ if(PET.on||(e.target.closest&&e.target.closest('[data-act=poke],[data-act=cspoke],[data-act=evspoke]'))) e.preventDefault(); },true);
 function charReact(el,lv,zone){ if(!el) return; const k=zone==='body'?(lv>=6?'shy':'flinch'):lv>=7?'hop':lv>=4?'nod':'flinch'; ['r-hop','r-nod','r-flinch','r-shy'].forEach(c=>el.classList.remove(c)); void el.offsetWidth; el.classList.add('r-'+k); clearTimeout(el._rt); el._rt=setTimeout(()=>el.classList.remove('r-'+k),950); }
 function shootHTML(n){let s='';for(let i=0;i<n;i++)s+=`<i class="shoot" style="top:${Math.round(Math.random()*45)}%;left:${50+Math.round(Math.random()*60)}%;animation-delay:${(i*0.9+Math.random()).toFixed(1)}s"></i>`;return s;}
-
+/* 글 도우미: AI 답의 대본 줄 정리(nl·unComma)·문자열 목록(strs) */
+const nl=s=>unComma(Array.isArray(s)?s.map(x=>typeof x==='string'?x:x&&typeof x==='object'?(x.name||x.speaker?`${x.name||x.speaker}: ${x.text||x.line||''}`:String(x.text||x.line||'')):String(x)).join('\n'):String(s||'').replace(/\\n/g,'\n'));
+// AI가 대본 줄을 쉼표로 이어 붙여 보낸 경우("[음악: 일상],A: 안녕!,B: 뭐 해") 줄로 되돌려요
+function unComma(t){ t=String(t||''); const re=/,\s*(?=\[[^\]\n]{1,30}\]|[^\s,:\[\]\n"'][^,:\n\[\]]{0,15}(?:\[[^\]\n]{1,12}\])?:\s)/g;
+  return t.split('\n').map(l=>{ const m=l.match(re); return m&&m.length>=2&&/^\s*(\[|[^,:\n]{1,16}(\[[^\]]*\])?:)/.test(l)?l.replace(re,'\n'):l; }).join('\n'); }
+const strs=a=>(Array.isArray(a)?a:[]).map(String).filter(Boolean);

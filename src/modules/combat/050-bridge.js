@@ -363,4 +363,6 @@ async function v2ConceptPrompt(d,c){
  }catch(e){if(V2ICONS===d&&d.preview===p){p.prompt=fallback;v2DrawIcons();toast('캐릭터·스킬 정보를 바탕으로 기본 프롬프트를 구성했어요.');}}
  finally{clearInterval(timer);if(V2ICONS===d&&d.preview===p){d.busy=false;v2DrawIcons();}}
 }
-
+/* 전투 화면 표시: 떠오르는 숫자(pop)·전투 기록(blog) — 아래 이벤트 연출이 주로 씀 */
+function pop(u,t,cls=''){const e=uel(u);if(!e)return;const d=document.createElement('span');d.className='dmg '+cls;d.textContent=t;e.appendChild(d);setTimeout(()=>d.remove(),700);}
+function blog(t){B.log.push(t);if(B.log.length>6)B.log.shift();const el=$('#bLog');if(el)el.innerHTML=B.log.map(x=>`<div>${esc(x)}</div>`).join('');}

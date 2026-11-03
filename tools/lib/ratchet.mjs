@@ -46,8 +46,22 @@ export function compare(base, cur) {
     const up = Object.keys(f.num).filter(n => (+f.num[n] || 0) > (+b.num?.[n] || 0)), down = Object.keys(f.num).filter(n => (+f.num[n] || 0) < (+b.num?.[n] || 0));
     if (up.length) out.worse.push({ ...f, was: b.num, up }); else if (down.length) out.better.push({ ...f, was: b.num, down }); }
   for (const [k, f] of B) if (!C.has(k)) out.fixed.push(f);
-  return out;
+  return moved(out, base, cur);
 }
+// 옮김: 코드를 다른 파일로 옮기면 키의 파일 경로만 바뀌어 같은 항목이 "해결 + 새로 생김"으로 갈림(줄 이동을 무시하듯 파일 이동도 가림).
+//   경로가 위치일 뿐인 범주만(빈 catch·이름 모호는 파일별 개수, 함수·상태 키 항목) — 경로를 뺀 정체(종류·함수 이름·상태 키)로 묶어
+//   그 정체의 합계(개수·복잡도 등, 수치 없으면 항목 수)가 기준보다 늘지 않았고 같은 정체가 기준 쪽에서 줄었으면 옮김(실패 아님, 따로 보고).
+//   모듈 자체가 정체인 범주(과잉 분할·기능 섞임)는 그대로
+const MOVABLE = new Set(['빈 catch', '도구 빈 catch', '이름 모호', '영역 침범 후보', '기능 분산', '남의 상태 쓰기', '복잡한 함수', '복잡한 익명 콜백', '복잡한 분배기 case', '도구 복잡한 함수', '도구 안 쓰는 함수']);
+const PATHS = /@?\s*(?:src|tools|build|pc|www)\/[\w./가-힣-]*/g;
+export const movedId = f => { const k = String(f.key), cat = k.split('|')[0]; return MOVABLE.has(cat) ? k.replace(PATHS, ' ').replace(/\s+/g, ' ').replace(/\|\s/, '|').trim() : null; };
+function moved(out, base, cur) { out.moved = [];
+  const sum = (L, id) => { const s = {}; let n = 0; for (const f of L) if (movedId(f) === id) { n++; for (const [k, v] of Object.entries(f.num || {})) s[k] = (s[k] || 0) + (+v || 0); } return { s, n }; };
+  for (const id of new Set([...out.added, ...out.worse].map(movedId).filter(Boolean))) { if (![...out.fixed, ...out.better].some(f => movedId(f) === id)) continue;
+    const b = sum(base, id), c = sum(cur, id), keys = Object.keys(c.s); if (keys.length ? !keys.every(k => c.s[k] <= (b.s[k] || 0)) : c.n > b.n) continue;
+    const other = f => movedId(f) !== id; out.moved.push(...[...out.added, ...out.worse].filter(f => !other(f)));
+    out.added = out.added.filter(other); out.worse = out.worse.filter(other); out.fixed = out.fixed.filter(other); out.better = out.better.filter(other); }
+  return out; }
 
 export const BASELINE = 'tools/baseline.json';
 export function readBaseline(ROOT, part = 'findings') { const p = join(ROOT, BASELINE); return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8'))[part] || null : null; }
@@ -65,7 +79,7 @@ export function refTree(ROOT, ref, OUT) {
 
 export function diffMd(d, title) {
   const row = f => `- ${f.text}${f.was ? ` (전: ${Object.entries(f.was).map(([k, v]) => `${k} ${v}`).join(' · ')})` : ''}`;
-  return [`## ${title}`, '', `새로 생김 ${d.added.length} · 나빠짐 ${d.worse.length} · 해결 ${d.fixed.length} · 좋아짐 ${d.better.length}`, '',
+  return [`## ${title}`, '', `새로 생김 ${d.added.length} · 나빠짐 ${d.worse.length} · 해결 ${d.fixed.length} · 좋아짐 ${d.better.length} · 옮김 ${(d.moved || []).length}`, '',
     '### 새로 생김', ...(d.added.length ? d.added.map(row) : ['없음']), '', '### 나빠짐', ...(d.worse.length ? d.worse.map(row) : ['없음']), '',
-    '### 해결', ...(d.fixed.length ? d.fixed.map(row) : ['없음']), '', '### 좋아짐', ...(d.better.length ? d.better.map(row) : ['없음']), ''].join('\n');
+    '### 해결', ...(d.fixed.length ? d.fixed.map(row) : ['없음']), '', '### 좋아짐', ...(d.better.length ? d.better.map(row) : ['없음']), '', '### 옮김(코드를 다른 파일로 — 같은 정체의 합계가 늘지 않음)', ...((d.moved || []).length ? d.moved.map(row) : ['없음']), ''].join('\n');
 }

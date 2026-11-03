@@ -4,11 +4,11 @@
   {
    "key": "복잡한 함수|buildNewGameDraft",
    "num": {
-    "복잡도": 143,
+    "복잡도": 142,
     "줄": 89,
     "중첩": 2
    },
-   "text": "buildNewGameDraft (src/main/0250-story-factory.js:214) 복잡도 143 · 89줄 · 중첩 2"
+   "text": "buildNewGameDraft (src/main/0260-new-game/020-build.js:62) 복잡도 142 · 89줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|cbPlay",
@@ -44,7 +44,7 @@
     "줄": 65,
     "중첩": 5
    },
-   "text": "cutoutWhite (src/main/0030-character-regen.js:387) 복잡도 91 · 65줄 · 중첩 5"
+   "text": "cutoutWhite (src/main/0030-image/010-engine.js:387) 복잡도 91 · 65줄 · 중첩 5"
   },
   {
    "key": "복잡한 함수|apply",
@@ -107,7 +107,7 @@
     "줄": 62,
     "중첩": 4
    },
-   "text": "naiGenerate0 (src/main/0030-character-regen.js:519) 복잡도 68 · 62줄 · 중첩 4"
+   "text": "naiGenerate0 (src/main/0030-image/010-engine.js:519) 복잡도 68 · 62줄 · 중첩 4"
   },
   {
    "key": "복잡한 함수|studioHTML",
@@ -116,7 +116,7 @@
     "줄": 81,
     "중첩": 1
    },
-   "text": "studioHTML (src/main/0180-ui-scroll.js:542) 복잡도 68 · 81줄 · 중첩 1"
+   "text": "studioHTML (src/main/0180-ui-scroll.js:357) 복잡도 68 · 81줄 · 중첩 1"
   },
   {
    "key": "복잡한 함수|liveTick",
@@ -188,7 +188,16 @@
     "줄": 40,
     "중첩": 3
    },
-   "text": "buildManualGameDraft (src/main/0250-story-factory.js:304) 복잡도 55 · 40줄 · 중첩 3"
+   "text": "buildManualGameDraft (src/main/0260-new-game/020-build.js:152) 복잡도 55 · 40줄 · 중첩 3"
+  },
+  {
+   "key": "복잡한 함수|openNaiPrep",
+   "num": {
+    "복잡도": 52,
+    "줄": 35,
+    "중첩": 2
+   },
+   "text": "openNaiPrep (src/main/0030-image/010-engine.js:681) 복잡도 52 · 35줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|contractHTML0",
@@ -200,22 +209,13 @@
    "text": "contractHTML0 (src/main/0180-ui-scroll.js:151) 복잡도 52 · 38줄 · 중첩 1"
   },
   {
-   "key": "복잡한 함수|openNaiPrep",
-   "num": {
-    "복잡도": 52,
-    "줄": 35,
-    "중첩": 2
-   },
-   "text": "openNaiPrep (src/main/0180-ui-scroll.js:404) 복잡도 52 · 35줄 · 중첩 2"
-  },
-  {
    "key": "복잡한 함수|bEnd",
    "num": {
     "복잡도": 49,
     "줄": 29,
     "중첩": 4
    },
-   "text": "bEnd (src/main/0490-boss-patterns.js:21) 복잡도 49 · 29줄 · 중첩 4"
+   "text": "bEnd (src/main/0480-battle.js:93) 복잡도 49 · 29줄 · 중첩 4"
   },
   {
    "key": "복잡한 함수|openLibItem",
@@ -233,7 +233,7 @@
     "줄": 28,
     "중첩": 2
    },
-   "text": "aiEventGen0 (src/main/0250-story-factory.js:153) 복잡도 45 · 28줄 · 중첩 2"
+   "text": "aiEventGen0 (src/main/0250-story-factory.js:126) 복잡도 45 · 28줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|motif",
@@ -260,7 +260,7 @@
     "줄": 15,
     "중첩": 3
    },
-   "text": "regenApply (src/main/0030-character-regen.js:85) 복잡도 43 · 15줄 · 중첩 3"
+   "text": "regenApply (src/main/0030-image/010-engine.js:85) 복잡도 43 · 15줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|renderSetup",
@@ -296,7 +296,7 @@
     "줄": 26,
     "중첩": 4
    },
-   "text": "eraseColorData (src/main/0030-character-regen.js:292) 복잡도 41 · 26줄 · 중첩 4"
+   "text": "eraseColorData (src/main/0030-image/010-engine.js:292) 복잡도 41 · 26줄 · 중첩 4"
   },
   {
    "key": "복잡한 함수|comfyGenerate",
@@ -305,7 +305,7 @@
     "줄": 27,
     "중첩": 2
    },
-   "text": "comfyGenerate (src/main/0030-character-regen.js:476) 복잡도 41 · 27줄 · 중첩 2"
+   "text": "comfyGenerate (src/main/0030-image/010-engine.js:476) 복잡도 41 · 27줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|value",
@@ -323,7 +323,7 @@
     "줄": 12,
     "중첩": 7
    },
-   "text": "lkOp (src/main/0340-single-device-lease.js:11) 복잡도 22 · 12줄 · 중첩 7"
+   "text": "lkOp (src/main/0360-sync/050-single-device.js:11) 복잡도 22 · 12줄 · 중첩 7"
   },
   {
    "key": "복잡한 함수|v2DrainBattleEvents",
@@ -389,15 +389,6 @@
    "text": "(최상위)→document.addEventListener @src/main/0488-stage-modes.js (src/main/0488-stage-modes.js:77) 복잡도 27 · 9줄 · 중첩 8"
   },
   {
-   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0015-prompt-studio/010-studio.js",
-   "num": {
-    "복잡도": 24,
-    "줄": 13,
-    "중첩": 11
-   },
-   "text": "(최상위)→document.addEventListener @src/main/0015-prompt-studio/010-studio.js (src/main/0015-prompt-studio/010-studio.js:357) 복잡도 24 · 13줄 · 중첩 11"
-  },
-  {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0565-asset-library.js",
    "num": {
     "복잡도": 21,
@@ -413,7 +404,7 @@
     "줄": 16,
     "중첩": 13
    },
-   "text": "(최상위)→document.addEventListener @src/main/0185-game-rules.js (src/main/0185-game-rules.js:130) 복잡도 20 · 16줄 · 중첩 13"
+   "text": "(최상위)→document.addEventListener @src/main/0185-game-rules.js (src/main/0185-game-rules.js:136) 복잡도 20 · 16줄 · 중첩 13"
   },
   {
    "key": "복잡한 익명 콜백|main parseScript→).filter(Boolean).flatMap(splitTags).map @src/main/0460-script-engine.js",
@@ -425,13 +416,22 @@
    "text": "parseScript→).filter(Boolean).flatMap(splitTags).map @src/main/0460-script-engine.js (src/main/0460-script-engine.js:12) 복잡도 18 · 16줄 · 중첩 9"
   },
   {
-   "key": "복잡한 익명 콜백|main openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/0260-new-game-draft.js",
+   "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0015-prompt-studio/010-studio.js",
+   "num": {
+    "복잡도": 17,
+    "줄": 11,
+    "중첩": 11
+   },
+   "text": "(최상위)→document.addEventListener @src/main/0015-prompt-studio/010-studio.js (src/main/0015-prompt-studio/010-studio.js:363) 복잡도 17 · 11줄 · 중첩 11"
+  },
+  {
+   "key": "복잡한 익명 콜백|main openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/0030-image/010-engine.js",
    "num": {
     "복잡도": 15,
     "줄": 6,
     "중첩": 7
    },
-   "text": "openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/0260-new-game-draft.js (src/main/0260-new-game-draft.js:189) 복잡도 15 · 6줄 · 중첩 7"
+   "text": "openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/0030-image/010-engine.js (src/main/0030-image/010-engine.js:792) 복잡도 15 · 6줄 · 중첩 7"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0445-factions.js",
@@ -527,9 +527,9 @@
   {
    "key": "빈 catch|src/main/0020-ai-connect.js 파싱 대체",
    "num": {
-    "개수": 9
+    "개수": 10
    },
-   "text": "src/main/0020-ai-connect.js 파싱 대체 9개"
+   "text": "src/main/0020-ai-connect.js 파싱 대체 10개"
   },
   {
    "key": "빈 catch|src/main/0020-ai-connect.js 동기 대체",
@@ -546,18 +546,25 @@
    "text": "src/main/0020-ai-connect.js 저장소 대체 3개"
   },
   {
-   "key": "빈 catch|src/main/0030-character-regen.js 동기 대체",
+   "key": "빈 catch|src/main/0030-image/010-engine.js 동기 대체",
    "num": {
     "개수": 3
    },
-   "text": "src/main/0030-character-regen.js 동기 대체 3개"
+   "text": "src/main/0030-image/010-engine.js 동기 대체 3개"
   },
   {
-   "key": "빈 catch|src/main/0030-character-regen.js 저장소 대체",
+   "key": "빈 catch|src/main/0030-image/010-engine.js 저장소 대체",
    "num": {
     "개수": 1
    },
-   "text": "src/main/0030-character-regen.js 저장소 대체 1개"
+   "text": "src/main/0030-image/010-engine.js 저장소 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0030-image/020-candidates.js 동기 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0030-image/020-candidates.js 동기 대체 2개"
   },
   {
    "key": "빈 catch|src/main/0040-sound.js 파싱 대체",
@@ -688,37 +695,44 @@
   {
    "key": "빈 catch|src/main/0250-story-factory.js 동기 대체",
    "num": {
-    "개수": 4
+    "개수": 3
    },
-   "text": "src/main/0250-story-factory.js 동기 대체 4개"
+   "text": "src/main/0250-story-factory.js 동기 대체 3개"
   },
   {
-   "key": "빈 catch|src/main/0250-story-factory.js 파싱 대체",
-   "num": {
-    "개수": 2
-   },
-   "text": "src/main/0250-story-factory.js 파싱 대체 2개"
-  },
-  {
-   "key": "빈 catch|src/main/0250-story-factory.js 저장소 대체",
-   "num": {
-    "개수": 4
-   },
-   "text": "src/main/0250-story-factory.js 저장소 대체 4개"
-  },
-  {
-   "key": "빈 catch|src/main/0260-new-game-draft.js 파싱 대체",
+   "key": "빈 catch|src/main/0260-new-game/010-draft.js 파싱 대체",
    "num": {
     "개수": 1
    },
-   "text": "src/main/0260-new-game-draft.js 파싱 대체 1개"
+   "text": "src/main/0260-new-game/010-draft.js 파싱 대체 1개"
   },
   {
-   "key": "빈 catch|src/main/0260-new-game-draft.js 저장소 대체",
+   "key": "빈 catch|src/main/0260-new-game/010-draft.js 저장소 대체",
    "num": {
     "개수": 2
    },
-   "text": "src/main/0260-new-game-draft.js 저장소 대체 2개"
+   "text": "src/main/0260-new-game/010-draft.js 저장소 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0260-new-game/020-build.js 파싱 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0260-new-game/020-build.js 파싱 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0260-new-game/020-build.js 저장소 대체",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0260-new-game/020-build.js 저장소 대체 4개"
+  },
+  {
+   "key": "빈 catch|src/main/0260-new-game/020-build.js 동기 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0260-new-game/020-build.js 동기 대체 3개"
   },
   {
    "key": "빈 catch|src/main/0290-season-rotation.js 동기 대체",
@@ -728,13 +742,6 @@
    "text": "src/main/0290-season-rotation.js 동기 대체 2개"
   },
   {
-   "key": "빈 catch|src/main/0320-art-style.js 파싱 대체",
-   "num": {
-    "개수": 1
-   },
-   "text": "src/main/0320-art-style.js 파싱 대체 1개"
-  },
-  {
    "key": "빈 catch|src/main/0330-casting.js 동기 대체",
    "num": {
     "개수": 1
@@ -742,32 +749,53 @@
    "text": "src/main/0330-casting.js 동기 대체 1개"
   },
   {
-   "key": "빈 catch|src/main/0340-single-device-lease.js 파싱 대체",
+   "key": "빈 catch|src/main/0335-github-api.js 파싱 대체",
    "num": {
     "개수": 1
    },
-   "text": "src/main/0340-single-device-lease.js 파싱 대체 1개"
+   "text": "src/main/0335-github-api.js 파싱 대체 1개"
   },
   {
-   "key": "빈 catch|src/main/0340-single-device-lease.js 동기 대체",
+   "key": "빈 catch|src/main/0360-sync/010-common.js 저장소 대체",
    "num": {
-    "개수": 3
+    "개수": 1
    },
-   "text": "src/main/0340-single-device-lease.js 동기 대체 3개"
+   "text": "src/main/0360-sync/010-common.js 저장소 대체 1개"
   },
   {
-   "key": "빈 catch|src/main/0350-boot-sync.js 파싱 대체",
-   "num": {
-    "개수": 3
-   },
-   "text": "src/main/0350-boot-sync.js 파싱 대체 3개"
-  },
-  {
-   "key": "빈 catch|src/main/0350-boot-sync.js 저장소 대체",
+   "key": "빈 catch|src/main/0360-sync/010-common.js 파싱 대체",
    "num": {
     "개수": 2
    },
-   "text": "src/main/0350-boot-sync.js 저장소 대체 2개"
+   "text": "src/main/0360-sync/010-common.js 파싱 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0360-sync/040-boot.js 파싱 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0360-sync/040-boot.js 파싱 대체 3개"
+  },
+  {
+   "key": "빈 catch|src/main/0360-sync/040-boot.js 저장소 대체",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0360-sync/040-boot.js 저장소 대체 2개"
+  },
+  {
+   "key": "빈 catch|src/main/0360-sync/050-single-device.js 파싱 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0360-sync/050-single-device.js 파싱 대체 1개"
+  },
+  {
+   "key": "빈 catch|src/main/0360-sync/050-single-device.js 동기 대체",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0360-sync/050-single-device.js 동기 대체 3개"
   },
   {
    "key": "빈 catch|src/main/0370-game-picker.js 저장소 대체",
@@ -775,20 +803,6 @@
     "개수": 1
    },
    "text": "src/main/0370-game-picker.js 저장소 대체 1개"
-  },
-  {
-   "key": "빈 catch|src/main/0390-github-sync.js 저장소 대체",
-   "num": {
-    "개수": 1
-   },
-   "text": "src/main/0390-github-sync.js 저장소 대체 1개"
-  },
-  {
-   "key": "빈 catch|src/main/0390-github-sync.js 파싱 대체",
-   "num": {
-    "개수": 3
-   },
-   "text": "src/main/0390-github-sync.js 파싱 대체 3개"
   },
   {
    "key": "빈 catch|src/main/0400-publish-subscribe.js 저장소 대체",
@@ -826,25 +840,18 @@
    "text": "src/main/0420-app-update.js 동기 대체 3개"
   },
   {
-   "key": "빈 catch|src/main/0430-update-guidance.js 파싱 대체",
+   "key": "빈 catch|src/main/0420-app-update.js 파싱 대체",
    "num": {
     "개수": 1
    },
-   "text": "src/main/0430-update-guidance.js 파싱 대체 1개"
+   "text": "src/main/0420-app-update.js 파싱 대체 1개"
   },
   {
-   "key": "빈 catch|src/main/0430-update-guidance.js 저장소 대체",
+   "key": "빈 catch|src/main/0420-app-update.js 저장소 대체",
    "num": {
     "개수": 1
    },
-   "text": "src/main/0430-update-guidance.js 저장소 대체 1개"
-  },
-  {
-   "key": "빈 catch|src/main/0450-relations-memory.js 동기 대체",
-   "num": {
-    "개수": 2
-   },
-   "text": "src/main/0450-relations-memory.js 동기 대체 2개"
+   "text": "src/main/0420-app-update.js 저장소 대체 1개"
   },
   {
    "key": "빈 catch|src/main/0462-direction.js 동기 대체",
@@ -854,11 +861,11 @@
    "text": "src/main/0462-direction.js 동기 대체 1개"
   },
   {
-   "key": "빈 catch|src/main/0490-boss-patterns.js 동기 대체",
+   "key": "빈 catch|src/main/0480-battle.js 동기 대체",
    "num": {
     "개수": 1
    },
-   "text": "src/main/0490-boss-patterns.js 동기 대체 1개"
+   "text": "src/main/0480-battle.js 동기 대체 1개"
   },
   {
    "key": "빈 catch|src/main/0500-gacha.js 동기 대체",
@@ -938,6 +945,13 @@
    "text": "src/main/0510-actions/130-dispatch.js 저장소 대체 2개"
   },
   {
+   "key": "빈 catch|src/main/0520-backup-storage.js 저장소 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0520-backup-storage.js 저장소 대체 1개"
+  },
+  {
    "key": "빈 catch|src/main/0535-content-audit.js 동기 대체",
    "num": {
     "개수": 1
@@ -950,20 +964,6 @@
     "개수": 6
    },
    "text": "src/main/0550-standalone-app.js 동기 대체 6개"
-  },
-  {
-   "key": "빈 catch|src/main/0550-standalone-app.js 저장소 대체",
-   "num": {
-    "개수": 1
-   },
-   "text": "src/main/0550-standalone-app.js 저장소 대체 1개"
-  },
-  {
-   "key": "빈 catch|src/main/0560-image-candidates.js 동기 대체",
-   "num": {
-    "개수": 2
-   },
-   "text": "src/main/0560-image-candidates.js 동기 대체 2개"
   },
   {
    "key": "빈 catch|src/main/0565-asset-library.js 저장소 대체",
@@ -1209,29 +1209,9 @@
    "text": ".dgb (src/style/0160-card-battle.css:50)"
   },
   {
-   "key": "영역 침범 후보|src/main/0110-challenge-raid.js rgEnemies",
+   "key": "영역 침범 후보|src/main/0120-abyss.js rgEnemies",
    "num": {},
-   "text": "rgEnemies (src/main/0110-challenge-raid.js) — 참조 91%가 src/main/0240-growth-curve.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0400-publish-subscribe.js syPush",
-   "num": {},
-   "text": "syPush (src/main/0400-publish-subscribe.js) — 참조 85%가 src/main/0390-github-sync.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0030-character-regen.js naiDrawItem0",
-   "num": {},
-   "text": "naiDrawItem0 (src/main/0030-character-regen.js) — 참조 83%가 src/main/0020-ai-connect.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0260-new-game-draft.js openSkin",
-   "num": {},
-   "text": "openSkin (src/main/0260-new-game-draft.js) — 참조 83%가 src/main/0020-ai-connect.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0030-character-regen.js naiGenerate0",
-   "num": {},
-   "text": "naiGenerate0 (src/main/0030-character-regen.js) — 참조 78%가 src/main/0020-ai-connect.js"
+   "text": "rgEnemies (src/main/0120-abyss.js) — 참조 91%가 src/main/0240-growth-curve.js"
   },
   {
    "key": "영역 침범 후보|src/main/0500-gacha.js bannerPool",
@@ -1239,19 +1219,9 @@
    "text": "bannerPool (src/main/0500-gacha.js) — 참조 78%가 src/main/0445-factions.js"
   },
   {
-   "key": "영역 침범 후보|src/main/0180-ui-scroll.js openNaiPrep",
-   "num": {},
-   "text": "openNaiPrep (src/main/0180-ui-scroll.js) — 참조 75%가 src/main/0020-ai-connect.js"
-  },
-  {
    "key": "영역 침범 후보|src/main/0250-story-factory.js openMeta",
    "num": {},
    "text": "openMeta (src/main/0250-story-factory.js) — 참조 75%가 src/main/0510-actions/"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0180-ui-scroll.js openNaiSet",
-   "num": {},
-   "text": "openNaiSet (src/main/0180-ui-scroll.js) — 참조 71%가 src/main/0030-character-regen.js"
   },
   {
    "key": "영역 침범 후보|src/main/0010-rules.js applyMeta",
@@ -1259,19 +1229,9 @@
    "text": "applyMeta (src/main/0010-rules.js) — 참조 67%가 src/main/0510-actions/"
   },
   {
-   "key": "영역 침범 후보|src/main/0230-modal.js readCharForm",
-   "num": {},
-   "text": "readCharForm (src/main/0230-modal.js) — 참조 67%가 src/main/0185-game-rules.js"
-  },
-  {
    "key": "영역 침범 후보|src/main/0290-season-rotation.js aiPickupStory",
    "num": {},
    "text": "aiPickupStory (src/main/0290-season-rotation.js) — 참조 67%가 src/main/0510-actions/"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0400-publish-subscribe.js syPull",
-   "num": {},
-   "text": "syPull (src/main/0400-publish-subscribe.js) — 참조 64%가 src/main/0390-github-sync.js"
   },
   {
    "key": "영역 침범 후보|src/main/0250-story-factory.js relGC",
@@ -1287,36 +1247,6 @@
    "key": "영역 침범 후보|src/main/0180-ui-scroll.js contractHTML0",
    "num": {},
    "text": "contractHTML0 (src/main/0180-ui-scroll.js) — 참조 57%가 src/main/0500-gacha.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0210-setup.js renderSetup",
-   "num": {},
-   "text": "renderSetup (src/main/0210-setup.js) — 참조 57%가 src/main/0020-ai-connect.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0120-abyss.js challengeHTML",
-   "num": {},
-   "text": "challengeHTML (src/main/0120-abyss.js) — 참조 54%가 src/main/0110-challenge-raid.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0180-ui-scroll.js openNaiGen",
-   "num": {},
-   "text": "openNaiGen (src/main/0180-ui-scroll.js) — 참조 54%가 src/main/0030-character-regen.js"
-  },
-  {
-   "key": "영역 침범 후보|src/modules/combat/050-bridge.js v2DrainBattleEvents",
-   "num": {},
-   "text": "v2DrainBattleEvents (src/modules/combat/050-bridge.js) — 참조 53%가 src/main/0480-battle.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0180-ui-scroll.js naiBatch",
-   "num": {},
-   "text": "naiBatch (src/main/0180-ui-scroll.js) — 참조 50%가 src/main/0030-character-regen.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0260-new-game-draft.js skinPartDraw",
-   "num": {},
-   "text": "skinPartDraw (src/main/0260-new-game-draft.js) — 참조 50%가 src/main/0030-character-regen.js"
   },
   {
    "key": "영역 침범 후보|src/main/0525-data-folder.js dataImport",
@@ -1405,14 +1335,14 @@
    "num": {
     "곳": 1
    },
-   "text": "src/main/0445-factions.js가 G.world.factions(주인 src/main/0030-character-regen.js)를 씀 1곳"
+   "text": "src/main/0445-factions.js가 G.world.factions(주인 src/main/0030-image/)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0510-actions/ G.world.factions",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/가 G.world.factions(주인 src/main/0030-character-regen.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 G.world.factions(주인 src/main/0030-image/)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0190-shop.js P().gems",
@@ -1499,11 +1429,11 @@
    "text": "src/main/0510-actions/가 P().curEvent(주인 src/main/0250-story-factory.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0490-boss-patterns.js P().stars",
+   "key": "남의 상태 쓰기|src/main/0488-stage-modes.js P().stars",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0490-boss-patterns.js가 P().stars(주인 src/main/0488-stage-modes.js)를 씀 1곳"
+   "text": "src/main/0488-stage-modes.js가 P().stars(주인 src/main/0480-battle.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0487-formation-sortie.js G.meta.rules",
@@ -1660,46 +1590,11 @@
    "text": "P().prepAsked — 3개 모듈이 씀"
   },
   {
-   "key": "과잉 분할|src/main/0390-github-sync.js ↔ src/main/0400-publish-subscribe.js",
-   "num": {},
-   "text": "서로 강하게 묶임: src/main/0390-github-sync.js ↔ src/main/0400-publish-subscribe.js — 사이 17.99 · 안 12.31/12.35"
-  },
-  {
-   "key": "과잉 분할|src/main/0250-story-factory.js ↔ src/main/0450-relations-memory.js",
-   "num": {},
-   "text": "서로 강하게 묶임: src/main/0250-story-factory.js ↔ src/main/0450-relations-memory.js — 사이 16.59 · 안 32.89/16.57"
-  },
-  {
-   "key": "과잉 분할|src/main/0110-challenge-raid.js ↔ src/main/0120-abyss.js",
-   "num": {},
-   "text": "서로 강하게 묶임: src/main/0110-challenge-raid.js ↔ src/main/0120-abyss.js — 사이 14.8 · 안 9.49/57.13"
-  },
-  {
-   "key": "과잉 분할|src/main/0480-battle.js ↔ src/modules/combat/050-bridge.js",
-   "num": {},
-   "text": "서로 강하게 묶임: src/main/0480-battle.js ↔ src/modules/combat/050-bridge.js — 사이 4.2 · 안 2.97/62.69"
-  },
-  {
-   "key": "과잉 분할|src/main/0510-actions/ ↔ src/main/0520-backup-storage.js",
-   "num": {},
-   "text": "서로 강하게 묶임: src/main/0510-actions/ ↔ src/main/0520-backup-storage.js — 사이 3.91 · 안 2.81/8.32"
-  },
-  {
-   "key": "과잉 분할|src/main/0420-app-update.js ↔ src/main/0430-update-guidance.js",
-   "num": {},
-   "text": "서로 강하게 묶임: src/main/0420-app-update.js ↔ src/main/0430-update-guidance.js — 사이 3.58 · 안 0/18.73"
-  },
-  {
-   "key": "과잉 분할|src/main/0320-art-style.js ↔ src/main/0370-game-picker.js",
-   "num": {},
-   "text": "서로 강하게 묶임: src/main/0320-art-style.js ↔ src/main/0370-game-picker.js — 사이 3.41 · 안 0.79/2.26"
-  },
-  {
    "key": "기능 섞임|src/main/0160-free-chat.js",
    "num": {
     "묶음": 3
    },
-   "text": "src/main/0160-free-chat.js — 묶음 9·5·1"
+   "text": "src/main/0160-free-chat.js — 묶음 9·6·1"
   },
   {
    "key": "기능 섞임|src/main/0130-gift.js",
@@ -1713,14 +1608,7 @@
    "num": {
     "묶음": 2
    },
-   "text": "src/main/0400-publish-subscribe.js — 묶음 11·7"
-  },
-  {
-   "key": "기능 섞임|src/main/0125-tower.js",
-   "num": {
-    "묶음": 3
-   },
-   "text": "src/main/0125-tower.js — 묶음 5·3·1"
+   "text": "src/main/0400-publish-subscribe.js — 묶음 7·6"
   },
   {
    "key": "기능 섞임|src/main/0470-title-opening.js",
@@ -1728,20 +1616,6 @@
     "묶음": 3
    },
    "text": "src/main/0470-title-opening.js — 묶음 6·3·1"
-  },
-  {
-   "key": "기능 섞임|src/main/0485-battle-rules.js",
-   "num": {
-    "묶음": 2
-   },
-   "text": "src/main/0485-battle-rules.js — 묶음 6·5"
-  },
-  {
-   "key": "기능 섞임|src/main/0550-standalone-app.js",
-   "num": {
-    "묶음": 3
-   },
-   "text": "src/main/0550-standalone-app.js — 묶음 5·4·1"
   },
   {
    "key": "기능 섞임|src/main/0220-mail.js",
@@ -1765,26 +1639,6 @@
    "text": "src/modules/combat/030-core.js — 묶음 88·38"
   },
   {
-   "key": "기능 분산|src/main/0260-new-game-draft.js openSkin",
-   "num": {},
-   "text": "openSkin (src/main/0260-new-game-draft.js) — 연결 70%가 src/main/0020-ai-connect.js"
-  },
-  {
-   "key": "기능 분산|src/main/0180-ui-scroll.js openNaiPrep",
-   "num": {},
-   "text": "openNaiPrep (src/main/0180-ui-scroll.js) — 연결 68%가 src/main/0020-ai-connect.js"
-  },
-  {
-   "key": "기능 분산|src/main/0180-ui-scroll.js apForm",
-   "num": {},
-   "text": "apForm (src/main/0180-ui-scroll.js) — 연결 61%가 src/main/0020-ai-connect.js"
-  },
-  {
-   "key": "기능 분산|src/main/0020-ai-connect.js isV45",
-   "num": {},
-   "text": "isV45 (src/main/0020-ai-connect.js) — 연결 75%가 src/main/0030-character-regen.js"
-  },
-  {
    "key": "기능 분산|src/main/0180-ui-scroll.js passHTML",
    "num": {},
    "text": "passHTML (src/main/0180-ui-scroll.js) — 연결 77%가 src/main/0090-growth.js"
@@ -1795,19 +1649,9 @@
    "text": "phPlay (src/main/0160-free-chat.js) — 연결 62%가 src/main/0100-messenger.js"
   },
   {
-   "key": "기능 분산|src/main/0110-challenge-raid.js rgCount",
-   "num": {},
-   "text": "rgCount (src/main/0110-challenge-raid.js) — 연결 87%가 src/main/0120-abyss.js"
-  },
-  {
    "key": "기능 분산|src/main/0100-messenger.js phMode",
    "num": {},
    "text": "phMode (src/main/0100-messenger.js) — 연결 100%가 src/main/0160-free-chat.js"
-  },
-  {
-   "key": "기능 분산|src/main/0020-ai-connect.js ILK",
-   "num": {},
-   "text": "ILK (src/main/0020-ai-connect.js) — 연결 67%가 src/main/0180-ui-scroll.js"
   },
   {
    "key": "기능 분산|src/main/0290-season-rotation.js cycLabel",
@@ -1815,19 +1659,14 @@
    "text": "cycLabel (src/main/0290-season-rotation.js) — 연결 63%가 src/main/0180-ui-scroll.js"
   },
   {
-   "key": "기능 분산|src/main/0110-challenge-raid.js rgEnemies",
+   "key": "기능 분산|src/main/0120-abyss.js rgEnemies",
    "num": {},
-   "text": "rgEnemies (src/main/0110-challenge-raid.js) — 연결 70%가 src/main/0240-growth-curve.js"
+   "text": "rgEnemies (src/main/0120-abyss.js) — 연결 70%가 src/main/0240-growth-curve.js"
   },
   {
    "key": "기능 분산|src/main/0470-title-opening.js logoStyle",
    "num": {},
    "text": "logoStyle (src/main/0470-title-opening.js) — 연결 76%가 src/main/0250-story-factory.js"
-  },
-  {
-   "key": "기능 분산|src/main/0450-relations-memory.js nl",
-   "num": {},
-   "text": "nl (src/main/0450-relations-memory.js) — 연결 66%가 src/main/0250-story-factory.js"
   },
   {
    "key": "기능 분산|src/main/0530-story-memory.js storyWrapUp",
@@ -1838,31 +1677,6 @@
    "key": "기능 분산|src/main/0250-story-factory.js bondNote",
    "num": {},
    "text": "bondNote (src/main/0250-story-factory.js) — 연결 100%가 src/main/0290-season-rotation.js"
-  },
-  {
-   "key": "기능 분산|src/main/0320-art-style.js bootCats",
-   "num": {},
-   "text": "bootCats (src/main/0320-art-style.js) — 연결 83%가 src/main/0370-game-picker.js"
-  },
-  {
-   "key": "기능 분산|src/main/0320-art-style.js bootPrepNeeded",
-   "num": {},
-   "text": "bootPrepNeeded (src/main/0320-art-style.js) — 연결 66%가 src/main/0370-game-picker.js"
-  },
-  {
-   "key": "기능 분산|src/main/0400-publish-subscribe.js syPush",
-   "num": {},
-   "text": "syPush (src/main/0400-publish-subscribe.js) — 연결 63%가 src/main/0390-github-sync.js"
-  },
-  {
-   "key": "기능 분산|src/main/0390-github-sync.js ghCreateBlob",
-   "num": {},
-   "text": "ghCreateBlob (src/main/0390-github-sync.js) — 연결 69%가 src/main/0400-publish-subscribe.js"
-  },
-  {
-   "key": "기능 분산|src/main/0420-app-update.js verCmp",
-   "num": {},
-   "text": "verCmp (src/main/0420-app-update.js) — 연결 100%가 src/main/0430-update-guidance.js"
   },
   {
    "key": "기능 분산|src/main/0290-season-rotation.js baseChar",
@@ -1878,16 +1692,6 @@
    "key": "기능 분산|src/main/0480-battle.js uel",
    "num": {},
    "text": "uel (src/main/0480-battle.js) — 연결 92%가 src/modules/combat/040-effects.js"
-  },
-  {
-   "key": "기능 분산|src/main/0480-battle.js pop",
-   "num": {},
-   "text": "pop (src/main/0480-battle.js) — 연결 87%가 src/modules/combat/050-bridge.js"
-  },
-  {
-   "key": "기능 분산|src/main/0480-battle.js blog",
-   "num": {},
-   "text": "blog (src/main/0480-battle.js) — 연결 60%가 src/modules/combat/050-bridge.js"
   },
   {
    "key": "도구 복잡한 함수|tool:tools/play/lib/qa.mjs runQA",
@@ -1957,11 +1761,18 @@
    "text": "src/main/0020-ai-connect.js 2개"
   },
   {
-   "key": "이름 모호|src/main/0030-character-regen.js",
+   "key": "이름 모호|src/main/0030-image/010-engine.js",
    "num": {
-    "개수": 4
+    "개수": 5
    },
-   "text": "src/main/0030-character-regen.js 4개"
+   "text": "src/main/0030-image/010-engine.js 5개"
+  },
+  {
+   "key": "이름 모호|src/main/0030-image/020-candidates.js",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0030-image/020-candidates.js 1개"
   },
   {
    "key": "이름 모호|src/main/0065-inherit.js",
@@ -2008,9 +1819,9 @@
   {
    "key": "이름 모호|src/main/0180-ui-scroll.js",
    "num": {
-    "개수": 6
+    "개수": 5
    },
-   "text": "src/main/0180-ui-scroll.js 6개"
+   "text": "src/main/0180-ui-scroll.js 5개"
   },
   {
    "key": "이름 모호|src/main/0200-skin-shop.js",
@@ -2041,11 +1852,11 @@
    "text": "src/main/0250-story-factory.js 9개"
   },
   {
-   "key": "이름 모호|src/main/0260-new-game-draft.js",
+   "key": "이름 모호|src/main/0260-new-game/010-draft.js",
    "num": {
     "개수": 1
    },
-   "text": "src/main/0260-new-game-draft.js 1개"
+   "text": "src/main/0260-new-game/010-draft.js 1개"
   },
   {
    "key": "이름 모호|src/main/0280-live-ops.js",
@@ -2120,9 +1931,9 @@
   {
    "key": "이름 모호|src/main/0480-battle.js",
    "num": {
-    "개수": 3
+    "개수": 4
    },
-   "text": "src/main/0480-battle.js 3개"
+   "text": "src/main/0480-battle.js 4개"
   },
   {
    "key": "이름 모호|src/main/0487-formation-sortie.js",
@@ -2137,13 +1948,6 @@
     "개수": 4
    },
    "text": "src/main/0488-stage-modes.js 4개"
-  },
-  {
-   "key": "이름 모호|src/main/0490-boss-patterns.js",
-   "num": {
-    "개수": 1
-   },
-   "text": "src/main/0490-boss-patterns.js 1개"
   },
   {
    "key": "이름 모호|src/main/0500-gacha.js",
@@ -2221,13 +2025,6 @@
     "개수": 1
    },
    "text": "src/main/0550-standalone-app.js 1개"
-  },
-  {
-   "key": "이름 모호|src/main/0560-image-candidates.js",
-   "num": {
-    "개수": 1
-   },
-   "text": "src/main/0560-image-candidates.js 1개"
   },
   {
    "key": "이름 모호|src/main/0565-asset-library.js",

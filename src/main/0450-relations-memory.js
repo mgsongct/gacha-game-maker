@@ -41,14 +41,6 @@ function relFromProfiles(quiet){ let n=0; const who=[...G.chars.filter(c=>!c.alt
   who.forEach(a=>{ const txt=String(a.profile||''); if(!txt) return; who.forEach(b=>{ if(a===b||String(b.name).length<2||!txt.includes(b.name)) return; const sen=(txt.split(/(?<=[.!?。])\s*/).find(x=>x.includes(b.name))||'').slice(0,160); n+=relNew(baseChar(a).id||a.id,baseChar(b).id||b.id,'아는 사이',sen,'설정',true); }); });
   if(n&&!quiet) mark('meta'); return n; }
 function memCatchUp(){ relGC(); if(!G.meta.relProf){ relFromProfiles(); G.meta.relProf=1; mark('meta'); } G.chapters.forEach(ch=>relFromScripts(ch,ch.kind==='event'?'외전 「'+ch.title+'」':ch.title)); }
-// 새 대원 능력치는 희귀도·역할로 시스템이 정해요(밸런스가 들쭉날쭉하지 않게)
-const SYS_BASE=GGMCombat.CHARACTER_BASE_STATS;
-const SYS_SK={dmg:[1.9,2.3,2.8],aoe:[1.0,1.3,1.6],heal:[1.0,1.3,1.6],shield:[1.1,1.5,1.8],buff:[1.0,1.2,1.4]};
-function sysStats(c){ const r=[1,2,3].includes(+c.rarity)?+c.rarity:1,i=r-1,B=SYS_BASE[c.role]||SYS_BASE.atk;
-  Object.assign(c,GGMCombat.generateBaseStats(c),{baseStatsVersion:1});
-  const k=B.sk.includes(c.skill.kind)?c.skill.kind:B.sk[0]; c.skill.kind=k; c.skill.power=SYS_SK[k][i]; c.skill.cd=k==='dmg'?(r===1?2:3):k==='buff'&&r>1?4:3; return c; }
-// 적 기본 능력치를 만든 뒤 v2BalanceChapter에서 실제 전투 시뮬레이션으로 조정
-function sysEventFoes(ch){ (ch.stages||[]).forEach((s,i)=>(s.enemies||[]).forEach(e=>{ if(e.manual) return; const m=(1+0.08*i)*(e.boss?4.5:1); e.hp=Math.round(1100*m*(0.92+Math.random()*0.16)); e.atk=Math.round(85*(e.boss?1.3:1)*(1+0.05*i)); e.def=Math.round(42*(1+0.05*i)); e.spd=e.spd||95; })); }
 async function relSeedAI(btn){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return 0; }
   const r=await aiJSON(relSeedAIPrompt(),btn,'default');
   const n=r?relApply(r.relations,'정리'):0; return n; }
@@ -76,40 +68,3 @@ function openRelEdit(id){ const r=RELS().find(x=>x.id===id); if(!r) return;
     <label class="f" for="rle_n">설명</label><textarea class="in" id="rle_n" maxlength="240">${esc(r.note||'')}</textarea>
     <label class="f" for="rle_h">있었던 일 (한 줄에 하나, 최근이 아래)</label><textarea class="in" id="rle_h">${esc((r.hist||[]).map(h=>(h.src?h.src+' · ':'')+h.text).join('\n'))}</textarea>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="relsave" data-id="${r.id}">저장</button><button class="btn ghost" data-act="reldel" data-id="${r.id}">이 관계 지우기</button><button class="btn ghost" data-act="relgo" data-r="${esc(RELC)}">돌아가기</button></div>`); }
-function aiErrText(e){ const base=AIERR[e&&e.code]||'AI 호출에 실패했어요.'; const m=String((e&&e.message)||'').trim(); if(e&&e.code==='origin_block') return base+' '+m; return m?base+' (서버: '+m.slice(0,160)+')':base; }
-const AIERR={origin_block:'이 서비스가 브라우저에서 온 요청(Origin 헤더)을 막았어요(403).',el_nokey:'설정의 소리에서 ElevenLabs 키를 넣어 주세요.',fish_nokey:'설정의 소리에서 Fish Audio 키를 넣어 주세요.',no_ai:'설정의 글 AI에서 AI를 먼저 등록해 주세요.',model_not_found:'모델 이름이나 리전을 확인해 주세요.',sa_bad:'서비스 계정 JSON을 확인해 주세요. 파일 내용 전체를 붙여넣어야 해요.',bad_key:'키가 올바르지 않거나 권한이 없어요. 설정의 글 AI에서 확인해 주세요.',network:'인터넷 연결을 확인해 주세요.',low_credit:'API 크레딧이 부족해요. Claude Console에서 충전해 주세요.',not_granted:'AI 사용 권한이 꺼져 있어요. 앱의 권한 메뉴에서 켤 수 있어요.',rate_limited:'요청이 많아요. 잠시 후 다시 시도해 주세요.',refused:'AI가 이 요청은 쓰지 않았어요. 수위나 내용을 바꿔 다시 시도해 주세요.',invalid_json:'AI 응답을 읽지 못했어요. 다시 시도해 주세요.',cancelled:'취소했어요.'};
-let AI_QUIET=false,AI_QUIET_LAST=''; // 새 게임 단계 재시도 중에는 같은 오류 알림을 되풀이하지 않고 마지막 원인만 보여 줘요
-async function aiJSON(prompt,btn,tier,images){
-  if(!SAMPLE){toast('설정의 글 AI에서 AI를 먼저 등록해 주세요');return null;}
-  const label=btn?btn.textContent:'';let loadingTimer;if(btn){btn.disabled=true;btn.textContent='AI가 쓰는 중…';if(String(prompt).includes('skills')){let dots=0;loadingTimer=setInterval(()=>{if(btn.isConnected)btn.textContent='캐릭터와 스킬 생성중'+'.'.repeat(dots++%3+1);},400);}}
-  try{ const skillPrompt=aiJSONSkillPromptText({prompt}); const r=await SAMPLE.json(skillPrompt,{modelTier:tier||'default',cache:false,images});
-    // AI가 {"chars":[…]} 대신 배열 […]만 돌려주는 경우(Gemini 등): 요청한 형식의 첫 키로 감싸요
-    if(Array.isArray(r)){ const m=String(prompt).match(/JSON만 출력[^{\[]*\{\s*"([A-Za-z_]+)"\s*:\s*\[/); if(m) return {[m[1]]:r}; }
-    return r; }
-  catch(e){ if(!AI_QUIET) toast(aiErrText(e)); else AI_QUIET_LAST=aiErrText(e); return null; }
-  finally{clearInterval(loadingTimer); if(btn&&btn.isConnected){btn.disabled=false;btn.textContent=label;} }
-}
-const nl=s=>unComma(Array.isArray(s)?s.map(x=>typeof x==='string'?x:x&&typeof x==='object'?(x.name||x.speaker?`${x.name||x.speaker}: ${x.text||x.line||''}`:String(x.text||x.line||'')):String(x)).join('\n'):String(s||'').replace(/\\n/g,'\n'));
-// AI가 대본 줄을 쉼표로 이어 붙여 보낸 경우("[음악: 일상],A: 안녕!,B: 뭐 해") 줄로 되돌려요
-function unComma(t){ t=String(t||''); const re=/,\s*(?=\[[^\]\n]{1,30}\]|[^\s,:\[\]\n"'][^,:\n\[\]]{0,15}(?:\[[^\]\n]{1,12}\])?:\s)/g;
-  return t.split('\n').map(l=>{ const m=l.match(re); return m&&m.length>=2&&/^\s*(\[|[^,:\n]{1,16}(\[[^\]]*\])?:)/.test(l)?l.replace(re,'\n'):l; }).join('\n'); }
-const strs=a=>(Array.isArray(a)?a:[]).map(String).filter(Boolean);
-function cleanChar(o){ const c=cleanChar0(o);posAssign(c,o&&o.pos);c.persona=personaClean(o&&o.persona);c.range=RANGE[o&&o.range]?o.range:'';c.pfields=pfieldsClean(o&&o.pfields);v2ApplyRoleSpeed(c);c.generation=v2CurrentGeneration();balanceOnCreate(c); let provided=null;try{if(o?.skills)provided=v2PrepareGenerated(o.skills,c);}catch(e){}c.skills=provided||GGMCombat.generationDefaults(c); if(o?.skills&&!provided)c.skillGenerationWarning='AI 스킬이 규칙에 맞지 않아 기본 스킬로 대체했어요. 스킬 편집기에서 다시 생성할 수 있어요.'; setTimeout(async()=>{try{if(!provided){if(typeof NEW_GAME_SOURCE!=='undefined'&&NEW_GAME_SOURCE&&G!==NEW_GAME_SOURCE){ c.skillPending=true; c.skillGenerationWarning='새 게임을 연 뒤 스킬을 설계해요'; return; } /* 새 게임 생성 중: 저장·새로고침에 끊기지 않게 게임을 연 뒤 skillResume()이 이어서 */ if(SAMPLE){c.skillGenerationWarning='스킬을 구성하고 내부 검사하는 중…';const kit=await v2GenerateSkills(c,'',msg=>{c.skillGenerationWarning=msg;});c.skills=kit;delete c.skillGenerationWarning;}}await v2QueueCharacter(c);}catch(e){c.skillGenerationWarning=String(e.message||e);}if(G.chars.includes(c)){mark('c:'+c.id);if(document.querySelector('.cs-sheet')?.dataset.cid===c.id)openChar(c.id);}},0); try{ const en=(G.lib||[]).find(l=>l.kind==='enemy'&&l.name===c.name); if(en&&/^\s*(1girl|1boy|1other)/i.test(en.prompt||'')){ c.naiPrompt=en.prompt; c.fromEnemy=en.id; } }catch(e){} naiBlocksRemember(c);return c; }
-// 새 게임 생성 중에 미뤄 둔 스킬 설계를 게임을 연 뒤 이어서 해요(예전엔 생성 중 백그라운드 작업이 저장·새로고침에 끊겨 임시 스킬로 굳었음)
-let SKILL_RESUME=false;
-async function skillResume(){ if(SKILL_RESUME||!SAMPLE) return; const L=G.chars.filter(c=>c.skillPending); if(!L.length) return; SKILL_RESUME=true; const g0=G;
-  try{ for(const c of L){ if(G!==g0) break; try{ c.skillGenerationWarning='스킬을 설계하는 중…'; const kit=await v2GenerateSkills(c,'',m=>{c.skillGenerationWarning=m;}); if(G!==g0) break; c.skills=kit; delete c.skillPending; delete c.skillGenerationWarning; await v2QueueCharacter(c); mark('c:'+c.id); }
-    catch(e){ if(G!==g0) break; c.skillGenerationWarning='스킬 설계를 마치지 못했어요: '+String(e&&(e.message||e.code)||e).slice(0,80)+' — 스킬 편집기에서 다시 만들 수 있어요'; mark('c:'+c.id); } } }finally{ SKILL_RESUME=false; } }
-function cleanChar0(o){
-  o=o||{}; const sk=o.skill||{}, tc=o.touch||{}, w=o.weapon||{}, id=uid(), aff={},tank=o.role==='def'?GGMCombat.generateBaseStats(o):null;
-  Object.entries(o.affLines||{}).forEach(([k,v])=>{const n=parseInt(k,10);if(n>=1&&n<=10)aff[n]=strs(v);});
-  return {id,genVer:auditGenVer(),ord:G.chars.length,name:String(o.name||'').slice(0,20),age:24,faction:String(o.faction||''),limited:!!o.limited,
-    useStanding:o.useStanding===true,rarity:[1,2,3].includes(+o.rarity)?+o.rarity:1,role:ROLE[o.role]?o.role:'atk',elem:ELEMS.includes(o.elem)?o.elem:ELEMS[0],
-    baseStatsVersion:1,hp:tank?tank.hp:num(o.hp,600,2000,1000),atk:num(o.atk,60,200,110),def:tank?tank.def:num(o.def,20,120,50),spd:num(o.spd,70,130,100),
-    skill:{name:String(sk.name||'스킬').slice(0,20),kind:KIND[sk.kind]?sk.kind:'dmg',power:num(sk.power,0.5,3.2,1.6),cd:num(Math.round(sk.cd),2,5,3),desc:String(sk.desc||'')},
-    profile:String(o.profile||''),intro:String(o.intro||''),lines:strs(o.lines).slice(0,12),affLines:aff,lvLines:strs(o.lvLines).slice(0,4),dupLines:strs(o.dupLines).slice(0,3),
-    touch:{head:strs(tc.head).slice(0,8),body:strs(tc.body).slice(0,8),pet:strs(tc.pet).slice(0,8)},
-    files:(Array.isArray(o.files)?o.files:[]).map(f=>({dup:num(parseInt(f.dup,10),1,5,1),text:String(f.text||'')})).filter(f=>f.text).slice(0,5),
-    weapon:{id:'w_'+id,name:String(w.name||''),desc:String(w.desc||''),prompt:String(w.prompt||''),img:null},
-    naiPrompt:allyTags(String(o.naiPrompt||'')),img:null,episodes:[],faces:[],skins:[],illust:{id:'il_'+id,kind:'illust',name:String(o.name||'')+' 일러스트',prompt:'',img:null},upper:{id:'up_'+id,kind:'upper',name:String(o.name||'')+' 상반신',prompt:'',img:null},pose:{id:'po_'+id,kind:'pose',name:String(o.name||'')+' 로비 포즈',prompt:'',img:null},lbbg:{id:'lg_'+id,kind:'lbbg',name:String(o.name||'')+' 로비 배경',prompt:'',img:null},lbcg:{id:'lb_'+id,kind:'lbcg',name:String(o.name||'')+' 돌파 CG',prompt:'',img:null}};
-}

@@ -566,3 +566,22 @@ function naiSkinParts(base,response){
  if(!outfit)throw Error('AI가 새 의상 정보를 비워서 반환했어요. 기존 스킨은 변경하지 않았어요.');
  return naiBlocksUpgrade({appearance:base.appearance,outfit,other:typeof response.other==='string'?response.other.trim():''});
 }
+/* 글 AI JSON 호출(aiJSON): 실패 문구·재시도 중 알림 줄이기 */
+function aiErrText(e){ const base=AIERR[e&&e.code]||'AI 호출에 실패했어요.'; const m=String((e&&e.message)||'').trim(); if(e&&e.code==='origin_block') return base+' '+m; return m?base+' (서버: '+m.slice(0,160)+')':base; }
+const AIERR={origin_block:'이 서비스가 브라우저에서 온 요청(Origin 헤더)을 막았어요(403).',el_nokey:'설정의 소리에서 ElevenLabs 키를 넣어 주세요.',fish_nokey:'설정의 소리에서 Fish Audio 키를 넣어 주세요.',no_ai:'설정의 글 AI에서 AI를 먼저 등록해 주세요.',model_not_found:'모델 이름이나 리전을 확인해 주세요.',sa_bad:'서비스 계정 JSON을 확인해 주세요. 파일 내용 전체를 붙여넣어야 해요.',bad_key:'키가 올바르지 않거나 권한이 없어요. 설정의 글 AI에서 확인해 주세요.',network:'인터넷 연결을 확인해 주세요.',low_credit:'API 크레딧이 부족해요. Claude Console에서 충전해 주세요.',not_granted:'AI 사용 권한이 꺼져 있어요. 앱의 권한 메뉴에서 켤 수 있어요.',rate_limited:'요청이 많아요. 잠시 후 다시 시도해 주세요.',refused:'AI가 이 요청은 쓰지 않았어요. 수위나 내용을 바꿔 다시 시도해 주세요.',invalid_json:'AI 응답을 읽지 못했어요. 다시 시도해 주세요.',cancelled:'취소했어요.'};
+let AI_QUIET=false,AI_QUIET_LAST=''; // 새 게임 단계 재시도 중에는 같은 오류 알림을 되풀이하지 않고 마지막 원인만 보여 줘요
+async function aiJSON(prompt,btn,tier,images){
+  if(!SAMPLE){toast('설정의 글 AI에서 AI를 먼저 등록해 주세요');return null;}
+  const label=btn?btn.textContent:'';let loadingTimer;if(btn){btn.disabled=true;btn.textContent='AI가 쓰는 중…';if(String(prompt).includes('skills')){let dots=0;loadingTimer=setInterval(()=>{if(btn.isConnected)btn.textContent='캐릭터와 스킬 생성중'+'.'.repeat(dots++%3+1);},400);}}
+  try{ const skillPrompt=aiJSONSkillPromptText({prompt}); const r=await SAMPLE.json(skillPrompt,{modelTier:tier||'default',cache:false,images});
+    // AI가 {"chars":[…]} 대신 배열 […]만 돌려주는 경우(Gemini 등): 요청한 형식의 첫 키로 감싸요
+    if(Array.isArray(r)){ const m=String(prompt).match(/JSON만 출력[^{\[]*\{\s*"([A-Za-z_]+)"\s*:\s*\[/); if(m) return {[m[1]]:r}; }
+    return r; }
+  catch(e){ if(!AI_QUIET) toast(aiErrText(e)); else AI_QUIET_LAST=aiErrText(e); return null; }
+  finally{clearInterval(loadingTimer); if(btn&&btn.isConnected){btn.disabled=false;btn.textContent=label;} }
+}
+/* 그림체(직접 입력): NovelAI 저장 설정 읽기·내 그림체 */
+const STYLE_EX='예: anime coloring, cel shading, vibrant colors  /  watercolor (medium), soft colors  /  1.2::artist:이름 ::';
+function naiSaved(){let sv={};try{sv=JSON.parse(appStorage.getItem(NKEY))||{};}catch(e){}return sv;}
+function setMyStyle(tags,neg){const sv=naiSaved();sv.styles=[{id:'my_style',name:'내 그림체',tags:String(tags||'').trim(),neg:String(neg||'').trim()}];sv.styleId='my_style';appStorage.setItem(NKEY,JSON.stringify(sv));}
+function myStyle(){return naiCfg().styles[0];}

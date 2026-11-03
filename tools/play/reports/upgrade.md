@@ -1,6 +1,6 @@
 # 구버전·미비 생성 게임 감지·보완 검증
 
-생성: `node tools/play/upgrade.mjs` · 2026-11-03T16:19 · 항목 10(tools/out/wiring.json — 포크 기능이 새로 만든 키·필드) · 항목마다 그 데이터만 뺀 예전 게임(점검 판·생성 판 0)을 지금 빌드에 불러와 감지·자동 보완
+생성: `node tools/play/upgrade.mjs` · 2026-11-03T16:55 · 항목 10(tools/out/wiring.json — 포크 기능이 새로 만든 키·필드) · 항목마다 그 데이터만 뺀 예전 게임(점검 판·생성 판 0)을 지금 빌드에 불러와 감지·자동 보완
 
 ## idol-audition — 앙코르 시그널
 

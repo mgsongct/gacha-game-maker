@@ -178,7 +178,7 @@ function naiDraw(kind,base,opt){
 const SKILL_TAGS={dmg:'attacking, slashing, weapon swing',aoe:'casting spell, magic circle, explosion, energy wave',heal:'casting spell, healing light, sparkles',shield:'magic barrier, shield, defensive stance',buff:'raising hand, aura, cheering, light rays'};
 // 스탠딩 레퍼런스: 설정에서 켜면 일러스트·CG(+스킬 컷인·상반신)를 그릴 때 그 캐릭터의 스탠딩을 캐릭터 레퍼런스로 넣어 얼굴·머리를 맞춰요(V4.5로 그려요)
 function autoRefOn(k){ const m=naiCfg().autoRef; if(imgProvider()==='comfy'||!m||m==='off') return false; return ['illust','lbcg','cg'].includes(k)||(m==='all'&&['scg','upper'].includes(k)); }
-async function standRefs(cs){ const rf=naiCfg().ref||NAI_DEF.ref, out=[]; for(const c of cs){ const src=c&&imgSrc(c); if(!src) continue; try{ out.push({image:await refImage(src),type:rf.type||'character',strength:rf.strength!=null?rf.strength:1,fidelity:rf.fidelity!=null?rf.fidelity:1}); }catch(e){ quietErr(e,'0030-character-regen.js:195'); } if(out.length>=4) break; } return out; }
+async function standRefs(cs){ const rf=naiCfg().ref||NAI_DEF.ref, out=[]; for(const c of cs){ const src=c&&imgSrc(c); if(!src) continue; try{ out.push({image:await refImage(src),type:rf.type||'character',strength:rf.strength!=null?rf.strength:1,fidelity:rf.fidelity!=null?rf.fidelity:1}); }catch(e){ quietErr(e,'0030-image/010-engine.js:181'); } if(out.length>=4) break; } return out; }
 async function naiDrawItem(it){
   const candidateEligible=imageCandidateEligible(it.k,it.o,it.c,it.generationMode||'automatic'),originalSrc=imgSrcRaw(it.o)||'';
   if(autoRefOn(it.k)){ const cs=it.k==='cg'?cgCast(it.o).map(x=>x.c):[it.c], refs=await standRefs(cs); if(refs.length) return naiDrawItem0(it,{refs,candidateEligible,originalSrc}); }
@@ -578,3 +578,313 @@ async function naiGenerate0(prompt,kind,opts){
   }
   throw last;
 }
+/* src/main/0180-ui-scroll.js에서 옮김 */
+function openNaiSet(){
+  const c=naiCfg(), sz=k=>{const v=(c.sizes||{})[k];const list=NAI_SIZES.map(x=>[x[0]+'x'+x[1],x[2]]);if(v&&!list.some(x=>x[0]===v))list.unshift([v,v]);return opt(list,v);};
+  openModal(`${head('그림 AI')}
+    <label class="f" for="nai_auto">AI가 새 스테이지·이벤트·${T('crew')}를 만들면</label><select class="in" id="nai_auto">${opt([['ask','그릴지 물어보기'],['auto','자동으로 그리기'],['off','그리지 않기']],c.autoArt||'ask')}</select>
+    <label class="f" for="nai_prov">그림 AI 종류</label><select class="in" id="nai_prov">${opt([['nai','NovelAI'],['comfy','ComfyUI (내 PC나 서버)']],c.provider||'nai')}</select>
+    <div class="optbox" id="comfyBox" ${c.provider==='comfy'?'':'hidden'}>
+      <label class="f" for="cf_url">ComfyUI 주소</label><input class="in" id="cf_url" value="${esc(comfyCfg().url)}" placeholder="http://192.168.0.10:8188">
+      ${!IS_NATIVE&&location.protocol==='https:'?'<p style="color:var(--rose);margin:4px 0 0;font-size:.82rem">아이폰·웹 버전에서는 https 주소만 연결돼요. PC의 ComfyUI를 Cloudflare Tunnel 같은 걸로 https 주소로 열고, --enable-cors-header 옵션도 켜 주세요.</p>':''}
+      <p class="muted" style="margin:4px 0 0">PC에서 ComfyUI를 <code>--listen</code> 옵션으로 켜고, 폰과 같은 와이파이에서 PC의 IP 주소를 넣어요. 밖에서 쓰려면 Cloudflare Tunnel 같은 https 주소도 돼요.</p>
+      <label class="f" for="cf_wf">워크플로 (API 형식 JSON)</label><textarea class="in" id="cf_wf" style="min-height:90px" placeholder='ComfyUI 메뉴 → Workflow → Export (API)로 저장한 파일 내용'>${esc(comfyCfg().wf)}</textarea>
+      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="cfload">JSON 파일 불러오기</button><button class="btn sm ghost" data-act="cftest">연결 확인</button></div>
+      <p class="muted" style="margin:4px 0 0">KSampler에 연결된 프롬프트·크기·시드 노드를 자동으로 찾아요. 직접 지정하려면 노드 제목을 <code>[GGM:positive]</code> <code>[GGM:negative]</code> <code>[GGM:size]</code> <code>[GGM:seed]</code> <code>[GGM:output]</code>으로 바꾸세요. 에셋 메이드의 <code>[AssetMaid:…]</code> 제목도 그대로 알아들어요.</p>
+      <div class="g2"><div><label class="f" for="cf_q">항상 붙일 품질 태그</label><input class="in" id="cf_q" value="${esc(comfyCfg().qtags)}"></div><div><label class="f" for="cf_n">항상 붙일 네거티브</label><input class="in" id="cf_n" value="${esc(comfyCfg().neg)}"></div></div>
+      <label class="f" for="cf_t">최대 대기 (초)</label><input class="in" id="cf_t" type="number" value="${comfyCfg().timeoutSec}">
+    </div>
+    <div id="naiBox" ${c.provider==='comfy'?'hidden':''}>
+    <label class="f" for="nai_key">영구 API 토큰</label><input class="in" id="nai_key" type="password" autocomplete="off" value="${esc(c.key)}" placeholder="pst-...">
+    <p class="muted" style="margin:4px 0 0">novelai.net 로그인 → 왼쪽 위 톱니(설정) → Account → Get Persistent API Token</p>
+    <label class="f" for="nai_ep">생성 주소 (엔드포인트)</label><input class="in" id="nai_ep" value="${esc(c.endpoint)}" placeholder="${NAI_ENDPOINT}">
+    <p class="muted" style="margin:4px 0 0">보통은 그대로 두세요. 중계 서버를 쓸 때만 바꿔요. 표정 변환도 같은 서버로 보내요.</p>
+    <datalist id="naimodels">${NAI_MODELS.map(m=>`<option value="${m[0]}">${m[1]}</option>`).join('')}</datalist>
+    <div class="g2"><div><label class="f" for="nai_model">기본 모델</label><input class="in" id="nai_model" list="naimodels" value="${esc(c.model)}"></div><div><label class="f" for="nai_rmodel">레퍼런스용 모델 (V4.5)</label><input class="in" id="nai_rmodel" list="naimodels" value="${esc(c.refModel)}"></div></div>
+    <div class="optbox"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><label class="f" for="nai_variety" style="margin:0">Variety Boost (V4.5 전용)</label><button type="button" id="nai_variety" class="v2-switch" role="switch" aria-label="V4.5 Variety Boost" aria-checked="${c.varietyBoostV45!==false}" data-act="naivariety"><span></span></button></div><p class="muted" style="margin:6px 0 0">V4.5 생성 옵션을 켜거나 꺼요. 기본은 켜기이며 품질 태그와 별개예요. V5·다른 모델과 캐릭터 레퍼런스를 쓰는 생성에는 적용하지 않아요. 아래 저장을 눌러 적용해 주세요.</p></div>
+    <div class="g2"><div><label class="f" for="nai_sampler">샘플러</label><select class="in" id="nai_sampler">${opt([['k_euler_ancestral','Euler Ancestral'],['k_euler','Euler'],['k_dpmpp_2s_ancestral','DPM++ 2S Ancestral'],['k_dpmpp_2m_sde','DPM++ 2M SDE'],['k_dpmpp_2m','DPM++ 2M'],['k_dpmpp_sde','DPM++ SDE']],c.sampler)}</select></div>
+    <div><label class="f" for="nai_noise">노이즈 스케줄</label><select class="in" id="nai_noise">${opt([['karras','karras'],['exponential','exponential'],['polyexponential','polyexponential']],c.noise)}</select></div></div>
+    <div class="g4"><div><label class="f" for="nai_steps">스텝</label><input class="in" id="nai_steps" type="number" value="${c.steps}"></div><div><label class="f" for="nai_scale">프롬프트 강도</label><input class="in" id="nai_scale" type="number" step="0.1" value="${c.scale}"></div><div><label class="f" for="nai_cfgr">CFG 리스케일</label><input class="in" id="nai_cfgr" type="number" step="0.05" value="${c.cfgRescale}"></div><div><label class="f" for="nai_retry">재시도</label><input class="in" id="nai_retry" type="number" value="${c.retries}"></div></div>
+    </div>
+    <h3 class="sec">기본 크기</h3>
+    <div class="g2"><div><label class="f" for="nai_sz_char">스탠딩</label><select class="in" id="nai_sz_char">${sz('char')}</select></div><div><label class="f" for="nai_sz_bg">배경</label><select class="in" id="nai_sz_bg">${sz('bg')}</select></div></div>
+    <div class="g2"><div><label class="f" for="nai_sz_prop">소품·무기</label><select class="in" id="nai_sz_prop">${sz('prop')}</select></div><div><label class="f" for="nai_sz_cg">CG</label><select class="in" id="nai_sz_cg">${sz('cg')}</select></div></div>
+    <div class="g2"><div><label class="f" for="nai_sz_enemy">적</label><select class="in" id="nai_sz_enemy">${sz('enemy')}</select></div><div><label class="f" for="nai_sz_illust">일러스트</label><select class="in" id="nai_sz_illust">${sz('illust')}</select></div></div>
+    <h3 class="sec">캐릭터 레퍼런스 기본값</h3>
+    <div class="g4"><div style="grid-column:span 2"><label class="f" for="nai_rt">종류</label><select class="in" id="nai_rt">${opt([['character','캐릭터'],['character&style','캐릭터+화풍'],['style','화풍만']],c.ref.type)}</select></div><div><label class="f" for="nai_rs">강도</label><input class="in" id="nai_rs" type="number" step="0.1" value="${c.ref.strength}"></div><div><label class="f" for="nai_rf">충실도</label><input class="in" id="nai_rf" type="number" step="0.1" value="${c.ref.fidelity}"></div></div>
+    <label class="f" for="nai_aref">스탠딩을 레퍼런스로 자동 사용</label><select class="in" id="nai_aref">${opt([['off','끄기'],['illust','일러스트·로비 CG·스토리 CG'],['all','일러스트·CG + 기술 컷인·상반신']],c.autoRef||'off')}</select>
+    <p class="muted" style="margin:4px 0 0">켜면 그림 준비실·바로 그리기에서 그 캐릭터(CG는 등장 ${T('crew')})의 스탠딩을 캐릭터 레퍼런스로 넣어서 얼굴·머리·옷이 스탠딩과 맞게 나와요. 스탠딩이 없는 캐릭터는 그냥 그려요. 레퍼런스는 V4.5 전용이라 위의 레퍼런스용 모델로 그리고, Anlas가 더 들 수 있어요.</p>
+    <h3 class="sec">그림체 프리셋</h3>
+    ${allPresets().map(s=>`<div class="ep">${pthumbHTML(s.id)}<span class="t"><b>✦ ${esc(s.name)}</b><span class="muted">${esc(s.desc||'')}${s.by?' · 프리셋 제공: '+esc(s.by):''}</span></span><button class="btn sm" data-act="naipreset" data-v="${s.id}">불러오기</button></div>`).join('')}<div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="packopen">내 프리셋 저장·공유</button></div>
+    <p class="muted" style="margin:4px 0 0;font-size:.78rem">불러오면 그림체·네거티브·생성 설정이 채워져요. 기본·개인 프리셋 모두 품질 태그를 상단 그림체 태그에 포함해요. 저장을 눌러야 적용되고, 저장하지 않고 닫으면 그대로예요.</p>
+    <h3 class="sec">프롬프트 조립</h3>
+    <p class="muted" style="margin:0">화풍 → 공통 앞 → 각자의 프롬프트 → 자세·구도(스탠딩) → 종류별 뒤. 겹치는 태그는 한 번만 들어가요. CG는 장면 프롬프트에 인물별 프롬프트를 따로 붙여요.</p>
+    <label class="f" for="nai_stags">그림체 태그 (모든 그림 맨 앞에 붙어요. 게임 정의에서 게임마다 따로 정할 수도 있어요)</label><textarea class="in" id="nai_stags" placeholder="${esc(STYLE_EX)}">${esc(c.styles[0].tags)}</textarea>
+    <label class="f" for="nai_sneg">그림체 네거티브 (선택)</label><input class="in" id="nai_sneg" value="${esc(c.styles[0].neg||'')}" placeholder="예: 3d, realistic">
+    <label class="f" for="nai_prefix">공통 앞 프롬프트 (모든 그림)</label><input class="in" id="nai_prefix" value="${esc(c.prefix)}">
+    <label class="f" for="nai_poses">자세 프리셋 (한 줄에 하나: 이름 | 태그)</label><textarea class="in" id="nai_poses">${esc(c.poses.map(x=>x.n+' | '+x.t).join('\n'))}</textarea>
+    <div class="optbox" style="margin-top:10px;font-size:.8rem"><b>종류별 추가 태그</b> <span class="muted">아래 '뒤' 칸은 AI를 거치지 않고 그 종류 그림에 항상 붙어요. AI가 태그를 쓸 때 따를 지침(의상을 자세히, 일러스트 조명·구도 등)은</span> <button class="linkb" type="button" data-act="llmopen">글 AI 지침 → 그림 태그 지침</button></div>
+    ${['char','illust','lbcg','enemy','bg','prop','cg'].map(k=>`<div class="g2"><div><label class="f" for="nai_p_${k}">${({char:'스탠딩',illust:'일러스트',lbcg:'돌파 CG',enemy:'적',bg:'배경',prop:'소품·무기',cg:'CG'})[k]} 뒤</label><input class="in" id="nai_p_${k}" value="${esc(c.parts[k].suffix)}"></div><div><label class="f" for="nai_n_${k}">네거티브 추가</label><input class="in" id="nai_n_${k}" value="${esc(c.parts[k].neg)}"></div></div>`).join('')}
+    <label class="f" for="nai_neg">공통 네거티브</label><textarea class="in" id="nai_neg">${esc(c.neg)}</textarea>
+    <label class="f" for="nai_cut">스탠딩·적 배경 자동 제거 (세부 조절은 각 이미지의 '배경 지우기'에서)</label><select class="in" id="nai_cut">${opt([['1','켜기'],['0','끄기']],c.cutout?'1':'0')}</select>
+    <label class="f" for="nai_tp">V5 투명 배경으로 생성 (스탠딩·적·프랍. 흰 배경을 지울 필요가 없어져요. 레퍼런스를 쓰면 V4.5라서 꺼져요)</label><select class="in" id="nai_tp">${opt([['1','켜기'],['0','끄기']],c.transparent?'1':'0')}</select>${appStorage.getItem('starfall-nai-tperr')?`<p class="muted" style="margin:4px 0 0">최근 투명 생성 실패: ${esc(appStorage.getItem('starfall-nai-tperr'))}</p>`:''}
+    <p class="muted" style="margin-top:8px">Opus 구독이면 1024×1024 이하 넓이, 28스텝 이하, 1장 생성에 Anlas가 들지 않아요. 레퍼런스와 img2img는 추가로 들 수 있어요.</p>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="naisave">저장</button><button class="btn ghost" data-act="naitest">연결 확인</button></div>`);
+}
+function readNai(){
+  const old=naiCfg(), v=id=>$('#'+id).value.trim();
+  const styles=old.styles;
+  const poses=lines($('#nai_poses').value).map(l=>{const p=l.split('|');return {n:(p[0]||'').trim(),t:p.slice(1).join('|').trim()};}).filter(x=>x.n&&x.t);
+  const parts={}; ['char','illust','lbcg','enemy','bg','prop','cg'].forEach(k=>{parts[k]={suffix:v('nai_p_'+k),neg:v('nai_n_'+k)};});
+  return {key:v('nai_key'),endpoint:v('nai_ep')||NAI_ENDPOINT,model:v('nai_model')||NAI_DEF.model,refModel:v('nai_rmodel')||NAI_DEF.refModel,sampler:$('#nai_sampler').value,noise:$('#nai_noise').value,
+    steps:num(v('nai_steps'),1,50,28),scale:num(v('nai_scale'),0,10,6),cfgRescale:num(v('nai_cfgr'),0,1,0),retries:num(v('nai_retry'),1,5,3),timeoutSec:old.timeoutSec,
+    provider:$('#nai_prov').value,comfy:{url:v('cf_url'),wf:$('#cf_wf').value.trim(),qtags:v('cf_q'),neg:v('cf_n'),timeoutSec:num(v('cf_t'),30,1200,300)},varietyBoostV45:$('#nai_variety').getAttribute('aria-checked')==='true',quality:false,qtags:'',legacyQualityTags:$('#nai_stags').dataset.presetApplied?'':old.legacyQualityTags||'',cutout:$('#nai_cut').value==='1',transparent:$('#nai_tp').value==='1',prefix:v('nai_prefix'),neg:v('nai_neg'),autoArt:$('#nai_auto').value,
+    sizes:{char:$('#nai_sz_char').value,bg:$('#nai_sz_bg').value,prop:$('#nai_sz_prop').value,cg:$('#nai_sz_cg').value,enemy:$('#nai_sz_enemy').value,illust:$('#nai_sz_illust').value},cut:Object.assign({},old.cut),
+    ref:{type:$('#nai_rt').value,strength:num(v('nai_rs'),0,1,1),fidelity:num(v('nai_rf'),0,1,1)},autoRef:$('#nai_aref')?$('#nai_aref').value:(old.autoRef||'off'),
+    styles:[{id:'my_style',name:'내 그림체',tags:v('nai_stags'),neg:v('nai_sneg')}],styleId:'my_style',poses:poses.length?poses:NAI_DEF.poses,parts};
+}
+function naiTarget(kind,id){if(ILK(kind)){const c=charById(id);return c&&c[kind];}if(kind==='weapon'){const c=charById(id);return c&&c.weapon;}return kind==='char'?charById(id):libById(id);}
+/* 화풍 프리셋 편집 */
+let CUTJOB=null;
+function openCut(kind,id){
+  const o=naiTarget(kind,id); const src=o&&imgSrc(o); if(!src){toast('먼저 이미지를 등록해 주세요');return;}
+  const c=cutCfg(); CUTJOB={kind,id,src,undo:[],zoom:1,cx:-1,cy:-1,opt:null,changed:false};
+  openModal(`${head('배경 지우기',`<span class="muted">${esc(o.name)}</span>`)}
+    <div class="cutbox"><div class="cutview" id="cutPrev"><canvas id="cutCv"></canvas><div class="cut-cur" id="cutCur" hidden></div></div><canvas class="cut-loupe" id="cutLoupe" width="150" height="150" hidden></canvas></div>
+    <div class="cuttools">
+      <select class="in" id="ct_pmode"><option value="wand">스포이드: 이어진 영역</option><option value="all">스포이드: 같은 색 전부</option><option value="brush">지우개 브러시</option><option value="restore">복원 브러시</option></select>
+      <button class="btn ghost" data-act="cutzoom" id="ct_zoom">확대 ×1</button><button class="btn ghost" data-act="cutundo" id="ct_undo" disabled>되돌리기</button>
+    </div>
+    <div class="cutpad">
+      <div class="pad"><button class="btn ghost" data-act="cutnudge" data-dx="0" data-dy="-1" aria-label="위">▲</button><button class="btn ghost" data-act="cutnudge" data-dx="-1" data-dy="0" aria-label="왼쪽">◀</button><button class="btn ghost" data-act="cutnudge" data-dx="1" data-dy="0" aria-label="오른쪽">▶</button><button class="btn ghost" data-act="cutnudge" data-dx="0" data-dy="1" aria-label="아래">▼</button></div>
+      <button class="btn cutgo" data-act="cuthere"><span class="cutsw" id="ct_sw"></span>커서 위치 지우기</button>
+    </div>
+    <div class="slider" id="ct_pt"><label for="ct_ptol"><span>스포이드 범위</span><b id="ct_ptolv">24</b></label><input id="ct_ptol" type="range" min="2" max="80" value="24"></div>
+    <div class="slider" id="ct_bs" hidden><label for="ct_brush"><span>브러시 크기</span><b id="ct_brushv">10</b></label><input id="ct_brush" type="range" min="2" max="60" value="10"></div>
+    <label class="f"><input type="checkbox" id="ct_quick"> 손을 떼면 바로 지우기 (스포이드)</label>
+    <p class="muted cutpick-hint" id="ct_hint">그림을 누른 채 움직이면 손가락 위쪽에 커서가 생겨요. 왼쪽 위 돋보기로 확인하고 화살표로 한 칸씩 맞춘 뒤 '커서 위치 지우기'를 누르세요. 브러시는 문지르는 대로 지우고, 복원 브러시는 원본으로 되돌려요.</p>
+    <details class="cutauto"><summary>자동으로 흰 배경 한 번에 지우기</summary>
+      <div class="slider"><label for="ct_tol"><span>배경 허용 범위</span><b id="ct_tolv">${c.tol}</b></label><input id="ct_tol" type="range" min="6" max="90" value="${c.tol}"></div>
+      <div class="slider"><label for="ct_soft"><span>가장자리 부드럽게</span><b id="ct_softv">${c.soft}</b></label><input id="ct_soft" type="range" min="4" max="70" value="${c.soft}"></div>
+      <div class="row"><label class="f"><input type="checkbox" id="ct_shadow" ${c.shadow?'checked':''}> 발밑 그림자 지우기</label></div>
+      <div class="row"><label class="f"><input type="checkbox" id="ct_holes" ${c.holes?'checked':''}> 막힌 배경도 지우기 (흰 옷이 지워지면 끄세요)</label></div>
+      <div class="row"><label class="f"><input type="checkbox" id="ct_spk" ${c.despeck?'checked':''}> 떠 있는 작은 점 지우기</label></div>
+      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="cutrun">자동 지우기 (원본 기준)</button></div>
+      <label class="f"><input type="checkbox" id="ct_def" checked> 이 설정을 자동 배경 제거 기본값으로</label>
+    </details>
+    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="cutnai">NovelAI로 배경 제거 (Anlas 소모)</button></div>
+    <div class="cutsave"><button class="btn block" data-act="cutsave" disabled id="ct_save">이걸로 저장</button></div>`);
+  (async()=>{ try{ const im=await loadImg(src), j=CUTJOB; if(!j||!$('#cutCv')) return; j.W=im.naturalWidth||im.width; j.H=im.naturalHeight||im.height;
+      j.cv=$('#cutCv'); j.cv.width=j.W; j.cv.height=j.H; j.cv.getContext('2d',{willReadFrequently:true}).drawImage(im,0,0);
+      j.orig=document.createElement('canvas'); j.orig.width=j.W; j.orig.height=j.H; j.orig.getContext('2d').drawImage(im,0,0); cutBind(); }catch(e){ toast('이미지를 불러오지 못했어요'); } })();
+}
+function openNaiPrep(kind,id){
+  const o=naiTarget(kind,id); if(!o) return;
+  const c=naiCfg(), k=kind==='char'?'char':kind==='weapon'?'prop':o.kind;
+  if(!imgReady()){toast(imgNeed());return;}
+  const owner=ILK(k)?charById(id):null;
+  const base=(k==='char'?joinTags(o.naiPrompt,designTags(o)):ILK(k)?joinTags(owner.naiPrompt,designTags(owner),o.prompt):o.prompt)||'';
+  if(k==='cg'){ if(!String(o.prompt||'').trim()&&!cgCast(o).length){toast('장면 프롬프트나 등장 '+T('crew')+'을(를) 채워 주세요');return;} }
+  else if(!String(base).trim()){toast('먼저 NAI 프롬프트를 채워 주세요');return;}
+  const styleId=naiStyle(c,o.naiStyle).id;
+  const pose=k==='char'?(o.naiPose||NAI_FRONT):ILK(k)?(o.naiPose!=null?o.naiPose:'looking at viewer'):'', frame=k==='char'?(o.naiFrame||'full body'):ILK(k)?(o.naiFrame||'cowboy shot'):'';
+  const p=k==='cg'?composeCG(o,{styleId}):composeNai(k,base,{pose,styleId,frame});
+  const [w,h]=naiSize(k,c), sz=w+'x'+h, hasImg=!!imgSrc(o);
+  const canRef=(k==='char'&&hasImg)||(ILK(k)&&!!imgSrc(owner))||(k==='cg'&&cgCast(o).some(x=>imgSrc(x.c)));
+  NPREP={kind,id,k,base};
+  const sizes=[...NAI_SIZES.map(x=>[x[0]+'x'+x[1],x[2]])]; if(!sizes.some(x=>x[0]===sz)) sizes.unshift([sz,sz]);
+  openModal(`${head('그리기 전 확인',`<span class="muted">${esc(o.name)}</span>`)}
+    <input type="hidden" id="np_style" value="${esc(styleId)}"><div class="g2"><div><label class="f">그림체</label><p class="muted" style="margin:6px 0 0;font-size:.78rem;word-break:break-all">${esc(String(naiStyle(c).tags||'').slice(0,80)||'태그 없음 (모델 기본)')}</p></div>
+    <div><label class="f" for="np_model">모델</label><select class="in" id="np_model">${opt([...NAI_MODELS,...(NAI_MODELS.some(m=>m[0]===c.model)?[]:[[c.model,c.model]])],c.model)}</select></div></div>
+    <div class="g2"><div><label class="f" for="np_size">크기</label><select class="in" id="np_size">${opt(sizes,sz)}</select></div>
+    ${k==='char'||ILK(k)?`<div><label class="f" for="np_frame">구도</label><select class="in" id="np_frame">${opt(NAI_FRAMES,frame)}</select></div>`:'<div></div>'}</div>
+    ${k==='char'||ILK(k)?`<div class="g2"><div><label class="f" for="np_posesel">자세</label><select class="in" id="np_posesel">${c.poses.map(x=>`<option value="${esc(x.t)}" ${x.t===pose?'selected':''}>${esc(x.n)}</option>`).join('')}<option value="__custom" ${c.poses.some(x=>x.t===pose)?'':'selected'}>직접 입력</option></select></div><div><label class="f" for="np_pose">자세 태그</label><input class="in" id="np_pose" value="${esc(pose)}"></div></div>`:''}
+    ${imgProvider()==='comfy'?'<p class="muted" style="margin:8px 0 0">ComfyUI로 그려요. 모델·샘플러는 워크플로를 따르고, 레퍼런스와 img2img는 NovelAI 전용이라 쓰지 않아요.</p>':''}
+    <label class="f" for="np_in">${k==='cg'?'장면 프롬프트 (전체)':'최종 프롬프트'} (직접 고쳐도 돼요)</label><textarea class="in" id="np_in" style="min-height:120px">${esc(p.input)}</textarea>
+    ${k==='cg'&&p.chars.length?`<h3 class="sec">캐릭터별 프롬프트</h3>${p.chars.map((x,i)=>`<div class="cgrow"><div class="g2"><div><label class="f">${esc(x.name)}</label><select class="in" id="np_cp${i}">${opt(CG_POS_LABEL,x.pos)}</select></div><div></div></div><textarea class="in" id="np_cc${i}" data-cid="${x.id}">${esc(x.prompt)}</textarea></div>`).join('')}<p class="muted" style="margin:4px 0 0">위치는 2명 이상일 때 적용돼요. 하나라도 자동이 아니면 좌표를 써요.</p>`:''}
+    <label class="f" for="np_neg">네거티브</label><textarea class="in" id="np_neg">${esc(p.neg)}</textarea>
+    ${canRef?`<div class="optbox"><label class="f"><input type="checkbox" id="np_ref" ${k!=='char'&&autoRefOn(k)?'checked':''}> ${k==='cg'?'등장 '+T('crew')+' 스탠딩을 캐릭터 레퍼런스로':'지금 스탠딩을 캐릭터 레퍼런스로 (얼굴과 머리 유지)'}</label>
+      <div class="g4"><div><label class="f" for="np_rtype">종류</label><select class="in" id="np_rtype">${opt([['character','캐릭터'],['character&style','캐릭터+화풍'],['style','화풍만']],c.ref.type)}</select></div><div><label class="f" for="np_rstr">강도</label><select class="in" id="np_rstr">${opt([[1,'1.0'],[0.8,'0.8'],[0.6,'0.6'],[0.4,'0.4']],c.ref.strength)}</select></div><div><label class="f" for="np_rfid">충실도</label><select class="in" id="np_rfid">${opt([[1,'1.0'],[0.8,'0.8'],[0.6,'0.6'],[0.4,'0.4']],c.ref.fidelity)}</select></div><div></div></div>
+      <p class="muted" style="margin:4px 0 0">캐릭터 레퍼런스는 V4.5에서만 돼서 이번 생성은 ${esc(isV45(c.refModel)?c.refModel:'nai-diffusion-4-5-full')}로 그려요. Anlas가 더 들 수 있어요.</p></div>`:''}
+    ${hasImg?`<div class="optbox"><label class="f"><input type="checkbox" id="np_i2i"> 지금 이미지를 바탕으로 다시 그리기 (img2img)</label>
+      <div class="g2"><div><label class="f" for="np_istr">변화량</label><select class="in" id="np_istr">${opt([[0.4,'0.4 조금'],[0.55,'0.55'],[0.7,'0.7'],[0.85,'0.85'],[1,'1.0 많이']],0.55)}</select></div><div><label class="f" for="np_inoise">노이즈</label><select class="in" id="np_inoise">${opt([[0,'0'],[0.1,'0.1'],[0.2,'0.2']],0)}</select></div></div></div>`:''}
+    <div class="g2"><div><label class="f" for="np_seed">시드 (비우면 랜덤)</label><input class="in" id="np_seed" type="number" value="${esc(NLASTSEED[id]||'')}" placeholder="랜덤"></div><div></div></div>
+    ${k==='char'||k==='cg'||ILK(k)?`<label class="f"><input type="checkbox" id="np_keep" checked> 다음에 이 이미지를 그릴 때도 화풍${k==='cg'?'·위치':'·자세·구도'} 유지</label>`:''}
+    <p class="muted" style="margin:6px 0 0">가중치는 <code>1.3::태그::</code>(강하게), <code>0.7::태그::</code>(약하게), 작가 태그는 <code>artist:이름</code>으로 써요.</p>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="naigo">그리기</button></div>`);
+}
+let NPREP=null;
+function reNaiPrep(){
+  if(!NPREP) return; const o=naiTarget(NPREP.kind,NPREP.id); if(!o) return;
+  const st=$('#np_style').value;
+  if(NPREP.k==='cg'){ const p=composeCG(o,{styleId:st}); $('#np_in').value=p.input; $('#np_neg').value=p.neg; return; }
+  const p=composeNai(NPREP.k,NPREP.base,{pose:$('#np_pose')?$('#np_pose').value:'',styleId:st,frame:$('#np_frame')?$('#np_frame').value:''}); $('#np_in').value=p.input; $('#np_neg').value=p.neg;
+}
+async function openNaiGen(kind,id,custom){
+  const o=naiTarget(kind,id); if(!o) return;
+  const c=naiCfg(), k=kind==='char'?'char':kind==='weapon'?'prop':o.kind, job={kind,id,custom,originalSrc:imgSrcRaw(o)||''}; NAIJOB=job;
+  openModal(`${head('그리는 중',`<span class="muted">${esc(o.name)}</span>`)}<div class="naiprev ${k}"><div class="spin"></div></div><p class="muted" id="nai_stat" style="text-align:center">보통 10~30초 걸려요. 창을 닫으면 결과를 버려요.</p>`);
+  try{
+    const op={originalSrc:job.originalSrc,promptParts:custom.promptParts,candidateEligible:custom.candidateEligible===true||imageCandidateEligible(kind==='lib'?o.kind:kind,o,charById(id)),neg:custom.neg,seed:custom.seed,model:custom.model,size:custom.size,chars:custom.chars,onRetry:(a,n,why)=>{const el=$('#nai_stat');if(el&&NAIJOB===job)el.textContent=`${why} · 다시 시도 ${a}/${n-1}…`;}};
+    if(custom.ref){
+      const rf={type:custom.ref.type,strength:custom.ref.strength,fidelity:custom.ref.fidelity};
+      if(k==='char'&&imgSrc(o)) op.refs=[Object.assign({image:await refImage(imgSrc(o))},rf)];
+      if(ILK(k)){ const ow=charById(id); if(ow&&imgSrc(ow)) op.refs=[Object.assign({image:await refImage(imgSrc(ow))},rf)]; }
+      if(k==='cg'){ op.refs=[]; for(const x of cgCast(o)) if(imgSrc(x.c)) op.refs.push(Object.assign({image:await refImage(imgSrc(x.c))},rf)); }
+    }
+    if(custom.i2i&&imgSrc(o)){ const [w,h]=custom.size||naiSize(k,c); op.img2img={image:await imgB64(imgSrc(o),w,h,'#ffffff'),strength:custom.i2i.strength,noise:custom.i2i.noise}; op.noCut=false; }
+    const scenePrep=['illust','lbcg'].includes(kind)&&!custom.sceneReady?illustrationScenePreparation(charById(id),kind,custom):null;
+    if(scenePrep)op.prepareCandidates=scenePrep;
+    const blob=await naiGenerate(custom.input,k,op);
+    scenePrep?.check();
+    if(blob.__candidateConfig){custom.promptParts=blob.__candidateConfig.promptParts;custom.input=blob.__candidateConfig.prompt;custom.neg=blob.__candidateConfig.neg??custom.neg;custom.sceneTags=blob.__candidateConfig.sceneTags;custom.sceneReady=!!blob.__candidateConfig.sceneReady;}
+    if(NAIJOB!==job) return;
+    job.blob=blob; job.seed=op.usedSeed; NLASTSEED[id]=''; if(blob.__candidateRegistered){await registerNaiJob();return;} const url=URL.createObjectURL(blob);
+    openModal(`${head('생성 결과',`<span class="muted">${esc(o.name)} · ${esc(op.usedModel)} · 시드 ${op.usedSeed}${op.usedTp?' · 투명 배경':''}</span>`)}<div class="naiprev ${k} done"><img src="${url}" alt="${esc(o.name)}" data-original-src="${esc(job.originalSrc)}"></div>
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="naiuse">이걸로 등록</button><button class="btn ghost" data-act="naiagain">다시 뽑기</button><button class="btn ghost" data-act="naiedit">설정 고치기</button></div>`);
+    NAIJOB=job;
+  }catch(e){ if(NAIJOB!==job) return; if(e?.code==='image_cancelled'){window.navBack();return;} NAIJOB=null; closeModal(); toast(naiErr(e)); }
+}
+async function registerNaiJob(){ const j=NAIJOB; if(!j||!j.blob) return; NAIJOB=null; const o=naiTarget(j.kind,j.id); if(!o) return;
+      if(j.kind==='weapon'){ await storeImage(o,j.blob,''); mark('c:'+j.id); render(); openChar(j.id); toast(T('weapon')+' 이미지를 등록했어요'); return; }
+      if(ILK(j.kind)){ await storeImage(o,j.blob,''); if(j.custom.sceneTags)o.prompt=j.custom.sceneTags; mark('c:'+j.id); render(); openChar(j.id); toast(j.kind==='lbcg'?T('limit')+' CG를 등록했어요':'일러스트를 등록했어요'); return; }
+      await storeImage(o,j.blob,j.kind==='char'?'c:':'l:'); render(); if(j.kind==='char') openChar(o.id); else openLibItem(o.id); toast(`${o.name} 이미지를 등록했어요`);
+      if(j.kind==='char'&&o.upper&&!imgSrc(o.upper)&&o.naiPrompt&&imgReady()){ artRun(new Set([artKey({k:'upper',o:o.upper,c:o})])); setTimeout(()=>toast(`${o.name} 상반신도 이어서 그려요`),1200); } return;
+}
+let NAIBATCH=null;
+async function naiBatch(kind){
+  const items=G.lib.filter(l=>l.kind===kind&&!l.img&&((l.prompt||'').trim()||(kind==='cg'&&cgCast(l).length)));
+  if(!items.length){toast('그릴 미등록 항목이 없어요');return;}
+  if(!imgReady()){toast(imgNeed());return;}
+  if(NAIBATCH){toast('이미 일괄 생성 중이에요');return;}
+  const job={stop:false}; NAIBATCH=job; let done=0;
+  openModal(`${head('일괄 생성')}<p id="nbStat">0 / ${items.length}</p><p class="muted">한 장씩 그려서 자동으로 등록해요. 창을 닫아도 계속 진행돼요.</p><div class="row"><button class="btn ghost" data-act="naistop">중지</button></div>`);
+  for(const l of items){
+    if(job.stop) break; const el=$('#nbStat'); if(el) el.textContent=`${done} / ${items.length} · ${l.name} 그리는 중`;
+    try{ const b=await naiDrawItem({k:kind,o:l}); await storeImage(l,b,'l:'); done++; await wait(600); }catch(e){ toast(naiErr(e)); break; }
+  }
+  NAIBATCH=null; render(); if($('#nbStat')) openLib(kind); toast(`${done}개를 그려서 등록했어요`);
+}
+/* src/main/0260-new-game/010-draft.js에서 옮김 */
+let FACESEL=new Set();
+// 얼굴 범위 칠하기: 그림 위에 칠한 곳만 다시 그려요(인페인팅). 흰색=다시 그릴 곳
+function fitDims(iw,ih){ const A=832*1216, r=iw/ih; let w=Math.sqrt(A*r), h=w/r; w=Math.max(512,Math.round(w/64)*64); h=Math.max(512,Math.round(h/64)*64); return [w,h]; }
+async function openMaskPainter(src,prev,cb,po){ po=po||{}; const im=await loadImg(src), [W,H]=fitDims(im.naturalWidth||im.width,im.naturalHeight||im.height);
+  const mk=document.createElement('canvas'); mk.width=W; mk.height=H; const mx=mk.getContext('2d'); mx.fillStyle='#000'; mx.fillRect(0,0,W,H);
+  if(prev){ try{ const pm=await loadImg(prev); mx.drawImage(pm,0,0,W,H); }catch(e){ quietErr(e,'0030-image/010-engine.js:774'); } }
+  const d=document.createElement('div'); d.className='mpaint';
+  d.innerHTML=`<div class="mp-bar"><b>${esc(po.title||'얼굴 범위 칠하기')}</b><button type="button" data-m="brush" class="on">✎ 칠하기</button><button type="button" data-m="erase">⌫ 지우개</button><label>크기 <input type="range" min="8" max="120" value="40"></label><button type="button" data-m="auto">얼굴 자동</button><button type="button" data-m="clear">비우기</button><span class="mp-sp"></span><button type="button" data-m="cancel">취소</button><button type="button" data-m="save" class="ok">저장</button></div>
+    <div class="mp-stage"><canvas></canvas></div><p class="mp-tip">바꾸고 싶은 얼굴 부분(눈·눈썹·입)을 빨갛게 칠해 주세요. 머리카락·옷은 칠하지 않는 게 좋아요. 한 번 저장하면 모든 표정에 같이 써요.</p>`;
+  document.body.appendChild(d);
+  const cv=d.querySelector('canvas'), x=cv.getContext('2d'), stage=d.querySelector('.mp-stage');
+  const fit=()=>{ const sw=stage.clientWidth-16, sh=stage.clientHeight-16, s=Math.min(sw/W,sh/H); cv.width=Math.round(W*s); cv.height=Math.round(H*s); draw(); };
+  const tint=document.createElement('canvas'); tint.width=W; tint.height=H; const tx=tint.getContext('2d');
+  const draw=()=>{ x.clearRect(0,0,cv.width,cv.height); x.fillStyle='#ddd'; x.fillRect(0,0,cv.width,cv.height); x.drawImage(im,0,0,cv.width,cv.height);
+    tx.clearRect(0,0,W,H); tx.drawImage(mk,0,0); tx.globalCompositeOperation='source-in'; tx.fillStyle='rgba(255,40,80,1)'; tx.fillRect(0,0,W,H); tx.globalCompositeOperation='source-over';
+    const id=mx.getImageData(0,0,W,H).data, t=tx.getImageData(0,0,W,H); for(let i=0;i<id.length;i+=4){ t.data[i+3]=id[i]>127?140:0; } tx.putImageData(t,0,0); x.drawImage(tint,0,0,cv.width,cv.height); };
+  let mode='brush', size=40, down=false, last=null;
+  const pt=e=>{ const r=cv.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]; };
+  const stroke=(a,b)=>{ mx.strokeStyle=mode==='erase'?'#000':'#fff'; mx.lineWidth=size*W/cv.width; mx.lineCap='round'; mx.beginPath(); mx.moveTo(a[0],a[1]); mx.lineTo(b[0],b[1]); mx.stroke(); };
+  cv.addEventListener('pointerdown',e=>{ down=true; cv.setPointerCapture(e.pointerId); last=pt(e); stroke(last,last); draw(); });
+  cv.addEventListener('pointermove',e=>{ if(!down) return; const p=pt(e); stroke(last,p); last=p; draw(); });
+  cv.addEventListener('pointerup',()=>{ down=false; }); cv.addEventListener('pointercancel',()=>{ down=false; });
+  d.querySelector('input[type=range]').addEventListener('input',e=>{ size=+e.target.value; });
+  d.querySelector('.mp-bar').addEventListener('click',e=>{ const el=e.target.closest('button'); if(!el) return; const m=el.dataset.m;
+    if(m==='brush'||m==='erase'){ mode=m; d.querySelectorAll('[data-m=brush],[data-m=erase]').forEach(q=>q.classList.toggle('on',q===el)); }
+    else if(m==='clear'){ mx.fillStyle='#000'; mx.fillRect(0,0,W,H); draw(); }
+    else if(m==='auto'){ const tall=H/W>1.25; mx.fillStyle='#fff'; mx.beginPath(); mx.ellipse(W*0.5,H*(tall?0.12:0.24),W*(tall?0.1:0.16),H*(tall?0.055:0.11),0,0,Math.PI*2); mx.fill(); draw(); toast('얼굴 위치를 대충 칠했어요. 맞지 않으면 고쳐 주세요'); }
+    else if(m==='cancel'){ d.remove(); if(po.onCancel) po.onCancel(); }
+    else if(m==='save'){ const id=mx.getImageData(0,0,W,H).data; let n=0; for(let i=0;i<id.length;i+=4) if(id[i]>127) n++; if(!n){ toast('얼굴 부분을 먼저 칠해 주세요'); return; } d.remove(); cb(mk.toDataURL('image/png')); } });
+  addEventListener('resize',fit,{once:false}); setTimeout(fit,30); }
+// 얼굴 집중 인페인팅: 칠한 곳 주변만 잘라 크게 키워 다시 그리고, 줄여서 원본에 부드럽게 섞어요(원본의 투명 배경·흰 옷은 그대로)
+async function focusedInpaint(src,maskUrl,draw){ const o=await loadImg(src), W=o.naturalWidth||o.width, H=o.naturalHeight||o.height, cv=(w,h)=>{ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; };
+  const M=cv(W,H), mx=M.getContext('2d'); mx.fillStyle='#000'; mx.fillRect(0,0,W,H); mx.drawImage(await loadImg(maskUrl),0,0,W,H);
+  const md=mx.getImageData(0,0,W,H).data; let bx0=W,by0=H,bx1=0,by1=0; for(let y=0;y<H;y++) for(let x=0;x<W;x++) if(md[(y*W+x)*4]>127){ if(x<bx0)bx0=x; if(x>bx1)bx1=x; if(y<by0)by0=y; if(y>by1)by1=y; }
+  if(bx1<bx0) throw {code:'mask_empty',message:'얼굴 범위가 비어 있어요'};
+  const pad=Math.max(48,Math.round(0.45*Math.max(bx1-bx0,by1-by0))), x0=Math.max(0,Math.floor((bx0-pad)/8)*8), y0=Math.max(0,Math.floor((by0-pad)/8)*8), x1=Math.min(W,Math.ceil((bx1+pad)/8)*8), y1=Math.min(H,Math.ceil((by1+pad)/8)*8), cw=x1-x0, ch=y1-y0;
+  const sc=Math.min(4,Math.sqrt(1048576/(cw*ch))), tw=Math.max(256,Math.floor(cw*sc/64)*64), th=Math.max(256,Math.floor(ch*sc/64)*64);
+  const I=cv(tw,th), ix=I.getContext('2d'); ix.fillStyle='#fff'; ix.fillRect(0,0,tw,th); ix.drawImage(o,x0,y0,cw,ch,0,0,tw,th);
+  const K=cv(tw,th), kx=K.getContext('2d'); kx.imageSmoothingEnabled=false; kx.drawImage(M,x0,y0,cw,ch,0,0,tw,th);
+  const kd=kx.getImageData(0,0,tw,th), BW=Math.ceil(tw/8), on=new Uint8Array(BW*Math.ceil(th/8)); for(let y=0;y<th;y++) for(let x=0;x<tw;x++) if(kd.data[(y*tw+x)*4]>127) on[(y>>3)*BW+(x>>3)]=1;
+  for(let y=0;y<th;y++) for(let x=0;x<tw;x++){ const i=(y*tw+x)*4, v=on[(y>>3)*BW+(x>>3)]?255:0; kd.data[i]=kd.data[i+1]=kd.data[i+2]=v; kd.data[i+3]=255; } kx.putImageData(kd,0,0);
+  const res=await draw(I.toDataURL('image/png').split(',')[1],K.toDataURL('image/png').split(',')[1],tw,th), ru=URL.createObjectURL(res);
+  try{ const r=await loadImg(ru), f=cw/tw;
+    // 칠한 곳을 조금 넓히고(팽창) 가장자리를 흐려서 이음매가 안 보이게
+    const D=cv(W,H), dx=D.getContext('2d'); dx.filter=`blur(${Math.max(2,Math.round(16*f))}px)`; dx.drawImage(M,0,0); dx.filter='none'; const dd=dx.getImageData(0,0,W,H); for(let i=0;i<dd.data.length;i+=4){ const v=dd.data[i]>8?255:0; dd.data[i]=dd.data[i+1]=dd.data[i+2]=v; dd.data[i+3]=255; } dx.putImageData(dd,0,0);
+    const Fm=cv(W,H), fx=Fm.getContext('2d'); fx.fillStyle='#000'; fx.fillRect(0,0,W,H); fx.save(); fx.beginPath(); fx.rect(x0,y0,cw,ch); fx.clip(); fx.filter=`blur(${Math.max(2,Math.round(10*f))}px)`; fx.drawImage(D,0,0); fx.restore();
+    const A=cv(W,H), ax=A.getContext('2d'); ax.drawImage(o,0,0,W,H); const B=cv(W,H), bx=B.getContext('2d'); bx.drawImage(r,0,0,tw,th,x0,y0,cw,ch);
+    const ad=ax.getImageData(0,0,W,H), bd=bx.getImageData(0,0,W,H).data, fd=fx.getImageData(0,0,W,H).data;
+    for(let i=0;i<ad.data.length;i+=4){ const k=fd[i]/255; if(k<=0.002) continue; ad.data[i]=ad.data[i]*(1-k)+bd[i]*k; ad.data[i+1]=ad.data[i+1]*(1-k)+bd[i+1]*k; ad.data[i+2]=ad.data[i+2]*(1-k)+bd[i+2]*k; }
+    ax.putImageData(ad,0,0); return await new Promise(res2=>A.toBlob(res2,'image/png')); }
+  finally{ URL.revokeObjectURL(ru); } }
+// 인페인팅 결과에서 칠한 얼굴 부분만 원본에 부드럽게 붙여요(원본의 투명 배경·흰 옷은 그대로)
+/* 표정 한 장 그리기 (b: 'full'|'up') — 표정 창과 새 게임 자동 표정이 같이 써요 */
+async function faceDrawOne(c,F,f,ko,b,O,x,generationMode='automatic'){const game=G,project=PJ().active;x=x||''; const en=(FACE_PRESETS.find(p=>p[0]===ko)||[])[1]||'happy', ft=FACE_TAGS[en]||en, ew=[1.7,1.5,1.35,1.2][O.lv]||1.5, i2s=[0.72,0.64,0.56,0.48][O.lv]||0.6, emph=faceDrawOneEmphText({ew,ft});
+  const basePr=F===c?c.naiPrompt:(F.prompt||c.naiPrompt), upO=faceUpperObj(c,F), srcO=b==='up'?upO:F, src=imgSrcRaw(srcO), frame=b==='up'?'cowboy shot':c.naiFrame, candidateEligible=imageCandidateEligible('face',b==='up'?f.up:f,c,generationMode),originalSrc=imgSrcRaw(b==='up'?f.up:f)||''; let blob;
+  const refs=O.ref?[{image:await refImage(imgSrcRaw(F)||upO&&imgSrcRaw(upO)),type:'character',strength:1,fidelity:1}]:undefined;
+  if(O.m==='inpaint') blob=await focusedInpaint(src,F.faceMask[b],(img,msk,tw,th,candidate)=>{ const pz=faceDrawOnePzText({candidate,basePr,emph,x,c}); return naiGenerate(pz.input,'char',{candidateBypass:true,seed:candidate.seed,neg:joinTags(pz.neg,'blurry, deformed face'),model:O.model,refs,size:[tw,th],noCut:true,noTp:true,inpaint:{image:img,mask:msk,strength:1,addOrig:false}}); },{candidateEligible,originalSrc,prompt:joinTags(basePr,emph,x)});
+  else if(O.m==='raw') blob=await naiDraw('char',joinTags(basePr,emph,x),{candidateEligible,originalSrc,frame,pose:c.naiPose||undefined,styleId:c.naiStyle,model:O.model,seed:srcO.seed!=null?srcO.seed:undefined});
+  else if(O.m==='emo') blob=await naiEmotion(src,en,x,O.lv,candidateEligible,originalSrc);
+  else { const im=await loadImg(src), [w,h]=fitDims(im.naturalWidth||im.width,im.naturalHeight||im.height); blob=await naiDraw('char',joinTags(basePr,emph,x),{candidateEligible,originalSrc,frame,pose:c.naiPose||undefined,styleId:c.naiStyle,model:O.model,refs,size:[w,h],seed:srcO.seed!=null?srcO.seed:undefined,img2img:{image:await imgB64(src,w,h,'#ffffff'),strength:i2s,noise:0.05}}); }
+  if(G!==game||PJ().active!==project)throw Error('게임이 바뀌어 표정 생성을 중단했습니다');
+  if(b==='up'){ f.up=f.up||{id:'fu'+f.id,name:ko+' 상반신',img:null}; await storeImage(f.up,blob,''); } else await storeImage(f,blob,'');
+  mark('c:'+c.id); }
+function faceUpperObj(c,F){ return F===c?(c.upper&&imgSrc(c.upper)?c.upper:null):(F.upper&&imgSrc(F.upper)?F.upper:null); }
+function openFaces(id,sid){
+  const c=charById(id); if(!c) return; if($('#ov').hidden) MBACK=()=>openChar(id); if(sid!==undefined) FACET={cid:id,sid:sid||''}; else if(FACET.cid!==id) FACET={cid:id,sid:''};
+  const F=faceTgt(c), names=[...new Set([...FACE_BASIC,...F.faces.map(f=>f.name)])], up=faceUpperObj(c,F), mk=F.faceMask||{}, cm=naiCfg().model||NAI_DEF.model;
+  FACEOPT=FACEOPT||{m:'inpaint',body:'both',model:/^nai-diffusion-5/.test(cm)?cm:'nai-diffusion-5-full',ref:false,lv:1};
+  const thumb=(o,l)=>`<span>${o&&imgSrcRaw(o)?`<img src="${esc(imgSrcRaw(o))}" alt="">`:'<i class="fc-empty">없음</i>'}${l}</span>`;
+  openModal(`${head(`${esc(c.name)} 표정`,`<span class="muted">${F===c?'기본 모습':esc(T('skin'))+' 「'+esc(F.name)+'」'}</span>`)}
+    ${(c.skins||[]).length?`<div class="chips" style="margin:0 0 8px"><button class="chip ${F===c?'on':''}" data-act="facetgt" data-id="${esc(id)}" data-s="">기본</button>${c.skins.map(k=>`<button class="chip ${F===k?'on':''}" data-act="facetgt" data-id="${esc(id)}" data-s="${k.id}">${esc(T('skin'))}: ${esc(k.name)}</button>`).join('')}</div>`:''}
+    <div class="fc-grid">${names.map(nm=>{ const f=F.faces.find(x=>x.name===nm); return `<div class="fc-it"><div class="fc-two">${thumb(f,'전신')}${thumb(f&&f.up,'상반신')}</div><b>${esc(nm)}</b><div class="row"><button class="btn sm ghost" data-act="faceup" data-id="${esc(id)}" data-v="${esc(nm)}">전신 ${f&&imgSrc(f)?'바꾸기':'넣기'}</button><button class="btn sm ghost" data-act="faceup" data-id="${esc(id)}" data-v="${esc(nm)}" data-b="up">상반신 ${f&&f.up&&imgSrc(f.up)?'바꾸기':'넣기'}</button>${f?`<button class="btn sm ghost" data-act="facedel" data-id="${esc(id)}" data-v="${esc(nm)}">✕</button>`:''}</div></div>`; }).join('')}</div>
+    <div class="row" style="margin-top:8px"><input class="in" id="fc_new" placeholder="새 표정 이름 (예: 삐짐)" style="flex:1"><button class="btn sm" data-act="faceupnew" data-id="${esc(id)}">이 이름으로 넣기</button><button class="btn sm ghost" data-act="faceupmany" data-id="${esc(id)}">여러 장 넣기</button></div>
+    <h4 class="sec">NovelAI로 만들기</h4>
+    ${imgSrcRaw(F)?'':`<p class="muted">먼저 ${F===c?'기본':'이 '+esc(T('skin'))+'의'} 스탠딩이 있어야 해요.</p>`}
+    <div class="row" style="margin:0 0 6px"><button class="btn sm ghost" data-act="facebasic">기본 6종 고르기 (${FACE_BASIC.join('·')})</button></div>
+    <div class="chips">${FACE_PRESETS.map(([ko])=>`<button class="chip ${FACESEL.has(ko)?'on':''}" data-act="facesel" data-v="${ko}" data-id="${id}">${ko}${F.faces.some(f=>f.name===ko&&imgSrc(f))?' ✓':''}</button>`).join('')}</div>
+    <div class="g2"><div><label class="f" for="fc_m">만드는 방법</label><select class="in" id="fc_m">${opt([['inpaint','얼굴만 다시 그리기 (인페인팅 · 추천)'],['raw','감정을 넣어 새로 그리기 (V5 전용, 같은 시드)'],['i2i','스탠딩을 바탕으로 다시 그리기 (img2img)'],['emo','NAI 표정 변환 (변화가 약할 수 있음)']],FACEOPT.m)}</select></div>
+      <div><label class="f" for="fc_body">그릴 그림</label><select class="in" id="fc_body">${opt([['both','전신 + 상반신'],['full','전신만'],['up','상반신만']],FACEOPT.body)}</select></div></div>
+    <div class="g2"><div><label class="f" for="fc_model">그림 모델</label><select class="in" id="fc_model">${opt(NAI_MODELS.filter(m=>/^nai-diffusion-(5|4-5)/.test(m[0])),FACEOPT.model)}</select></div>
+      <div><label class="f" for="fc_lv">변화 강도</label><select class="in" id="fc_lv">${opt([[0,'강하게'],[1,'조금 강하게'],[2,'보통'],[3,'약하게']],FACEOPT.lv)}</select></div></div>
+    <label class="f" style="margin-top:6px"><input type="checkbox" id="fc_ref" ${FACEOPT.ref?'checked':''}> 캐릭터 레퍼런스도 함께 (얼굴을 더 똑같이 · V4.5로 그려져요)</label>
+    <div class="optbox" style="margin-top:6px"><b style="font-size:.85rem">얼굴 범위 (인페인팅용)</b> <span class="muted" style="font-size:.76rem">한 번 칠해 두면 모든 표정에 같이 써요</span>
+      <div class="row" style="margin-top:6px"><button class="btn sm ${mk.full?'':'ghost'}" data-act="facemask" data-id="${esc(id)}" data-b="full" ${imgSrcRaw(F)?'':'disabled'}>${mk.full?'✓ ':''}전신에 칠하기</button><button class="btn sm ${mk.up?'':'ghost'}" data-act="facemask" data-id="${esc(id)}" data-b="up" ${up?'':'disabled'}>${mk.up?'✓ ':''}상반신에 칠하기</button>${up?'':'<span class="muted" style="font-size:.74rem">상반신 그림이 없어요</span>'}</div></div>
+    <label class="f" for="fc_x">추가 프롬프트 (선택)</label><input class="in" id="fc_x" placeholder="예: blush, teary eyes">
+    <p class="muted" id="fc_stat"></p>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="facego" data-id="${id}">선택한 표정 만들기</button></div>`);
+}
+let FACEOPT=null;
+function faceOptRead(){ if(!$('#fc_m')) return; FACEOPT={m:$('#fc_m').value,body:$('#fc_body').value,model:$('#fc_model').value,ref:$('#fc_ref').checked,lv:+$('#fc_lv').value}; }
+function openSkin(id){
+  const c=charById(id); MBACK=()=>openChar(id);
+  openModal(`${head(`${esc(c.name)} ${T('skin')} 만들기`)}
+    <p class="muted">기본은 설정의 모델(V5 Full 권장)로 투명 배경 스탠딩을 그려요. 얼굴을 원본과 더 똑같이 맞추고 싶으면 아래에서 캐릭터 레퍼런스를 켜세요(V4.5로 그려지고 흰 배경을 지워요).</p>
+    <label class="f" for="sk_name">${T('skin')} 이름</label><input class="in" id="sk_name" placeholder="예: 축제 유카타">
+    <label class="f" for="sk_idea">의상 아이디어</label><input class="in" id="sk_idea" placeholder="예: 남색 유카타, 머리에 꽃장식, 손에 종이 등불">
+    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aiskin" data-id="${id}">AI로 프롬프트 쓰기</button></div>
+    <label class="f" for="sk_prompt">NAI 프롬프트</label><textarea class="in" id="sk_prompt" placeholder="1girl, solo, ..." data-nai-blocks="${esc(JSON.stringify({...naiBlocksOf(c),outfit:'',combined:naiBlocksJoin({...naiBlocksOf(c),outfit:''})}))}">${esc(naiBlocksJoin({...naiBlocksOf(c),outfit:''}))}</textarea>
+    <label class="f" for="sk_pose">자세</label><select class="in" id="sk_pose">${naiCfg().poses.map(p=>`<option value="${esc(p.t)}" ${p.t===(c.naiPose||NAI_FRONT)?'selected':''}>${esc(p.n)}</option>`).join('')}</select>
+    <div class="optbox"><label class="f"><input type="checkbox" id="sk_ref" ${imgSrc(c)?'':'disabled'}> 지금 스탠딩을 캐릭터 레퍼런스로 (선택)</label>
+    <div class="g2"><div><label class="f" for="sk_fid">충실도</label><select class="in" id="sk_fid">${opt([[1,'1.0 (원본에 가깝게)'],[0.8,'0.8'],[0.6,'0.6']],1)}</select></div><div></div></div>
+    <div class="g2"><div><label class="f" for="sk_str">레퍼런스 강도</label><select class="in" id="sk_str">${opt([[1,'강하게 (얼굴 유지)'],[0.8,'보통'],[0.6,'약하게']],1)}</select></div><div><label class="f" for="sk_style">그림체도 따라가기</label><select class="in" id="sk_style">${opt([['1','예'],['0','아니요']],'1')}</select></div></div></div>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="skingo" data-id="${id}">그리기</button></div>
+    ${(c.skins||[]).length?`<h3 class="sec">만든 ${T('skin')}</h3><p class="muted" style="margin:0 0 6px;font-size:.8rem">${T('skin')}마다 스탠딩·상반신·일러스트·돌파 CG를 따로 둘 수 있어요. ${T('skin')}을 입히면 있는 그림은 ${T('skin')} 것을, 로비 일러스트·돌파 CG가 없으면 스킨의 상반신이나 스탠딩을 써요. 스탠딩 사용이 꺼져 있으면 이 스킨의 상반신이 필요해요.</p>${c.skins.map(k=>skinCard(c,k)).join('')}`:''}`);
+}
+function skinRefresh(id){ if($('#modal .sheet.cs-sheet')) openChar(id); else if($('#sk_name')) openSkin(id); else render(); }
+function skinCard(c,k){
+  const slot=(x,l,o)=>`<div class="sk-slot ${x==='illust'||x==='lbcg'?'wide':''}">${o&&imgSrcRaw(o)?`<img src="${esc(imgSrcRaw(o))}" alt="">`:'<span>없음</span>'}<b>${l}</b><div class="sk-acts"><button class="btn sm" data-act="skpartgen" data-id="${c.id}" data-s="${k.id}" data-x="${x}">그리기</button><button class="btn sm ghost" data-act="skpartup" data-id="${c.id}" data-s="${k.id}" data-x="${x}">올리기</button>${o&&o.img?XBTN('skinpart',c.id,` data-s="${k.id}" data-x="${x}"`,'✕'):''}</div></div>`;
+  return `<div class="sk-card"><div class="sk-h"><b>${esc(k.name)}</b><span><button class="btn sm" data-act="skpartall" data-id="${c.id}" data-s="${k.id}">빈 칸 모두 그리기</button> <button class="btn sm ghost" data-act="skindel" data-id="${c.id}" data-s="${k.id}">삭제</button></span></div>
+    <details><summary>의상 프롬프트 편집</summary><textarea class="in" id="skin_prompt_${k.id}" data-skin-prompt="${k.id}" data-owner="${c.id}">${esc(k.prompt||'')}</textarea><button class="btn sm" data-act="skinpromptsave" data-id="${c.id}" data-s="${k.id}">프롬프트 저장</button><p class="muted">저장한 내용은 이후 새로 그리는 그림에 적용돼요. 기존 그림은 유지돼요.</p></details><div class="sk-grid">${slot('stand','스탠딩',k)}${slot('upper','상반신',k.upper)}${slot('illust','일러스트',k.illust)}${slot('lbcg',T('limit')+' CG',k.lbcg)}</div>
+    <label class="f" for="skscene_${k.id}">일러스트·${T('limit')} CG 장면 태그 (선택)</label><input class="in" id="skscene_${k.id}" value="${esc(k.scene||'')}" placeholder="예: beach, sunset, waves, smile">
+    <div class="sk-extra"><b>표정</b> ${(k.faces||[]).filter(f=>imgSrc(f)).map(f=>`<span class="sk-face"><img src="${esc(imgSrc(f))}" alt=""><i>${esc(f.name)}</i></span>`).join('')||'<span class="muted">없음 · 없으면 이 '+esc(T('skin'))+' 스탠딩을 써요</span>'}<button class="btn sm ghost" data-act="faces-open" data-id="${c.id}" data-s="${k.id}">표정 만들기</button></div>
+    <div class="sk-extra"><b>대사</b> <span class="muted">${(k.lines||[]).length?esc((k.lines||[]).slice(0,2).join(' / '))+((k.lines||[]).length>2?' …':''):'없음 · 없으면 기본 대사를 써요'}</span><button class="btn sm ghost" data-act="skinlines" data-id="${c.id}" data-s="${k.id}">${(k.lines||[]).length?'대사 다시 쓰기':'AI로 대사 쓰기'}</button></div>
+    <div class="sk-extra"><b>목소리</b> <span class="muted">${k.voiceId?esc(k.voiceName||'지정됨'):'기본 목소리'}</span><button class="btn sm ghost" data-act="voice" data-id="${c.id}" data-s="${k.id}">${k.voiceId?'바꾸기':'이 '+esc(T('skin'))+' 목소리 고르기'}</button>${k.voiceId?`<button class="btn sm ghost" data-act="skvclear" data-id="${c.id}" data-s="${k.id}">기본으로</button>`:''}</div></div>`; }
+function skinPartDraw(c,k,x,generationMode='automatic'){ const inp=$('#skscene_'+k.id); if(inp){k.scene=inp.value.trim();naiBlocksSave(k,'scene',inp);} const scene=k.scene||'',candidateEligible=imageCandidateEligible('char',x==='stand'?k:skinPart(k,x),c,generationMode),originalSrc=imgSrcRaw(x==='stand'?k:skinPart(k,x))||'';
+  if(x==='stand') return naiDraw('char',k.prompt,{candidateEligible,originalSrc,styleId:c.naiStyle,frame:c.naiFrame});
+  if(x==='upper') return naiDraw('char',k.prompt,{candidateEligible,originalSrc,frame:'cowboy shot',pose:'looking at viewer, smile',styleId:c.naiStyle});
+  return naiDraw(x,joinTags(k.prompt,scene||(x==='lbcg'?(c.lbcg&&c.lbcg.prompt)||'dramatic lighting, sparkles, smile, wind':(c.illust&&c.illust.prompt)||'')),{candidateEligible,originalSrc,styleId:c.naiStyle}); }
+async function skinPartGen(c,k,xs,btn,generationMode='manual'){ if(!imgReady()){ toast(imgNeed()); return; } if(!k.prompt){ toast('이 '+T('skin')+'은 프롬프트가 없어서 그릴 수 없어요. 올리기를 써 주세요'); return; }
+  const game=G,project=PJ().active,label=btn?.textContent;if(btn){btn.disabled=true;btn.textContent='그리는 중…';}let n=0;
+  for(const x of xs){ try{ const b=await skinPartDraw(c,k,x,generationMode);if(G!==game||PJ().active!==project||charById(c.id)!==c||!c.skins.includes(k))throw Error('대상이 바뀌어 스킨 생성을 중단했습니다');await storeImage(x==='stand'?k:skinPart(k,x),b,''); n++; mark('c:'+c.id); }catch(e){ toast(naiErr(e)); break; } }
+  if(btn?.isConnected){btn.disabled=false;btn.textContent=label;}if(n)toast(`${k.name}: ${n}장 완성`);skinRefresh(c.id);render(); }

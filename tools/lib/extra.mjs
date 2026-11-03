@@ -163,3 +163,8 @@ export function tdzRefs(units) { const order = [...units.filter(u => u.name.star
     const visit = n => { if (FN.test(n.type)) return; if (n.type === 'identifier' && !(n.parent?.type === 'variable_declarator' && n.parent.childForFieldName('name')?.id === n.id)) { const d = decl.get(n.text); if (d && (d.ui > ui || (d.ui === ui && d.at > n.startIndex))) out.push({ loc: u.loc(n), name: n.text, decl: d.loc }); } for (let j = 0; j < n.childCount; j++) visit(n.child(j)); };
     visit(c); } });
   return out; }
+// 선언 바로 위의 설명 주석(// 줄·한 줄 /* */·여러 줄 /* */)까지 같이 — 파일 머리말(/* =====)과 옮김 표식(…에서 옮김 */)은 남김
+export function leadComments(src, at) { let a = at; for (;;) { const before = src.slice(0, a); if (!before.endsWith('\n')) return a; const ls = before.lastIndexOf('\n', before.length - 2) + 1, line = before.slice(ls, -1);
+    if (/^\s*\/\//.test(line)) { a = ls; continue; }
+    if (/\*\/\s*$/.test(line)) { const st = before.lastIndexOf('/*', before.length - 1); if (st < 0 || (st > 0 && src[st - 1] !== '\n')) return a; const c = src.slice(st, before.length - 1); if (/^\/\* =====|에서 옮김 \*\/$/.test(c.trim()) || /\*\/[\s\S]*\S/.test(c.replace(/\*\/\s*$/, ''))) return a; a = st; continue; }
+    return a; } }

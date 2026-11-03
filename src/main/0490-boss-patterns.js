@@ -3,50 +3,6 @@ const BPATS={aoe:['광역 포격','7초마다 전원 공격',7],snipe:['집중 �
 function bossPats(e,raid){return GGMCombat.enemyPatterns(e);}
 function bossPatText(e,raid){ return bossPats(e,raid).map(k=>BPATS[k][0]).join(' · ')+' · 체력 40% 이하 광폭화 (15초 / 재사용 30초)'; }
 function bossNext(u){return B&&B.engine&&u.ready&&u.ready.active-B.engine.time<=1;}
-function bUpdate(){
-  if(!B||B.presentationBusy) return;
-  B.enemies.forEach((en,i)=>{const el=$('#u_e'+i);if(!el)return;el.querySelector('.hpb i').style.width=(en.hp/en.maxhp*100)+'%';el.querySelector('.gg i').style.width=Math.min(100,en.g/10)+'%';el.classList.toggle('dead',en.hp<=0);el.classList.toggle('warn',!!en.boss&&en.hp>0&&bossNext(en));el.classList.toggle('focus',en.status.some(s=>s.id==='order'));});
-  B.allies.forEach((u,i)=>{const el=$('#u_a'+i);if(!el)return;el.querySelector('.hpb i').style.width=(u.hp/u.maxhp*100)+'%';el.querySelector('.shb i').style.width=Math.min(100,u.sh/u.maxhp*100)+'%';el.classList.toggle('dead',u.hp<=0);
-    const b=el.querySelector('.skill'),wait=Math.max(0,u.ready.ultimate-B.engine.time,(u.kit.ultimate.lockout||0)-(B.engine.time-u.lastCast.ultimate)),limited=!!u.kit.ultimate.limit&&u.casts.ultimate>=u.kit.ultimate.limit,blocked=u.status.some(s=>s.type==='stun')||GGMCombat.isSilenced(u,'ultimate'),r=wait<=0&&u.sp>=GGMCombat.SP.max&&u.hp>0&&!blocked&&!limited;b.classList.toggle('ready',r);b.disabled=!r;b.querySelector('small').textContent=u.hp<=0?'전투 불능':limited?'이번 전투 사용 완료':blocked?'행동 제한':r?'궁극기 사용':u.sp<100?'SP '+Math.floor(u.sp)+'/100':`${Math.ceil(wait)}초 후`;const sp=el.querySelector('.v2-sp');if(sp){sp.setAttribute('aria-valuenow',Math.floor(u.sp));sp.querySelector('i').style.width=u.sp+'%';}el.title=u.status.map(s=>GGMCombat.EFFECTS[s.type][0]).join(', ');const at=el.querySelector('.v2-active-time');if(at)at.textContent=u.hp>0?'액티브 · '+(u.kit.active.trigger==='interval'?Math.ceil(Math.max(0,u.ready.active-B.engine.time,(u.kit.active.lockout||0)-(B.engine.time-u.lastCast.active)))+'초 후':['after_basic','on_hit','attack_hit','critical'].includes(u.kit.active.trigger)?(u.counts[u.kit.active.trigger]||0)%Math.round(u.kit.active.triggerEvery)+'/'+Math.round(u.kit.active.triggerEvery)+'회':GGMCombat.TRIGGERS[u.kit.active.trigger]):'';});
-  GGMVFX.sync();
-}
-function bCheck(){
- if(!B||B.over||B.presentationBusy||B.ending)return;
- if(B.engine?.impactJobs.length&&!B.engine.winner)return;
- const win=!alive(B.enemies).length,lose=!alive(B.allies).length;if(!win&&!lose)return;
- const battle=B,delay=Math.max(0,(battle.impactUntil||0)-Date.now());
- if(delay){battle.ending=true;battle.finishTimer=setTimeout(()=>{if(B!==battle||battle.over)return;battle.ending=false;bEnd(win);},delay);}
- else bEnd(win);
-}
-function bEnd(win){
-  if(B.ctx.kind==='practice'){v2StopPractice();return;}
-  B.over=true; clearInterval(B.timer); try{ window.GGMVFX&&GGMVFX.clear(); }catch(e){} bUpdate(); bump('battle'); // 공격 중이던 카드·이펙트가 결과 화면 위에 남지 않게
-  const so=sortieResult(win); if(so!==null){ const d=document.createElement('div');d.className='result';d.innerHTML=so;$('#ov > .bt').appendChild(d); return; } // 출격 경로(0487)
-  if(B.ctx.kind==='raid'||B.ctx.kind==='rogue'||B.ctx.kind==='tower'){ const html=B.ctx.kind==='raid'?raidEnd(win):B.ctx.kind==='tower'?towerEnd(win):rogueEnd(win); const d=document.createElement('div');d.className='result';d.innerHTML=html;$('#ov > .bt').appendChild(d); return; }
-  const s=B.s, kind=B.ctx.kind; let html;
-  if(win){
-    sfx('승리'); const p=P(); let r={}, first=false, exp=60, note='';
-    if(kind==='farm'){ const f=s.farm; r=farmReward(f.key,f.lv); p.farmClear[s.id]=true; exp=20+20*farmRec(f.lv); }
-    else if(kind==='event'){ const ev=G.events.find(e=>e.id===B.ch.eventId); first=!p.cleared[s.id]; r={token:s.reward*(first?2:1),tokenName:ev?ev.token:'토큰'}; if(first) r.gems=100; giveReward(r,ev&&ev.id); r={...r}; p.cleared[s.id]=true; if(first) recruitCheck(B.ch,s); exp=80; }
-    else { first=!p.cleared[s.id]; r=first?{gems:s.reward*2,gold:3000,exp:10}:{gold:1500,exp:3}; p.cleared[s.id]=true; if(first){ gateCheck(); recruitCheck(B.ch,s); } exp=120+Math.max(0,G.chapters.filter(ch=>ch.kind==='main').indexOf(B.ch))*40; }
-    if(kind!=='event'){ Object.assign(r,rateR(r)); giveReward(r); }
-    if(first&&kind!=='farm') newBonds(s);
-    B.allies.forEach(u=>{const o=own(u.c.id);if(o)gainExp(o,expR(exp));});
-    mark('prog');
-    const noDeath=B.allies.every(u=>u.hp>0), fast=s.goal&&GOALS[s.goal.k]?GOALS[s.goal.k].ok(B,s.goal.a):B.ticks<=420, stars=1+(noDeath?1:0)+(fast?1:0);
-    p.stars=p.stars||{}; const was=p.stars[s.id]||0; if(stars>was) p.stars[s.id]=stars; let bonus='';
-    if(stars===3&&was<3&&kind!=='farm'){ giveReward({gems:50}); bonus=` · 첫 ★3 보너스 ◆50`; }
-    const mvp=[...B.allies].sort((a,b)=>(b.dmg||0)-(a.dmg||0))[0], tot=B.allies.reduce((a,u)=>a+(u.dmg||0),0)||1, ml=mvp&&rand((mvp.c.lvLines.length?mvp.c.lvLines:[]).concat(mvp.c.lines));
-    html=`<div class="rs-stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}" style="animation-delay:${i*0.18}s">★</span>`).join('')}</div>
-      <h2 class="disp" style="color:var(--rose);margin:0">${esc(T('ops'))} 성공</h2>
-      <div class="rs-cond"><span class="on">✓ 승리</span><span class="${noDeath?'on':''}">${noDeath?'✓':'✗'} 전원 생존</span><span class="${fast?'on':''}">${fast?'✓':'✗'} ${esc(goalText(s.goal))}</span></div>
-      ${mvp?`<div class="rs-mvp"><div class="rs-art">${art(mvp.c)}</div><div class="rs-mt"><i>MVP</i><b>${esc(mvp.name)}</b>${ml?`<span>“${esc(sub(ml))}”</span>`:''}</div></div>
-      <div class="rs-dmg">${B.allies.map(u=>`<div><b>${esc(u.name)}</b><span class="bar"><i style="width:${Math.round((u.dmg||0)/tot*100)}%"></i></span><em>${nf(u.dmg||0)}</em></div>`).join('')}</div>`:''}
-      <p style="margin:4px 0">${rewardText(r)}${first?' (첫 클리어 보상)':(kind==='farm'?'':`<br><small class="muted">${esc(T('currency'))}은(는) 첫 클리어 때만 받아요</small>`)}${bonus}<br>참가 ${T('crew')} 경험치 +${exp}</p><button class="btn" data-act="bdone" data-win="1" data-first="${first?1:0}">계속</button>`;
-    if(mvp&&mvp.c.voiceId&&SND().voiceLobby&&ml) setTimeout(()=>speak(mvp.c,ml),700);
-  } else { sfx('패배'); html=`<h2 class="disp" style="color:#ff5277">작전 실패</h2><p>${T('enhance')}로 레벨을 올리거나 편성과 속성을 바꿔 보세요.<br>${esc(elemLine())}.</p><div class="row"><button class="btn ghost" data-act="bdone">돌아가기</button><button class="btn" data-act="bretry">다시 도전</button></div>`; }
-  const d=document.createElement('div');d.className='result';d.innerHTML=html;$('#ov > .bt').appendChild(d);
-}
 // 훈련: 10단계, 단계마다 권장 레벨이 있어요(그 레벨 대원의 능력치에 맞춰 적이 강해져요)
 const FARM_LV=[1,5,10,15,20,30,40,50,60,70], FARM_N=FARM_LV.length;
 const FARM_RW={exp:[10,20,35,55,80,110,150,200,260,330],gold:[4000,7000,11000,16000,22000,30000,40000,52000,66000,82000],wmat:[5,9,14,20,28,38,50,64,80,100],core:[1,1,2,2,3,4,5,6,7,8]};

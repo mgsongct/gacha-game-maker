@@ -168,6 +168,7 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
 // 자연 경계(모듈성 최대화): 두 덩어리가 다리 하나로 이어지면 두 묶음 — 찾은 경계의 Q가 한 덩어리로 볼 때보다 큼 · 이름 범위: 지역 이름만 넘기고 콜백 인자는 안 셈, 바깥 이름에 쓰기·await 잡음
 { const { louvain, modularity } = await import('./lib/modules.mjs'), adj = new Map(), e = (a, b) => { for (const [x, y] of [[a, b], [b, a]]) { if (!adj.has(x)) adj.set(x, new Map()); adj.get(x).set(y, 1); } };
   ['a', 'b', 'c', 'd'].forEach((x, i, A) => A.slice(i + 1).forEach(y => e(x, y))); ['p', 'q', 'r', 's'].forEach((x, i, A) => A.slice(i + 1).forEach(y => e(x, y))); e('d', 'p');
+  for (const sd of [1, 2, 3]) { const c2 = louvain(adj, sd); assert.ok(new Set(c2.values()).size === 2 && c2.get('a') === c2.get('d') && c2.get('a') !== c2.get('p'), '묶기: 노드 순서를 바꿔도 같은 경계(seed)'); }
   const c = louvain(adj), parts = new Set(c.values()); assert.ok(parts.size === 2 && c.get('a') === c.get('d') && c.get('p') === c.get('s') && c.get('a') !== c.get('p') && modularity(adj, c) > modularity(adj, new Map([...adj.keys()].map(k => [k, 0]))), '모듈성 묶기: ' + JSON.stringify([...c]));
   const { freeNames } = await import('./lib/scope.mjs'), r9 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r9, 'src/main'), { recursive: true });
   writeFileSync(join(r9, 'src/main/010-a.js'), "function top(){}\nasync function f(a,c){ const d=1; let n=0; const X=`${a}${c.map(y=>y+d)}${top()}${G.x}`; const W=`${n++}`; const A=`${await top()}`; }\n");
@@ -175,6 +176,9 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   const X = freeNames(decl('X')), W = freeNames(decl('W')), A = freeNames(decl('A'));
   assert.ok(X.locals.sort().join() === 'a,c,d' && X.globals.sort().join() === 'G,top' && !X.writes.length && W.writes.join() === 'n' && A.hasAwait, '이름 범위: ' + JSON.stringify({ X, W: W.writes, A: A.hasAwait })); rmSync(r9, { recursive: true, force: true }); }
 // 불러올 때 아직 없는 이름(TDZ): 함수 밖에서 뒤에 선언될 const를 읽으면 잡고, 함수 안(나중에 돎)·앞에 선언된 이름은 안 잡음
+{ const { leadComments } = await import('./lib/extra.mjs'), at = s => s.indexOf('function f'); /* 옮기기 도구: 선언 위 설명 주석까지(머리말·옮김 표식·같은 줄 코드 뒤 주석은 남김) */
+  const s1 = '/* ===== 머리말 ===== */\n/* 설명 하나 */\n// 설명 둘\nfunction f(){}', s2 = '/* ===== 머리말 ===== */\nfunction f(){}', s3 = 'x();\n/* 여러\n   줄 */\nfunction f(){}', s4 = 'g(); /* 끝 */\nfunction f(){}', s5 = '/* a.js에서 옮김 */\nfunction f(){}';
+  assert.ok(s1.slice(leadComments(s1, at(s1))).startsWith('/* 설명 하나') && leadComments(s2, at(s2)) === at(s2) && s3.slice(leadComments(s3, at(s3))).startsWith('/* 여러') && leadComments(s4, at(s4)) === at(s4) && leadComments(s5, at(s5)) === at(s5), '옮기기: 설명 주석 같이'); }
 { const { tdzRefs } = await import('./lib/extra.mjs'), r10 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r10, 'src/main'), { recursive: true });
   writeFileSync(join(r10, 'src/main/010-a.js'), "const A = { tags: B, ok: OK };\nconst OK = 1;\nfunction later(){ return B; }\nconst C = () => B;\n"); writeFileSync(join(r10, 'src/main/020-b.js'), "const B = 'x';\nconst D = A.ok + OK;\n");
   const T = tdzRefs(await loadUnits(r10)).map(x => x.name).sort(); assert.deepEqual(T, ['B', 'OK'], 'TDZ: ' + JSON.stringify(T)); rmSync(r10, { recursive: true, force: true }); }
@@ -207,6 +211,11 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   assert.ok(MM.envy.some(e => e.fn === 'misplaced' && e.to === 'src/main/020-b.js') && !MM.envy.some(e => e.fn === 'aOwn'), '다른 모듈 일을 하는 함수: ' + JSON.stringify(MM.envy));
   assert.ok(MM.scattered.some(x => x.key === 'G.meta.box' && x.owner === 'src/main/010-a.js' && x.files.length === 3) && MM.foreign.filter(x => x.key === 'G.meta.box').length === 2, '파편화·남의 상태 쓰기: ' + JSON.stringify(MM.scattered));
   assert.ok(MM.mods.find(m => m.file === 'src/main/010-a.js').title === '가', '모듈 제목'); rmSync(r8, { recursive: true, force: true }); }
+// 공용 기반 모듈은 파일 단위로 셈: 두 파일을 폴더 모듈 하나로 묶어도 판정이 그대로(모듈 단위로 세면 "부르는 모듈 수"가 줄어 공용에서 빠졌음)
+{ const r11 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r11, 'src/main'), { recursive: true });
+  writeFileSync(join(r11, 'src/main/005-u.js'), 'function u(){ return 1; }\n'); writeFileSync(join(r11, 'src/main/010-x.js'), 'function x(){ return u(); }\n'); writeFileSync(join(r11, 'src/main/020-y.js'), 'function y(){ return u(); }\n'); writeFileSync(join(r11, 'src/main/030-z.js'), 'function z(){ return 3; }\n');
+  const U = await loadUnits(r11), g = buildGraph(U).fns, sf = stateFlow(U, g), M1 = moduleMap(U, g, sf), M2 = moduleMap(U, g, sf, { modOf: f => /0[12]0-/.test(f) ? 'src/main/xy/' : f });
+  assert.ok(M1.infra.includes('src/main/005-u.js') && M2.infra.includes('src/main/005-u.js'), '공용 기반: 폴더로 묶어도 같음 ' + JSON.stringify([M1.infra, M2.infra])); rmSync(r11, { recursive: true, force: true }); }
 // 개발 내역 검증: 진입점에서 닿는 함수(최상위 문장·값으로 넘김 포함), 보내는 쪽 없는 액션의 case는 따라가지 않음, 글 속 코드 이름 뽑기
 { const r9 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r9, 'src/main'), { recursive: true });
   writeFileSync(join(r9, 'src/main/010-h.js'), "function used(){ return 1; } function viaTable(){ return 2; } function dead(){ return 3; } function onlyDeadAct(){ return 4; }\nfunction handleXAction(a){ switch(a){ case 'live': used(); break; case 'gone': onlyDeadAct(); break; } }\nconst TBL={k:viaTable};\ndocument.addEventListener('click',e=>handleXAction(e.target.dataset.act));\n");
@@ -219,6 +228,10 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   writeFileSync(src, '\n\n\n' + t0); const d0 = compare(f0, findings((await analyze(root)).J)); assert.ok(!d0.added.length && !d0.worse.length && !d0.fixed.length, '래칫: 줄만 밀리면 그대로 ' + JSON.stringify(d0.added.concat(d0.worse, d0.fixed).map(f => f.key)));
   w('src/main/070-r.js', 'function quiet(x){ try{ x(); }catch(e){} return 1; }\n'); const d1 = compare(f0, findings((await analyze(root)).J));
   assert.ok(d1.added.some(f => f.cat === '빈 catch' && f.key.includes('070-r.js')), '래칫: 새 빈 catch는 새로 생김 ' + JSON.stringify(d1.added.map(f => f.key)));
+  { /* 파일 이동: 위치만 나타내는 범주는 경로를 뺀 정체로 짝 — 합계가 늘지 않으면 옮김, 늘면 새로 생김. 모듈이 정체인 범주(과잉 분할)는 짝짓지 않음 */
+    const e = (key, n) => ({ key, num: n == null ? {} : { 개수: n }, text: key }), m1 = compare([e('빈 catch|src/main/0250-a.js 파싱 대체', 2), e('빈 catch|src/main/0450-b.js 파싱 대체', 1)], [e('빈 catch|src/main/0260-x/020-b.js 파싱 대체', 3)]);
+    const m2 = compare([e('빈 catch|src/main/a.js 파싱 대체', 2)], [e('빈 catch|src/main/b.js 파싱 대체', 3)]), m3 = compare([e('영역 침범 후보|src/main/a.js f')], [e('영역 침범 후보|src/main/0360-sync/ f')]), m4 = compare([e('과잉 분할|src/main/a.js ↔ src/main/b.js')], [e('과잉 분할|src/main/c.js ↔ src/main/d.js')]);
+    assert.ok(!m1.added.length && !m1.fixed.length && m1.moved.length === 1 && m2.added.length === 1 && m2.fixed.length === 1 && !m3.added.length && m3.moved.length === 1 && m4.added.length === 1 && m4.fixed.length === 1, '래칫: 파일 이동은 옮김 ' + JSON.stringify([m1, m2, m4].map(d => [d.added.length, d.fixed.length, d.moved.length]))); }
   const g = { num: { 복잡도: 40 }, key: 'x|f', cat: '복잡한 함수', text: 'f' }, d2 = compare([g], [{ ...g, num: { 복잡도: 44 } }]); assert.ok(d2.worse.length === 1 && d2.worse[0].up.includes('복잡도'), '래칫: 같은 함수의 복잡도 증가는 나빠짐');
   rmSync(join(root, 'src/main/070-r.js')); writeFileSync(src, t0); }
 // 배선 점검: 생성기가 쓰는 키·스키마 world/키·지연 기본값(빈 값/쓸 만한 값)·엔티티 필드(컬렉션 콜백에 묶인 변수)를 생성물과 맞춤
