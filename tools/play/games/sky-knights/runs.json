@@ -1,0 +1,257 @@
+[
+ {
+  "phase": "new",
+  "at": "2026-11-03T07:23:20.146Z",
+  "pending": [
+   "world"
+  ],
+  "log": [
+   {
+    "kind": "world",
+    "len": 3283,
+    "max_tokens": 32000,
+    "at": 1793690591576,
+    "pending": true
+   },
+   {
+    "kind": "world",
+    "len": 3283,
+    "max_tokens": 32000,
+    "at": 1793690593079,
+    "pending": true
+   },
+   {
+    "kind": "world",
+    "len": 3283,
+    "max_tokens": 32000,
+    "at": 1793690594583,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 104개를 업그레이드할 수 있어요"
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "stage": "새 게임 1/4 세계관과 게임 정의를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 3210
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 1/4 세계관과 게임 정의를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 3210
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 1/4 세계관과 게임 정의를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 3210
+   }
+  ],
+  "ms": 4511,
+  "stat": [],
+  "errors": []
+ },
+ {
+  "phase": "new",
+  "at": "2026-11-03T07:26:44.716Z",
+  "pending": [
+   "chars"
+  ],
+  "log": [
+   {
+    "kind": "world",
+    "len": 3283,
+    "max_tokens": 32000,
+    "at": 1793690796139,
+    "outLen": 8505
+   },
+   {
+    "kind": "chars",
+    "len": 18236,
+    "max_tokens": 32000,
+    "at": 1793690796147,
+    "pending": true
+   },
+   {
+    "kind": "chars",
+    "len": 18236,
+    "max_tokens": 32000,
+    "at": 1793690797652,
+    "pending": true
+   },
+   {
+    "kind": "chars",
+    "len": 18236,
+    "max_tokens": 32000,
+    "at": 1793690799157,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 104개를 업그레이드할 수 있어요"
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "stage": "새 게임 2/4 단원 6명을 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 18163
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 2/4 단원 6명을 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 18163
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 2/4 단원 6명을 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 18163
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 1/4 세계관과 게임 정의를 만드는 중",
+    "reqLen": 3210
+   }
+  ],
+  "ms": 4526,
+  "stat": [],
+  "errors": []
+ },
+ {
+  "phase": "new",
+  "at": "2026-11-03T07:34:13.577Z",
+  "pending": [
+   "opening",
+   "skill-루시안-1",
+   "skill-루시안-2",
+   "skill-루시안-3"
+  ],
+  "log": [
+   {
+    "kind": "world",
+    "len": 3283,
+    "max_tokens": 32000,
+    "at": 1793691244955,
+    "outLen": 8505
+   },
+   {
+    "kind": "chars",
+    "len": 18236,
+    "max_tokens": 32000,
+    "at": 1793691244963,
+    "outLen": 42699
+   },
+   {
+    "kind": "opening",
+    "len": 9355,
+    "max_tokens": 32000,
+    "at": 1793691244982,
+    "pending": true
+   },
+   {
+    "kind": "skill-루시안-1",
+    "len": 4292,
+    "max_tokens": 16000,
+    "at": 1793691244991,
+    "pending": true
+   },
+   {
+    "kind": "skill-루시안-2",
+    "len": 4345,
+    "max_tokens": 16000,
+    "at": 1793691245001,
+    "pending": true
+   },
+   {
+    "kind": "skill-루시안-3",
+    "len": 4345,
+    "max_tokens": 16000,
+    "at": 1793691245004,
+    "pending": true
+   },
+   {
+    "kind": "opening",
+    "len": 9355,
+    "max_tokens": 32000,
+    "at": 1793691246494,
+    "pending": true
+   },
+   {
+    "kind": "opening",
+    "len": 9355,
+    "max_tokens": 32000,
+    "at": 1793691248000,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 104개를 업그레이드할 수 있어요"
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "stage": "새 게임 3/4 오프닝, 배경·소품·음악 목록, 배너를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 9282
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 3/4 오프닝, 배경·소품·음악 목록, 배너를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 9282
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 3/4 오프닝, 배경·소품·음악 목록, 배너를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4272
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 3/4 오프닝, 배경·소품·음악 목록, 배너를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4272
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 3/4 오프닝, 배경·소품·음악 목록, 배너를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4219
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 3/4 오프닝, 배경·소품·음악 목록, 배너를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 9282
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 2/4 단원 6명을 만드는 중",
+    "reqLen": 18163
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 1/4 세계관과 게임 정의를 만드는 중",
+    "reqLen": 3210
+   }
+  ],
+  "ms": 4552,
+  "stat": [],
+  "errors": []
+ }
+]
