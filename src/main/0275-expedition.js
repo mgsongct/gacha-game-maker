@@ -69,7 +69,7 @@ function openExSet(){ const cfg=EXC(), m=exMode(), adv={cond:cfg.cond,tiers:cfg.
 async function exSave(){ let adv; try{ adv=JSON.parse($('#ex_adv').value); }catch(e){ toast('설정 JSON을 확인해 주세요: '+e.message); return; }
   const mode=(document.querySelector('[name=ex_mode]:checked')||{}).value||'combat', s=P().exped, busy=Object.keys(P().disp||{}).length||s&&(Object.keys(s.jobs||{}).length||Object.values((s.biz||{}).assign||{}).flat().length); // 전투형 파견도 진행 중이면 확인
   if(mode!==exMode()&&busy&&!(await appConfirm('진행 중인 일정·배치가 있어요. 방식을 바꾸면 진행 중인 일정은 보상 없이 끝나고 배치가 풀려요. 바꿀까요?'))) return;
-  if(mode!==exMode()){ if(s){ s.jobs={}; s.biz.assign={}; s.biz.at=0; s.offers={}; } P().disp={}; if(P().dboard) P().dboard.list=[]; } // 바꾸면 전투형 파견도 끝냄(남으면 대원이 계속 바쁨)
+  if(mode!==exMode()){ if(s){ s.jobs={}; s.biz.assign={}; s.biz.at=0; s.offers={}; } dispEndAll(); } // 바꾸면 전투형 파견도 끝냄(남으면 대원이 계속 바쁨)
   Object.assign(exMeta(),adv,{mode}); mark('meta','prog'); closeModal(); render(); }
 
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act, id=el.dataset.id;

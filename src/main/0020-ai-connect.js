@@ -498,7 +498,7 @@ function naiBlocksOwner(e){
  if(id.startsWith('nai_p_'))return {o:naiCfg().parts[id.slice(6)],key:'suffix'};
  if(['wp_scene','il_scene','lb_scene','sc_scene','lbbg_scene'].includes(id)){const c=charById(e.closest('.cs-sheet')?.dataset.cid);return {o:id==='wp_scene'?c?.weapon:c?.[({il_scene:'illust',lb_scene:'lbcg',sc_scene:'scg',lbbg_scene:'lbbg'})[id]],key:'prompt'};}
  if(id==='v2-icon-prompt'&&typeof V2ICONS!=='undefined'){const p=V2ICONS?.preview;return {o:p&&{prompt:p.prompt,naiBlocks:{prompt:p.promptParts}},key:'prompt'};}
- if(id==='pf_nai')return {o:P().avatar,key:'prompt'};
+ if(id==='pf_nai')return {o:avatarObj(),key:'prompt'}; /* 플레이어 외형 칸은 0160 avatarObj가 맡음(없으면 만듦) */
  if(id==='sk_prompt'&&document.getElementById('sk_char'))return {o:G.meta.shop?.self,key:'naiPrompt'};
  if(id==='rg_e_look')return {o:REGEN?.nc,key:'naiPrompt'};
  if(id==='li_prompt')return {o:libById(document.querySelector('[data-act=savelib]')?.dataset.id),key:'prompt'};

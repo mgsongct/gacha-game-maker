@@ -2,6 +2,8 @@
    우편함
    ========================================================= */
 function mailBox(){const p=P(); if(!Array.isArray(p.mail)) p.mail=[]; return p.mail;}
+/* 우편 하나 지우기 — 우편 칸은 이 모듈이 맡음(액션 처리기가 칸을 직접 바꿔 끼우지 않게) */
+function mailRemove(x){ P().mail=mailBox().filter(q=>q!==x); }
 function sendMail(m){ let box=mailBox(); const now=Date.now(); if(m.kind){ const p0=P(); p0.mail=box=box.filter(x=>x.kind!==m.kind); } box.unshift({id:'m'+uid(),kind:m.kind||'',from:m.from||'운영팀',title:m.title||'우편',body:m.body||'',reward:m.reward||{},at:now,exp:m.days===0?0:now+(m.days||30)*864e5,got:false,read:false}); if(box.length>100) box.length=100; mark('prog'); }
 function mailLive(x){return !x.got&&(!x.exp||Date.now()<x.exp);}
 const mailHas=x=>Object.keys(x.reward||{}).length>0;

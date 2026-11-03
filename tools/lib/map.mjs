@@ -119,6 +119,18 @@ export function accessorUse(fns, acc) { const out = new Map();
       if (n.type === 'identifier' && (n.parent?.type === 'variable_declarator' && same(n.parent.childForFieldName('name'), n))) return; rec[writtenAt(n) ? 'w' : 'r'].add(k); });
     if (rec.w.size || rec.r.size) out.set(f.key, rec); }
   return out; }
+// 진행 상태 정의가 어디 있나(일원화 점검 — 원안은 한 파일이라 진행 칸의 기본값·만들기·리셋·형식 보정이 한 덩어리였음, 모듈 분할 뒤 갈렸는지):
+//   칸마다 기본값 자리(DEFAULT_PROG · 불러오기 보정 fix·defaults · 진행 접근 함수의 없을 때 만들기)와 그 모듈, 접근 함수, 칸을 쓰는 모듈(직접 + 접근 함수로 — 칸 속을 바꾸는 깊은 쓰기 포함)
+export function progSlots(units, fns, sf) { const acc = progAccessors(fns), use = accessorUse(fns, acc), DP = constLiterals(units, ['DEFAULT_PROG']).DEFAULT_PROG || {}, mod = k => moduleOf(fileOf(fns.get(k)?.loc)), slots = new Map(), S = k => { if (!slots.has(k)) slots.set(k, { defs: new Set(), acc: [], w: new Set(), r: new Set() }); return slots.get(k); };
+  const dpFile = (() => { for (const u of units) for (const fl of u.files || []) if (fl.path && u.text.split('\n').slice(fl.start, fl.end).some(l => /\bDEFAULT_PROG\s*=/.test(l))) return moduleOf(fl.path); return 'DEFAULT_PROG'; })();
+  Object.keys(DP).forEach(k => S(k).defs.add(dpFile)); for (const [n, k] of acc) { const f = [...fns.values()].find(x => x.top && x.name === n); S(k).acc.push(n); S(k).defs.add(mod(f.key)); }
+  for (const f of fns.values()) { if (!f.top) continue; const alias = new Set(['P()', 'G.prog']), m = mod(f.key), loadFix = /^(fix|defaults)$/.test(f.name); walk(f.node, n => { if (n.type === 'variable_declarator' && PROG_BASE.test(n.childForFieldName('value')?.text || '')) alias.add(n.childForFieldName('name')?.text); else if (n.type === 'variable_declarator' && /^(g|game)\.prog$/.test(n.childForFieldName('value')?.text || '') && loadFix) alias.add(n.childForFieldName('name')?.text); });
+    walk(f.node, n => { if (n.type !== 'member_expression') return; const o = n.childForFieldName('object')?.text, k = n.childForFieldName('property')?.text; if (!k || !(alias.has(o) || (loadFix && /^(g|game|d)\.prog$/.test(o)))) return; const w = writtenAt(n) || ((n.parent?.type === 'assignment_expression' || n.parent?.type === 'augmented_assignment_expression') && same(n.parent.childForFieldName('left'), n));
+      if (loadFix && w) S(k).defs.add(m); else if (!acc.has(f.name)) S(k)[w ? 'w' : 'r'].add(m); }); }
+  for (const [fk, u] of use) { u.w.forEach(k => S(k).w.add(mod(fk))); u.r.forEach(k => S(k).r.add(mod(fk))); }
+  const rows = [...slots].map(([k, v]) => ({ slot: k, defs: [...v.defs].sort(), acc: v.acc, writers: [...v.w].sort(), readers: [...v.r].sort() })).sort((a, b) => a.slot.localeCompare(b.slot));
+  const accMods = [...new Set(rows.flatMap(r => r.acc.map(n => mod([...fns.values()].find(x => x.top && x.name === n).key))))].sort(), defPlaces = [...new Set(rows.flatMap(r => r.defs))].sort();
+  return { rows, accMods, defPlaces, multiDef: rows.filter(r => r.defs.length > 1).length, multiAcc: rows.filter(r => r.acc.length > 1).length }; }
 const LOAD_EV = /^['"](load|DOMContentLoaded|ggm-storage-ok|pageshow)['"]$/;
 function calleesIn(node, nameMap, out) { walk(node, m => { if (m.type === 'call_expression' && m.childForFieldName('function')?.type === 'identifier') { const k = nameMap.get(m.childForFieldName('function').text); if (k) out.add(k); } }); }
 const declOnly = st => FNT.has(st.type) || ((st.type === 'lexical_declaration' || st.type === 'variable_declaration') && st.namedChildren.every(d => FNT.has(d.childForFieldName('value')?.type)));

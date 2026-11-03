@@ -5872,7 +5872,7 @@ function naiBlocksOwner(e){
  if(id.startsWith('nai_p_'))return {o:naiCfg().parts[id.slice(6)],key:'suffix'};
  if(['wp_scene','il_scene','lb_scene','sc_scene','lbbg_scene'].includes(id)){const c=charById(e.closest('.cs-sheet')?.dataset.cid);return {o:id==='wp_scene'?c?.weapon:c?.[({il_scene:'illust',lb_scene:'lbcg',sc_scene:'scg',lbbg_scene:'lbbg'})[id]],key:'prompt'};}
  if(id==='v2-icon-prompt'&&typeof V2ICONS!=='undefined'){const p=V2ICONS?.preview;return {o:p&&{prompt:p.prompt,naiBlocks:{prompt:p.promptParts}},key:'prompt'};}
- if(id==='pf_nai')return {o:P().avatar,key:'prompt'};
+ if(id==='pf_nai')return {o:avatarObj(),key:'prompt'}; /* 플레이어 외형 칸은 0160 avatarObj가 맡음(없으면 만듦) */
  if(id==='sk_prompt'&&document.getElementById('sk_char'))return {o:G.meta.shop?.self,key:'naiPrompt'};
  if(id==='rg_e_look')return {o:REGEN?.nc,key:'naiPrompt'};
  if(id==='li_prompt')return {o:libById(document.querySelector('[data-act=savelib]')?.dataset.id),key:'prompt'};
@@ -9819,6 +9819,8 @@ function renderSetup(){
    우편함
    ========================================================= */
 function mailBox(){const p=P(); if(!Array.isArray(p.mail)) p.mail=[]; return p.mail;}
+/* 우편 하나 지우기 — 우편 칸은 이 모듈이 맡음(액션 처리기가 칸을 직접 바꿔 끼우지 않게) */
+function mailRemove(x){ P().mail=mailBox().filter(q=>q!==x); }
 function sendMail(m){ let box=mailBox(); const now=Date.now(); if(m.kind){ const p0=P(); p0.mail=box=box.filter(x=>x.kind!==m.kind); } box.unshift({id:'m'+uid(),kind:m.kind||'',from:m.from||'운영팀',title:m.title||'우편',body:m.body||'',reward:m.reward||{},at:now,exp:m.days===0?0:now+(m.days||30)*864e5,got:false,read:false}); if(box.length>100) box.length=100; mark('prog'); }
 function mailLive(x){return !x.got&&(!x.exp||Date.now()<x.exp);}
 const mailHas=x=>Object.keys(x.reward||{}).length>0;
@@ -10990,6 +10992,8 @@ function DBOARD(){ const p=P(); let b=p.dboard; if(!b||!Array.isArray(b.list)) b
   while(b.list.length<5) b.list.push(dispOffer(b.list.map(o=>o.name)));
   return b; }
 function dispList(){ return DBOARD().list; }
+/* 전투형 파견을 모두 보상 없이 끝내고 의뢰판을 비움 — 파견 칸(disp·dboard)은 이 모듈이 맡음. 원정 방식을 바꿀 때(0275)가 부름 */
+function dispEndAll(){ const p=P(); p.disp={}; if(p.dboard) p.dboard.list=[]; }
 function dispClaim(d){ const id=d.id; const dr=Object.assign({},d.reward,{gift:d.hours>=4?2:1}); if(dr.gems){ dr.gold=(dr.gold||0)+dr.gems*100; delete dr.gems; } if(seasonIs('train')) Object.keys(dr).forEach(k=>{ if(typeof dr[k]==='number'&&k!=='gift') dr[k]=Math.round(dr[k]*1.5); }); Object.assign(dr,rateR(dr)); giveReward(dr); (P().disp[id].chars||[]).forEach(cid=>{const c=charById(cid);if(c)addAff(c,10);}); delete P().disp[id]; const b=DBOARD(), i=b.list.findIndex(o=>o.id===id); if(i>=0) b.list.splice(i,1,dispOffer(b.list.map(o=>o.name))); return dr; }
 function openDispSel(did){
   const d=dispList().find(x=>x.id===did), busy=busyIds(), owned=G.chars.filter(c=>own(c.id)&&!busy.has(c.id));
@@ -11071,7 +11075,7 @@ function openExSet(){ const cfg=EXC(), m=exMode(), adv={cond:cfg.cond,tiers:cfg.
 async function exSave(){ let adv; try{ adv=JSON.parse($('#ex_adv').value); }catch(e){ toast('설정 JSON을 확인해 주세요: '+e.message); return; }
   const mode=(document.querySelector('[name=ex_mode]:checked')||{}).value||'combat', s=P().exped, busy=Object.keys(P().disp||{}).length||s&&(Object.keys(s.jobs||{}).length||Object.values((s.biz||{}).assign||{}).flat().length); // 전투형 파견도 진행 중이면 확인
   if(mode!==exMode()&&busy&&!(await appConfirm('진행 중인 일정·배치가 있어요. 방식을 바꾸면 진행 중인 일정은 보상 없이 끝나고 배치가 풀려요. 바꿀까요?'))) return;
-  if(mode!==exMode()){ if(s){ s.jobs={}; s.biz.assign={}; s.biz.at=0; s.offers={}; } P().disp={}; if(P().dboard) P().dboard.list=[]; } // 바꾸면 전투형 파견도 끝냄(남으면 대원이 계속 바쁨)
+  if(mode!==exMode()){ if(s){ s.jobs={}; s.biz.assign={}; s.biz.at=0; s.offers={}; } dispEndAll(); } // 바꾸면 전투형 파견도 끝냄(남으면 대원이 계속 바쁨)
   Object.assign(exMeta(),adv,{mode}); mark('meta','prog'); closeModal(); render(); }
 
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act, id=el.dataset.id;
@@ -13660,7 +13664,7 @@ case 'mailview': { if(e.target.closest('[data-act=mailget]')) break; const x=mai
 case 'mailget': { const x=mailBox().find(q=>q.id===id); const r=claimMail(x); if(!r){toast('받을 수 없는 우편이에요');break;} sfx('확인'); render(); openMail(); buyFx(rewardText(r)||'수령 완료',x.title); break; }
 case 'mailall': { let tot={}; mailBox().forEach(x=>{ if(mailLive(x)&&Object.keys(x.reward||{}).length){ const r=claimMail(x); Object.entries(r).forEach(([k,v])=>tot[k]=(tot[k]||0)+v); } }); if(!Object.keys(tot).length){toast('받을 우편이 없어요');break;} render(); openMail(); buyFx('모두 받기',rewardText(tot)); break; }
 case 'mailclean': { const p2=P(), n0=mailBox().length; p2.mail=mailBox().filter(x=>!mailDone(x)); mark('prog'); openMail(); render(); toast(`우편 ${n0-p2.mail.length}개를 지웠어요`); break; }
-case 'maildel': { const x=mailBox().find(q=>q.id===id); if(!x) break; if(mailHas(x)&&mailLive(x)&&!(await appConfirm('아직 받지 않은 보상이 있어요. 그래도 지울까요?'))) break; P().mail=mailBox().filter(q=>q!==x); mark('prog'); openMail(); render(); break; }
+case 'maildel': { const x=mailBox().find(q=>q.id===id); if(!x) break; if(mailHas(x)&&mailLive(x)&&!(await appConfirm('아직 받지 않은 보상이 있어요. 그래도 지울까요?'))) break; mailRemove(x); mark('prog'); openMail(); render(); break; }
   }
 }
 
