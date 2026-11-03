@@ -59,6 +59,14 @@ export function schemaOf(text) { const all = [...String(text).matchAll(/JSON만 
 // 견본을 너그럽게 JSON으로: 800~3000 → 800, 따옴표 없는 말 → 문자열, 끝 쉼표·빈 값 정리. 못 읽으면 null
 export function lenientJSON(body) { let t = String(body).replace(/:\s*(-?\d+(?:\.\d+)?)\s*~\s*-?\d+(?:\.\d+)?[^,}\]\n"]*/g, ':$1').replace(/"\s*:\s*([^"{[\],}\s][^,}\]\n]*?)\s*(?=[,}\]])/g, (m, v) => /^(-?\d+(\.\d+)?|true|false|null)$/.test(v.trim()) ? m : `":${JSON.stringify(v.trim())}`).replace(/,\s*([}\]])/g, '$1').replace(/\[\s*\.\.\.\s*\]/g, '[]').replace(/,\s*\.\.\.\s*(?=[\]}])/g, '').replace(/:\s*(?=[,}])/g, ':""');
   try { return JSON.parse(t); } catch { return null; } }
+// 가짜 글 AI의 답: 형식 견본(lenientJSON 결과)을 그럴듯한 답으로 — 앱이 답을 검사해 버리지 않고 채우기까지 가게(동적 도구 tools/play/combos·upgrade가 같이 씀)
+//   빈 글 → "값 n" · 고르기 견본(a|b|c) → 목록 안 차례대로 하나씩 · 글 → 번호를 붙여 서로 다르게(같은 줄 되풀이가 가짜로 생기지 않게)
+//   객체 하나짜리 목록 → 그 안 고르기 견본의 가짓수만큼(최대 4개) 늘림(예: 포지션은 기본형 공격·방어·지원이 다 있어야 받음). 브라우저에도 넘기므로 바깥 이름을 쓰지 않음
+export function fakeAnswer(v, st = { n: 0 }, i = 0) { const isEnum = s => /^[^\s|]+(\|[^\s|]+)+$/.test(s), width = x => Array.isArray(x) ? Math.max(1, ...x.map(width)) : x && typeof x === 'object' ? Math.max(1, ...Object.values(x).map(width)) : typeof x === 'string' && isEnum(x) ? x.split('|').length : 1;
+  if (Array.isArray(v)) { const L = v.length === 1 && v[0] && typeof v[0] === 'object' && !Array.isArray(v[0]) ? Array.from({ length: Math.min(4, width(v[0])) }, () => v[0]) : v; return L.map((x, k) => fakeAnswer(x, st, k)); }
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, fakeAnswer(x, st, i)]));
+  if (typeof v === 'string') { if (isEnum(v)) { const o = v.split('|'); return o[i % o.length]; } return `${v || '값'} ${++st.n}`; }
+  return v; }
 const JSON_SINK = /^(aiJSON|aiJSONRetry|SAMPLE\.json|request)$/;
 // text: 보낸 프롬프트 · o.sink: 받는 호출 · o.frags: {조각 id: 지금 글} · o.reads: 코드가 읽는 응답 키(정적, 없으면 null)
 export function checkPrompt(text, o = {}) { const F = [], add = (kind, code, msg) => F.push({ kind, code, msg: short(msg, 160) }), t = (o.strip || []).reduce((a, x) => x.trim() ? a.split(x.trim()).join('') : a, String(text)); // o.strip: 연결 층이 모든 요청에 덧붙이는 글(지점의 프롬프트가 아님)

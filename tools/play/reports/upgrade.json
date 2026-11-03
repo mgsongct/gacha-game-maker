@@ -15,6 +15,10 @@
    },
    {
     "what": "G.meta.rules",
+    "worse": [],
+    "next": [
+     "c_spot 0→6"
+    ],
     "res": "보완됨(자동)",
     "notice": true,
     "hit": [
@@ -24,10 +28,16 @@
    },
    {
     "what": "G.meta.positions",
-    "res": "기본값으로 동작",
+    "worse": [],
+    "next": [
+     "c_spot 0→6"
+    ],
+    "res": "보완됨(자동)",
     "notice": true,
-    "hit": [],
-    "err": "글 AI 요청 1"
+    "hit": [
+     "g_pos 1"
+    ],
+    "err": "글 AI 요청 2"
    },
    {
     "what": "G.meta.balance",
@@ -41,22 +51,36 @@
    },
    {
     "what": "캐릭터.persona",
-    "res": "감지됨·보완 요청함(가짜 AI라 내용 미확인)",
+    "worse": [],
+    "next": [
+     "c_spot 0→6"
+    ],
+    "res": "보완됨(자동)",
     "notice": true,
     "hit": [
      "c_persona 6"
     ],
-    "err": "글 AI 요청 11"
+    "err": "글 AI 요청 7"
    },
    {
     "what": "캐릭터.pfields",
-    "res": "놓침",
+    "worse": [],
+    "next": [
+     "c_spot 0→6"
+    ],
+    "res": "보완됨(자동)",
     "notice": true,
-    "hit": [],
-    "err": "글 AI 요청 1"
+    "hit": [
+     "c_pfields 6"
+    ],
+    "err": "글 AI 요청 7"
    },
    {
     "what": "세력.stance",
+    "worse": [],
+    "next": [
+     "c_spot 0→6"
+    ],
     "res": "놓침",
     "notice": true,
     "hit": [],
@@ -86,6 +110,10 @@
    },
    {
     "what": "G.meta.rules",
+    "worse": [],
+    "next": [
+     "c_spot 0→8"
+    ],
     "res": "보완됨(자동)",
     "notice": true,
     "hit": [
@@ -95,10 +123,16 @@
    },
    {
     "what": "G.meta.positions",
-    "res": "기본값으로 동작",
+    "worse": [],
+    "next": [
+     "c_spot 0→8"
+    ],
+    "res": "보완됨(자동)",
     "notice": true,
-    "hit": [],
-    "err": "글 AI 요청 1"
+    "hit": [
+     "g_pos 1"
+    ],
+    "err": "글 AI 요청 2"
    },
    {
     "what": "G.meta.balance",
@@ -112,22 +146,36 @@
    },
    {
     "what": "캐릭터.persona",
-    "res": "감지됨·보완 요청함(가짜 AI라 내용 미확인)",
+    "worse": [],
+    "next": [
+     "c_spot 0→8"
+    ],
+    "res": "보완됨(자동)",
     "notice": true,
     "hit": [
      "c_persona 8"
     ],
-    "err": "글 AI 요청 11"
+    "err": "글 AI 요청 9"
    },
    {
     "what": "캐릭터.pfields",
-    "res": "놓침",
+    "worse": [],
+    "next": [
+     "c_spot 0→8"
+    ],
+    "res": "보완됨(자동)",
     "notice": true,
-    "hit": [],
-    "err": "글 AI 요청 1"
+    "hit": [
+     "c_pfields 8"
+    ],
+    "err": "글 AI 요청 9"
    },
    {
     "what": "세력.stance",
+    "worse": [],
+    "next": [
+     "c_spot 0→8"
+    ],
     "res": "놓침",
     "notice": true,
     "hit": [],

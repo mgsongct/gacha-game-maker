@@ -92,7 +92,7 @@ function fnGraph(fns, sf, M, modOfFile) {
   return { adj, modOf: new Map(top.map(f => [f.key, modOfFile(fileOf(f.loc))])), name: new Map(top.map(f => [f.key, f.name])) }; }
 const r2 = x => Math.round(x * 100) / 100, groupBy = (it, f) => { const m = new Map(); for (const x of it) { const k = f(x); if (!m.has(k)) m.set(k, []); m.get(k).push(x); } return m; };
 // 과잉 분할: 두 모듈 사이 무게가 둘 중 작은 쪽의 안 무게 이상이고 서로가 서로의 가장 강한 바깥 연결 / 위성: 함수 4개 이하 모듈의 바깥 무게 70%↑가 한 모듈
-function overSplitOf(adj, modOf, byMod) {
+function overSplitOf(adj, modOf, byMod, name = new Map()) {
   const intra = new Map(), inter = new Map(), pk = (a, b) => a < b ? a + '|' + b : b + '|' + a;
   for (const [n, nb] of adj) for (const [j, w] of nb) { if (n > j) continue; const a = modOf.get(n), b = modOf.get(j); if (a === b) intra.set(a, (intra.get(a) || 0) + w); else inter.set(pk(a, b), (inter.get(pk(a, b)) || 0) + w); }
   const ext = m => [...inter].filter(([k]) => k.split('|').includes(m)).map(([k, w]) => [k.split('|').find(x => x !== m) || m, w]).sort((a, b) => b[1] - a[1]), out = [];
@@ -100,6 +100,9 @@ function overSplitOf(adj, modOf, byMod) {
     if (w >= Math.min(ia, ib) && w >= 1 && ea && eb && ea[0] === b && eb[0] === a) out.push({ kind: '서로 강하게 묶임', mods: [a, b], inter: r2(w), intra: [r2(ia), r2(ib)], fns: [(byMod.get(a) || []).length, (byMod.get(b) || []).length] }); }
   for (const [m, ns] of byMod) { if (ns.length > 4) continue; const e = ext(m), tot = e.reduce((s2, [, w]) => s2 + w, 0) + (intra.get(m) || 0);
     if (e.length && tot >= 1 && e[0][1] / tot >= 0.7 && !out.some(x => x.mods.includes(m))) out.push({ kind: '위성 모듈(작고 한 모듈에 매달림)', mods: [m, e[0][0]], inter: r2(e[0][1]), intra: [r2(intra.get(m) || 0), r2(intra.get(e[0][0]) || 0)], fns: [ns.length, (byMod.get(e[0][0]) || []).length] }); }
+  for (const x of out) { const [a, b] = x.mods, lean = []; /* 고칠 단서: 상대 모듈 쪽 무게가 제 모듈 쪽보다 큰 함수(옮길 후보) */
+    for (const [n, nb] of adj) { const m = modOf.get(n); if (m !== a && m !== b) continue; const o = m === a ? b : a; let wo = 0, wm = 0; for (const [j, w] of nb) { if (modOf.get(j) === o) wo += w; else if (modOf.get(j) === m) wm += w; } if (wo > wm && wo >= 1) lean.push({ fn: name.get(n) || n, from: m, to: o, w: r2(wo), own: r2(wm) }); }
+    x.lean = lean.sort((p, q) => q.w - p.w); }
   return out.sort((a, b) => b.inter - a.inter); }
 // 기능 섞임: 모듈 함수가 여러 묶음(두 번째 묶음 ≥30%·3함수) — 묶음 이름은 그 묶음에 함수가 많은 모듈 둘
 function mixedOf(comm, modOf, name, byComm, byMod) {
@@ -115,4 +118,4 @@ function displacedOf(adj, modOf, name, layer) { const out = [];
 export function naturalBoundaries(fns, sf, M, modOfFile = f => f, layer = null) {
   const { adj, modOf, name } = fnGraph(fns, sf, M, modOfFile), comm = louvain(adj), byComm = groupBy(comm.keys(), n => comm.get(n)), byMod = groupBy(comm.keys(), n => modOf.get(n));
   const Qfile = modularity(adj, new Map([...adj.keys()].map(n => [n, modOf.get(n)]))), Qnat = modularity(adj, comm);
-  return { nodes: adj.size, clusters: byComm.size, Qfile: Math.round(Qfile * 1000) / 1000, Qnat: Math.round(Qnat * 1000) / 1000, overSplit: overSplitOf(adj, modOf, byMod), mixed: mixedOf(comm, modOf, name, byComm, byMod), displaced: displacedOf(adj, modOf, name, layer) }; }
+  return { nodes: adj.size, clusters: byComm.size, Qfile: Math.round(Qfile * 1000) / 1000, Qnat: Math.round(Qnat * 1000) / 1000, overSplit: overSplitOf(adj, modOf, byMod, name), mixed: mixedOf(comm, modOf, name, byComm, byMod), displaced: displacedOf(adj, modOf, name, layer) }; }

@@ -193,7 +193,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8-2-1. 게임 규칙 (상성·능력치)
 
-- `src/main/0185-game-rules.js`: 생성기 연결(반응 스키마 `REACT_SCHEMA`, `elemName`·`reactClean`), `G.meta.rules` 편집(`openRules`), `rulesApply`(applyMeta에서 BEATS·`GGMCombat.applyRules`), `rulesOptions`(v2Options로 전투·밸런스 검사에 전달), 캐릭터 화면 `rulesCharHTML`, 도감 `rulesCodex`
+- `src/main/0185-game-rules.js`: 생성기 연결(반응 스키마 `REACT_SCHEMA`, `elemName`·`reactClean`), `G.meta.rules` 편집(`openRules`), `rulesApply`(applyMeta에서 BEATS·`GGMCombat.applyRules`), `rulesOptions`(v2Options로 전투·밸런스 검사에 전달), 포지션 `posValid`(기본형 셋이 다 있어야 받음 — 새 게임 생성도 씀)·`posSpread`(기본형이 같은 포지션에 고루 배정)·`posAI`(점검 `g_pos` — 포지션 없는 예전 게임에 세계관 맞춤 포지션 설계, 실행 중 자동 채움), 캐릭터 화면 `rulesCharHTML`, 도감 `rulesCodex`
 - 전투 엔진: `damage()`의 속성 배율 = `sim.elemAdv/elemDis × relMul`, `create()`에서 `synergy()`. 역할 기본 능력치·속도·희귀도 배율은 `CHARACTER_BASE_STATS`·`ROLE_SPEED`·`RARITY_STAT_MUL` 표(기본값 `RULE_DEFAULTS`)
 - 설계: [research/game-rules.md](research/game-rules.md)
 
@@ -206,7 +206,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 ## 8-2-3. 캐릭터 개성·인연 톡·메모리얼
 
 - `src/main/0455-persona.js`: `c.persona`·`c.pfields`·`c.memorial`, `personaReview`(검수 점수), `personaAI`(채우기·다듬기), `personaAIReview`, `talkAffGen`(aff 트리거 톡), `memorialGen`, `memoOn`(로비 대사 → `affLinePool0`), 캐릭터 정보 탭 `personaHTML`
-- 생성기 연결: 프로필 틀 `PROFILE_TPLS`·스키마 `PROFILE_TPL_SCHEMA`
+- 생성기 연결: 프로필 틀 `PROFILE_TPLS`·스키마 `PROFILE_TPL_SCHEMA`. 점검 `c_persona`·`c_persona_weak`·`c_pfields`(프로필 항목만 빔 → 개성 채우기)
 - `personaBrief`가 `ctx()`에 들어가 모든 AI 생성이 말투를 지킴. 새 캐릭터 스키마(`charSchema`)에 persona·pfields
 - 설계: [research/character.md](research/character.md)
 

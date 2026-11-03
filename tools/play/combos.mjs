@@ -13,7 +13,7 @@ import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { loadUnits } from '../lib/source.mjs';
 import { IMAGE_SINKS } from '../lib/prompts.mjs';
-import { promptSitesStatic, checkPrompt, composition, schemaOf, lenientJSON } from '../lib/combos.mjs';
+import { promptSitesStatic, checkPrompt, composition, schemaOf, lenientJSON, fakeAnswer } from '../lib/combos.mjs';
 import { withPage, ROOT, PC_DIR } from './lib/page.mjs';
 import { readGame, gidOf, hasGame } from './lib/data.mjs';
 import { kindOf } from './lib/kind.mjs';
@@ -101,9 +101,9 @@ async function runSide(www, tag) {
           P().seenOpening = true; closeModal(); closeOv(); appStorage.removeItem('ggm-ng-draft');
           appStorage.setItem(PKEY, JSON.stringify({ active: 'gen', fallback: false, list: [{ id: 'gen', type: 'anthropic', name: 'tools/play', key: 'replay', model: 'replay', quick: 'replay-quick' }] })); setupAI();
           // 형식 견본을 그대로 답(견본 속 범위·설명은 앞 값으로) — 흐름이 응답을 받아 다음 단계로 가게
-          const schemaOf = new Function('return ' + libSrc.schemaOf)(), lenientJSON = new Function('return ' + libSrc.lenientJSON)();
-          let echoN = 0; const distinct = v => Array.isArray(v) ? v.map(distinct) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, distinct(x)])) : typeof v === 'string' && v ? `${v} ${++echoN}` : v; // 견본 값을 그대로 쓰면 대원마다 같은 글이 돼 같은 줄 되풀이가 가짜로 생김 — 번호를 붙여 서로 다르게
-          const echo = p => { const sc = schemaOf(p), v = sc && sc.body ? lenientJSON(sc.body) : null; return v ? JSON.stringify(distinct(v)) : '{}'; }; // 형식 견본을 그대로 답(tools/lib/combos.mjs와 같은 읽기)
+          const [schemaOf, lenientJSON, fakeAnswer] = ['schemaOf', 'lenientJSON', 'fakeAnswer'].map(k => new Function('return ' + libSrc[k])());
+          const fakeSt = { n: 0 }; // 형식 견본을 그럴듯한 답으로(tools/lib/combos.mjs fakeAnswer — 번호를 붙여 서로 다르게: 대원마다 같은 글이면 같은 줄 되풀이가 가짜로 생김)
+          const echo = p => { const sc = schemaOf(p), v = sc && sc.body ? lenientJSON(sc.body) : null; return v ? JSON.stringify(fakeAnswer(v, fakeSt)) : '{}'; };
           const realHttp = http;
           appStorage.setItem(NKEY, JSON.stringify({ key: 'combos-fake', retries: 0 })); // 그림 AI가 켜진 것으로(요청은 아래에서 가로챔)
           http = async (url, opts) => { if (/image\.novelai\.net/.test(url)) { const b = typeof opts.body === 'string' ? JSON.parse(opts.body) : (opts.body || {}), pr = b.parameters || {}; const frames = String(new Error().stack).split('\n').map(l => (/at (?:async )?([\w$.]+) \(/.exec(l) || [])[1]).filter(Boolean);
@@ -134,7 +134,7 @@ async function runSide(www, tag) {
           }
           load(); const frags = Object.fromEntries(Object.values(window.__PF || {}).map(f => [f.id, promptFrag(f.id)]));
           return { recs, errs, frags };
-        }, { step, game: gm.game, owners, skip: [...skip], flows: step.kind === 'new' ? {} : FLOWS, acts: step.kind === 'new' ? [] : uniqActs, responses: gm.responses, kindSrc: kindOf.toString(), libSrc: { schemaOf: schemaOf.toString(), lenientJSON: lenientJSON.toString() } });
+        }, { step, game: gm.game, owners, skip: [...skip], flows: step.kind === 'new' ? {} : FLOWS, acts: step.kind === 'new' ? [] : uniqActs, responses: gm.responses, kindSrc: kindOf.toString(), libSrc: { schemaOf: schemaOf.toString(), lenientJSON: lenientJSON.toString(), fakeAnswer: fakeAnswer.toString() } });
       }, { tag: `combos-${tag}`, www });
       out.recs.forEach((r, i) => records.push({ ...r, game: gm.name, sit: step.sit, seq: i, frags: out.frags }));
       (out.errs || []).forEach(e => records.push({ game: gm.name, sit: step.sit, error: e }));

@@ -123,10 +123,16 @@ async function rulesAIFill(){ const res=await rulesAIData(null); if(!res) return
 function rulesMissingDesc(){ return G.meta.elems.some(e=>!e.d)||Object.keys(ROLE).some(k=>!((G.meta.rules||{}).roleDesc||{})[k]); }
 function rulesNotInCodex(){ return !(G.world.codex||[]).some(x=>x.title==='[규칙] 속성 상성'); }
 function posClean(list){ return (Array.isArray(list)?list:[]).slice(0,10).map(p=>({id:'p_'+uid(),name:String(p.name||'포지션').slice(0,10),base:ROLE[p.base]?p.base:'atk',desc:String(p.desc||'').slice(0,80),range:RANGE[p.range]?p.range:'',t:Object.fromEntries(POS_TRAITS.map(([k])=>[k,Math.max(-80,Math.min(150,Math.round(+((p.t||{})[k])||0)))]).filter(([,v])=>v))})).filter(p=>p.name); }
+/* 쓸 만한 포지션 목록: 2개 이상이고 기본형(공격·방어·지원)이 다 있음 — 새 게임 생성(0250)과 포지션 자동 설계가 같이 씀 */
+function posValid(L){ return L.length>=2&&['atk','def','sup'].every(k=>L.some(p=>p.base===k)); }
+/* 포지션 자동 설계(점검 g_pos·실행 중 자동 채움): 포지션 없이 기본 3개로 돌던 예전 게임에 세계관에 맞춘 포지션을 만들어 저장하고 캐릭터를 고루 배정 */
+async function posAI(){ const r=await aiJSON(rulesPosAIPrompt(),null,'default'), L=posClean(r&&r.positions); if(!posValid(L)) return false; G.meta.positions=L; posSpread(L); mark('meta'); return true; }
 async function rulesPosAI(btn){ rulesRead(); const r=await aiJSON(rulesPosAIPrompt(),btn,'default'); const L=posClean(r&&r.positions); if(!L.length) return; RD.positions=L; openRules(true); toast(`포지션 ${L.length}개를 설계했어요. 저장을 눌러 주세요`); }
 async function rulesRecalc(){ if(!(await appConfirm(`기본형·희귀도 기준으로 모든 ${T('crew')}의 체력·공격·방어·속도를 다시 계산할까요? 직접 고친 능력치도 바뀌어요(이격은 원본 비율을 따라가요).`))) return; if(!rulesSave()) return;
   let n=0; for(const c of G.chars){ if(c.alt) continue; const s=GGMCombat.generateBaseStats(c); Object.assign(c,{hp:s.hp,atk:s.atk,def:s.def,spd:s.spd}); mark('c:'+c.id); n++; } toast(`${n}명의 능력치를 다시 계산했어요`); openRules(); }
-function rulesPosAssign(){ rulesRead(); const P=RD.positions; let n=0; G.chars.forEach(c=>{ if(P.some(p=>p.id===c.pos)) return; const cand=P.filter(p=>p.base===c.role); if(!cand.length) return; c.pos=cand[hashN(c.id)%cand.length].id; mark('c:'+c.id); n++; }); toast(`${n}명에게 포지션을 배정했어요(기본형이 같은 포지션 중에서). 캐릭터 편집에서 바꿀 수 있어요`); }
+/* 기본형이 같은 포지션 중에서 고루 배정(포지션이 목록에 없는 캐릭터만) — 규칙 화면의 배정 버튼과 포지션 자동 설계(posAI)가 같이 씀. 배정한 수 */
+function posSpread(P){ let n=0; G.chars.forEach(c=>{ if(P.some(p=>p.id===c.pos)) return; const cand=P.filter(p=>p.base===c.role); if(!cand.length) return; c.pos=cand[hashN(c.id)%cand.length].id; mark('c:'+c.id); n++; }); return n; }
+function rulesPosAssign(){ rulesRead(); const n=posSpread(RD.positions); toast(`${n}명에게 포지션을 배정했어요(기본형이 같은 포지션 중에서). 캐릭터 편집에서 바꿀 수 있어요`); }
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
   if(a==='rulesopen') openRules();
   else if(a==='rulessave'){ if(rulesSave()){ closeModal(); render(); toast('게임 규칙을 저장했어요'); } }

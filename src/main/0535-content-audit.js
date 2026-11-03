@@ -28,10 +28,12 @@ const AUDIT_RULES=[
  {id:'c_statband',scope:'char',kind:'upgrade',since:3,label:'능력치가 희귀도·기본형 기준에서 많이 벗어났어요(AI 생성 편차)',test:c=>!c.alt&&balInfo(c).statOut,fix:{mode:'auto',run:c=>{ balNormalize(c,'edge'); }}},
  {id:'c_genlag',scope:'char',kind:'upgrade',since:3,label:'출시 세대가 현재보다 많이 뒤처졌어요(구캐릭터 AS)',test:c=>!c.alt&&balInfo(c).genLag,fix:{mode:'skills-remaster'}},
  {id:'c_persona',scope:'char',kind:'missing',since:4,label:'개성 시트(성격·말투·반전 매력)가 없거나 비었어요',test:c=>!c.alt&&!((c.persona||{}).traits||[]).length,fix:{mode:'ai-persona',k:'fill'}},
+ {id:'c_pfields',scope:'char',kind:'missing',since:9,label:'프로필 항목(생일·신장 등 게임의 프로필 틀)이 비었어요',test:c=>!c.alt&&((c.persona||{}).traits||[]).length>0&&!Object.keys(c.pfields||{}).length,fix:{mode:'ai-persona',k:'fill'}},
  {id:'c_persona_weak',scope:'char',kind:'upgrade',since:4,label:'개성 검수 점수가 낮아요(매력·차별성 부족)',test:c=>!c.alt&&((c.persona||{}).traits||[]).length>0&&personaReview(c).score<55,fix:{mode:'ai-persona',k:'improve'}},
  {id:'c_afftalk',scope:'char',kind:'missing',since:4,label:'호감도에 따라 열리는 인연 톡이 없어요',test:c=>!c.alt&&!affThreads(c).length,fix:{mode:'ai-afftalk'}},
  {id:'c_memorial',scope:'char',kind:'missing',since:4,label:'메모리얼(높은 호감도 특별 장면·로비 대사)이 없어요',test:c=>!c.alt&&!(c.memorial&&c.memorial.script),fix:{mode:'ai-memo'}},
  {id:'g_rules',scope:'game',kind:'upgrade',since:3,label:'속성·역할 설명이 없어요(게임 규칙·도감에 표시돼요)',test:()=>rulesMissingDesc(),fix:{mode:'ai-rules'}},
+ {id:'g_pos',scope:'game',kind:'upgrade',since:9,label:'세계관에 맞춘 포지션이 없어요(기본 공격·방어·지원으로 돌아가요 — AI로 설계해 캐릭터에 배정)',test:()=>!(Array.isArray(G.meta.positions)&&G.meta.positions.length),fix:{mode:'ai-run',run:()=>posAI()}},
  {id:'g_codex',scope:'game',kind:'upgrade',since:3,label:'도감에 게임 규칙(상성·역할)이 기록되지 않았어요',test:()=>rulesNotInCodex(),fix:{mode:'auto',run:()=>{ rulesCodex(); }}},
  {id:'w_faction',scope:'game',kind:'upgrade',since:8,label:'세력·몬스터 설정이 얕아요(종류·목적·관계·정체가 비어 있음)',test:()=>factionReview().score<70,fix:{mode:'ai-run',run:()=>factionAI()}},
  {id:'c_monster',scope:'char',kind:'missing',since:1,label:'몬스터로 보이는 캐릭터예요(톡·일정·인연 대상이 되면 안 돼요 → 적으로 전환)',test:c=>!c.monster&&!c.alt&&isMonsterLike(c),fix:{mode:'auto',run:c=>charToMonster(c)}},
@@ -43,7 +45,7 @@ const AUDIT_RULES=[
  {id:'c_spot',scope:'char',kind:'upgrade',since:5,label:'일정 장소에서 만날 때의 장면이 없어요(기본 장면으로 나와요)',test:c=>!c.alt&&!c.npc&&spots().length>0&&spots().some(s=>!(c.spotTalk||{})[s.id]),fix:{mode:'ai-run',run:c=>spotTalkAI(c)}},
  {id:'l_imgperson',scope:'lib',kind:'missing',since:1,label:'배경·소품 그림 프롬프트에 사람 태그가 섞여 있어요(사람 그림이 돼요)',test:l=>!!IMG_NOHUMAN[l.kind]&&!!l.prompt&&imgGuard(l.kind,l.prompt).removed.length>0,fix:{mode:'auto',run:l=>{ plHit('img-person-'+l.kind,l.prompt); l.prompt=imgGuard(l.kind,l.prompt).out; }}},
  {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
-function auditVer(){ return Math.max(...AUDIT_RULES.map(r=>r.since)); }
+function auditVer(){ return Math.max(...AUDIT_RULES.map(r=>r.since)); } // 점검 판: 9 = 프로필 항목·포지션 보완(생성 규칙은 그대로라 auditGenVer는 8)
 function auditTargets(scope){ if(scope==='char') return G.chars; if(scope==='lib') return G.lib; if(scope==='game') return [G.meta]; if(scope==='stage') return G.chapters.filter(ch=>ch.kind==='main'||ch.kind==='event').flatMap(ch=>ch.stages||[]); return []; }
 function auditName(r,o){ if(r.scope==='game') return G.meta.title||'게임'; if(r.scope==='stage'){ const ch=G.chapters.find(c=>(c.stages||[]).includes(o)); return `${ch?ch.title+' · ':''}${o.title||o.id}`; } return o.name||o.id; }
 function auditScan(only){ const out=[]; for(const r of AUDIT_RULES){ const items=auditTargets(r.scope).filter(o=>(!only||only(o,r))&&(()=>{ try{ return r.test(o); }catch(e){ return false; } })()); if(items.length) out.push({rule:r,items}); } return out; }
