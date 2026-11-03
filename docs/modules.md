@@ -129,6 +129,8 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 7. 대본 엔진 (VN)
 
+파일: `src/main/0460-script-engine.js`
+
 스토리·에피소드·오프닝·이벤트·톡이 공유하는 **텍스트 대본 형식**. AI도 이 형식으로 씁니다.
 
 ```
@@ -147,6 +149,8 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - `playStory(title, script, done)` → `#ov`에서 재생. 화자는 `findSpeaker`(캐릭터) / `npcBy`(NPC). 표정 미지정 시 `textFace()`가 대사 감정으로 추정. `[배경:]`·`[소품:]`·`[CG:]`·`[음악:]`은 `lib`에서 이름으로 찾음.
 
 ## 8. 가챠(계약)
+
+파일: `src/main/0500-gacha.js` · 픽업 `src/main/0140-pickup-new.js` `src/main/0150-pickup-existing.js`
 
 - `pull(n)` → 비용 `n*COST(120)` 차감 → `rollOne(guarSR, forceSSR, banner)` n회 → `mark('prog')` → **`await flush()` 후** 연출 `playGacha(res)`. (저장 성공 전엔 결과를 보여 주지 않음)
 - `rollOne`: 소프트 천장 확률 `softRate()`, 천장 `settings.pity`, 10연 마지막 SR 보장, 픽업 확률 `banner.rate`, 픽업 실패 시 다음 SSR 확정(`guar`), 모집 포인트(`spark`, `SPARK` 포인트로 교환). 중복은 `dup`(돌파, 최대 5) + `REFUND` 환급.
@@ -238,6 +242,8 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 9. 성장 · 경제 · 콘텐츠
 
+파일: `src/main/0090-growth.js` `src/main/0240-growth-curve.js` `src/main/0190-shop.js` `src/main/0110-challenge-raid.js` `src/main/0120-abyss.js` · 라이브 운영 `src/main/0280-live-ops.js` `src/main/0290-season-rotation.js`
+
 - 성장(성장·성장 곡선 섹션): 레벨(최대 120, 71~ 초월승급), 돌파, 스킬 강화, 전용 무기, 호감도(`addAff`, 레벨별 대사·에피소드 해금). 비용 공식은 `GGMCombat.growthCost/limitBreakCost` 등.
 - 일일/주간 카운터: `dm()` / `bump(key)`(미션·패스 진행).
 - 상점: 보급 상점(일일), 캐시 상점(전부 무료 재화), 이벤트 상점, 자동 스킨 상점.
@@ -246,10 +252,14 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 10. 메신저(등대톡) · 갠톡
 
+파일: `src/main/0100-messenger.js` `src/main/0160-free-chat.js`
+
 - `threads[]`의 대본을 `trigger` 조건(스테이지 클리어 등)에 따라 `prog.inbox`로 배달, `openPhone(tid)`.
 - 갠톡: 캐릭터와 AI 자유 채팅. 결과는 스토리 기억에 반영될 수 있음.
 
 ## 11. 스토리 공장 · 새 게임 · 기억
+
+파일: `src/main/0250-story-factory.js` `src/main/0260-new-game-draft.js` `src/main/0330-casting.js` · 관계·기억 `src/main/0450-relations-memory.js` `src/main/0530-story-memory.js` · 도감 `src/main/0300-codex.js`
 
 - 새 게임 초안(`openDraft`)·장르 마법사(`showSetup`): 세계관 → 캐릭터 → 오프닝(배경·소품·음악·배너 포함) → 1장 순서로 AI 다단계 생성(`buildNewGameDraft`, 단계별 `ngStep`이 최대 3회 시도·초안에 저장해 이어 쓰기). 1장은 이후 장과 달리 한 번의 호출로 대본까지 씀. 생성 중에는 `NEW_GAME_SOURCE`가 설정되어 저장·탭 이동이 막힘. 계측과 개선 안건은 [research/generation-pipeline.md](research/generation-pipeline.md).
 - 스토리 공장: 챕터 구성 → 스테이지마다 집필 → 요약·관계(`rels`)·톡 생성.

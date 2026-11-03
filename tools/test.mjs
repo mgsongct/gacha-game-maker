@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { loadUnits } from './lib/source.mjs';
+import { loadUnits, walk } from './lib/source.mjs';
 import { buildGraph, unused, unusedVars, cycles, deepest } from './lib/graph.mjs';
 import { actions, mutations, stateFlow } from './lib/flow.mjs';
 import { parseErrors, dupBodies, repeatedStrings, sgRules, commentedCode } from './lib/quality.mjs';
@@ -152,6 +152,36 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   assert.ok(imperative('처음 만난다)') && imperative('보스전이다.') && !imperative('저장했어요.') && imperative('BURST 생성 금지.') && !imperative('JSON만 출력: {}'), '해라체 판별(…금지도 지시, JSON만 출력은 표식)');
   writeFileSync(join(r7, 'src/main/020-q.js'), "pfDef('B','다른 곳',()=>'흩어진 조각은 안 된다.');\n"); const FF = fragmentFiles(await loadUnits(r7));
   assert.ok(FF.home === 'src/main/010-p.js' && FF.stray.length === 1 && FF.stray[0].file === 'src/main/020-q.js', '조각이 두 파일에 흩어지면 잡음: ' + JSON.stringify(FF)); rmSync(r7, { recursive: true, force: true }); }
+// 프롬프트 흐름 보강: 글로 쓰는 지역 변수(const FAN=…)·연결 층 덧붙임(받은 프롬프트에 붙이는 글)·넘겨받은 글 AI(s.json(p) — 안쪽 콜백)·돌려주는 식만(부수 글 뺌)·출력 자리만(비교값 뺌)
+{ const r8 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r8, 'src/main'), { recursive: true });
+  writeFileSync(join(r8, 'src/main/010-a.js'), [
+    "async function aiCall(prompt){ const P2=prompt+'\\n\\n다른 설명 없이 JSON만 출력한다.'; return http(P2); }",
+    "async function aiJSON(p){ return aiCall(p); }",
+    "async function gen(src){ const FAN=src?`원작 「${src}」을 따른다.`:''; return aiJSON(`${FAN}\\n${helper()}${isMe('나')?'':''}\\nJSON만 출력: {\"a\":1}`); }",
+    "function helper(){ toast('저장하지 못했다.'); return '이름을 짓는다.'; }",
+    "function isMe(n){ return n==='나는 아니다'; }",
+    "async function req(s,prompt){ return Promise.resolve().then(()=>s.json(prompt,{})); }",
+    "async function skill(){ return req(SAMPLE,'세 스킬을 설계한다.'); }",
+    "async function res(){ const r=await fetch('x'); return r.json(); }"].join('\n'));
+  const U8 = await loadUnits(r8), got = inlinePrompts(U8).map(p => `${p.site.split(' ')[1]}:${p.head}`).sort();
+  assert.deepEqual(got, ['aiCall:\\n\\n다른 설명 없이 JSON만 출력한다.', 'gen:원작 「」을 따른다.', 'helper:이름을 짓는다.', 'skill:세 스킬을 설계한다.'], '프롬프트 흐름 보강: ' + JSON.stringify(got)); rmSync(r8, { recursive: true, force: true }); }
+// 자연 경계(모듈성 최대화): 두 덩어리가 다리 하나로 이어지면 두 묶음 — 찾은 경계의 Q가 한 덩어리로 볼 때보다 큼 · 이름 범위: 지역 이름만 넘기고 콜백 인자는 안 셈, 바깥 이름에 쓰기·await 잡음
+{ const { louvain, modularity } = await import('./lib/modules.mjs'), adj = new Map(), e = (a, b) => { for (const [x, y] of [[a, b], [b, a]]) { if (!adj.has(x)) adj.set(x, new Map()); adj.get(x).set(y, 1); } };
+  ['a', 'b', 'c', 'd'].forEach((x, i, A) => A.slice(i + 1).forEach(y => e(x, y))); ['p', 'q', 'r', 's'].forEach((x, i, A) => A.slice(i + 1).forEach(y => e(x, y))); e('d', 'p');
+  const c = louvain(adj), parts = new Set(c.values()); assert.ok(parts.size === 2 && c.get('a') === c.get('d') && c.get('p') === c.get('s') && c.get('a') !== c.get('p') && modularity(adj, c) > modularity(adj, new Map([...adj.keys()].map(k => [k, 0]))), '모듈성 묶기: ' + JSON.stringify([...c]));
+  const { freeNames } = await import('./lib/scope.mjs'), r9 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r9, 'src/main'), { recursive: true });
+  writeFileSync(join(r9, 'src/main/010-a.js'), "function top(){}\nasync function f(a,c){ const d=1; let n=0; const X=`${a}${c.map(y=>y+d)}${top()}${G.x}`; const W=`${n++}`; const A=`${await top()}`; }\n");
+  const U9 = await loadUnits(r9), decl = nm => { let hit = null; walk(U9[0].tree.rootNode, n => { if (n.type === 'variable_declarator' && n.childForFieldName('name')?.text === nm) hit = n.childForFieldName('value'); }); return hit; };
+  const X = freeNames(decl('X')), W = freeNames(decl('W')), A = freeNames(decl('A'));
+  assert.ok(X.locals.sort().join() === 'a,c,d' && X.globals.sort().join() === 'G,top' && !X.writes.length && W.writes.join() === 'n' && A.hasAwait, '이름 범위: ' + JSON.stringify({ X, W: W.writes, A: A.hasAwait })); rmSync(r9, { recursive: true, force: true }); }
+// 프롬프트 글 검사(조합 도구): 깨짐 · 과잉 · 과소
+{ const C = await import('./lib/combos.mjs'), codes = (t, o) => C.checkPrompt(t, o).map(f => f.kind + ':' + f.code).sort();
+  assert.deepEqual(codes('세계관: {name}\n이름 undefined\n배경 목록:\n\nJSON만 출력: {"a":1}', { sink: 'aiJSON' }), ['깨짐:값 없음', '깨짐:빈 머리말', '깨짐:안 채운 자리'], '깨짐');
+  assert.deepEqual(codes('이 줄은 서른 글자가 넘는 같은 지시문입니다 반복됩니다.\n이 줄은 서른 글자가 넘는 같은 지시문입니다 반복됩니다.\n쓴다', { sink: 'aiJSON' }), ['과소:형식 지시 없음', '과잉:같은 줄 되풀이'], '과잉·과소');
+  assert.deepEqual(codes('JSON만 출력: {"a":1}\nJSON만 출력: {"a":1,"b":2}\n\n다른 설명 없이 JSON만 출력한다.', { sink: 'aiJSON', used: ['a'], got: ['a', 'b'], strip: ['\n\n다른 설명 없이 JSON만 출력한다.'] }), ['과잉:읽지 않는 키 요구', '깨짐:표식 여러 개'], '표식(쌍점)만 셈 · 받고 버린 키 · 연결 층 덧붙임은 뺌');
+  const sc = C.schemaOf('규칙\nJSON만 출력: {"hp":800~3000(방어형),"r":1~3 정수,"x":[{"n":""}],"y":[...]} 끝\n\nJSON만 출력한다.');
+  assert.ok(sc.keys.join() === 'hp,r,x,y' && sc.tail.startsWith('끝') && JSON.stringify(C.lenientJSON(sc.body)) === '{"hp":800,"r":1,"x":[{"n":""}],"y":[]}', '형식 견본 읽기: ' + JSON.stringify(sc));
+  const cm = C.composition('앞 공통 규칙은 이렇게 길게 적는다 정말로. 이름 세라 끝', { A: '공통 규칙은 이렇게 길게 적는다 정말로. 이름 {n} 끝', B: '없는 조각의 기본 글은 여기에 있다 길게' }); assert.deepEqual(cm.used, ['A'], '조각 구성(자리로 나눈 덩어리)'); }
 // 지시문 옮기기(prompts-move): 템플릿은 원문 그대로 조각으로 — ${식}은 이름 붙은 자리(T('x')→x, a.b→b, 겹치면 번호), "JSON만 출력" 표식·스키마는 호출 지점에 남김, 문자열은 통째로
 { const a = moveLiteral("`세계관: ${w.name}\\n이 장면을 써라. ${T('crew')}와 ${c.name}가 나온다.\\nJSON만 출력: {\"a\":1}`", 'X'), b = moveLiteral("'채워라. 이미 있는 값은 살린다'", 'Y'), u = new Map();
   assert.ok(a.frag === '세계관: {name}\\n이 장면을 써라. {crew}와 {name2}가 나온다.' && a.call === "pf('X',{name:w.name,crew:T('crew'),name2:c.name})" && a.keep === '\\nJSON만 출력: {"a":1}', '템플릿 옮기기: ' + JSON.stringify(a));
@@ -194,4 +224,4 @@ function featA(){ return [G.meta.made, G.meta.never, G.world.lore, G.world.plot2
   assert.equal(fl.zzNew, 'P1', '캐릭터 콜백에서 읽는 새 필드가 어디에도 없음 → P1'); assert.equal(fl.zzMade, undefined, '생성물에 있는 필드는 통과: ' + JSON.stringify(fl));
   rmSync(r3, { recursive: true, force: true }); }
 rmSync(root, { recursive: true, force: true });
-console.log('ok tools: 개발 내역 검증(닿는 함수·보내는 쪽 없는 액션·글 속 코드 이름) · 모듈 경계(영역 침범·남의 상태 쓰기·파편화) · 지시문 옮기기(원문 그대로·자리 이름·표식 남김) · 프롬프트 조각 한곳(흩어짐 오류) · 프롬프트 스튜디오 밖 프롬프트 글(글 AI 호출 흐름·해라체) · 순수 모듈 경계 · 분석 코드 = 빌드된 SPA · 주석 속 코드 · 함수를 담은 표(멤버 호출 연결) · 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');
+console.log('ok tools: 자연 경계(모듈성 묶기)·이름 범위(지역 이름·쓰기·await) · 프롬프트 흐름 보강(지역 변수·연결 층·넘겨받은 글 AI·돌려주는 식·출력 자리) · 프롬프트 글 검사(깨짐·과잉·과소·견본 읽기·조각 구성) · 개발 내역 검증(닿는 함수·보내는 쪽 없는 액션·글 속 코드 이름) · 모듈 경계(영역 침범·남의 상태 쓰기·파편화) · 지시문 옮기기(원문 그대로·자리 이름·표식 남김) · 프롬프트 조각 한곳(흩어짐 오류) · 프롬프트 스튜디오 밖 프롬프트 글(글 AI 호출 흐름·해라체) · 순수 모듈 경계 · 분석 코드 = 빌드된 SPA · 주석 속 코드 · 함수를 담은 표(멤버 호출 연결) · 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');

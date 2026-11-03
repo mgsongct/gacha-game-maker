@@ -1,15 +1,17 @@
 #!/usr/bin/env node
 // 스튜디오 밖 지시문을 프롬프트 스튜디오 조각으로 옮기기(치환 도구). 원칙: 프롬프트는 스튜디오에 파편화되지 않게 한곳에 모아 두고 거기서 개선(CLAUDE.md §0-1).
 //   node tools/prompts-move.mjs <목록.json> [--dry]
+//   node tools/prompts-move.mjs --req [--dry]   남은 요청 글: 요청 조립 식째 스튜디오 「요청 조립」으로(아래 codeMove)
+//   node tools/prompts-move.mjs --fns [--dry]   프롬프트 글을 돌려주는 조립 함수·글 상수를 선언째 스튜디오 「조립 함수」로
 //   node tools/prompts-move.mjs --slots [--dry]   이미 옮긴 조각의 뜻 없는 자리 이름({v}·{String} 등)을 식에서 다시 짓기
 //   목록: {"group":"묶음 이름","items":[{"at":"src/main/x.js:줄","head":"지시문 글 머리(도구 보고서의 「…」)","id":"조각_ID","label":"스튜디오에 보일 이름"}]}
 // 하는 일: 그 지시문 글(문자열·템플릿)을 원문 그대로 조각 기본값으로 옮기고, 템플릿의 ${식}은 이름 붙은 자리 {이름}으로 바꿔
 //   호출 지점을 pf('조각_ID',{이름:식}) 으로 바꿈. 템플릿에 "JSON만 출력"(llmWrap·aiJSON이 찾는 표식)이 있으면 그 앞까지만 옮기고 표식·스키마는 둠.
 //   조각은 pfDef가 있는 파일(스튜디오) 「조각 모음」 끝에 묶음으로 넣음. 옮긴 뒤 보낸 프롬프트는 바이트 단위로 같아야 함(회귀 재생으로 확인).
-import { readFileSync, writeFileSync } from 'node:fs';
-import { join, dirname, resolve } from 'node:path';
+import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadUnits } from './lib/source.mjs';
+import { loadUnits, walk } from './lib/source.mjs';
 import { inlinePrompts, fragmentFiles } from './lib/prompts.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..'), END = '/* ===== 조각 모음 끝';
@@ -60,6 +62,56 @@ export function renameSlots(studio, srcs) { let changed = 0; const out = new Map
   return { studio, srcs: out, changed }; }
 const pfLine = (id, label, frag, vars) => `pfDef('${id}','${label.replace(/'/g, "\\'")}',()=>\`${frag}\`${vars && vars.length ? `,'자리: ${vars.map(v => '{' + v + '}').join(' ')}'` : ''});`;
 
+// 요청 조립 코드 옮기기(--req · --fns): 스튜디오 밖에 남은 프롬프트 글을 그 글을 만드는 코드째 스튜디오 모듈로(원문 그대로 — 뜻이 같아야 함).
+//   --req: 글 AI·그림 AI 호출의 프롬프트 인자 식과 그 식이 글로 쓰는 지역 변수의 값(const FAN=…) → 스튜디오 「요청 조립」 파일의 함수. 자리에는 그 함수 호출.
+//          식이 쓰는 지역 이름만 인자로 넘김(최상위·전역 이름은 그대로 — scope.freeNames). await·바깥 지역 이름에 쓰기·this가 든 식은 옮기지 않고 알림
+//   --fns: 그 식이 부르거나 가리키는 최상위 함수·글 상수 중 프롬프트 글을 돌려주는 것(ctx·charSchema·*_SCHEMA·composeNai·태그 표 …) → 스튜디오 「조립 함수」 파일로 선언째.
+//          옮긴 const가 불러올 때 계산되면 앞뒤 파일 순서(모듈 → main 이름순)로 아직 없는 이름을 쓰는지(TDZ) 보고 막음
+//   스튜디오는 폴더 모듈(src/main/0025-prompt-studio/)이어야 함. 옮긴 뒤: 빌드 · node build/test.mjs · node tools/play/combos.mjs --ref HEAD(보낸 프롬프트가 바이트 단위로 같은지)
+const MAIN_ORDER = root => { const tree = d => readdirSync(d).filter(f => !f.startsWith('.')).sort().flatMap(f => statSync(join(d, f)).isDirectory() ? tree(join(d, f)) : [join(d, f)]);
+  return [...['src/modules/app', 'src/modules/combat'].flatMap(d => existsSync(join(root, d)) ? tree(join(root, d)) : []), ...tree(join(root, 'src/main'))].filter(f => f.endsWith('.js')).map(f => relative(root, f)); }; // 실행 순서: 모듈 블록 → main(src/index.html)
+// 옮길 것 모으기: 요청 지점마다 프롬프트 흐름(깊이 0 = 인자 식·지역 변수 값 → --req, 깊이 1↑ = 부르는 최상위 선언 → --fns)
+function collectMoves(L, mode) { const { units, home, P, freeNames, inModule, read, notes, adds, edit, fresh } = L;
+  const has = (node, pred) => { let hit = false; walk(node, n => { if (hit) return false; if ((n.type === 'string' || n.type === 'template_string') && P.outputPos(n) && pred(P.ownText(n))) hit = true; }); return hit; };
+  const place = (file, node, line) => { const src = read(file), t = node.text; let best = -1, bd = Infinity; for (let i = src.indexOf(t); i >= 0; i = src.indexOf(t, i + 1)) { const d = Math.abs(src.slice(0, i).split('\n').length - line); if (d < bd) { bd = d; best = i; } } return best; }; // 같은 원문이 여럿이면 그 줄의 것
+  for (const [sinks, pred] of [[undefined, P.promptText], [P.IMAGE_SINKS, P.tagText]]) { const F = P.promptFlow(units, { sinks, tables: sinks === P.IMAGE_SINKS }), seen = new Set();
+    for (const s of F.sites) { if (inModule(s.loc, home)) continue; const exprs = [], tops = [];
+      F.flow([{ u: s.u, node: s.root }], () => {}, (node, u, depth) => { if (depth === 0) exprs.push({ u, node }); else { let t = node; while (t.parent && t.parent.type !== 'program') t = t.parent; tops.push({ u, node: t }); } });
+      for (const { u, node } of mode === 'req' ? exprs : tops) { const [file, line] = u.loc(node).split(':'); if (inModule(file, home) || seen.has(node.id) || !has(node, pred)) continue; seen.add(node.id);
+        if (mode === 'req') reqMove({ ...L, place }, s, u, node, file, +line, sinks, exprs, seen); else fnMove({ ...L, place }, node, u, file, +line); } } } }
+// --req 하나: 식을 함수로 — 지역 이름만 인자로(바깥 식을 옮기면 안쪽은 같이 감)
+function reqMove(L, s, u, node, file, line, sinks, exprs, seen) { const { freeNames, notes, adds, edit, fresh, place } = L;
+  if (exprs.some(o => o.node.id !== node.id && o.u === u && o.node.startIndex <= node.startIndex && o.node.endIndex >= node.endIndex && seen.has(o.node.id))) return;
+  const fn = freeNames(node); if (fn.hasAwait || fn.hasThis || fn.writes.length) { notes.push(`옮기지 않음 ${file}:${line} ${s.owner} — ${fn.hasAwait ? 'await' : fn.hasThis ? 'this' : '바깥 이름에 씀 ' + fn.writes.join(',')}`); return; }
+  let kase = null; for (let c = node; c && c.type !== 'program'; c = c.parent) if (c.type === 'switch_case') { kase = c.childForFieldName('value')?.text.replace(/^['"]|['"]$/g, ''); break; }
+  const decl = node.parent?.type === 'variable_declarator' ? node.parent.childForFieldName('name')?.text : null, base = (kase || s.owner).replace(/[^\w$]/g, '');
+  const name = fresh(decl ? `${base}${decl[0].toUpperCase()}${decl.slice(1)}Text` : `${base}${sinks ? 'Tags' : 'Prompt'}`), arg = fn.locals.length ? `{${fn.locals.join(',')}}` : '', at = place(file, node, line);
+  if (at < 0) { notes.push(`원문을 못 찾음 ${file}:${line}`); return; }
+  edit(file, at, node.text.length, `${name}(${arg})`); adds.push({ file, line, owner: s.owner, text: `function ${name}(${arg}){ return ${node.text}; }` }); }
+// --fns 하나: 최상위 선언째(바로 위 // 주석 포함)
+function fnMove(L, node, u, file, line) { const { read, notes, adds, edit, place } = L;
+  const nm = node.type === 'function_declaration' ? node.childForFieldName('name')?.text : node.namedChildren?.find(c => c.type === 'variable_declarator')?.childForFieldName('name')?.text;
+  if (!nm || node.type === 'expression_statement') return; const at = place(file, node, line); if (at < 0) { notes.push(`선언을 못 찾음 ${file}:${line} ${nm}`); return; }
+  const src = read(file), pre = src.slice(0, at).match(/(?:^|\n)((?:\/\/[^\n]*\n)+)$/), a0 = pre ? at - pre[1].length : at;
+  edit(file, a0, at - a0 + node.text.length + (src[at + node.text.length] === '\n' ? 1 : 0), ''); adds.push({ file, line, owner: nm, decl: node, u, text: src.slice(a0, at + node.text.length) }); }
+// TDZ: 옮긴 const가 불러올 때 계산하는 이름이 스튜디오보다 늦게 실행되는 파일의 const면 옮기지 않음
+function tdzFilter(L, target) { const { units, adds, edits, read, notes } = L, order = MAIN_ORDER(ROOT), ti = order.indexOf(target) >= 0 ? order.indexOf(target) : order.findIndex(f => f > target), lexIn = new Map();
+  units.forEach(u => { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type === 'lexical_declaration') c.namedChildren.filter(d => d.type === 'variable_declarator').forEach(d => lexIn.set(d.childForFieldName('name')?.text, u.loc(c).split(':')[0])); } });
+  for (const x of adds.filter(y => y.decl && y.decl.type === 'lexical_declaration')) { const bad = []; walk(x.decl, n => { if (/^(arrow_function|function_expression|function_declaration)$/.test(n.type)) return false; if (n.type === 'identifier' && lexIn.has(n.text) && order.indexOf(lexIn.get(n.text)) >= ti && !adds.some(y => y.owner === n.text)) bad.push(n.text); });
+    if (bad.length) { notes.push(`TDZ: ${x.owner}(${x.file}) 값이 스튜디오보다 늦게 정해지는 ${[...new Set(bad)].join(',')}를 씀 — 옮기지 않음`); adds.splice(adds.indexOf(x), 1); const es = edits.get(x.file); es.splice(es.findIndex(e => e.rep === '' && read(x.file).slice(e.at, e.at + e.len).includes(x.text)), 1); } } }
+async function codeMove(mode, dry) {
+  const P = await import('./lib/prompts.mjs'), { freeNames, inModule } = await import('./lib/scope.mjs'), units = await loadUnits(ROOT), home = fragmentFiles(units).home;
+  if (!home || !home.endsWith('/')) { console.log(`스튜디오(${home})가 폴더 모듈이 아니에요 — src/main/0025-prompt-studio/ 폴더로 먼저 옮기세요`); process.exit(1); }
+  const files = new Map(), read = f => { if (!files.has(f)) files.set(f, readFileSync(join(ROOT, f), 'utf8')); return files.get(f); }, notes = [], adds = [], edits = new Map(), topNames = new Set();
+  units.forEach(u => { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i), nm = c.type === 'function_declaration' ? c.childForFieldName('name')?.text : (c.type === 'lexical_declaration' || c.type === 'variable_declaration') ? c.namedChildren.find(x => x.type === 'variable_declarator')?.childForFieldName('name')?.text : null; if (nm) topNames.add(nm); } });
+  const L = { units, home, P, freeNames, inModule, read, notes, adds, edits, edit: (file, at, len, rep) => { if (!edits.has(file)) edits.set(file, []); edits.get(file).push({ at, len, rep }); }, fresh: n => { let k = n, i = 2; while (topNames.has(k)) k = n + i++; topNames.add(k); return k; } };
+  collectMoves(L, mode); const target = home + (mode === 'req' ? '020-requests.js' : '030-builders.js'); if (mode === 'fns') tdzFilter(L, target);
+  const groups = new Map(); adds.forEach(x => { if (!groups.has(x.file)) groups.set(x.file, []); groups.get(x.file).push(x); });
+  const head = mode === 'req' ? '/* ===== 프롬프트 스튜디오: 요청 조립 — 기능 파일이 글 AI·그림 AI에 보내는 요청 글(머리말·답 형식 견본·조건부 지시)을 여기서 만들고, 기능 파일은 데이터만 넘김 ===== */' : '/* ===== 프롬프트 스튜디오: 조립 함수 — 여러 요청이 같이 쓰는 프롬프트 글(AI 컨텍스트·답 형식 견본·그림 태그 표·태그 조립) ===== */';
+  if (!dry) { for (const [f, es] of edits) { let t = read(f); es.sort((a, b) => b.at - a.at).forEach(e => { t = t.slice(0, e.at) + e.rep + t.slice(e.at + e.len); }); writeFileSync(join(ROOT, f), t); }
+    if (adds.length) { const tf = join(ROOT, target), cur = existsSync(tf) ? readFileSync(tf, 'utf8') : head + '\n'; writeFileSync(tf, cur.replace(/\n*$/, '\n') + [...groups].map(([f, xs]) => `/* ${f} */\n${xs.map(x => x.text).join('\n')}`).join('\n') + '\n'); } }
+  console.log(`${dry ? '(미리보기) ' : ''}${mode === 'req' ? '요청 조립 식' : '조립 함수·글 상수'} ${adds.length}개 → ${target} (파일 ${groups.size}곳)`); groups.forEach((xs, f) => console.log(`  ${f}: ${xs.map(x => x.owner).join(', ')}`)); notes.forEach(n => console.log('  ' + n)); }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && (process.argv.includes('--req') || process.argv.includes('--fns'))) { await codeMove(process.argv.includes('--req') ? 'req' : 'fns', process.argv.includes('--dry')); process.exit(0); }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--slots')) { // 이미 옮긴 조각의 뜻 없는 자리 이름 다시 짓기
   const units = await loadUnits(ROOT), home = fragmentFiles(units).home, files = units.flatMap(u => u.files.map(f => f.path)).filter(f => f !== home), srcs = new Map(files.map(f => [f, readFileSync(join(ROOT, f), 'utf8')]));
   const r = renameSlots(readFileSync(join(ROOT, home), 'utf8'), srcs); if (!process.argv.includes('--dry')) { writeFileSync(join(ROOT, home), r.studio); for (const [f, t] of r.srcs) if (t !== srcs.get(f)) writeFileSync(join(ROOT, f), t); }

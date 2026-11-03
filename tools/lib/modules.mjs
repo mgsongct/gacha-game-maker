@@ -31,5 +31,82 @@ export function moduleMap(units, fns, sf) {
   for (const [, o] of owner) M(o).owns++;
   const foreign = []; for (const [k, c] of keyFiles) { const o = owner.get(k); for (const [f, n] of c) if (f !== o) foreign.push({ key: k, owner: o, file: f, n }); }
   const scattered = [...keyFiles].filter(([, c]) => c.size >= 3).map(([k, c]) => ({ key: k, owner: owner.get(k), files: [...c.keys()] })).sort((a, b) => b.files.length - a.files.length);
-  return { infra: [...infra].sort(), mods: [...mods.values()].sort((a, b) => a.file.localeCompare(b.file)), envy: envy.sort((a, b) => b.share - a.share), foreign, scattered, hubs: [...hub].sort() };
+  return { refs, infra: [...infra].sort(), mods: [...mods.values()].sort((a, b) => a.file.localeCompare(b.file)), envy: envy.sort((a, b) => b.share - a.share), foreign, scattered, hubs: [...hub].sort() };
 }
+// 기능 영역(docs/modules.md의 ## 절 — 절마다 적은 파일·함수 이름이 그 기능의 선언): 영역마다
+//   선언과 코드가 맞나(적힌 함수가 영역 파일 밖에 있음 = 흩어짐, 없음 = 문서 낡음) · 영역 상태(영역 파일이 주인인 키)를 영역 밖에서 씀 ·
+//   영역 밖 함수가 영역 일을 함(영역 침범 후보 중 몰린 곳이 영역) · 영역 함수가 남의 일을 함 · 영역이 부르는/불리는 다른 영역
+export function areaMap(doc, units, fns, M) {
+  const top = [...fns.values()].filter(f => f.top && !f.table), byName = new Map(top.map(f => [f.name, f])), fileOf2 = f => fileOf(f.loc), all = new Set(top.map(fileOf2));
+  const secs = String(doc).split(/^## /m).slice(1).map(t => { const title = t.split('\n')[0].trim(), body = t.slice(title.length);
+    const files = [...new Set([...body.matchAll(/`(src\/[\w\/.-]+?)`/g)].map(m => m[1]).flatMap(p => p.endsWith('.js') ? [p] : [...all].filter(f => f.startsWith(p.replace(/\/?$/, '/')))))].filter(f => all.has(f));
+    const names = [...new Set([...body.matchAll(/`([^`\n]+)`/g)].flatMap(m => m[1].match(/[A-Za-z_$][\w$]*(?=\(|$|[`·,\s])/g) || []))].filter(n => byName.has(n));
+    return { title, files, names }; }).filter(s => s.files.length);
+  const areaOf = new Map(); secs.forEach(s => s.files.forEach(f => { if (!areaOf.has(f)) areaOf.set(f, s.title); }));
+  return secs.map(s => { const F = new Set(s.files), inA = f => F.has(f);
+    // 흩어진 함수: 절에 적힌 함수가 영역 파일 밖에 있고, 그 함수의 참조(호출·상태)가 절반 이상 영역 파일로 감(다른 영역을 가리키려고 적은 이름은 뺌)
+    const share = f => { const m = M.refs.get(f.key); if (!m) return 0; const tot = [...m.values()].reduce((a, b) => a + b, 0); return tot ? [...m].filter(([k]) => inA(k)).reduce((a, [, n]) => a + n, 0) / tot : 0; };
+    const misplaced = s.names.map(n => byName.get(n)).filter(f => !inA(fileOf2(f)) && !M.infra.includes(fileOf2(f)) && share(f) >= 0.5).map(f => `${f.name}(${fileOf2(f).replace(/^src\/(main|modules)\//, '')} ${Math.round(100 * share(f))}%)`);
+    const foreignW = M.foreign.filter(x => inA(x.owner) && !inA(x.file)).map(x => `${x.key} ← ${x.file.replace(/^src\/(main|modules)\//, '')}`);
+    const envyIn = M.envy.filter(e => inA(e.to) && !inA(e.file)).map(e => `${e.fn}(${e.file.replace(/^src\/(main|modules)\//, '')} ${e.share}%)`), envyOut = M.envy.filter(e => inA(e.file) && !inA(e.to)).map(e => `${e.fn}→${e.to.replace(/^src\/(main|modules)\//, '')}`);
+    const out = new Map(), inn = new Map(); for (const m of M.mods) { if (inA(m.file)) for (const [b, n] of m.out) if (!inA(b)) { const a = areaOf.get(b) || b.replace(/^src\/(main|modules)\//, ''); out.set(a, (out.get(a) || 0) + n); } if (!inA(m.file)) for (const [b, n] of m.out) if (inA(b)) { const a = areaOf.get(m.file) || m.file.replace(/^src\/(main|modules)\//, ''); inn.set(a, (inn.get(a) || 0) + n); } }
+    const top3 = m => [...m].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, n]) => `${k}(${n})`).join(', ');
+    return { title: s.title, files: s.files, fns: top.filter(f => inA(fileOf2(f))).length, misplaced, foreignW, envyIn, envyOut, calls: top3(out), calledBy: top3(inn) }; }); }
+
+// ── 자연 경계(정밀): 함수 그래프(호출 + 같은 상태 키를 읽고 쓰는 사이)를 모듈성 최대화(Louvain)로 묶어, 코드가 실제로 뭉치는 경계를 찾고 파일(모듈) 경계와 견줌.
+//   과잉 분할 — 한 묶음이 여러 모듈에 걸치고, 그 모듈들 각각의 함수 대부분(≥50%)이 그 묶음: 사실상 한 기능을 여러 파일로 쪼갬
+//   기능 섞임 — 한 모듈의 함수가 여러 묶음으로 갈림(두 번째 묶음도 ≥30%·3함수↑): 한 파일에 여러 기능
+//   기능 분산(제자리 아닌 함수) — 함수가 속한 묶음의 주인 모듈(그 묶음 함수가 가장 많은 모듈)이 자기 모듈과 다름: 다른 기능의 조각이 이 파일에 있음
+//   모듈성 Q — 파일 경계로 나눴을 때와 찾은 경계의 Q. 차이가 클수록 파일 경계가 코드의 실제 뭉침과 어긋남
+// 공용 기반(허브 함수·공용 모듈)과 액션 분배기(handle*Action — 원안 설계상 모든 기능으로 넘기는 층)는 그래프에서 뺌. 상태 키는 접근 함수가 2~15개인 것만(G.chars 같은 전역 키는 모두를 잇기만 함)
+export function louvain(adj) { // adj: Map(node → Map(nbr → w)) 무향
+  let nodes = [...adj.keys()].sort(), comm = new Map(nodes.map(n => [n, n])), level = adj, members = new Map(nodes.map(n => [n, [n]]));
+  for (let pass = 0; pass < 10; pass++) {
+    const N = [...level.keys()].sort(), k = new Map(N.map(n => [n, [...level.get(n).values()].reduce((a, b) => a + b, 0)])), m2 = [...k.values()].reduce((a, b) => a + b, 0) || 1, c = new Map(N.map(n => [n, n])), tot = new Map(k);
+    let moved = true, any = false;
+    for (let it = 0; it < 50 && moved; it++) { moved = false;
+      for (const i of N) { const ci = c.get(i), ki = k.get(i), w = new Map(); for (const [j, x] of level.get(i)) if (j !== i) w.set(c.get(j), (w.get(c.get(j)) || 0) + x);
+        tot.set(ci, tot.get(ci) - ki); let best = ci, bg = (w.get(ci) || 0) - tot.get(ci) * ki / m2;
+        for (const [cj, x] of [...w].sort((a, b) => String(a[0]).localeCompare(String(b[0])))) { const g = x - tot.get(cj) * ki / m2; if (g > bg + 1e-12) { bg = g; best = cj; } }
+        tot.set(best, (tot.get(best) || 0) + ki); if (best !== ci) { c.set(i, best); moved = true; any = true; } } }
+    if (!any) break;
+    const next = new Map(), mem2 = new Map(); for (const n of N) { const cn = c.get(n); if (!next.has(cn)) { next.set(cn, new Map()); mem2.set(cn, []); } mem2.get(cn).push(...members.get(n)); }
+    for (const n of N) for (const [j, x] of level.get(n)) { const a = c.get(n), b = c.get(j); next.get(a).set(b, (next.get(a).get(b) || 0) + x); }
+    level = next; members = mem2; }
+  for (const [cn, ms] of members) ms.forEach(n => comm.set(n, cn)); return comm; }
+export function modularity(adj, part) { let m2 = 0, q = 0; const deg = new Map(), tot = new Map(); for (const [n, nb] of adj) { const d = [...nb.values()].reduce((a, b) => a + b, 0); deg.set(n, d); m2 += d; tot.set(part.get(n), (tot.get(part.get(n)) || 0) + d); }
+  for (const [n, nb] of adj) for (const [j, w] of nb) if (part.get(n) === part.get(j)) q += w; let s = 0; for (const t of tot.values()) s += (t / (m2 || 1)) ** 2; return m2 ? q / m2 - s : 0; }
+// 함수 그래프: 호출(부르는 함수가 많은 함수일수록 가볍게 — 여러 기능이 같이 쓰는 도구) + 같은 상태 키(접근 함수 2~8개인 것만, 1/(n-1))
+function fnGraph(fns, sf, M, modOfFile) {
+  const top = [...fns.values()].filter(f => f.top && !f.table && !M.hubs.includes(f.key) && !/^handle\w+Action$/.test(f.name) && !M.infra.includes(fileOf(f.loc))), keys = new Set(top.map(f => f.key)), adj = new Map(top.map(f => [f.key, new Map()]));
+  const add = (a, b, w) => { if (a === b || !keys.has(a) || !keys.has(b)) return; adj.get(a).set(b, (adj.get(a).get(b) || 0) + w); adj.get(b).set(a, (adj.get(b).get(a) || 0) + w); };
+  for (const f of top) for (const [ck, n] of f.calls) { const c = fns.get(ck); add(f.key, ck, Math.min(n, 3) / Math.log2(2 + (c ? c.callers.size : 1))); }
+  for (const k of sf.list) { const S = [...new Set([...k.r, ...k.w])].filter(x => keys.has(x)); if (S.length < 2 || S.length > 8) continue; const w = 1 / (S.length - 1); for (let i = 0; i < S.length; i++) for (let j = i + 1; j < S.length; j++) add(S[i], S[j], w); }
+  for (const [n, nb] of [...adj]) if (!nb.size) adj.delete(n); // 홀로 있는 함수는 뺌
+  return { adj, modOf: new Map(top.map(f => [f.key, modOfFile(fileOf(f.loc))])), name: new Map(top.map(f => [f.key, f.name])) }; }
+const r2 = x => Math.round(x * 100) / 100, groupBy = (it, f) => { const m = new Map(); for (const x of it) { const k = f(x); if (!m.has(k)) m.set(k, []); m.get(k).push(x); } return m; };
+// 과잉 분할: 두 모듈 사이 무게가 둘 중 작은 쪽의 안 무게 이상이고 서로가 서로의 가장 강한 바깥 연결 / 위성: 함수 4개 이하 모듈의 바깥 무게 70%↑가 한 모듈
+function overSplitOf(adj, modOf, byMod) {
+  const intra = new Map(), inter = new Map(), pk = (a, b) => a < b ? a + '|' + b : b + '|' + a;
+  for (const [n, nb] of adj) for (const [j, w] of nb) { if (n > j) continue; const a = modOf.get(n), b = modOf.get(j); if (a === b) intra.set(a, (intra.get(a) || 0) + w); else inter.set(pk(a, b), (inter.get(pk(a, b)) || 0) + w); }
+  const ext = m => [...inter].filter(([k]) => k.split('|').includes(m)).map(([k, w]) => [k.split('|').find(x => x !== m) || m, w]).sort((a, b) => b[1] - a[1]), out = [];
+  for (const [k, w] of inter) { const [a, b] = k.split('|'), ia = intra.get(a) || 0, ib = intra.get(b) || 0, ea = ext(a)[0], eb = ext(b)[0];
+    if (w >= Math.min(ia, ib) && w >= 1 && ea && eb && ea[0] === b && eb[0] === a) out.push({ kind: '서로 강하게 묶임', mods: [a, b], inter: r2(w), intra: [r2(ia), r2(ib)], fns: [(byMod.get(a) || []).length, (byMod.get(b) || []).length] }); }
+  for (const [m, ns] of byMod) { if (ns.length > 4) continue; const e = ext(m), tot = e.reduce((s2, [, w]) => s2 + w, 0) + (intra.get(m) || 0);
+    if (e.length && tot >= 1 && e[0][1] / tot >= 0.7 && !out.some(x => x.mods.includes(m))) out.push({ kind: '위성 모듈(작고 한 모듈에 매달림)', mods: [m, e[0][0]], inter: r2(e[0][1]), intra: [r2(intra.get(m) || 0), r2(intra.get(e[0][0]) || 0)], fns: [ns.length, (byMod.get(e[0][0]) || []).length] }); }
+  return out.sort((a, b) => b.inter - a.inter); }
+// 기능 섞임: 모듈 함수가 여러 묶음(두 번째 묶음 ≥30%·3함수) — 묶음 이름은 그 묶음에 함수가 많은 모듈 둘
+function mixedOf(comm, modOf, name, byComm, byMod) {
+  const label = c => [...groupBy(byComm.get(c), n => modOf.get(n))].map(([m, xs]) => [m, xs.length]).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([m, k]) => `${m}(${k})`).join('+'), out = [];
+  for (const [m, ns] of byMod) { const parts = [...groupBy(ns, n => comm.get(n))].map(([c, xs]) => [c, xs.length]).sort((a, b) => b[1] - a[1]);
+    if (parts.length >= 2 && parts[1][1] >= 3 && parts[1][1] / ns.length >= 0.3) out.push({ mod: m, fns: ns.length, parts: parts.slice(0, 3).map(([c, k]) => ({ n: k, cluster: label(c), sample: byComm.get(c).filter(x => modOf.get(x) === m).slice(0, 4).map(x => name.get(x)) })) }); }
+  return out; }
+// 기능 분산(제자리 아닌 함수): 함수의 연결 무게가 다른 한 모듈로 60%↑이고 자기 모듈 쪽의 2배↑(근거 무게 2↑)
+function displacedOf(adj, modOf, name) { const out = [];
+  for (const [n, nb] of adj) { const own = modOf.get(n), by = new Map(); let tot = 0; for (const [j, w] of nb) { by.set(modOf.get(j), (by.get(modOf.get(j)) || 0) + w); tot += w; }
+    const [tm, tw] = [...by].filter(([m]) => m !== own).sort((a, b) => b[1] - a[1])[0] || []; if (tm && tot >= 2 && tw / tot >= 0.6 && tw >= 2 * (by.get(own) || 0)) out.push({ fn: name.get(n), mod: own, to: tm, share: Math.round(100 * tw / tot), weight: r2(tot) }); }
+  return out.sort((a, b) => a.to.localeCompare(b.to) || b.share - a.share); }
+export function naturalBoundaries(fns, sf, M, modOfFile = f => f) {
+  const { adj, modOf, name } = fnGraph(fns, sf, M, modOfFile), comm = louvain(adj), byComm = groupBy(comm.keys(), n => comm.get(n)), byMod = groupBy(comm.keys(), n => modOf.get(n));
+  const Qfile = modularity(adj, new Map([...adj.keys()].map(n => [n, modOf.get(n)]))), Qnat = modularity(adj, comm);
+  return { nodes: adj.size, clusters: byComm.size, Qfile: Math.round(Qfile * 1000) / 1000, Qnat: Math.round(Qnat * 1000) / 1000, overSplit: overSplitOf(adj, modOf, byMod), mixed: mixedOf(comm, modOf, name, byComm, byMod), displaced: displacedOf(adj, modOf, name) }; }
