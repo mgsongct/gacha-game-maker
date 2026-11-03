@@ -8,10 +8,11 @@ import { loadUnits } from './lib/source.mjs';
 import { buildGraph, unused, unusedVars, cycles, deepest } from './lib/graph.mjs';
 import { actions, mutations, stateFlow } from './lib/flow.mjs';
 import { parseErrors, dupBodies, repeatedStrings, sgRules } from './lib/quality.mjs';
-import { domIds, htmlInject, saveKeys, listenerLeaks, cssCheck, sideFiles, relayHosts } from './lib/extra.mjs';
+import { domIds, htmlInject, saveKeys, listenerLeaks, cssCheck, sideFiles, relayHosts, spaCheck } from './lib/extra.mjs';
 import { analyze } from './lib/analyze.mjs';
 import { findings, compare } from './lib/ratchet.mjs';
 import { wiringReport, schemaKeys } from './lib/wiring.mjs';
+import { bindings, violations, renameEdits } from './lib/names.mjs';
 
 const root = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w = (p, s) => { mkdirSync(join(root, p, '..'), { recursive: true }); writeFileSync(join(root, p), s); };
 w('src/index.html', '<script>\n<!--@ main/ -->\n</script>\n');
@@ -108,6 +109,20 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
 { const r2 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r2, 'src/main'), { recursive: true });
   writeFileSync(join(r2, 'src/main/010-a.js'), "function T(k){ return String(k).replace(/[<>]/g,''); }\nfunction vHTML(){ return `<b>${T('x')}</b>`; }\n");
   const u2 = await loadUnits(r2), H2 = htmlInject(u2, buildGraph(u2).fns); assert.ok(!H2.out.length && !H2.taint.length, 'HTML 안전한 T()는 통과'); rmSync(r2, { recursive: true, force: true }); }
+// 이름 규칙: 컬렉션 콜백·찾기 결과로 종류를 알아내고, 다른 종류에도 쓰이는 이름을 규칙 이름으로 안전하게 바꿈(한글 앞 글자·단축 속성·안쪽 재선언·충돌 건너뜀)
+{ const r4 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r4, 'src/main'), { recursive: true });
+  const src = "let G={};\nfunction fa(){ const 이름='가나다'; return G.chapters.map(c => ({ c, t: c.title, n: (() => { const c = 1; return c; })() })).concat(G.chars.map(c => c.name)); }\nfunction fb(){ return G.chapters.map(c => { const ch = 1; return c.x + ch; }); }\nfunction fc(){ const c = G.chars.find(x => x.id === 1), k = $('#a').value; return [c, k, G.lib.map(x => x.kind)]; }\n";
+  writeFileSync(join(r4, 'src/main/010-n.js'), src); const u4 = await loadUnits(r4), B4 = bindings(u4), V4 = violations(B4, { 캐릭터: 'c', 장: 'ch' });
+  assert.ok(!B4.some(b => b.name === 'k'), "$('#a').value는 DOM 요소가 아님(호출 결과의 멤버)");
+  const V4x = violations(B4, { 캐릭터: 'c', 장: 'ch', 요소: 'el', 자료: 'l' }).filter(v => v.name === 'x' && v.kind === '캐릭터'); assert.ok(V4x.length === 1 && /가림/.test(renameEdits(V4x[0]).why || ''), '바깥 const c를 가리는 바꾸기는 건너뜀');
+  assert.equal(V4.length, 3, '장에 쓴 c 두 곳 + 캐릭터·자료에 쓴 x: ' + JSON.stringify(V4.map(v => v.loc)));
+  const R4 = V4.map(renameEdits); assert.ok(R4[0].ok && !R4[1].ok && /이미 있음/.test(R4[1].why), '두 번째는 범위 안 ch와 충돌해 건너뜀');
+  let t4 = u4[0].text; R4[0].edits.sort((a, b) => b.start - a.start).forEach(e => { t4 = t4.slice(0, e.start) + e.text + t4.slice(e.end); });
+  assert.ok(t4.includes("G.chapters.map(ch => ({ c: ch, t: ch.title, n: (() => { const c = 1; return c; })() })).concat(G.chars.map(c => c.name))"), '바꾼 결과: ' + t4.split('\n')[1]);
+  rmSync(r4, { recursive: true, force: true }); }
+// SPA 단일 파일 전제: 빌드 결과가 로컬 스크립트·스타일시트를 따로 불러오면 오류(외부 글꼴·manifest·아이콘은 통과)
+{ w('www/index.html', '<link rel="manifest" href="manifest.webmanifest"><link href="https://fonts.googleapis.com/css2" rel="stylesheet"><script>1</script><script src="app.js"></script><link rel="stylesheet" href="style.css">');
+  const S = spaCheck(root).errors.map(e => e.text); assert.ok(S.length === 2 && /app\.js/.test(S[0]) && /style\.css/.test(S[1]), 'SPA 단일 파일: ' + JSON.stringify(S)); w('www/index.html', '<script>1</script>'); }
 // 위반 래칫: 줄만 밀린 것은 같은 항목, 새 빈 catch·복잡도 증가는 잡음
 { const f0 = findings((await analyze(root)).J), src = join(root, 'src/main/010-a.js'), { readFileSync } = await import('node:fs'), t0 = readFileSync(src, 'utf8');
   writeFileSync(src, '\n\n\n' + t0); const d0 = compare(f0, findings((await analyze(root)).J)); assert.ok(!d0.added.length && !d0.worse.length && !d0.fixed.length, '래칫: 줄만 밀리면 그대로 ' + JSON.stringify(d0.added.concat(d0.worse, d0.fixed).map(f => f.key)));
@@ -129,4 +144,4 @@ function featA(){ return [G.meta.made, G.meta.never, G.world.lore, G.world.plot2
   assert.equal(fl.zzNew, 'P1', '캐릭터 콜백에서 읽는 새 필드가 어디에도 없음 → P1'); assert.equal(fl.zzMade, undefined, '생성물에 있는 필드는 통과: ' + JSON.stringify(fl));
   rmSync(r3, { recursive: true, force: true }); }
 rmSync(root, { recursive: true, force: true });
-console.log('ok tools: 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');
+console.log('ok tools: 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');

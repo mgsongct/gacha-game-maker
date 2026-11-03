@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.18'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.19'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -4601,7 +4601,7 @@ const CAST_SEX={f:'여성만',m:'남성만',mix:'여성 + 남성 혼성'};
 function castRule(k){ k=k==null?((typeof G!=='undefined'&&G&&G.meta&&G.meta.castSex)||''):k; return k==='f'?'등장인물 성별: 아군과 주요 인물은 모두 여성이다(naiPrompt는 1girl로 시작). ':k==='m'?'등장인물 성별: 아군과 주요 인물은 모두 남성이다(naiPrompt는 1boy로 시작). ':k==='mix'?'등장인물 성별: 아군과 주요 인물은 여성과 남성을 고르게 섞는다(대략 반반. 여성은 1girl, 남성은 1boy로 시작). 새 인물을 만들 때 지금 아군의 성비를 보고 적은 쪽을 채운다. ':''; }
 function rulesText(){const tone=String((G.meta&&G.meta.tone)||'').trim();return genderText()+callText()+castRule()+`규칙: 등장인물은 모두 성인이다. ${tone?'이 게임의 분위기: '+tone+'. 글의 톤은 이 분위기를 따른다. ':''}모든 글은 한국어로 쓴다. 이 게임의 용어: 플레이어 호칭 "${T('player')}", 유료 재화 "${T('currency')}", 뽑기 "${T('gacha')}", 전투 "${T('ops')}", 탐사 콘텐츠 "${T('abyss')}", 아군 "${T('crew')}", 메신저 "${T('talk')}". 속성: ${ELEMS.join(', ')}${elemLine()?` (${elemLine()})`:''}.`;}
 // 속성 상성 문장: 실제 상성표(rulesElemMat, 없으면 BEATS)에서 만들어요(예전엔 속성 3개를 가정해 4개 이상인 게임에 틀린 상성을 알렸음)
-function elemLine(){ const m=G&&G.meta&&Array.isArray(G.meta.elems)&&G.meta.elems.length?rulesElemMat():null; return ELEMS.map(e=>{ const s=m&&m[e]?Object.keys(m[e]).filter(t=>t!==e&&m[e][t]>1):(BEATS[e]?[BEATS[e]]:[]); return s.length?jo(e,'은','는')+' '+s.join('·')+'에 강함':''; }).filter(Boolean).join(', '); }
+function elemLine(){ const m=G&&G.meta&&Array.isArray(G.meta.elems)&&G.meta.elems.length?rulesElemMat():null; return ELEMS.map(elem=>{ const s=m&&m[elem]?Object.keys(m[elem]).filter(t=>t!==elem&&m[elem][t]>1):(BEATS[elem]?[BEATS[elem]]:[]); return s.length?jo(elem,'은','는')+' '+s.join('·')+'에 강함':''; }).filter(Boolean).join(', '); }
 // 받침에 맞는 조사: jo('열정','은','는') → '열정은', jo('캐스팅','으로','로') → '캐스팅으로'(ㄹ 받침이면 '로'). 한글이 아닌 끝 글자는 '을(를)'처럼 둘 다
 function jo(w,a,b){ w=String(w??''); const c=w.charCodeAt(w.length-1)-0xAC00, j=c>=0&&c<=11171?c%28:-1; if(j<0) return w+(a==='으로'?'(으)로':a+'('+b+')'); return w+((j>0&&!(a==='으로'&&j===8))?a:b); }
 // 이미 만든 이벤트 소재를 알려 줘서 같은 얘기를 또 하지 않게 해요
@@ -7640,12 +7640,12 @@ function challengeHTML(){
 function TOWER(){ const p=P(); if(!p.tower||typeof p.tower!=='object') p.tower={}; return p.tower; }
 function towerList(){ const L=[{id:'all',name:'시련의 탑',desc:'누구나 출전',allow:null}];
   ruleFacs().forEach(f=>L.push({id:'f:'+f,name:`${f}의 탑`,desc:`${f} 소속만 출전`,allow:c=>c.faction===f}));
-  ELEMS.forEach(e=>L.push({id:'e:'+e,name:`${e}의 탑`,desc:`${e} 속성만 출전`,allow:c=>c.elem===e}));
+  ELEMS.forEach(elem=>L.push({id:'e:'+elem,name:`${elem}의 탑`,desc:`${elem} 속성만 출전`,allow:c=>c.elem===elem}));
   return L; }
 function towerById(id){ return towerList().find(t=>t.id===id); }
 function towerPool(boss){ const out=[]; G.chapters.forEach(ch=>(ch.stages||[]).forEach(s=>(s.enemies||[]).forEach(e=>{ if(!!e.boss===!!boss&&!out.some(x=>x.name===e.name)) out.push(e); }))); return out; }
 function towerStage(tid,floor){ const t=towerById(tid)||towerById('all'), h=hashN(tid+'#'+floor), boss=floor%5===0, k=(floor-1)*.4;
-  const pool=towerPool(false), bp=towerPool(true), foeElem=tid.startsWith('e:')?(ELEMS.find(x=>BEATS[tid.slice(2)]===x)||ELEMS[0]):null;
+  const pool=towerPool(false), bp=towerPool(true), foeElem=tid.startsWith('e:')?(ELEMS.find(elem=>BEATS[tid.slice(2)]===elem)||ELEMS[0]):null;
   const mk=(src,i,b)=>{ const e={name:(src&&src.name)||(b?'탑의 수호자':'탑의 파수꾼'),look:src&&src.look,elem:foeElem&&i%2===0?foeElem:ELEMS[(h+i)%ELEMS.length],hp:900,atk:90,def:40,spd:92+Math.min(40,floor),boss:!!b}; return fitEnemy(e,enemyTarget(k,i,!!b)); };
   const n=boss?2:Math.min(4,2+Math.floor(floor/10)), en=[]; for(let i=0;i<n;i++) en.push(mk(pool[(h+i*7)%Math.max(1,pool.length)],i,false)); if(boss) en.push(mk(bp[h%Math.max(1,bp.length)],n,true));
   const s={id:`tower_${tid}_${floor}`,title:`${t.name} ${floor}층`,enemies:en,reward:0,pre:'',post:''};
@@ -11538,7 +11538,7 @@ const F_FIELDS=[['desc','개요'],['goal','목적'],['leader','지도자·핵심
 function castCfg(){ const c=G.meta.cast||{}; return {pickupGate:c.pickupGate!==false,hostileGate:c.hostileGate!==false}; }
 function factions(){ const w=G.world; if(!Array.isArray(w.factions)) w.factions=[]; G.chars.forEach(c=>{ if(c.faction&&!c.monster&&!c.collab&&!w.factions.some(f=>f.name===c.faction)) w.factions.push({name:c.faction,desc:'',kind:'playable',rel:{},stance:[]}); }); /* 캐릭터 소속인데 목록에 없는 세력 */ w.factions.forEach(f=>{ if(!FKIND[f.kind]) f.kind=G.chars.some(c=>c.faction===f.name&&!c.monster)?'playable':G.lib.some(l=>l.kind==='enemy'&&!l.charId&&l.name.includes(f.name))?'monster':'neutral'; if(!Array.isArray(f.stance)) f.stance=[]; if(!f.rel||typeof f.rel!=='object') f.rel={}; }); return w.factions; }
 function facByName(n){ return factions().find(f=>f.name===n); }
-function mainNow(){ return Math.max(1,G.chapters.filter(c=>c.kind==='main'&&(c.stages||[]).some(s=>P().cleared[s.id])).length+1); } // 지금 진행 중인 장(1부터)
+function mainNow(){ return Math.max(1,G.chapters.filter(ch=>ch.kind==='main'&&(ch.stages||[]).some(s=>P().cleared[s.id])).length+1); } // 지금 진행 중인 장(1부터)
 function stanceAt(f,ch){ if(!f) return 'neutral'; const L=(f.stance||[]).filter(x=>+x.ch<=ch).sort((a,b)=>a.ch-b.ch); return L.length?L.at(-1).s:f.kind==='playable'?'ally':f.kind==='neutral'?'neutral':'hostile'; }
 // 몬스터: 자료실 적 중 캐릭터·NPC가 아닌 것
 const SYS_ENEMY=/^(훈련 |강화 표적|탑의 )/; // 훈련·탑의 표적은 시스템 적
@@ -12049,10 +12049,10 @@ function slotOf(name){ const c=vnSpeaker(name); return c?vnStage(c,(S.stage||[])
 function vnEmote(slot,emo){ if(!slot||!emo||dirMode()==='off') return; slot.querySelectorAll('.emo').forEach(x=>x.remove()); slot.insertAdjacentHTML('beforeend',emoteHTML(emo)); const i=slot.lastElementChild; setTimeout(()=>i&&i.remove(),1800); if(EMOTES[emo]&&/하트|놀람|화남/.test(emo)) try{ sfx(emo==='하트'?'확인':'타격'); }catch(e){} }
 function vnMotion(slot,m){ if(!slot||!m||dirMode()==='off') return; const cls=MOTIONS[m]; if(!cls) return; Object.values(MOTIONS).forEach(x=>slot.classList.remove(x)); void slot.offsetWidth; slot.classList.add(cls); if(cls!=='m-exit'&&cls!=='m-near'&&cls!=='m-far') setTimeout(()=>slot.classList.remove(cls),900);
   if(cls==='m-exit') setTimeout(()=>{ S&&S.stage&&(S.stage=S.stage.filter(x=>x.c.id!==slot.dataset.cid)); slot.remove(); },600); }
-function vnScreen(arg){ const v=$('#vn'), f=$('#vnFlash'); if(!v) return; const end=/끝$/.test(arg), key=String(arg).replace(/\s*끝$/,'').replace(/\s+/g,''), k=SCREEN_FX[key]; if(!k) return false;
+function vnScreen(arg){ const v=$('#vn'), el=$('#vnFlash'); if(!v) return; const end=/끝$/.test(arg), key=String(arg).replace(/\s*끝$/,'').replace(/\s+/g,''), k=SCREEN_FX[key]; if(!k) return false;
   if(FX_KEEP.includes(k)){ v.classList.toggle('fx-'+k,!end); return true; }
   if(k==='shake'||k==='shake2'){ v.classList.remove('shake','shake2'); void v.offsetWidth; v.classList.add(k); }
-  else { f.className='vn-flash'; void f.offsetWidth; f.className='vn-flash '+k; } return true; }
+  else { el.className='vn-flash'; void el.offsetWidth; el.className='vn-flash '+k; } return true; }
 // 대본 엔진(0460)이 부르는 곳
 function vnDirectSay(L,c,fz){ const d=L.dir||{}, slot=vnStage(c,fz); if(dirMode()==='off') return; vnMotion(slot,d.motion); vnEmote(slot,d.emo||(dirMode()==='auto'&&!d.face&&!d.motion?autoEmote(L.text):'')); }
 function vnDirectCmd(L){ if(L.cmd==='연출'){ const [who,...rest]=String(L.arg).split(/\s+/), slot=slotOf(who), d=dirSplit(rest.join('|')); vnMotion(slot,d.motion); vnEmote(slot,d.emo); return true; }
@@ -12092,14 +12092,14 @@ function planCtx(n){ if(!planHas()) return ''; const p=PLAN(), act=planActOf(n),
   if(p.notes) L.push('설계 메모: '+p.notes);
   return L.join('\n')+'\n'; }
 // 점검: 복선 없이 밝히는 반전, 공개 장 뒤에 있는 복선, 공개 장이 지났는데 대본에 없는 반전, 분기가 대본에 없음
-function planCheck(){ const p=PLAN(), main=G.chapters.filter(c=>c.kind==='main'), n=main.length, txt=i=>{ const ch=main[i-1]; return ch?(ch.stages||[]).map(s=>(s.pre||'')+'\n'+(s.post||'')).join('\n'):''; }, out=[];
+function planCheck(){ const p=PLAN(), main=G.chapters.filter(ch=>ch.kind==='main'), n=main.length, txt=i=>{ const ch=main[i-1]; return ch?(ch.stages||[]).map(s=>(s.pre||'')+'\n'+(s.post||'')).join('\n'):''; }, out=[];
   if(!p.logline) out.push('로그라인이 없어요'); if(!p.acts.length) out.push('막 구성이 없어요');
   p.twists.forEach(t=>{ const cl=(t.clues||[]).filter(c=>c.hint); if(!cl.length) out.push(`반전 「${t.truth.slice(0,20)}」에 복선이 없어요`); else if(cl.every(c=>+c.ch>=+t.reveal)) out.push(`반전 「${t.truth.slice(0,20)}」의 복선이 모두 공개 장(${t.reveal}장) 이후예요`);
     if(+t.reveal&&+t.reveal<=n&&!t.done) out.push(`${t.reveal}장이 이미 있는데 반전 「${t.truth.slice(0,20)}」 공개를 확인하지 않았어요(대본 확인 후 '공개됨' 표시)`); });
   p.branches.forEach(b=>{ if(+b.at<=n&&!txt(+b.at).includes('[분기: '+b.id+']')&&!txt(+b.at).includes('[분기:'+b.id+']')) out.push(`${b.at}장 대본에 분기 「${b.question.slice(0,20)}」([분기: ${b.id}])가 없어요`); if((b.options||[]).length<2) out.push(`분기 「${b.question.slice(0,20)}」의 보기가 2개 미만이에요`); });
   const last=p.acts.length?+p.acts.at(-1).upto:0; if(last&&n>last) out.push(`지금 ${n}장으로 설계한 막(~${last}장)을 넘었어요 — 다음 막을 설계해 주세요`);
   return out; }
-async function planAI(mode,btn,instruction){ const p=PLAN(), n=G.chapters.filter(c=>c.kind==='main').length;
+async function planAI(mode,btn,instruction){ const p=PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').length;
   const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 게임의 메인 시나리오를 ${mode==='extend'?`지금 설계(${JSON.stringify(p).slice(0,3000)})를 이어서 다음 막을 덧붙여`:mode==='improve'?`지금 설계(${JSON.stringify(p).slice(0,3000)})를 더 짜임새 있게 다듬어`:'처음부터'} 설계하라. 지금 메인 스토리는 ${n}장까지 있다(이미 쓴 장의 내용과 어긋나지 않게).
 ${instruction?'추가 지시: '+instruction+'\n':''}규칙: 막(act)마다 목표가 있고 장 번호 범위(upto)로 나눈다(한 막 3~5장). 숨겨진 반전 2~4개: 각 반전은 진실·공개 장·그 전에 심을 복선 2~3개(장 번호와 힌트). 공개 장은 복선보다 뒤. 분기 1~3개: 몇 장에서 플레이어가 고르고(보기 2~3개), 고른 보기가 이후 이야기에 무엇을 바꾸는지(result). 주요 ${T('crew')} 3~5명의 아크(시작 → 변화 → 끝). 결말은 하나로 정하되 분기에 따라 과정이 달라진다.
 JSON만 출력: {"logline":"","theme":"","ending":"","acts":[{"name":"1막 이름","upto":4,"goal":""}],"twists":[{"id":"t1","truth":"","reveal":5,"who":"관련 인물","clues":[{"ch":2,"hint":""}]}],"branches":[{"id":"b1","at":3,"question":"","options":[{"label":"","result":""}]}],"arcs":[{"name":"캐릭터 이름","start":"","change":"","end":""}]}`,btn,'complex');
@@ -12115,7 +12115,7 @@ function planClean(r){ const S=(v,n)=>String(v||'').trim().slice(0,n||200), N=v=
 
 /* 화면 */
 function planPanel(){ const p=G.world.plan||{}, iss=planHas()?planCheck():[]; return `<div class="panel pm-hide"><h3>시나리오 설계 ${iss.length?`<span class="badge">점검 ${iss.length}</span>`:''}</h3><p class="muted" style="margin:0 0 6px">${planHas()?`${esc(p.logline||'')} · 막 ${(p.acts||[]).length} · 반전 ${(p.twists||[]).length} · 분기 ${(p.branches||[]).length}`:'큰 틀·플롯·반전·분기를 먼저 설계하면, 새 장을 쓸 때 AI가 그 설계를 따라요(복선은 미리, 반전은 정한 장에서).'}</p><button class="btn sm" data-act="planopen">시나리오 설계</button></div>`; }
-function openPlan(){ const p=PLAN(), n=G.chapters.filter(c=>c.kind==='main').length, F=P().flags||{}, iss=planCheck(), t=(k,v,ph,rows)=>rows?`<textarea class="in" data-pl="${k}" rows="${rows}" placeholder="${esc(ph||'')}">${esc(v||'')}</textarea>`:`<input class="in" data-pl="${k}" value="${esc(v??'')}" placeholder="${esc(ph||'')}">`, num=(k,v)=>`<input class="in" type="number" min="1" data-pl="${k}" value="${v??''}" style="max-width:70px">`;
+function openPlan(){ const p=PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').length, F=P().flags||{}, iss=planCheck(), t=(k,v,ph,rows)=>rows?`<textarea class="in" data-pl="${k}" rows="${rows}" placeholder="${esc(ph||'')}">${esc(v||'')}</textarea>`:`<input class="in" data-pl="${k}" value="${esc(v??'')}" placeholder="${esc(ph||'')}">`, num=(k,v)=>`<input class="in" type="number" min="1" data-pl="${k}" value="${v??''}" style="max-width:70px">`;
   openModal(`${head('시나리오 설계',`<span class="muted">지금 메인 ${n}장</span>`)}
   ${iss.length?`<div class="panel" style="border-color:var(--gold)"><b>점검</b><ul style="margin:4px 0;padding-left:18px;font-size:.82rem">${iss.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
   <label class="f">로그라인 (한 줄 요약)</label>${t('logline',p.logline)}<div class="g2"><div><label class="f">주제</label>${t('theme',p.theme)}</div><div><label class="f">목표 결말</label>${t('ending',p.ending)}</div></div>
@@ -12311,7 +12311,7 @@ function fieldTime(s){ const r=s&&s.field; return r&&r.k==='timed'?Math.max(20,M
 function rulesHTML(s){ const f=fieldText(s.field); return `<div class="panel" style="padding:8px;margin:6px 0;font-size:.82rem">${f?`<div><b>전장 규칙</b> ${esc(f)}</div>`:''}<div><b>별 조건</b> 승리 · 전원 생존 · ${esc(goalText(s.goal))}</div></div>`; }
 // 집중 지시
 function bFocus(i){ if(!B||B.over||!B.engine) return; const u=B.enemies[i], t=B.engine.time; if(!u||u.hp<=0) return; if(t<(B.focusReady||0)){ toast(`집중 지시는 ${Math.ceil(B.focusReady-t)}초 뒤에 다시 쓸 수 있어요`); return; }
-  B.enemies.forEach(e=>{ e.status=e.status.filter(s=>s.id!=='order'); }); u.status.push({id:'order',type:'focus',value:1,until:t+8,next:Infinity,source:null,slot:'order',remaining:1,hpRemain:1});
+  B.enemies.forEach(en=>{ en.status=en.status.filter(s=>s.id!=='order'); }); u.status.push({id:'order',type:'focus',value:1,until:t+8,next:Infinity,source:null,slot:'order',remaining:1,hpRemain:1});
   B.focusReady=t+12; blog(`집중 공격 지시: ${u.name}`); bUpdate(); }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="bfocus"]'); if(!b) return; e.stopPropagation(); bFocus(+b.dataset.i); });
 /* ===== 대열(근접·원거리·지원)과 출격 경로(진격·퇴각·갈림길) ===== */
@@ -12560,7 +12560,7 @@ const SPARK=200;
    예전 저장(배너별 값)은 처음 읽을 때 픽업 배너들 중 가장 큰 천장·남은 확정을 이어받아요 */
 function pityKey(b){ return !b||b.id==='std'?'std':(b.pickup||[]).length?'pickup':b.id; }
 function pityGet(b){ const p=P(),k=pityKey(b); if(k==='std') return p.pity||0; p.pities=p.pities||{};
-  if(k==='pickup'&&p.pities.pickup==null){ const old=G.banners.filter(x=>x.id!=='std'&&(x.pickup||[]).length); p.pities.pickup=Math.max(0,...old.map(x=>p.pities[x.id]||0)); p.guar=p.guar||{}; if(p.guar.pickup==null) p.guar.pickup=old.some(x=>p.guar[x.id]); }
+  if(k==='pickup'&&p.pities.pickup==null){ const old=G.banners.filter(bn=>bn.id!=='std'&&(bn.pickup||[]).length); p.pities.pickup=Math.max(0,...old.map(x=>p.pities[x.id]||0)); p.guar=p.guar||{}; if(p.guar.pickup==null) p.guar.pickup=old.some(x=>p.guar[x.id]); }
   return p.pities[k]||0; }
 function pitySet(b,v){ const p=P(),k=pityKey(b); if(k==='std') p.pity=v; else p.pities[k]=v; }
 function guarGet(b){ pityGet(b); return !!(P().guar||{})[pityKey(b)]; }
@@ -12678,8 +12678,8 @@ function conResBar(){ const r=CRES(); return `<div class="row" style="gap:6px;fl
 function conDispReward(hours,need){ const pts=Math.pow(hours,0.85)*(1+0.35*(need-1)), ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2), r={}; ks.forEach(k=>{ r[k]=Math.max(10,Math.round(pts*60/10)*10); }); return r; }
 
 /* 바리에이션 후보: 레시피가 맞고, 조건에 맞는 보유 캐릭터 중 아직 그 바리에이션이 없는 캐릭터 */
-function conVariantOf(b,tpl){ return G.chars.find(x=>x.alt===b.id&&x.cvar===tpl.id); }
-function conTargets(tpl){ return G.chars.filter(b=>!b.alt&&!b.cvar&&own(b.id)&&GGMConstruct.condMatch(tpl.cond,b,{own:own(b.id),affLv:affLv(own(b.id)),cleared:P().cleared})); }
+function conVariantOf(b,tpl){ return G.chars.find(c=>c.alt===b.id&&c.cvar===tpl.id); }
+function conTargets(tpl){ return G.chars.filter(c=>!c.alt&&!c.cvar&&own(c.id)&&GGMConstruct.condMatch(tpl.cond,c,{own:own(c.id),affLv:affLv(own(c.id)),cleared:P().cleared})); }
 function conVariantChoices(input){ return VARIANTS().filter(t=>t.on!==false&&GGMConstruct.matches(t.recipe,input)).map(tpl=>({tpl,bases:conTargets(tpl).filter(b=>{ const v=conVariantOf(b,tpl); return !(v&&own(v.id)); })})); }
 function conPool(){ return G.chars.filter(c=>!c.limited&&!c.cvar&&!c.alt&&castOk(c)).map(c=>({id:c.id,rarity:c.rarity,role:c.role,faction:c.faction,elem:c.elem})); }
 

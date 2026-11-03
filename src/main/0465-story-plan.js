@@ -21,14 +21,14 @@ function planCtx(n){ if(!planHas()) return ''; const p=PLAN(), act=planActOf(n),
   if(p.notes) L.push('설계 메모: '+p.notes);
   return L.join('\n')+'\n'; }
 // 점검: 복선 없이 밝히는 반전, 공개 장 뒤에 있는 복선, 공개 장이 지났는데 대본에 없는 반전, 분기가 대본에 없음
-function planCheck(){ const p=PLAN(), main=G.chapters.filter(c=>c.kind==='main'), n=main.length, txt=i=>{ const ch=main[i-1]; return ch?(ch.stages||[]).map(s=>(s.pre||'')+'\n'+(s.post||'')).join('\n'):''; }, out=[];
+function planCheck(){ const p=PLAN(), main=G.chapters.filter(ch=>ch.kind==='main'), n=main.length, txt=i=>{ const ch=main[i-1]; return ch?(ch.stages||[]).map(s=>(s.pre||'')+'\n'+(s.post||'')).join('\n'):''; }, out=[];
   if(!p.logline) out.push('로그라인이 없어요'); if(!p.acts.length) out.push('막 구성이 없어요');
   p.twists.forEach(t=>{ const cl=(t.clues||[]).filter(c=>c.hint); if(!cl.length) out.push(`반전 「${t.truth.slice(0,20)}」에 복선이 없어요`); else if(cl.every(c=>+c.ch>=+t.reveal)) out.push(`반전 「${t.truth.slice(0,20)}」의 복선이 모두 공개 장(${t.reveal}장) 이후예요`);
     if(+t.reveal&&+t.reveal<=n&&!t.done) out.push(`${t.reveal}장이 이미 있는데 반전 「${t.truth.slice(0,20)}」 공개를 확인하지 않았어요(대본 확인 후 '공개됨' 표시)`); });
   p.branches.forEach(b=>{ if(+b.at<=n&&!txt(+b.at).includes('[분기: '+b.id+']')&&!txt(+b.at).includes('[분기:'+b.id+']')) out.push(`${b.at}장 대본에 분기 「${b.question.slice(0,20)}」([분기: ${b.id}])가 없어요`); if((b.options||[]).length<2) out.push(`분기 「${b.question.slice(0,20)}」의 보기가 2개 미만이에요`); });
   const last=p.acts.length?+p.acts.at(-1).upto:0; if(last&&n>last) out.push(`지금 ${n}장으로 설계한 막(~${last}장)을 넘었어요 — 다음 막을 설계해 주세요`);
   return out; }
-async function planAI(mode,btn,instruction){ const p=PLAN(), n=G.chapters.filter(c=>c.kind==='main').length;
+async function planAI(mode,btn,instruction){ const p=PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').length;
   const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 게임의 메인 시나리오를 ${mode==='extend'?`지금 설계(${JSON.stringify(p).slice(0,3000)})를 이어서 다음 막을 덧붙여`:mode==='improve'?`지금 설계(${JSON.stringify(p).slice(0,3000)})를 더 짜임새 있게 다듬어`:'처음부터'} 설계하라. 지금 메인 스토리는 ${n}장까지 있다(이미 쓴 장의 내용과 어긋나지 않게).
 ${instruction?'추가 지시: '+instruction+'\n':''}규칙: 막(act)마다 목표가 있고 장 번호 범위(upto)로 나눈다(한 막 3~5장). 숨겨진 반전 2~4개: 각 반전은 진실·공개 장·그 전에 심을 복선 2~3개(장 번호와 힌트). 공개 장은 복선보다 뒤. 분기 1~3개: 몇 장에서 플레이어가 고르고(보기 2~3개), 고른 보기가 이후 이야기에 무엇을 바꾸는지(result). 주요 ${T('crew')} 3~5명의 아크(시작 → 변화 → 끝). 결말은 하나로 정하되 분기에 따라 과정이 달라진다.
 JSON만 출력: {"logline":"","theme":"","ending":"","acts":[{"name":"1막 이름","upto":4,"goal":""}],"twists":[{"id":"t1","truth":"","reveal":5,"who":"관련 인물","clues":[{"ch":2,"hint":""}]}],"branches":[{"id":"b1","at":3,"question":"","options":[{"label":"","result":""}]}],"arcs":[{"name":"캐릭터 이름","start":"","change":"","end":""}]}`,btn,'complex');
@@ -44,7 +44,7 @@ function planClean(r){ const S=(v,n)=>String(v||'').trim().slice(0,n||200), N=v=
 
 /* 화면 */
 function planPanel(){ const p=G.world.plan||{}, iss=planHas()?planCheck():[]; return `<div class="panel pm-hide"><h3>시나리오 설계 ${iss.length?`<span class="badge">점검 ${iss.length}</span>`:''}</h3><p class="muted" style="margin:0 0 6px">${planHas()?`${esc(p.logline||'')} · 막 ${(p.acts||[]).length} · 반전 ${(p.twists||[]).length} · 분기 ${(p.branches||[]).length}`:'큰 틀·플롯·반전·분기를 먼저 설계하면, 새 장을 쓸 때 AI가 그 설계를 따라요(복선은 미리, 반전은 정한 장에서).'}</p><button class="btn sm" data-act="planopen">시나리오 설계</button></div>`; }
-function openPlan(){ const p=PLAN(), n=G.chapters.filter(c=>c.kind==='main').length, F=P().flags||{}, iss=planCheck(), t=(k,v,ph,rows)=>rows?`<textarea class="in" data-pl="${k}" rows="${rows}" placeholder="${esc(ph||'')}">${esc(v||'')}</textarea>`:`<input class="in" data-pl="${k}" value="${esc(v??'')}" placeholder="${esc(ph||'')}">`, num=(k,v)=>`<input class="in" type="number" min="1" data-pl="${k}" value="${v??''}" style="max-width:70px">`;
+function openPlan(){ const p=PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').length, F=P().flags||{}, iss=planCheck(), t=(k,v,ph,rows)=>rows?`<textarea class="in" data-pl="${k}" rows="${rows}" placeholder="${esc(ph||'')}">${esc(v||'')}</textarea>`:`<input class="in" data-pl="${k}" value="${esc(v??'')}" placeholder="${esc(ph||'')}">`, num=(k,v)=>`<input class="in" type="number" min="1" data-pl="${k}" value="${v??''}" style="max-width:70px">`;
   openModal(`${head('시나리오 설계',`<span class="muted">지금 메인 ${n}장</span>`)}
   ${iss.length?`<div class="panel" style="border-color:var(--gold)"><b>점검</b><ul style="margin:4px 0;padding-left:18px;font-size:.82rem">${iss.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
   <label class="f">로그라인 (한 줄 요약)</label>${t('logline',p.logline)}<div class="g2"><div><label class="f">주제</label>${t('theme',p.theme)}</div><div><label class="f">목표 결말</label>${t('ending',p.ending)}</div></div>

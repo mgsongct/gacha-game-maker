@@ -20,8 +20,8 @@ function conResBar(){ const r=CRES(); return `<div class="row" style="gap:6px;fl
 function conDispReward(hours,need){ const pts=Math.pow(hours,0.85)*(1+0.35*(need-1)), ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2), r={}; ks.forEach(k=>{ r[k]=Math.max(10,Math.round(pts*60/10)*10); }); return r; }
 
 /* 바리에이션 후보: 레시피가 맞고, 조건에 맞는 보유 캐릭터 중 아직 그 바리에이션이 없는 캐릭터 */
-function conVariantOf(b,tpl){ return G.chars.find(x=>x.alt===b.id&&x.cvar===tpl.id); }
-function conTargets(tpl){ return G.chars.filter(b=>!b.alt&&!b.cvar&&own(b.id)&&GGMConstruct.condMatch(tpl.cond,b,{own:own(b.id),affLv:affLv(own(b.id)),cleared:P().cleared})); }
+function conVariantOf(b,tpl){ return G.chars.find(c=>c.alt===b.id&&c.cvar===tpl.id); }
+function conTargets(tpl){ return G.chars.filter(c=>!c.alt&&!c.cvar&&own(c.id)&&GGMConstruct.condMatch(tpl.cond,c,{own:own(c.id),affLv:affLv(own(c.id)),cleared:P().cleared})); }
 function conVariantChoices(input){ return VARIANTS().filter(t=>t.on!==false&&GGMConstruct.matches(t.recipe,input)).map(tpl=>({tpl,bases:conTargets(tpl).filter(b=>{ const v=conVariantOf(b,tpl); return !(v&&own(v.id)); })})); }
 function conPool(){ return G.chars.filter(c=>!c.limited&&!c.cvar&&!c.alt&&castOk(c)).map(c=>({id:c.id,rarity:c.rarity,role:c.role,faction:c.faction,elem:c.elem})); }
 

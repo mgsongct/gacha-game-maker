@@ -42,10 +42,10 @@ function slotOf(name){ const c=vnSpeaker(name); return c?vnStage(c,(S.stage||[])
 function vnEmote(slot,emo){ if(!slot||!emo||dirMode()==='off') return; slot.querySelectorAll('.emo').forEach(x=>x.remove()); slot.insertAdjacentHTML('beforeend',emoteHTML(emo)); const i=slot.lastElementChild; setTimeout(()=>i&&i.remove(),1800); if(EMOTES[emo]&&/하트|놀람|화남/.test(emo)) try{ sfx(emo==='하트'?'확인':'타격'); }catch(e){} }
 function vnMotion(slot,m){ if(!slot||!m||dirMode()==='off') return; const cls=MOTIONS[m]; if(!cls) return; Object.values(MOTIONS).forEach(x=>slot.classList.remove(x)); void slot.offsetWidth; slot.classList.add(cls); if(cls!=='m-exit'&&cls!=='m-near'&&cls!=='m-far') setTimeout(()=>slot.classList.remove(cls),900);
   if(cls==='m-exit') setTimeout(()=>{ S&&S.stage&&(S.stage=S.stage.filter(x=>x.c.id!==slot.dataset.cid)); slot.remove(); },600); }
-function vnScreen(arg){ const v=$('#vn'), f=$('#vnFlash'); if(!v) return; const end=/끝$/.test(arg), key=String(arg).replace(/\s*끝$/,'').replace(/\s+/g,''), k=SCREEN_FX[key]; if(!k) return false;
+function vnScreen(arg){ const v=$('#vn'), el=$('#vnFlash'); if(!v) return; const end=/끝$/.test(arg), key=String(arg).replace(/\s*끝$/,'').replace(/\s+/g,''), k=SCREEN_FX[key]; if(!k) return false;
   if(FX_KEEP.includes(k)){ v.classList.toggle('fx-'+k,!end); return true; }
   if(k==='shake'||k==='shake2'){ v.classList.remove('shake','shake2'); void v.offsetWidth; v.classList.add(k); }
-  else { f.className='vn-flash'; void f.offsetWidth; f.className='vn-flash '+k; } return true; }
+  else { el.className='vn-flash'; void el.offsetWidth; el.className='vn-flash '+k; } return true; }
 // 대본 엔진(0460)이 부르는 곳
 function vnDirectSay(L,c,fz){ const d=L.dir||{}, slot=vnStage(c,fz); if(dirMode()==='off') return; vnMotion(slot,d.motion); vnEmote(slot,d.emo||(dirMode()==='auto'&&!d.face&&!d.motion?autoEmote(L.text):'')); }
 function vnDirectCmd(L){ if(L.cmd==='연출'){ const [who,...rest]=String(L.arg).split(/\s+/), slot=slotOf(who), d=dirSplit(rest.join('|')); vnMotion(slot,d.motion); vnEmote(slot,d.emo); return true; }

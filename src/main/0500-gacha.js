@@ -32,7 +32,7 @@ const SPARK=200;
    예전 저장(배너별 값)은 처음 읽을 때 픽업 배너들 중 가장 큰 천장·남은 확정을 이어받아요 */
 function pityKey(b){ return !b||b.id==='std'?'std':(b.pickup||[]).length?'pickup':b.id; }
 function pityGet(b){ const p=P(),k=pityKey(b); if(k==='std') return p.pity||0; p.pities=p.pities||{};
-  if(k==='pickup'&&p.pities.pickup==null){ const old=G.banners.filter(x=>x.id!=='std'&&(x.pickup||[]).length); p.pities.pickup=Math.max(0,...old.map(x=>p.pities[x.id]||0)); p.guar=p.guar||{}; if(p.guar.pickup==null) p.guar.pickup=old.some(x=>p.guar[x.id]); }
+  if(k==='pickup'&&p.pities.pickup==null){ const old=G.banners.filter(bn=>bn.id!=='std'&&(bn.pickup||[]).length); p.pities.pickup=Math.max(0,...old.map(x=>p.pities[x.id]||0)); p.guar=p.guar||{}; if(p.guar.pickup==null) p.guar.pickup=old.some(x=>p.guar[x.id]); }
   return p.pities[k]||0; }
 function pitySet(b,v){ const p=P(),k=pityKey(b); if(k==='std') p.pity=v; else p.pities[k]=v; }
 function guarGet(b){ pityGet(b); return !!(P().guar||{})[pityKey(b)]; }

@@ -1316,5 +1316,553 @@
    "num": {},
    "text": "P1 direction spotTalk: 기능이 캐릭터에서 읽는 새 필드인데 생성기가 만들지 않고(스키마·대입·리터럴 없음) 생성 게임에도 없음 — 플레이 중 만들어지거나 사용자가 채워야 함"
   }
+ ],
+ "names": [
+  {
+   "key": "이름 모호|src/main/0010-rules.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0010-rules.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0020-ai-connect.js (원본)",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0020-ai-connect.js (원본) 4개"
+  },
+  {
+   "key": "이름 모호|src/main/0025-prompt-studio.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0025-prompt-studio.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0030-character-regen.js (원본)",
+   "num": {
+    "개수": 10
+   },
+   "text": "src/main/0030-character-regen.js (원본) 10개"
+  },
+  {
+   "key": "이름 모호|src/main/0040-sound.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0040-sound.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0065-inherit.js (포크)",
+   "num": {
+    "개수": 6
+   },
+   "text": "src/main/0065-inherit.js (포크) 6개"
+  },
+  {
+   "key": "이름 모호|src/main/0065-inherit.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0065-inherit.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0070-save.js (원본)",
+   "num": {
+    "개수": 7
+   },
+   "text": "src/main/0070-save.js (원본) 7개"
+  },
+  {
+   "key": "이름 모호|src/main/0080-storage-integration.js (원본)",
+   "num": {
+    "개수": 6
+   },
+   "text": "src/main/0080-storage-integration.js (원본) 6개"
+  },
+  {
+   "key": "이름 모호|src/main/0090-growth.js (원본)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0090-growth.js (원본) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0100-messenger.js (원본)",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0100-messenger.js (원본) 4개"
+  },
+  {
+   "key": "이름 모호|src/main/0110-challenge-raid.js (원본)",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0110-challenge-raid.js (원본) 3개"
+  },
+  {
+   "key": "이름 모호|src/main/0120-abyss.js (원본)",
+   "num": {
+    "개수": 11
+   },
+   "text": "src/main/0120-abyss.js (원본) 11개"
+  },
+  {
+   "key": "이름 모호|src/main/0125-tower.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0125-tower.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0130-gift.js (원본)",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0130-gift.js (원본) 3개"
+  },
+  {
+   "key": "이름 모호|src/main/0135-schedule.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0135-schedule.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0150-pickup-existing.js (원본)",
+   "num": {
+    "개수": 7
+   },
+   "text": "src/main/0150-pickup-existing.js (원본) 7개"
+  },
+  {
+   "key": "이름 모호|src/main/0160-free-chat.js (원본)",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0160-free-chat.js (원본) 4개"
+  },
+  {
+   "key": "이름 모호|src/main/0180-ui-scroll.js (원본)",
+   "num": {
+    "개수": 19
+   },
+   "text": "src/main/0180-ui-scroll.js (원본) 19개"
+  },
+  {
+   "key": "이름 모호|src/main/0185-game-rules.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0185-game-rules.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0187-balance.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0187-balance.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0200-skin-shop.js (원본)",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0200-skin-shop.js (원본) 3개"
+  },
+  {
+   "key": "이름 모호|src/main/0210-setup.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0210-setup.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0230-modal.js (원본)",
+   "num": {
+    "개수": 5
+   },
+   "text": "src/main/0230-modal.js (원본) 5개"
+  },
+  {
+   "key": "이름 모호|src/main/0240-growth-curve.js (원본)",
+   "num": {
+    "개수": 9
+   },
+   "text": "src/main/0240-growth-curve.js (원본) 9개"
+  },
+  {
+   "key": "이름 모호|src/main/0250-story-factory.js (원본)",
+   "num": {
+    "개수": 15
+   },
+   "text": "src/main/0250-story-factory.js (원본) 15개"
+  },
+  {
+   "key": "이름 모호|src/main/0260-new-game-draft.js (원본)",
+   "num": {
+    "개수": 6
+   },
+   "text": "src/main/0260-new-game-draft.js (원본) 6개"
+  },
+  {
+   "key": "이름 모호|src/main/0275-expedition.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0275-expedition.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0280-live-ops.js (원본)",
+   "num": {
+    "개수": 5
+   },
+   "text": "src/main/0280-live-ops.js (원본) 5개"
+  },
+  {
+   "key": "이름 모호|src/main/0290-season-rotation.js (원본)",
+   "num": {
+    "개수": 25
+   },
+   "text": "src/main/0290-season-rotation.js (원본) 25개"
+  },
+  {
+   "key": "이름 모호|src/main/0300-codex.js (원본)",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0300-codex.js (원본) 4개"
+  },
+  {
+   "key": "이름 모호|src/main/0350-boot-sync.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0350-boot-sync.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0370-game-picker.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0370-game-picker.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0400-publish-subscribe.js (원본)",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0400-publish-subscribe.js (원본) 3개"
+  },
+  {
+   "key": "이름 모호|src/main/0410-desktop.js (원본)",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0410-desktop.js (원본) 4개"
+  },
+  {
+   "key": "이름 모호|src/main/0440-ai-context.js (원본)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0440-ai-context.js (원본) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0445-factions.js (포크)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0445-factions.js (포크) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0445-factions.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0445-factions.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0450-relations-memory.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0450-relations-memory.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0455-persona.js (포크)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0455-persona.js (포크) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0455-persona.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0455-persona.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0460-script-engine.js (원본)",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0460-script-engine.js (원본) 4개"
+  },
+  {
+   "key": "이름 모호|src/main/0462-direction.js (포크)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0462-direction.js (포크) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0465-story-plan.js (원본)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0465-story-plan.js (원본) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0470-title-opening.js (원본)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0470-title-opening.js (원본) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0480-battle.js (원본)",
+   "num": {
+    "개수": 7
+   },
+   "text": "src/main/0480-battle.js (원본) 7개"
+  },
+  {
+   "key": "이름 모호|src/main/0485-battle-rules.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0485-battle-rules.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0487-formation-sortie.js (포크)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0487-formation-sortie.js (포크) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0487-formation-sortie.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0487-formation-sortie.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0488-stage-modes.js (포크)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0488-stage-modes.js (포크) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0488-stage-modes.js (원본)",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0488-stage-modes.js (원본) 3개"
+  },
+  {
+   "key": "이름 모호|src/main/0490-boss-patterns.js (원본)",
+   "num": {
+    "개수": 6
+   },
+   "text": "src/main/0490-boss-patterns.js (원본) 6개"
+  },
+  {
+   "key": "이름 모호|src/main/0500-gacha.js (원본)",
+   "num": {
+    "개수": 7
+   },
+   "text": "src/main/0500-gacha.js (원본) 7개"
+  },
+  {
+   "key": "이름 모호|src/main/0505-construct.js (원본)",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0505-construct.js (원본) 3개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/010-setup.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0510-actions/010-setup.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/020-navigation-and-tools.js (원본)",
+   "num": {
+    "개수": 10
+   },
+   "text": "src/main/0510-actions/020-navigation-and-tools.js (원본) 10개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/040-story-and-authoring.js (원본)",
+   "num": {
+    "개수": 38
+   },
+   "text": "src/main/0510-actions/040-story-and-authoring.js (원본) 38개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/050-settings-and-audio.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0510-actions/050-settings-and-audio.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/070-combat-and-formation.js (원본)",
+   "num": {
+    "개수": 5
+   },
+   "text": "src/main/0510-actions/070-combat-and-formation.js (원본) 5개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/100-images-and-assets.js (원본)",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0510-actions/100-images-and-assets.js (원본) 3개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/100-images-and-assets.js (포크)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0510-actions/100-images-and-assets.js (포크) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/110-economy.js (원본)",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0510-actions/110-economy.js (원본) 3개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/120-messenger.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0510-actions/120-messenger.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/130-dispatch.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0510-actions/130-dispatch.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0510-actions/140-share-export.js (원본)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0510-actions/140-share-export.js (원본) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0520-backup-storage.js (원본)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0520-backup-storage.js (원본) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0525-data-folder.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0525-data-folder.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0530-story-memory.js (원본)",
+   "num": {
+    "개수": 7
+   },
+   "text": "src/main/0530-story-memory.js (원본) 7개"
+  },
+  {
+   "key": "이름 모호|src/main/0535-content-audit.js (원본)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0535-content-audit.js (원본) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0535-content-audit.js (포크)",
+   "num": {
+    "개수": 3
+   },
+   "text": "src/main/0535-content-audit.js (포크) 3개"
+  },
+  {
+   "key": "이름 모호|src/main/0550-standalone-app.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0550-standalone-app.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0560-image-candidates.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/0560-image-candidates.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/main/0565-asset-library.js (포크)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/main/0565-asset-library.js (포크) 2개"
+  },
+  {
+   "key": "이름 모호|src/main/0565-asset-library.js (원본)",
+   "num": {
+    "개수": 4
+   },
+   "text": "src/main/0565-asset-library.js (원본) 4개"
+  },
+  {
+   "key": "이름 모호|src/modules/combat/050-bridge.js (원본)",
+   "num": {
+    "개수": 5
+   },
+   "text": "src/modules/combat/050-bridge.js (원본) 5개"
+  },
+  {
+   "key": "이름 모호|src/modules/combat/070-equipment.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/modules/combat/070-equipment.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/modules/combat/080-training.js (원본)",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/modules/combat/080-training.js (원본) 1개"
+  },
+  {
+   "key": "이름 모호|src/modules/combat/090-practice.js (원본)",
+   "num": {
+    "개수": 2
+   },
+   "text": "src/modules/combat/090-practice.js (원본) 2개"
+  }
  ]
 }

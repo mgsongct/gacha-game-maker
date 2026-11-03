@@ -5,12 +5,12 @@
 function TOWER(){ const p=P(); if(!p.tower||typeof p.tower!=='object') p.tower={}; return p.tower; }
 function towerList(){ const L=[{id:'all',name:'시련의 탑',desc:'누구나 출전',allow:null}];
   ruleFacs().forEach(f=>L.push({id:'f:'+f,name:`${f}의 탑`,desc:`${f} 소속만 출전`,allow:c=>c.faction===f}));
-  ELEMS.forEach(e=>L.push({id:'e:'+e,name:`${e}의 탑`,desc:`${e} 속성만 출전`,allow:c=>c.elem===e}));
+  ELEMS.forEach(elem=>L.push({id:'e:'+elem,name:`${elem}의 탑`,desc:`${elem} 속성만 출전`,allow:c=>c.elem===elem}));
   return L; }
 function towerById(id){ return towerList().find(t=>t.id===id); }
 function towerPool(boss){ const out=[]; G.chapters.forEach(ch=>(ch.stages||[]).forEach(s=>(s.enemies||[]).forEach(e=>{ if(!!e.boss===!!boss&&!out.some(x=>x.name===e.name)) out.push(e); }))); return out; }
 function towerStage(tid,floor){ const t=towerById(tid)||towerById('all'), h=hashN(tid+'#'+floor), boss=floor%5===0, k=(floor-1)*.4;
-  const pool=towerPool(false), bp=towerPool(true), foeElem=tid.startsWith('e:')?(ELEMS.find(x=>BEATS[tid.slice(2)]===x)||ELEMS[0]):null;
+  const pool=towerPool(false), bp=towerPool(true), foeElem=tid.startsWith('e:')?(ELEMS.find(elem=>BEATS[tid.slice(2)]===elem)||ELEMS[0]):null;
   const mk=(src,i,b)=>{ const e={name:(src&&src.name)||(b?'탑의 수호자':'탑의 파수꾼'),look:src&&src.look,elem:foeElem&&i%2===0?foeElem:ELEMS[(h+i)%ELEMS.length],hp:900,atk:90,def:40,spd:92+Math.min(40,floor),boss:!!b}; return fitEnemy(e,enemyTarget(k,i,!!b)); };
   const n=boss?2:Math.min(4,2+Math.floor(floor/10)), en=[]; for(let i=0;i<n;i++) en.push(mk(pool[(h+i*7)%Math.max(1,pool.length)],i,false)); if(boss) en.push(mk(bp[h%Math.max(1,bp.length)],n,true));
   const s={id:`tower_${tid}_${floor}`,title:`${t.name} ${floor}층`,enemies:en,reward:0,pre:'',post:''};

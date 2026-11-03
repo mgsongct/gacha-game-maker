@@ -144,3 +144,11 @@ export function relayHosts(units, hosts) {
   const firstList = lists[0][1], ok = h => firstList.includes(h) || /-aiplatform\.googleapis\.com$/.test(h);
   return { diff, api: api.size, notAllowed: [...api].filter(([h]) => !ok(h)).map(([host, loc]) => ({ host, loc })) };
 }
+// SPA 단일 파일 전제: 앱은 src/를 빌드한 www/index.html 한 파일. 빌드 결과가 로컬 스크립트·스타일시트 파일을 따로 불러오면(<script src="x.js">, <link rel="stylesheet" href="x.css">) 전제가 깨짐.
+// 허용: 외부 https 주소(글꼴 등), PWA 부속(manifest·아이콘 링크), 서비스 워커 등록(navigator.serviceWorker.register)
+export function spaCheck(ROOT) { const out = [], f = join(ROOT, 'www/index.html'); if (!existsSync(f)) return { errors: [{ loc: 'www/index.html', text: '빌드 결과가 없음 — node build/build.mjs' }], scripts: 0 };
+  const html = readFileSync(f, 'utf8'), local = u => !/^(https?:)?\/\//.test(u) && !/^data:/.test(u);
+  for (const m of html.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi)) if (local(m[1])) out.push({ loc: 'www/index.html', text: `로컬 스크립트 파일을 따로 불러옴: ${m[1]} — src/에 넣어 빌드로 합치세요` });
+  for (const m of html.matchAll(/<link\b[^>]*>/gi)) { const t = m[0], h = (t.match(/href\s*=\s*["']([^"']+)["']/i) || [])[1]; if (h && /rel\s*=\s*["']?stylesheet/i.test(t) && local(h)) out.push({ loc: 'www/index.html', text: `로컬 스타일시트 파일을 따로 불러옴: ${h} — src/style에 넣어 빌드로 합치세요` }); }
+  for (const m of html.matchAll(/\bimport\s*\(\s*["'](\.{0,2}\/[^"']+)["']\s*\)/g)) out.push({ loc: 'www/index.html', text: `로컬 모듈을 동적으로 불러옴: ${m[1]}` });
+  return { errors: out, scripts: (html.match(/<script\b/gi) || []).length }; }

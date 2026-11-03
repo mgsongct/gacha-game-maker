@@ -2,6 +2,13 @@
 
 이 저장소에서 작업할 때 지키는 원칙입니다. 사용자가 거듭 지시한 내용을 지침으로 고정한 것이라, 작업을 시작하기 전에 먼저 읽고 판단 기준으로 씁니다.
 
+## 0. 전제: SPA 단일 파일 + 빌드식 소스(git 히스토리)
+- **원본(포크 전, `13a3fe9`까지)은 `index.html` 한 파일**이었습니다. 한 파일을 직접 고치는 부담이 커서, 포크가 TiddlyWiki 구조를 빌려 **소스를 `src/`로 나누고 빌드로 한 파일을 만들도록** 바꿨습니다(`49cec7a` — 빌드 결과가 원본 `index.html`과 바이트 단위로 같았음, sha256 `80d9f374…`).
+- 그래서 앱은 지금도 **`www/index.html` 한 파일**(SPA)이고, 소스는 `src/`(boot·style·modules·main 파트), `node build/build.mjs`가 합칩니다. `www/index.html`을 직접 고치지 않습니다.
+- 흐름: **`src/` 모듈 → 빌드 → `www/index.html`(SPA, gacha-game-maker) → AI로 게임 생성 → 게임마다 `data/<게임id>/<종류>.json`(meta·world·chars·npcs·rels·chapters·lib·threads·opening·banners·events·dispatches·prog·game) + 이미지(media)**. 이 배치는 PC 서버(`pc/ggm-server.py`)의 영구 저장소이자 데이터 폴더 zip 형식이고, 앱의 `dataSplit`·`dataJoin`(`src/main/0525-data-folder.js`)이 나누고 합칩니다. 생성 결과를 점검하는 도구(`tools/play`·`tools/wiring.mjs`)는 이 실제 저장 형식을 읽고 씁니다.
+- 원본 업데이트를 계속 가져올 수 있게 하는 것도 설계 목표입니다: `build/split.mjs`(원본 한 파일 → `src/`), `build/compare.mjs`(원본 대비 더한·뺀·바뀐 모듈), 브라우저 테스트 2b(원본 커밋도 split→build 바이트 동일). (`0d5adbc`의 "포크 업데이트 채널"은 앱 자체 업데이트를 원본이 아닌 이 포크에서 받게 한 것) **원본에서 온 코드를 대량으로 바꾸는 리팩터링(이름 일괄 변경 등)은 원본 업데이트 반영을 어렵게 하므로**, 기본은 포크가 더한 코드에 적용하고 원본 코드는 손대는 곳만 정리합니다.
+- 빌드 결과는 로컬 스크립트·스타일시트를 따로 불러오지 않습니다(허용: 외부 글꼴, PWA 부속 `manifest.webmanifest`·`sw.js`·`icons/`). `tools/check.mjs`가 검사(SPA 단일 파일 전제)하고, CI의 `build --check`가 `src/`와 빌드 결과가 같은지 봅니다. 루트 `index.html`은 `www/`로 넘기는 안내 페이지입니다.
+
 ## 1. 우선순위
 
 이 저장소는 원본(포크 기준 커밋 `13a3fe9`까지)을 포크해 기능을 더한 개인용 프로젝트입니다. **중요한 것은 포크 후 추가한 커스텀 기능이 생성된 게임에 제대로 적용되고 문제없이 동작하는지**입니다.
@@ -41,6 +48,7 @@ node build/build.mjs
 node build/test.mjs
 node tools/test.mjs
 node tools/check.mjs --strict
+node tools/names.mjs --strict
 node tools/wiring.mjs --strict
 node tools/play/test.mjs
 ```

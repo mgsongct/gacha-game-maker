@@ -6,27 +6,21 @@
 //   결과: tools/out/wiring.md · wiring.json. --strict: P0·P1 판정이 기준선(tools/baseline.json의 wiring)보다 새로 생기면 exit 1 · --update-baseline: 줄었을 때 기준선 낮춤
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
-import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { loadUnits } from './lib/source.mjs';
 import { buildGraph } from './lib/graph.mjs';
 import { stateFlow } from './lib/flow.mjs';
-import { constLiterals, allProps, wiringReport } from './lib/wiring.mjs';
+import { constLiterals, wiringReport } from './lib/wiring.mjs';
+import { srcAt } from './lib/gitsrc.mjs';
 import { compare, readBaseline, writeBaseline, diffMd } from './lib/ratchet.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url)), ROOT = resolve(HERE, '..'), OUT = join(HERE, 'out'), REG = JSON.parse(readFileSync(join(HERE, 'fork-features.json'), 'utf8'));
-const git = cmd => execSync(`git ${cmd}`, { cwd: ROOT, encoding: 'utf8' }).trim();
-// git 기준의 src/만 풀어 두고(캐시) 최상위 함수 키·프로퍼티 이름을 뽑음
-async function srcAt(ref) { const sha = git(`rev-parse --verify ${JSON.stringify(ref + '^{commit}')}`), dir = join(OUT, 'ref-src', sha), cache = join(dir, 'names.json');
-  if (existsSync(cache)) return { sha, ...JSON.parse(readFileSync(cache, 'utf8')) };
-  mkdirSync(dir, { recursive: true }); execSync(`git archive ${sha} src | tar -x -C ${JSON.stringify(dir)}`, { cwd: ROOT });
-  const units = await loadUnits(dir), { fns } = buildGraph(units), r = { fns: [...fns.values()].filter(f => f.top).map(f => f.key), props: [...allProps(units)] };
-  writeFileSync(cache, JSON.stringify(r)); return { sha, ...r }; }
+const srcAtRef = ref => srcAt(ROOT, OUT, ref);
 
 const units = await loadUnits(ROOT), { fns } = buildGraph(units), sf = stateFlow(units, fns), defaults = constLiterals(units, ['DEFAULT_META', 'DEFAULT_WORLD', 'DEFAULT_PROG']);
-const upstream = await srcAt(REG.upstreamSrc || REG.upstream), features = [];
+const upstream = await srcAtRef(REG.upstreamSrc || REG.upstream), features = [];
 for (const f of REG.features) { const added = new Set();
-  for (const c of f.commits) { const [now, before] = [await srcAt(c), await srcAt(c + '^')], b = new Set(before.fns); now.fns.filter(k => !b.has(k)).forEach(k => added.add(k)); }
+  for (const c of f.commits) { const [now, before] = [await srcAtRef(c), await srcAtRef(c + '^')], b = new Set(before.fns); now.fns.filter(k => !b.has(k)).forEach(k => added.add(k)); }
   features.push({ id: f.id, title: f.title, doc: f.doc, fns: new Set([...added].filter(k => fns.has(k))) }); }
 // 생성 게임: 커밋된 결과(game.json)와, 지금 코드로 같은 응답을 다시 생성한 결과(regress/game.json — tools/play/regress.mjs)
 const GD = join(HERE, 'play/games'), games = (existsSync(GD) ? readdirSync(GD) : []).flatMap(d => [['game.json', d], ['regress/game.json', d + '(재생)']].filter(([f]) => existsSync(join(GD, d, f))).map(([f, name]) => ({ name, game: JSON.parse(readFileSync(join(GD, d, f), 'utf8')) })));
