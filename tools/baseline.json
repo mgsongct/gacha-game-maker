@@ -2,11 +2,6 @@
  "note": "자기점검·배선 점검 기준선 — 늘리지 않음(CLAUDE.md §2). 줄면 node tools/check.mjs --update-baseline · node tools/wiring.mjs --update-baseline",
  "findings": [
   {
-   "key": "오류|SPA 단일 파일 전제 깨짐 src/main/0010-rules.js 분석한 코드(main)가 빌드된 www/index.html에 그대로 없음 — node build/build.mjs로 다시 빌드하거나 분석 단위를 빌드 구조에 맞추세요",
-   "num": {},
-   "text": "SPA 단일 파일 전제 깨짐: src/main/0010-rules.js 분석한 코드(main)가 빌드된 www/index.html에 그대로 없음 — node build/build.mjs로 다시 빌드하거나 분석 단위를 빌드 구조에 맞추세요"
-  },
-  {
    "key": "복잡한 함수|buildNewGameDraft",
    "num": {
     "복잡도": 150,
@@ -4349,7 +4344,7 @@
     "줄": 34,
     "중첩": 1
    },
-   "text": "(최상위)→p22.evaluate @build/test.mjs (build/test.mjs:499) 복잡도 42 · 34줄 · 중첩 1"
+   "text": "(최상위)→p22.evaluate @build/test.mjs (build/test.mjs:501) 복잡도 42 · 34줄 · 중첩 1"
   },
   {
    "key": "도구 빈 catch|build/test.mjs",

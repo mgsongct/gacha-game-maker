@@ -159,16 +159,16 @@ function drCtx(skip){ const d=DR2, L=[];
 function drSnap(label){ const d=DR2; d.undo={label,kw:d.kw,tone:d.tone,world:d.world,setting:d.setting,story:d.story,chars:JSON.parse(JSON.stringify(d.chars)),hero:JSON.parse(JSON.stringify(Object.assign({},d.hero,{av:undefined})))}; }
 async function drPolish(k,btn){ drRead(); if(k==='hero') return drPolishHero(btn); const cur=String(DR2[k]||'').trim(); if(!cur){ toast('먼저 내용을 조금 적어 주세요'); return; }
   const what=k==='world'?'게임 세계관':k==='story'?'스토리 개요':'게임 설정(세력·용어·규칙·비밀)';
-  const r=await aiJSON(`${pf('DR_POLISH',{what,v:k==='setting'?pf('DR_POLISH_SECRET'):'',drCtx:drCtx(k),cur})}JSON만 출력: {"text":"다듬은 전체 글"}`,btn,'default');
+  const r=await aiJSON(`${pf('DR_POLISH',{what,pf:k==='setting'?pf('DR_POLISH_SECRET'):'',drCtx:drCtx(k),cur})}JSON만 출력: {"text":"다듬은 전체 글"}`,btn,'default');
   if(r&&r.text){ drRead(); drSnap(what); DR2[k]=String(r.text); const dn=drDedup(); drSave(); drRerender(); toast('다른 항목에 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); } }
 async function drPolishHero(btn){ const h=DR2.hero;
-  const r=await aiJSON(`${pf('DR_POLISH_HERO',{drCtx:drCtx('hero'),v:JSON.stringify({call:h.call||'',name:h.name||'',gender:h.gender||'',look:h.look||'',bio:h.bio||''})})}JSON만 출력: {"call":"호칭(2~4자)","name":"이름(비어 있었으면 빈 문자열)","look":"외모","bio":"설정 3~5문장"}`,btn,'default');
+  const r=await aiJSON(`${pf('DR_POLISH_HERO',{drCtx:drCtx('hero'),call:JSON.stringify({call:h.call||'',name:h.name||'',gender:h.gender||'',look:h.look||'',bio:h.bio||''})})}JSON만 출력: {"call":"호칭(2~4자)","name":"이름(비어 있었으면 빈 문자열)","look":"외모","bio":"설정 3~5문장"}`,btn,'default');
   if(!r||typeof r!=='object') return; drRead(); drSnap('주인공'); const S=v=>typeof v==='string'?v.trim():''; const H=DR2.hero;
   if(S(r.call)) H.call=S(r.call).slice(0,12); if(S(r.name)&&!String(H.name||'').trim()) H.name=S(r.name).slice(0,12); if(S(r.look)) H.look=S(r.look).slice(0,400); if(S(r.bio)) H.bio=S(r.bio).slice(0,1500);
   drDedup(); drSave(); drRerender(); toast('주인공을 다듬었어요. 마음에 안 들면 「되돌리기」'); }
 /* 전체 맞추기: 세계관·설정·스토리·인물·주인공 설정을 한꺼번에 보고, 서로 어긋난 곳을 고치고 관계를 엮어요. 적힌 내용은 살리고, 한 번 되돌릴 수 있어요 */
 async function drHarmony(btn){ drRead(); const d=DR2; if(!drText(d).trim()){ toast('먼저 세계관이나 인물을 조금 적어 주세요'); return; }
-  const r=await aiJSON(`${pf('DR_HARMONY',{DR_NODUP,v:d.kw||'(비어 있음)',tone:!d.tone?'(비어 있음)':dupTxt(d.kw,d.tone)?pf('DR_HARMONY_TONE'):d.tone,drTheme:drTheme(d).filter(x=>!/^장르|^분위기/.test(x)).join('\n'),drText:drText(d).slice(0,20000)})}JSON만 출력: {"kw":"장르와 키워드","tone":"분위기","world":"세계관 전체 글","setting":"설정 전체 글","story":"스토리 개요 전체 글","chars":[{"name":"","role":"","profile":"","speech":"","look":""}],"heroBio":"주인공 설정"} — chars는 위 인물 순서 그대로, 같은 수로.`,btn,'complex');
+  const r=await aiJSON(`${pf('DR_HARMONY',{DR_NODUP,kw:d.kw||'(비어 있음)',tone:!d.tone?'(비어 있음)':dupTxt(d.kw,d.tone)?pf('DR_HARMONY_TONE'):d.tone,drTheme:drTheme(d).filter(x=>!/^장르|^분위기/.test(x)).join('\n'),drText:drText(d).slice(0,20000)})}JSON만 출력: {"kw":"장르와 키워드","tone":"분위기","world":"세계관 전체 글","setting":"설정 전체 글","story":"스토리 개요 전체 글","chars":[{"name":"","role":"","profile":"","speech":"","look":""}],"heroBio":"주인공 설정"} — chars는 위 인물 순서 그대로, 같은 수로.`,btn,'complex');
   if(!r||typeof r!=='object'){ return; } drRead();
   drSnap('전체 맞추기');
   const S=v=>typeof v==='string'?v.trim():'';
@@ -178,7 +178,7 @@ async function drHarmony(btn){ drRead(); const d=DR2; if(!drText(d).trim()){ toa
   if(String(d.hero.bio||'').trim()&&S(r.heroBio)) d.hero.bio=S(r.heroBio);
   const dn=drDedup(d); drSave(); drRerender(); toast('서로 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); }
 async function drFillChar(i,btn){ drRead(); const c=DR2.chars[i]; if(!c) return;
-  const r=await aiJSON(`${pf('DR_FILL_CHAR',{drCtx:drCtx('c:'+i),v:JSON.stringify({name:c.name||'',role:c.role||'',profile:c.profile||'',speech:c.speech||'',look:c.look||''})})}JSON만 출력: {"name":"","role":"한 줄 소개","profile":"성격·과거·관계 3~5문장","speech":"말투 설명과 예시 한 마디","look":"외모"}`,btn,'default');
+  const r=await aiJSON(`${pf('DR_FILL_CHAR',{drCtx:drCtx('c:'+i),name:JSON.stringify({name:c.name||'',role:c.role||'',profile:c.profile||'',speech:c.speech||'',look:c.look||''})})}JSON만 출력: {"name":"","role":"한 줄 소개","profile":"성격·과거·관계 3~5문장","speech":"말투 설명과 예시 한 마디","look":"외모"}`,btn,'default');
   if(!r) return; let o=Array.isArray(r)?r[0]:r; if(o&&!o.profile&&!o.role){ const v=Object.values(o).find(x=>x&&typeof x==='object'&&!Array.isArray(x)); if(v) o=v; } if(!o||typeof o!=='object'){ toast('AI 응답을 읽지 못했어요. 다시 눌러 주세요'); return; }
   drRead(); const c2=DR2.chars[i]||c; drSnap((c2.name||'인물')+' 다듬기'); const S=v=>Array.isArray(v)?v.join(' ').trim():typeof v==='string'?v.trim():'';
   const RK=/\s*[\[(【]\s*(SSR|SR|R)\s*[\])】]\s*/gi; let rk=''; ['role','profile','speech','look'].forEach(k=>{ let v=S(o[k]); if(!v) return; v=v.replace(RK,(m,g)=>{ rk=rk||g.toUpperCase(); return ' '; }).replace(/\s{2,}/g,' ').trim(); if(v) c2[k]=v; }); if(rk&&!c2.rank&&c2.kind!=='npc') c2.rank=({SSR:3,SR:2,R:1})[rk]; if(!String(c2.name||'').trim()&&S(o.name)) c2.name=S(o.name).replace(RK,' ').trim();

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // 스튜디오 밖 지시문을 프롬프트 스튜디오 조각으로 옮기기(치환 도구). 원칙: 프롬프트는 스튜디오에 파편화되지 않게 한곳에 모아 두고 거기서 개선(CLAUDE.md §0-1).
 //   node tools/prompts-move.mjs <목록.json> [--dry]
+//   node tools/prompts-move.mjs --slots [--dry]   이미 옮긴 조각의 뜻 없는 자리 이름({v}·{String} 등)을 식에서 다시 짓기
 //   목록: {"group":"묶음 이름","items":[{"at":"src/main/x.js:줄","head":"지시문 글 머리(도구 보고서의 「…」)","id":"조각_ID","label":"스튜디오에 보일 이름"}]}
 // 하는 일: 그 지시문 글(문자열·템플릿)을 원문 그대로 조각 기본값으로 옮기고, 템플릿의 ${식}은 이름 붙은 자리 {이름}으로 바꿔
 //   호출 지점을 pf('조각_ID',{이름:식}) 으로 바꿈. 템플릿에 "JSON만 출력"(llmWrap·aiJSON이 찾는 표식)이 있으면 그 앞까지만 옮기고 표식·스키마는 둠.
@@ -23,8 +24,12 @@ function exprEnd(s, i) { let d = 0;
     i++; } }
 function tmplEnd(s, i) { for (;;) { const c = s[i]; if (c === '\\') { i += 2; continue; } if (c === '`') return i; if (s.startsWith('${', i)) { i = exprEnd(s, i + 2) + 1; continue; } i++; } }
 export function topSubs(body) { const out = []; for (let i = 0; i < body.length;) { if (body[i] === '\\') { i += 2; continue; } if (body.startsWith('${', i)) { const e = exprEnd(body, i + 2); out.push({ from: i, to: e + 1, expr: body.slice(i + 2, e) }); i = e + 1; continue; } i++; } return out; }
-// 자리 이름: T('x') → x, 이름 → 그대로, a.b → b, f(…) → f, 나머지 v1…(겹치면 뒤에 번호)
-export function slotName(expr, used) { const t = expr.trim(); let n = (t.match(/^T\('(\w+)'\)$/) || [])[1] || (/^[A-Za-z_$][\w$]*$/.test(t) ? t : '') || (t.match(/\.([A-Za-z_$][\w$]*)$/) || [])[1] || (t.match(/^([A-Za-z_$][\w$]*)\(/) || [])[1] || 'v';
+// 자리 이름: T('x') → x, 이름 → 그대로, 그 밖에는 식 안의 뜻 있는 속성 이름(c.profile → profile, m.elems.map(…) → elems, ROLE → role) —
+// 메서드·내장 이름(slice·join·map·String·JSON …)은 건너뜀. 못 찾으면 v(겹치면 뒤에 번호)
+const NOT_SLOT = new Set('slice join map filter trim length replace includes find some every keys values entries stringify parse max min round floor ceil from concat split toString padStart reduce sort reverse flat push indexOf toLowerCase toUpperCase test match String JSON Math Object Array Number Boolean Date new c o e x l s t n i k p r g m w f b d v a'.split(' '));
+const meaningful = t => { const props = [...t.matchAll(/\.([A-Za-z_$][\w$]*)/g)].map(m => m[1]).filter(w => !NOT_SLOT.has(w)), ids = [...t.matchAll(/(^|[^.\w$'"])([A-Za-z_$][\w$]*)/g)].map(m => m[2]).filter(w => !NOT_SLOT.has(w) && !/^(G|P|T|esc|own|charById|true|false|null|undefined)$/.test(w));
+  const w = props[0] || ids[0] || ''; return /^[A-Z][A-Z0-9_]+$/.test(w) ? w.toLowerCase().replace(/_(\w)/g, (_, c) => c.toUpperCase()) : w; };
+export function slotName(expr, used) { const t = expr.trim(); let n = (t.match(/^T\('(\w+)'\)$/) || [])[1] || (/^[A-Za-z_$][\w$]*$/.test(t) ? t : '') || meaningful(t) || 'v';
   n = n.replace(/\$/g, '') || 'v'; if (!/^[A-Za-z]/.test(n)) n = 'v' + n; let k = n, i = 2; while (used.has(k) && used.get(k) !== t) k = n + i++; used.set(k, t); return k; }
 // 지시문 글(원문 리터럴) → { frag: 조각 글, call: 호출 지점 식, keep: 리터럴에 남길 꼬리(표식·스키마) }
 export function moveLiteral(lit, id) { const q = lit[0];
@@ -36,8 +41,29 @@ export function moveLiteral(lit, id) { const q = lit[0];
   frag += head.slice(last);
   const call = `pf('${id}'${vars.length ? ',{' + vars.map(([n, e]) => n === e ? n : `${n}:${e}`).join(',') + '}' : ''})`;
   return { frag, call, keep: mk < 0 ? null : body.slice(cut), vars: vars.map(v => v[0]) }; }
+// 호출 지점 pf('ID',{…})의 자리 목록 [{name, expr, from, to}] — 맨 위 쉼표로 나눔
+export function callSlots(src, id) { const at = src.indexOf(`pf('${id}',{`); if (at < 0) return null; const o = at + `pf('${id}',`.length, end = exprEnd(src, o + 1), body = src.slice(o + 1, end), out = [];
+  let d = 0, start = 0; const push = (a, b) => { const t = body.slice(a, b), m = t.match(/^\s*([A-Za-z_$][\w$]*)\s*(?::([\s\S]*))?$/); if (m) out.push({ name: m[1], expr: (m[2] ?? m[1]).trim() }); };
+  for (let i = 0; i < body.length; i++) { const c = body[i]; if (c === "'" || c === '"') { const q = c; i++; while (body[i] !== q) { if (body[i] === '\\') i++; i++; } } else if (c === '`') i = tmplEnd(body, i + 1); else if ('([{'.includes(c)) d++; else if (')]}'.includes(c)) d--; else if (c === ',' && !d) { push(start, i); start = i + 1; } }
+  push(start, body.length); return { at, from: o, to: end + 1, slots: out }; }
+// 뜻 없는 자리 이름(v·v2·String·length 같은 옮기기 도구의 예전 이름)을 식에서 다시 짓기 — 조각 글·자리 목록·호출 지점을 같이 바꿈
+const POOR = /^(v\d*|String|length|JSON|Math|join|slice|map)$/;
+export function renameSlots(studio, srcs) { let changed = 0; const out = new Map(srcs);
+  studio = studio.replace(/^pfDef\('(\w+)','((?:[^'\\]|\\.)*)',\(\)=>`((?:[^`\\]|\\.)*)`,'자리: ([^']*)'\);$/gms, (all, id, label, frag, where) => {
+    const file = [...out.keys()].find(f => out.get(f).includes(`pf('${id}',{`)); if (!file) return all; const src = out.get(file), cs = callSlots(src, id); if (!cs || !cs.slots.some(x => POOR.test(x.name))) return all;
+    const used = new Map(cs.slots.filter(x => !POOR.test(x.name)).map(x => [x.name, x.expr])), ren = new Map();
+    for (const x of cs.slots) if (POOR.test(x.name)) { const n = slotName(x.expr, used); ren.set(x.name, n); }
+    const sub = t => t.replace(/\{([A-Za-z]\w*)\}/g, (m, k) => ren.has(k) ? `{${ren.get(k)}}` : m);
+    const call = '{' + cs.slots.map(x => { const n = ren.get(x.name) || x.name; return n === x.expr ? n : `${n}:${x.expr}`; }).join(',') + '}';
+    out.set(file, src.slice(0, cs.from) + call + src.slice(cs.to)); changed++;
+    return `pfDef('${id}','${label}',()=>\`${sub(frag)}\`,'자리: ${sub(where)}');`; });
+  return { studio, srcs: out, changed }; }
 const pfLine = (id, label, frag, vars) => `pfDef('${id}','${label.replace(/'/g, "\\'")}',()=>\`${frag}\`${vars && vars.length ? `,'자리: ${vars.map(v => '{' + v + '}').join(' ')}'` : ''});`;
 
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--slots')) { // 이미 옮긴 조각의 뜻 없는 자리 이름 다시 짓기
+  const units = await loadUnits(ROOT), home = fragmentFiles(units).home, files = units.flatMap(u => u.files.map(f => f.path)).filter(f => f !== home), srcs = new Map(files.map(f => [f, readFileSync(join(ROOT, f), 'utf8')]));
+  const r = renameSlots(readFileSync(join(ROOT, home), 'utf8'), srcs); if (!process.argv.includes('--dry')) { writeFileSync(join(ROOT, home), r.studio); for (const [f, t] of r.srcs) if (t !== srcs.get(f)) writeFileSync(join(ROOT, f), t); }
+  console.log(`자리 이름을 다시 지은 조각 ${r.changed}개${process.argv.includes('--dry') ? '(미리보기)' : ''}`); process.exit(0); }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const spec = JSON.parse(readFileSync(resolve(process.argv[2]), 'utf8')), dry = process.argv.includes('--dry'), units = await loadUnits(ROOT), rows = inlinePrompts(units, { nodes: true }), home = fragmentFiles(units).home;
   const files = new Map(), read = f => { if (!files.has(f)) files.set(f, readFileSync(join(ROOT, f), 'utf8')); return files.get(f); }, lines = [];

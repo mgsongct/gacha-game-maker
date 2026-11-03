@@ -75,7 +75,7 @@ function jaMap(){ try{ return JSON.parse(appStorage.getItem(JAKEY)||'{}')||{}; }
 const jaKey=t=>hash(t).toString(36)+'_'+t.length;
 /* 스토리를 열면 목소리가 있는 대사를 한 번에 일본어로 옮겨 둬요(한 줄씩 옮기면 느리고 늦게 나와서) */
 function jaBatch(texts){ if(!SAMPLE) return; const m=jaMap(), todo=[...new Set(texts.map(x=>cleanTTS(sub(x))).filter(x=>x&&!m[jaKey(x)]&&!JAWAIT[jaKey(x)]))]; if(!todo.length) return;
-  for(let i=0;i<todo.length;i+=30){ const part=todo.slice(i,i+30); const pr=(async()=>{ try{ const r=await SAMPLE.json(`${pf('VOICE_JA_BATCH',{v:part.map((x,j)=>(j+1)+'. '+x).join('\n')})}\nJSON만 출력: {"ja":["옮긴 대사 ${part.length}개"]}`,{modelTier:'quick'}); const a=Array.isArray(r&&r.ja)?r.ja:[];
+  for(let i=0;i<todo.length;i+=30){ const part=todo.slice(i,i+30); const pr=(async()=>{ try{ const r=await SAMPLE.json(`${pf('VOICE_JA_BATCH',{part:part.map((x,j)=>(j+1)+'. '+x).join('\n')})}\nJSON만 출력: {"ja":["옮긴 대사 ${part.length}개"]}`,{modelTier:'quick'}); const a=Array.isArray(r&&r.ja)?r.ja:[];
         if(a.length===part.length){ const m2=jaMap(); part.forEach((x,j)=>{ const v=String(a[j]||'').trim(); if(v) m2[jaKey(x)]=v; }); try{ appStorage.setItem(JAKEY,JSON.stringify(m2)); }catch(e){} } }catch(e){} finally{ part.forEach(x=>{ if(JAWAIT[jaKey(x)]===pr) delete JAWAIT[jaKey(x)]; }); } })().then(()=>null);
     part.forEach(x=>{ JAWAIT[jaKey(x)]=pr; }); } }
 async function toJa(t){ const k=jaKey(t); if(JAWAIT[k]){ const v=await JAWAIT[k]; if(v) return v; } const m=jaMap(); if(m[k]) return m[k]; if(!SAMPLE) return t; if(JAWAIT[k]) return JAWAIT[k];

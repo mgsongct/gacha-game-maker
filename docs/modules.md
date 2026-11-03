@@ -31,7 +31,7 @@
 - 로비 하위 화면: `evshop, abyss, challenge, codex, notice, event, evd, farm, disp, pass, shop, cash`.
 - `render()`: 상단 재화 갱신 → `F[tab]()`이 반환한 **HTML 문자열**을 `#view.innerHTML`로 통째 교체 → 스크롤 복원(`UI_SCROLL_MODULE`). 가상 DOM·컴포넌트 없음.
 - 문자열 템플릿에 사용자/AI 텍스트를 넣을 땐 **반드시 `esc()`** 사용(기존 코드 관례).
-- 팝업: `openModal(html, lock, cls)` / `closeModal()`. `MODAL_NAV_MODULE`이 `openXxx` 함수들을 감싸 **모달 뒤로가기 스택**(`NAV`, `window.navBack()`)을 만듦. Android 뒤로가기·Esc·배경 클릭 모두 `navBack()`.
+- 팝업: `openModal(html, lock, cls)` / `closeModal()`. `MODAL_NAV_MODULE`이 `open…` 함수들을 감싸 **모달 뒤로가기 스택**(`NAV`, `window.navBack()`)을 만듦. Android 뒤로가기·Esc·배경 클릭 모두 `navBack()`.
 - 전체화면 연출(타이틀, VN 대본, 가챠, 전투)은 `#ov`, 메신저는 `#phone`.
 - 데스크톱: `applyDesk()`가 가운데 세로 레이아웃 + 키보드(1~5 탭, Space/Enter, Esc).
 
@@ -151,7 +151,6 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - `pull(n)` → 비용 `n*COST(120)` 차감 → `rollOne(guarSR, forceSSR, banner)` n회 → `mark('prog')` → **`await flush()` 후** 연출 `playGacha(res)`. (저장 성공 전엔 결과를 보여 주지 않음)
 - `rollOne`: 소프트 천장 확률 `softRate()`, 천장 `settings.pity`, 10연 마지막 SR 보장, 픽업 확률 `banner.rate`, 픽업 실패 시 다음 SSR 확정(`guar`), 모집 포인트(`spark`, `SPARK` 포인트로 교환). 중복은 `dup`(돌파, 최대 5) + `REFUND` 환급.
 - `bannerPool(b)`: `pool.mode`(all/factions/ids)로 후보 결정.
-- `discover()`: 재화를 써서 AI가 **새 캐릭터를 즉석 생성**하고 바로 획득.
 
 ## 8-1. 건조/영입 · 원정 · 바리에이션
 

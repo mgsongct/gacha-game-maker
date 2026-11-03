@@ -358,7 +358,7 @@ async function v2ConceptPrompt(d,c){
  d.busy=true;const fallback=v2IconPrompt(c,p.slot);let status=document.getElementById('v2-icon-status'),dots=0;const tick=()=>{if(status?.isConnected)status.textContent='컨셉에 맞는 프롬프트 구성중'+'.'.repeat(dots++%3+1);};tick();const timer=setInterval(tick,400);
  try{
   let prompt=fallback;
-  if(SAMPLE){const s=v2Ensure(c)[p.slot];const r=await SAMPLE.json(`${pf('SKILL_ICON_ART',{v:JSON.stringify({name:c.name,profile:c.profile,appearance:c.naiPrompt,element:c.elem,weapon:c.weapon?.desc,slot:p.slot,skill:s}),fallback})}JSON만 출력: {"prompt":"영어 태그"}`,{modelTier:'quick',cache:false});if(typeof r?.prompt==='string'&&r.prompt.trim())prompt=r.prompt.trim().slice(0,1800)+', no text, no letters, no watermark';}
+  if(SAMPLE){const s=v2Ensure(c)[p.slot];const r=await SAMPLE.json(`${pf('SKILL_ICON_ART',{name:JSON.stringify({name:c.name,profile:c.profile,appearance:c.naiPrompt,element:c.elem,weapon:c.weapon?.desc,slot:p.slot,skill:s}),fallback})}JSON만 출력: {"prompt":"영어 태그"}`,{modelTier:'quick',cache:false});if(typeof r?.prompt==='string'&&r.prompt.trim())prompt=r.prompt.trim().slice(0,1800)+', no text, no letters, no watermark';}
   if(V2ICONS===d&&d.preview===p){p.prompt=prompt;v2DrawIcons();}
  }catch(e){if(V2ICONS===d&&d.preview===p){p.prompt=fallback;v2DrawIcons();toast('캐릭터·스킬 정보를 바탕으로 기본 프롬프트를 구성했어요.');}}
  finally{clearInterval(timer);if(V2ICONS===d&&d.preview===p){d.busy=false;v2DrawIcons();}}

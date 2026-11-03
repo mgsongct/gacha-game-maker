@@ -74,7 +74,7 @@ function codeToStage(code){ code=String(code||'').trim(); if(!code||/^start|처�
 function cxProgressText(){ const st=mainStages(), done=st.filter(s=>P().cleared[s.id]); return done.length?`플레이어가 지금까지 깬 스테이지: ${done.map(s=>s.code+' '+s.title).join(', ')}`:'플레이어는 아직 스토리를 시작하지 않았다'; }
 async function cxDiscover(t){
   const st=mainStages(), have=cxEntries().map(e=>e.title);
-  const r=await aiJSON(`${pf('CODEX_DISCOVER',{RULES,ctx:ctx(),v:have.join(', '),v2:st.map(s=>s.code+' '+s.title).join(', ')||'없음',cxProgressText:cxProgressText()})}JSON만 출력: {"entries":[{"cat":"place|term|history|person|faction|item","title":"짧은 제목","body":"내용","after":"start 또는 1-3 같은 스테이지 코드"}]}`,t);
+  const r=await aiJSON(`${pf('CODEX_DISCOVER',{RULES,ctx:ctx(),have:have.join(', '),code:st.map(s=>s.code+' '+s.title).join(', ')||'없음',cxProgressText:cxProgressText()})}JSON만 출력: {"entries":[{"cat":"place|term|history|person|faction|item","title":"짧은 제목","body":"내용","after":"start 또는 1-3 같은 스테이지 코드"}]}`,t);
   if(!r||!Array.isArray(r.entries)) return 0;
   let n=0; r.entries.slice(0,8).forEach(x=>{ if(!x||!x.title||!x.body) return; const cat=CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term'; const sid=codeToStage(x.after);
     cxStore().push({id:'cx'+uid(),cat,title:String(x.title).slice(0,40),body:String(x.body),unlock:sid?{type:'clear',value:sid}:{type:'start'},src:'ai',at:Date.now()}); n++; });
@@ -82,7 +82,7 @@ async function cxDiscover(t){
 }
 async function cxDeepen(key,t){
   const e=cxEntries().find(x=>x.key===key); if(!e) return false;
-  const r=await aiJSON(`${pf('CODEX_DEEPEN',{RULES,ctx:ctx(),title:e.title,v:CX_LABEL[e.cat]||'',String:String(e.body||'').slice(0,800),v2:e.notes.map(n=>n.text).join(' / ').slice(0,800)||'없음',cxProgressText:cxProgressText()})}JSON만 출력: {"text":"덧붙일 내용"}`,t);
+  const r=await aiJSON(`${pf('CODEX_DEEPEN',{RULES,ctx:ctx(),title:e.title,cat:CX_LABEL[e.cat]||'',body:String(e.body||'').slice(0,800),notes:e.notes.map(n=>n.text).join(' / ').slice(0,800)||'없음',cxProgressText:cxProgressText()})}JSON만 출력: {"text":"덧붙일 내용"}`,t);
   if(!r||!r.text) return false;
   const N=cxNotes(); (N[key]=N[key]||[]).push({text:String(r.text),at:mainStages().filter(s=>P().cleared[s.id]).map(s=>s.code).pop()||'시작 전'}); mark('world'); return true;
 }

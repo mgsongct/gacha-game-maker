@@ -29,7 +29,7 @@ async function autoNpcs(chs,btn){ if(!SAMPLE) return 0; const cnt={}; const skip
   (chs||[]).forEach(ch=>(ch.stages||[]).forEach(st=>[st.pre,st.post].forEach(t=>parseScript(t||'').forEach(L=>{ if(L.type==='say'&&!skip(L.who)) cnt[L.who]=(cnt[L.who]||0)+1; }))));
   const names=Object.entries(cnt).filter(([,n])=>n>=3).sort((a,b)=>b[1]-a[1]).map(x=>x[0]).slice(0,6); if(!names.length) return 0;
   const lines=n=>{ const out=[]; (chs||[]).forEach(ch=>(ch.stages||[]).forEach(st=>[st.pre,st.post].forEach(t=>parseScript(t||'').forEach(L=>{ if(L.type==='say'&&L.who===n&&out.length<4) out.push(L.text); })))); return out.join(' / '); };
-  const r=await aiJSON(`${pf('AUTO_NPCS',{castRule:castRule(),String:String(G.world.summary||'').slice(0,300),v:names.map(n=>`- ${n}: ${lines(n).slice(0,200)}`).join('\n'),NAI_CHAR})}\nJSON만 출력: {"npcs":[{"name":"","role":"한 줄","look":"한국어 외모","naiPrompt":""}]}`,btn||null,'quick');
+  const r=await aiJSON(`${pf('AUTO_NPCS',{castRule:castRule(),world:String(G.world.summary||'').slice(0,300),names:names.map(n=>`- ${n}: ${lines(n).slice(0,200)}`).join('\n'),NAI_CHAR})}\nJSON만 출력: {"npcs":[{"name":"","role":"한 줄","look":"한국어 외모","naiPrompt":""}]}`,btn||null,'quick');
   let n=0; (r&&Array.isArray(r.npcs)?r.npcs:[]).forEach(x=>{ const nm=String((x&&x.name)||'').trim(); if(!names.includes(nm)||npcBy(nm)) return; const o=npcNew(nm); Object.assign(o,{role:String(x.role||''),look:String(x.look||''),naiPrompt:stripMinor(stripAge(String(x.naiPrompt||'')))}); G.npcs=G.npcs||[]; G.npcs.push(o); n++; }); if(n) mark('meta'); return n; }
 function castChars(){ return [...G.chars.filter(c=>c.naiPrompt&&!(c.alt)),...(G.npcs||[]).filter(n=>n.naiPrompt)]; }
 const castById=id=>charById(id)||(G.npcs||[]).find(n=>n.id===id);

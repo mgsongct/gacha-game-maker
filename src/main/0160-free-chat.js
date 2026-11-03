@@ -18,7 +18,7 @@ function readPlayerForm(){ const p=P(); if($('#pf_name')) p.player=$('#pf_name')
   if($('#pf_gsel')){ p.gender=$('#pf_gsel').value; p.genderTxt=''; }
   if($('#pf_look')) p.look=$('#pf_look').value.trim().slice(0,400); if($('#pf_bio')) p.bio=$('#pf_bio').value.trim().slice(0,1500); if($('#pf_hide')) p.hideEyes=$('#pf_hide').checked;if($('#pf_nai'))naiBlocksSave(avatarObj(),'prompt','pf_nai'); mark('prog'); }
 const genderCode=g=>/^(남|남성|남자|male|man)$/i.test(g||'')?'m':/^(여|여성|여자|female|woman)$/i.test(g||'')?'f':'';
-async function heroTags(hr){ const r=await aiJSON(`${pf('HERO_TAGS',{v:hr.gender||'정하지 않음',look:hr.look,v2:hr.hide?'':'눈, '})}\nJSON만 출력: {"tags":"..."}`,null,'quick');
+async function heroTags(hr){ const r=await aiJSON(`${pf('HERO_TAGS',{gender:hr.gender||'정하지 않음',look:hr.look,hide:hr.hide?'':'눈, '})}\nJSON만 출력: {"tags":"..."}`,null,'quick');
   let tags=String((r&&r.tags)||'').trim(); if(!tags) return '';
   if(hr.hide) tags=joinTags(tagList(tags).filter(t=>!EYE_TAG.test(tagKey(t))).join(', '),'hair over eyes, bangs covering eyes, long bangs');
   return tags; }
@@ -44,7 +44,7 @@ async function fcSend(opt){
     const o=own(c.id), lv=affLv(o), files=(c.files||[]).filter(x=>o&&o.dup>=(x.dup||0)).map(x=>x.text).filter(Boolean);
     const pool=typeof affLinePool==='function'?affLinePool(c).slice(0,8):(c.lines||[]).slice(0,6);
     const recent=roomLog(cid).slice(-24).map(l=>l.w==='me'?(l.img?`(${playerName()}이(가) 사진을 보냄${l.t?': '+l.t:''})`:`${playerName()}: ${l.t}`):l.w==='c'?`${c.name}: ${l.t}`:l.w==='p'?`(${c.name}이(가) 사진을 보냄)`:`(${l.t})`).join('\n');
-    const r=await aiJSON(`${pf('FREE_CHAT',{RULES,ctx:ctx(),name:c.name,talk:T('talk'),playerName:playerName(),player:T('player'),v:c.faction||'무소속',v2:ROLE[c.role]||'',v3:c.profile||'',v4:pool.map(x=>'"'+x+'"').join(' / '),lv,v5:files.length?'이 캐릭터가 이미 털어놓은 비밀: '+files.join(' / '):'',fcProgress:fcProgress(),v6:(()=>{ const m=G.chapters.filter(ch=>ch.kind==='main'&&ch.summary).slice(-2); return m.length?'최근 메인 스토리 요약: '+m.map(x=>x.title+' — '+x.summary).join(' / '):''; })(),relCtx:relCtx(recent+'\n'+text,[baseChar(c).id,REL_ME],30),v7:f.sum?'예전 대화 요약: '+f.sum:'',recent,v8:opt.img?pf('FREE_CHAT_PHOTO_RECV',{playerName:playerName(),name:c.name}):'',fcPhotoOn:fcPhotoOn()?pf('FREE_CHAT_PHOTO'):''})}JSON만 출력: {"replies":["말풍선1","말풍선2"],"aff":0~2 정수(대화가 즐겁거나 의미 있었으면 1~2)${fcPhotoOn()?',"photo":"사진을 보낼 때만, 장면 태그. 안 보내면 빈 문자열"':''}}`,null,'default',opt.img?await chatImgB64(opt.img):undefined);
+    const r=await aiJSON(`${pf('FREE_CHAT',{RULES,ctx:ctx(),name:c.name,talk:T('talk'),playerName:playerName(),player:T('player'),faction:c.faction||'무소속',role:ROLE[c.role]||'',profile:c.profile||'',pool:pool.map(x=>'"'+x+'"').join(' / '),lv,files:files.length?'이 캐릭터가 이미 털어놓은 비밀: '+files.join(' / '):'',fcProgress:fcProgress(),chapters:(()=>{ const m=G.chapters.filter(ch=>ch.kind==='main'&&ch.summary).slice(-2); return m.length?'최근 메인 스토리 요약: '+m.map(x=>x.title+' — '+x.summary).join(' / '):''; })(),relCtx:relCtx(recent+'\n'+text,[baseChar(c).id,REL_ME],30),sum:f.sum?'예전 대화 요약: '+f.sum:'',recent,img:opt.img?pf('FREE_CHAT_PHOTO_RECV',{playerName:playerName(),name:c.name}):'',fcPhotoOn:fcPhotoOn()?pf('FREE_CHAT_PHOTO'):''})}JSON만 출력: {"replies":["말풍선1","말풍선2"],"aff":0~2 정수(대화가 즐겁거나 의미 있었으면 1~2)${fcPhotoOn()?',"photo":"사진을 보낼 때만, 장면 태그. 안 보내면 빈 문자열"':''}}`,null,'default',opt.img?await chatImgB64(opt.img):undefined);
     ty.remove(); const pn=playerName(), reps=(r&&Array.isArray(r.replies)?r.replies:r&&r.reply?[r.reply]:[]).map(x=>String(x||'').trim()).map(x=>x.replace(new RegExp('^'+c.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*[:：]\\s*'),'')).filter(x=>x&&!new RegExp('^(나|'+pn.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'|'+T('player')+')\\s*[:：]').test(x)).slice(0,4);
     if(!reps.length){ if(r) toast('답장을 받지 못했어요. 다시 보내 주세요'); return; }
     for(let i=0;i<reps.length;i++){
@@ -65,7 +65,7 @@ async function fcNpcPhoto(c,f,tags,alive,ty){
   }catch(e){ }finally{ t2.remove(); } }
 async function fcSummarize(cid){
   const c=charById(cid), f=fcOf(cid); const end=f.log.length-24, part=f.log.slice(f.sumTo||0,end); if(part.length<20) return;
-  try{ const r=await aiJSON(`${pf('FREE_CHAT_SUMMARY',{name:c.name,playerName:playerName(),v:f.sum?'기존 요약: '+f.sum+'\n':'',v2:part.map(l=>(l.w==='me'?playerName():l.w==='c'?c.name:'')+': '+l.t).join('\n')})}JSON만 출력: {"summary":"요약"}`,null,'quick'); if(r&&r.summary){ f.sum=String(r.summary).slice(0,1200); f.sumTo=end; mark('prog'); } }catch(e){ quietErr(e,'0160-free-chat.js:87'); }
+  try{ const r=await aiJSON(`${pf('FREE_CHAT_SUMMARY',{name:c.name,playerName:playerName(),sum:f.sum?'기존 요약: '+f.sum+'\n':'',name2:part.map(l=>(l.w==='me'?playerName():l.w==='c'?c.name:'')+': '+l.t).join('\n')})}JSON만 출력: {"summary":"요약"}`,null,'quick'); if(r&&r.summary){ f.sum=String(r.summary).slice(0,1200); f.sumTo=end; mark('prog'); } }catch(e){ quietErr(e,'0160-free-chat.js:87'); }
 }
 document.addEventListener('keydown',e=>{ if(e.target&&e.target.id==='fcIn'&&e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); if(e.isComposing||e.keyCode===229) return; fcSend(); } });
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='fcIn'){ const t=e.target; t.style.height='auto'; t.style.height=Math.min(120,t.scrollHeight)+'px'; } });

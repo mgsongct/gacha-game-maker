@@ -105,7 +105,9 @@ try {
   const type = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.webmanifest': 'application/json', '.png': 'image/png' };
   const server = createServer((q, r) => { try { const p = join(www, decodeURIComponent(new URL(q.url, 'http://x').pathname).replace(/\/$/, '/index.html')); r.writeHead(200, { 'content-type': type[extname(p)] || 'application/octet-stream' }); r.end(readFileSync(p)); } catch (e) { r.writeHead(404); r.end(); } });
   await new Promise(ok => server.listen(0, ok));
-  const browser = await chromium.launch(), page = await browser.newPage(), errors = [];
+  const browser = await chromium.launch(), COV = process.env.GGM_COVERAGE ? [] : null; // 동적 검증(tools/history.mjs): 페이지마다 V8 커버리지 → 실제로 실행된 함수
+  if (COV) { const np = browser.newPage.bind(browser); browser.newPage = async (...a) => { for (const c of COV) await c.take(); const p = await np(...a); COV.push(await coverageStart(p)); return p; }; } // 같은 렌더러의 페이지는 계수기를 공유 — 새 페이지가 기록을 시작하면 지워지므로 먼저 받아 둠
+  const page = await browser.newPage(), errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); // 외부(폰트·AI) 차단
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
@@ -738,7 +740,30 @@ try {
     return o; });
   assert.ok(Object.values(r30).every(v => v === true), JSON.stringify(r30)); assert.deepEqual(err30, [], '페이지 오류');
   console.log('ok 30 규칙·세력·연출 수정: 현재 장 계산, 빈 배너 풀의 잠금 유지, 넘기기가 분기 선택지에서 멈추고 기록, 상성 문장이 실제 상성표(속성 4개)');
-  await browser.close(); server.close();  assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
+  // 32: 개발 내역 동적 검증에서 실행이 확인되지 않던 포크 기능(화면·AI 경로)을 실제로 실행 — 게임 규칙 편집(AI 설명·포지션 AI·배정·저장·재계산·이름 바꾸기),
+  //     밸런스 저장, 개성 AI 검수·일괄 처리, 로비 감정 아이콘, 스테이지 양식 아이콘, 데이터 폴더 내보내기 저장·동기화 값
+  const p32 = await browser.newPage(), err32 = []; p32.on('pageerror', e => err32.push(String(e)));
+  await p32.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p32.goto(`http://127.0.0.1:${server.address().port}/?t=32`);
+  await p32.waitForFunction(() => typeof openRules === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r32 = await p32.evaluate(async () => { const o = {}; P().seenOpening = true; closeModal(); closeOv(); appConfirm = async () => true;
+    SAMPLE = { json: async p => /"positions"/.test(p) ? { positions: [{ name: '선봉', base: 'atk', range: 'melee', desc: '앞', t: { atk: 10 } }, { name: '방벽', base: 'def', range: 'melee', desc: '막', t: {} }, { name: '의무', base: 'sup', range: 'support', desc: '치료', t: {} }] }
+      : /"score"/.test(p) ? { score: 77, strengths: ['말투'], weaknesses: ['과거'], suggestions: ['버릇'] } : /"elems"/.test(p) ? { elems: G.meta.elems.map((e, i) => '설명' + i), roles: { atk: '공격 설명', def: '방어 설명', sup: '지원 설명' } } : { persona: { traits: ['차분', '집요', '다정'], catch: '대표 대사' } } };
+    openRules(); await rulesAI(null); o.rulesAI = RD.elems.every((e, i) => e.d === '설명' + i) && RD.roleDesc.atk === '공격 설명';
+    await rulesPosAI(null); o.posAI = RD.positions.length === 3 && RD.positions[0].name === '선봉'; G.chars.forEach(c => { delete c.pos; }); rulesPosAssign(); o.posAssign = G.chars.filter(c => c.role).every(c => RD.positions.some(p => p.id === c.pos && p.base === c.role));
+    o.rulesSave = rulesSave() === true && G.meta.elems[0].d === '설명0'; G.meta.elems.forEach(e => { delete e.d; }); o.aiFill = await rulesAIFill() && G.meta.elems.every(e => e.d);
+    const c0 = G.chars.find(c => !c.alt); c0.hp = 1; openRules(); await rulesRecalc(); o.recalc = c0.hp > 1;
+    const e0 = G.meta.elems[0].n, e1 = G.meta.elems[1].n; G.meta.rules = Object.assign(G.meta.rules || {}, { beats: { [e0]: e1 } }); rulesRename({ [e0]: '새속성' }); o.rename = (G.meta.rules.beats || {})['새속성'] === e1;
+    openBalance(); document.querySelector('#bal_per').value = '7'; document.querySelector('[data-act="balsave"]').click(); o.balSave = BAL().per === 7;
+    const c = G.chars.find(x => !x.alt && !x.npc); o.review = !!(await personaAIReview(c, null)) && c.personaAIReview.score === 77; psReopen(c); // 검수 버튼 뒤 다시 그리기
+    c.persona = {}; openPersonaAll(); const box = document.querySelector(`[data-psc="${c.id}"]`); if (box) box.checked = true; await personaBatch('fill'); o.batch = !!box && (c.persona.traits || []).includes('집요'); // 채우기는 빈 곳만 채움(있는 값 유지)
+    const el = document.createElement('div'); document.body.appendChild(el); lobbyEmote(el, '좋아! 정말 기뻐!', 'head'); o.emote = !!document.querySelector('.lb-emo') || dirMode() === 'off';
+    o.modeIcon = modeIcon({ mode: 'debate' }) === '⚖' && modeIcon({ mode: 'contest' }) === '✦' && modeIcon({}) === '';
+    o.syLs = JSON.parse(syLsValue(PJKEY)).active === PJ().active || appStorage.getItem(PJKEY) != null;
+    window.showSaveFilePicker = undefined; await dataExport(); o.export = /데이터 폴더 내보내기 완료/.test(document.querySelector('#modal').textContent);
+    return o; });
+  assert.ok(Object.values(r32).every(v => v === true), JSON.stringify(r32)); assert.deepEqual(err32, [], '페이지 오류');
+  console.log('ok 32 화면·AI 경로 실행 확인: 게임 규칙 편집(AI 설명·포지션 AI·배정·저장·재계산·속성 이름 바꾸기)·밸런스 저장·개성 AI 검수·일괄·로비 감정 아이콘·양식 아이콘·데이터 폴더 내보내기');
+  if (COV) await coverageSave(COV); await browser.close(); server.close();  assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
   assert.deepEqual(err2, [], '페이지 오류');
   console.log('ok 5  데이터 폴더 zip: data/<id>/<종류>.json + media 내보내기 → 같은 내용으로 읽힘 → 새 게임으로 가져오기(그림 포함)');
@@ -772,3 +797,14 @@ try {
     } finally { proc.kill(); }
   }
 } finally { rmSync(tmp, { recursive: true, force: true }); }
+// 커버리지(CDP 정밀 커버리지): 페이지가 다시 불러오거나 이동하면 이전 문서의 실행 기록이 사라지므로, 이동을 시작할 때마다 먼저 받아 둠
+async function coverageStart(p) { const cdp = await p.context().newCDPSession(p), c = { ran: new Set(), defined: new Set(), miss: 0 };
+  const take = async () => { const r = await cdp.send('Profiler.takePreciseCoverage').catch(e => { c.miss++; return { result: [], e }; }); for (const sc of r.result) for (const f of sc.functions) { if (!f.functionName) continue; c.defined.add(f.functionName); if (f.ranges[0] && f.ranges[0].count > 0) c.ran.add(f.functionName); } };
+  await cdp.send('Page.enable'); await cdp.send('Profiler.enable'); await cdp.send('Profiler.startPreciseCoverage', { callCount: true, detailed: false });
+  cdp.on('Page.frameRequestedNavigation', take); cdp.on('Page.frameStartedLoading', take); c.take = take;
+  const ev = p.evaluate.bind(p); p.evaluate = async (...a) => { const r = await ev(...a); await take(); return r; }; /* 앱 함수를 부른 직후 받아 둠 — 곧바로 다시 불러오는 동작(가져오기 등)은 이동 이벤트보다 이동이 먼저 끝남 */ return c; }
+// 커버리지 모으기: 실행된(한 번이라도) 함수 이름과 정의만 되고 실행 안 된 함수 이름 → tools/out/coverage.json
+async function coverageSave(list) { const ran = new Set(), defined = new Set(); let miss = 0;
+  for (const c of list) { await c.take(); c.ran.forEach(n => ran.add(n)); c.defined.forEach(n => defined.add(n)); miss += c.miss; }
+  mkdirSync(join(ROOT, 'tools/out'), { recursive: true }); writeFileSync(join(ROOT, 'tools/out/coverage.json'), JSON.stringify({ at: new Date().toISOString(), pages: list.length, missedSnapshots: miss, ran: [...ran].sort(), notRan: [...defined].filter(n => !ran.has(n)).sort() }, null, 1));
+  console.log(`커버리지: 페이지 ${list.length} · 실행된 함수 ${ran.size} · 실행 안 된 함수 ${[...defined].filter(n => !ran.has(n)).length} · 놓친 기록 ${miss} → tools/out/coverage.json`); }

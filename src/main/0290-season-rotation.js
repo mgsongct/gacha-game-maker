@@ -14,10 +14,10 @@ function seasonNext(){ const L=P().live, en=SEASONS.filter(x=>L.seasons[x[0]]!==
 async function aiNewPickupChar(con,rr,btn,col,alt){
   if(alt) return aiAltChar(alt,con,rr,btn);
   const COL=col&&col.src?`\n콜라보 ${T('crew')}: 다른 작품 「${col.src}」${col.who?'의 「'+col.who+'」':'의 인상적인 성인 캐릭터 1명'}이(가) 이 세계에 찾아온 콜라보 게스트로 만든다. 이름·외모·성격·말투·능력은 원작에 충실하게 쓰고, 원작에서 미성년자이거나 학생인 캐릭터라면 만들지 말고 대신 그 작품의 성인 캐릭터를 고른다. 학교 배경은 쓰지 않는다. profile에 이 세계에 오게 된 계기(차원 이동·초대·사고 등)를 쓰고, faction은 "콜라보"로 한다. naiPrompt에는 원작 외모 특징을 영어 태그로 자세히 쓴다(성인 체형, mature 등 나이 태그는 넣지 않는다).`:'';
-  const r=await aiJSON(pf('PICKUP_NEW_CHAR',{RULES,ctx:ctx(),COL,crew:T('crew'),v:con||(COL?'원작 설정 그대로':'지금 세계관과 이야기 흐름에 어울리는 새 얼굴. 기존 인물과 다른 매력'),v2:rr&&rr!=='ai'?` 희귀도는 ${rr}.`:'',files:T('files'),charSchema:charSchema(),CHAR_STAT_RULE}),btn);
+  const r=await aiJSON(pf('PICKUP_NEW_CHAR',{RULES,ctx:ctx(),COL,crew:T('crew'),con:con||(COL?'원작 설정 그대로':'지금 세계관과 이야기 흐름에 어울리는 새 얼굴. 기존 인물과 다른 매력'),rr:rr&&rr!=='ai'?` 희귀도는 ${rr}.`:'',files:T('files'),charSchema:charSchema(),CHAR_STAT_RULE}),btn);
   if(!r) return null; const c=cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr; if(!c.name) c.name='이름 없음'; if(col&&col.src){ c.collab=col.src; if(!c.faction) c.faction='콜라보'; } G.chars.push(c); mark('c:'+c.id); return c; }
 async function aiAltChar(b,con,rr,btn){ const canon=!!b.__canon; b=charById(b.id)||b;
-  const r=await aiJSON(pf('ALT_CHAR',{RULES,ctx:ctx(),crew:T('crew'),name:b.name,v:canon?pf('ALT_CANON'):pf('ALT_SIDE'),v2:con||pf('ALT_THEME_AUTO'),files:T('files'),v3:b.naiPrompt||'',String:String(b.profile||'').slice(0,400),v4:(b.lines||[]).slice(0,3).join(' / '),v5:rr&&rr!=='ai'?`\n희귀도는 ${rr}.`:'',charSchema:charSchema(),CHAR_STAT_RULE}),btn);
+  const r=await aiJSON(pf('ALT_CHAR',{RULES,ctx:ctx(),crew:T('crew'),name:b.name,canon:canon?pf('ALT_CANON'):pf('ALT_SIDE'),con:con||pf('ALT_THEME_AUTO'),files:T('files'),naiPrompt:b.naiPrompt||'',profile:String(b.profile||'').slice(0,400),lines:(b.lines||[]).slice(0,3).join(' / '),rr:rr&&rr!=='ai'?`\n희귀도는 ${rr}.`:'',charSchema:charSchema(),CHAR_STAT_RULE}),btn);
   if(!r) return null; const c=cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr;
   if(!c.name||c.name.indexOf(b.name)!==0) c.name=`${b.name}(${String(con||'이격').replace(/[()]/g,'').slice(0,6)})`;
   c.alt=b.id; c.altCanon=canon; c.faction=b.faction||c.faction; if(b.voiceId) c.voiceId=b.voiceId; if(b.naiStyle) c.naiStyle=b.naiStyle; if(b.age&&!c.age) c.age=b.age; if(!c.lines||!c.lines.length) c.lines=(b.lines||[]).slice(0,3);
@@ -115,7 +115,7 @@ function openNotice(i){
     <div class="row" style="margin-top:12px"><button class="btn" data-act="go" data-to="notice">공지 전체 보기</button></div>`);
 }
 function lookMap(stages){const m={__reuse:{}};(Array.isArray(stages)?stages:[]).forEach(s2=>(Array.isArray(s2&&s2.enemies)?s2.enemies:[]).forEach(e=>{if(e&&e.name&&e.look)m[String(e.name)]=String(e.look);if(e&&e.name&&e.reuse)m.__reuse[String(e.name)]=String(e.reuse);}));return m;}
-function enemyReuseHint(){ const L=[...new Set(G.lib.filter(l=>l.kind==='enemy'&&!l.alias&&!l.charId&&(l.prompt||l.img)).map(l=>l.name))].slice(-40); return L.length?pf('ENEMY_REUSE',{v:L.join(', ')}):''; }
+function enemyReuseHint(){ const L=[...new Set(G.lib.filter(l=>l.kind==='enemy'&&!l.alias&&!l.charId&&(l.prompt||l.img)).map(l=>l.name))].slice(-40); return L.length?pf('ENEMY_REUSE',{L:L.join(', ')}):''; }
 function addCGs(arr){ let n=0; (Array.isArray(arr)?arr:[]).forEach(x=>{ if(!x||!x.name||G.lib.some(l=>l.name===String(x.name))) return;
     const cast=strs(x.cast).map(nm=>isMe(nm.trim())?{id:'__player'}:findSpeaker(nm.trim())).filter(Boolean).slice(0,4), pos=cast.length===1?['center']:cast.length===2?['left','right']:['left','center','right','auto'];
     const l={id:'l'+uid(),kind:'cg',name:String(x.name),prompt:String(x.prompt||''),cast:cast.map((c,i)=>({id:c.id,pos:pos[i]||'auto',act:''})),img:null}; G.lib.push(l); mark('l:'+l.id); n++; }); return n; }
