@@ -99,6 +99,17 @@
 | H3 | 커밋 설명·문서의 이름이 코드와 맞나 | 커밋 설명 속 없는 이름은 모두 뒤 커밋이 바꾸거나 지운 것(도구가 바꾼 커밋 표시). docs/modules.md의 discover·openXxx, docs/research/expedition.md의 옛 이름 정정. 조사 노트의 나머지는 외부 이름(다른 게임·API·ComfyUI 노드)과 아직 하지 않은 제안 | ✅ |
 | H4 | 옮기기 도구가 만든 조각의 자리 이름 | 45개 조각에 {v}·{v2}·{String} 같은 뜻 없는 이름 → 식의 속성 이름으로 다시 지음(prompts-move --slots). 보낸 프롬프트는 그대로(회귀 재생) | ✅ |
 
+## 7-1-2. 배포본 — 원본 배포 zip처럼 빌드·실행 파일로 정리·점검되나
+
+원본 배포본: 저장소의 빌드된 `www/index.html`·`version.json` + `gacha-game-maker-pc.zip`(실행 파일 `ggm-server.py`·`start.sh`·`PC서버-시작.bat`과 `README.txt`만 — 앱은 서버를 켤 때 GitHub에서 받음). 포크도 같은 구성(받는 곳만 이 포크의 main).
+
+| ID | 문제 | 상태 |
+|---|---|---|
+| D1 | 배포 zip이 `pc/` 실행 파일과 같은지 점검이 없고 손으로 묶는 명령뿐 | ✅ `node build/build.mjs --zip`(원본처럼 유닉스 권한 0644·UTF-8 파일 이름), `--check`가 zip 구성·내용 = `pc/` 실행 파일 4개를 봄 |
+| D2 | `version.json`의 build·sha256이 `www/index.html`과 맞는지 점검이 없음 | ✅ `--check`가 봄(+ `pc/README.txt`에 서버 버전) |
+| D3 | zip을 빈 폴더에 풀고 실행 파일로 켜서 앱을 받아 띄우는 실제 사용 흐름의 시험이 없음(테스트 6은 `pc/`에서 바로, 앱 받기 없이 실행) | ✅ 테스트 33: zip을 풀고 `start.sh --no-tunnel` → 받는 곳(로컬 서버, PC 서버 `GGM_RAW` — 서버 2026.11.03.3)에서 빌드된 www를 받음 → 브라우저에서 앱 빌드 = `version.json` |
+| D4 | 배포본은 이 포크 main의 www를 받으므로, 작업 브랜치의 빌드는 main에 합쳐야 배포에 반영 | 기록(합치기는 사용자 결정) |
+
 ## 7-2. 모듈 경계 — 영역 침범·파편화 (`node tools/modules.mjs` → `tools/out/modules.md`, 자기점검 래칫)
 
 원안 `index.html` 한 파일을 개발 편의·혼돈 방지를 위해 나눈 모듈(src/main 파일 96 + src/modules 파일 = 100)이 제 영역만 맡는지 도구로 잰 결과. 공용 기반 모듈(모듈 절반 이상이 부름: 0010 규칙·0060 유틸·0070 저장·0080 저장소 연동·0230 모달)과 액션 분배기(handle*Action)는 영역 판단에서 뺌.

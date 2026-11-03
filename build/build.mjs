@@ -3,6 +3,8 @@
 //   node build/build.mjs            빌드 + version.json의 build·sha256 갱신
 //   node build/build.mjs --check    빌드 결과가 www/index.html과 같은지만 확인(다르면 exit 1)
 //   node build/build.mjs --src D --out F --no-version   (테스트용)
+//   node build/build.mjs --zip      PC 서버 배포본 gacha-game-maker-pc.zip을 pc/의 실행 파일로 다시 묶음
+//   --check는 배포본도 봄: version.json의 build·sha256이 www/index.html과 맞는지, zip이 pc/ 실행 파일과 같은지, README.txt에 서버 버전이 있는지
 //
 // src/index.html 템플릿 지시어 (한 줄 전체를 차지):
 //   <!--@ path -->                파일 내용을 그대로 넣음. path가 /로 끝나면 폴더 안 파일을 이름순으로 이어 붙임(하위 폴더 포함)
@@ -12,8 +14,20 @@ import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from '
 import { join, dirname, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { zipWrite, zipRead } from './zip.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+// PC 서버 배포본: 원본 배포 zip과 같은 구성(실행 파일 + 안내). 앱(www/)은 서버를 켤 때 GitHub에서 받음
+export const PC_FILES = ['ggm-server.py', 'start.sh', 'PC서버-시작.bat', 'README.txt'], PC_ZIP = 'gacha-game-maker-pc.zip';
+// 배포본 점검: [이름, 맞나, 다르면 할 일]
+export function releaseCheck(root, html) { const out = [], sha = createHash('sha256').update(html).digest('hex'), built = (html.match(/var BUILT='([^']+)'/) || [])[1];
+  const v = existsSync(join(root, 'version.json')) ? JSON.parse(readFileSync(join(root, 'version.json'), 'utf8')) : {};
+  out.push(['version.json build = BUILT', v.build === built, `node build/build.mjs (지금 ${v.build} · BUILT ${built})`], ['version.json sha256 = www/index.html', v.sha256 === sha, 'node build/build.mjs']);
+  const z = existsSync(join(root, PC_ZIP)) ? zipRead(readFileSync(join(root, PC_ZIP))) : new Map(), names = [...z.keys()].sort().join(','), want = [...PC_FILES].sort().join(',');
+  out.push([`${PC_ZIP} 구성 = ${PC_FILES.join(' · ')}`, names === want, `node build/build.mjs --zip (지금 ${names || '없음'})`]);
+  for (const f of PC_FILES) out.push([`${PC_ZIP}의 ${f} = pc/${f}`, !!z.get(f) && existsSync(join(root, 'pc', f)) && Buffer.compare(z.get(f), readFileSync(join(root, 'pc', f))) === 0, 'node build/build.mjs --zip']);
+  const sv = (readFileSync(join(root, 'pc/ggm-server.py'), 'utf8').match(/SERVER_VER = '([^']+)'/) || [])[1]; out.push([`pc/README.txt에 서버 버전 ${sv}`, !!sv && readFileSync(join(root, 'pc/README.txt'), 'utf8').includes(sv), 'pc/README.txt에 바뀐 점과 버전을 적기']);
+  return out; }
 const DIRECTIVE = /^<!--@(modules)?\s+(\S+)(?:\s+(\S+))?\s*-->$/;
 
 const files = dir => readdirSync(dir).filter(f => !f.startsWith('.') && statSync(join(dir, f)).isFile()).sort();
@@ -50,10 +64,12 @@ if (isMain) {
   const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
   const src = resolve(arg('--src', join(ROOT, 'src'))), outFile = resolve(arg('--out', join(ROOT, 'www/index.html')));
   const html = build(src), sha = createHash('sha256').update(html).digest('hex');
+  if (process.argv.includes('--zip')) { writeFileSync(join(ROOT, PC_ZIP), zipWrite(PC_FILES.map(f => ({ name: f, data: readFileSync(join(ROOT, 'pc', f)) })))); console.log(`배포본: ${PC_ZIP} ← pc/${PC_FILES.join(', pc/')}`); process.exit(0); }
   if (process.argv.includes('--check')) {
     const same = existsSync(outFile) && readFileSync(outFile, 'utf8') === html;
     console.log(same ? `OK: ${outFile}와 같아요 (sha256 ${sha})` : `다름: ${outFile}을(를) 다시 빌드해야 해요`);
-    process.exit(same ? 0 : 1);
+    const rel = outFile === join(ROOT, 'www/index.html') ? releaseCheck(ROOT, html) : []; rel.filter(r => !r[1]).forEach(([n, , fix]) => console.log(`다름: ${n} — ${fix}`)); if (rel.length && rel.every(r => r[1])) console.log(`OK: 배포본(version.json · ${PC_ZIP} · pc/README.txt) ${rel.length}개 항목`);
+    process.exit(same && rel.every(r => r[1]) ? 0 : 1);
   }
   writeFileSync(outFile, html);
   console.log(`빌드: ${outFile} (${Buffer.byteLength(html).toLocaleString()} bytes, sha256 ${sha})`);

@@ -86,11 +86,15 @@ src/
 1. `src/boot/head.js`의 `BUILT` 올리기 (필요하면 `REQUIRED_APK`)
 2. `node build/build.mjs` → `version.json`의 `build`·`sha256`이 자동으로 맞춰짐
 3. `version.json`의 `notes`, `at`, `apk` 손으로 수정 → 커밋·푸시
-4. PC 서버(`pc/`)를 고쳤다면 `SERVER_VER`를 올리고 배포 zip을 다시 묶기:
+4. PC 서버(`pc/`)를 고쳤다면 `SERVER_VER`를 올리고 `pc/README.txt`에 바뀐 점과 버전을 적은 뒤 배포 zip을 다시 묶기:
 
 ```bash
-cd pc && python3 -c "import zipfile;z=zipfile.ZipFile('../gacha-game-maker-pc.zip','w',8);[z.write(f) for f in ['ggm-server.py','start.sh','PC서버-시작.bat','README.txt']]"
+node build/build.mjs --zip
 ```
+
+5. `node build/build.mjs --check`로 배포본 점검: `www/index.html` = src 빌드, `version.json`의 build·sha256 = `www/index.html`, `gacha-game-maker-pc.zip` = `pc/`의 실행 파일 4개(원본 배포 zip과 같은 구성), `pc/README.txt`에 서버 버전.
+
+배포본의 구성은 원본과 같아요: zip에는 실행 파일(`ggm-server.py`·`start.sh`·`PC서버-시작.bat`)과 안내(`README.txt`)만 있고, 앱(`www/` — 빌드된 `index.html` 등)은 서버를 켤 때 GitHub(`GGM_REPO`·`GGM_BRANCH`, 기본 이 포크의 main)에서 받아요. 그래서 작업 브랜치의 빌드는 main에 합쳐야 배포본이 받아요.
 
 ## 6. 원본(upstream) 새 릴리스 가져오기
 
@@ -117,5 +121,6 @@ node build/split.mjs /tmp/upstream.html /tmp/upstream-src && diff -ru src /tmp/u
 | 4 | 그 결과를 Chromium(Playwright)으로 실행 → 추가 모듈·파트·수정 코드 실행, 앱 화면 렌더링, 페이지 오류 0 (Playwright가 없으면 건너뜀) |
 | 5 | 실제 빌드에서 데이터 폴더 zip 내보내기 → 다시 읽으면 같은 내용 → 새 게임으로 가져오기(그림 포함) |
 | 6 | 실제 PC 서버를 켜고 앱에서 저장 → `data/main/*.json` 자동 동기화, 빈 브라우저는 서버에서 게임을 받아 옴 (python3 없으면 건너뜀) |
+| 33 | 배포본: `gacha-game-maker-pc.zip`을 빈 폴더에 풀고 `start.sh`로 켜면 받는 곳(GitHub raw 자리에 로컬 서버 — `GGM_RAW`)에서 빌드된 `www`를 받아 띄우고, 브라우저에서 그 빌드가 돎(앱 빌드 = `version.json`, 서버 버전 = `SERVER_VER`) |
 
 `pc/test_store.py`: 나눠 저장·합쳐 받기 동일성, 바뀐 종류만 쓰기, 409 충돌, 삭제 게임 보존, 예전 `state.json` 이전.

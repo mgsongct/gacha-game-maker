@@ -11,6 +11,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
+import { zipRead } from './zip.mjs';
 import { build } from './build.mjs';
 import { split } from './split.mjs';
 import { original as upstreamHtml } from './compare.mjs';
@@ -795,6 +796,23 @@ try {
       await b3.close(); assert.deepEqual(err3, [], '페이지 오류');
       console.log('ok 6  PC 서버: 앱 저장 → data/main/*.json 자동 동기화, 빈 기기는 서버 data 폴더에서 받아 옴');
     } finally { proc.kill(); }
+    // 33 배포본: 원본 배포 zip처럼 실행 파일만 든 gacha-game-maker-pc.zip을 빈 폴더에 풀고 start.sh로 켜면, 앱(www/)을 받는 곳(GitHub raw 자리에 로컬 서버)에서
+    //    빌드된 www를 받아 띄우고 브라우저에서 그 빌드가 돈다(BUILT = version.json build, 서버 버전 = SERVER_VER)
+    const dist = join(tmp, 'dist'), z = zipRead(readFileSync(join(ROOT, 'gacha-game-maker-pc.zip'))); mkdirSync(dist); for (const [n, b] of z) writeFileSync(join(dist, n), b);
+    const raw = createServer((q, r) => { try { const f = decodeURIComponent(new URL(q.url, 'http://x').pathname).split('/www/')[1]; r.writeHead(200); r.end(readFileSync(join(ROOT, 'www', f))); } catch (e) { r.writeHead(404); r.end(); } });
+    await new Promise(ok => raw.listen(0, ok)); const port2 = 20000 + Math.floor(Math.random() * 20000), out = [];
+    const proc2 = spawn('sh', ['start.sh', '--no-tunnel'], { cwd: dist, env: { ...process.env, GGM_PORT: String(port2), GGM_RAW: `http://127.0.0.1:${raw.address().port}`, BROWSER: 'true' } }); proc2.stdout.on('data', d => out.push(String(d)));
+    try {
+      const until = async (fn, ms, what) => { const t = Date.now(); for (;;) { try { const v = await fn(); if (v) return v; } catch (e) { out.push(String(e)); } if (Date.now() - t > ms) throw Error('시간 초과: ' + what + '\n' + out.join('')); await new Promise(r => setTimeout(r, 300)); } };
+      const hello = await until(async () => { const r = await fetch(`http://127.0.0.1:${port2}/api/hello`); return r.ok && r.json(); }, 20000, '배포본 서버 시작'), V = JSON.parse(readFileSync(join(ROOT, 'version.json'), 'utf8'));
+      assert.equal(hello.ver, (readFileSync(join(ROOT, 'pc/ggm-server.py'), 'utf8').match(/SERVER_VER = '([^']+)'/) || [])[1], '배포본 서버 버전');
+      assert.equal(readFileSync(join(dist, 'www/index.html'), 'utf8'), readFileSync(join(ROOT, 'www/index.html'), 'utf8'), '빈 폴더에서 켜면 받는 곳의 빌드된 www를 받음');
+      const key = readFileSync(join(dist, 'ggm-data/key.txt'), 'utf8').trim(), b4 = await chromium.launch(), p4 = await b4.newPage(), err4 = []; p4.on('pageerror', e => err4.push(String(e)));
+      await p4.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p4.goto(`http://127.0.0.1:${port2}/?pc=${key}`);
+      await p4.waitForFunction(() => typeof G === 'object' && typeof APP_BUILD === 'string', null, { timeout: 20000 }); const built = await p4.evaluate(() => APP_BUILD); await b4.close();
+      assert.equal(built, V.build, '배포본에서 도는 앱 = version.json의 빌드'); assert.deepEqual(err4, [], '페이지 오류');
+      console.log('ok 33 배포본: gacha-game-maker-pc.zip(실행 파일만)을 빈 폴더에 풀고 start.sh로 켜면 빌드된 www를 받아 띄움(앱 빌드 = version.json, 서버 버전 = SERVER_VER)');
+    } finally { proc2.kill(); raw.close(); }
   }
 } finally { rmSync(tmp, { recursive: true, force: true }); }
 // 커버리지(CDP 정밀 커버리지): 페이지가 다시 불러오거나 이동하면 이전 문서의 실행 기록이 사라지므로, 이동을 시작할 때마다 먼저 받아 둠
