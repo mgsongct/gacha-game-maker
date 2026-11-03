@@ -14,5 +14,6 @@ jobs:
       - run: node build/compare.mjs         # 원본 대비 바뀐 모듈 목록 (로그 확인용)
       - run: npm ci --prefix tools --no-audit --no-fund   # 정적분석 도구(tree-sitter·ast-grep)
       - run: node tools/test.mjs           # 점검 도구 자체 검사(심어 둔 문제를 잡는지)
-      - run: node tools/check.mjs --strict # 자기점검: 파싱 오류·이름 충돌·처리기 없는 액션이 있으면 실패, 보고서는 tools/out/
+      - run: node tools/check.mjs --strict # 자기점검: 오류, 기준선(tools/baseline.json)보다 새로 생기거나 나빠진 위반(도구 코드 메타 점검 포함)이 있으면 실패
+      - run: node tools/wiring.mjs --strict # 포크 기능 배선 점검: 생성기 ↔ 기능 ↔ 생성된 게임(tools/play/games) 판정이 기준선보다 새로 생기면 실패
       - run: node tools/play/test.mjs      # 생성·QA·플레이 도구 자체 검사(playwright가 없으면 건너뜀)

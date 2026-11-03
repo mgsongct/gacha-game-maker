@@ -40,6 +40,19 @@ node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(
 | 부속 파일 | 서비스 워커·중계 서버(Cloudflare·Vercel)·빌드·도구 스크립트 tree-sitter 파싱, PC 서버 파이썬 `ast.parse` | **오류** |
 | 중계 서버 허용 주소 | 두 중계 서버의 `ALLOW_HOSTS`가 같은지, 앱이 부르는 API 주소(호출 첫 인자·`base`/`url`/`endpoint` 값·`…DEF`/`…ENDPOINT` 상수의 https 주소 중 API 모양)가 목록에 있는지 | **경고**(웹 버전 중계에서 host not allowed) |
 
+## 포크 기능 배선 점검 (`node tools/wiring.mjs [--strict] [--update-baseline]`)
+생성기가 포크 기능의 데이터를 만드는지, 생성된 게임에 실제로 들어갔는지를 tree-sitter로 맞춰 봐요(`lib/wiring.mjs`, 목록 `fork-features.json`). 결과 `out/wiring.md`.
+
+| 단계 | 방법 |
+|---|---|
+| 기능의 범위 | `fork-features.json`의 커밋마다 그 커밋 트리 − 부모 트리의 최상위 함수(= 그 기능이 들여온 함수). git 트리의 `src/`만 `out/ref-src/<sha>/`에 풀어 캐시 |
+| 기능이 읽는 데이터 | 그 함수들이 읽는 `G.meta.*`·`G.world.*`·`G.*`·`P().*` 키(상태 흐름 분석) + 게임 컬렉션 콜백·찾기 함수에 묶인 변수(`G.chars.map(c => c.x)`, `const c = charById(…)`)에서 읽는 **원본에 없던 필드** |
+| 생성기가 만드는 것 | `generators`(buildNewGameDraft 등)에서 부르는 함수(깊이 3)의 `ng.*`·`G.*` 대입과 `Object.assign` 리터럴 키, 프롬프트 JSON 스키마의 `부모/키`(world/plan 등), 생성기 파일 안 객체 리터럴 키 |
+| 기능 쪽 기본값 | 읽는 곳이 `키 \|\| 기본값`·`Object.assign(기본값, 키)`·`if(!x.키) x.키 = 기본값`이면 지연 기본값 — 빈 값([]·{})인지 쓸 만한 값인지 리터럴로 판단. 원본 샘플 기본값은 `DEFAULT_META`·`DEFAULT_WORLD`·`DEFAULT_PROG` 리터럴 |
+| 생성된 게임 | `tools/play/games/*/game.json`(커밋된 결과)과 `regress/game.json`(지금 코드로 같은 응답을 다시 생성) — 값·빔·기본값·없음 |
+
+판정: **P0** 생성기가 만들지 않고 생성 게임에도 없고 기능 기본값도 빈 값 → 기능이 비어 있는 채로 시작 · **P1** 공통 기본값으로만 시작(게임 맞춤 아님) / 생성기가 만드는 키인데 생성물에 없음 / 기능이 엔티티에서 읽는 새 필드가 어디에도 없음. 생성기가 정할 것이 아닌 키(사용자 설정)·공통 기본값으로 충분한 키·플레이 중 생기는 필드는 `fork-features.json`의 `userKeys`·`defaultOk`·`runtimeFields`에 **사유와 함께** 적어요. 판정은 `baseline.json`의 `wiring`으로 래칫(CI `--strict`).
+
 ## 위반 래칫 (기준선·변경 비교)
 - 모든 발견(오류·경고·복잡한 함수·복잡한 익명 콜백·분배기 case·동기 순환·안 쓰는 코드·되풀이 문자열·빈 catch(파일·종류별 개수)·흩어진 상태·쓰기만 하는 키·발신 없는 처리기·안 쓰는 CSS·도구 메타 점검)을 **줄 번호 없는 키**로 바꿔 비교해요(`lib/ratchet.mjs`). 줄만 밀린 것은 같은 항목
 - **새로 생김**(기준에 없던 키) · **나빠짐**(같은 항목의 복잡도·줄·중첩·횟수·개수 증가) · 해결 · 좋아짐

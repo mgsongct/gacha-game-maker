@@ -45,8 +45,10 @@ export function compare(base, cur) {
 }
 
 export const BASELINE = 'tools/baseline.json';
-export function readBaseline(ROOT) { const p = join(ROOT, BASELINE); return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')).findings : null; }
-export function writeBaseline(ROOT, F) { writeFileSync(join(ROOT, BASELINE), JSON.stringify({ note: '자기점검 기준선 — 늘리지 않음(CLAUDE.md §3). 줄면 node tools/check.mjs --update-baseline', findings: F.map(({ key, num, text }) => ({ key, num, text })) }, null, 1) + '\n'); }
+export function readBaseline(ROOT, part = 'findings') { const p = join(ROOT, BASELINE); return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8'))[part] || null : null; }
+export function writeBaseline(ROOT, F, part = 'findings') { const p = join(ROOT, BASELINE), cur = existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : {}; // 다른 부분(배선 점검 wiring 등)은 그대로 둠
+  cur.note = '자기점검·배선 점검 기준선 — 늘리지 않음(CLAUDE.md §3). 줄면 node tools/check.mjs --update-baseline · node tools/wiring.mjs --update-baseline'; cur[part] = F.map(({ key, num, text }) => ({ key, num, text }));
+  writeFileSync(p, JSON.stringify(cur, null, 1) + '\n'); }
 
 // git 기준(ref)의 트리를 tools/out/ref/<sha>/에 풀어 둠(이미 있으면 그대로) — 같은 분석을 그 트리에 돌려 비교
 export function refTree(ROOT, ref, OUT) {

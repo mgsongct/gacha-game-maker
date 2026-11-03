@@ -1,5 +1,5 @@
 {
- "note": "자기점검 기준선 — 늘리지 않음(CLAUDE.md §3). 줄면 node tools/check.mjs --update-baseline",
+ "note": "자기점검·배선 점검 기준선 — 늘리지 않음(CLAUDE.md §3). 줄면 node tools/check.mjs --update-baseline · node tools/wiring.mjs --update-baseline",
  "findings": [
   {
    "key": "복잡한 함수|buildNewGameDraft",
@@ -1268,6 +1268,53 @@
     "개수": 5
    },
    "text": "build/test.mjs 5개"
+  }
+ ],
+ "wiring": [
+  {
+   "key": "배선 P0|plan G.world.plan",
+   "num": {},
+   "text": "P0 plan G.world.plan: 생성기가 만들지 않고 생성 게임에도 없음 — 기능의 기본값이 빈 값이라 기능이 비어 있는 채로 시작"
+  },
+  {
+   "key": "배선 P0|combat G.meta.spots",
+   "num": {},
+   "text": "P0 combat G.meta.spots: 생성기가 만들지 않고 생성 게임에도 없음 — 기능 쪽 기본값도 없어 기능이 비어 있는 채로 시작"
+  },
+  {
+   "key": "배선 P1|construct G.meta.construct",
+   "num": {},
+   "text": "P1 construct G.meta.construct: 생성기가 만드는 키(conStartNew)인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
+  },
+  {
+   "key": "배선 P1|construct G.meta.variants",
+   "num": {},
+   "text": "P1 construct G.meta.variants: 생성기가 만드는 키(ngWorldExtras)인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
+  },
+  {
+   "key": "배선 P1|expedition G.meta.expedition",
+   "num": {},
+   "text": "P1 expedition G.meta.expedition: 생성기가 만드는 키(ngWorldExtras)인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
+  },
+  {
+   "key": "배선 P1|persona G.meta.persona",
+   "num": {},
+   "text": "P1 persona G.meta.persona: 생성기가 게임에 맞춰 정하지 않음 — 기능의 공통 기본값으로 시작"
+  },
+  {
+   "key": "배선 P1|combat spotTalk",
+   "num": {},
+   "text": "P1 combat spotTalk: 기능이 캐릭터에서 읽는 새 필드인데 생성기가 만들지 않고(스키마·대입·리터럴 없음) 생성 게임에도 없음 — 플레이 중 만들어지거나 사용자가 채워야 함"
+  },
+  {
+   "key": "배선 P1|direction memorial",
+   "num": {},
+   "text": "P1 direction memorial: 기능이 캐릭터에서 읽는 새 필드인데 생성기가 만들지 않고(스키마·대입·리터럴 없음) 생성 게임에도 없음 — 플레이 중 만들어지거나 사용자가 채워야 함"
+  },
+  {
+   "key": "배선 P1|direction spotTalk",
+   "num": {},
+   "text": "P1 direction spotTalk: 기능이 캐릭터에서 읽는 새 필드인데 생성기가 만들지 않고(스키마·대입·리터럴 없음) 생성 게임에도 없음 — 플레이 중 만들어지거나 사용자가 채워야 함"
   }
  ]
 }

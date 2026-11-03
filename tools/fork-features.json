@@ -1,0 +1,34 @@
+{
+ "note": "포크 기능 목록(CLAUDE.md §1과 같음). 기능의 범위는 커밋이 새로 들여온 최상위 함수로 자동으로 잡아요(tools/wiring.mjs). 새 포크 기능을 넣으면 여기에 커밋을 더하세요.",
+ "upstream": "13a3fe9",
+ "upstreamSrc": "49cec7a",
+ "upstreamSrcNote": "원본(13a3fe9)은 index.html 한 파일이라 src/가 없어요. 49cec7a는 원본을 src/로 나누기만 한 커밋이라 원본 필드·함수의 기준으로 씀",
+ "userKeys": {
+  "G.meta.prompts": "게임마다 사용자가 프롬프트 스튜디오에서 덮어쓰는 값 — 생성기가 정할 것이 아님",
+  "G.meta.auditSeen": "점검 알림을 본 판(내부 표시)"
+ },
+ "defaultOk": {
+  "G.meta.balance": "밸런스 정책은 공통 기본값(수동 세대·자동 정규화)으로 충분 — 생성기가 게임마다 정할 값이 아님",
+  "G.meta.cast": "등장·적대 잠금은 기본으로 켜짐이 설계 의도"
+ },
+ "runtimeFields": {
+  "cvar": "건조로 바리에이션을 만들 때 붙음(생성 시점에는 없음이 정상)",
+  "monster": "적·몬스터를 캐릭터로 바꿀 때 붙음 — 생성기는 몬스터를 대원에서 거름"
+ },
+ "generators": ["buildNewGameDraft", "buildManualGameDraft", "aiChapterGen0", "aiEventGen0"],
+ "features": [
+  { "id": "construct", "title": "건조/영입·원정 자원·바리에이션·상속형 이격", "commits": ["1942dc8"], "doc": "docs/research/construction.md" },
+  { "id": "expedition", "title": "원정 장르(전투·아이돌·방송·경영)", "commits": ["04162f7"], "doc": "docs/research/expedition.md" },
+  { "id": "audit", "title": "콘텐츠 점검·업그레이드", "commits": ["68d1695"], "doc": "docs/research/content-audit.md" },
+  { "id": "rules", "title": "게임 규칙 공개·편집", "commits": ["67b4bd0"], "doc": "docs/research/game-rules.md" },
+  { "id": "elems", "title": "속성·상성표·반응·포지션", "commits": ["91e3967"], "doc": "docs/research/game-rules.md" },
+  { "id": "balance", "title": "밸런스 관리", "commits": ["edcec93"], "doc": "docs/research/balance.md" },
+  { "id": "persona", "title": "캐릭터 개성·인연 톡·메모리얼", "commits": ["f3e1289"], "doc": "docs/research/character.md" },
+  { "id": "plan", "title": "시나리오 설계·프롬프트 스튜디오", "commits": ["ef76799"], "doc": "docs/research/story-design.md" },
+  { "id": "combat", "title": "전장 규칙·별 조건·집중·시련의 탑·일정", "commits": ["c14034c"], "doc": "docs/research/combat-content.md" },
+  { "id": "direction", "title": "연출 엔진·에셋 공유", "commits": ["9bca08e"], "doc": "docs/research/direction.md" },
+  { "id": "sortie", "title": "대열·출격 경로", "commits": ["39c6780"], "doc": "docs/research/formation-sortie.md" },
+  { "id": "factions", "title": "세력·적 도감·등장 계획", "commits": ["eec0f99", "146cf9a"], "doc": "docs/research/factions-cast.md" },
+  { "id": "stagemodes", "title": "스테이지 양식(회담·콘테스트)", "commits": ["6c208a1"], "doc": "docs/research/stage-modes.md" }
+ ]
+}

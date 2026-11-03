@@ -24,6 +24,9 @@
 - 일회성 스크립트(`node -e`, 파이썬 한 줄, `/tmp`·scratchpad의 스크립트)로 재거나 확인하지 않습니다. 필요한 측정이 도구에 없으면 **도구에 점검 항목을 더하고**, 도구 자체 테스트(`tools/test.mjs`, `tools/play/test.mjs`)에 그 문제를 심어 잡히는지 확인한 뒤, 그 도구로 잽니다.
 - 도구는 계속 갱신하는 자산입니다. 새 기능·새 문제 유형이 생기면 점검 항목을 늘리고, 다음 사람이 그대로 이어받을 수 있게 README에 적습니다. 결과물은 `tools/out/`, `tools/play/reports/`, 게임 폴더의 `qa/`에 남습니다.
 - CI(`.github/workflows/check.yml`)에 들어간 점검만 "자동화됨"으로 봅니다. 새 점검은 CI에 넣습니다.
+- 도구 자신도 같은 규칙으로 검증합니다(메타 점검: `tools/**`·`build/*.mjs`의 빈 catch·복잡도·다중화·안 쓰는 함수 — `check.mjs`가 함께 봄).
+- **오탐이 나오면 원인을 가릅니다.** 도구의 문제(분석이 틀림)면 도구를 고치고 자체 테스트에 그 경우를 넣습니다. 코드의 문제(이름·구조가 원칙 없이 섞여 분석이 헷갈림)면 소스를 리팩터링합니다 — 코드 품질 정비도 도구의 역할이라, 원칙(예: 변수·함수 이름 규칙)을 도구가 자동으로 모으고 점검하고 치환까지 하게 만듭니다. 휴리스틱으로 덮어 두지 않습니다.
+- 포크 기능 배선(생성기 ↔ 기능 ↔ 생성된 게임)은 `node tools/wiring.mjs`로 봅니다(기능 목록·예외 사유는 `tools/fork-features.json`).
 
 ## 3. 위반을 늘리지 않음
 
@@ -38,6 +41,7 @@ node build/build.mjs
 node build/test.mjs
 node tools/test.mjs
 node tools/check.mjs --strict
+node tools/wiring.mjs --strict
 node tools/play/test.mjs
 ```
 
