@@ -574,7 +574,7 @@ try {
   await p24.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p24.goto(`http://127.0.0.1:${server.address().port}/?t=24`);
   await p24.waitForFunction(() => typeof buildNewGameDraft === 'function' && typeof G === 'object', null, { timeout: 15000 });
   const r24 = await p24.evaluate(async () => {
-    const o = {}, P0 = []; P().seenOpening = true; closeModal(); closeOv(); try { appStorage.removeItem('ggm-ng-draft'); } catch (e) {}
+    const o = {}, P0 = window.__P24 = []; P().seenOpening = true; closeModal(); closeOv(); try { appStorage.removeItem('ggm-ng-draft'); } catch (e) {}
     const ch = (nm, fac, role, deb, extra) => Object.assign({ name: nm, faction: fac, role, rarity: nm.length % 3 + 1, profile: nm + '의 프로필', lines: ['안녕'], naiPrompt: '1girl, solo', debut: deb }, extra || {});
     SAMPLE = { json: async p => { P0.push(p);
       if (/속성\(elems\)은/.test(p)) return { expedition: 'business', expeditionNames: { fame: '명성', jobs: ['접수대', '공방', '전령'] }, finale: 'contest', profileTemplate: 'fantasy', variants: [{ name: '축제복', prompt: 'festival yukata, paper lanterns', cond: { factions: ['등불단'], roles: ['atk'] } }, { name: '잠수복', prompt: 'diving suit, ocean', cond: { factions: ['없는 세력'] } }, { name: '한글뿐', prompt: '유카타' }], title: '심연등불', sub: 'Abyss Lamp', world: { name: '등불섬', summary: '요약', lore: '설정', plot: '플롯', factions: [{ name: '등불단', kind: 'playable', desc: '섬을 지키는 수호단. 등불을 켜고 밤을 막는다.', goal: '섬 수호', leader: '단장', base: '등대', ideology: '빛은 나눈다', rel: { '검은 조류': '적대 — 섬을 노림' } }, { name: '검은 조류', kind: 'hostile', desc: '바다를 장악한 해적 연합.', goal: '섬 점령', leader: '조류왕', base: '난파선', ideology: '힘이 법', stance: [{ ch: 1, s: 'hostile', why: '' }, { ch: 3, s: 'ally', why: '공동의 적' }] }, { name: '심해의 것', kind: 'monster', desc: '심연에서 올라오는 괴물들.', origin: '가라앉은 신', nature: '빛을 먹는다', weakness: '불' }] }, elems: [{ n: '불', c: '#ff0000', d: '', beats: '물' }, { n: '물', c: '#0000ff', d: '', beats: '불' }, { n: '빛속성.', c: '#ffff00', d: '', beats: '불' }], reactions: [{ a: '빛속성.', b: '불', name: '섬광', type: 'vuln', value: 1.3 }] };
@@ -611,6 +611,14 @@ try {
     const ch2 = { id: 'c2', kind: 'main', title: '2장', stages: [{ id: 'x1', title: 'a', pre: '다섯: 오랜만이군', post: '', enemies: [] }] }; G.chapters.push(ch2); debutResolve(ch2); o.later = five.debut === 'x1' && !five.debutLater;
     G = G0; return o; });
   assert.ok(Object.values(r24).every(v => v === true), JSON.stringify(r24)); assert.deepEqual(err24, [], '페이지 오류');
+  const r24b = await p24.evaluate(() => { const o = {}, P0 = window.__P24, find = re => P0.find(p => re.test(p)) || '', po = find(/이 게임의 시작 부분을 만들어라/), pch = find(/debut 항목/), pc = find(/프롤로그 다음으로 이어지는 1장/); // 생성 프롬프트 지시 충돌(S1)
+    o.meet = /첫 동료들\(처음부터 함께하는 동료: [^)]*하나/.test(po) && /\(네오, 다섯은\(는\) 1장부터 정해진 장면에서 처음 등장하니 프롤로그에 내지 않는다\)/.test(po) && /프롤로그에서 처음 만나 1장부터/.test(pch) && /프롤로그에서 이미 만난 사이/.test(pc);
+    o.faction = !/세력을 고르게/.test(pch) && /플레이어블 세력\(나중에 우호가 되는 세력 포함\) 사이에서 고르게/.test(pch);
+    o.skillEx = pch.includes('"studio":true') && !/"crit_up"|"value":\d\.\d/.test(pch);
+    o.bestiary = /bestiary에 새 적\(사람·캐릭터가 아닌 적\)마다/.test(pc); o.faces = SCRIPT_FMT.includes('목록이 없는 캐릭터는 ' + FACE_BASIC.join('·'));
+    const k = v2PrepareGenerated(JSON.parse(JSON.stringify(GGMCombat.promptExample({ role: 'atk' }))), G.chars[0]); o.exCompiles = !!k && k.passive.effects.length > 0 && k.active.effects.some(e => e.type === 'damage');
+    return o; });
+  assert.ok(Object.values(r24b).every(v => v === true), JSON.stringify(r24b));
   console.log('ok 24 생성기: 새 게임이 세력(종류·관계·장별 관계)·등장 계획(처음부터/1장 스테이지/나중)·적 도감·전장 규칙을 만들고 몬스터 캐릭터를 거름, 픽업은 처음부터 동료, 이후 장이 나중 등장을 정함');
   // 25) 스테이지 양식: 회담(추궁·증거 제시·동료 설득·신뢰도·실패)·콘테스트(매력·취향·분위기·1위), 생성 검증(modeClean·buildStages·스키마·STAGE_MODES·끄기), 클리어 처리·노드 아이콘
   const p25 = await browser.newPage(), err25 = []; p25.on('pageerror', e => err25.push(String(e)));

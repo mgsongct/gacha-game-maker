@@ -1,5 +1,6 @@
 // 생성 본체: 앱의 실제 생성 경로를 돌리고 글 AI 요청(Anthropic 형식)만 응답 표로 답한다.
-//   responses: { kind: 응답 글 | {status, text}(HTTP 오류 흉내) }. 없는 kind는 onPrompt(kind, 프롬프트)로 넘기고 529(대기)로 돌려준다.
+//   responses: { kind: 응답 글 | {status, text}(HTTP 오류 흉내) }. 없는 kind는 529(대기)로 돌려준다.
+//   onPrompt(kind, 프롬프트, 대기 여부): 앱이 보낸 요청마다 부름(답이 있는 요청도 — 지금 빌드의 프롬프트를 분석할 수 있게)
 //   phase: 'new'(input → 새 게임) | 'skills'(임시 스킬 대원) | 'chapter'(다음 메인 장) | 'import'(game 객체를 앱의 데이터 폴더 가져오기로 새 게임에 추가)
 //   pcHome: 주면 실제 PC 서버로 돌림 — 게임을 서버 data에서 받아(빈 브라우저 → 앱이 pcPull) 단계를 돌리고, 끝나면 앱의 pcPush로 data에 씀(page.mjs).
 //           없으면 예전처럼 game(JSON 글)을 페이지에 불러와 돌리고 결과만 돌려줌(자체 검사·실패 주입용)
@@ -9,7 +10,7 @@ import { kindOf } from './kind.mjs';
 
 export async function runGenerate({ phase, responses = {}, input = null, game = null, stages = 4, direction = '메인 플롯을 따라 자연스럽게 이어서', onPrompt = null, tag = 'generate', settleMs = 4000, pcHome = null, gid = null, www }) {
   return withPage(async page => {
-    await page.exposeFunction('__onPrompt', (kind, text) => { if (onPrompt) onPrompt(kind, text); });
+    await page.exposeFunction('__onPrompt', (kind, text, pending) => { if (onPrompt) onPrompt(kind, text, pending); });
     const res = await page.evaluate(async ({ phase, responses, input, game, stages, direction, settleMs, kindSrc }) => {
       const log = [], pending = new Set(), toasts = [], seenSkill = {};
       P().seenOpening = true; closeModal(); closeOv(); appStorage.removeItem('ggm-ng-draft');
@@ -21,9 +22,9 @@ export async function runGenerate({ phase, responses = {}, input = null, game = 
         if (!/api\.anthropic\.com\/v1\/messages/.test(url)) return realHttp(url, opts);
         const body = opts.body, msgs = body.messages, first = msgs[0].content, prompt = typeof first === 'string' ? first : first.map(b => b.text || '').join('');
         let kind = kindOf(prompt); if (msgs.length > 1) kind += '-cont' + (msgs.length - 1) / 2;
-        const rec = { kind, len: prompt.length, max_tokens: body.max_tokens, at: Date.now() }; log.push(rec); const r = responses[kind];
+        const rec = { kind, len: prompt.length, max_tokens: body.max_tokens, at: Date.now() }; log.push(rec); const r = responses[kind]; await window.__onPrompt(kind, prompt, r == null);
         await new Promise(res => setTimeout(res, 30)); /* 실제 네트워크처럼 매크로태스크로 응답 — 즉시 응답하면 앱의 setTimeout 콜백(백그라운드 작업)이 생성이 끝날 때까지 못 돌아 실제와 순서가 달라짐 */
-        if (r == null) { pending.add(kind); await window.__onPrompt(kind, prompt); rec.pending = true; return { status: 529, text: JSON.stringify({ type: 'error', error: { type: 'overloaded_error', message: 'pending response' } }) }; }
+        if (r == null) { pending.add(kind); rec.pending = true; return { status: 529, text: JSON.stringify({ type: 'error', error: { type: 'overloaded_error', message: 'pending response' } }) }; }
         if (typeof r === 'object') { rec.injected = r.status; return r; }
         rec.outLen = r.length;
         return { status: 200, text: JSON.stringify({ content: [{ type: 'text', text: r }], stop_reason: 'end_turn', usage: { input_tokens: 0, output_tokens: 0 } }) };

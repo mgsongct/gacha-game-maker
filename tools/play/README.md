@@ -18,6 +18,7 @@ node tools/play/shots.mjs <게임 폴더>               # 새 플레이어로 �
 node tools/play/regress.mjs [--ref <git 기준>] [게임 폴더…]   # 같은 응답을 기준 빌드와 지금 빌드에 넣어 새 게임 생성 결과 비교 → reports/regress.md
 node tools/play/faults.mjs [시나리오…]              # 생성기 실패 주입 → reports/faults.md
 node tools/play/prompts.mjs <게임 폴더…>            # 생성 프롬프트 점검(스튜디오 조각 비율·되풀이·충돌·샘플 이름) → reports/prompts.md
+node tools/play/prompts.mjs --regress <게임 폴더…>  # 같은 점검을 회귀 재생이 지금 빌드로 보낸 프롬프트(regress/prompts)에 → reports/prompts-regress.md
 node tools/play/test.mjs                           # 도구 자체 검사(fixtures/mini)
 node tools/play/rekind.mjs <게임 폴더> [--dry]       # kind 규칙이 바뀌었을 때 prompts/·responses/ 이름 옮기기
 ```

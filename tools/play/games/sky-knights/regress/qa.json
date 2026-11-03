@@ -474,11 +474,11 @@
   },
   {
    "n": "브람",
-   "dev": 0.04957904583723116
+   "dev": 0.03835360149672584
   },
   {
    "n": "넬",
-   "dev": 0.013876843018213458
+   "dev": -0.005203816131829964
   },
   {
    "n": "루시안",
@@ -503,7 +503,10 @@
   "missingBgm": {
    "설렘": 2
   },
-  "faces": {},
+  "faces": {
+   "놀람": 10,
+   "화남": 4
+  },
   "commands": {
    "음악": 14,
    "효과": 9,
@@ -532,12 +535,12 @@
    "부품"
   ],
   "dispatches": [
-   "항로 순찰 1h·2명 → {\"gold\":2000,\"exp\":4}",
-   "상선 호위 4h·3명 → {\"gold\":8300,\"exp\":17,\"wmat\":4}",
-   "부유석 탐사 8h·3명 → {\"gold\":14900,\"exp\":30,\"wmat\":8,\"core\":2}",
-   "리벳항 수리 지원 2h·2명 → {\"gold\":3700,\"exp\":7,\"wmat\":2}",
-   "기상 관측 0.5h·1명 → {\"gold\":800}",
-   "운해 정찰 12h·4명 → {\"gold\":25400,\"exp\":51,\"wmat\":14,\"core\":3}"
+   "항로 순찰",
+   "상선 호위",
+   "부유석 탐사",
+   "리벳항 수리 지원",
+   "기상 관측",
+   "운해 정찰"
   ],
   "groups": [
    "후방({\"role\":\"sup\"})",
@@ -584,12 +587,7 @@
   "poolSize": 4,
   "never": [],
   "expIncome": [
-   "항로 순찰 160(시간당 160)",
-   "상선 호위 660(시간당 165)",
-   "부유석 탐사 1200(시간당 150)",
-   "리벳항 수리 지원 300(시간당 150)",
-   "기상 관측 60(시간당 120)",
-   "운해 정찰 2040(시간당 170)"
+   "게시판 의뢰 30개의 건조 자원: 평균 987 · 시간당 평균 149 · 자원 보상 없는 의뢰 0"
   ]
  },
  "firstPull": {
@@ -689,46 +687,46 @@
     "name": "수영복",
     "prompt": "swimsuit, beach, summer, sunlight",
     "chance": 35,
-    "recipe": "300/100/100/300",
+    "recipe": "400/100/100/400",
     "cond": "{}",
     "eligible": [
      "브람",
      "넬",
      "루시안"
     ],
-    "affordable": 2
+    "affordable": 1
    },
    {
     "name": "교복",
     "prompt": "blazer, formal school-style uniform cosplay, adult",
     "chance": 35,
-    "recipe": "100/300/100/300",
+    "recipe": "100/400/100/400",
     "cond": "{}",
     "eligible": [
      "브람",
      "넬",
      "루시안"
     ],
-    "affordable": 2
+    "affordable": 1
    },
    {
     "name": "갑옷",
     "prompt": "fantasy plate armor, ornate armor, cape",
-    "chance": 35,
-    "recipe": "100/100/300/300",
+    "chance": 30,
+    "recipe": "100/100/500/400",
     "cond": "{}",
     "eligible": [
      "브람",
      "넬",
      "루시안"
     ],
-    "affordable": 2
+    "affordable": 1
    },
    {
     "name": "공연의상1",
     "prompt": "idol stage costume, frills, stage lights",
     "chance": 30,
-    "recipe": "300/300/100/400",
+    "recipe": "300/300/100/500",
     "cond": "{}",
     "eligible": [
      "브람",
@@ -741,7 +739,7 @@
     "name": "공연의상2",
     "prompt": "elegant evening gown, concert stage, spotlight",
     "chance": 30,
-    "recipe": "300/100/300/400",
+    "recipe": "500/100/300/500",
     "cond": "{}",
     "eligible": [
      "브람",
@@ -754,7 +752,7 @@
     "name": "공연의상3",
     "prompt": "rock band stage outfit, leather, electric guitar",
     "chance": 30,
-    "recipe": "100/300/300/400",
+    "recipe": "100/500/300/500",
     "cond": "{}",
     "eligible": [
      "브람",
@@ -771,29 +769,29 @@
     "name": "브람(수영복)",
     "rarity": "R",
     "tagOk": true,
-    "look": "1boy, solo, short hair, grey hair, thick beard, brown eyes, scar on nose, very tall, muscular male, broad shoulders, riveted plates, brass fittings, tower shiel",
+    "look": "1boy, solo, short hair, grey hair, thick beard, brown eyes, scar on nose, very tall, muscular male, broad shoulders, riveted plates, brass fittings, swimsuit, b",
     "inherited": true
    }
   ]
  },
  "squadStats": [
-  "브람(R 수호) 체력3500 공격129 방어188",
-  "넬(SR 수호) 체력2978 공격113 방어161",
+  "브람(R 수호) 체력3416 공격129 방어188",
+  "넬(SR 수호) 체력2760 공격113 방어170",
   "루시안(SSR 선봉) 체력1664 공격234 방어81"
  ],
  "pageErrors": [],
  "folder": {
-  "prompts": 0,
-  "chars": 0,
+  "prompts": 4,
+  "chars": 44722,
   "sampleInPrompts": {},
   "inlineSkillPass": "6/6",
   "commitAtCall": 4,
   "calls": 4,
   "mainSteps": [
-   "world:4053",
-   "chars:18291",
-   "opening:9228",
-   "chapter1:11715"
+   "world:4922",
+   "chars:18439",
+   "opening:9403",
+   "chapter1:11958"
   ]
  }
 }

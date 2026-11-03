@@ -1,19 +1,19 @@
 # 생성 프롬프트 점검 (프롬프트 스튜디오 관점)
 
-생성: `node tools/play/prompts.mjs` · 2026-11-03T08:02 · 대상: idol-audition(앙코르 시그널), sky-knights(게일 크레스트)
+생성: `node tools/play/prompts.mjs` · 프롬프트: prompts · 2026-11-03T11:39 · 대상: idol-audition(앙코르 시그널), sky-knights(게일 크레스트)
 
 스튜디오 조각(`pfDef`)은 설정 → 프롬프트 스튜디오에서 게임마다 덮어쓰기·덧붙이기할 수 있는 부분입니다. 공통 규칙(`RULES`)과 스킬 작성 규칙(`GGMCombat.prompt()`)은 조각이 아니라 고칠 수 없습니다.
 
 ## idol-audition — 앙코르 시그널
 
-- 조각 13개(사용된 요청 수): BATTLE_FLOW 207자(0), SCRIPT_FMT 950자(2), THREAD_FMT 380자(1), TITLE_RULE 190자(1), NAI_CHAR 523자(1), CHAR_STAT_RULE 584자(0), EXPLORATION_NAME_RULE 127자(1), JSON_STRICT 107자(0), IMG_GUIDE 221자(3), POS_RULE 206자(1), FACTION_RULE 381자(1), DIRECTION_GUIDE 317자(2), STAGE_MODES 412자(1)
-- 스튜디오 밖 정적 덩어리: 공통 규칙 RULES 332자 · 스킬 작성 규칙 10408자
+- 조각 14개(사용된 요청 수): BATTLE_FLOW 207자(0), SCRIPT_FMT 985자(0), THREAD_FMT 380자(1), TITLE_RULE 190자(1), NAI_CHAR 523자(1), CHAR_STAT_RULE 584자(0), EXPLORATION_NAME_RULE 127자(1), JSON_STRICT 107자(0), IMG_GUIDE 221자(3), POS_RULE 206자(1), EXPEDITION_NAME_RULE 325자(0), FACTION_RULE 381자(1), DIRECTION_GUIDE 317자(2), STAGE_MODES 412자(1)
+- 스튜디오 밖 정적 덩어리: 공통 규칙 RULES 332자 · 스킬 작성 규칙 10462자
 
 | 요청 | 길이(자) | 조각 비율 | 조각 | RULES | 스킬 규칙 | 고정 덩어리 비율 | "JSON만 출력" 횟수 | 샘플 이름 |
 |---|---|---|---|---|---|---|---|---|
-| chapter1 | 10701 | 21% | SCRIPT_FMT THREAD_FMT IMG_GUIDE DIRECTION_GUIDE STAGE_MODES | 예 |  | 3% | 2 | 28 |
+| chapter1 | 10701 | 12% | THREAD_FMT IMG_GUIDE DIRECTION_GUIDE STAGE_MODES | 예 |  | 3% | 2 | 28 |
 | chars | 17845 | 4% | NAI_CHAR IMG_GUIDE | 예 | 예 | 60% | 2 | 3 |
-| opening | 8237 | 18% | SCRIPT_FMT IMG_GUIDE DIRECTION_GUIDE | 예 |  | 4% | 2 | 28 |
+| opening | 8237 | 7% | IMG_GUIDE DIRECTION_GUIDE | 예 |  | 4% | 2 | 28 |
 | skill-문가을-1 | 4305 | 0% |  |  |  | 0% | 2 | 1 |
 | skill-백소하-1 | 4322 | 0% |  |  |  | 0% | 2 | 1 |
 | skill-서지안-1 | 4572 | 0% |  |  |  | 0% | 2 | 1 |
@@ -41,20 +41,20 @@
 
 ### 충돌하는 지시
 
-- **처음 동료: 아는 사이 vs 첫 만남** — 대원 단계는 처음부터 동료를 "이미 아는 사이"로, 오프닝은 "첫 만남"을 요구
+- **처음 동료: 아는 사이 vs 첫 만남** — 대원 단계는 처음부터 동료가 프롤로그에서 "이미 아는 사이"라 하고, 오프닝 프롤로그는 "첫 동료들과의 만남"을 요구
 - **표정 목록 없음** — "표정 목록에서 고른다"는데 표정 목록이 주어지지 않음
 - **세력 고르게 vs 플레이어블만** — "세력을 고르게 나누라"면서 대원은 플레이어블(또는 나중 우호) 소속만 허용
 - **value 백분율 vs 예시 소수** — 규칙은 value를 백분율(150)로, 예시는 1.8 같은 소수
 - **효과 목록에 없는 예시 타입** — 스키마 예시의 crit_up이 효과 타입 목록에 없음(글 AI 보고)
 - **반드시 전투 vs 전투 없는 아이디어** — 모든 장의 마지막 스테이지를 전투로 강제 — 입력 아이디어가 전투 없는 장르여도
-- **사람 제외 도감 vs 사람 적** — 적 도감은 사람 제외인데 장르에 따라 적이 모두 사람
+- **사람 제외 도감 vs 새 적마다** — "새 적마다 도감을 쓴다"면서 도감 스키마는 사람인 적을 뺌(전투 상대가 모두 사람인 장르에서 어긋남)
 - **원본 속성 이름 고정 문구** — 스킬 팔레트 지시에 원본 속성 이름 「홍·녹·청」이 고정 문구로
 - **장르 충돌** — 입력 아이디어가 "전투 대신/없음"인데 프롬프트가 전투를 강제
 
 ## sky-knights — 게일 크레스트
 
-- 조각 13개(사용된 요청 수): BATTLE_FLOW 207자(8), SCRIPT_FMT 953자(10), THREAD_FMT 380자(2), TITLE_RULE 190자(1), NAI_CHAR 523자(4), CHAR_STAT_RULE 584자(0), EXPLORATION_NAME_RULE 127자(1), JSON_STRICT 107자(0), IMG_GUIDE 221자(6), POS_RULE 206자(1), FACTION_RULE 381자(1), DIRECTION_GUIDE 317자(10), STAGE_MODES 412자(3)
-- 스튜디오 밖 정적 덩어리: 공통 규칙 RULES 334자 · 스킬 작성 규칙 10408자
+- 조각 14개(사용된 요청 수): BATTLE_FLOW 207자(8), SCRIPT_FMT 988자(0), THREAD_FMT 380자(2), TITLE_RULE 190자(1), NAI_CHAR 523자(4), CHAR_STAT_RULE 584자(0), EXPLORATION_NAME_RULE 127자(1), JSON_STRICT 107자(0), IMG_GUIDE 221자(6), POS_RULE 206자(1), EXPEDITION_NAME_RULE 325자(0), FACTION_RULE 381자(1), DIRECTION_GUIDE 317자(10), STAGE_MODES 412자(3)
+- 스튜디오 밖 정적 덩어리: 공통 규칙 RULES 334자 · 스킬 작성 규칙 10462자
 
 | 요청 | 길이(자) | 조각 비율 | 조각 | RULES | 스킬 규칙 | 고정 덩어리 비율 | "JSON만 출력" 횟수 | 샘플 이름 |
 |---|---|---|---|---|---|---|---|---|
@@ -62,23 +62,23 @@
 | chapter-다음_날_아침_바람꼬리는_피난선을_이끌고_-s1-1ai1cd | 998 | 0% |  |  |  | 0% | 2 | 2 |
 | chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s1-a6keqn | 1948 | 0% |  |  |  | 0% | 2 | 2 |
 | chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s2-k8wx6i | 1947 | 0% |  |  |  | 0% | 2 | 2 |
-| chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2 | 31059 | 8% | BATTLE_FLOW SCRIPT_FMT NAI_CHAR IMG_GUIDE DIRECTION_GUIDE STAGE_MODES | 예 | 예 | 35% | 2 | 8 |
-| chapter-다음_메인_챕터_3장_를_구성하라_대본은_-rzuue6 | 32847 | 8% | BATTLE_FLOW SCRIPT_FMT NAI_CHAR IMG_GUIDE DIRECTION_GUIDE STAGE_MODES | 예 | 예 | 33% | 2 | 8 |
+| chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2 | 31059 | 5% | BATTLE_FLOW NAI_CHAR IMG_GUIDE DIRECTION_GUIDE STAGE_MODES | 예 | 예 | 35% | 2 | 8 |
+| chapter-다음_메인_챕터_3장_를_구성하라_대본은_-rzuue6 | 32847 | 5% | BATTLE_FLOW NAI_CHAR IMG_GUIDE DIRECTION_GUIDE STAGE_MODES | 예 | 예 | 33% | 2 | 8 |
 | chapter-다음_종이_울린_뒤_이십_초가_비어_있습니다-s4-7h9p13 | 1761 | 0% |  |  |  | 0% | 2 | 2 |
-| chapter-다음에_태워_줄게_어디_갔다_왔어_나-0g2ojz | 19482 | 8% | BATTLE_FLOW SCRIPT_FMT DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
-| chapter-다음에_태워_줄게_어디_갔다_왔어_나-8wi0pv | 19515 | 8% | BATTLE_FLOW SCRIPT_FMT DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
-| chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh | 19393 | 8% | BATTLE_FLOW SCRIPT_FMT DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
-| chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf | 18512 | 8% | BATTLE_FLOW SCRIPT_FMT DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
-| chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y | 19488 | 8% | BATTLE_FLOW SCRIPT_FMT DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
-| chapter-다음에_태워_줄게_어디_갔다_왔어_나-x33jt1 | 19381 | 8% | BATTLE_FLOW SCRIPT_FMT DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
+| chapter-다음에_태워_줄게_어디_갔다_왔어_나-0g2ojz | 19482 | 3% | BATTLE_FLOW DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
+| chapter-다음에_태워_줄게_어디_갔다_왔어_나-8wi0pv | 19515 | 3% | BATTLE_FLOW DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
+| chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh | 19393 | 3% | BATTLE_FLOW DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
+| chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf | 18512 | 3% | BATTLE_FLOW DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
+| chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y | 19488 | 3% | BATTLE_FLOW DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
+| chapter-다음에_태워_줄게_어디_갔다_왔어_나-x33jt1 | 19381 | 3% | BATTLE_FLOW DIRECTION_GUIDE | 예 |  | 2% | 2 | 8 |
 | chapter-다음엔_덜_떨게요_아마도요_다른_설명이-s2-u1jg5a | 2193 | 0% |  |  |  | 0% | 2 | 2 |
 | chapter-다음은_검은_돛의_그림자_의_대본을_처음부-11mkbb | 3555 | 0% |  |  |  | 0% | 2 |  |
 | chapter-다음은_스토리에_여러_번_나온_조연들이다_-bfix2y | 1381 | 54% | NAI_CHAR IMG_GUIDE |  |  | 0% | 2 |  |
 | chapter-다음은_완성된_대본에서_확인한_사건_기록이다-9qn5kt | 3868 | 10% | THREAD_FMT | 예 |  | 9% | 2 | 1 |
 | chapter-이_입력은_게임_작가의_이야기_기억_정리_작-s2-x36yek | 1011 | 0% |  |  |  | 0% | 2 |  |
-| chapter1 | 11842 | 19% | SCRIPT_FMT THREAD_FMT IMG_GUIDE DIRECTION_GUIDE STAGE_MODES | 예 |  | 3% | 2 | 28 |
+| chapter1 | 11842 | 11% | THREAD_FMT IMG_GUIDE DIRECTION_GUIDE STAGE_MODES | 예 |  | 3% | 2 | 28 |
 | chars | 18236 | 4% | NAI_CHAR IMG_GUIDE | 예 | 예 | 59% | 2 | 3 |
-| opening | 9355 | 16% | SCRIPT_FMT IMG_GUIDE DIRECTION_GUIDE | 예 |  | 4% | 2 | 28 |
+| opening | 9355 | 6% | IMG_GUIDE DIRECTION_GUIDE | 예 |  | 4% | 2 | 28 |
 | skill-넬-1 | 4307 | 0% |  |  |  | 0% | 2 | 1 |
 | skill-루시안-1 | 4292 | 0% |  |  |  | 0% | 2 | 1 |
 | skill-브람-1 | 4288 | 0% |  |  |  | 0% | 2 | 1 |
@@ -109,13 +109,13 @@
 
 ### 충돌하는 지시
 
-- **처음 동료: 아는 사이 vs 첫 만남** — 대원 단계는 처음부터 동료를 "이미 아는 사이"로, 오프닝은 "첫 만남"을 요구
+- **처음 동료: 아는 사이 vs 첫 만남** — 대원 단계는 처음부터 동료가 프롤로그에서 "이미 아는 사이"라 하고, 오프닝 프롤로그는 "첫 동료들과의 만남"을 요구
 - **표정 목록 없음** — "표정 목록에서 고른다"는데 표정 목록이 주어지지 않음
 - **세력 고르게 vs 플레이어블만** — "세력을 고르게 나누라"면서 대원은 플레이어블(또는 나중 우호) 소속만 허용
 - **value 백분율 vs 예시 소수** — 규칙은 value를 백분율(150)로, 예시는 1.8 같은 소수
 - **효과 목록에 없는 예시 타입** — 스키마 예시의 crit_up이 효과 타입 목록에 없음(글 AI 보고)
 - **반드시 전투 vs 전투 없는 아이디어** — 모든 장의 마지막 스테이지를 전투로 강제 — 입력 아이디어가 전투 없는 장르여도
-- **사람 제외 도감 vs 사람 적** — 적 도감은 사람 제외인데 장르에 따라 적이 모두 사람
+- **사람 제외 도감 vs 새 적마다** — "새 적마다 도감을 쓴다"면서 도감 스키마는 사람인 적을 뺌(전투 상대가 모두 사람인 장르에서 어긋남)
 - **원본 속성 이름 고정 문구** — 스킬 팔레트 지시에 원본 속성 이름 「홍·녹·청」이 고정 문구로
 
 

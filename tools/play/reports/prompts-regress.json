@@ -1,0 +1,474 @@
+[
+ {
+  "game": "idol-audition",
+  "title": "앙코르 시그널",
+  "frags": [
+   {
+    "id": "BATTLE_FLOW",
+    "label": "전투 흐름(스토리 안의 전투 다루기)",
+    "chars": 207,
+    "usedIn": 0
+   },
+   {
+    "id": "SCRIPT_FMT",
+    "label": "대본 형식(스토리·이벤트·메모리얼 대본)",
+    "chars": 985,
+    "usedIn": 2
+   },
+   {
+    "id": "THREAD_FMT",
+    "label": "메신저(톡) 형식",
+    "chars": 380,
+    "usedIn": 1
+   },
+   {
+    "id": "TITLE_RULE",
+    "label": "게임 이름 짓기",
+    "chars": 190,
+    "usedIn": 1
+   },
+   {
+    "id": "NAI_CHAR",
+    "label": "캐릭터 외모 태그(naiPrompt)",
+    "chars": 523,
+    "usedIn": 1
+   },
+   {
+    "id": "CHAR_STAT_RULE",
+    "label": "새 캐릭터 능력치·외모 규칙(캐릭터 생성 4곳 공통)",
+    "chars": 584,
+    "usedIn": 0
+   },
+   {
+    "id": "EXPLORATION_NAME_RULE",
+    "label": "탐사 콘텐츠 이름",
+    "chars": 127,
+    "usedIn": 1
+   },
+   {
+    "id": "JSON_STRICT",
+    "label": "JSON 출력 강조(모든 JSON 요청 끝)",
+    "chars": 107,
+    "usedIn": 0
+   },
+   {
+    "id": "IMG_GUIDE",
+    "label": "그림 태그 공통 가이드(그림 태그를 쓰는 모든 요청에 자동으로 들어감)",
+    "chars": 221,
+    "usedIn": 3
+   },
+   {
+    "id": "POS_RULE",
+    "label": "포지션(직군·함종) 설계",
+    "chars": 206,
+    "usedIn": 1
+   },
+   {
+    "id": "EXPEDITION_NAME_RULE",
+    "label": "파견 방식 이름",
+    "chars": 325,
+    "usedIn": 1
+   },
+   {
+    "id": "FACTION_RULE",
+    "label": "세력 설계 규칙(새 게임·세력 AI 채우기)",
+    "chars": 381,
+    "usedIn": 1
+   },
+   {
+    "id": "DIRECTION_GUIDE",
+    "label": "연출 문법(감정 아이콘·동작·화면 효과)",
+    "chars": 317,
+    "usedIn": 2
+   },
+   {
+    "id": "STAGE_MODES",
+    "label": "스테이지 양식(전투·이야기·회담·콘테스트) 고르기",
+    "chars": 412,
+    "usedIn": 1
+   }
+  ],
+  "rulesChars": 332,
+  "skillChars": 10462,
+  "rows": [
+   {
+    "kind": "chapter1",
+    "len": 10756,
+    "frags": [
+     "SCRIPT_FMT",
+     "THREAD_FMT",
+     "IMG_GUIDE",
+     "DIRECTION_GUIDE",
+     "STAGE_MODES"
+    ],
+    "fragPct": 22,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 3,
+    "json": 2,
+    "sample": 10
+   },
+   {
+    "kind": "chars",
+    "len": 18048,
+    "frags": [
+     "NAI_CHAR",
+     "IMG_GUIDE"
+    ],
+    "fragPct": 4,
+    "rulesIn": true,
+    "skillIn": true,
+    "fixedPct": 60,
+    "json": 2,
+    "sample": 3
+   },
+   {
+    "kind": "opening",
+    "len": 8228,
+    "frags": [
+     "SCRIPT_FMT",
+     "IMG_GUIDE",
+     "DIRECTION_GUIDE"
+    ],
+    "fragPct": 19,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 4,
+    "json": 2,
+    "sample": 10
+   },
+   {
+    "kind": "world",
+    "len": 4927,
+    "frags": [
+     "TITLE_RULE",
+     "EXPLORATION_NAME_RULE",
+     "POS_RULE",
+     "EXPEDITION_NAME_RULE",
+     "FACTION_RULE"
+    ],
+    "fragPct": 25,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 3
+   }
+  ],
+  "repeated": [
+   {
+    "chars": 2120,
+    "n": 2,
+    "head": "멤버: 차하린(SSR, 새벽별 엔터테인먼트, 열정속성 퍼포머, 새벽별 엔터테인먼트의 센터 지망 연습생. 데뷔 직전까지 갔던 경",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 985,
+    "n": 2,
+    "head": "대본은 하나의 문자열이고 줄마다 줄바꿈(\\n)으로 나눈다(쉼표로 잇거나 배열로 쓰지 않는다). 대본 형식(한 줄에 하나): \"",
+    "frag": "SCRIPT_FMT"
+   },
+   {
+    "chars": 611,
+    "n": 2,
+    "head": "메인 플롯(작가용 비밀 설정 포함): 새벽별의 연습생들은 첫 순위 발표에서 최하위권을 기록하며 팀 내 센터 자리와 방향성을 두",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 525,
+    "n": 2,
+    "head": "- 새벽별 엔터테인먼트 [플레이어블 소속 · 지금 플레이어와 우호]: 망원동 상가 3층의 연습실 하나로 시작한 신생 기획사다.",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 332,
+    "n": 3,
+    "head": "플레이어(실장님)의 성별은 정하지 않는다. 성별이 드러나는 호칭은 피한다. 플레이어(실장님)의 외모: 단정한 셔츠에 사원증을 ",
+    "frag": "RULES(조각 아님)"
+   },
+   {
+    "chars": 495,
+    "n": 2,
+    "head": "- 시그널 팬연합 [중립 · 지금 플레이어와 중립 · 3장부터 우호 예정(새벽별의 진심 어린 무대에 반한 회원들이 생겨나며 공",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 473,
+    "n": 2,
+    "head": "- 오로라TV 스타라인 제작국 [중립 · 지금 플레이어와 중립 · 5장부터 적대 예정(실장님이 투표 보정의 흔적을 쫓기 시작하",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 435,
+    "n": 2,
+    "head": "상세 설정: 10년 전 첫 시즌 이후 「스타라인」은 아이돌이 되는 가장 빠른 길이자 유일한 길처럼 여겨진다. 매 회차 연습생들",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 432,
+    "n": 2,
+    "head": "- 크라운 엔터테인먼트 [적대 세력 · 지금 플레이어와 적대]: 매 시즌 데뷔조 과반을 배출해 온 업계 1위 대형 기획사다. ",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 399,
+    "n": 2,
+    "head": "- 블랙 렌즈 [적대 세력 · 지금 플레이어와 적대]: 연습생의 과거와 사생활을 캐내 영상으로 퍼뜨리는 폭로 채널 집단이다. ",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 173,
+    "n": 3,
+    "head": "- 그림 종류마다 태그 대상이 다르다. 캐릭터(naiPrompt)=외모만. CG=장소·구도·행동·분위기(외모 제외). 배경=사",
+    "frag": "IMG_GUIDE"
+   },
+   {
+    "chars": 160,
+    "n": 2,
+    "head": "게임 \"앙코르 시그널\". 세계관 \"스타라인의 서울\": 국민 투표로 데뷔조를 뽑는 서바이벌 오디션 「스타라인」이 모든 화제를 삼",
+    "frag": "하드코딩"
+   }
+  ],
+  "conflicts": [],
+  "genreConflict": false
+ },
+ {
+  "game": "sky-knights",
+  "title": "게일 크레스트",
+  "frags": [
+   {
+    "id": "BATTLE_FLOW",
+    "label": "전투 흐름(스토리 안의 전투 다루기)",
+    "chars": 207,
+    "usedIn": 0
+   },
+   {
+    "id": "SCRIPT_FMT",
+    "label": "대본 형식(스토리·이벤트·메모리얼 대본)",
+    "chars": 988,
+    "usedIn": 2
+   },
+   {
+    "id": "THREAD_FMT",
+    "label": "메신저(톡) 형식",
+    "chars": 380,
+    "usedIn": 1
+   },
+   {
+    "id": "TITLE_RULE",
+    "label": "게임 이름 짓기",
+    "chars": 190,
+    "usedIn": 1
+   },
+   {
+    "id": "NAI_CHAR",
+    "label": "캐릭터 외모 태그(naiPrompt)",
+    "chars": 523,
+    "usedIn": 1
+   },
+   {
+    "id": "CHAR_STAT_RULE",
+    "label": "새 캐릭터 능력치·외모 규칙(캐릭터 생성 4곳 공통)",
+    "chars": 584,
+    "usedIn": 0
+   },
+   {
+    "id": "EXPLORATION_NAME_RULE",
+    "label": "탐사 콘텐츠 이름",
+    "chars": 127,
+    "usedIn": 1
+   },
+   {
+    "id": "JSON_STRICT",
+    "label": "JSON 출력 강조(모든 JSON 요청 끝)",
+    "chars": 107,
+    "usedIn": 0
+   },
+   {
+    "id": "IMG_GUIDE",
+    "label": "그림 태그 공통 가이드(그림 태그를 쓰는 모든 요청에 자동으로 들어감)",
+    "chars": 221,
+    "usedIn": 3
+   },
+   {
+    "id": "POS_RULE",
+    "label": "포지션(직군·함종) 설계",
+    "chars": 206,
+    "usedIn": 1
+   },
+   {
+    "id": "EXPEDITION_NAME_RULE",
+    "label": "파견 방식 이름",
+    "chars": 325,
+    "usedIn": 1
+   },
+   {
+    "id": "FACTION_RULE",
+    "label": "세력 설계 규칙(새 게임·세력 AI 채우기)",
+    "chars": 381,
+    "usedIn": 1
+   },
+   {
+    "id": "DIRECTION_GUIDE",
+    "label": "연출 문법(감정 아이콘·동작·화면 효과)",
+    "chars": 317,
+    "usedIn": 2
+   },
+   {
+    "id": "STAGE_MODES",
+    "label": "스테이지 양식(전투·이야기·회담·콘테스트) 고르기",
+    "chars": 412,
+    "usedIn": 1
+   }
+  ],
+  "rulesChars": 334,
+  "skillChars": 10462,
+  "rows": [
+   {
+    "kind": "chapter1",
+    "len": 11958,
+    "frags": [
+     "SCRIPT_FMT",
+     "THREAD_FMT",
+     "IMG_GUIDE",
+     "DIRECTION_GUIDE",
+     "STAGE_MODES"
+    ],
+    "fragPct": 19,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 3,
+    "json": 2,
+    "sample": 9
+   },
+   {
+    "kind": "chars",
+    "len": 18439,
+    "frags": [
+     "NAI_CHAR",
+     "IMG_GUIDE"
+    ],
+    "fragPct": 4,
+    "rulesIn": true,
+    "skillIn": true,
+    "fixedPct": 59,
+    "json": 2,
+    "sample": 3
+   },
+   {
+    "kind": "opening",
+    "len": 9403,
+    "frags": [
+     "SCRIPT_FMT",
+     "IMG_GUIDE",
+     "DIRECTION_GUIDE"
+    ],
+    "fragPct": 16,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 4,
+    "json": 2,
+    "sample": 9
+   },
+   {
+    "kind": "world",
+    "len": 4922,
+    "frags": [
+     "TITLE_RULE",
+     "EXPLORATION_NAME_RULE",
+     "POS_RULE",
+     "EXPEDITION_NAME_RULE",
+     "FACTION_RULE"
+    ],
+    "fragPct": 25,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 3
+   }
+  ],
+  "repeated": [
+   {
+    "chars": 2270,
+    "n": 2,
+    "head": "단원: 카시아(SSR, 질풍문장 기사단, 질풍속성 선봉, 옛 질풍문장 기사단 총장의 마지막 종자였던 기사. 기사단이 해산된 뒤",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 988,
+    "n": 2,
+    "head": "대본은 하나의 문자열이고 줄마다 줄바꿈(\\n)으로 나눈다(쉼표로 잇거나 배열로 쓰지 않는다). 대본 형식(한 줄에 하나): \"",
+    "frag": "SCRIPT_FMT"
+   },
+   {
+    "chars": 701,
+    "n": 2,
+    "head": "메인 플롯(작가용 비밀 설정 포함): 부유석은 아득한 옛날 운해를 헤엄치던 거대한 하늘고래 '천경'들의 굳은 심장이며, 군도의",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 615,
+    "n": 2,
+    "head": "- 와류수 [괴물·마물 · 지금 플레이어와 적대]: 잿빛 폭풍 '아가리'가 지나간 자리에 나타나는 괴물 무리다. 기류와 번개,",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 561,
+    "n": 2,
+    "head": "- 검은 돛 공적단 [적대 세력 · 지금 플레이어와 적대 · 3장부터 우호 예정(선장 로웬이 옛 부단장임이 밝혀지고, 의회라는",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 532,
+    "n": 2,
+    "head": "상세 설정: 아주 오래전 지상은 끝없는 구름의 바다 '운해' 아래로 가라앉았고, 살아남은 사람들은 부유석이 박힌 섬 위에서 하",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 503,
+    "n": 2,
+    "head": "- 질풍문장 기사단 [플레이어블 소속 · 지금 플레이어와 우호]: 삼백 년 동안 아스테른 군도의 항로를 지켜 온 기사단이다. ",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 334,
+    "n": 3,
+    "head": "플레이어(기사단장)의 성별은 정하지 않는다. 성별이 드러나는 호칭은 피한다. 플레이어(기사단장)의 외모: 바람에 해진 기사단 ",
+    "frag": "RULES(조각 아님)"
+   },
+   {
+    "chars": 486,
+    "n": 2,
+    "head": "- 백운 의회 [적대 세력 · 지금 플레이어와 적대]: 수도섬 아우렐리아를 다스리며 군도 전체의 부유석 거래와 항로 허가를 쥔",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 441,
+    "n": 2,
+    "head": "- 황동 상회 연합 [플레이어블 소속 · 지금 플레이어와 우호]: 자유항 코그웰을 중심으로 비행선 조선소와 공방, 상인들이 모",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 425,
+    "n": 2,
+    "head": "- 운해 순례회 [중립 · 지금 플레이어와 중립]: 종루섬 에코벨에 모여 사는 순례자 공동체다. 폭풍을 하늘이 내리는 심판이라",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 173,
+    "n": 3,
+    "head": "- 그림 종류마다 태그 대상이 다르다. 캐릭터(naiPrompt)=외모만. CG=장소·구도·행동·분위기(외모 제외). 배경=사",
+    "frag": "IMG_GUIDE"
+   },
+   {
+    "chars": 181,
+    "n": 2,
+    "head": "게임 \"게일 크레스트\". 세계관 \"아스테른 군도\": 수백 개의 하늘섬이 부유석의 힘으로 떠 있는 아스테른 군도에, 섬을 통째로",
+    "frag": "하드코딩"
+   }
+  ],
+  "conflicts": [],
+  "genreConflict": false
+ }
+]
