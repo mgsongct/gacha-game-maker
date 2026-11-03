@@ -217,6 +217,29 @@ try {
     return o; });
   assert.ok(Object.values(r11).every(v => v === true || (typeof v === 'number' && v > 0)), JSON.stringify(r11)); assert.deepEqual(err11, [], '페이지 오류');
   console.log('ok 11 원정 모드: 방송 출연(배정→출연→보수·인지도·컨디션, 휴식, 톱이면 선택), 스트리머(영상 라이브러리 수익), 경영(배치·정산·평판), 일하는 중 전투 불가');
+
+  // 12) 콘텐츠 점검·업그레이드: 빠진 것·구버전 감지 → 자동 변환·AI 채우기·지정 변환·스테이지 대본, 되돌리기, 새 캐릭터 생성 버전
+  const p12 = await browser.newPage(), err12 = []; p12.on('pageerror', e => err12.push(String(e)));
+  await p12.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p12.goto(`http://127.0.0.1:${server.address().port}/?t=12`);
+  await p12.waitForFunction(() => typeof auditScan === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r12 = await p12.evaluate(async () => {
+    const o = {}, A0 = G.chars.filter(c => !c.alt)[0], A = cleanChar({ ...JSON.parse(JSON.stringify(A0)), name: '구버전캐릭' }); G.chars.push(A); o.sampleNotOld = !auditScan().some(g => g.rule.id === 'c_old' && g.items.includes(A0)); const R = id => AUDIT_RULES.find(r => r.id === id), has = (id, x) => (auditScan().find(g => g.rule.id === id) || { items: [] }).items.includes(x);
+    A.lines = []; A.naiPrompt = (A.naiPrompt || '1girl, solo') + ', mature female'; delete A.genVer; delete A.symColor; delete A.symItem; mark('c:' + A.id);
+    const st = G.chapters.find(c => c.kind === 'main').stages[0]; const preBefore = st.pre; st.pre = '';
+    o.detect = has('c_lines', A) && has('c_age', A) && has('c_old', A) && has('c_symbol', A) && has('s_script', st);
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="audopen"]') && !!document.body.innerHTML.includes('생성 기능 향상');
+    await auditFix(R('c_age'), [A]); o.ageFixed = !has('c_age', A); await auditFix(R('c_symbol'), [A]); o.symbol = !!A.symColor;
+    auditUndo(); o.undo = !A.symColor && has('c_symbol', A);
+    let asked = ''; SAMPLE = { json: async p => { asked = p; return /"pre"/.test(p) ? { pre: '[사무소]\n세라: 시작하자.' } : /반말/.test(p) ? { lines: ['반말1', '반말2', '반말3'] } : { lines: ['대사1', '대사2', '대사3', '대사4'] }; } };
+    await auditFix(R('c_lines'), [A]); o.aiFill = A.lines.length === 4 && !has('c_lines', A) && /평소 대사/.test(asked);
+    await auditConvert([A], ['lines'], '대사를 모두 반말로'); o.convert = A.lines[0] === '반말1'; auditUndo(); o.convertUndo = A.lines[0] === '대사1';
+    await auditFix(R('s_script'), [st]); o.stage = /세라: 시작하자/.test(st.pre); st.pre = preBefore;
+    await auditFix(R('c_old'), [A]); o.stamped = A.genVer === auditGenVer() && !has('c_old', A); closeModal();
+    o.newChar = cleanChar({ name: '새캐릭' }).genVer === auditGenVer();
+    openAudit(); o.seen = G.meta.auditSeen === auditVer() && !!document.querySelector('[data-act="audconv"]'); closeModal();
+    return o; });
+  assert.ok(Object.values(r12).every(v => v === true), JSON.stringify(r12)); assert.deepEqual(err12, [], '페이지 오류');
+  console.log('ok 12 콘텐츠 점검: 빠진 대사·나이 태그·상징·구버전·빈 대본 감지 → 자동 변환·AI 채우기·지정 변환·되돌리기, 새 캐릭터 genVer');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);

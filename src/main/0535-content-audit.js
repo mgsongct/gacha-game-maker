@@ -1,0 +1,101 @@
+/* ===== 콘텐츠 점검·업그레이드 (생성 기능이 좋아졌거나 기존 생성물에 빠진 게 있을 때) ===== */
+/* 규칙(AUDIT_RULES)마다 "감지 → 고치기"를 정의해요. 종류: missing(빠짐·잘못됨) · upgrade(구버전 생성물, 새 기능으로 바꿀 수 있음)
+   고치는 방법: auto(규칙 변환, AI 없이) · ai(빠진 항목만 AI로 채움) · image(그림 생성) · open(기존 편집 화면 열기)
+   생성 버전: 새로 만드는 캐릭터에 genVer가 찍혀요(cleanChar0). genVer가 없거나 낮으면 구버전 생성물이에요.
+   지정 변환: 고른 캐릭터·항목을 지시문대로 AI가 바꿔요. 마지막 일괄 작업은 되돌릴 수 있어요. 문서: docs/research/content-audit.md */
+function auditGenVer(){ return 3; } // 생성 규칙이 바뀌면 올려요(2: 상징 컬러·아이템, 3: 바리에이션·상속 시대)
+const AUDIT_FIELDS={profile:['프로필','"profile":"성격·배경·비밀을 담은 3~5문장"'],intro:['첫 대사','"intro":"첫 만남 대사 1줄"'],lines:['평소 대사','"lines":["로비·평소 대사 5개"]'],
+  touch:['터치 반응','"touch":{"head":["머리 쓰다듬기 반응 3개"],"body":["몸 터치 반응 3개"],"pet":["쓰다듬기 반응 3개"]}'],affLines:['호감도 대사','"affLines":{"3":["대사 1~2개"],"5":["대사 1~2개"],"8":["대사 1~2개"]}'],
+  lvLines:['레벨업 대사','"lvLines":["2개"]'],dupLines:['돌파 대사','"dupLines":["2개"]'],naiPrompt:['외모 태그','"naiPrompt":"NovelAI 영어 태그"']};
+const auditStrs=v=>(Array.isArray(v)?v:[]).map(x=>String(x||'').trim()).filter(Boolean);
+const auditImgCats=['char','upper','illust','weapon'];
+const AUDIT_RULES=[
+ {id:'c_profile',scope:'char',kind:'missing',since:1,label:'프로필이 비었거나 너무 짧아요',test:c=>String(c.profile||'').trim().length<40,fix:{mode:'ai',fields:['profile']}},
+ {id:'c_lines',scope:'char',kind:'missing',since:1,label:'평소 대사가 3개 미만이에요',test:c=>auditStrs(c.lines).length<3,fix:{mode:'ai',fields:['lines']}},
+ {id:'c_touch',scope:'char',kind:'missing',since:1,label:'터치 반응 대사가 없어요',test:c=>!auditStrs(c.touch?.head).length||!auditStrs(c.touch?.body).length,fix:{mode:'ai',fields:['touch']}},
+ {id:'c_aff',scope:'char',kind:'missing',since:1,label:'호감도 대사가 없어요',test:c=>!Object.values(c.affLines||{}).some(v=>auditStrs(v).length),fix:{mode:'ai',fields:['affLines']}},
+ {id:'c_intro',scope:'char',kind:'missing',since:1,label:'첫 대사가 없어요',test:c=>!String(c.intro||'').trim(),fix:{mode:'ai',fields:['intro']}},
+ {id:'c_look',scope:'char',kind:'missing',since:1,label:'외모 태그(그림 프롬프트)가 없어요',test:c=>!String(c.naiPrompt||'').trim(),fix:{mode:'ai',fields:['naiPrompt']}},
+ {id:'c_age',scope:'char',kind:'missing',since:1,label:'외모 태그에 나이 태그가 남아 있어요(예전 생성물)',test:c=>tagList(c.naiPrompt).some(t=>AGE_TAGS.test(tagKey(t))),fix:{mode:'auto',run:c=>{ c.naiPrompt=stripAge(c.naiPrompt); }}},
+ {id:'c_minor',scope:'char',kind:'missing',since:1,label:'외모 태그에 허용되지 않는 태그가 있어요',test:c=>tagList(c.naiPrompt).some(t=>MINOR_TAGS.test(tagKey(t))),fix:{mode:'auto',run:c=>{ c.naiPrompt=tagList(c.naiPrompt).filter(t=>!MINOR_TAGS.test(tagKey(t))).join(', '); }}},
+ {id:'c_weapon',scope:'char',kind:'missing',since:1,label:`${T('weapon')} 그림 프롬프트가 잘못됐거나 없어요`,test:c=>!!c.weapon&&!!c.weapon.name&&(!c.weapon.prompt||wpBad(c.weapon.prompt)),fix:{mode:'weapon'}},
+ {id:'c_skills',scope:'char',kind:'upgrade',since:2,label:'스킬이 지금 전투 규칙(밸런스 검사)과 맞지 않아요',test:c=>!c.skills||c.skills.version!==2||!c.skillBalance||c.skillBalance.ruleset!==GGMCombat.RULESET,fix:{mode:'skills'}},
+ {id:'c_symbol',scope:'char',kind:'upgrade',since:2,label:'상징 컬러·아이템이 정해지지 않았어요(바리에이션 디자인에 쓰여요)',test:c=>!c.alt&&(!c.symColor||!c.symItem)&&!!(GGMConstruct.symbolColor(c)||GGMConstruct.symbolItem(c)),fix:{mode:'auto',run:c=>{ c.symColor=c.symColor||GGMConstruct.symbolColor(c)||''; c.symItem=c.symItem||GGMConstruct.symbolItem(c)||''; }}},
+ {id:'c_old',scope:'char',kind:'upgrade',since:3,label:'구버전 생성기로 만든 캐릭터예요(새 규칙으로 일부 다시 만들 수 있어요)',test:c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id),fix:{mode:'open',stamp:true}},
+ {id:'c_img',scope:'char',kind:'missing',since:1,label:'그림(스탠딩·상반신·일러스트·무기)이 아직 없어요',test:c=>drawTodo(auditImgCats).some(it=>it.c===c),fix:{mode:'image'}},
+ {id:'s_script',scope:'stage',kind:'missing',since:1,label:'스테이지 대본(전투 전 장면)이 비었어요',test:s=>!String(s.pre||'').trim(),fix:{mode:'ai-stage'}},
+ {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
+function auditVer(){ return Math.max(...AUDIT_RULES.map(r=>r.since)); }
+function auditTargets(scope){ if(scope==='char') return G.chars; if(scope==='lib') return G.lib; if(scope==='stage') return G.chapters.filter(ch=>ch.kind==='main'||ch.kind==='event').flatMap(ch=>ch.stages||[]); return []; }
+function auditName(r,o){ if(r.scope==='stage'){ const ch=G.chapters.find(c=>(c.stages||[]).includes(o)); return `${ch?ch.title+' · ':''}${o.title||o.id}`; } return o.name||o.id; }
+function auditScan(only){ const out=[]; for(const r of AUDIT_RULES){ const items=auditTargets(r.scope).filter(o=>(!only||only(o,r))&&(()=>{ try{ return r.test(o); }catch(e){ return false; } })()); if(items.length) out.push({rule:r,items}); } return out; }
+
+/* 되돌리기: 마지막 일괄 작업 직전 상태 */
+let AUDIT_UNDO=null, AUDIT_JOB=null;
+function auditSnap(objs,label){ AUDIT_UNDO={label,at:Date.now(),items:objs.map(o=>({o,before:JSON.parse(JSON.stringify(o))}))}; }
+function auditUndo(){ const U=AUDIT_UNDO; if(!U) return; for(const {o,before} of U.items){ for(const k of Object.keys(o)) if(!(k in before)) delete o[k]; Object.assign(o,before); if(G.chars.includes(o)) mark('c:'+o.id); } mark('prog'); AUDIT_UNDO=null; toast(`되돌렸어요: ${U.label}`); }
+function auditMarkObj(o){ if(G.chars.includes(o)) mark('c:'+o.id); else if(G.lib.includes(o)) mark('l:'+o.id); else { const ch=G.chapters.find(c=>(c.stages||[]).includes(o)); if(ch) mark('ch:'+ch.id); } }
+
+async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(instruction 없음) 또는 지정 변환(instruction 있음)
+  const schema='{'+fields.map(f=>AUDIT_FIELDS[f][1]).join(',')+'}', cur=fields.map(f=>`${AUDIT_FIELDS[f][0]}: ${JSON.stringify(c[f]??'')}`).join('\n');
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」(${ROLE[c.role]||''}, ${c.faction||'무소속'}). 프로필: ${String(c.profile||'').slice(0,400)}\n지금 값:\n${cur}\n\n${instruction?`다음 지시대로 위 항목을 고쳐 써라: "${instruction}". 지시와 관계없는 설정·말투는 유지한다.`:'비었거나 부족한 항목을 이 캐릭터의 성격·말투·설정에 맞게 채워라. 이미 있는 내용은 살리고 어긋나지 않게 한다.'}${fields.includes('naiPrompt')?' '+NAI_CHAR:''}\nJSON만 출력: ${schema}`,null,'default');
+  if(!r) return false;
+  for(const f of fields){ const v=r[f]; if(v==null) continue;
+    if(f==='touch'&&typeof v==='object') c.touch={head:auditStrs(v.head).slice(0,8),body:auditStrs(v.body).slice(0,8),pet:auditStrs(v.pet).slice(0,8)};
+    else if(f==='affLines'&&typeof v==='object'){ const o={}; Object.entries(v).forEach(([k,x])=>{ const n=parseInt(k,10); if(n>=1&&n<=10) o[n]=auditStrs(x).slice(0,4); }); c.affLines=o; }
+    else if(['lines','lvLines','dupLines'].includes(f)) c[f]=auditStrs(v).slice(0,12);
+    else if(f==='naiPrompt') c.naiPrompt=stripAge(tagList(String(v)).filter(t=>!MINOR_TAGS.test(tagKey(t))).join(', '));
+    else c[f]=String(v).trim(); }
+  mark('c:'+c.id); return true; }
+async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(`${RULES}\n${ctx()}\n\n${SCRIPT_FMT}\n「${ch?ch.title:''}」의 스테이지 「${s.title||''}」 전투 직전 장면 대본을 써라. 앞뒤 스테이지 흐름과 이어지게, 12~25줄.\nJSON만 출력: {"pre":"대본"}`,null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
+
+async function auditFix(rule,items){
+  if(AUDIT_JOB){ toast('점검 작업이 진행 중이에요'); return; } const m=rule.fix.mode;
+  if(m==='open'){ const c=items[0]; if(rule.fix.stamp) items.forEach(x=>{ x.genVer=auditGenVer(); auditMarkObj(x); }); closeModal(); if(c&&typeof openRegen==='function') openRegen(c.id); if(items.length>1) toast(`${items.length}명을 지금 버전으로 표시했어요. 다시 만들 부분은 캐릭터마다 「다시 만들기」에서 골라요`); return; }
+  if(m==='image'){ if(!imgReady()){ toast('그림 AI(NovelAI 또는 ComfyUI)를 먼저 설정해 주세요'); return; } const set=new Set(items); closeModal(); runPrep(rule.scope==='lib'?['bg','prop','cg','enemy']:auditImgCats,it=>set.has(it.c)||set.has(it.o)); return; }
+  if((m==='ai'||m==='ai-stage'||m==='weapon')&&!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; }
+  auditSnap(items,rule.label); const job=AUDIT_JOB={stop:false,done:0,total:items.length}; let ok=0;
+  try{ for(const o of items){ if(job.stop) break; syBar(`점검: ${rule.label} ${job.done+1}/${job.total}`);
+      try{ if(m==='auto'){ rule.fix.run(o); auditMarkObj(o); ok++; }
+        else if(m==='ai'){ if(await auditAIFill(o,rule.fix.fields)) ok++; }
+        else if(m==='ai-stage'){ if(await auditAIStage(o)) ok++; }
+        else if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); ok++; }
+        else if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); ok++; } }catch(e){ console.warn('audit',rule.id,e); }
+      job.done++; } }
+  finally{ AUDIT_JOB=null; syBar(''); }
+  mark('prog'); toast(`${rule.label}: ${ok}/${items.length}개 고쳤어요${AUDIT_UNDO?' (되돌리기 가능)':''}`); if(!$('#modal').hidden) openAudit(AUDIT_FOCUS); else render(); }
+async function auditConvert(chars,fields,instruction){
+  if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(!chars.length||!fields.length||!instruction.trim()){ toast('대상·항목·지시를 모두 정해 주세요'); return; } if(AUDIT_JOB) return;
+  auditSnap(chars,'지정 변환: '+instruction.slice(0,20)); const job=AUDIT_JOB={stop:false}; let ok=0;
+  try{ for(const [i,c] of chars.entries()){ if(job.stop) break; syBar(`지정 변환 ${i+1}/${chars.length}: ${c.name}`); try{ if(await auditAIFill(c,fields,instruction)) ok++; }catch(e){} } }
+  finally{ AUDIT_JOB=null; syBar(''); } toast(`지정 변환: ${ok}/${chars.length}명 바꿨어요 (되돌리기 가능)`); openAudit(AUDIT_FOCUS); }
+
+/* 화면 */
+let AUDIT_FOCUS=null; // 캐릭터 하나만 볼 때 id
+function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen=auditVer(); mark('meta'); }
+  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
+  const chars=focus?G.chars.filter(c=>c.id===focus):G.chars;
+  openModal(`${head(focus?`${charById(focus)?.name||''} 점검`:'콘텐츠 점검·업그레이드',`<span class="muted">생성 규칙 v${auditGenVer()} · ${focus?'':`구버전 생성물 ${old}명`}</span>`)}
+    <p class="muted" style="font-size:.82rem;margin:0 0 8px">생성 기능이 좋아졌거나 예전에 만든 콘텐츠에 빠진 게 있으면 여기에서 찾아 고쳐요. 고치기 전 상태는 마지막 작업 한 번까지 되돌릴 수 있어요.</p>
+    ${AUDIT_UNDO?`<div class="panel" style="padding:8px 10px"><span class="muted">마지막 작업: ${esc(AUDIT_UNDO.label)} (${AUDIT_UNDO.items.length}개)</span> <button class="btn sm ghost" data-act="audundo">되돌리기</button></div>`:''}
+    ${res.length?res.map(({rule:r,items},gi)=>`<details class="panel" style="margin:6px 0" ${gi<3?'open':''}><summary><span class="badge">${kinds[r.kind]}</span> <b>${esc(r.label)}</b> <span class="muted">${items.length}개</span></summary>
+      <div style="max-height:160px;overflow:auto;margin:6px 0;font-size:.85rem">${items.map((o,i)=>`<label style="display:flex;gap:6px"><input type="checkbox" data-aud="${r.id}" data-i="${i}" checked>${esc(auditName(r,o))}${r.scope==='char'&&(+o.genVer||0)<auditGenVer()?' <span class="muted">(구버전)</span>':''}</label>`).join('')}</div>
+      <button class="btn sm" data-act="audfix" data-rule="${r.id}">선택 항목 ${how[r.fix.mode]}</button></details>`).join(''):'<p>👍 찾은 문제가 없어요.</p>'}
+    <details class="panel" style="margin-top:10px" ${focus?'open':''}><summary><b>지정 변환 (AI)</b> <span class="muted">고른 ${esc(T('crew'))}의 항목을 지시대로 바꿔요</span></summary>
+      <label class="f">대상</label><div style="max-height:120px;overflow:auto;font-size:.85rem">${chars.map(c=>`<label style="display:inline-flex;gap:4px;margin:2px 8px 2px 0"><input type="checkbox" data-audc="${c.id}" ${focus?'checked':''}>${esc(c.name)}</label>`).join('')}</div>
+      <label class="f">항목</label><div class="row" style="flex-wrap:wrap">${Object.entries(AUDIT_FIELDS).map(([k,[l]])=>`<label style="display:inline-flex;gap:4px"><input type="checkbox" data-audf="${k}">${esc(l)}</label>`).join('')}</div>
+      <label class="f" for="aud_ins">지시</label><textarea class="in" id="aud_ins" rows="2" placeholder="예: 대사를 모두 반말로 / 프로필에 출신지와 좋아하는 음식 추가 / 외모 태그를 겨울 분위기로"></textarea>
+      <div class="row" style="margin-top:6px"><button class="btn sm" data-act="audconv">지정 변환 시작</button></div></details>
+    <div class="row" style="margin-top:12px">${AUDIT_JOB?'<button class="btn ghost" data-act="audstop">작업 멈추기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>`); }
+function auditPanel(){ const n=auditScan().reduce((a,x)=>a+x.items.length,0), fresh=(+G.meta.auditSeen||0)<auditVer();
+  return `<div class="panel pm-hide"><h3>콘텐츠 점검·업그레이드 ${fresh?'<span class="badge">생성 기능 향상</span>':''}</h3><p class="muted" style="margin:0 0 10px">${n?`고칠 수 있는 항목 ${n}개. `:''}빠진 대사·그림·태그, 구버전 생성물을 찾아 자동·AI로 고치거나, 고른 캐릭터를 지시대로 바꿔요.</p><button class="btn sm" data-act="audopen">점검 열기</button></div>`; }
+function auditNotice(){ try{ if((+G.meta.auditSeen||0)>=auditVer()||!P().seenOpening) return; const n=auditScan().reduce((a,x)=>a+x.items.length,0); if(n) toast(`생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 ${n}개를 업그레이드할 수 있어요`); }catch(e){} }
+setTimeout(auditNotice,6000);
+
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+  if(a==='audopen') openAudit(b.dataset.id||null);
+  else if(a==='audundo'){ auditUndo(); openAudit(AUDIT_FOCUS); }
+  else if(a==='audstop'){ if(AUDIT_JOB) AUDIT_JOB.stop=true; }
+  else if(a==='audfix'){ const r=AUDIT_RULES.find(x=>x.id===b.dataset.rule), g=r&&auditScan(AUDIT_FOCUS?(o=>o.id===AUDIT_FOCUS):null).find(x=>x.rule===r); if(!g) return;
+    const pick=[...document.querySelectorAll(`[data-aud="${r.id}"]`)].filter(x=>x.checked).map(x=>g.items[+x.dataset.i]).filter(Boolean); if(!pick.length){ toast('고칠 항목을 골라 주세요'); return; } auditFix(r,pick); }
+  else if(a==='audconv'){ const cs=[...document.querySelectorAll('[data-audc]:checked')].map(x=>charById(x.dataset.audc)).filter(Boolean), fs=[...document.querySelectorAll('[data-audf]:checked')].map(x=>x.dataset.audf); auditConvert(cs,fs,($('#aud_ins')||{}).value||''); } });

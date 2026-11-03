@@ -166,6 +166,12 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - 화면·상태 `src/main/0275-expedition.js`: 탭 `disp`가 `dispPageHTML()` → 전투형이면 기존 `dispHTML`, 아니면 `exHTML`. `exBusyIds`를 `busyIds`(0090)에 합쳐 일하는 캐릭터는 전투 불가. 설정 `openExSet`
 - 설계·수치: [research/expedition.md](research/expedition.md)
 
+## 8-3. 콘텐츠 점검·업그레이드
+
+- `src/main/0535-content-audit.js`: 규칙 `AUDIT_RULES`(감지 `test` + 고치기 `fix.mode`), `auditScan`, `auditFix`, 지정 변환 `auditConvert`, 되돌리기 `auditUndo`, 생성 버전 `auditGenVer()`(새 캐릭터 `cleanChar0`에서 `genVer`로 찍힘)
+- 기존 기능 재사용: `openRegen`, `runPrep`, `fixWeaponPrompts`, `v2ReadyChars`, `stripAge`
+- 설계·규칙 추가 방법: [research/content-audit.md](research/content-audit.md)
+
 ## 9. 성장 · 경제 · 콘텐츠
 
 - 성장(성장·성장 곡선 섹션): 레벨(최대 120, 71~ 초월승급), 돌파, 스킬 강화, 전용 무기, 호감도(`addAff`, 레벨별 대사·에피소드 해금). 비용 공식은 `GGMCombat.growthCost/limitBreakCost` 등.
