@@ -8,7 +8,7 @@
     "줄": 89,
     "중첩": 2
    },
-   "text": "buildNewGameDraft (src/main/0250-story-factory.js:231) 복잡도 150 · 89줄 · 중첩 2"
+   "text": "buildNewGameDraft (src/main/0250-story-factory.js:242) 복잡도 150 · 89줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|cbPlay",
@@ -188,7 +188,7 @@
     "줄": 28,
     "중첩": 2
    },
-   "text": "aiEventGen0 (src/main/0250-story-factory.js:170) 복잡도 55 · 28줄 · 중첩 2"
+   "text": "aiEventGen0 (src/main/0250-story-factory.js:181) 복잡도 55 · 28줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|buildManualGameDraft",
@@ -197,7 +197,7 @@
     "줄": 40,
     "중첩": 3
    },
-   "text": "buildManualGameDraft (src/main/0250-story-factory.js:321) 복잡도 55 · 40줄 · 중첩 3"
+   "text": "buildManualGameDraft (src/main/0250-story-factory.js:332) 복잡도 55 · 40줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|contractHTML0",
@@ -220,11 +220,11 @@
   {
    "key": "복잡한 함수|bEnd",
    "num": {
-    "복잡도": 51,
+    "복잡도": 49,
     "줄": 29,
     "중첩": 4
    },
-   "text": "bEnd (src/main/0490-boss-patterns.js:21) 복잡도 51 · 29줄 · 중첩 4"
+   "text": "bEnd (src/main/0490-boss-patterns.js:21) 복잡도 49 · 29줄 · 중첩 4"
   },
   {
    "key": "복잡한 함수|openLibItem",
@@ -440,7 +440,7 @@
     "줄": 7,
     "중첩": 7
    },
-   "text": "(최상위)→document.addEventListener @src/main/0445-factions.js (src/main/0445-factions.js:91) 복잡도 14 · 7줄 · 중첩 7"
+   "text": "(최상위)→document.addEventListener @src/main/0445-factions.js (src/main/0445-factions.js:93) 복잡도 14 · 7줄 · 중첩 7"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0275-expedition.js",
@@ -1251,7 +1251,7 @@
     "줄": 34,
     "중첩": 1
    },
-   "text": "(최상위)→p22.evaluate @build/test.mjs (build/test.mjs:498) 복잡도 42 · 34줄 · 중첩 1"
+   "text": "(최상위)→p22.evaluate @build/test.mjs (build/test.mjs:499) 복잡도 42 · 34줄 · 중첩 1"
   },
   {
    "key": "도구 빈 catch|build/test.mjs",

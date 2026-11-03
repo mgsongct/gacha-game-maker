@@ -531,6 +531,12 @@ try {
     tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="bsys"][data-k="sortie"]');
     return o; });
   assert.ok(Object.values(r22).every(v => v === true), JSON.stringify(r22)); assert.deepEqual(err22, [], '페이지 오류');
+  const r22b = await p22.evaluate(async () => { const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)), ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages.find(x => !x.story && x.enemies.length); appConfirm = async () => true; // 출격 중 후퇴·보스 패배
+    const fightAt = async node => { startBattle(ch.id, s.id); for (let i = 0; i < 50 && !SORTIE(); i++) await wait(100); SORTIE().node = node; sortieFight(); for (let i = 0; i < 50 && !B; i++) await wait(100); };
+    await fightAt('n1'); document.querySelector('[data-act="bquit"]').click(); for (let i = 0; i < 50 && B; i++) await wait(50); o.quitEnds = !B && !SORTIE(); // 지점 전투 중 후퇴 = 출격 퇴각
+    await fightAt('n3'); bEnd(false); o.bossLoss = !SORTIE() && !document.querySelector('.result [data-act="bretry"]') && !!document.querySelector('.result [data-act="bdone"]'); // 보스 패배는 출격 끝(행동력 없는 다시 도전 없음)
+    return o; });
+  assert.ok(Object.values(r22b).every(v => v === true), JSON.stringify(r22b));
   console.log('ok 22 대열·출격 경로: 근접은 전열만 공격·엄호·후열 회복(엔진), 사거리·편성 경고, 전초전→갈림길(지원형 조건)→보스, 체력 유지·진격·퇴각·이어 하기, 생성(route·range)·점검');
   // 23) 세력·몬스터·등장: 세력 종류·장별 관계(stance)·AI 컨텍스트, 깊이 점검·AI 채우기, 몬스터가 캐릭터·NPC로 생성되지 않음·톡 제외·전환, 첫 등장 전 픽업 잠금·적대 세력 잠금, 만나지 않은 보유 캐릭터 안내, 점검 규칙
   const p23 = await browser.newPage(), err23 = []; p23.on('pageerror', e => err23.push(String(e)));

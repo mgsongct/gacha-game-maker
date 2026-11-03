@@ -21,7 +21,7 @@ function bCheck(){
 function bEnd(win){
   if(B.ctx.kind==='practice'){v2StopPractice();return;}
   B.over=true; clearInterval(B.timer); try{ window.GGMVFX&&GGMVFX.clear(); }catch(e){} bUpdate(); bump('battle'); // 공격 중이던 카드·이펙트가 결과 화면 위에 남지 않게
-  if(B.ctx.sortie&&!B.ctx.boss){ const d=document.createElement('div');d.className='result';d.innerHTML=sortieNodeEnd(win);$('#ov > .bt').appendChild(d); return; } if(B.ctx.sortie) sortieEnd(); // 출격 경로(0487)
+  const so=sortieResult(win); if(so!==null){ const d=document.createElement('div');d.className='result';d.innerHTML=so;$('#ov > .bt').appendChild(d); return; } // 출격 경로(0487)
   if(B.ctx.kind==='raid'||B.ctx.kind==='rogue'||B.ctx.kind==='tower'){ const html=B.ctx.kind==='raid'?raidEnd(win):B.ctx.kind==='tower'?towerEnd(win):rogueEnd(win); const d=document.createElement('div');d.className='result';d.innerHTML=html;$('#ov > .bt').appendChild(d); return; }
   const s=B.s, kind=B.ctx.kind; let html;
   if(win){

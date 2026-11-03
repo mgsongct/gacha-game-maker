@@ -68,7 +68,7 @@ case 'vnauto': e.stopPropagation(); S.auto=!S.auto; t.classList.toggle('on',S.au
 case 'vnskip': e.stopPropagation(); vnSkip(); break;
 case 'vnlog': e.stopPropagation(); openModal(`${head('대화 기록')}${S.log.map(L=>`<p style="margin:6px 0">${L.type==='say'?`<b>${esc(isMe(L.who)?playerName():L.who)}</b> ${esc(sub(L.text))}`:L.type==='place'?`<span class="muted">[${esc(L.text)}]</span>`:`<i class="muted">${esc(sub(L.text))}</i>`}</p>`).join('')}`); break;
 case 'bquit': if(B?.ctx.kind==='practice'){v2StopPractice();break;}if(B&&(B.ctx.kind==='raid'||B.ctx.kind==='rogue')){ if((await appConfirm(B.ctx.kind==='raid'?'여기서 끝낼까요? 지금까지 준 피해는 기록돼요.':'후퇴하면 이번 탐사가 끝나요. 지금까지의 보상은 받아요.'))){ if(!B.over) bEnd(false); } break; }
-      if((await appConfirm('후퇴할까요? 보상은 받을 수 없어요.'))){clearInterval(B.timer);B=null;closeOv();render();} break;
+      if((await quitConfirm())){clearInterval(B.timer);B=null;closeOv();render();} break;
 case 'skill': { const u=B&&B.allies[+t.dataset.i]; if(u&&u.hp>0&&!B.over){ SCUT_MAN=true; useSkill(u); SCUT_MAN=false; } bUpdate(); break; }
 case 'bretry': { const st=B.s,cx=B.ctx; B=null; startStage(st,cx); break; }
 case 'flip': revealCard(+t.dataset.i); break;

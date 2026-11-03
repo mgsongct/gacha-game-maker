@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.28'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.29'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -12393,6 +12393,10 @@ function sortieNodeEnd(win){ const x=sortieParts(); if(!x) return ''; const {run
   const g=rateR({gold:400+120*run.path.length}), xp=expR(30); giveReward(g); run.gained.gold+=g.gold||0; run.gained.exp+=xp; B.allies.forEach(u=>{ const o=own(u.c.id); if(o) gainExp(o,xp); }); run.path.push(run.node); mark('prog'); sfx('승리');
   return `<h2 class="disp" style="color:var(--rose);margin:0">${esc(nodeById(x.R,run.node).name)} 돌파</h2><p>${rewardText(g)} · 경험치 +${xp}</p><button class="btn" data-act="somap">경로로</button>`; }
 function sortieEnd(){ P().sortie=null; mark('prog'); }
+// 출격 전투가 끝났을 때 결과 화면(bEnd가 부름, 출격이 아니면 null): 지점 승패·보스 패배는 출격 결과(패배하면 출격 끝 — 행동력 없이 "다시 도전"하던 것 막음), 보스 승리는 출격을 닫고 보통 클리어 화면
+function sortieResult(win){ if(!B.ctx.sortie) return null; if(B.ctx.boss&&win){ sortieEnd(); return null; } return sortieNodeEnd(win); }
+// 전투 중 "후퇴": 출격 지점 전투면 출격 퇴각(지금까지 얻은 골드·경험치는 이미 받음). 예전엔 전투만 닫혀 출격이 남아 같은 지점을 행동력 없이 다시 도전할 수 있었음
+async function quitConfirm(){ const so=!!B.ctx.sortie; if(!(await appConfirm(so?'퇴각하면 이번 출격이 끝나요. 지금까지 얻은 골드·경험치는 받아요.':'후퇴할까요? 보상은 받을 수 없어요.'))) return false; if(so) sortieEnd(); return true; }
 function battleSysPanel(){ const r=G.meta.rules||{}; return `<div class="panel pm-hide"><h3>전투 체계</h3><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-act="bsys" data-k="formation" ${formOn()?'checked':''}>대열 (근접·원거리·지원, 전열이 후열을 지킴)</label><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-act="bsys" data-k="sortie" ${sortieOn()?'checked':''}>출격 경로 (지점마다 진격·퇴각, 갈림길, 체력 유지)</label><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-act="bsmode" data-k="debate" ${modesCfg().debate?'checked':''}>회담 스테이지 (주장·증거·설득) — 새 스토리 생성에 섞기</label><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-act="bsmode" data-k="contest" ${modesCfg().contest?'checked':''}>콘테스트 스테이지 (매력 어필) — 새 스토리 생성에 섞기</label></div>`; }
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
   if(a==='bsys'){ G.meta.rules=G.meta.rules||{}; G.meta.rules[el.dataset.k]=el.checked; mark('meta'); }
@@ -12507,7 +12511,7 @@ function bCheck(){
 function bEnd(win){
   if(B.ctx.kind==='practice'){v2StopPractice();return;}
   B.over=true; clearInterval(B.timer); try{ window.GGMVFX&&GGMVFX.clear(); }catch(e){} bUpdate(); bump('battle'); // 공격 중이던 카드·이펙트가 결과 화면 위에 남지 않게
-  if(B.ctx.sortie&&!B.ctx.boss){ const d=document.createElement('div');d.className='result';d.innerHTML=sortieNodeEnd(win);$('#ov > .bt').appendChild(d); return; } if(B.ctx.sortie) sortieEnd(); // 출격 경로(0487)
+  const so=sortieResult(win); if(so!==null){ const d=document.createElement('div');d.className='result';d.innerHTML=so;$('#ov > .bt').appendChild(d); return; } // 출격 경로(0487)
   if(B.ctx.kind==='raid'||B.ctx.kind==='rogue'||B.ctx.kind==='tower'){ const html=B.ctx.kind==='raid'?raidEnd(win):B.ctx.kind==='tower'?towerEnd(win):rogueEnd(win); const d=document.createElement('div');d.className='result';d.innerHTML=html;$('#ov > .bt').appendChild(d); return; }
   const s=B.s, kind=B.ctx.kind; let html;
   if(win){
@@ -12925,7 +12929,7 @@ case 'vnauto': e.stopPropagation(); S.auto=!S.auto; t.classList.toggle('on',S.au
 case 'vnskip': e.stopPropagation(); vnSkip(); break;
 case 'vnlog': e.stopPropagation(); openModal(`${head('대화 기록')}${S.log.map(L=>`<p style="margin:6px 0">${L.type==='say'?`<b>${esc(isMe(L.who)?playerName():L.who)}</b> ${esc(sub(L.text))}`:L.type==='place'?`<span class="muted">[${esc(L.text)}]</span>`:`<i class="muted">${esc(sub(L.text))}</i>`}</p>`).join('')}`); break;
 case 'bquit': if(B?.ctx.kind==='practice'){v2StopPractice();break;}if(B&&(B.ctx.kind==='raid'||B.ctx.kind==='rogue')){ if((await appConfirm(B.ctx.kind==='raid'?'여기서 끝낼까요? 지금까지 준 피해는 기록돼요.':'후퇴하면 이번 탐사가 끝나요. 지금까지의 보상은 받아요.'))){ if(!B.over) bEnd(false); } break; }
-      if((await appConfirm('후퇴할까요? 보상은 받을 수 없어요.'))){clearInterval(B.timer);B=null;closeOv();render();} break;
+      if((await quitConfirm())){clearInterval(B.timer);B=null;closeOv();render();} break;
 case 'skill': { const u=B&&B.allies[+t.dataset.i]; if(u&&u.hp>0&&!B.over){ SCUT_MAN=true; useSkill(u); SCUT_MAN=false; } bUpdate(); break; }
 case 'bretry': { const st=B.s,cx=B.ctx; B=null; startStage(st,cx); break; }
 case 'flip': revealCard(+t.dataset.i); break;
