@@ -1,0 +1,112 @@
+[
+ {
+  "name": "ok",
+  "desc": "정상 응답",
+  "saved": true,
+  "calls": 20,
+  "skillCalls": 16,
+  "commitAtCall": 12,
+  "draftKept": false,
+  "toasts": [],
+  "toastRepeats": 0,
+  "pageErrors": 0,
+  "title": "시험등대",
+  "plot": "등불단이 꺼져 가는 대등대를 다시 밝히려 한다.",
+  "factions": "등불단, 검은 조류, 심해의 것",
+  "chars": "하나(atk,3) 두리(def,2) 세찌(sup,2) 네오(atk,1)",
+  "skillPending": 4
+ },
+ {
+  "name": "badjson_world",
+  "desc": "세계관 응답이 계속 JSON이 아님",
+  "saved": false,
+  "calls": 6,
+  "skillCalls": 0,
+  "commitAtCall": null,
+  "draftKept": false,
+  "toasts": [
+   "AI 응답을 읽지 못했어요. 다시 시도해 주세요.",
+   "생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 104개를 업그레이드할 수 있어요"
+  ],
+  "toastRepeats": 2,
+  "pageErrors": 0
+ },
+ {
+  "name": "thinworld",
+  "desc": "세계관 응답에 플롯·설정·세력이 없음",
+  "saved": true,
+  "calls": 16,
+  "skillCalls": 12,
+  "commitAtCall": 13,
+  "draftKept": false,
+  "toasts": [],
+  "toastRepeats": 0,
+  "pageErrors": 0,
+  "title": "시험등대",
+  "plot": "1부의 축: 헬릭스는 분화구 아래 잠든 \"첫 번째 별\"을 깨워 성핵을 무",
+  "factions": "새벽등대, 헬릭스 컨소시엄, 잔광, 회색구 시민회, 회색구 연합, 등불단",
+  "chars": "하나(atk,3) 두리(def,2) 세찌(sup,2) 네오(atk,1)",
+  "skillPending": 4
+ },
+ {
+  "name": "fewchars",
+  "desc": "대원 4명 요청에 3명(이름 중복·없는 역할·등급 9·80자 이름·모르는 세력·빈 프로필)",
+  "saved": true,
+  "calls": 13,
+  "skillCalls": 9,
+  "commitAtCall": 11,
+  "draftKept": false,
+  "toasts": [],
+  "toastRepeats": 0,
+  "pageErrors": 0,
+  "title": "시험등대",
+  "plot": "등불단이 꺼져 가는 대등대를 다시 밝히려 한다.",
+  "factions": "등불단, 검은 조류, 심해의 것, 없는세력",
+  "chars": "하나(atk,1) 하나(atk,3) 가가가가가가가가가가(def,2)",
+  "skillPending": 3
+ },
+ {
+  "name": "nochapter",
+  "desc": "1장 응답이 빈 객체",
+  "saved": false,
+  "calls": 18,
+  "skillCalls": 12,
+  "commitAtCall": null,
+  "draftKept": true,
+  "toasts": [
+   "생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 104개를 업그레이드할 수 있어요"
+  ],
+  "toastRepeats": 0,
+  "pageErrors": 0
+ },
+ {
+  "name": "opening_timeout",
+  "desc": "오프닝 요청 시간 초과(504)",
+  "saved": false,
+  "calls": 17,
+  "skillCalls": 12,
+  "commitAtCall": null,
+  "draftKept": true,
+  "toasts": [
+   "AI 호출에 실패했어요. (서버: (504) upstream timeout)",
+   "생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 104개를 업그레이드할 수 있어요"
+  ],
+  "toastRepeats": 2,
+  "pageErrors": 0
+ },
+ {
+  "name": "chars_network",
+  "desc": "대원 요청 서버 오류(500)",
+  "saved": false,
+  "calls": 4,
+  "skillCalls": 0,
+  "commitAtCall": null,
+  "draftKept": true,
+  "toasts": [
+   "AI 호출에 실패했어요. (서버: (500) internal error)",
+   "생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 104개를 업그레이드할 수 있어요"
+  ],
+  "toastRepeats": 2,
+  "pageErrors": 0
+ }
+]

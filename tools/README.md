@@ -12,6 +12,8 @@ node tools/test.mjs             # 도구 자체 검사
 node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(기본은 미리 보기, 지운 뒤 생긴 것까지 되풀이)
 ```
 
+생성 기능과 **생성된 게임**의 QA·플레이 점검(브라우저로 실제 앱을 돌림)은 [play/README.md](play/README.md): `generate.mjs`(글 AI 응답을 파일로 주고받으며 게임 생성·재생) · `qa.mjs` · `shots.mjs` · `faults.mjs` · `test.mjs`.
+
 ## 무엇을 보나
 
 | 분석 | 방법 | 결과 |

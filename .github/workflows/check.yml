@@ -15,3 +15,4 @@ jobs:
       - run: npm ci --prefix tools --no-audit --no-fund   # 정적분석 도구(tree-sitter·ast-grep)
       - run: node tools/test.mjs           # 점검 도구 자체 검사(심어 둔 문제를 잡는지)
       - run: node tools/check.mjs --strict # 자기점검: 파싱 오류·이름 충돌·처리기 없는 액션이 있으면 실패, 보고서는 tools/out/
+      - run: node tools/play/test.mjs      # 생성·QA·플레이 도구 자체 검사(playwright가 없으면 건너뜀)
