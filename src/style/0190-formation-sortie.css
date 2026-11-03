@@ -1,0 +1,19 @@
+/* 대열·출격 경로(main/0487) */
+.au.row-back{transform:translateY(-10px) scale(.94);opacity:.96}
+.au .rg,.fslot .rgi{position:absolute;right:4px;top:4px;z-index:3;font-size:.75rem;font-style:normal;background:#0009;color:#fff;border-radius:6px;padding:0 5px}
+.eu.row-back{transform:scale(.9);opacity:.92}
+.fslot{position:relative}.fslot.rowbad{outline:2px dashed #ff9f43;outline-offset:-2px}
+.fslot .rww{position:absolute;left:2px;right:2px;bottom:38%;z-index:3;font-size:.6rem;font-style:normal;background:#ff9f43;color:#111;border-radius:4px;padding:1px 3px;text-align:center}
+.so-map{display:flex;align-items:center;gap:6px;margin:10px 0}
+.so-col{flex:1;display:flex;flex-direction:column;gap:6px}
+.so-arrow{font-style:normal;opacity:.6;font-size:1.4rem}
+.so-node{padding:8px;border-radius:10px;border:1px solid var(--line,#ffffff22);background:var(--card,#ffffff0d);font-size:.8rem}
+.so-node b{display:block}.so-node span{opacity:.75;font-size:.72rem}
+.so-node.here{border-color:var(--gold,#ffd166);box-shadow:0 0 0 2px #ffd16655}
+.so-node.past{opacity:.5}
+.so-node.k-boss{border-color:#ff5277}
+.so-sq{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.so-u{font-size:.75rem;padding:6px;border-radius:8px;background:var(--card,#ffffff0d)}
+.so-u .hpb{display:block;height:5px;background:#ffffff22;border-radius:3px;margin:3px 0}.so-u .hpb i{display:block;height:100%;background:#5ce08a;border-radius:3px}
+.so-u.crit .hpb i{background:#ff9f43}.so-u.down{opacity:.45}
+.so-warn{color:#ff9f43;font-size:.8rem;margin:6px 0 0}.so-msg{margin:0 0 6px;color:var(--gold,#ffd166)}

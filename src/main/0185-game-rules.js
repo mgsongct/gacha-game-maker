@@ -32,7 +32,7 @@ function rulesElemMat(){ const r=RULESM(), E=G.meta.elems.map(e=>e.n), b=rulesBe
   E.forEach(a=>{ m[a]={}; E.forEach(t=>{ const o=g[a]&&g[a][t]; m[a][t]=+o>0?+o:b[a]===t?adv:b[t]===a?dis:1; }); }); return m; }
 function rulesOptions(){ const r=G.meta.rules||{}, P={}, seen=new Set();
   POSITIONS().forEach(p=>{ const t=p.t||{}; if(Object.values(t).some(v=>+v)) P[p.id]=t; if(!seen.has(p.base)){ seen.add(p.base); if(P[p.id]) P['role:'+p.base]=t; } });
-  return {elemAdv:+r.elemAdv||1.5,elemDis:+r.elemDis||.75,elemMat:rulesElemMat(),reactions:Array.isArray(r.reactions)?r.reactions.filter(x=>x&&x.a&&x.b):[],aura:+r.aura||4,positions:P,synergy:r.synergy||null,rel:Array.isArray(r.rel)?r.rel:[],...(typeof balanceOptions==='function'?balanceOptions():{})}; } // 밸런스 AS 전투 보정(0187)
+  return {formation:r.formation!==false,elemAdv:+r.elemAdv||1.5,elemDis:+r.elemDis||.75,elemMat:rulesElemMat(),reactions:Array.isArray(r.reactions)?r.reactions.filter(x=>x&&x.a&&x.b):[],aura:+r.aura||4,positions:P,synergy:r.synergy||null,rel:Array.isArray(r.rel)?r.rel:[],...(typeof balanceOptions==='function'?balanceOptions():{})}; } // 밸런스 AS 전투 보정(0187)
 const rulesPct=x=>`×${Math.round(x*100)/100}`;
 function rulesElemLine(e){ const m=rulesElemMat()[e]||{}, strong=Object.keys(m).filter(t=>m[t]>1), weak=Object.keys(m).filter(t=>(rulesElemMat()[t]||{})[e]>1);
   return [strong.length?`${strong.map(t=>`<b>${esc(t)}</b>`).join('·')}에 강함(${strong.map(t=>rulesPct(m[t])).join('·')})`:'',weak.length?`${weak.map(t=>`<b>${esc(t)}</b>`).join('·')}에 약함`:''].filter(Boolean).join(' · ')||'상성 없음'; }
@@ -67,7 +67,7 @@ function openRules(keep){ if(!keep||!RD) RD=rulesDraft(); const R=RD, D=R.D, E=R
   <button class="btn sm ghost" data-act="rulesadd" data-k="reaction">+ 반응 추가</button>
   <h3 class="sec" style="margin-top:14px">포지션 <span class="muted" style="font-size:.8rem">(직군·함종 등)</span></h3><p class="muted" style="font-size:.8rem;margin:0 0 6px">포지션마다 전투 기본형(공격·방어·지원 — 스킬 생성과 AI 행동)을 고르고 기능을 얹어요. 위협도가 높으면 적이 더 노리고, 낮으면 덜 노려요.</p>
   <div class="row" style="flex-wrap:wrap;gap:4px;margin-bottom:6px"><button class="btn sm ghost" data-act="rulespreset" data-k="basic">기본 3</button><button class="btn sm ghost" data-act="rulespreset" data-k="squad8">직군형 8 (선봉·근접·방벽·사수·술사·의무·보조·특수)</button><button class="btn sm ghost" data-act="rulespreset" data-k="ship6">함종형 6 (구축·경순·중순·전함·항모·잠수)</button><button class="btn sm ghost" data-act="rulesposai">AI로 세계관에 맞게 설계</button></div>
-  ${R.positions.map((p,i)=>`<div class="panel" style="padding:8px;margin:6px 0"><div class="row" style="gap:6px;flex-wrap:wrap;align-items:center">${txt(`p.${i}.name`,p.name,'이름','max-width:90px')}${sel(`p.${i}.base`,p.base,Object.keys(ROLE).map(k=>[k,ROLE[k]+'형']),90)}${txt(`p.${i}.desc`,p.desc,'기능 설명','flex:1;min-width:120px')}${R.positions.length>1?`<button class="btn sm ghost" data-act="rulesrdel" data-k="positions" data-i="${i}">삭제</button>`:''}</div>
+  ${R.positions.map((p,i)=>`<div class="panel" style="padding:8px;margin:6px 0"><div class="row" style="gap:6px;flex-wrap:wrap;align-items:center">${txt(`p.${i}.name`,p.name,'이름','max-width:90px')}${sel(`p.${i}.base`,p.base,Object.keys(ROLE).map(k=>[k,ROLE[k]+'형']),90)}${sel(`p.${i}.range`,p.range||'',[['','사거리 자동'],...Object.entries(RANGE)],100)}${txt(`p.${i}.desc`,p.desc,'기능 설명','flex:1;min-width:120px')}${R.positions.length>1?`<button class="btn sm ghost" data-act="rulesrdel" data-k="positions" data-i="${i}">삭제</button>`:''}</div>
     <div class="g4" style="margin-top:4px">${POS_TRAITS.map(([k,l])=>`<div><label class="f" style="font-size:.72rem">${l}</label>${num(`p.${i}.t.${k}`,(p.t||{})[k],'0')}</div>`).join('')}</div></div>`).join('')}
   <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm ghost" data-act="rulesadd" data-k="pos">+ 포지션 추가</button><button class="btn sm ghost" data-act="rulesposassign">${esc(T('crew'))} 포지션 자동 배정</button></div>
   <h3 class="sec" style="margin-top:14px">전투 기본형 능력치</h3><p class="muted" style="font-size:.8rem;margin:0 0 6px">새로 만드는 ${esc(T('crew'))}의 R 기준 기본 능력치·속도(포지션 기능 % 적용 전).</p>
@@ -133,7 +133,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); i
   else if(a==='rulesposai') rulesPosAI(b);
   else if(a==='rulesrecalc') rulesRecalc();
   else if(a==='rulesposassign'){ rulesPosAssign(); }
-  else if(a==='rulespreset'){ rulesRead(); RD.positions=POS_PRESETS[b.dataset.k].map(([name,base,desc,t])=>({id:'p_'+uid(),name:b.dataset.k==='basic'?ROLE[base]:name,base,desc,t:{...t}})); openRules(true); }
+  else if(a==='rulespreset'){ rulesRead(); RD.positions=POS_PRESETS[b.dataset.k].map(([name,base,desc,t])=>({id:'p_'+uid(),name:b.dataset.k==='basic'?ROLE[base]:name,base,desc,t:{...t},range:POS_RANGE[b.dataset.k==='basic'?ROLE[base]:name]||''})); openRules(true); }
   else if(a==='rulesadd'){ rulesRead(); const k=b.dataset.k, E=RD.elems.map(x=>x.n);
     if(k==='elem'&&RD.elems.length<8){ let n='속성'+(RD.elems.length+1); RD.elems.push({n,c:'#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0'),d:'',orig:'',beat:''}); }
     else if(k==='reaction') RD.reactions.push({a:E[0],b:E[1],name:'반응',type:'amp',value:1.5});

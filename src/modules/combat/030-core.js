@@ -573,7 +573,7 @@ function* inspectEquipment(character,option,options={}){
 }
 
 function create(allies,enemies,options={}){
- const sim={allies,enemies,time:0,ticks:0,random:rng(options.seed||1),visualRandom:rng((options.seed||1)^0x5f3759df),beats:options.beats||{},elemAdv:+options.elemAdv||1.5,elemDis:+options.elemDis||.75,rel:Array.isArray(options.rel)?options.rel:[],elemMat:options.elemMat||null,reactions:Array.isArray(options.reactions)?options.reactions:[],aura:+options.aura||4,positions:options.positions||{},elems:options.elems||['홍','청','녹'],events:[],winner:null,auto:true,practice:options.practice===true,maxTime:options.practice===true?Infinity:options.maxTime||119,revivals:0,pending:[],depth:0,timedImpacts:options.timedImpacts===true,externalImpacts:options.externalImpacts===true,impactJobs:[],impactSeq:0};
+ const sim={allies,enemies,time:0,ticks:0,random:rng(options.seed||1),visualRandom:rng((options.seed||1)^0x5f3759df),beats:options.beats||{},elemAdv:+options.elemAdv||1.5,elemDis:+options.elemDis||.75,rel:Array.isArray(options.rel)?options.rel:[],elemMat:options.elemMat||null,reactions:Array.isArray(options.reactions)?options.reactions:[],aura:+options.aura||4,positions:options.positions||{},elems:options.elems||['홍','청','녹'],events:[],winner:null,auto:true,practice:options.practice===true,maxTime:options.practice===true?Infinity:options.maxTime||119,revivals:0,pending:[],depth:0,timedImpacts:options.timedImpacts===true,externalImpacts:options.externalImpacts===true,impactJobs:[],impactSeq:0,formation:options.formation===true};
  for(const [side,team] of [['a',allies],['e',enemies]])team.forEach((u,i)=>{
   u.side=side;u.slot=i;u.trainingDummy=sim.practice&&side==='e';u.maxhp=clamp(u.maxhp||u.hp,1,1e10,1000);u.hp=clamp(u.hp,0,u.maxhp,u.maxhp);u.atk=clamp(u.atk,1,1e8,100);u.def=clamp(u.def,0,1e8,50);u.spd=clamp(u.spd,10,300,100);u.mul=clamp(u.mul,.1,3,1);
   u.baseMaxhp=u.maxhp;u.baseElem=u.elem;u.faction=u.faction||u.c?.faction||'';
@@ -582,7 +582,7 @@ function create(allies,enemies,options={}){
   u.meleeGroup=null;u.meleeUntil=0;u.meleeDelay=0;u.lastInvincibleAt=-Infinity;u.invincibilityReadyAt=-Infinity;u.lastDamageDealt=0;u.lastDamageTaken=0;u.lastHealing=0;u.lastBlocked=0;
   for(const slot of Object.keys(SLOTS))u.ready[slot]=slot==='ultimate'?0:u.kit[slot].initial;
  });
- positionTraits(sim); genBoost(sim,options.genBoost); synergy(sim,options.synergy);
+ formationSetup(sim); positionTraits(sim); genBoost(sim,options.genBoost); synergy(sim,options.synergy);
  outcome(sim);for(const u of [...allies,...enemies])if(['battle_start','always'].includes(u.kit.passive.trigger))cast(sim,u,'passive');
  outcome(sim);return sim;
 }
@@ -637,7 +637,17 @@ function sorted(sim,list,e){
  if(p==='무작위'){for(let i=a.length-1;i>0;i--){const j=Math.floor(sim.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
  return a.sort((x,y)=>value(y)-value(x)||x.slot-y.slot);
 }
-function weighted(sim,pool){const taunts=pool.filter(t=>amount(t,'taunt')>0),focus=pool.filter(t=>amount(t,'focus')>0),a=taunts.length?taunts:focus.length?focus:pool;const weight=t=>(t.role==='def'?3:1)*(t.slot<2?2:1)*Math.max(.1,1+amount(t,'threat')/100)*Math.max(.1,1+(t.posT?.threat||0)/100);let r=sim.random()*a.reduce((n,t)=>n+weight(t),0);for(const t of a){r-=weight(t);if(r<=0)return [t];}return a.slice(-1);}
+// 대열(options.formation): 근접 공격은 전열이 살아 있으면 전열만 노림(후열 보호), 원거리·지원은 누구든 노리지만 후열을 노리면 전열 방어형이 30% 확률로 엄호
+function weighted(sim,pool,u){let a0=pool;if(sim.formation&&u){const front=pool.filter(t=>t.row==='front');if(u.range==='melee'&&front.length)a0=front;}
+ const taunts=a0.filter(t=>amount(t,'taunt')>0),focus=a0.filter(t=>amount(t,'focus')>0),a=taunts.length?taunts:focus.length?focus:a0;const weight=t=>(t.role==='def'?3:1)*((sim.formation?t.row==='front':t.slot<2)?2:1)*Math.max(.1,1+amount(t,'threat')/100)*Math.max(.1,1+(t.posT?.threat||0)/100);let r=sim.random()*a.reduce((n,t)=>n+weight(t),0);let pick=a.slice(-1);for(const t of a){r-=weight(t);if(r<=0){pick=[t];break;}}
+ if(sim.formation&&u&&pick[0]&&pick[0].row==='back'){const guard=pool.find(t=>t.row==='front'&&t.role==='def'&&t.hp>0);if(guard&&sim.random()<.3){emit(sim,{type:'status',source:guard,target:guard,label:'엄호'});return [guard];}}
+ return pick;}
+// 대열 배치: 아군은 슬롯 0·1 전열, 2·3 후열(2명 이하면 모두 전열). 적은 근접·보스가 전열, 원거리·지원이 후열(근접이 없으면 모두 전열)
+function rangeOf(u){if(['melee','ranged','support'].includes(u.range))return u.range;if(u.role==='sup')return 'support';if(u.role==='def'||u.boss)return 'melee';return isRanged({...u,role:'atk',side:'a'})?'ranged':'melee';}
+function formationSetup(sim){for(const team of [sim.allies,sim.enemies]){team.forEach(u=>{u.range=rangeOf(u);});
+ if(team===sim.allies)team.forEach((u,i)=>{u.row=team.length<=2||i<2?'front':'back';});else{const anyMelee=team.some(u=>u.range==='melee');team.forEach(u=>{u.row=!anyMelee||u.range==='melee'?'front':'back';});}}}
+// 대열 배율: 후열 근접 일반 공격 ×0.7(거리), 후열 원거리 ×1.1, 전열의 원거리·지원이 받는 피해 ×1.25, 전열 방어형이 받는 피해 ×0.9
+function rowMul(sim,u,t,o){if(!sim.formation||o.fixed||o.periodic)return 1;let m=1;if(u.row==='back'&&u.range==='melee'&&o.basic)m*=.7;if(u.row==='back'&&u.range==='ranged')m*=1.1;if(t.row==='front'&&t.range!=='melee')m*=1.25;if(t.row==='front'&&t.role==='def')m*=.9;return m;}
 function targets(sim,u,e){
  const [friends,foes]=teams(sim,u),a=living(friends),confused=amount(u,'confuse')>0,b=confused?living(friends.filter(x=>x!==u)):living(foes);
  const one=list=>sorted(sim,list,e).slice(0,1),fallback=t=>t?.hp>0?[t]:e.fallback==='남은 효과 종료'?[]:one(e.target==='last_healed'?a:b);
@@ -649,7 +659,7 @@ function targets(sim,u,e){
  case 'marked_enemies':return b.filter(t=>markCount(t,e.mark||e.conditionMark||'낙인',u,e.owner==='아군끼리 공유')>0);
  case 'same_element':return a.filter(t=>t.elem===u.elem);case 'same_faction':return a.filter(t=>t.faction===u.faction);
  case 'role_allies':return a.filter(t=>t.role===({'공격형':'atk','방어형':'def','지원형':'sup'}[e.role]||e.role));case 'slot_ally':return a.filter(t=>t.slot===e.slot-1);
- default:return e.priority?one(b):weighted(sim,b);
+ default:return e.priority?one(b):weighted(sim,b,u);
  }
 }
 function emit(sim,event){if(sim.events.length<256)sim.events.push(event);}
@@ -685,6 +695,7 @@ function damage(sim,u,t,value,trueDamage=false,react=true,options={}){
  let multiplier=options.fixed?1:1+(bonus(u,'주는 피해')+bonus(u,options.basic?'일반 공격 피해':options.slot==='ultimate'?'필살기 피해':options.slot==='active'?'액티브 피해':'')+(el>1?bonus(u,'약점 공격 피해'):0))/100;
  if(options.basic)multiplier*=1+amount(u,'basic')/100;
  if(!options.fixed)multiplier*=Math.max(0,1+(u.posT?.dmg||0)/100)*Math.max(0,1+(t.posT?.taken||0)/100); // 포지션: 주는·받는 피해
+ multiplier*=rowMul(sim,u,t,options); // 대열
  const rx=reactHit(sim,u,t,options); // 속성 반응
  let d=options.raw??stat(u,'atk')*u.mul*value;
  if(!options.periodic&&!options.fixed)d*=el*rx.mul*(crit?Math.max(1,1.5+bonus(u,'치명타 피해')/100):1)*(.9+sim.random()*.2);
@@ -716,7 +727,7 @@ function heal(sim,u,t,h,react=true,visual=null){
   queueImpact(sim,u,t,visual.slot,visual,false,job=>heal(sim,u,t,h,react,{...visual,landed:true,intentStyle:job.plan.style}));return 0;
  }
  if(t.hp<=0||amount(t,'noheal')>0)return 0;
- h=Math.max(0,Math.round(h*Math.max(.1,1+(bonus(u,'주는 회복량')+(u.posT?.heal||0))/100)*Math.max(.1,1+bonus(t,'받는 회복량')/100)));
+ h=Math.max(0,Math.round(h*Math.max(.1,1+(bonus(u,'주는 회복량')+(u.posT?.heal||0))/100)*Math.max(.1,1+bonus(t,'받는 회복량')/100)*(sim.formation&&u.row==='back'&&u.range==='support'?1.2:1))); // 대열: 후열 지원형 회복 +20%
  const n=Math.min(t.maxhp-t.hp,h),over=h-n;t.hp+=n;u.healing+=n;u.lastHealing=n;u.lastHealed=t;record(u,'실제 회복량',n);emit(sim,{type:'heal',source:u,target:t,value:n,visual});
  for(const s of t.status.filter(s=>s.type==='overheal'))if(over>0){const value=Math.min(s.cap,over*s.value/100);addStatus(sim,s.source,t,{...s.effect,type:'shield',basis:'고정 수치',value},s.slot,value);emit(sim,{type:'visualProc',source:s.source,target:t,visual:{kind:'overheal',phase:'convert'}});}
  if(react&&n>0){proc(sim,u,'heal_given',{target:t});proc(sim,t,'heal_received',{target:t});}return n;
@@ -908,7 +919,7 @@ function* balanceEncounter(enemies,level,options={}){
  best.report.searchTrials=72;best.report.targetReached=best.report.winRate>=.5&&best.report.winRate<=.75;return best;
 }
 function prompt(){return `스킬 JSON은 skills:{version:2,passive,active,ultimate}. 슬롯은 {name,description,cooldown,initial,trigger,triggerEvery,threshold,triggerMark,limit,lockout,auto,fx,color,effects:[...]}. 시간은 초 기준, active는 interval,after_basic,on_hit,attack_hit,critical,hp_below 중 선택. ultimate는 SP100 충전 발동. passive 조건 ${JSON.stringify(TRIGGERS)}. 추가 효과 sp는 studio:false, value1~30 SP를 아군에게 회복. AI 효과 1~3개, 단순한 주효과와 보조효과만. 무한 자원/피해 비례 증폭/기록 연계 금지. ${JSON.stringify(Studio.EFFECTS)}. 효과 기본 형식 ${JSON.stringify(defaultEffect())}. target ${JSON.stringify(TARGETS)}, priority ${JSON.stringify(Studio.PRIORITY)}, condition ${JSON.stringify(CONDITIONS)}, basis ${JSON.stringify(Studio.BASIS)}, stat ${JSON.stringify(Studio.STATS)}. studio:true 필수, value는 기준값의 백분율(고정 수치 기준이면 절대값). duration .1~180초, chance1~100, stacks1~99,hits1~30, interval .1~180초, cooldown .17~180초(패시브0가능). skillSlot은 액티브|필살기|액티브와 필살기. replace는 sourceSlot passive|active|ultimate에서 대상 슬롯과 다른 하나를 선택. mark/record/mode 이름과 조건 이름을 일치시켜 연계. 공격은 적, 지원은 아군 대상. BURST는 제거됐으므로 생성 금지. 예시 ${JSON.stringify(defaults())}`;}
-const api={GROWTH_COST_MULTIPLIER,growthCost,levelExperience,limitBreakCost,equipmentUpgradeCost,AFFINITY,migrateGrowthProgress,CHARACTER_BASE_STATS,RARITY_STAT_MUL,ROLE_SPEED,RULE_DEFAULTS,applyRules,relMul,generateBaseStats,baseStats,migrateBaseStats,IMPACT,FLIGHT_MS,isRanged,physicalStyle,UX_COLOR_RULES,paletteRuleForEffect,effectPalette,skillPaletteDecision,skillPalette,nearestPaletteColor,paletteSources,impactPlan,landImpact,endpointGrowthKind,trainingChanges,trainingFingerprint,invincibilityGrowth,INVINCIBILITY,TRAINING,trainingState,trainingLevel,trainingPlan,trainedSkill,trainedKit,trainingInitialSP,EQUIPMENT_MODS,equipmentSkillSignature,equipmentChoices,equipmentValidate,equipmentBind,equipmentDraft,equipmentState,equipmentDescription,inspectEquipment,Visuals,skillVisual,FX_TYPES,FX_COLORS,roleSpeed,conceptText,isHealer,AI_EFFECT_LIMITS,aiLimits,aiRole,aiRecipes,aiDesign,GENERATIONS,generation,slotCost,aiPolicy,generationDefaults,SP,gainSP,VERSION,RULESET,DT,SLOTS,TARGETS,TRIGGERS,CONDITIONS,EFFECTS,Studio,OFFENSIVE,effectSpec,defaultEffect,isSilenced,targets,conditionPass,basisValue,clone,normalize,validate,defaults,budget,bounded,enemyPatterns,enemyKit,create,step,cast,run,reference,inspectSkill,balanceSkill,balanceSlot,balanceEncounter,prompt};
+const api={rangeOf,GROWTH_COST_MULTIPLIER,growthCost,levelExperience,limitBreakCost,equipmentUpgradeCost,AFFINITY,migrateGrowthProgress,CHARACTER_BASE_STATS,RARITY_STAT_MUL,ROLE_SPEED,RULE_DEFAULTS,applyRules,relMul,generateBaseStats,baseStats,migrateBaseStats,IMPACT,FLIGHT_MS,isRanged,physicalStyle,UX_COLOR_RULES,paletteRuleForEffect,effectPalette,skillPaletteDecision,skillPalette,nearestPaletteColor,paletteSources,impactPlan,landImpact,endpointGrowthKind,trainingChanges,trainingFingerprint,invincibilityGrowth,INVINCIBILITY,TRAINING,trainingState,trainingLevel,trainingPlan,trainedSkill,trainedKit,trainingInitialSP,EQUIPMENT_MODS,equipmentSkillSignature,equipmentChoices,equipmentValidate,equipmentBind,equipmentDraft,equipmentState,equipmentDescription,inspectEquipment,Visuals,skillVisual,FX_TYPES,FX_COLORS,roleSpeed,conceptText,isHealer,AI_EFFECT_LIMITS,aiLimits,aiRole,aiRecipes,aiDesign,GENERATIONS,generation,slotCost,aiPolicy,generationDefaults,SP,gainSP,VERSION,RULESET,DT,SLOTS,TARGETS,TRIGGERS,CONDITIONS,EFFECTS,Studio,OFFENSIVE,effectSpec,defaultEffect,isSilenced,targets,conditionPass,basisValue,clone,normalize,validate,defaults,budget,bounded,enemyPatterns,enemyKit,create,step,cast,run,reference,inspectSkill,balanceSkill,balanceSlot,balanceEncounter,prompt};
 root.GGMCombat=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
 

@@ -474,6 +474,46 @@ try {
     return o; });
   assert.ok(Object.values(r21).every(v => v === true), JSON.stringify(r21)); assert.deepEqual(err21, [], '페이지 오류');
   console.log('ok 21 에셋 관리: 공유 보관함(넣기·가져오기)·새 자료 자동 재사용·AI 컨텍스트, 사용처·중복 합치기(별칭)·되돌리기, 감정 아이콘 그림 교체');
+  // 22) 대열·출격 경로: 엔진 대열(근접은 전열만·엄호·후열 지원 회복), 사거리 추정·편성 경고, 출격(전초전→갈림길(지원형 조건)→보스), 체력 유지·진격·퇴각·이어 하기, 행동력 1번, 생성(route·range)·점검 c_range
+  const p22 = await browser.newPage(), err22 = []; p22.on('pageerror', e => err22.push(String(e)));
+  await p22.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p22.goto(`http://127.0.0.1:${server.address().port}/?t=22`);
+  await p22.waitForFunction(() => typeof sortieBegin === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r22 = await p22.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true; closeModal(); closeOv();
+    const mk = (side, n, role, range, hp = 3000) => ({ side, name: n, role, range, elem: ELEMS[0], maxhp: hp, hp, atk: 120, def: 40, spd: 100 });
+    const A = [mk('a', 'A1', 'def', 'melee', 9000), mk('a', 'A2', 'atk', 'melee', 9000), mk('a', 'A3', 'sup', 'support'), mk('a', 'A4', 'atk', 'ranged')], E = [mk('e', 'E1', 'atk', 'melee'), mk('e', 'E2', 'atk', 'melee')];
+    const sim = GGMCombat.create(A, E, { seed: 5, formation: true, maxTime: 40 }); let hitBack = 0, hitFront = 0, guard = 0;
+    for (let i = 0; i < 230 && !sim.winner; i++) { const ev = GGMCombat.step(sim, true) || []; ev.forEach(x => { if (x.type === 'damage' && x.source.side === 'e' && x.basic) { if (x.target.row === 'back') hitBack++; else hitFront++; } if (x.type === 'status' && x.label === '엄호') guard++; }); }
+    o.rows = A.map(u => u.row).join() === 'front,front,back,back' && E.every(u => u.row === 'front');
+    o.block = hitFront > 0 && hitBack === 0;
+    o.rangeOf = GGMCombat.rangeOf({ role: 'sup' }) === 'support' && GGMCombat.rangeOf({ role: 'def' }) === 'melee';
+    const sera = charById('sera'); o.charRange = ['melee', 'ranged', 'support'].includes(charRange(sera)) && (sera.range = 'melee', charRange(sera) === 'melee') && rowWarn(sera, 3, 4).includes('후열 근접') && (delete sera.range, true);
+    o.opts = v2Options().formation === true; G.meta.rules = Object.assign({}, G.meta.rules, { formation: false }); o.optOff = v2Options().formation === false; G.meta.rules.formation = true;
+    G.chars.slice(0, 5).forEach(c => { if (!own(c.id)) grantOwned(c, 't'); }); const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages.find(x => !x.story && x.enemies.length); P().cleared[s.id] = true;
+    P().squad = G.chars.filter(c => own(c.id) && c.role !== 'sup').slice(0, 3).map(c => c.id); const stam0 = stam().v;
+    startBattle(ch.id, s.id); for (let i = 0; i < 50 && !SORTIE(); i++) await wait(100); await wait(100);
+    o.begin = !!SORTIE() && SORTIE().node === 'n1' && !!document.querySelector('.so-map') && !B;
+    document.querySelector('[data-act="sogo"]').click(); for (let i = 0; i < 60 && !B; i++) await wait(100);
+    o.node1 = B && B.ctx.sortie && !B.ctx.boss && B.s.enemies.length <= 2 && B.s.enemies.every(e => !e.boss);
+    B.allies[0].hp = Math.round(B.allies[0].maxhp * .2); const hurt = B.allies[0].c.id; bEnd(true);
+    o.nodeWin = SORTIE().path.includes('n1') && Math.abs(SORTIE().hp[hurt] - .2) < .02 && document.querySelector('.result').innerHTML.includes('돌파');
+    document.querySelector('[data-act="somap"]').click(); await wait(50);
+    o.fork = !!document.querySelector('[data-act="sonext"][data-v="n2a"]') && document.querySelector('[data-act="sonext"][data-v="n2b"]').disabled && document.body.innerHTML.includes('대파');
+    closeModal(); document.body.insertAdjacentHTML('beforeend', `<button id="_st" data-act="stage" data-ch="${ch.id}" data-st="${s.id}"></button>`); document.querySelector('#_st').click(); await wait(50); o.resume = !!document.querySelector('.so-map'); document.querySelector('#_st').remove();
+    document.querySelector('[data-act="sonext"][data-v="n2a"]').click(); await wait(30); document.querySelector('[data-act="sogo"]').click(); for (let i = 0; i < 60 && !B; i++) await wait(100);
+    o.carry = B && B.ctx.node !== 'x' && Math.abs(B.allies.find(u => u.c.id === hurt).hp / B.allies.find(u => u.c.id === hurt).maxhp - .2) < .02 && B.s.enemies.length === 3;
+    bEnd(true); document.querySelector('[data-act="somap"]').click(); await wait(50); document.querySelector('[data-act="sonext"][data-v="n3"]').click(); await wait(30); document.querySelector('[data-act="sogo"]').click(); for (let i = 0; i < 60 && !B; i++) await wait(100);
+    o.boss = B && B.ctx.boss && B.s === s; bEnd(true); o.cleared = !SORTIE() && !!document.querySelector('.rs-stars'); document.querySelector('.result [data-act="bdone"]').click(); await wait(50);
+    o.stam = stam().v === stam0 - stamCost('main');
+    startBattle(ch.id, s.id); for (let i = 0; i < 50 && !SORTIE(); i++) await wait(100); await wait(50); const g0 = P().gold; document.querySelector('[data-act="soretreat"]').click(); o.retreat = !SORTIE() && P().gold === g0;
+    const st = buildStages([{ title: 'a', enemies: [{ name: 'x' }], route: { n1: '항구 전초', a: '정면 부두', b: '뒷골목', fork: '안개 낀 갈림길', boss: '선창 본대' } }], { max: 3, reward: () => 1, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
+    const R = routeOf(st[0]); o.route = R.nodes[0].name === '항구 전초' && R.nodes[1].name === '정면 부두' && R.fork === '안개 낀 갈림길' && stageSchema(false).includes('"route"');
+    o.schema = charSchema().includes('"range"') && cleanChar({ name: 'r', role: 'atk', range: 'ranged' }).range === 'ranged';
+    const c = G.chars[1]; delete c.range; o.audit = auditScan().some(g => g.rule.id === 'c_range' && g.items.includes(c));
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="bsys"][data-k="sortie"]');
+    return o; });
+  assert.ok(Object.values(r22).every(v => v === true), JSON.stringify(r22)); assert.deepEqual(err22, [], '페이지 오류');
+  console.log('ok 22 대열·출격 경로: 근접은 전열만 공격·엄호·후열 회복(엔진), 사거리·편성 경고, 전초전→갈림길(지원형 조건)→보스, 체력 유지·진격·퇴각·이어 하기, 생성(route·range)·점검');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);

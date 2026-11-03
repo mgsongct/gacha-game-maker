@@ -578,6 +578,7 @@ function studioHTML(){
   ${exSettingsPanel()}
   ${auditPanel()}
   ${rulesPanel()}
+  ${battleSysPanel()}
   ${balancePanel()}
   ${personaPanel()}
   ${planPanel()}

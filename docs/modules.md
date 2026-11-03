@@ -210,6 +210,12 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - `src/main/0565-asset-library.js`: 공유 보관함 `shList/shPut/shTake/shAdopt`(addLib·scanScriptAssets), `libUsage`, `libDupes/libMerge`(alias), 화면 `openAssets`
 - 설계: [research/direction.md](research/direction.md)
 
+## 8-2-8. 대열 · 출격 경로
+
+- 엔진 `030-core.js`: `options.formation` → `formationSetup`(u.range·u.row), `weighted(sim,pool,u)`(근접은 전열만·엄호), `rowMul`(자리 상성), heal(후열 지원 +20%), `GGMCombat.rangeOf`
+- `src/main/0487-formation-sortie.js`: `charRange`·`rowWarn`(편성), `routeOf/routeAuto`·`nodeStage`, `sortieBegin`(startBattle)·`sortieMap`·`sortieFight`·`sortieNodeEnd`(bEnd), `P().sortie`, 설정 `battleSysPanel`(G.meta.rules.formation·sortie)
+- 설계: [research/formation-sortie.md](research/formation-sortie.md)
+
 ## 8-3. 콘텐츠 점검·업그레이드
 
 - `src/main/0535-content-audit.js`: 규칙 `AUDIT_RULES`(감지 `test` + 고치기 `fix.mode`), `auditScan`, `auditFix`, 지정 변환 `auditConvert`, 되돌리기 `auditUndo`, 생성 버전 `auditGenVer()`(새 캐릭터 `cleanChar0`에서 `genVer`로 찍힘)
