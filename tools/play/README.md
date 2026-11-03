@@ -16,6 +16,7 @@ node tools/play/qa.mjs <게임 폴더> [game.json]      # QA·플레이 점검 �
 node tools/play/shots.mjs <게임 폴더> [game.json]   # 새 플레이어로 화면 플레이·캡처 → shots/
 node tools/play/faults.mjs [시나리오…]              # 생성기 실패 주입 → reports/faults.md
 node tools/play/test.mjs                           # 도구 자체 검사(fixtures/mini)
+node tools/play/rekind.mjs <게임 폴더> [--dry]       # kind 규칙이 바뀌었을 때 prompts/·responses/ 이름 옮기기
 ```
 
 ## 게임 폴더
@@ -25,11 +26,11 @@ node tools/play/test.mjs                           # 도구 자체 검사(fixtur
 | `input.json` | 새 게임 입력. 초안 화면의 자율 모드와 같은 형식 `{"mode":"auto","auto":"한 줄 아이디어","n":6}` | 예 |
 | `prompts/<kind>.txt` | 앱이 글 AI에 보낸 글(지침·교훈·"JSON만 출력"까지 붙은 최종본) | 예 — 프롬프트 품질을 볼 근거 |
 | `responses/<kind>.txt` | 그 요청에 대한 답(모델이 낸 글 그대로) | 예 — 재생에 필요 |
-| `game.json` · `game-after-<단계>.json` | 생성된 게임(앱 저장 형식) | 예 |
+| `game.json` · `game-after-<단계>.json` | 생성된 게임(앱 저장 형식). `skills`·`chapter`는 대기 중 요청이 없을 때만 갱신(미완료 시도는 `attempt-<단계>.json`) — 반쯤 된 장을 저장하면 다음 실행이 그다음 장을 만들기 시작하기 때문 | 예 |
 | `runs.json` | 실행 기록: 호출 순서·길이·대기 중 요청·저장 시점·알림·AI 기록 | 예 |
 | `qa/` · `shots/` | QA 보고서·화면 캡처 | 예 |
 
-**kind** — `world` · `chars` · `opening` · `chapter1` · `skill-<대원 이름>-<그 대원의 n번째 요청>` · `<단계>-<요청 첫머리>-<해시>`. 끝에 `-cont1`이 붙으면 길이 초과로 끊긴 답을 이어 달라는 요청. `skill-이름-2`처럼 번호가 오르면 앱이 앞 답을 거절하고 이유를 덧붙여 다시 물은 것입니다.
+**kind** — `world` · `chars` · `opening` · `chapter1` · `skill-<대원 이름>-<그 대원의 n번째 요청>` · `<단계>-<요청 첫머리>[-s<스테이지>]-<프롬프트 전체 해시>`(규칙은 `lib/kind.mjs`). 스테이지별 대본처럼 앞부분이 같은 요청도 전체 해시로 구분됩니다. 규칙을 바꾸면 `node tools/play/rekind.mjs <게임 폴더>`로 기존 파일 이름을 옮깁니다. 끝에 `-cont1`이 붙으면 길이 초과로 끊긴 답을 이어 달라는 요청. `skill-이름-2`처럼 번호가 오르면 앱이 앞 답을 거절하고 이유를 덧붙여 다시 물은 것입니다.
 
 ## 게임 하나 만들기 (사람·에이전트가 글 AI 역할)
 

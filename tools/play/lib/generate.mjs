@@ -3,25 +3,17 @@
 //   phase: 'new'(input → 새 게임) | 'skills'(game의 임시 스킬 대원) | 'chapter'(game에 다음 메인 장)
 // 명령줄은 tools/play/generate.mjs, 실패 주입은 tools/play/faults.mjs
 import { withPage } from './page.mjs';
+import { kindOf } from './kind.mjs';
 
 export async function runGenerate({ phase, responses = {}, input = null, game = null, stages = 4, direction = '메인 플롯을 따라 자연스럽게 이어서', onPrompt = null, tag = 'generate', settleMs = 4000 }) {
   return withPage(async page => {
     await page.exposeFunction('__onPrompt', (kind, text) => { if (onPrompt) onPrompt(kind, text); });
-    return page.evaluate(async ({ phase, responses, input, game, stages, direction, settleMs }) => {
+    return page.evaluate(async ({ phase, responses, input, game, stages, direction, settleMs, kindSrc }) => {
       const log = [], pending = new Set(), toasts = [], seenSkill = {};
       P().seenOpening = true; closeModal(); closeOv(); try { appStorage.removeItem('ggm-ng-draft'); } catch (e) {}
       const tt = toast; toast = m => { toasts.push(String(m)); return tt(m); };
       appStorage.setItem(PKEY, JSON.stringify({ active: 'gen', fallback: false, list: [{ id: 'gen', type: 'anthropic', name: 'tools/play', key: 'replay', model: 'replay', quick: 'replay-quick' }] })); setupAI();
-      const kindOf = p => {
-        if (/속성\(elems\)은/.test(p)) return 'world';
-        if (/debut 항목/.test(p)) return 'chars';
-        if (/이 게임의 시작 부분을 만들어라/.test(p)) return 'opening';
-        if (/프롤로그 다음으로 이어지는 1장/.test(p)) return 'chapter1';
-        if (/캐릭터의 패시브·액티브·궁극기를 한 주역할로 설계하세요/.test(p)) { const nm = (p.match(/"name":"([^"]+)"/) || [, 'x'])[1]; seenSkill[nm] = (seenSkill[nm] || 0) + 1; return `skill-${nm}-${seenSkill[nm]}`; }
-        const head = p.replace(/^[\s\S]*?(다음[^\n]{0,30}|[^\n]{0,40}(만들어라|써라|정하라|작성하라|구성하라))/, '$1').slice(0, 24).replace(/[^\w가-힣]+/g, '_');
-        let h = 0; for (const ch of p.slice(0, 400)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-        return `${phase}-${head}-${(h % 46656).toString(36)}`;
-      };
+      const kindOf = p => (new Function('return ' + kindSrc)())(p, phase, seenSkill);
       const realHttp = http;
       http = async (url, opts) => {
         if (!/api\.anthropic\.com\/v1\/messages/.test(url)) return realHttp(url, opts);
@@ -56,6 +48,6 @@ export async function runGenerate({ phase, responses = {}, input = null, game = 
       }
       Object.assign(result, { log, pending: [...pending], toasts: toasts.slice(0, 30), ailog: (typeof AILOG !== 'undefined' ? AILOG : []).slice(0, 40).map(x => ({ ok: x.ok, stage: x.stage, err: x.err, reqLen: x.reqLen })) });
       return result;
-    }, { phase, responses, input, game, stages, direction, settleMs });
+    }, { phase, responses, input, game, stages, direction, settleMs, kindSrc: kindOf.toString() });
   }, { tag });
 }

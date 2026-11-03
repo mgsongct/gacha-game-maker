@@ -12,7 +12,8 @@
 //   input.json            새 게임 입력({mode:'auto', auto:'한 줄 아이디어', n:6} — 초안 화면의 자율 모드와 같은 형식)
 //   prompts/<kind>.txt    앱이 글 AI에 보낸 글(지침·교훈·"JSON만 출력"까지 붙은 최종본)
 //   responses/<kind>.txt  그 요청에 대한 글 AI의 답(모델이 낸 글 그대로, JSON만)
-//   game.json             생성된 게임(앱 저장 형식). 단계마다 game-after-<phase>.json도 남김
+//   game.json             생성된 게임(앱 저장 형식). 단계가 끝날 때마다 game-after-<phase>.json도 남김(skills·chapter는 대기 중 요청이 없을 때만 갱신,
+//                         미완료 시도는 attempt-<phase>.json)
 //   runs.json             실행 기록(호출 순서·길이·대기 중 요청·알림·AI 기록)
 // kind: world · chars · opening · chapter1 · skill-<대원 이름>-<그 대원의 n번째 요청> · <phase>-<요청 첫머리>-<해시>
 //       뒤에 -cont1 이 붙으면 길이 초과로 끊긴 답을 이어 달라는 요청
@@ -36,6 +37,9 @@ const runs = existsSync(join(dir, 'runs.json')) ? JSON.parse(readFileSync(join(d
 runs.push({ phase, at: new Date().toISOString(), pending: out.pending, commitAtCall: out.commitAtCall, log: out.log, toasts: out.toasts, ailog: out.ailog, ms: out.ms, stat: out.stat, thrown: out.thrown, chapter: out.chapter, todo: out.todo, pageErrors: errors });
 writeFileSync(join(dir, 'runs.json'), JSON.stringify(runs, null, 1));
 // 새 게임은 대기 중 요청이 있어도(예: 백그라운드 스킬 설계) 앱이 저장한 그대로 기록 — 그 상태 자체가 점검 대상
-if (out.game) { writeFileSync(join(dir, 'game.json'), JSON.stringify(out.game)); writeFileSync(join(dir, `game-after-${phase}.json`), JSON.stringify(out.game)); }
+// skills·chapter는 대기 중 요청이 없을 때만 game.json을 바꿈 — 미완료 상태로 바꾸면 다음 실행이 다음 장(3장…)을 만들기 시작함
+const complete = phase === 'new' ? !!out.game : !!out.game && !out.pending.length;
+if (complete) { writeFileSync(join(dir, 'game.json'), JSON.stringify(out.game)); writeFileSync(join(dir, `game-after-${phase}.json`), JSON.stringify(out.game)); }
+else if (out.game) writeFileSync(join(dir, `attempt-${phase}.json`), JSON.stringify(out.game));
 console.log(JSON.stringify({ phase, done: !!out.game && !out.pending.length, saved: !!out.game, pending: out.pending, calls: out.log.length, thrown: out.thrown || null, pageErrors: errors.length, toasts: out.toasts.slice(-3), chapter: out.chapter || null, todo: out.todo || null }, null, 1));
 if (out.pending.length) console.log('답이 필요한 프롬프트:\n' + out.pending.map(k => join(dir, 'prompts', k + '.txt')).join('\n') + `\n→ 같은 이름으로 ${join(dir, 'responses')}/<kind>.txt 에 답을 쓰고 다시 실행`);
