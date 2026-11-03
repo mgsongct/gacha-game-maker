@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.10'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.11'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -1968,6 +1968,52 @@ img,video,canvas{max-width:100%}
 .sc-spot::before{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(transparent,#000c)}
 .sc-spot>*{position:relative}
 .sc-who{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+/* 연출 엔진(main/0462-direction.js): 두 사람 무대·감정 아이콘·동작·화면 효과·스티커 */
+.vn-slot{position:relative;height:100%;flex:1 1 0;min-width:0;display:flex;justify-content:center;align-items:flex-end;transition:filter .25s,transform .3s}
+.vn-char.duo .vn-slot{flex:0 0 58%}
+.vn-char.duo .vn-slot:first-child{margin-right:-16%}
+.vn-char.duo .vn-slot:not(.speak){filter:brightness(.55);z-index:0}
+.vn-char.duo .vn-slot.speak{z-index:1}
+.vn-slot.enter{animation:enter .45s ease-out}
+.vn-char.up .vn-slot{overflow:hidden}
+.emo{position:absolute;left:58%;top:6%;width:54px;height:54px;z-index:4;pointer-events:none;filter:drop-shadow(0 2px 3px #0008)}
+.vn-char.up .emo{top:4%}
+.emo svg,.emo img{width:100%;height:100%;object-fit:contain}
+.emo.big{position:static;display:inline-block;width:84px;height:84px}
+.e-pop{animation:emoPop 1.6s ease-out forwards}.e-drip{animation:emoDrip 1.6s ease-in forwards}.e-throb{animation:emoThrob 1.6s ease-in-out forwards}
+.e-tilt{animation:emoTilt 1.6s ease-out forwards}.e-fade{animation:emoFade 1.6s ease-out forwards}.e-bob{animation:emoBob 1.6s ease-in-out forwards}
+.emo.big{animation-iteration-count:1;animation-fill-mode:none}
+@keyframes emoPop{0%{transform:scale(0);opacity:0}15%{transform:scale(1.25);opacity:1}25%{transform:scale(1)}85%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+@keyframes emoDrip{0%{transform:translateY(-6px);opacity:0}15%{opacity:1}80%{transform:translateY(10px);opacity:1}100%{transform:translateY(14px);opacity:0}}
+@keyframes emoThrob{0%,100%{transform:scale(.6);opacity:0}10%,30%,50%,70%{transform:scale(1.1);opacity:1}20%,40%,60%{transform:scale(.9)}90%{opacity:1}}
+@keyframes emoTilt{0%{transform:rotate(-30deg) scale(.4);opacity:0}20%{transform:rotate(12deg) scale(1);opacity:1}35%{transform:rotate(0)}85%{opacity:1}100%{opacity:0}}
+@keyframes emoFade{0%{opacity:0}20%,80%{opacity:1}100%{opacity:0}}
+@keyframes emoBob{0%{opacity:0;transform:translateY(6px)}20%{opacity:1}40%{transform:translateY(-4px) rotate(-8deg)}60%{transform:translateY(2px) rotate(8deg)}85%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+.m-jump{animation:mJump .55s ease-out}.m-shake{animation:mShake .5s}.m-tremble{animation:mTremble .7s linear}.m-nod{animation:mNod .55s}.m-tilt{animation:mTilt .7s ease-out}
+.m-near{transform:scale(1.14) translateY(4%)}.m-far{transform:scale(.88)}.m-exit{animation:mExit .6s ease-in forwards}.m-enter{animation:enter .45s ease-out}.m-fall{animation:mFall .8s ease-in}
+@keyframes mJump{30%{transform:translateY(-9%)}55%{transform:translateY(0)}70%{transform:translateY(-3%)}}
+@keyframes mShake{20%{transform:translateX(-5%)}40%{transform:translateX(5%)}60%{transform:translateX(-3%)}80%{transform:translateX(2%)}}
+@keyframes mTremble{0%,100%{transform:translate(0)}10%,30%,50%,70%,90%{transform:translate(-1.2%,.4%)}20%,40%,60%,80%{transform:translate(1.2%,-.4%)}}
+@keyframes mNod{40%{transform:translateY(3%)}}
+@keyframes mTilt{40%{transform:rotate(-4deg)}100%{transform:rotate(0)}}
+@keyframes mExit{to{transform:translateX(40%);opacity:0}}
+@keyframes mFall{40%{transform:rotate(3deg) translateY(4%)}100%{transform:translateY(12%);opacity:.6}}
+.vn.shake2{animation:shake .45s 2}
+.vn-flash.r{background:#ff2848;animation:flash .7s}
+.vn-flash.f{background:#000;animation:blk 2.4s}
+.vn::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .5s}
+.vn.fx-lines::after{opacity:.5;background:repeating-conic-gradient(from 0deg at 50% 45%,#fff0 0 4deg,#fff9 4deg 5deg);-webkit-mask:radial-gradient(circle at 50% 45%,#0000 28%,#000 70%);mask:radial-gradient(circle at 50% 45%,#0000 28%,#000 70%)}
+.vn.fx-rain::after{opacity:.55;background:repeating-linear-gradient(105deg,#fff0 0 14px,#cfe6ff66 14px 15px);background-size:100% 140px;animation:fxRain .45s linear infinite}
+.vn.fx-snow::after{opacity:.8;background-image:radial-gradient(#fff 1.5px,#0000 2px),radial-gradient(#fff 1px,#0000 1.5px);background-size:70px 70px,40px 40px;animation:fxSnow 6s linear infinite}
+.vn.fx-petal::after{opacity:.85;background-image:radial-gradient(ellipse 4px 2.5px,#ffb7cf 90%,#0000),radial-gradient(ellipse 3px 2px,#ffd1e0 90%,#0000);background-size:90px 90px,60px 60px;animation:fxSnow 7s linear infinite}
+.vn.fx-vignette::after,.vn.fx-memory::after{opacity:1;background:radial-gradient(ellipse at center,#0000 50%,#000c 100%)}
+.vn.fx-memory .vn-bg,.vn.fx-memory .vn-char,.vn.fx-memory .vn-cg{filter:sepia(.75) saturate(.7) brightness(.92)}
+@keyframes fxRain{to{background-position:-40px 140px}}
+@keyframes fxSnow{to{background-position:30px 420px,-20px 300px}}
+.bub.sticker{background:none!important;box-shadow:none!important;padding:0}
+.lb-emo{position:fixed;width:54px;height:54px;z-index:60;pointer-events:none}.lb-emo .emo{position:static;display:block}
+@media (prefers-reduced-motion:reduce){.m-jump,.m-shake,.m-tremble,.m-nod,.m-tilt,.m-fall,.vn.fx-rain::after,.vn.fx-snow::after,.vn.fx-petal::after{animation:none}}
+.emo.still{animation:none!important}
 </style>
 </head>
 <body>
@@ -4515,8 +4561,8 @@ function rulesText(){const tone=String((G.meta&&G.meta.tone)||'').trim();return 
 function evPastHint(skip){ const L=(G.events||[]).filter(e=>e&&e.id!==skip).slice(-12).map(e=>`${e.title}${e.desc?'('+String(e.desc).slice(0,40)+')':''}`); return L.length?`\n지금까지 나온 이벤트(소재·사건·결말을 반복하지 않고 새로운 소재로 쓴다): ${L.join(' / ')}`:''; }
 const BATTLE_FLOW_BASE='\n전투 흐름: 스테이지마다 전투가 있는 건 게임 구조일 뿐이다. 데이트·일상·대화 장면 한가운데에 갑작스러운 습격을 만들어 전투에 억지 개연성을 붙이지 않는다. pre는 장면이 자연스럽게 마무리되는 곳에서 끝내고, 전투는 훈련·의뢰·순찰 중 마주친 적 정도로 한 줄만 언급하거나 아예 언급하지 않아도 된다. post도 전투를 길게 되짚지 말고 이야기의 흐름을 이어 간다.';
 pfDef('BATTLE_FLOW','전투 흐름(스토리 안의 전투 다루기)',()=>BATTLE_FLOW_BASE);
-function scriptFmt(){return `대본은 하나의 문자열이고 줄마다 줄바꿈(\\n)으로 나눈다(쉼표로 잇거나 배열로 쓰지 않는다). 대본 형식(한 줄에 하나): "이름: 대사" / 표정을 바꾸려면 "이름[표정]: 대사" (표정은 각 캐릭터의 표정 목록에서 고른다) / 그 외 문장은 나레이션 / [배경: 배경이름]은 배경 전환 / [장소이름]은 장소 자막과 배경 전환 / [소품: 소품이름]은 소품 클로즈업, [소품 끝]으로 닫음 / [효과: 흔들림], [효과: 플래시], [효과: 암전] / [효과음: 이름] / [음악: 음악이름]은 배경음 전환, [음악 끝]은 정지 / [톡: 캐릭터이름]부터 [톡 끝]까지는 휴대폰 메신저 화면으로 대화가 진행되는 장면 / [CG: CG이름]은 일러스트 한 장을 화면 가득 보여 주고, [CG 끝]으로 닫음 / "선택: 보기1 | 보기2"는 플레이어 선택지이고, 이어지는 줄 앞에 "1) "이나 "2) "를 붙이면 그 선택을 했을 때만 나온다. 플레이어 대사는 "${T('player')}: "로 쓰고, 플레이어를 부를 때는 보통 호칭 "${T('player')}"을 그대로 쓰며, 이름을 불러야 할 때만 {${T('player')}}으로 쓴다. 배경, 소품, 음악, 효과음은 가능한 한 기존 목록의 이름을 그대로 쓴다. 기존 인물이 적으로 나오거나 적이었던 인물이 동료가 되면 이름을 바꾸지 않고 같은 이름을 그대로 쓴다(그림이 이어지도록).`;}
-function threadFmt(){return `메신저 형식(한 줄에 하나): "캐릭터이름: 메시지" / "선택: 답장1 | 답장2"는 플레이어 답장 선택지(고른 답장이 전송됨). 플레이어의 말은 반드시 선택지로만 쓰고 "나: 메시지"처럼 플레이어 대사를 직접 쓰지 않는다(플레이어가 멋대로 말하면 안 된다). 선택지 없이 플레이어 반응이 필요하면 선택지 1개짜리로 쓴다, 이어지는 줄 앞에 "1) " 같은 번호를 붙이면 그 답장을 골랐을 때만 나온다 / [사진: 소품 또는 배경 이름]은 사진 전송. 실제 메신저처럼 짧은 메시지를 여러 번 나눠 보내고, ㅋㅋ와 이모지를 써도 된다. 세계관과 메인 스토리의 사건, 떡밥을 자연스럽게 언급한다.`;}
+function scriptFmt(){return `대본은 하나의 문자열이고 줄마다 줄바꿈(\\n)으로 나눈다(쉼표로 잇거나 배열로 쓰지 않는다). 대본 형식(한 줄에 하나): "이름: 대사" / 표정을 바꾸려면 "이름[표정]: 대사" (표정은 각 캐릭터의 표정 목록에서 고른다) / 그 외 문장은 나레이션 / [배경: 배경이름]은 배경 전환 / [장소이름]은 장소 자막과 배경 전환 / [소품: 소품이름]은 소품 클로즈업, [소품 끝]으로 닫음 / ${DIRECTION_GUIDE} / [효과음: 이름] / [음악: 음악이름]은 배경음 전환, [음악 끝]은 정지 / [톡: 캐릭터이름]부터 [톡 끝]까지는 휴대폰 메신저 화면으로 대화가 진행되는 장면 / [CG: CG이름]은 일러스트 한 장을 화면 가득 보여 주고, [CG 끝]으로 닫음 / "선택: 보기1 | 보기2"는 플레이어 선택지이고, 이어지는 줄 앞에 "1) "이나 "2) "를 붙이면 그 선택을 했을 때만 나온다. 플레이어 대사는 "${T('player')}: "로 쓰고, 플레이어를 부를 때는 보통 호칭 "${T('player')}"을 그대로 쓰며, 이름을 불러야 할 때만 {${T('player')}}으로 쓴다. 배경, 소품, 음악, 효과음은 가능한 한 기존 목록의 이름을 그대로 쓴다. 기존 인물이 적으로 나오거나 적이었던 인물이 동료가 되면 이름을 바꾸지 않고 같은 이름을 그대로 쓴다(그림이 이어지도록).`;}
+function threadFmt(){return `메신저 형식(한 줄에 하나): "캐릭터이름: 메시지" / "선택: 답장1 | 답장2"는 플레이어 답장 선택지(고른 답장이 전송됨). 플레이어의 말은 반드시 선택지로만 쓰고 "나: 메시지"처럼 플레이어 대사를 직접 쓰지 않는다(플레이어가 멋대로 말하면 안 된다). 선택지 없이 플레이어 반응이 필요하면 선택지 1개짜리로 쓴다, 이어지는 줄 앞에 "1) " 같은 번호를 붙이면 그 답장을 골랐을 때만 나온다 / [사진: 소품 또는 배경 이름]은 사진 전송 / [스티커: 하트|땀|화남|놀람|의문|음표|눈물|홍조|반짝]은 감정 스티커(가끔만). 실제 메신저처럼 짧은 메시지를 여러 번 나눠 보내고, ㅋㅋ와 이모지를 써도 된다. 세계관과 메인 스토리의 사건, 떡밥을 자연스럽게 언급한다.`;}
 Object.defineProperty(window,'RULES',{get:rulesText});
 pfDef('SCRIPT_FMT','대본 형식(스토리·이벤트·메모리얼 대본)',scriptFmt);
 pfDef('THREAD_FMT','메신저(톡) 형식',threadFmt);
@@ -6984,7 +7030,7 @@ function closePhone(){ PH=null; $('#phone').hidden=true; $('#phone').innerHTML='
 function phoneList(){
   PH=null; const rooms=phRooms();
   $('#phone').innerHTML=`<div class="phone"><div class="ph-top"><button data-act="phclose" aria-label="닫기">✕</button><b>${esc(T('talk'))}</b><button data-act="phnew" aria-label="대화 추가">＋</button></div><div class="ph-list">${
-    rooms.length?rooms.map(x=>{ const l=x.last; return `<button class="ph-row" data-act="openfc" data-id="${esc(x.c.id)}"><div class="av">${art(x.c)}</div><div class="t"><b>${esc(x.c.name)}</b><span>${esc(l?(l.w==='p'?'사진을 보냈어요':(l.w==='me'?'나: ':'')+(l.t||(l.img?'사진':''))):(x.title||'대화를 시작해 보세요'))}</span></div>${x.unread?'<i class="dot"></i>':''}</button>`; }).join('')
+    rooms.length?rooms.map(x=>{ const l=x.last; return `<button class="ph-row" data-act="openfc" data-id="${esc(x.c.id)}"><div class="av">${art(x.c)}</div><div class="t"><b>${esc(x.c.name)}</b><span>${esc(l?(l.w==='k'?'스티커를 보냈어요':l.w==='p'?'사진을 보냈어요':(l.w==='me'?'나: ':'')+(l.t||(l.img?'사진':''))):(x.title||'대화를 시작해 보세요'))}</span></div>${x.unread?'<i class="dot"></i>':''}</button>`; }).join('')
     :`<p class="muted" style="text-align:center;padding:40px 16px">아직 대화가 없어요. ${esc(T('crew'))}과(와) 친해지거나 ${esc(T('ops'))}을(를) 진행하면 연락이 와요.<br><br><button class="btn sm" data-act="phnew">＋ 대화 추가</button></p>`}</div></div>`;
 }
 function phRooms(){ const m={};
@@ -7021,7 +7067,7 @@ async function hydrateChatImgs(){ let ch=false;
 function bubbleHTML(l,c){
   if(l.w==='s') return `<div class="sys">${esc(l.t)}</div>`;
   if(l.w==='me') return `<div class="msg me">${l.img?`<div class="bub photo">${chatImgHTML(l.img)}</div>`:''}${l.t||!l.img?`<div class="bub">${esc(l.t)}</div>`:''}</div>`;
-  const inner=l.w==='p'?`<div class="bub photo">${l.img?chatImgHTML(l.img):libArt(l.t)}</div>`:`<div class="bub">${esc(l.t)}</div>`;
+  const inner=l.w==='k'?`<div class="bub sticker">${emoteHTML(l.t,true)}</div>`:l.w==='p'?`<div class="bub photo">${l.img?chatImgHTML(l.img):libArt(l.t)}</div>`:`<div class="bub">${esc(l.t)}</div>`;
   return `<div class="msg"><div class="av sm">${art(c)}</div>${inner}</div>`;
 }
 function chatImgView(k){ const u=chatImgCache[k], ph=$('.phone'); if(!u||!ph) return; const old=$('.ph-menu'); if(old) old.remove();
@@ -7834,7 +7880,8 @@ async function phPlay(t,c,s,token){
         await wait(Math.min(1800,500+L.text.length*35)); ty.remove(); if(!alive()) return;
         entry={w:'c',t:sub(L.text)};
       }
-    } else if(L.type==='cmd'&&['사진','소품','배경'].includes(L.cmd)){ await wait(800); if(!alive()) return; entry={w:'p',t:L.arg}; }
+    } else if(L.type==='cmd'&&L.cmd==='스티커'&&emoKey(L.arg)){ await wait(600); if(!alive()) return; entry={w:'k',t:emoKey(L.arg)}; } // 스티커(0462)
+    else if(L.type==='cmd'&&['사진','소품','배경'].includes(L.cmd)){ await wait(800); if(!alive()) return; entry={w:'p',t:L.arg}; }
     else if(L.type==='nar'||L.type==='place'){ entry={w:'s',t:sub(L.text)}; }
     if(!alive()) return;
     s.pos++; if(entry) s.lastPick='';
@@ -8440,6 +8487,7 @@ function studioHTML(){
   ${balancePanel()}
   ${personaPanel()}
   ${planPanel()}
+  ${assetPanel()}
   ${promptPanel()}
   <div class="panel pm-hide"><h3>게임</h3><p class="muted" style="margin:0 0 10px">지금 게임: <b>${esc(G.meta.title)}</b>. 세계관, 용어, 속성, 화면 테마를 바꾸거나, AI로 완전히 다른 가챠 게임을 새로 만들 수 있어요. 게임은 여러 개 만들어 두고 오갈 수 있어요.</p>
     <div class="row"><button class="btn sm" data-act="meta-open">게임 정의 편집</button><button class="btn sm" data-act="draft-open">AI로 새 게임 만들기</button><button class="btn sm ghost" data-act="pj-open">게임 목록 (${pj.list.length})</button></div></div>
@@ -8460,6 +8508,7 @@ function studioHTML(){
     <div class="g2"><div><label class="f">타이틀 ${T('crew')}</label><select class="in" data-pset="titleChar"><option value="">자동</option>${G.chars.map(c=>`<option value="${c.id}" ${P().titleChar===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
     <div><label class="f">타이틀 배경</label><select class="in" data-pset="titleBg">${bgOptions(P().titleBg)}</select></div></div>
     <div class="g2"><div><label class="f">로비 표시 (타이틀은 일러스트 우선)</label><select class="in" data-pset="lobbyMode">${opt([['auto','자동 (포즈 → 상반신 → 스탠딩)'],['illust','일러스트 표시'],['layer','항상 배경 + 캐릭터 따로 (캐릭터만 움직임)'],['stand','항상 스탠딩 + 배경']],P().lobbyMode||'auto')}</select></div><div><label class="f">로비 캐릭터 크기</label><select class="in" data-pset="lbSize">${opt([['fit','위 배너에 안 가리게 (기본)'],['big','크게 (머리가 가려질 수 있어요)'],['small','작게']],P().lbSize||'fit')}</select></div></div>
+    <div class="g2"><div><label class="f">대본 연출 (감정 아이콘·동작·화면 효과)</label><select class="in" data-pset="vnDirect">${opt([['auto','대본 + 대사에 맞춰 자동 감정 (기본)'],['script','대본에 쓴 것만'],['off','끄기']],P().vnDirect||'auto')}</select></div><div><label class="f">대화 무대</label><select class="in" data-pset="vnStage">${opt([['duo','최근 두 사람 (기본)'],['single','말하는 사람만']],P().vnStage||'duo')}</select></div></div>
     <label class="f">전투 애니메이션</label><select class="in" data-pset="battleMotion">${opt([['full','일반 — 타격 동작·투사체·스피드라인'],['reduced','간소화 — 이동과 스피드라인 생략'],['system','기기의 동작 줄이기 설정에 맞춤']],P().battleMotion||'full')}</select>
     <p class="muted" style="font-size:.8rem;margin:5px 0 12px">일반 모드는 기기의 애니메이션 배율과 별도로 전투 연출을 재생해요. 움직임을 줄이고 싶으면 간소화를 선택하세요.</p>
     <label class="f">기술 컷인 (전투에서 스킬 쓸 때)</label><select class="in" data-pset="skillCut">${opt([['auto','직접 쓴 스킬과 컷인 그림이 있는 '+T('crew')+'는 크게'],['big','항상 크게 (없으면 스탠딩)'],['small','작은 띠만'],['off','끄기']],P().skillCut||'auto')}</select>
@@ -9396,7 +9445,7 @@ function genStep(t,key,label){ return m=>{ if(t){ if(t.isConnected) t.textConten
 function nameTaken(n){ n=String(n||'').trim(); return G.chars.some(c=>c.name===n)||(G.npcs||[]).some(c=>c.name===n); }
 function mkNpc(d){ const o=npcNew(String(d.name||'').trim().slice(0,20)); return Object.assign(o,{role:String(d.role||'').slice(0,40),profile:String(d.profile||'').slice(0,600),speech:String(d.speech||'').slice(0,120),look:String(d.look||''),naiPrompt:stripAge(String(d.naiPrompt||''))}); }
 function addNpcs(arr){ const out=[]; (Array.isArray(arr)?arr:[]).slice(0,3).forEach(d=>{ if(!d||!String(d.name||'').trim()||nameTaken(d.name)) return; const n=mkNpc(d); G.npcs=G.npcs||[]; G.npcs.push(n); out.push(n); }); if(out.length) mark('meta'); return out; }
-function addLib(kind,arr){ let n=0; (Array.isArray(arr)?arr:[]).forEach(b=>{ if(b&&b.name&&!G.lib.some(l=>l.name===String(b.name))){ const l={id:'l'+uid(),kind,name:String(b.name),prompt:String(b.prompt||''),img:null}; G.lib.push(l); mark('l:'+l.id); n++; } }); return n; }
+function addLib(kind,arr){ let n=0; (Array.isArray(arr)?arr:[]).forEach(b=>{ if(b&&b.name&&!G.lib.some(l=>l.name===String(b.name))){ const l={id:'l'+uid(),kind,name:String(b.name),prompt:String(b.prompt||''),img:null}; G.lib.push(l); mark('l:'+l.id); shAdopt(l); n++; } }); return n; }
 // 새 대원: 그 장에서 처음 만나는 '인연'. 데뷔 스테이지를 깨면 상시 계약에 합류해요
 function addNewChars(arr,max,stages,opt){ opt=opt||{}; const out=[]; let list=Array.isArray(arr)?arr:(arr&&typeof arr==='object'?[arr]:[]);
   list.slice(0,max).forEach((x,i)=>{ if(!x||!String(x.name||'').trim()||nameTaken(x.name)) return; const c=sysStats(cleanChar(x)); if(!c.name) return; c.ord=G.chars.length;
@@ -9474,7 +9523,7 @@ function addThreads(arr,ch,needOwn){ const set=storySayNorms(ch); let n=0;
 // 대본에 나왔는데 자료실에 없는 소품·사진·배경은 자료실에 넣어서 그림 준비에 잡히게 해요
 function scanScriptAssets(){ const want=new Map(); const scan=t=>{ if(!t) return; parseScript(t).forEach(L=>{ if(L.type!=='cmd') return; if((L.cmd==='소품'||L.cmd==='사진')&&L.arg&&L.arg!=='끝') want.set(L.arg,want.get(L.arg)||'prop'); else if(L.cmd==='배경'&&L.arg) want.set(L.arg,'bg'); }); };
   G.chapters.forEach(ch=>(ch.stages||[]).forEach(s=>{ scan(s.pre); scan(s.post); })); G.threads.forEach(t=>scan(t.script)); G.chars.forEach(c=>(c.episodes||[]).forEach(e=>scan(e.script))); scan(G.opening&&G.opening.prologue);
-  let n=0; want.forEach((kind,name)=>{ if(G.lib.some(l=>l.name===name)) return; if(kind==='bg'&&G.lib.some(l=>l.kind==='bg'&&(l.name.includes(name)||name.includes(l.name)))) return; const l={id:'l'+uid(),kind,name:String(name).slice(0,40),prompt:'',img:null,auto:true}; G.lib.push(l); mark('l:'+l.id); n++; }); return n; }
+  let n=0; want.forEach((kind,name)=>{ if(G.lib.some(l=>l.name===name)) return; if(kind==='bg'&&G.lib.some(l=>l.kind==='bg'&&(l.name.includes(name)||name.includes(l.name)))) return; const l={id:'l'+uid(),kind,name:String(name).slice(0,40),prompt:'',img:null,auto:true}; G.lib.push(l); mark('l:'+l.id); shAdopt(l); n++; }); return n; }
 // 프롬프트가 없는 자료(대본에서 찾은 소품 등)는 그리기 전에 AI로 한꺼번에 영어 프롬프트를 써요
 let LIBP_JOB=null;
 function ensureLibPrompts(){ if(LIBP_JOB) return LIBP_JOB; const need=G.lib.filter(l=>(['prop','bg'].includes(l.kind)||(l.kind==='enemy'&&!l.alias&&!l.charId))&&!l.prompt); if(!need.length) return Promise.resolve();
@@ -11438,7 +11487,7 @@ function readStoryForm(){ return {plot:($('#ng_story')?$('#ng_story').value.trim
 function ctx(side,focus){ // side: 외전·이벤트용. 메인 플롯·비밀·진행 상황을 빼요(이벤트가 메인 떡밥을 끌어오지 않게)
   const w=G.world, sd=[], wS=dedupText(w.summary,sd).text, wL=dedupText(w.lore,sd).text, wP=side?'':dedupText(w.plot||'',sd).text, bib=G.meta.bible?dedupText(side?String(G.meta.bible).split('\n').filter(l=>!/^\s*비밀/.test(l)).join('\n'):String(G.meta.bible),sd).text:''; // 세계관 요약·상세·플롯·작가 설정에 겹치는 문장은 한 번만 보내요
   const prog=G.chapters.filter(c=>c.kind==='main').map(ch=>ch.title+': '+ch.stages.map(s=>s.title+(P().cleared[s.id]?'(완료)':'')).join(', ')).join(' / ');
-  return `게임 "${G.meta.title}". ${w.source?'원작(2차 창작): '+w.source+' — 원작 설정을 따른다. 원작에서 미성년자·학생인 캐릭터는 쓰지 않는다.\n':''}세계관 "${w.name}": ${wS}\n${wL?'상세 설정: '+wL+'\n':''}${side?'':`메인 플롯(작가용 비밀 설정 포함): ${wP||w.plot||'미정'}\n${storyCfg().plot?'플레이어가 직접 짠 스토리 개요(이 흐름을 반드시 따른다): '+storyCfg().plot+'\n':''}`}${bib?(side?'작가 설정(세계관 참고용):\n'+bib.slice(0,8000):'작가 설정(이 설정을 그대로 따른다. 비밀은 이야기 흐름에 맞게 천천히 드러낸다):\n'+bib.slice(0,12000))+'\n':''}세력: ${w.factions.map(f=>f.name+'('+f.desc+')').join(', ')}\n${side?'':`메인 스토리 진행: ${prog}\n`}${T('crew')}: ${G.chars.filter(c=>!(c.alt&&!c.altCanon)).map(c=>`${c.name}(${c.alt&&charById(c.alt)?'「'+charById(c.alt).name+'」이(가) 정사에서 변한 모습. 메인 스토리에서는 이제 이 모습으로 나오고 원래 모습과 같은 장면에 함께 나오지 않는다. ':''}${RL[c.rarity]}, ${c.faction||'무소속'}, ${c.elem}속성 ${ROLE[c.role]}, ${smProfile(c,focus)}${personaBrief(c)?' 개성: '+personaBrief(c)+'.':''} 말투 예: "${smVoice(c,focus)}"${c.faces.length?' 표정: '+c.faces.map(f=>f.name).join('/'):''})`).join('; ')}${G.chars.some(c=>c.alt&&!c.altCanon)?'\n외전 전용 이격(메인 스토리에는 쓰지 않는다. 메인 스토리에서는 원래 모습으로 쓴다): '+G.chars.filter(c=>c.alt&&!c.altCanon).map(c=>c.name+'='+((charById(c.alt)||{}).name||'')+'의 외전 모습').join(', '):''}${(G.npcs||[]).length?'\nNPC(조연, '+T('crew')+'가 아님. 스토리에 등장할 수 있고 대사 이름은 그대로 쓴다): '+G.npcs.map(n=>`${n.name}(${n.role||'조연'}, ${String(n.profile||'').slice(0,focus&&smFocused(n,focus)?1000:200)}${n.speech?' 말투: '+String(n.speech).slice(0,60):''})`).join('; '):''}\n배경 목록: ${G.lib.filter(l=>l.kind==='bg').map(l=>l.name).join(', ')}\n소품 목록: ${G.lib.filter(l=>l.kind==='prop').map(l=>l.name).join(', ')}\n음악 목록: ${G.lib.filter(l=>l.kind==='bgm').map(l=>l.name).join(', ')}\n효과음 목록: ${G.lib.filter(l=>l.kind==='sfx').map(l=>l.name).join(', ')}\nCG 목록: ${G.lib.filter(l=>l.kind==='cg').map(l=>l.name).join(', ')||'없음'}`+smNotes(side)+smCodex(focus,side);
+  return `게임 "${G.meta.title}". ${w.source?'원작(2차 창작): '+w.source+' — 원작 설정을 따른다. 원작에서 미성년자·학생인 캐릭터는 쓰지 않는다.\n':''}세계관 "${w.name}": ${wS}\n${wL?'상세 설정: '+wL+'\n':''}${side?'':`메인 플롯(작가용 비밀 설정 포함): ${wP||w.plot||'미정'}\n${storyCfg().plot?'플레이어가 직접 짠 스토리 개요(이 흐름을 반드시 따른다): '+storyCfg().plot+'\n':''}`}${bib?(side?'작가 설정(세계관 참고용):\n'+bib.slice(0,8000):'작가 설정(이 설정을 그대로 따른다. 비밀은 이야기 흐름에 맞게 천천히 드러낸다):\n'+bib.slice(0,12000))+'\n':''}세력: ${w.factions.map(f=>f.name+'('+f.desc+')').join(', ')}\n${side?'':`메인 스토리 진행: ${prog}\n`}${T('crew')}: ${G.chars.filter(c=>!(c.alt&&!c.altCanon)).map(c=>`${c.name}(${c.alt&&charById(c.alt)?'「'+charById(c.alt).name+'」이(가) 정사에서 변한 모습. 메인 스토리에서는 이제 이 모습으로 나오고 원래 모습과 같은 장면에 함께 나오지 않는다. ':''}${RL[c.rarity]}, ${c.faction||'무소속'}, ${c.elem}속성 ${ROLE[c.role]}, ${smProfile(c,focus)}${personaBrief(c)?' 개성: '+personaBrief(c)+'.':''} 말투 예: "${smVoice(c,focus)}"${c.faces.length?' 표정: '+c.faces.map(f=>f.name).join('/'):''})`).join('; ')}${G.chars.some(c=>c.alt&&!c.altCanon)?'\n외전 전용 이격(메인 스토리에는 쓰지 않는다. 메인 스토리에서는 원래 모습으로 쓴다): '+G.chars.filter(c=>c.alt&&!c.altCanon).map(c=>c.name+'='+((charById(c.alt)||{}).name||'')+'의 외전 모습').join(', '):''}${(G.npcs||[]).length?'\nNPC(조연, '+T('crew')+'가 아님. 스토리에 등장할 수 있고 대사 이름은 그대로 쓴다): '+G.npcs.map(n=>`${n.name}(${n.role||'조연'}, ${String(n.profile||'').slice(0,focus&&smFocused(n,focus)?1000:200)}${n.speech?' 말투: '+String(n.speech).slice(0,60):''})`).join('; '):''}\n배경 목록: ${G.lib.filter(l=>l.kind==='bg').map(l=>l.name).join(', ')}${(()=>{ const L=shList().filter(x=>x.kind==='bg'&&!G.lib.some(l=>l.kind==='bg'&&l.name===x.name)).slice(0,20).map(x=>x.name); return L.length?'\n공유 보관함 배경(이 이름을 쓰면 그림을 바로 재사용): '+L.join(', '):''; })()}\n소품 목록: ${G.lib.filter(l=>l.kind==='prop').map(l=>l.name).join(', ')}\n음악 목록: ${G.lib.filter(l=>l.kind==='bgm').map(l=>l.name).join(', ')}\n효과음 목록: ${G.lib.filter(l=>l.kind==='sfx').map(l=>l.name).join(', ')}\nCG 목록: ${G.lib.filter(l=>l.kind==='cg').map(l=>l.name).join(', ')||'없음'}`+smNotes(side)+smCodex(focus,side);
 }
 /* ===== 인물 관계도 · 스토리 기억 =====
    관계는 두 사람(대원·NPC·플레이어) 사이의 기록이에요. 로어북처럼 글에 이름이 나오면 그 사람의 관계만 골라 AI에 넣어요. */
@@ -11700,7 +11749,7 @@ document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act
    대본 엔진
    ========================================================= */
 // 한 줄에 붙어 나온 [소품 끝]·[배경: …] 같은 지시를 따로 떼어 내요(예: "문장. [소품 끝]")
-const TAG_RE=/\[(?:(?:소품|음악|톡|CG|cg)\s*끝|(?:배경|소품|효과음|효과|사진|음악|톡|CG|cg|분기)\s*[:：][^\]\n]+)\]/g;
+const TAG_RE=/\[(?:(?:소품|음악|톡|CG|cg)\s*끝|(?:배경|소품|효과음|효과|사진|음악|톡|CG|cg|분기|연출|스티커)\s*[:：][^\]\n]+)\]/g;
 function splitTags(l){ const m0=l.match(/^(\d\)\s*)?([\s\S]*)$/), pre=m0[1]||'', body=m0[2]; TAG_RE.lastIndex=0; if(!TAG_RE.test(body)){ TAG_RE.lastIndex=0; return [l]; } TAG_RE.lastIndex=0;
   if(/^[^:：\[\s][^:：]{0,20}[:：]\s*\[[^\]]+\]$/.test(body)||/^\[[^\]]+\]$/.test(body)) return [l];
   const out=[]; let last=0, mm; while((mm=TAG_RE.exec(body))){ const before=body.slice(last,mm.index).trim(); if(before) out.push(before); out.push(mm[0]); last=mm.index+mm[0].length; } const rest=body.slice(last).trim(); if(rest) out.push(rest); TAG_RE.lastIndex=0;
@@ -11716,10 +11765,10 @@ function parseScript(t){
     else if(/^\[음악\s*끝\]$/.test(l)) o={type:'cmd',cmd:'음악끝',arg:''};
     else if(/^\[톡\s*끝\]$/.test(l)) o={type:'cmd',cmd:'톡끝',arg:''};
     else if(/^\[CG\s*끝\]$/i.test(l)) o={type:'cmd',cmd:'CG끝',arg:''};
-    else if((m=l.match(/^\[(배경|소품|효과음|효과|사진|음악|톡|CG|cg|분기)\s*[:：]\s*(.+?)\]$/))) o={type:'cmd',cmd:m[1],arg:m[2].trim()};
+    else if((m=l.match(/^\[(배경|소품|효과음|효과|사진|음악|톡|CG|cg|분기|연출|스티커)\s*[:：]\s*(.+?)\]$/))) o={type:'cmd',cmd:m[1],arg:m[2].trim()};
     else if((m=l.match(/^\[(.+?)\]/))) o={type:'place',text:m[1].trim()};
     else if((m=l.match(/^선택\s*[:：]\s*(.+)$/))) o={type:'choice',opts:m[1].split('|').map(s=>s.trim()).filter(Boolean)};
-    else if((m=l.match(/^([^:：\s][^:：]{0,20})[:：]\s*(.+)$/))){ let who=m[1].trim(),face=''; const fm=who.match(/^(.+?)\s*\[(.+?)\]$/); if(fm){who=fm[1].trim();face=fm[2].trim();} const cm=m[2].trim().match(/^\[(배경|소품|효과음|효과|사진|음악|톡|CG|cg|분기)\s*[:：]\s*(.+?)\]$/); o=cm?{type:'cmd',cmd:cm[1],arg:cm[2].trim(),who}:{type:'say',who,face,text:m[2]}; }
+    else if((m=l.match(/^([^:：\s][^:：\[]{0,20}(?:\s*\[[^\]:：]{1,40}\])?)[:：]\s*(.+)$/))){ let who=m[1].trim(),face='',dir=null; const fm=who.match(/^(.+?)\s*\[(.+?)\]$/); if(fm){who=fm[1].trim();dir=dirSplit(fm[2]);face=dir.face;} /* 연출(0462): [표정|감정|동작] */ const cm=m[2].trim().match(/^\[(배경|소품|효과음|효과|사진|음악|톡|CG|cg|분기|연출|스티커)\s*[:：]\s*(.+?)\]$/); o=cm?{type:'cmd',cmd:cm[1],arg:cm[2].trim(),who}:{type:'say',who,face,text:m[2]}; if(dir&&!cm&&(dir.emo||dir.motion)) o.dir=dir; }
     else o={type:'nar',text:l};
     o.cond=cond; return o;
   });
@@ -11762,6 +11811,7 @@ function vnStep(){
 function vnCmd(L){
   const a=L.arg;
   if(L.cmd==='분기'){ S.branch=a; return; } // 다음 선택지를 시나리오 분기로 기록(0465-story-plan.js)
+  if(vnDirectCmd(L)) return; // 연출·스티커·화면 효과(0462)
   if(L.cmd==='배경') setVnBg(a);
   else if(L.cmd==='음악') bgm(a);
   else if(L.cmd==='CG'||L.cmd==='cg'){ const g=$('#vnCG'); g.innerHTML=libArt(a)+'<button class="vn-cgx" data-act="vncgview" type="button">⤢ 크게 보기</button>'; g.hidden=false; g.classList.remove('in'); void g.offsetWidth; g.classList.add('in'); $('#vn').classList.add('cgon'); }
@@ -11787,7 +11837,7 @@ function vnShow(L){
   }
   if(L.type==='say'){
     const me=isMe(L.who), c=me?null:vnSpeaker(L.who), fz=c?(L.face||textFace(c,L.text)):'', key=c?c.id+'|'+fz:'';
-    if(c&&key!==S.curKey){ const same=S.cur===c; S.cur=c; S.curKey=key; ch.innerHTML=art(c,'',{face:fz,upper:true}); if(!same){ch.classList.remove('enter');void ch.offsetWidth;ch.classList.add('enter');} }
+    if(c){ const fresh=!(S.stage||[]).some(x=>x.c===c); vnDirectSay(L,c,fz); if(fresh){ const sl=ch.querySelector('.vn-slot.speak'); if(sl){ sl.classList.remove('enter'); void sl.offsetWidth; sl.classList.add('enter'); } } } // 무대·연출(0462)
     ch.classList.toggle('dim',!c);
     $('#vnName').textContent=me?playerName():L.who; $('#vnText').classList.remove('nar');
     if(c&&c.voiceId&&SND().voiceStory) speak(c,L.text); else stopVoice();
@@ -11802,6 +11852,70 @@ function vnAutoNext(){if(!S||!S.auto||S.typing||S.choice)return;clearTimeout(S.a
 function vnEnd(){if(!S)return;clearInterval(S.timer);clearTimeout(S.autoT);stopVoice();const d=S.done;S=null;closeOv();d&&d();}
 function closeOv(){$('#ov').hidden=true;$('#ov').innerHTML='';sceneBgm();}
 
+/* ===== 연출 엔진: 감정 아이콘 · 캐릭터 동작 · 화면 효과 · 두 사람 무대 ===== */
+/* 대본 문법(SCRIPT_FMT의 DIRECTION_GUIDE 조각):
+     이름[표정|하트|점프]: 대사      — 대괄호 안을 | 로 나눠 표정·감정·동작을 함께(순서 상관없음)
+     [연출: 이름 하트 점프]          — 대사 없이 감정·동작만
+     [효과: 붉은섬광] [효과: 비] [효과: 비 끝] [효과: 회상] [효과: 회상 끝] …
+     톡(메신저)·대본의 [스티커: 하트] — 감정 아이콘을 스티커로
+   감정 아이콘은 기본 SVG를 쓰고, 자료실에 같은 이름의 '감정' 그림(kind 'emote')이 있으면 그걸 써요(공유 보관함으로 게임끼리 재사용).
+   P().vnDirect: 'auto'(대본 + 대사로 자동 감정, 기본) | 'script'(대본에 쓴 것만) | 'off' · P().vnStage: 'duo'(최근 두 사람, 기본) | 'single'
+   문서: docs/research/direction.md */
+const EMO_SVG=(body,vb)=>`<svg viewBox="${vb||'0 0 40 40'}" aria-hidden="true">${body}</svg>`, EMO_ST='stroke="#1a1020" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"';
+const EMOTES={
+ 하트:{c:'#ff5c8a',svg:EMO_SVG(`<path d="M20 34 6 20a8 8 0 0 1 14-10 8 8 0 0 1 14 10z" fill="#ff5c8a" ${EMO_ST}/>`),a:'pop',k:/좋아해|사랑|두근|설레|고마워|기뻐|♥|❤/},
+ 땀:{c:'#7cc8ff',svg:EMO_SVG(`<path d="M22 4c6 10 10 15 10 21a10 10 0 0 1-20 0c0-6 4-11 10-21z" fill="#a9dcff" ${EMO_ST}/>`),a:'drip',k:/(^|\s)(어,|어어|저기…|아하하|하하…)|당황|곤란|미안…|^\.\.\.|^…/},
+ 화남:{c:'#ff4b4b',svg:EMO_SVG(`<g fill="none" stroke="#ff3b3b" stroke-width="4.5" stroke-linecap="round"><path d="M8 15q7 0 7-7"/><path d="M25 8q0 7 7 7"/><path d="M32 25q-7 0-7 7"/><path d="M15 32q0-7-7-7"/></g>`),a:'throb',k:/화나|짜증|뭐야!|용서 못|열받|시끄러|그만해!/},
+ 놀람:{c:'#ffd23f',svg:EMO_SVG(`<path d="M15 3h10l-2 22h-6z" fill="#ffd23f" ${EMO_ST}/><circle cx="20" cy="32" r="4" fill="#ffd23f" ${EMO_ST}/>`),a:'pop',k:/[!！][?？]|[?？][!！]|뭐라고|설마|깜짝|에엣|헉/},
+ 의문:{c:'#9bd0ff',svg:EMO_SVG(`<path d="M12 13a8 8 0 1 1 12 7c-3 2-4 3-4 7" fill="none" stroke="#1a1020" stroke-width="7" stroke-linecap="round"/><path d="M12 13a8 8 0 1 1 12 7c-3 2-4 3-4 7" fill="none" stroke="#9bd0ff" stroke-width="3.5" stroke-linecap="round"/><circle cx="20" cy="35" r="3.5" fill="#9bd0ff" ${EMO_ST}/>`),a:'tilt',k:/글쎄|왜\?|그게 무슨|음\?|응\?/},
+ 침묵:{c:'#ffffff',svg:EMO_SVG(`<g fill="#fff" ${EMO_ST}><circle cx="9" cy="24" r="4"/><circle cx="20" cy="24" r="4"/><circle cx="31" cy="24" r="4"/></g>`),a:'fade',k:/^(…|\.\.\.)+$/},
+ 음표:{c:'#c49bff',svg:EMO_SVG(`<path d="M16 30V8l16-4v20" fill="none" stroke="#1a1020" stroke-width="6"/><path d="M16 30V8l16-4v20" fill="none" stroke="#c49bff" stroke-width="3"/><circle cx="12" cy="30" r="5" fill="#c49bff" ${EMO_ST}/><circle cx="28" cy="26" r="5" fill="#c49bff" ${EMO_ST}/>`),a:'bob',k:/[♪~]$|후후|에헤헤|흥흥|랄라|ㅎㅎ|ㅋㅋ/},
+ 번뜩:{c:'#fff27a',svg:EMO_SVG(`<g stroke="#fff27a" stroke-width="4" stroke-linecap="round"><path d="M20 3v8M20 29v8M3 20h8M29 20h8M8 8l5 5M27 27l5 5M32 8l-5 5M13 27l-5 5"/></g>`),a:'pop',k:/그렇구나!|알았다|좋은 생각|번뜩|맞아!/},
+ 눈물:{c:'#7cc8ff',svg:EMO_SVG(`<g fill="#a9dcff" ${EMO_ST}><path d="M12 8c4 7 6 10 6 14a6 6 0 0 1-12 0c0-4 2-7 6-14z"/><path d="M28 14c4 7 6 10 6 14a6 6 0 0 1-12 0c0-4 2-7 6-14z"/></g>`),a:'drip',k:/흑|훌쩍|울지|눈물|슬퍼/},
+ 홍조:{c:'#ff8fb0',svg:EMO_SVG(`<g stroke="#ff6f9a" stroke-width="3.5" stroke-linecap="round"><path d="M6 26l5-8M13 26l5-8M20 26l5-8M27 26l5-8"/></g>`),a:'fade',k:/부끄|창피|그, 그런|바보…|딱히/},
+ 졸림:{c:'#b8c4ff',svg:`<svg viewBox="0 0 40 40" aria-hidden="true"><text x="6" y="30" font-size="22" font-weight="900" fill="#b8c4ff" stroke="#1a1020" stroke-width="1.5">Z</text><text x="22" y="18" font-size="14" font-weight="900" fill="#b8c4ff" stroke="#1a1020" stroke-width="1">z</text></svg>`,a:'bob',k:/졸려|하암|피곤/},
+ 반짝:{c:'#fff3a8',svg:EMO_SVG(`<path d="M20 2l4 14 14 4-14 4-4 14-4-14-14-4 14-4z" fill="#fff3a8" ${EMO_ST}/>`),a:'pop',k:/반짝|멋지|대단해|최고/},
+ 한숨:{c:'#e6e6e6',svg:EMO_SVG(`<path d="M8 26a7 7 0 0 1 6-11 9 9 0 0 1 17 3 6 6 0 0 1-1 12H12a5 5 0 0 1-4-4z" fill="#eee" ${EMO_ST}/>`),a:'fade',k:/하아…|휴우|에휴|한숨/}};
+const EMO_ALIAS={'♥':'하트','💦':'땀','💢':'화남','!':'놀람','?':'의문','…':'침묵','♪':'음표','💡':'번뜩','😢':'눈물','😳':'홍조','💤':'졸림','✨':'반짝','당황':'땀','분노':'화남','놀라움':'놀람','물음표':'의문','기쁨':'음표','슬픔':'눈물','부끄러움':'홍조'};
+const MOTIONS={점프:'m-jump',뛰어오름:'m-jump',흔들:'m-shake',도리도리:'m-shake',떨림:'m-tremble',끄덕:'m-nod',갸웃:'m-tilt',다가옴:'m-near',물러남:'m-far',퇴장:'m-exit',등장:'m-enter',쓰러짐:'m-fall'};
+const SCREEN_FX={흔들림:'shake',강한흔들림:'shake2',플래시:'w',섬광:'w',붉은섬광:'r',암전:'b',페이드:'f',집중선:'lines',비:'rain',눈:'snow',벚꽃:'petal',회상:'memory',비네트:'vignette'};
+const FX_KEEP=['lines','rain','snow','petal','memory','vignette']; // 끝을 쓸 때까지 남는 효과
+function emoKey(t){ t=String(t||'').trim(); return EMOTES[t]?t:EMO_ALIAS[t]||''; }
+function emoteHTML(name,big){ const k=emoKey(name); if(!k) return ''; const l=typeof G!=='undefined'&&G&&G.lib.find(x=>x.kind==='emote'&&x.name===k), s=l&&imgSrc(l);
+  return `<i class="emo ${big?'big':''} e-${EMOTES[k].a}" data-emo="${esc(k)}">${s?`<img src="${esc(s)}" alt="${esc(k)}">`:EMOTES[k].svg}</i>`; }
+// "미소|하트|점프" → {face,emo,motion}
+function dirSplit(s){ const o={face:'',emo:'',motion:''}; String(s||'').split(/[|,·/]/).map(x=>x.trim()).filter(Boolean).forEach(t=>{ if(!o.emo&&emoKey(t)) o.emo=emoKey(t); else if(!o.motion&&MOTIONS[t]) o.motion=t; else if(!o.face) o.face=t; }); return o; }
+function autoEmote(text){ const t=String(text||'').trim(); for(const [k,d] of Object.entries(EMOTES)) if(d.k&&d.k.test(t)) return k; return ''; }
+function dirMode(){ const m=P().vnDirect; return m==='script'||m==='off'?m:'auto'; }
+// 무대: 최근 두 사람을 좌우로, 말하는 사람은 밝게
+function vnStage(c,face){ const ch=$('#vnChar'); if(!ch) return null; S.stage=S.stage||[]; let e=S.stage.find(x=>x.c===c);
+  if(!e){ e={c,face:null}; S.stage.push(e); const duo=P().vnStage!=='single'; while(S.stage.length>(duo?2:1)) S.stage.shift(); ch.innerHTML=S.stage.map(x=>`<div class="vn-slot" data-cid="${esc(x.c.id)}"></div>`).join(''); S.stage.forEach(x=>x.face=null); ch.classList.toggle('duo',S.stage.length>1); }
+  S.stage.forEach(x=>{ const el=ch.querySelector(`.vn-slot[data-cid="${CSS.escape(x.c.id)}"]`); if(!el) return; if(x.c===c&&x.face!==face){ x.face=face; el.innerHTML=art(c,'',{face,upper:true}); } if(x.face===null){ x.face=''; el.innerHTML=art(x.c,'',{upper:true}); } el.classList.toggle('speak',x.c===c); });
+  return ch.querySelector(`.vn-slot[data-cid="${CSS.escape(c.id)}"]`); }
+function slotOf(name){ const c=vnSpeaker(name); return c?vnStage(c,(S.stage||[]).find(x=>x.c===c)?.face||''):null; }
+function vnEmote(slot,emo){ if(!slot||!emo||dirMode()==='off') return; slot.querySelectorAll('.emo').forEach(x=>x.remove()); slot.insertAdjacentHTML('beforeend',emoteHTML(emo)); const i=slot.lastElementChild; setTimeout(()=>i&&i.remove(),1800); if(EMOTES[emo]&&/하트|놀람|화남/.test(emo)) try{ sfx(emo==='하트'?'확인':'타격'); }catch(e){} }
+function vnMotion(slot,m){ if(!slot||!m||dirMode()==='off') return; const cls=MOTIONS[m]; if(!cls) return; Object.values(MOTIONS).forEach(x=>slot.classList.remove(x)); void slot.offsetWidth; slot.classList.add(cls); if(cls!=='m-exit'&&cls!=='m-near'&&cls!=='m-far') setTimeout(()=>slot.classList.remove(cls),900);
+  if(cls==='m-exit') setTimeout(()=>{ S&&S.stage&&(S.stage=S.stage.filter(x=>x.c.id!==slot.dataset.cid)); slot.remove(); },600); }
+function vnScreen(arg){ const v=$('#vn'), f=$('#vnFlash'); if(!v) return; const end=/끝$/.test(arg), key=String(arg).replace(/\s*끝$/,'').replace(/\s+/g,''), k=SCREEN_FX[key]; if(!k) return false;
+  if(FX_KEEP.includes(k)){ v.classList.toggle('fx-'+k,!end); return true; }
+  if(k==='shake'||k==='shake2'){ v.classList.remove('shake','shake2'); void v.offsetWidth; v.classList.add(k); }
+  else { f.className='vn-flash'; void f.offsetWidth; f.className='vn-flash '+k; } return true; }
+// 대본 엔진(0460)이 부르는 곳
+function vnDirectSay(L,c,fz){ const d=L.dir||{}, slot=vnStage(c,fz); if(dirMode()==='off') return; vnMotion(slot,d.motion); vnEmote(slot,d.emo||(dirMode()==='auto'&&!d.face&&!d.motion?autoEmote(L.text):'')); }
+function vnDirectCmd(L){ if(L.cmd==='연출'){ const [who,...rest]=String(L.arg).split(/\s+/), slot=slotOf(who), d=dirSplit(rest.join('|')); vnMotion(slot,d.motion); vnEmote(slot,d.emo); return true; }
+  if(L.cmd==='스티커'){ if(S.phone){ const body=$('#vnPhBody'); body&&body.insertAdjacentHTML('beforeend',`<div class="msg"><div class="bub sticker">${emoteHTML(L.arg,true)}</div></div>`); } else vnEmote(S.stage&&S.stage.length?$('#vnChar .vn-slot.speak'):null,emoKey(L.arg)); return true; }
+  if(L.cmd==='효과') return vnScreen(L.arg); return false; }
+// 로비 터치 반응
+function lobbyEmote(el,line,zone){ if(dirMode()==='off'||!el) return; const k=autoEmote(line)||(zone==='head'?'하트':''); if(!k) return; const r=el.getBoundingClientRect(), d=document.createElement('div'); d.className='lb-emo'; d.style.cssText=`left:${r.left+r.width*.6}px;top:${r.top+r.height*.12}px`; d.innerHTML=emoteHTML(k); document.body.appendChild(d); setTimeout(()=>d.remove(),1600); }
+
+/* AI 연출 입히기: 대사·나레이션은 그대로 두고 표정|감정|동작 태그와 [효과]만 더해요. 바뀐 글이 있으면 버려요 */
+function dirStrip(t){ return parseScript(t).filter(L=>L.type==='say'||L.type==='nar'||L.type==='choice').map(L=>L.type==='choice'?L.opts.join('|'):(L.who||'')+':'+L.text).join('\n'); }
+function dirCount(t){ return parseScript(t).filter(L=>(L.type==='say'&&L.dir&&(L.dir.emo||L.dir.motion))||(L.type==='cmd'&&(L.cmd==='연출'||(L.cmd==='효과'&&!/흔들림|플래시|암전/.test(L.arg))))).length; }
+async function directScript(text,btn){ const src=String(text||''); if(!src.trim()) return null;
+  const r=await aiJSON(`${RULES}\n${DIRECTION_GUIDE}\n\n아래 대본에 연출만 더하라. 대사·나레이션·선택지 글자는 한 글자도 바꾸지 않고, 줄을 지우거나 순서를 바꾸지 않는다. 더할 수 있는 것: 이름 뒤 [표정|감정|동작], 줄 사이 [연출: 이름 감정 동작], [효과: …]. 감정이 크게 움직이는 줄에만(전체 줄의 20~35%) 넣고, 같은 감정을 연달아 쓰지 않는다.\n\n대본:\n${src}\n\nJSON만 출력: {"script":"연출을 더한 대본 전체"}`,btn,'complex');
+  const out=r&&nl(r.script); if(!out) return null; if(dirStrip(out)!==dirStrip(src)) return null; return out; }
+async function directStage(s){ let ok=false; for(const k of ['pre','post']){ if(!s[k]) continue; const o=await directScript(s[k]); if(o){ s[k]=o; ok=true; } } if(ok){ s.dirV=1; auditMarkObj(s); } return ok; }
+pfDef('DIRECTION_GUIDE','연출 문법(감정 아이콘·동작·화면 효과)',()=>`연출: 이름 뒤 대괄호에 표정·감정·동작을 |로 함께 쓸 수 있다(예: "세라[미소|하트|점프]: 정말?"). 감정 아이콘: ${Object.keys(EMOTES).join('·')}. 동작: 점프·흔들·떨림·끄덕·갸웃·다가옴·물러남·퇴장·쓰러짐. 대사 없이 [연출: 이름 감정 동작]. 화면 효과: [효과: 흔들림|강한흔들림|플래시|붉은섬광|암전|페이드|집중선|비|눈|벚꽃|회상|비네트] (집중선·비·눈·벚꽃·회상·비네트는 [효과: 비 끝]처럼 끝을 쓴다). 메신저에서는 [스티커: 감정 아이콘 이름]. 감정이 크게 움직이는 순간에만 쓰고 남발하지 않는다.`);
 /* ===== 시나리오 설계 (사전 설계 → 장마다 빌드) ===== */
 /* 그때그때 즉흥으로 쓰지 않고, 큰 틀(로그라인·주제·결말·막 구성)·숨겨진 반전(진실·공개 장·복선)·분기(선택 → 이후 장에 반영)·캐릭터 아크를
    먼저 설계해 두고, 장을 쓸 때 그 장에 필요한 것만(막 목표·심을 복선·지금 밝힐 반전·아직 숨길 것·분기 결과) AI에 넘겨요.
@@ -12466,7 +12580,7 @@ case 'poke': { if(document.body.classList.contains('lb-hidden')){ document.body.
       const face=touchFace(c,zone,affLv(own(c.id)));
       addAff(c,zone==='body'?1:2); bump('touch'); mark('prog');
       const b=$('#bubble'), l=pickTouchLine(pool,b?.textContent);
-      if(b){ b.textContent=sub(l); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } if(c.voiceId&&SND().voiceLobby) speak(c,l);
+      if(b){ b.textContent=sub(l); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } lobbyEmote(t,l,zone); if(c.voiceId&&SND().voiceLobby) speak(c,l);
       const st=t.querySelector('.lb-stage')||t; const old=st.querySelector('.lobby-art:not(.lobby-pose)'); if(old){ /* 레이어 그림(포즈)은 표정 그림이 없어서 그대로 둬요. 바꾸면 스탠딩으로 고정돼 버렸어요 */ const tmp=document.createElement('div'); tmp.innerHTML=P().lobbyMode==='stand'?art(c,'lobby-art react',{face}):lobbyCharacterArt(c,'lobby-art react',face); old.replaceWith(tmp.firstElementChild); clearTimeout(window._faceT); window._faceT=setTimeout(()=>{const cur=document.querySelector('.lobby-art'); if(cur&&tab==='lobby'){const t2=document.createElement('div');t2.innerHTML=P().lobbyMode==='stand'?art(c,'lobby-art'):lobbyCharacterArt(c);cur.replaceWith(t2.firstElementChild);}},3500); }
       { const x=e.clientX||innerWidth/2, y=e.clientY||innerHeight/2, lv=affLv(own(c.id)); ripple(x,y,lv>=7); if(lv>=5&&zone!=='body') hearts(x,y,Math.min(5,lv-3)); setTimeout(()=>charReact(document.querySelector('.lobby .lobby-art,.lobby .lobby-ill'),lv,zone),10); } break; }
 case 'lbbgdel': { if(playMode())break;const c=charById(id); if(!c?.lbbg||!(await appConfirm('로비 레이어의 배경만 지울까요?'))) break; await imgClear(c.lbbg); mark('c:'+c.id); openChar(c.id); render(); break; }
@@ -13691,7 +13805,7 @@ document.addEventListener('input',e=>{if(e.target.id==='ng_story'){const count=d
    고치는 방법: auto(규칙 변환, AI 없이) · ai(빠진 항목만 AI로 채움) · image(그림 생성) · open(기존 편집 화면 열기)
    생성 버전: 새로 만드는 캐릭터에 genVer가 찍혀요(cleanChar0). genVer가 없거나 낮으면 구버전 생성물이에요.
    지정 변환: 고른 캐릭터·항목을 지시문대로 AI가 바꿔요. 마지막 일괄 작업은 되돌릴 수 있어요. 문서: docs/research/content-audit.md */
-function auditGenVer(){ return 5; } // 5: 전장 규칙·별 조건·일정 장면 // 4: 개성 시트·인연 톡·메모리얼 // 생성 규칙이 바뀌면 올려요(2: 상징 컬러·아이템, 3: 바리에이션·상속 시대)
+function auditGenVer(){ return 6; } // 6: 연출(감정 아이콘·동작·화면 효과) // 5: 전장 규칙·별 조건·일정 장면 // 4: 개성 시트·인연 톡·메모리얼 // 생성 규칙이 바뀌면 올려요(2: 상징 컬러·아이템, 3: 바리에이션·상속 시대)
 const AUDIT_FIELDS={profile:['프로필','"profile":"성격·배경·비밀을 담은 3~5문장"'],intro:['첫 대사','"intro":"첫 만남 대사 1줄"'],lines:['평소 대사','"lines":["로비·평소 대사 5개"]'],
   touch:['터치 반응','"touch":{"head":["머리 쓰다듬기 반응 3개"],"body":["몸 터치 반응 3개"],"pet":["쓰다듬기 반응 3개"]}'],affLines:['호감도 대사','"affLines":{"3":["대사 1~2개"],"5":["대사 1~2개"],"8":["대사 1~2개"]}'],
   lvLines:['레벨업 대사','"lvLines":["2개"]'],dupLines:['돌파 대사','"dupLines":["2개"]'],naiPrompt:['외모 태그','"naiPrompt":"NovelAI 영어 태그"']};
@@ -13721,6 +13835,7 @@ const AUDIT_RULES=[
  {id:'c_memorial',scope:'char',kind:'missing',since:4,label:'메모리얼(높은 호감도 특별 장면·로비 대사)이 없어요',test:c=>!c.alt&&!(c.memorial&&c.memorial.script),fix:{mode:'ai-memo'}},
  {id:'g_rules',scope:'game',kind:'upgrade',since:3,label:'속성·역할 설명이 없어요(게임 규칙·도감에 표시돼요)',test:()=>rulesMissingDesc(),fix:{mode:'ai-rules'}},
  {id:'g_codex',scope:'game',kind:'upgrade',since:3,label:'도감에 게임 규칙(상성·역할)이 기록되지 않았어요',test:()=>rulesNotInCodex(),fix:{mode:'auto',run:()=>{ rulesCodex(); }}},
+ {id:'s_direct',scope:'stage',kind:'upgrade',since:6,label:'대본에 연출(감정 아이콘·동작·화면 효과)이 없어요(AI로 대사는 그대로 두고 연출만 더해요)',test:s=>!s.dirV&&String((s.pre||'')+(s.post||'')).split('\n').length>=6&&dirCount((s.pre||'')+'\n'+(s.post||''))===0,fix:{mode:'ai-run',run:s=>directStage(s)}},
  {id:'s_rules',scope:'stage',kind:'upgrade',since:5,label:'전장 규칙·별 조건이 없는 스테이지예요(예전 생성물)',test:s=>!s.story&&!s.farm&&(s.enemies||[]).length>0&&!s.rulesV,fix:{mode:'auto',run:s=>{ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)), L=ch?ch.stages:[s]; stageAutoRules(s,L.indexOf(s),L.length); }}},
  {id:'g_spots',scope:'game',kind:'upgrade',since:5,label:'일정(장소 방문) 장소가 없어요',test:()=>!spots().length,fix:{mode:'auto',run:()=>{ spotsAuto(); }}},
  {id:'c_spot',scope:'char',kind:'upgrade',since:5,label:'일정 장소에서 만날 때의 장면이 없어요(기본 장면으로 나와요)',test:c=>!c.alt&&!c.npc&&spots().length>0&&spots().some(s=>!(c.spotTalk||{})[s.id]),fix:{mode:'ai-run',run:c=>spotTalkAI(c)}},
@@ -14003,6 +14118,60 @@ function imageScrollGuard(){
 })();
 
 /* /IMAGE_CANDIDATES_MODULE */
+/* ===== 에셋 관리: 공유 보관함 · 사용처 · 중복 합치기 · 감정 아이콘 그림 ===== */
+/* 게임마다 따로 있던 자료실(G.lib)을 게임끼리 재사용하게 해요.
+   - 공유 보관함: 'ggm-shared-assets'(목록) + IDB 'shared::<id>'(그림·소리). 어느 게임에서 넣든 모든 게임에서 가져와요
+   - 자동 재사용: 새 장 생성(addLib)·대본에서 찾은 자료(scanScriptAssets)가 그림 없이 생기면, 보관함에 같은 종류·이름이 있을 때 그대로 가져옴(shAdopt)
+   - 사용처: 대본(스토리·톡·에피소드·메모리얼·일정)에서 이름을 세어 안 쓰는 자료를 보여 줌. 같은 프롬프트·이름 중복은 별칭(alias)으로 합침(그림 1장 공유)
+   - 감정 아이콘(0462)의 그림을 직접 올려 바꿈(kind 'emote') · 문서 docs/research/direction.md */
+const SH_KEY='ggm-shared-assets', SH_KINDS={bg:'배경',prop:'소품',cg:'CG',enemy:'적',icon:'아이콘',emote:'감정 아이콘',bgm:'음악',sfx:'효과음'};
+const shAudio=k=>k==='bgm'||k==='sfx';
+function shList(){ try{ const a=JSON.parse(appStorage.getItem(SH_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function shSave(a){ try{ appStorage.setItem(SH_KEY,JSON.stringify(a)); }catch(e){} }
+const shCache={};
+async function shSrc(x){ if(shCache[x.id]) return shCache[x.id]; try{ const b=await idbGet('shared::'+x.id); if(b) return shCache[x.id]=URL.createObjectURL(b); }catch(e){} return null; }
+function libTarget(l){ return l&&l.alias&&G.lib.find(x=>x.id===l.alias)||l; }
+async function libBlob(l){ const o=libTarget(l); return idbGetNS(shAudio(o.kind)?'a_'+o.id:o.id); }
+async function shPut(l){ const b=await libBlob(l); if(!b) return false; const L=shList(), old=L.find(x=>x.kind===l.kind&&x.name===l.name), id=old?old.id:'s'+uid();
+  await idbPut('shared::'+id,b); if(shCache[id]){ URL.revokeObjectURL(shCache[id]); delete shCache[id]; }
+  const it={id,kind:l.kind,name:l.name,prompt:String(libTarget(l).prompt||''),from:G.meta.title,at:Date.now()}; shSave(old?L.map(x=>x===old?it:x):[it,...L]); return true; }
+async function shTake(x,into){ const b=await idbGet('shared::'+x.id).catch(()=>null); if(!b) return null; let l=into||G.lib.find(y=>y.kind===x.kind&&y.name===x.name);
+  if(!l){ l={id:'l'+uid(),kind:x.kind,name:x.name,prompt:x.prompt||'',img:null}; G.lib.push(l); } delete l.alias; if(!l.prompt&&x.prompt) l.prompt=x.prompt;
+  if(shAudio(x.kind)) await storeAudio(l,b); else await storeImage(l,b); l.shared=x.id; mark('l:'+l.id); return l; }
+function shAdopt(l){ if(!l||l.img||l.audio||l.alias) return; const x=shList().find(y=>y.kind===l.kind&&y.name===l.name); if(x) shTake(x,l).catch(()=>{}); }
+// 대본에 나오는 자료 이름 세기
+function libUsage(){ const n={}, add=k=>{ if(k) n[k]=(n[k]||0)+1; }, scan=t=>{ if(!t) return; try{ parseScript(t).forEach(L=>{ if(L.type==='cmd') add(L.arg); else if(L.type==='place') add(L.text); }); }catch(e){} };
+  G.chapters.forEach(ch=>(ch.stages||[]).forEach(s=>{ scan(s.pre); scan(s.post); })); (G.threads||[]).forEach(t=>scan(t.script)); G.chars.forEach(c=>{ (c.episodes||[]).forEach(e=>scan(e.script)); if(c.memorial) scan(c.memorial.script); Object.values(c.spotTalk||{}).forEach(scan); });
+  scan(G.opening&&G.opening.prologue); spots().forEach(s=>add(s.bg)); add(P().titleBg); add(P().lobbyBg); G.lib.filter(l=>l.kind==='cg').forEach(l=>add(l.name)); return n; }
+function libDupes(){ const out=[], seen={}; G.lib.filter(l=>['bg','prop','enemy','icon'].includes(l.kind)&&!l.alias).forEach(l=>{ const k=l.kind+'|'+(String(l.prompt||'').trim().toLowerCase()||'#'+l.name.replace(/\s+/g,'')); if(seen[k]) out.push({keep:seen[k],dup:l}); else seen[k]=l; }); return out; }
+function libMerge(list){ auditSnap(list.map(x=>x.dup),'자료 합치기'); list.forEach(({keep,dup})=>{ dup.alias=keep.id; dup.img=null; mark('l:'+dup.id); }); return list.length; }
+
+let AM_TAB='shared';
+async function openAssets(tab){ if(tab) AM_TAB=tab; const tabs=[['shared','공유 보관함'],['game','이 게임 자료'],['emote','감정 아이콘']]; let body='';
+  if(AM_TAB==='shared'){ const L=shList(); const srcs=await Promise.all(L.map(x=>shAudio(x.kind)?null:shSrc(x)));
+    body=`<p class="muted" style="font-size:.82rem">모든 게임이 함께 쓰는 자료예요. 이 게임 자료에서 '보관함에 넣기'로 넣고, 여기서 '가져오기'로 지금 게임에 넣어요. 새 장을 만들 때 같은 이름의 배경·소품이 생기면 자동으로 가져와요.</p>
+    ${L.length?L.map((x,i)=>`<div class="ep">${srcs[i]?`<img src="${esc(srcs[i])}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:6px">`:`<span style="width:48px;text-align:center">${shAudio(x.kind)?'♪':'—'}</span>`}<span class="t"><b>${esc(x.name)}</b><span class="muted">${esc(SH_KINDS[x.kind]||x.kind)} · ${esc(x.from||'')}${G.lib.some(l=>l.kind===x.kind&&l.name===x.name&&(l.img||l.audio))?' · 이 게임에 있음':''}</span></span><button class="btn sm" data-act="amtake" data-id="${x.id}">가져오기</button><button class="btn sm ghost" data-act="amshdel" data-id="${x.id}">✕</button></div>`).join(''):'<p class="muted">아직 비어 있어요</p>'}`; }
+  else if(AM_TAB==='game'){ const U=libUsage(), D=libDupes(), L=G.lib.filter(l=>SH_KINDS[l.kind]), unused=L.filter(l=>['bg','prop'].includes(l.kind)&&!U[l.name]&&!l.alias);
+    body=`<p class="muted" style="font-size:.82rem">자료 ${L.length}개 · 대본에서 안 쓰는 배경·소품 ${unused.length}개 · 중복 ${D.length}개</p>
+    ${D.length?`<div class="panel" style="padding:8px"><b>중복</b> (같은 프롬프트·이름): ${D.map(x=>`${esc(x.dup.name)} → ${esc(x.keep.name)}`).join(', ')}<div class="row" style="margin-top:6px"><button class="btn sm" data-act="ammerge">그림 1장으로 합치기 (${D.length})</button>${AUDIT_UNDO?`<button class="btn sm ghost" data-act="amundo">되돌리기</button>`:''}</div></div>`:''}
+    <div class="row" style="gap:6px;margin:6px 0"><button class="btn sm ghost" data-act="amadopt">보관함에서 같은 이름 자료 채우기</button></div>
+    ${L.map(l=>{ const s=shAudio(l.kind)?null:imgSrc(l); return `<div class="ep">${s?`<img src="${esc(s)}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:6px">`:`<span style="width:48px;text-align:center">${shAudio(l.kind)?(l.audio?'♪':'—'):'—'}</span>`}<span class="t"><b>${esc(l.name)}</b><span class="muted">${esc(SH_KINDS[l.kind])} · 대본 ${U[l.name]||0}번${l.alias?' · 별칭':''}${l.shared?' · 보관함':''}</span></span>${(s||l.audio)&&!l.alias?`<button class="btn sm ghost" data-act="amput" data-id="${l.id}">보관함에 넣기</button>`:''}</div>`; }).join('')}`; }
+  else { body=`<p class="muted" style="font-size:.82rem">대본의 [표정|하트] · [연출: 이름 땀] · [스티커: 화남]에 쓰는 감정 아이콘이에요. 그림을 올리면 기본 아이콘 대신 써요(공유 보관함에 넣으면 다른 게임에서도).</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px">${Object.keys(EMOTES).map(k=>{ const l=G.lib.find(x=>x.kind==='emote'&&x.name===k); return `<div style="width:92px;text-align:center"><div style="height:60px">${emoteHTML(k,true).replace('class="emo big','class="emo big still')}</div><b style="font-size:.8rem">${esc(k)}</b><label class="btn sm ghost" style="display:block;margin-top:4px">그림<input type="file" accept="image/*" hidden data-amemo="${esc(k)}"></label>${l?`<button class="btn sm ghost" data-act="amemodel" data-id="${l.id}" style="margin-top:2px">기본으로</button>`:''}</div>`; }).join('')}</div>`; }
+  openModal(`${head('에셋 관리','<span class="muted">공유·재사용</span>')}<div class="row" style="gap:4px;margin-bottom:8px">${tabs.map(([k,l])=>`<button class="btn sm ${AM_TAB===k?'':'ghost'}" data-act="amtab" data-k="${k}">${l}</button>`).join('')}</div>${body}<div class="row" style="margin-top:12px"><button class="btn ghost" data-act="close">닫기</button></div>`); }
+function assetPanel(){ const sh=shList().length, d=libDupes().length; return `<div class="panel pm-hide"><h3>에셋 관리 ${d?`<span class="badge">중복 ${d}</span>`:''}</h3><p class="muted" style="margin:0 0 6px">공유 보관함 ${sh}개 · 게임끼리 배경·소품·음악·감정 아이콘을 재사용하고, 중복 자료를 합치고, 안 쓰는 자료를 찾아요.</p><button class="btn sm" data-act="amopen">에셋 관리</button></div>`; }
+document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act, id=b.dataset.id;
+  if(a==='amopen') openAssets();
+  else if(a==='amtab') openAssets(b.dataset.k);
+  else if(a==='amput'){ const l=G.lib.find(x=>x.id===id); if(l&&await shPut(l)) toast(`「${l.name}」을(를) 공유 보관함에 넣었어요`); else toast('넣을 그림·소리가 없어요'); openAssets(); }
+  else if(a==='amtake'){ const x=shList().find(y=>y.id===id); const l=x&&await shTake(x); toast(l?`「${l.name}」을(를) 가져왔어요`:'가져오지 못했어요'); openAssets(); }
+  else if(a==='amshdel'){ if(!(await appConfirm('공유 보관함에서 지울까요? 이미 가져온 게임의 자료는 그대로예요.'))) return; shSave(shList().filter(x=>x.id!==id)); try{ await idbDel('shared::'+id); }catch(_){} openAssets(); }
+  else if(a==='ammerge'){ const n=libMerge(libDupes()); toast(`${n}개를 합쳤어요(그림 1장을 같이 써요)`); openAssets(); }
+  else if(a==='amundo'){ auditUndo(); G.lib.forEach(l=>mark('l:'+l.id)); openAssets(); }
+  else if(a==='amadopt'){ let n=0; for(const l of G.lib.filter(l=>!l.img&&!l.audio&&!l.alias)){ const x=shList().find(y=>y.kind===l.kind&&y.name===l.name); if(x&&await shTake(x,l)) n++; } toast(n?`${n}개를 보관함에서 채웠어요`:'채울 자료가 없어요'); openAssets(); }
+  else if(a==='amemodel'){ G.lib=G.lib.filter(x=>x.id!==id); mark('l:'+id); openAssets(); } });
+document.addEventListener('change',async e=>{ const k=e.target.dataset&&e.target.dataset.amemo, f=e.target.files&&e.target.files[0]; if(!k||!f) return;
+  let l=G.lib.find(x=>x.kind==='emote'&&x.name===k); if(!l){ l={id:'l'+uid(),kind:'emote',name:k,prompt:'',img:null}; G.lib.push(l); } await storeImage(l,f); mark('l:'+l.id); toast(`「${k}」 아이콘을 바꿨어요`); openAssets('emote'); });
 /* MODAL_NAV_MODULE */
 /* One user dismissal returns one modal level. Programmatic closeModal still closes all. */
 (function(){

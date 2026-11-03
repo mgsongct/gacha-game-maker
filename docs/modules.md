@@ -204,6 +204,12 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - `src/main/0135-schedule.js`: `G.meta.spots`, `c.spotTalk`, `P().sched`, `spotsAuto`·`spotsAI`·`spotTalkAI`·`schedVisit`. 점검 `g_spots`·`c_spot`(fix 모드 `ai-run`)
 - 설계: [research/combat-content.md](research/combat-content.md)
 
+## 8-2-7. 연출 엔진 · 에셋 관리
+
+- `src/main/0462-direction.js`: `EMOTES`·`MOTIONS`·`SCREEN_FX`, 파싱 `dirSplit`(parseScript가 `L.dir`), 무대 `vnStage`(두 사람), `vnDirectSay`·`vnDirectCmd`(vnShow·vnCmd), `autoEmote`, `emoteHTML`(메신저 스티커 `w:'k'`·로비 `lobbyEmote`), AI `directScript`·`directStage`, 조각 `DIRECTION_GUIDE`, 점검 `s_direct`
+- `src/main/0565-asset-library.js`: 공유 보관함 `shList/shPut/shTake/shAdopt`(addLib·scanScriptAssets), `libUsage`, `libDupes/libMerge`(alias), 화면 `openAssets`
+- 설계: [research/direction.md](research/direction.md)
+
 ## 8-3. 콘텐츠 점검·업그레이드
 
 - `src/main/0535-content-audit.js`: 규칙 `AUDIT_RULES`(감지 `test` + 고치기 `fix.mode`), `auditScan`, `auditFix`, 지정 변환 `auditConvert`, 되돌리기 `auditUndo`, 생성 버전 `auditGenVer()`(새 캐릭터 `cleanChar0`에서 `genVer`로 찍힘)

@@ -1,0 +1,46 @@
+/* 연출 엔진(main/0462-direction.js): 두 사람 무대·감정 아이콘·동작·화면 효과·스티커 */
+.vn-slot{position:relative;height:100%;flex:1 1 0;min-width:0;display:flex;justify-content:center;align-items:flex-end;transition:filter .25s,transform .3s}
+.vn-char.duo .vn-slot{flex:0 0 58%}
+.vn-char.duo .vn-slot:first-child{margin-right:-16%}
+.vn-char.duo .vn-slot:not(.speak){filter:brightness(.55);z-index:0}
+.vn-char.duo .vn-slot.speak{z-index:1}
+.vn-slot.enter{animation:enter .45s ease-out}
+.vn-char.up .vn-slot{overflow:hidden}
+.emo{position:absolute;left:58%;top:6%;width:54px;height:54px;z-index:4;pointer-events:none;filter:drop-shadow(0 2px 3px #0008)}
+.vn-char.up .emo{top:4%}
+.emo svg,.emo img{width:100%;height:100%;object-fit:contain}
+.emo.big{position:static;display:inline-block;width:84px;height:84px}
+.e-pop{animation:emoPop 1.6s ease-out forwards}.e-drip{animation:emoDrip 1.6s ease-in forwards}.e-throb{animation:emoThrob 1.6s ease-in-out forwards}
+.e-tilt{animation:emoTilt 1.6s ease-out forwards}.e-fade{animation:emoFade 1.6s ease-out forwards}.e-bob{animation:emoBob 1.6s ease-in-out forwards}
+.emo.big{animation-iteration-count:1;animation-fill-mode:none}
+@keyframes emoPop{0%{transform:scale(0);opacity:0}15%{transform:scale(1.25);opacity:1}25%{transform:scale(1)}85%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+@keyframes emoDrip{0%{transform:translateY(-6px);opacity:0}15%{opacity:1}80%{transform:translateY(10px);opacity:1}100%{transform:translateY(14px);opacity:0}}
+@keyframes emoThrob{0%,100%{transform:scale(.6);opacity:0}10%,30%,50%,70%{transform:scale(1.1);opacity:1}20%,40%,60%{transform:scale(.9)}90%{opacity:1}}
+@keyframes emoTilt{0%{transform:rotate(-30deg) scale(.4);opacity:0}20%{transform:rotate(12deg) scale(1);opacity:1}35%{transform:rotate(0)}85%{opacity:1}100%{opacity:0}}
+@keyframes emoFade{0%{opacity:0}20%,80%{opacity:1}100%{opacity:0}}
+@keyframes emoBob{0%{opacity:0;transform:translateY(6px)}20%{opacity:1}40%{transform:translateY(-4px) rotate(-8deg)}60%{transform:translateY(2px) rotate(8deg)}85%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+.m-jump{animation:mJump .55s ease-out}.m-shake{animation:mShake .5s}.m-tremble{animation:mTremble .7s linear}.m-nod{animation:mNod .55s}.m-tilt{animation:mTilt .7s ease-out}
+.m-near{transform:scale(1.14) translateY(4%)}.m-far{transform:scale(.88)}.m-exit{animation:mExit .6s ease-in forwards}.m-enter{animation:enter .45s ease-out}.m-fall{animation:mFall .8s ease-in}
+@keyframes mJump{30%{transform:translateY(-9%)}55%{transform:translateY(0)}70%{transform:translateY(-3%)}}
+@keyframes mShake{20%{transform:translateX(-5%)}40%{transform:translateX(5%)}60%{transform:translateX(-3%)}80%{transform:translateX(2%)}}
+@keyframes mTremble{0%,100%{transform:translate(0)}10%,30%,50%,70%,90%{transform:translate(-1.2%,.4%)}20%,40%,60%,80%{transform:translate(1.2%,-.4%)}}
+@keyframes mNod{40%{transform:translateY(3%)}}
+@keyframes mTilt{40%{transform:rotate(-4deg)}100%{transform:rotate(0)}}
+@keyframes mExit{to{transform:translateX(40%);opacity:0}}
+@keyframes mFall{40%{transform:rotate(3deg) translateY(4%)}100%{transform:translateY(12%);opacity:.6}}
+.vn.shake2{animation:shake .45s 2}
+.vn-flash.r{background:#ff2848;animation:flash .7s}
+.vn-flash.f{background:#000;animation:blk 2.4s}
+.vn::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .5s}
+.vn.fx-lines::after{opacity:.5;background:repeating-conic-gradient(from 0deg at 50% 45%,#fff0 0 4deg,#fff9 4deg 5deg);-webkit-mask:radial-gradient(circle at 50% 45%,#0000 28%,#000 70%);mask:radial-gradient(circle at 50% 45%,#0000 28%,#000 70%)}
+.vn.fx-rain::after{opacity:.55;background:repeating-linear-gradient(105deg,#fff0 0 14px,#cfe6ff66 14px 15px);background-size:100% 140px;animation:fxRain .45s linear infinite}
+.vn.fx-snow::after{opacity:.8;background-image:radial-gradient(#fff 1.5px,#0000 2px),radial-gradient(#fff 1px,#0000 1.5px);background-size:70px 70px,40px 40px;animation:fxSnow 6s linear infinite}
+.vn.fx-petal::after{opacity:.85;background-image:radial-gradient(ellipse 4px 2.5px,#ffb7cf 90%,#0000),radial-gradient(ellipse 3px 2px,#ffd1e0 90%,#0000);background-size:90px 90px,60px 60px;animation:fxSnow 7s linear infinite}
+.vn.fx-vignette::after,.vn.fx-memory::after{opacity:1;background:radial-gradient(ellipse at center,#0000 50%,#000c 100%)}
+.vn.fx-memory .vn-bg,.vn.fx-memory .vn-char,.vn.fx-memory .vn-cg{filter:sepia(.75) saturate(.7) brightness(.92)}
+@keyframes fxRain{to{background-position:-40px 140px}}
+@keyframes fxSnow{to{background-position:30px 420px,-20px 300px}}
+.bub.sticker{background:none!important;box-shadow:none!important;padding:0}
+.lb-emo{position:fixed;width:54px;height:54px;z-index:60;pointer-events:none}.lb-emo .emo{position:static;display:block}
+@media (prefers-reduced-motion:reduce){.m-jump,.m-shake,.m-tremble,.m-nod,.m-tilt,.m-fall,.vn.fx-rain::after,.vn.fx-snow::after,.vn.fx-petal::after{animation:none}}
+.emo.still{animation:none!important}

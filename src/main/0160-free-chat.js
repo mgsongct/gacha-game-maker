@@ -120,7 +120,8 @@ async function phPlay(t,c,s,token){
         await wait(Math.min(1800,500+L.text.length*35)); ty.remove(); if(!alive()) return;
         entry={w:'c',t:sub(L.text)};
       }
-    } else if(L.type==='cmd'&&['사진','소품','배경'].includes(L.cmd)){ await wait(800); if(!alive()) return; entry={w:'p',t:L.arg}; }
+    } else if(L.type==='cmd'&&L.cmd==='스티커'&&emoKey(L.arg)){ await wait(600); if(!alive()) return; entry={w:'k',t:emoKey(L.arg)}; } // 스티커(0462)
+    else if(L.type==='cmd'&&['사진','소품','배경'].includes(L.cmd)){ await wait(800); if(!alive()) return; entry={w:'p',t:L.arg}; }
     else if(L.type==='nar'||L.type==='place'){ entry={w:'s',t:sub(L.text)}; }
     if(!alive()) return;
     s.pos++; if(entry) s.lastPick='';

@@ -12,6 +12,7 @@
 | [story-design.md](story-design.md) | 시나리오 사전 설계: 막 구성·숨겨진 반전(복선→공개 장)·분기(선택 → 플래그 → 이후 장)·캐릭터 아크, 장마다 필요한 설계만 프롬프트에 | `src/main/0465-story-plan.js`, `aiChapterGen0`(`0250`), 대본 `[분기: id]`(`0460`) |
 | [prompts.md](prompts.md) | 프롬프트 현황 조사와 스튜디오: 흩어진 조각 등록·게임별 수정·AI 다듬기, 그림 가드(배경·소품의 사람 태그), 정정 → 교훈 자산화로 반복 방지, AI 기록 분석 | `src/main/0025-prompt-studio.js`, `llmWrap`·`composeNai`(`0020`) |
 | [combat-content.md](combat-content.md) | 전투 개선과 캐릭터 활용처: 전장 규칙·별 조건·집중 지시, 시련의 탑(소속·속성 제한), 일정(장소 방문·호감도), 생성·점검 연계 | `src/main/0485-battle-rules.js`, `0125-tower.js`, `0135-schedule.js` |
+| [direction.md](direction.md) | 커뮤 연출: 감정 아이콘·캐릭터 동작·화면 효과·두 사람 무대·스티커, AI 연출 입히기, 공유 보관함·자동 재사용·중복 합치기 | `src/main/0462-direction.js`, `0565-asset-library.js`, 대본 엔진 `0460` |
 | [content-audit.md](content-audit.md) | 콘텐츠 점검·업그레이드: 생성 기능 향상·구버전 생성물(genVer) 감지, 자동 변환·AI 채우기·지정 변환·되돌리기, 규칙 추가 방법 | `src/main/0535-content-audit.js` |
 | [variants.md](variants.md) | 바리에이션(이격·영의): 공통 템플릿, 조건으로 자동 적용, **상속형 관리(원본 + 수정치)**, 캐릭터 특징을 반영한 디자인 프롬프트 | 같은 파일들 + `src/main/0065-inherit.js`, `aiAltChar`(`src/main/0290-season-rotation.js`) |
 

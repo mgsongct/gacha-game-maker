@@ -422,6 +422,58 @@ try {
     return o; });
   assert.ok(Object.values(r19).every(v => v === true), JSON.stringify(r19)); assert.deepEqual(err19, [], '페이지 오류');
   console.log('ok 19 일정: 장소(자동·AI)·좋아하는 장소(호감도 1.5배)·하루 3번·보상, 장면(AI·기본 대본), 점검 규칙(장소·장면), 로비 진입');
+  // 20) 연출 엔진: 이름[표정|감정|동작] 파싱, [연출]·[효과]·[스티커], 두 사람 무대, 자동 감정·끄기, 메신저 스티커, 대본 형식 안내, AI 연출 입히기(대사 보존 검증)·점검 규칙
+  const p20 = await browser.newPage(), err20 = []; p20.on('pageerror', e => err20.push(String(e)));
+  await p20.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p20.goto(`http://127.0.0.1:${server.address().port}/?t=20`);
+  await p20.waitForFunction(() => typeof vnStage === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r20 = await p20.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true; closeModal(); closeOv();
+    const L = parseScript('세라[미소|하트|점프]: 정말?\n[연출: 이브 땀 떨림]\n[효과: 비]\n이브[당황]: 어어…\n[스티커: 화남]');
+    o.parse = L[0].type === 'say' && L[0].who === '세라' && L[0].face === '미소' && L[0].dir.emo === '하트' && L[0].dir.motion === '점프' && L[1].cmd === '연출' && L[2].cmd === '효과' && L[3].dir.emo === '땀' && L[3].face === '' && L[4].cmd === '스티커';
+    o.plain = parseScript('세라[미소]: 안녕')[0].face === '미소' && !parseScript('세라[미소]: 안녕')[0].dir;
+    o.auto = autoEmote('뭐라고?!') === '놀람' && autoEmote('좋아해') === '하트' && autoEmote('그냥 걷자') === '';
+    o.guide = SCRIPT_FMT.includes('감정 아이콘') && SCRIPT_FMT.includes('[효과: 흔들림') && THREAD_FMT.includes('[스티커:');
+    const step = async () => { const v = document.querySelector('#vn'); if (!v) return; v.click(); if (S && S.typing) v.click(); await wait(60); };
+    playStory('t', '세라: 안녕\n이브[미소|하트|점프]: 반가워요\n[효과: 회상]\n[연출: 세라 땀 떨림]\n세라: 어\n[효과: 회상 끝]\n카야: 셋째');
+    const until = async f => { for (let i = 0; i < 12 && !f(); i++) await step(); return !!f(); };
+    o.duo = await until(() => !!document.querySelector('.vn-slot.speak .emo[data-emo="하트"]')) && document.querySelectorAll('#vnChar .vn-slot').length === 2 && document.querySelector('#vnChar').classList.contains('duo') && document.querySelector('.vn-slot.speak').classList.contains('m-jump');
+    o.memory = await until(() => document.querySelector('#vn').classList.contains('fx-memory') && !!document.querySelector('.vn-slot .emo[data-emo="땀"]'));
+    o.memEnd = await until(() => $('#vnName').textContent === '카야') && !document.querySelector('#vn').classList.contains('fx-memory') && document.querySelectorAll('#vnChar .vn-slot').length === 2;
+    vnEnd();
+    P().vnStage = 'single'; P().vnDirect = 'off'; playStory('t', '세라: 안녕\n이브[하트]: 좋아해'); await until(() => $('#vnName').textContent === '이브'); o.off = document.querySelectorAll('#vnChar .vn-slot').length === 1 && !document.querySelector('.emo'); vnEnd(); P().vnStage = 'duo'; P().vnDirect = 'auto';
+    o.sticker = emoteHTML('♥', true).includes('data-emo="하트"') && bubbleHTML({ w: 'k', t: '하트' }, G.chars[0]).includes('sticker');
+    const src = '세라: 정말이야?\n이브: 네\n선택: 믿는다 | 의심한다\n1) 세라: 고마워';
+    SAMPLE = { json: async p => /연출만 더하라/.test(p) ? { script: /의심/.test(p) ? '세라[놀람]: 정말이야?\n이브[|끄덕]: 네\n선택: 믿는다 | 의심한다\n1) 세라[미소|하트]: 고마워' : '' } : {} };
+    const d = await directScript(src); o.direct = !!d && dirCount(d) >= 2 && dirStrip(d) === dirStrip(src);
+    SAMPLE = { json: async () => ({ script: '세라[놀람]: 정말이야? 바뀜\n이브: 네' }) }; o.reject = (await directScript(src)) === null;
+    const ch = G.chapters.find(c => c.kind === 'main'), st = ch.stages.find(s => (s.pre || '').split('\n').length >= 6 || ((s.pre || '') + (s.post || '')).split('\n').length >= 6);
+    o.audit = !!st && auditScan().some(g => g.rule.id === 's_direct' && g.items.includes(st));
+    SAMPLE = { json: async p => { const m = p.match(/대본:\n([\s\S]*)\n\nJSON만 출력/); const t = m ? m[1] : ''; return { script: t.replace(/^([^:\n\[]{1,20}): /m, '$1[|놀람]: ') }; } };
+    const g = auditScan().find(x => x.rule.id === 's_direct'); await auditFix(g.rule, [st]); o.auditFix = st.dirV === 1 && dirCount((st.pre || '') + '\n' + (st.post || '')) >= 1;
+    tab = 'studio'; STTAB = 'view'; render(); o.setting = !!document.querySelector('[data-pset="vnDirect"]') && !!document.querySelector('[data-pset="vnStage"]');
+    return o; });
+  assert.ok(Object.values(r20).every(v => v === true), JSON.stringify(r20)); assert.deepEqual(err20, [], '페이지 오류');
+  console.log('ok 20 연출 엔진: 이름[표정|감정|동작]·[연출]·[효과](회상·집중선 등)·[스티커], 두 사람 무대, 자동 감정·끄기, 메신저 스티커, 대본 형식 안내, AI 연출 입히기(대사 보존)·점검 규칙');
+  // 21) 에셋 관리: 공유 보관함 넣기·가져오기(다른 게임에서도), 새 자료 자동 재사용(addLib), 사용처·중복 합치기(별칭)·되돌리기, 감정 아이콘 그림 교체, AI 컨텍스트에 보관함 배경
+  const p21 = await browser.newPage(), err21 = []; p21.on('pageerror', e => err21.push(String(e)));
+  await p21.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p21.goto(`http://127.0.0.1:${server.address().port}/?t=21`);
+  await p21.waitForFunction(() => typeof shPut === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r21 = await p21.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)); P().seenOpening = true; closeModal(); closeOv();
+    const png = await (await fetch('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==')).blob();
+    const bg = { id: 'l' + uid(), kind: 'bg', name: '공유 시험 바다', prompt: 'no humans, scenery, sea', img: null }; G.lib.push(bg); await storeImage(bg, png);
+    o.put = await shPut(bg) && shList().some(x => x.name === '공유 시험 바다');
+    G.lib = G.lib.filter(l => l !== bg); addLib('bg', [{ name: '공유 시험 바다', prompt: '' }]); await wait(300); const nb = G.lib.find(l => l.name === '공유 시험 바다'); o.adopt = !!nb && !!nb.img && !!imgSrc(nb) && !!nb.shared;
+    o.ctx = ctx().includes('배경 목록') ; shSave(shList().concat([{ id: 'sx', kind: 'bg', name: '보관함 전용 숲', prompt: '', from: 'x', at: 1 }])); o.ctxShared = ctx().includes('보관함 전용 숲');
+    const a = { id: 'l' + uid(), kind: 'prop', name: '열쇠 A', prompt: 'no humans, object focus, key', img: null }, b2 = { id: 'l' + uid(), kind: 'prop', name: '열쇠 B', prompt: 'no humans, object focus, key', img: null }; G.lib.push(a, b2);
+    const D = libDupes(); o.dupes = D.some(x => x.keep === a && x.dup === b2); libMerge(D); o.merge = b2.alias === a.id; auditUndo(); o.undo = !b2.alias;
+    G.chapters[0].stages[0].pre = (G.chapters[0].stages[0].pre || '') + '\n[소품: 열쇠 A]'; o.usage = libUsage()['열쇠 A'] >= 1 && !libUsage()['열쇠 B'];
+    const em = { id: 'l' + uid(), kind: 'emote', name: '하트', prompt: '', img: null }; G.lib.push(em); await storeImage(em, png); o.emote = emoteHTML('하트').includes('<img');
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="amopen"]');
+    await openAssets('shared'); o.ui1 = !!document.querySelector('[data-act="amtake"]'); await openAssets('game'); o.ui2 = !!document.querySelector('[data-act="amput"]'); await openAssets('emote'); o.ui3 = document.querySelectorAll('[data-amemo]').length === Object.keys(EMOTES).length; closeModal();
+    return o; });
+  assert.ok(Object.values(r21).every(v => v === true), JSON.stringify(r21)); assert.deepEqual(err21, [], '페이지 오류');
+  console.log('ok 21 에셋 관리: 공유 보관함(넣기·가져오기)·새 자료 자동 재사용·AI 컨텍스트, 사용처·중복 합치기(별칭)·되돌리기, 감정 아이콘 그림 교체');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
