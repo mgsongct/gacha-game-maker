@@ -32,7 +32,7 @@ function rulesElemMat(){ const r=RULESM(), E=G.meta.elems.map(e=>e.n), b=rulesBe
   E.forEach(a=>{ m[a]={}; E.forEach(t=>{ const o=g[a]&&g[a][t]; m[a][t]=+o>0?+o:b[a]===t?adv:b[t]===a?dis:1; }); }); return m; }
 function rulesOptions(){ const r=G.meta.rules||{}, P={}, seen=new Set();
   POSITIONS().forEach(p=>{ const t=p.t||{}; if(Object.values(t).some(v=>+v)) P[p.id]=t; if(!seen.has(p.base)){ seen.add(p.base); if(P[p.id]) P['role:'+p.base]=t; } });
-  return {elemAdv:+r.elemAdv||1.5,elemDis:+r.elemDis||.75,elemMat:rulesElemMat(),reactions:Array.isArray(r.reactions)?r.reactions.filter(x=>x&&x.a&&x.b):[],aura:+r.aura||4,positions:P,synergy:r.synergy||null,rel:Array.isArray(r.rel)?r.rel:[]}; }
+  return {elemAdv:+r.elemAdv||1.5,elemDis:+r.elemDis||.75,elemMat:rulesElemMat(),reactions:Array.isArray(r.reactions)?r.reactions.filter(x=>x&&x.a&&x.b):[],aura:+r.aura||4,positions:P,synergy:r.synergy||null,rel:Array.isArray(r.rel)?r.rel:[],...(typeof balanceOptions==='function'?balanceOptions():{})}; } // 밸런스 AS 전투 보정(0187)
 const rulesPct=x=>`×${Math.round(x*100)/100}`;
 function rulesElemLine(e){ const m=rulesElemMat()[e]||{}, strong=Object.keys(m).filter(t=>m[t]>1), weak=Object.keys(m).filter(t=>(rulesElemMat()[t]||{})[e]>1);
   return [strong.length?`${strong.map(t=>`<b>${esc(t)}</b>`).join('·')}에 강함(${strong.map(t=>rulesPct(m[t])).join('·')})`:'',weak.length?`${weak.map(t=>`<b>${esc(t)}</b>`).join('·')}에 약함`:''].filter(Boolean).join(' · ')||'상성 없음'; }

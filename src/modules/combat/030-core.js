@@ -582,7 +582,7 @@ function create(allies,enemies,options={}){
   u.meleeGroup=null;u.meleeUntil=0;u.meleeDelay=0;u.lastInvincibleAt=-Infinity;u.invincibilityReadyAt=-Infinity;u.lastDamageDealt=0;u.lastDamageTaken=0;u.lastHealing=0;u.lastBlocked=0;
   for(const slot of Object.keys(SLOTS))u.ready[slot]=slot==='ultimate'?0:u.kit[slot].initial;
  });
- positionTraits(sim); synergy(sim,options.synergy);
+ positionTraits(sim); genBoost(sim,options.genBoost); synergy(sim,options.synergy);
  outcome(sim);for(const u of [...allies,...enemies])if(['battle_start','always'].includes(u.kit.passive.trigger))cast(sim,u,'passive');
  outcome(sim);return sim;
 }
@@ -592,6 +592,9 @@ function relKey(u,by){return by==='faction'?u.faction||u.c?.faction:by==='role'?
 // 포지션 기능: 능력치 %, 주는·받는 피해 %, 회복량 %, 치명타 %p, 시작 SP, 위협도 %(적이 노릴 확률). 포지션 id가 없으면 역할 기본 포지션('role:atk' 등)
 function positionTraits(sim){for(const u of [...sim.allies,...sim.enemies]){const p=sim.positions[u.pos||u.c?.pos]||sim.positions['role:'+(u.role||u.c?.role)];if(!p)continue;u.posT=p;
  const k=f=>Math.max(.1,1+(+p[f]||0)/100);u.maxhp=Math.round(u.maxhp*k('hp'));u.hp=Math.round(u.hp*k('hp'));u.baseMaxhp=u.maxhp;u.atk=Math.round(u.atk*k('atk'));u.def=Math.round(u.def*k('def'));u.spd=clamp(Math.round(u.spd*k('spd')),10,300,100);if(+p.sp)u.sp=clamp(u.sp+(+p.sp),0,100,u.sp);}}
+// 밸런스 AS(구세대 보정): 현재 세대보다 낮은 세대 캐릭터는 세대 차이당 pct%(최대 max%) 체력·공격·방어 보정. 저장된 능력치는 그대로
+function genBoost(sim,b){if(!b||!(+b.pct>0)||!(+b.cur>1))return;for(const u of sim.allies){const g=+(u.generation??u.c?.generation)||+b.cur,gap=Math.max(0,+b.cur-g);if(!gap)continue;const k=1+Math.min(+b.max||100,gap*+b.pct)/100;
+ u.maxhp=Math.round(u.maxhp*k);u.hp=Math.round(u.hp*k);u.baseMaxhp=u.maxhp;u.atk=Math.round(u.atk*k);u.def=Math.round(u.def*k);u.genBoost=Math.round((k-1)*100);}}
 // 속성 반응: 맞은 대상에 속성 흔적(aura)이 남고, 다른 속성이 aura 초 안에 맞히면 반응. amp=피해 배율 · burst=공격력×값 추가 피해 · stun=기절(초) · vuln=받는 피해 +값%(dur초)
 function reactHit(sim,u,t,o){const none={mul:1,flat:0};if(!sim.reactions.length||o.periodic||o.fixed||!u.elem||t.hp<=0)return none;const a=t.aura;
  if(a&&a.until>sim.time&&a.e!==u.elem){const r=sim.reactions.find(x=>x.a===a.e&&x.b===u.elem)||sim.reactions.find(x=>x.both&&x.a===u.elem&&x.b===a.e);

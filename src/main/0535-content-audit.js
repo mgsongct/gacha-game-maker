@@ -25,6 +25,8 @@ const AUDIT_RULES=[
  {id:'c_img',scope:'char',kind:'missing',since:1,label:'그림(스탠딩·상반신·일러스트·무기)이 아직 없어요',test:c=>drawTodo(auditImgCats).some(it=>it.c===c),fix:{mode:'image'}},
  {id:'s_script',scope:'stage',kind:'missing',since:1,label:'스테이지 대본(전투 전 장면)이 비었어요',test:s=>!String(s.pre||'').trim(),fix:{mode:'ai-stage'}},
  {id:'c_pos',scope:'char',kind:'upgrade',since:3,label:'포지션이 정해지지 않았어요(전투 기본형에 맞는 포지션으로 배정)',test:c=>!c.alt&&!posById(c.pos),fix:{mode:'auto',run:c=>{ posAssign(c,c.pos); }}},
+ {id:'c_statband',scope:'char',kind:'upgrade',since:3,label:'능력치가 희귀도·기본형 기준에서 많이 벗어났어요(AI 생성 편차)',test:c=>!c.alt&&balInfo(c).statOut,fix:{mode:'auto',run:c=>{ balNormalize(c,'edge'); }}},
+ {id:'c_genlag',scope:'char',kind:'upgrade',since:3,label:'출시 세대가 현재보다 많이 뒤처졌어요(구캐릭터 AS)',test:c=>!c.alt&&balInfo(c).genLag,fix:{mode:'skills-remaster'}},
  {id:'g_rules',scope:'game',kind:'upgrade',since:3,label:'속성·역할 설명이 없어요(게임 규칙·도감에 표시돼요)',test:()=>rulesMissingDesc(),fix:{mode:'ai-rules'}},
  {id:'g_codex',scope:'game',kind:'upgrade',since:3,label:'도감에 게임 규칙(상성·역할)이 기록되지 않았어요',test:()=>rulesNotInCodex(),fix:{mode:'auto',run:()=>{ rulesCodex(); }}},
  {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
@@ -64,7 +66,8 @@ async function auditFix(rule,items){
         else if(m==='ai-stage'){ if(await auditAIStage(o)) ok++; }
         else if(m==='ai-rules'){ if(await rulesAIFill()) ok++; }
         else if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); ok++; }
-        else if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); ok++; } }catch(e){ console.warn('audit',rule.id,e); }
+        else if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); ok++; }
+        else if(m==='skills-remaster'){ if(balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); ok++; } } }catch(e){ console.warn('audit',rule.id,e); }
       job.done++; } }
   finally{ AUDIT_JOB=null; syBar(''); }
   mark('prog'); toast(`${rule.label}: ${ok}/${items.length}개 고쳤어요${AUDIT_UNDO?' (되돌리기 가능)':''}`); if(!$('#modal').hidden) openAudit(AUDIT_FOCUS); else render(); }
@@ -77,7 +80,7 @@ async function auditConvert(chars,fields,instruction){
 /* 화면 */
 let AUDIT_FOCUS=null; // 캐릭터 하나만 볼 때 id
 function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen=auditVer(); mark('meta'); }
-  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기','ai-rules':'AI로 설명 채우기',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
+  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기','ai-rules':'AI로 설명 채우기','skills-remaster':'세대 맞추기(AS)',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
   const chars=focus?G.chars.filter(c=>c.id===focus):G.chars;
   openModal(`${head(focus?`${charById(focus)?.name||''} 점검`:'콘텐츠 점검·업그레이드',`<span class="muted">생성 규칙 v${auditGenVer()} · ${focus?'':`구버전 생성물 ${old}명`}</span>`)}
     <p class="muted" style="font-size:.82rem;margin:0 0 8px">생성 기능이 좋아졌거나 예전에 만든 콘텐츠에 빠진 게 있으면 여기에서 찾아 고쳐요. 고치기 전 상태는 마지막 작업 한 번까지 되돌릴 수 있어요.</p>

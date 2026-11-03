@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.6'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.7'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -2850,7 +2850,7 @@ function create(allies,enemies,options={}){
   u.meleeGroup=null;u.meleeUntil=0;u.meleeDelay=0;u.lastInvincibleAt=-Infinity;u.invincibilityReadyAt=-Infinity;u.lastDamageDealt=0;u.lastDamageTaken=0;u.lastHealing=0;u.lastBlocked=0;
   for(const slot of Object.keys(SLOTS))u.ready[slot]=slot==='ultimate'?0:u.kit[slot].initial;
  });
- positionTraits(sim); synergy(sim,options.synergy);
+ positionTraits(sim); genBoost(sim,options.genBoost); synergy(sim,options.synergy);
  outcome(sim);for(const u of [...allies,...enemies])if(['battle_start','always'].includes(u.kit.passive.trigger))cast(sim,u,'passive');
  outcome(sim);return sim;
 }
@@ -2860,6 +2860,9 @@ function relKey(u,by){return by==='faction'?u.faction||u.c?.faction:by==='role'?
 // 포지션 기능: 능력치 %, 주는·받는 피해 %, 회복량 %, 치명타 %p, 시작 SP, 위협도 %(적이 노릴 확률). 포지션 id가 없으면 역할 기본 포지션('role:atk' 등)
 function positionTraits(sim){for(const u of [...sim.allies,...sim.enemies]){const p=sim.positions[u.pos||u.c?.pos]||sim.positions['role:'+(u.role||u.c?.role)];if(!p)continue;u.posT=p;
  const k=f=>Math.max(.1,1+(+p[f]||0)/100);u.maxhp=Math.round(u.maxhp*k('hp'));u.hp=Math.round(u.hp*k('hp'));u.baseMaxhp=u.maxhp;u.atk=Math.round(u.atk*k('atk'));u.def=Math.round(u.def*k('def'));u.spd=clamp(Math.round(u.spd*k('spd')),10,300,100);if(+p.sp)u.sp=clamp(u.sp+(+p.sp),0,100,u.sp);}}
+// 밸런스 AS(구세대 보정): 현재 세대보다 낮은 세대 캐릭터는 세대 차이당 pct%(최대 max%) 체력·공격·방어 보정. 저장된 능력치는 그대로
+function genBoost(sim,b){if(!b||!(+b.pct>0)||!(+b.cur>1))return;for(const u of sim.allies){const g=+(u.generation??u.c?.generation)||+b.cur,gap=Math.max(0,+b.cur-g);if(!gap)continue;const k=1+Math.min(+b.max||100,gap*+b.pct)/100;
+ u.maxhp=Math.round(u.maxhp*k);u.hp=Math.round(u.hp*k);u.baseMaxhp=u.maxhp;u.atk=Math.round(u.atk*k);u.def=Math.round(u.def*k);u.genBoost=Math.round((k-1)*100);}}
 // 속성 반응: 맞은 대상에 속성 흔적(aura)이 남고, 다른 속성이 aura 초 안에 맞히면 반응. amp=피해 배율 · burst=공격력×값 추가 피해 · stun=기절(초) · vuln=받는 피해 +값%(dur초)
 function reactHit(sim,u,t,o){const none={mul:1,flat:0};if(!sim.reactions.length||o.periodic||o.fixed||!u.elem||t.hp<=0)return none;const a=t.aura;
  if(a&&a.until>sim.time&&a.e!==u.elem){const r=sim.reactions.find(x=>x.a===a.e&&x.b===u.elem)||sim.reactions.find(x=>x.both&&x.a===u.elem&&x.b===a.e);
@@ -3639,7 +3642,7 @@ root.GGMVFX={revision:'FX11',intent,motionMode,reduced,TIMING,resolveColor,cutIn
 let V2EDIT=null;
 const V2PENDING=new WeakMap();
 // The season setting controls future releases; a character keeps its release generation.
-function v2CurrentGeneration(){return GGMCombat.generation({generation:typeof G!=='undefined'&&G?.prog?.live?.skillGeneration});}
+function v2CurrentGeneration(){if(typeof balanceGeneration==='function'){const g=balanceGeneration();if(g)return GGMCombat.generation({generation:g});}return GGMCombat.generation({generation:typeof G!=='undefined'&&G?.prog?.live?.skillGeneration});} // 밸런스 설정(세대 고정·자동 상승)이 있으면 그걸 따라요
 function v2SeasonGenerationHTML(){const g=v2CurrentGeneration();return `<div class="panel" id="v2-season-generation-panel"><h3>캐릭터 출시 세대</h3><label class="f" for="v2-season-generation">새 캐릭터에게 적용할 세대<select class="in" id="v2-season-generation">${[1,2,3,4,5].map(n=>`<option value="${n}" ${g===n?'selected':''}>${n}세대</option>`).join('')}</select></label><p class="muted">선택하면 바로 저장됩니다. 이후 새로 추가되는 캐릭터(신규 픽업·이벤트·직접 추가 포함)는 이 세대로 만들어집니다. 세대가 높을수록 AI가 사용할 수 있는 스킬 전력 예산이 늘어납니다. 세대는 직접 바꾸며 시즌이 넘어가도 자동으로 올라가지 않습니다.</p><p class="muted">기존 캐릭터의 세대와 스킬은 그대로 유지됩니다. 기존 캐릭터의 스킬을 다시 생성할 때도 그 캐릭터의 출시 세대를 사용합니다. 복각 픽업도 기존 세대를 유지합니다.</p></div>`;}
 function v2Options(){return {elems:[...ELEMS],beats:{...BEATS},...(typeof rulesOptions==='function'?rulesOptions():{})};} // 게임 규칙의 상성 배율·시너지·관계
 let V2JOBS=Promise.resolve();
@@ -8274,6 +8277,7 @@ function studioHTML(){
   ${exSettingsPanel()}
   ${auditPanel()}
   ${rulesPanel()}
+  ${balancePanel()}
   <div class="panel pm-hide"><h3>게임</h3><p class="muted" style="margin:0 0 10px">지금 게임: <b>${esc(G.meta.title)}</b>. 세계관, 용어, 속성, 화면 테마를 바꾸거나, AI로 완전히 다른 가챠 게임을 새로 만들 수 있어요. 게임은 여러 개 만들어 두고 오갈 수 있어요.</p>
     <div class="row"><button class="btn sm" data-act="meta-open">게임 정의 편집</button><button class="btn sm" data-act="draft-open">AI로 새 게임 만들기</button><button class="btn sm ghost" data-act="pj-open">게임 목록 (${pj.list.length})</button></div></div>
   <div class="panel"><h3>게시·구독</h3><p class="muted" style="margin:0 0 10px">${G.meta.subscr?`구독 중인 게임이에요 · v${G.meta.subscr.ver||0}${G.meta.subscr.at?' · '+esc(new Date(G.meta.subscr.at).toLocaleDateString())+' 받음':''}. 만든 사람이 업데이트하면 켤 때 알려 줘요.`:G.meta.pub&&G.meta.pub.ver?`게시 중 · v${G.meta.pub.ver}. 새 장·이벤트를 만든 뒤 다시 게시하면 구독한 사람에게 업데이트가 가요.`:'내 게임을 GitHub 공개 저장소에 올려 다른 사람이 구독하게 하거나, 다른 사람이 게시한 게임을 주소로 받아요.'}</p>
@@ -8371,7 +8375,7 @@ function rulesElemMat(){ const r=RULESM(), E=G.meta.elems.map(e=>e.n), b=rulesBe
   E.forEach(a=>{ m[a]={}; E.forEach(t=>{ const o=g[a]&&g[a][t]; m[a][t]=+o>0?+o:b[a]===t?adv:b[t]===a?dis:1; }); }); return m; }
 function rulesOptions(){ const r=G.meta.rules||{}, P={}, seen=new Set();
   POSITIONS().forEach(p=>{ const t=p.t||{}; if(Object.values(t).some(v=>+v)) P[p.id]=t; if(!seen.has(p.base)){ seen.add(p.base); if(P[p.id]) P['role:'+p.base]=t; } });
-  return {elemAdv:+r.elemAdv||1.5,elemDis:+r.elemDis||.75,elemMat:rulesElemMat(),reactions:Array.isArray(r.reactions)?r.reactions.filter(x=>x&&x.a&&x.b):[],aura:+r.aura||4,positions:P,synergy:r.synergy||null,rel:Array.isArray(r.rel)?r.rel:[]}; }
+  return {elemAdv:+r.elemAdv||1.5,elemDis:+r.elemDis||.75,elemMat:rulesElemMat(),reactions:Array.isArray(r.reactions)?r.reactions.filter(x=>x&&x.a&&x.b):[],aura:+r.aura||4,positions:P,synergy:r.synergy||null,rel:Array.isArray(r.rel)?r.rel:[],...(typeof balanceOptions==='function'?balanceOptions():{})}; } // 밸런스 AS 전투 보정(0187)
 const rulesPct=x=>`×${Math.round(x*100)/100}`;
 function rulesElemLine(e){ const m=rulesElemMat()[e]||{}, strong=Object.keys(m).filter(t=>m[t]>1), weak=Object.keys(m).filter(t=>(rulesElemMat()[t]||{})[e]>1);
   return [strong.length?`${strong.map(t=>`<b>${esc(t)}</b>`).join('·')}에 강함(${strong.map(t=>rulesPct(m[t])).join('·')})`:'',weak.length?`${weak.map(t=>`<b>${esc(t)}</b>`).join('·')}에 약함`:''].filter(Boolean).join(' · ')||'상성 없음'; }
@@ -8479,6 +8483,56 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); i
     else if(k==='rel') RD.rel.push({by:'faction',a:'',b:'',mul:1.2}); openRules(true); }
   else if(a==='rulesedel'){ rulesRead(); const gone=RD.elems.splice(+b.dataset.i,1)[0]; RD.elems.forEach(x=>{ if(x.beat===gone.n) x.beat=''; }); openRules(true); }
   else if(a==='rulesrdel'){ rulesRead(); RD[b.dataset.k].splice(+b.dataset.i,1); openRules(true); } });
+/* ===== 밸런스 관리: 파워 인플레(세대) 제어 · 능력치 균질화 · 구캐릭터 AS ===== */
+/* 문제: ① 새 캐릭터는 지금 "출시 세대"로 만들어져 세대가 오를수록 스킬 예산이 커져요(1세대 ×1 → 5세대 ×2.1) → 오래된 캐릭터가 구식이 됨
+         ② AI가 쓴 능력치는 범위만 맞춰서(체력 600~2000 등) 같은 희귀도끼리도 들쭉날쭉
+   G.meta.balance: creep(manual|fixed|auto) baseGen per maxGen released · catchUp(off|boost|remaster) pct max lag · tol(허용 편차 %) autoNorm(생성 시 보정)
+   문서: docs/research/balance.md */
+function BAL(){ const d={creep:'manual',baseGen:1,per:5,maxGen:5,released:0,catchUp:'off',pct:8,max:30,lag:1,tol:15,autoNorm:true}; const m=G.meta; if(!m.balance||typeof m.balance!=='object') m.balance={}; return Object.assign({},d,m.balance); }
+function balanceGeneration(){ const b=BAL(); if(b.creep==='fixed') return Math.max(1,Math.min(5,+b.baseGen||1)); if(b.creep==='auto') return Math.max(1,Math.min(+b.maxGen||5,(+b.baseGen||1)+Math.floor((+b.released||0)/Math.max(1,+b.per||5)))); return null; }
+function balanceOptions(){ const b=BAL(); return b.catchUp==='boost'?{genBoost:{cur:v2CurrentGeneration(),pct:+b.pct||0,max:+b.max||0}}:{}; }
+const balPower=s=>Math.round(s.hp/5+s.atk*3+s.def*2+s.spd); // 캐릭터 화면 전투력과 같은 식(성장 전 기본값)
+function balExpected(c){ return balPower(GGMCombat.generateBaseStats(c,()=>.5)); } // 희귀도·기본형 기준값(무작위 흔들림 없이)
+function balDev(c){ const e=balExpected(c); return e?balPower(c)/e-1:0; }
+function balInfo(c){ const b=BAL(), cur=v2CurrentGeneration(), gen=GGMCombat.generation(c), dev=balDev(c), skill=!c.skillBalance||c.skillBalance.ruleset!==GGMCombat.RULESET;
+  return {c,dev,gen,cur,statOut:Math.abs(dev)*100>+b.tol,genLag:cur-gen>+b.lag,skill}; }
+function balReport(){ return G.chars.filter(c=>!c.alt).map(balInfo); }
+// 보수: 속도는 두고 체력·공격·방어를 같은 비율로 맞춰서 원래 성향(체력형·공격형)은 살려요. mode edge=허용 범위 끝까지만, center=기준값으로
+function balNormalize(c,mode='edge'){ const e=balExpected(c), b=BAL(), tol=+b.tol/100*.97, /* 반올림 여유 */ now=balPower(c), target=mode==='center'?e:Math.min(e*(1+tol),Math.max(e*(1-tol),now)); const base=c.hp/5+c.atk*3+c.def*2; if(!base||Math.abs(target-now)<1) return false;
+  const k=Math.max(.2,(target-c.spd)/base); c.hp=Math.max(10,Math.round(c.hp*k/10)*10); c.atk=Math.max(1,Math.round(c.atk*k)); c.def=Math.max(0,Math.round(c.def*k)); c.skillBalance=null; return true; }
+// AS 리마스터: 세대를 현재 세대 - 허용 차이까지 올리고, 스킬 밸런스를 다시 검사하게 해요(전투 전에 자동으로 다시 맞춰짐)
+function balRemaster(c){ const b=BAL(), cur=v2CurrentGeneration(), want=Math.max(GGMCombat.generation(c),cur-Math.max(0,+b.lag)); if(want===GGMCombat.generation(c)) return false; c.generation=want; c.skillBalance=null; return true; }
+function balanceOnCreate(c){ const m=G.meta; if(!m.balance) m.balance={}; if(BAL().creep==='auto') m.balance.released=(+m.balance.released||0)+1; if(BAL().autoNorm) balNormalize(c,'edge'); }
+
+function balancePanel(){ const b=BAL(), R=balReport(), out=R.filter(x=>x.statOut).length, lag=R.filter(x=>x.genLag).length;
+  const creepL={manual:'수동(시즌 설정)',fixed:`고정 ${b.baseGen}세대`,auto:`자동 상승(${b.per}명마다, 최대 ${b.maxGen})`}[b.creep], asL={off:'끔',boost:`전투 보정 세대당 +${b.pct}%`,remaster:'리마스터'}[b.catchUp];
+  return `<div class="panel pm-hide"><h3>밸런스 관리 ${out||lag?`<span class="badge">점검 ${out+lag}</span>`:''}</h3><p class="muted" style="margin:0 0 6px">현재 출시 세대 ${v2CurrentGeneration()} · 세대 정책 ${esc(creepL)} · 구캐릭터 AS ${esc(asL)} · 능력치 허용 ±${b.tol}%${out?` · 범위 밖 ${out}명`:''}${lag?` · 세대 뒤처짐 ${lag}명`:''}</p><button class="btn sm" data-act="balopen">밸런스 점검·설정</button></div>`; }
+function openBalance(){ const b=BAL(), R=balReport(), num=(id,v,min,max,step)=>`<input class="in" type="number" id="${id}" value="${v}" min="${min}" max="${max}" ${step?`step="${step}"`:''}>`, cur=v2CurrentGeneration();
+  const byR=[3,2,1].map(r=>{ const L=R.filter(x=>x.c.rarity===r); if(!L.length) return ''; const d=L.map(x=>x.dev*100); return `<tr><td>${RL[r]}</td><td>${L.length}</td><td>${Math.round(Math.min(...d))}% ~ ${Math.round(Math.max(...d))}%</td><td>${Math.min(...L.map(x=>x.gen))} ~ ${Math.max(...L.map(x=>x.gen))}</td></tr>`; }).join('');
+  openModal(`${head('밸런스 점검·설정',`<span class="muted">현재 출시 세대 ${cur}</span>`)}
+  <h3 class="sec">세대(파워 인플레) 정책</h3><p class="muted" style="font-size:.8rem;margin:0 0 6px">세대가 높을수록 스킬 예산이 커져요(1세대 ×1 → 5세대 ×2.1). 새 캐릭터는 그때의 세대로 만들어지고 계속 그 세대로 남아요.</p>
+  <select class="in" id="bal_creep">${[['manual','수동 — 시즌 운영의 출시 세대 설정을 따름(기존 방식)'],['fixed','고정 — 모든 새 캐릭터를 같은 세대로(인플레 없음)'],['auto','자동 상승 — 새 캐릭터 N명마다 1세대씩, 최대 세대까지']].map(([k,l])=>`<option value="${k}" ${b.creep===k?'selected':''}>${l}</option>`).join('')}</select>
+  <div class="g4" style="margin-top:6px"><div><label class="f">기준 세대</label>${num('bal_base',b.baseGen,1,5)}</div><div><label class="f">N명마다</label>${num('bal_per',b.per,1,99)}</div><div><label class="f">최대 세대</label>${num('bal_max',b.maxGen,1,5)}</div><div><label class="f">출시 수</label>${num('bal_rel',b.released,0,9999)}</div></div>
+  <h3 class="sec" style="margin-top:12px">구캐릭터 AS</h3><select class="in" id="bal_as">${[['off','끔'],['boost','전투 보정 — 세대 차이당 체력·공격·방어 +x% (저장된 능력치는 그대로)'],['remaster','리마스터 — 뒤처진 캐릭터의 세대를 올리고 스킬 밸런스 재검사']].map(([k,l])=>`<option value="${k}" ${b.catchUp===k?'selected':''}>${l}</option>`).join('')}</select>
+  <div class="g4" style="margin-top:6px"><div><label class="f">세대당 +%</label>${num('bal_pct',b.pct,0,100)}</div><div><label class="f">최대 +%</label>${num('bal_cap',b.max,0,300)}</div><div><label class="f">허용 세대 차이</label>${num('bal_lag',b.lag,0,4)}</div></div>
+  <h3 class="sec" style="margin-top:12px">능력치 균질화</h3><p class="muted" style="font-size:.8rem;margin:0 0 6px">희귀도·전투 기본형의 기준값(게임 규칙의 기본 능력치·희귀도 배율)과 비교해요. 보수는 속도는 두고 체력·공격·방어를 같은 비율로 맞춰서 캐릭터 성향은 살려요.</p>
+  <div class="g4"><div><label class="f">허용 편차 ±%</label>${num('bal_tol',b.tol,1,100)}</div></div><label style="display:flex;gap:6px;margin:6px 0"><input type="checkbox" id="bal_auto" ${b.autoNorm?'checked':''}> AI가 새로 만든 ${esc(T('crew'))}의 능력치가 범위를 벗어나면 자동으로 범위 안으로</label>
+  <div class="row" style="margin:8px 0"><button class="btn sm" data-act="balsave">설정 저장</button></div>
+  <h3 class="sec">점검 결과</h3><table style="font-size:.8rem;border-collapse:collapse;margin-bottom:6px"><tr><th style="text-align:left;padding:2px 6px">희귀도</th><th style="padding:2px 6px">수</th><th style="padding:2px 6px">기준 대비</th><th style="padding:2px 6px">세대</th></tr>${byR}</table>
+  <div style="max-height:260px;overflow:auto;font-size:.82rem">${R.sort((a,b2)=>Math.abs(b2.dev)-Math.abs(a.dev)).map((x,i)=>`<label style="display:flex;gap:6px;align-items:center;padding:2px 0;border-bottom:1px solid var(--line)"><input type="checkbox" data-bal="${x.c.id}" ${x.statOut||x.genLag?'checked':''}><b style="min-width:80px">${esc(x.c.name)}</b><span>${RL[x.c.rarity]} · ${esc(posOf(x.c).name)}</span><span style="color:${x.statOut?'#ff5a5a':'inherit'}">${x.dev>=0?'+':''}${Math.round(x.dev*100)}%</span><span style="color:${x.genLag?'#ffd35a':'inherit'}">${x.gen}세대</span>${x.skill?'<span class="muted">스킬 검사 필요</span>':''}</label>`).join('')}</div>
+  <div class="row" style="margin-top:8px;flex-wrap:wrap;gap:6px"><button class="btn sm" data-act="balfix" data-k="edge">선택: 능력치 범위 안으로</button><button class="btn sm ghost" data-act="balfix" data-k="center">선택: 기준값으로</button><button class="btn sm ghost" data-act="balfix" data-k="remaster">선택: 세대 맞추기(AS)</button><button class="btn sm ghost" data-act="balfix" data-k="skill">선택: 스킬 밸런스 다시 검사</button>${typeof AUDIT_UNDO!=='undefined'&&AUDIT_UNDO?`<button class="btn sm ghost" data-act="balundo">되돌리기: ${esc(AUDIT_UNDO.label)}</button>`:''}</div>
+  <div class="row" style="margin-top:12px"><button class="btn ghost" data-act="close">닫기</button></div>`); }
+function balSave(){ const v=id=>+(($('#'+id)||{}).value), m=G.meta; m.balance=Object.assign(m.balance||{},{creep:$('#bal_creep').value,baseGen:Math.max(1,Math.min(5,v('bal_base')||1)),per:Math.max(1,v('bal_per')||5),maxGen:Math.max(1,Math.min(5,v('bal_max')||5)),released:Math.max(0,v('bal_rel')||0),catchUp:$('#bal_as').value,pct:Math.max(0,v('bal_pct')||0),max:Math.max(0,v('bal_cap')||0),lag:Math.max(0,Math.min(4,v('bal_lag')||0)),tol:Math.max(1,v('bal_tol')||15),autoNorm:$('#bal_auto').checked}); mark('meta'); }
+async function balFix(kind){ const ids=[...document.querySelectorAll('[data-bal]:checked')].map(x=>x.dataset.bal), cs=ids.map(charById).filter(Boolean); if(!cs.length){ toast('캐릭터를 골라 주세요'); return; }
+  const label={edge:'능력치 범위 안으로',center:'능력치 기준값으로',remaster:'세대 맞추기',skill:'스킬 밸런스 재검사'}[kind]; auditSnap(cs,label); let n=0;
+  for(const c of cs){ let ok=false; if(kind==='edge'||kind==='center') ok=balNormalize(c,kind); else if(kind==='remaster') ok=balRemaster(c); else if(kind==='skill'){ c.skillBalance=null; ok=true; } if(ok){ mark('c:'+c.id); n++; } }
+  if(kind==='skill'||kind==='remaster'){ syBar('스킬 밸런스 검사 중…'); try{ await v2ReadyChars(cs.filter(c=>!c.skillBalance)); }catch(e){} syBar(''); }
+  toast(`${label}: ${n}명 (되돌리기 가능)`); openBalance(); }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+  if(a==='balopen') openBalance();
+  else if(a==='balsave'){ balSave(); toast('밸런스 설정을 저장했어요'); openBalance(); }
+  else if(a==='balfix') balFix(b.dataset.k);
+  else if(a==='balundo'){ auditUndo(); openBalance(); } });
 /* =========================================================
    상점 (무료 보급 상점, 캐시 상점)
    ========================================================= */
@@ -11331,7 +11385,7 @@ const nl=s=>unComma(Array.isArray(s)?s.map(x=>typeof x==='string'?x:x&&typeof x=
 function unComma(t){ t=String(t||''); const re=/,\s*(?=\[[^\]\n]{1,30}\]|[^\s,:\[\]\n"'][^,:\n\[\]]{0,15}(?:\[[^\]\n]{1,12}\])?:\s)/g;
   return t.split('\n').map(l=>{ const m=l.match(re); return m&&m.length>=2&&/^\s*(\[|[^,:\n]{1,16}(\[[^\]]*\])?:)/.test(l)?l.replace(re,'\n'):l; }).join('\n'); }
 const strs=a=>(Array.isArray(a)?a:[]).map(String).filter(Boolean);
-function cleanChar(o){ const c=cleanChar0(o);posAssign(c,o&&o.pos);v2ApplyRoleSpeed(c);c.generation=v2CurrentGeneration(); let provided=null;try{if(o?.skills)provided=v2PrepareGenerated(o.skills,c);}catch(e){}c.skills=provided||GGMCombat.generationDefaults(c); if(o?.skills&&!provided)c.skillGenerationWarning='AI 스킬이 규칙에 맞지 않아 기본 스킬로 대체했어요. 스킬 편집기에서 다시 생성할 수 있어요.'; setTimeout(async()=>{try{if(!provided){if(SAMPLE){c.skillGenerationWarning='스킬을 구성하고 내부 검사하는 중…';const kit=await v2GenerateSkills(c,'',msg=>{c.skillGenerationWarning=msg;});c.skills=kit;delete c.skillGenerationWarning;}}await v2QueueCharacter(c);}catch(e){c.skillGenerationWarning=String(e.message||e);}if(G.chars.includes(c)){mark('c:'+c.id);if(document.querySelector('.cs-sheet')?.dataset.cid===c.id)openChar(c.id);}},0); try{ const en=(G.lib||[]).find(l=>l.kind==='enemy'&&l.name===c.name); if(en&&/^\s*(1girl|1boy|1other)/i.test(en.prompt||'')){ c.naiPrompt=en.prompt; c.fromEnemy=en.id; } }catch(e){} naiBlocksRemember(c);return c; }
+function cleanChar(o){ const c=cleanChar0(o);posAssign(c,o&&o.pos);v2ApplyRoleSpeed(c);c.generation=v2CurrentGeneration();balanceOnCreate(c); let provided=null;try{if(o?.skills)provided=v2PrepareGenerated(o.skills,c);}catch(e){}c.skills=provided||GGMCombat.generationDefaults(c); if(o?.skills&&!provided)c.skillGenerationWarning='AI 스킬이 규칙에 맞지 않아 기본 스킬로 대체했어요. 스킬 편집기에서 다시 생성할 수 있어요.'; setTimeout(async()=>{try{if(!provided){if(SAMPLE){c.skillGenerationWarning='스킬을 구성하고 내부 검사하는 중…';const kit=await v2GenerateSkills(c,'',msg=>{c.skillGenerationWarning=msg;});c.skills=kit;delete c.skillGenerationWarning;}}await v2QueueCharacter(c);}catch(e){c.skillGenerationWarning=String(e.message||e);}if(G.chars.includes(c)){mark('c:'+c.id);if(document.querySelector('.cs-sheet')?.dataset.cid===c.id)openChar(c.id);}},0); try{ const en=(G.lib||[]).find(l=>l.kind==='enemy'&&l.name===c.name); if(en&&/^\s*(1girl|1boy|1other)/i.test(en.prompt||'')){ c.naiPrompt=en.prompt; c.fromEnemy=en.id; } }catch(e){} naiBlocksRemember(c);return c; }
 function cleanChar0(o){
   o=o||{}; const sk=o.skill||{}, tc=o.touch||{}, w=o.weapon||{}, id=uid(), aff={},tank=o.role==='def'?GGMCombat.generateBaseStats(o):null;
   Object.entries(o.affLines||{}).forEach(([k,v])=>{const n=parseInt(k,10);if(n>=1&&n<=10)aff[n]=strs(v);});
@@ -13247,6 +13301,8 @@ const AUDIT_RULES=[
  {id:'c_img',scope:'char',kind:'missing',since:1,label:'그림(스탠딩·상반신·일러스트·무기)이 아직 없어요',test:c=>drawTodo(auditImgCats).some(it=>it.c===c),fix:{mode:'image'}},
  {id:'s_script',scope:'stage',kind:'missing',since:1,label:'스테이지 대본(전투 전 장면)이 비었어요',test:s=>!String(s.pre||'').trim(),fix:{mode:'ai-stage'}},
  {id:'c_pos',scope:'char',kind:'upgrade',since:3,label:'포지션이 정해지지 않았어요(전투 기본형에 맞는 포지션으로 배정)',test:c=>!c.alt&&!posById(c.pos),fix:{mode:'auto',run:c=>{ posAssign(c,c.pos); }}},
+ {id:'c_statband',scope:'char',kind:'upgrade',since:3,label:'능력치가 희귀도·기본형 기준에서 많이 벗어났어요(AI 생성 편차)',test:c=>!c.alt&&balInfo(c).statOut,fix:{mode:'auto',run:c=>{ balNormalize(c,'edge'); }}},
+ {id:'c_genlag',scope:'char',kind:'upgrade',since:3,label:'출시 세대가 현재보다 많이 뒤처졌어요(구캐릭터 AS)',test:c=>!c.alt&&balInfo(c).genLag,fix:{mode:'skills-remaster'}},
  {id:'g_rules',scope:'game',kind:'upgrade',since:3,label:'속성·역할 설명이 없어요(게임 규칙·도감에 표시돼요)',test:()=>rulesMissingDesc(),fix:{mode:'ai-rules'}},
  {id:'g_codex',scope:'game',kind:'upgrade',since:3,label:'도감에 게임 규칙(상성·역할)이 기록되지 않았어요',test:()=>rulesNotInCodex(),fix:{mode:'auto',run:()=>{ rulesCodex(); }}},
  {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
@@ -13286,7 +13342,8 @@ async function auditFix(rule,items){
         else if(m==='ai-stage'){ if(await auditAIStage(o)) ok++; }
         else if(m==='ai-rules'){ if(await rulesAIFill()) ok++; }
         else if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); ok++; }
-        else if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); ok++; } }catch(e){ console.warn('audit',rule.id,e); }
+        else if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); ok++; }
+        else if(m==='skills-remaster'){ if(balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); ok++; } } }catch(e){ console.warn('audit',rule.id,e); }
       job.done++; } }
   finally{ AUDIT_JOB=null; syBar(''); }
   mark('prog'); toast(`${rule.label}: ${ok}/${items.length}개 고쳤어요${AUDIT_UNDO?' (되돌리기 가능)':''}`); if(!$('#modal').hidden) openAudit(AUDIT_FOCUS); else render(); }
@@ -13299,7 +13356,7 @@ async function auditConvert(chars,fields,instruction){
 /* 화면 */
 let AUDIT_FOCUS=null; // 캐릭터 하나만 볼 때 id
 function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen=auditVer(); mark('meta'); }
-  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기','ai-rules':'AI로 설명 채우기',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
+  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기','ai-rules':'AI로 설명 채우기','skills-remaster':'세대 맞추기(AS)',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
   const chars=focus?G.chars.filter(c=>c.id===focus):G.chars;
   openModal(`${head(focus?`${charById(focus)?.name||''} 점검`:'콘텐츠 점검·업그레이드',`<span class="muted">생성 규칙 v${auditGenVer()} · ${focus?'':`구버전 생성물 ${old}명`}</span>`)}
     <p class="muted" style="font-size:.82rem;margin:0 0 8px">생성 기능이 좋아졌거나 예전에 만든 콘텐츠에 빠진 게 있으면 여기에서 찾아 고쳐요. 고치기 전 상태는 마지막 작업 한 번까지 되돌릴 수 있어요.</p>

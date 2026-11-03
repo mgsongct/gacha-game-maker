@@ -273,6 +273,30 @@ try {
   const r13b = await p13.evaluate(() => ({ desc: G.meta.elems[0].d === '불꽃의 힘', n: G.meta.elems.length === 3, adv: rulesOptions().elemAdv === 2, pos: POSITIONS().length === 8, react: rulesOptions().reactions[0].name === '증기 폭발' }));
   assert.ok(Object.values(r13).every(v => v === true), JSON.stringify(r13)); assert.ok(Object.values(r13b).every(v => v === true), JSON.stringify(r13b)); assert.deepEqual(err13, [], '페이지 오류');
   console.log('ok 13 게임 규칙: 속성 추가·제거·상성표·반응(엔진에서 발동), 포지션 프리셋·기능(엔진 반영)·자동 배정·편집, 시너지·관계, 도감, 다시 열어도 유지');
+
+  // 14) 밸런스: 능력치 편차 점검·보수(성향 유지), 생성 시 자동 보정, 세대 정책(고정·자동 상승), 구캐릭터 AS(전투 보정·리마스터), 점검 규칙, 되돌리기
+  const p14 = await browser.newPage(), err14 = []; p14.on('pageerror', e => err14.push(String(e)));
+  await p14.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p14.goto(`http://127.0.0.1:${server.address().port}/?t=14`);
+  await p14.waitForFunction(() => typeof openBalance === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r14 = await p14.evaluate(async () => {
+    const o = {}, mkc = x => { const c = cleanChar(x); G.chars.push(c); return c; };
+    G.meta.balance = { autoNorm: false }; const big = mkc({ name: '과잉', role: 'atk', rarity: 1, hp: 2000, atk: 200, def: 120, spd: 100 });
+    o.detect = balInfo(big).statOut && auditScan().some(g => g.rule.id === 'c_statband' && g.items.includes(big));
+    const ratio = big.hp / big.atk, spd = big.spd; openBalance(); document.querySelectorAll('[data-bal]').forEach(x => { x.checked = x.dataset.bal === big.id; });
+    await balFix('edge'); o.edge = Math.abs(balDev(big)) <= .151 && big.spd === spd && Math.abs(big.hp / big.atk - ratio) / ratio < .05;
+    const pick = () => document.querySelectorAll('[data-bal]').forEach(x => { x.checked = x.dataset.bal === big.id; }); pick(); await balFix('center'); o.center = Math.abs(balDev(big)) < .02; auditUndo(); o.undo = Math.abs(balDev(big)) > .01 && Math.abs(balDev(big)) <= .151;
+    G.meta.balance = { autoNorm: true }; const auto = mkc({ name: '자동', role: 'atk', rarity: 2, hp: 2000, atk: 200, def: 120 }); o.autoNorm = Math.abs(balDev(auto)) <= .151;
+    G.meta.balance = { creep: 'fixed', baseGen: 2 }; o.fixed = v2CurrentGeneration() === 2 && mkc({ name: '고정', role: 'sup' }).generation === 2;
+    G.meta.balance = { creep: 'auto', baseGen: 1, per: 2, maxGen: 3, released: 0 }; const g = [1, 2, 3, 4, 5].map(i => mkc({ name: 'a' + i, role: 'atk' }).generation); o.auto = JSON.stringify(g) === '[1,1,2,2,3]' && v2CurrentGeneration() === 3;
+    const old = G.chars.find(c => c.name === 'a1');
+    G.meta.balance = Object.assign(G.meta.balance, { catchUp: 'boost', pct: 10, max: 30 }); const op = v2Options(); o.boostOpt = op.genBoost.cur === 3 && op.genBoost.pct === 10;
+    const kit = GGMCombat.normalize(GGMCombat.generationDefaults({ role: 'atk' })), u = (c, gen) => ({ name: 'u', role: 'atk', elem: G.meta.elems[0].n, hp: 1000, atk: 100, def: 50, spd: 100, kit, baseKit: kit, ready: {}, c: { ...c, generation: gen } });
+    const sim = GGMCombat.create([u(old, 1), u(old, 3)], [{ ...u(old, 3), c: null }], { ...op, seed: 2 }); o.boost = sim.allies[0].maxhp === 1200 && sim.allies[1].maxhp === 1000;
+    G.meta.balance = Object.assign(G.meta.balance, { catchUp: 'remaster', lag: 1 }); o.lagDetect = auditScan().some(gr => gr.rule.id === 'c_genlag' && gr.items.includes(old)); o.remaster = balRemaster(old) && old.generation === 2 && !old.skillBalance;
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="balopen"]'); openBalance(); o.modal = !!document.querySelector('#bal_creep') && document.querySelectorAll('[data-bal]').length >= 8; closeModal();
+    return o; });
+  assert.ok(Object.values(r14).every(v => v === true), JSON.stringify(r14)); assert.deepEqual(err14, [], '페이지 오류');
+  console.log('ok 14 밸런스: 능력치 편차 점검·보수(성향 유지·기준값)·생성 시 자동 보정, 세대 고정·자동 상승, 구캐릭터 AS 전투 보정(엔진)·리마스터, 점검 규칙, 되돌리기');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
