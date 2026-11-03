@@ -566,7 +566,7 @@ try {
     const o = {}, P0 = []; P().seenOpening = true; closeModal(); closeOv(); try { appStorage.removeItem('ggm-ng-draft'); } catch (e) {}
     const ch = (nm, fac, role, deb, extra) => Object.assign({ name: nm, faction: fac, role, rarity: nm.length % 3 + 1, profile: nm + '의 프로필', lines: ['안녕'], naiPrompt: '1girl, solo', debut: deb }, extra || {});
     SAMPLE = { json: async p => { P0.push(p);
-      if (/속성\(elems\)은/.test(p)) return { variants: [{ name: '축제복', prompt: 'festival yukata, paper lanterns', cond: { factions: ['등불단'], roles: ['atk'] } }, { name: '잠수복', prompt: 'diving suit, ocean', cond: { factions: ['없는 세력'] } }, { name: '한글뿐', prompt: '유카타' }], title: '심연등불', sub: 'Abyss Lamp', world: { name: '등불섬', summary: '요약', lore: '설정', plot: '플롯', factions: [{ name: '등불단', kind: 'playable', desc: '섬을 지키는 수호단. 등불을 켜고 밤을 막는다.', goal: '섬 수호', leader: '단장', base: '등대', ideology: '빛은 나눈다', rel: { '검은 조류': '적대 — 섬을 노림' } }, { name: '검은 조류', kind: 'hostile', desc: '바다를 장악한 해적 연합.', goal: '섬 점령', leader: '조류왕', base: '난파선', ideology: '힘이 법', stance: [{ ch: 1, s: 'hostile', why: '' }, { ch: 3, s: 'ally', why: '공동의 적' }] }, { name: '심해의 것', kind: 'monster', desc: '심연에서 올라오는 괴물들.', origin: '가라앉은 신', nature: '빛을 먹는다', weakness: '불' }] }, elems: [{ n: '불', c: '#ff0000', d: '', beats: '물' }, { n: '물', c: '#0000ff', d: '', beats: '불' }] };
+      if (/속성\(elems\)은/.test(p)) return { profileTemplate: 'fantasy', variants: [{ name: '축제복', prompt: 'festival yukata, paper lanterns', cond: { factions: ['등불단'], roles: ['atk'] } }, { name: '잠수복', prompt: 'diving suit, ocean', cond: { factions: ['없는 세력'] } }, { name: '한글뿐', prompt: '유카타' }], title: '심연등불', sub: 'Abyss Lamp', world: { name: '등불섬', summary: '요약', lore: '설정', plot: '플롯', factions: [{ name: '등불단', kind: 'playable', desc: '섬을 지키는 수호단. 등불을 켜고 밤을 막는다.', goal: '섬 수호', leader: '단장', base: '등대', ideology: '빛은 나눈다', rel: { '검은 조류': '적대 — 섬을 노림' } }, { name: '검은 조류', kind: 'hostile', desc: '바다를 장악한 해적 연합.', goal: '섬 점령', leader: '조류왕', base: '난파선', ideology: '힘이 법', stance: [{ ch: 1, s: 'hostile', why: '' }, { ch: 3, s: 'ally', why: '공동의 적' }] }, { name: '심해의 것', kind: 'monster', desc: '심연에서 올라오는 괴물들.', origin: '가라앉은 신', nature: '빛을 먹는다', weakness: '불' }] }, elems: [{ n: '불', c: '#ff0000', d: '', beats: '물' }, { n: '물', c: '#0000ff', d: '', beats: '불' }] };
       if (/debut 항목/.test(p)) return { chars: [ch('하나', '등불단', 'atk', 'start'), ch('두리', '등불단', 'def', 'start'), ch('세찌', '등불단', 'sup', 'start'), ch('네오', '등불단', 'atk', '2'), ch('다섯', '검은 조류', 'atk', 'later'), ch('심해 촉수', '심해의 것', 'atk', 'start', { naiPrompt: 'no humans, monster, tentacles' })] };
       if (/이 게임의 시작 부분을 만들어라/.test(p)) return { opening: { lines: ['a'], prologue: '하나: 시작이야' }, backgrounds: [{ name: '등대', prompt: 'no humans, scenery' }], props: [], music: [], banners: { std: '상시', pickup: { name: '픽업', char: '네오' }, faction: { name: 'f', faction: '등불단' } } };
       if (/프롤로그 다음으로 이어지는 1장/.test(p)) return { summary: 's', relations: [], chapter: { title: '1장', logline: 'l', stages: [1, 2, 3, 4].map(i => ({ title: 's' + i, battle: true, pre: i === 2 ? '네오: 처음 뵙겠습니다' : '하나: 가자', post: '', enemies: [{ name: i === 4 ? '심연의 눈' : '촉수 무리', elem: '불', boss: i === 4, faction: '심해의 것', look: 'no humans, monster' }] })) }, bestiary: [{ name: '촉수 무리', faction: '심해의 것', desc: '심연의 촉수가 떼로 올라온 것', nature: '밤에 몰려온다', weak: '불' }, { name: '심연의 눈', faction: '심해의 것', desc: '거대한 눈', nature: '', weak: '빛' }], threads: [] };
@@ -585,6 +585,7 @@ try {
     const en = g.lib.filter(l => l.kind === 'enemy'); o.bestiary = en.some(l => l.name === '촉수 무리' && l.desc && l.faction === '심해의 것') && en.some(l => l.name === '심연의 눈' && l.weak === '빛');
     o.rules = g.chapters[0].stages.every(s => s.rulesV === 1) && !g.chapters[0].stages[0].field;
     const V = g.meta.variants || []; o.variants = V.length === 2 && V[0].name === '축제복' && V[0].cond.factions.join() === '등불단' && V[0].cond.roles.join() === 'atk' && !Object.keys(V[1].cond).length && V.every(t => t.recipe.min[3] <= 400 && t.recipe.min[3] * 2 <= 600 + 1e-9 + 600 && t.chance > 0);
+    o.profileTpl = (g.meta.persona || {}).tpl?.includes('종족') && g.chars.every(c => !c.pfields || typeof c.pfields === 'object');
     o.construct = !!(g.meta.construct && g.meta.construct.on) && g.prog.cres && g.prog.cres.res4 >= 600 && !!g.prog.cbuild.started;
     // 생성된 게임을 불러와 잠금·이후 장의 첫 등장 확인
     const G0 = G; G = fix(JSON.parse(JSON.stringify(g)));
@@ -678,8 +679,24 @@ try {
     o.one = typeof auditFixOne === 'function' && await auditFixOne(AUDIT_RULES.find(r => r.id === 'g_spots'), G) === true && spots().length > 0;
     return o; });
   assert.ok(Object.values(r28).every(v => v === true), JSON.stringify(r28)); assert.deepEqual(err28, [], '페이지 오류');
-  console.log('ok 28 포크 기능 내용 자동 채움: liveTick 첫 실행·다음 실행에서 빈 일정 장소·도감 규칙을 점검 규칙의 고치기로 채움, 설정으로 끔, 한 항목 고치기 공유');  await browser.close(); server.close();
-  assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
+  console.log('ok 28 포크 기능 내용 자동 채움: liveTick 첫 실행·다음 실행에서 빈 일정 장소·도감 규칙을 점검 규칙의 고치기로 채움, 설정으로 끔, 한 항목 고치기 공유');
+
+  // 29) 시나리오 설계 자동(실행 중 AI): 장을 쓰기 전에 설계가 없으면 처음부터, 설계된 막이 이번 장 앞에서 끝났으면 다음 막을 이어서. 스테이지 집필 프롬프트에 설계가 들어감
+  const p29 = await browser.newPage(), err29 = []; p29.on('pageerror', e => err29.push(String(e)));
+  await p29.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p29.goto(`http://127.0.0.1:${server.address().port}/?t=29`);
+  await p29.waitForFunction(() => typeof planEnsure === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r29 = await p29.evaluate(async () => { const o = {}, asks = []; P().seenOpening = true; closeModal(); closeOv(); G.world.plan = null;
+    SAMPLE = { json: async p => { asks.push(p); return /메인 시나리오를/.test(p) ? (/이어서 다음 막/.test(p) ? { acts: [{ name: '2막', upto: 6, goal: '추적' }], twists: [], branches: [], arcs: [] } : { logline: '자동 로그라인', acts: [{ name: '1막', upto: 3, goal: '시작' }], twists: [{ id: 't1', truth: '진실', reveal: 3, clues: [{ ch: 2, hint: '복선 힌트' }] }], branches: [], arcs: [] }) : {}; } };
+    o.newPlan = await planEnsure(1) && planHas() && PLAN().logline === '자동 로그라인';
+    o.keep = await planEnsure(2) === false; // 막 안이면 그대로
+    o.extend = await planEnsure(4) && PLAN().acts.length === 2 && PLAN().acts[1].upto === 6;
+    SAMPLE = null; o.noAI = await planEnsure(9) === false;
+    const s = { title: '스테이지', beats: ['b'] }, ch = { title: '장', logline: '', stages: [s] }; asks.length = 0; SAMPLE = { json: async p => { asks.push(p); return { pre: '세라: 가자', post: '' }; } };
+    await writeStages(ch, { head: '시험', LS: lenSpec(), step: () => {}, plan: planCtx(2) }).catch(() => {}); o.writer = asks.some(p => /스테이지 집필/.test(p) && /시나리오 설계/.test(p) && /복선 힌트/.test(p));
+    return o; });
+  assert.ok(Object.values(r29).every(v => v === true), JSON.stringify(r29)); assert.deepEqual(err29, [], '페이지 오류');
+  console.log('ok 29 시나리오 설계 자동: 장을 쓰기 전에 없으면 설계·막이 끝났으면 잇기·글 AI 없으면 안 함, 스테이지 집필에 설계(복선·반전) 전달');
+  await browser.close(); server.close();  assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
   assert.deepEqual(err2, [], '페이지 오류');
   console.log('ok 5  데이터 폴더 zip: data/<id>/<종류>.json + media 내보내기 → 같은 내용으로 읽힘 → 새 게임으로 가져오기(그림 포함)');

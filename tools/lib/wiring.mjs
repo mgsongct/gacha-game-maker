@@ -94,28 +94,38 @@ export function entities(g) { const st = (g.chapters || []).flatMap(c => c.stage
   return { 캐릭터: (g.chars || []).filter(c => !c.alt), 스테이지: st, 적: st.flatMap(s => s.enemies || []), 자료: g.lib || [], 메신저: g.threads || [], 배너: g.banners || [], 이벤트: g.events || [], 세력: (g.world || {}).factions || [] }; }
 
 // features: [{id, title, fns:Set(현재 트리의 함수 키)}], defaults: {DEFAULT_META, DEFAULT_WORLD, DEFAULT_PROG}, games: [{name, game}], upstreamProps: Set
-export function wiringReport({ fns, sf, features, roots, defaults, games, upstreamProps, userKeys = {}, defaultOk = {}, runtimeFields = {} }) {
-  const cl = closure(fns, roots), genFiles = new Set(roots.filter(r => fns.has(r)).map(r => fns.get(r).loc.split(':')[0])), gv = generatorVocab(fns, cl.keys(), genFiles), D = (path) => { const [b, x, y] = path.split('.'); if (b === 'P()') return (defaults.DEFAULT_PROG || {})[x]; if (x === 'meta') return (defaults.DEFAULT_META || {})[y]; if (x === 'world') return (defaults.DEFAULT_WORLD || {})[y]; return undefined; };
-  const out = [];
-  for (const ft of features) {
+// stages: 단계별 함수 집합 {생성, '실행 중 AI', 사용자}(lib/lifecycle.mjs stageClosures), genRoots: 생성 시작점(객체 리터럴 키는 그 파일 안의 것만 어휘로)
+// 판정은 원안의 생성 경계를 따름: 생성 단계가 만드는 키는 생성된 게임에 있어야 하고, 실행 중 AI가 만드는 키는 생성 직후엔 없어도 정상,
+// 사용자 조작으로만 만들어지는 키는 "자동이 기본"에 어긋남(P1), 어느 단계도 만들지 않으면(기본값도 빈 값) 기능이 비어 있음(P0)
+// 키 판정(원안의 생성 경계): 생성 단계 키는 생성 게임에 있어야 하고, 실행 중 AI 키는 생성 직후 없어도 정상, 사용자 조작으로만 → P1, 아무 단계도 없음 → P0
+function keyFlag(r) { if (r.key.startsWith('P().') || r.user) return null;
+  const coll = /^G\.\w+$/.test(r.key), miss = r.games.every(s => s === '없음' || (!coll && s === '빔')), dflt = r.games.every(s => s === '기본값'), gen = r.gen || r.schema, auto = gen || r.live;
+  if (r.ok && (!gen || miss || dflt)) return null; // 공통 기본값으로 충분하다고 정한 키(fork-features.json defaultOk) — 생성이 빈 값을 써 두고 기능이 기본값을 주는 경우 포함
+  if (!auto && !r.userW && miss && !r.def && r.lazy !== 'value') return { sev: 'P0', msg: `어느 단계(생성·실행 중 AI·사용자)도 만들지 않고 생성 게임에도 없음 — ${r.lazy === 'empty' ? '기능의 기본값이 빈 값이라' : '기능 쪽 기본값도 없어'} 기능이 비어 있음` };
+  if (!auto && r.userW) return { sev: 'P1', msg: `자동으로 만들어지지 않음 — 사용자 조작(${r.userW})으로만. 자동(생성·실행 중 AI)이 기본` };
+  if (!auto && miss) return { sev: 'P1', msg: `생성·실행 중 AI가 게임에 맞춰 정하지 않음 — ${r.def ? '원본 샘플 기본값' : '기능의 공통 기본값'}으로 시작` };
+  if (!auto && dflt) return { sev: 'P1', msg: '생성·실행 중 AI가 정하지 않아 원본 샘플 기본값 그대로' };
+  if (gen && miss) return { sev: 'P1', msg: `생성 단계가 만드는 키(${r.gen || '스키마'})인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물` };
+  return null; }
+const zeroOnly = g => !g || (/ 0\/\d+$/.test(g) && !/ [1-9]\d*\//.test(g));
+// 원본에 없던 새 필드(기능 함수가 엔티티에서 읽는 프로퍼티) — 생성·실행 중 AI 어휘에 있는지, 생성물 엔티티에 실제로 있는지(한 단계 안 c.persona.traits까지)
+const hasField = (x, p) => x && typeof x === 'object' && (!empty(x[p]) || Object.values(x).some(v => v && typeof v === 'object' && !Array.isArray(v) && !empty(v[p])));
+function featureFields(ft, { fns, gv, lv, games, upstreamProps }) { const EP = new Map();
+  for (const k of ft.fns) { const f = fns.get(k); if (!f) continue; for (const [p, ts] of entityProps(f.node)) { if (!EP.has(p)) EP.set(p, new Set()); ts.forEach(t => EP.get(p).add(t)); } }
+  const cover = (g, p) => Object.entries(entities(g.game)).filter(([k]) => EP.get(p).has(k)).map(([k, L]) => `${k} ${L.filter(x => hasField(x, p)).length}/${L.length}`).join(' · ');
+  return [...EP.keys()].filter(p => !upstreamProps.has(p) && p.length > 2).map(p => ({ field: p, on: [...EP.get(p)].join('·'), gen: gv.props.has(p) || gv.schema.has(p), live: lv.props.has(p) || lv.schema.has(p), schema: gv.schema.has(p), games: games.map(g => cover(g, p)) })); }
+// stages: 단계별 함수 집합 {생성, '실행 중 AI', 사용자}(lib/lifecycle.mjs stageClosures), genRoots: 생성 시작점(객체 리터럴 키는 그 파일 안의 것만 어휘로)
+export function wiringReport({ fns, sf, features, stages, genRoots, defaults, games, upstreamProps, userKeys = {}, defaultOk = {}, runtimeFields = {} }) {
+  const genFiles = new Set(genRoots.filter(r => fns.has(r)).map(r => fns.get(r).loc.split(':')[0])), gv = generatorVocab(fns, stages['생성'].keys(), genFiles), lv = generatorVocab(fns, stages['실행 중 AI'].keys(), genFiles),
+    D = (path) => { const [b, x, y] = path.split('.'); if (b === 'P()') return (defaults.DEFAULT_PROG || {})[x]; if (x === 'meta') return (defaults.DEFAULT_META || {})[y]; if (x === 'world') return (defaults.DEFAULT_WORLD || {})[y]; return undefined; },
+    writers = (key, st) => { const x = sf.list.find(k => k.key === key); return x ? [...x.w].filter(f => stages[st].has(f)) : []; }, uniq = (...a) => [...new Set(a.flat())].slice(0, 3).join(', ');
+  const row = (ft, key) => { const [, area, leaf] = key.split('.'); // G.world.X는 스키마의 world/X도 생성으로 봄(ng.world에 AI 응답을 통째로 넣음)
+    return { key, gen: uniq(gv.writes.get(key) || [], writers(key, '생성')), live: uniq(lv.writes.get(key) || [], writers(key, '실행 중 AI')), userW: uniq(writers(key, '사용자')), schema: area === 'world' && gv.schema.has(`world/${leaf}`), def: D(key) !== undefined, lazy: lazyDefault(fns, ft.fns, key, sf), user: userKeys[key] || '', ok: defaultOk[key] || '', games: games.map(g => statusOf(valueAt(g.game, key), D(key))) }; };
+  const out = features.map(ft => {
     const keys = sf.list.filter(k => /^(G\.meta\.|G\.world\.|P\(\)\.|G\.)\w+$/.test(k.key) && [...k.r].some(r => ft.fns.has(r))).map(k => k.key).filter(k => !/^G\.(meta|world|prog|chars|chapters)$/.test(k));
-    // 스키마로 만든 것으로 보는 경우: G.world.X는 스키마의 world/X(ng.world에 AI 응답을 통째로 넣음). G.meta·P()·G.X는 코드가 대입해야만 들어가므로 스키마로는 안 봄
-    const rows = keys.map(key => { const w = gv.writes.get(key), [, area, leaf] = key.split('.');
-      return { key, gen: w ? [...w].slice(0, 3).join(', ') : '', schema: area === 'world' && gv.schema.has(`world/${leaf}`), def: D(key) !== undefined, lazy: lazyDefault(fns, ft.fns, key, sf), user: userKeys[key] || '', ok: defaultOk[key] || '', games: games.map(g => statusOf(valueAt(g.game, key), D(key))) }; });
-    // 원본에 없던 새 필드(기능 함수가 읽는 프로퍼티 중) — 생성물 엔티티에 실제로 있는지
-    const EP = new Map(); for (const k of ft.fns) { const f = fns.get(k); if (!f) continue; for (const [p, ts] of entityProps(f.node)) { if (!EP.has(p)) EP.set(p, new Set()); ts.forEach(t => EP.get(p).add(t)); } }
-    const newProps = [...EP.keys()].filter(p => !upstreamProps.has(p) && p.length > 2);
-    const has = (x, p) => x && typeof x === 'object' && (!empty(x[p]) || Object.values(x).some(v => v && typeof v === 'object' && !Array.isArray(v) && !empty(v[p]))); // 한 단계 안(c.persona.traits)까지
-    const fields = newProps.map(p => ({ field: p, on: [...EP.get(p)].join('·'), gen: gv.props.has(p) || gv.schema.has(p), schema: gv.schema.has(p), games: games.map(g => Object.entries(entities(g.game)).filter(([k]) => EP.get(p).has(k)).map(([k, L]) => { const n = L.filter(x => has(x, p)).length; return `${k} ${n}/${L.length}`; }).join(' · ')) }));
-    const flags = [];
-    for (const r of rows) { if (r.key.startsWith('P().') || r.user) continue; const coll = /^G\.\w+$/.test(r.key), miss = r.games.every(s => s === '없음' || (!coll && s === '빔')), dflt = r.games.every(s => s === '기본값'), made = r.gen || r.schema;
-      if (r.ok && !made && (miss || dflt)) continue; // 공통 기본값으로 충분하다고 정한 키(fork-features.json defaultOk)
-      if (!made && miss && !r.def && r.lazy !== 'value') flags.push({ sev: 'P0', key: r.key, msg: `생성기가 만들지 않고 생성 게임에도 없음 — ${r.lazy === 'empty' ? '기능의 기본값이 빈 값이라' : '기능 쪽 기본값도 없어'} 기능이 비어 있는 채로 시작` });
-      else if (!made && miss) flags.push({ sev: 'P1', key: r.key, msg: `생성기가 게임에 맞춰 정하지 않음 — ${r.def ? '원본 샘플 기본값' : '기능의 공통 기본값'}으로 시작` });
-      else if (!made && dflt) flags.push({ sev: 'P1', key: r.key, msg: '생성기가 정하지 않아 생성 게임이 원본 샘플 기본값 그대로' });
-      else if (made && miss) flags.push({ sev: 'P1', key: r.key, msg: `생성기가 만드는 키(${r.gen || '스키마'})인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물` }); }
-    for (const x of fields) if (!runtimeFields[x.field] && !x.gen && x.games.every(g => !g || / 0\/\d+$/.test(g) && !/ [1-9]\d*\//.test(g))) flags.push({ sev: 'P1', key: x.field, msg: `기능이 ${x.on}에서 읽는 새 필드인데 생성기가 만들지 않고(스키마·대입·리터럴 없음) 생성 게임에도 없음 — 플레이 중 만들어지거나 사용자가 채워야 함` });
-    out.push({ id: ft.id, title: ft.title, fns: ft.fns.size, rows, fields, flags });
-  }
-  return { closure: cl.size, roots, features: out, schemaKeys: gv.schema.size, games: games.map(g => g.name) };
+    const rows = keys.map(k => row(ft, k)), fields = featureFields(ft, { fns, gv, lv, games, upstreamProps });
+    const flags = [...rows.map(r => { const f = keyFlag(r); return f && { ...f, key: r.key }; }).filter(Boolean),
+      ...fields.filter(x => !runtimeFields[x.field] && !x.gen && !x.live && x.games.every(zeroOnly)).map(x => ({ sev: 'P1', key: x.field, msg: `기능이 ${x.on}에서 읽는 새 필드인데 생성·실행 중 AI가 만들지 않고 생성 게임에도 없음` }))];
+    return { id: ft.id, title: ft.title, fns: ft.fns.size, rows, fields, flags }; });
+  return { closure: Object.fromEntries(Object.entries(stages).map(([k, v]) => [k, v.size])), features: out, schemaKeys: gv.schema.size, games: games.map(g => g.name) };
 }

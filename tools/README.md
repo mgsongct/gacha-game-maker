@@ -49,17 +49,17 @@ node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(
 - 한계: 동적 키 쓰기(`P()[k]=v`)는 못 따라가요(아무도 안 씀으로 나옴 — 도구 문제인지 코드 문제인지 따로 가림)
 
 ## 포크 기능 배선 점검 (`node tools/wiring.mjs [--strict] [--update-baseline]`)
-생성기가 포크 기능의 데이터를 만드는지, 생성된 게임에 실제로 들어갔는지를 tree-sitter로 맞춰 봐요(`lib/wiring.mjs`, 목록 `fork-features.json`). 결과 `out/wiring.md`.
+포크 기능의 데이터가 **원안의 생성 경계**(생성 = 세계관·기본 원칙 / 실행 중 AI = 시나리오·콘텐츠 / 사용자)에 맞게 만들어지는지, 생성된 게임에 실제로 들어갔는지를 tree-sitter로 맞춰 봐요(`lib/wiring.mjs`, 목록 `fork-features.json`, 결과 `out/wiring.md`). 단계 구분은 데이터 생애주기(`lib/lifecycle.mjs`)와 같아요.
 
 | 단계 | 방법 |
 |---|---|
-| 기능의 범위 | `fork-features.json`의 커밋마다 그 커밋 트리 − 부모 트리의 최상위 함수(= 그 기능이 들여온 함수). git 트리의 `src/`만 `out/ref-src/<sha>/`에 풀어 캐시 |
-| 기능이 읽는 데이터 | 그 함수들이 읽는 `G.meta.*`·`G.world.*`·`G.*`·`P().*` 키(상태 흐름 분석) + 게임 컬렉션 콜백·찾기 함수에 묶인 변수(`G.chars.map(c => c.x)`, `const c = charById(…)`)에서 읽는 **원본에 없던 필드** |
-| 생성기가 만드는 것 | `generators`(buildNewGameDraft 등)에서 부르는 함수(깊이 3)의 `ng.*`·`G.*` 대입과 `Object.assign` 리터럴 키, 프롬프트 JSON 스키마의 `부모/키`(world/plan 등), 생성기 파일 안 객체 리터럴 키 |
-| 기능 쪽 기본값 | 읽는 곳이 `키 \|\| 기본값`·`Object.assign(기본값, 키)`·`if(!x.키) x.키 = 기본값`이면 지연 기본값 — 빈 값([]·{})인지 쓸 만한 값인지 리터럴로 판단. 원본 샘플 기본값은 `DEFAULT_META`·`DEFAULT_WORLD`·`DEFAULT_PROG` 리터럴 |
-| 생성된 게임 | `tools/play/games/*/game.json`(커밋된 결과)과 `regress/game.json`(지금 코드로 같은 응답을 다시 생성) — 값·빔·기본값·없음 |
+| 기능의 범위 | `fork-features.json`의 커밋마다 그 커밋 트리 − 부모 트리의 최상위 함수. git 트리의 `src/`만 `out/ref-src/<sha>/`에 풀어 캐시 |
+| 기능이 읽는 데이터 | 그 함수들이 읽는 `G.meta.*`·`G.world.*`·`G.*`·`P().*` 키 + 게임 컬렉션 콜백·찾기 함수에 묶인 변수에서 읽는 **원본에 없던 필드** |
+| 누가 만드나 | 생성 단계(새 게임 초안)의 `ng.*`·`G.*` 대입·`Object.assign` 리터럴·프롬프트 스키마(`부모/키`), 실행 중 AI 단계(liveTick 경로)의 쓰기, 사용자 조작 처리기의 쓰기 |
+| 기능 쪽 기본값 | `키 \|\| 기본값`·`Object.assign(기본값, 키)`·`if(!x.키) x.키 = 기본값` — 빈 값인지 쓸 만한 값인지 리터럴로 판단. 원본 샘플 기본값은 `DEFAULT_META`·`DEFAULT_WORLD`·`DEFAULT_PROG` 리터럴 |
+| 생성된 게임 | `pc/data`(PC 서버 data 폴더)의 게임(샘플 main 제외) — 값·빔·기본값·없음 |
 
-판정: **P0** 생성기가 만들지 않고 생성 게임에도 없고 기능 기본값도 빈 값 → 기능이 비어 있는 채로 시작 · **P1** 공통 기본값으로만 시작(게임 맞춤 아님) / 생성기가 만드는 키인데 생성물에 없음 / 기능이 엔티티에서 읽는 새 필드가 어디에도 없음. 생성기가 정할 것이 아닌 키(사용자 설정)·공통 기본값으로 충분한 키·플레이 중 생기는 필드는 `fork-features.json`의 `userKeys`·`defaultOk`·`runtimeFields`에 **사유와 함께** 적어요. 판정은 `baseline.json`의 `wiring`으로 래칫(CI `--strict`).
+판정: **P0** 어느 단계도 만들지 않아 기능이 비어 있음 · **P1** 사용자 조작으로만 만들어짐(자동이 기본) / 생성 단계 키인데 생성 게임에 없음 / 공통·샘플 기본값으로만 시작 / 기능이 읽는 새 필드를 생성·실행 중 AI가 만들지 않음. **실행 중 AI가 만드는 키는 생성 직후 없어도 정상.** 생성기가 정할 것이 아닌 키(사용자 설정)·공통 기본값으로 충분한 키·플레이 중 생기는 필드는 `fork-features.json`의 `userKeys`·`defaultOk`·`runtimeFields`에 **사유와 함께**. 판정은 `baseline.json`의 `wiring`으로 래칫(CI `--strict`).
 
 ## 이름 규칙 (`node tools/names.mjs [--apply] [--strict] [--update-baseline]`)
 분석이 헷갈리는 원인(같은 지역 이름 `b`·`e`·`x`가 배너·버튼·캐릭터, 적·이벤트·오류처럼 여러 종류에 쓰임)을 코드 품질 문제로 보고 정리하는 도구예요(`lib/names.mjs`, 규칙 `naming.json`, 결과 `out/names.md`).

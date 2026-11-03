@@ -5,7 +5,8 @@
  "upstreamSrcNote": "원본(13a3fe9)은 index.html 한 파일이라 src/가 없어요. 49cec7a는 원본을 src/로 나누기만 한 커밋이라 원본 필드·함수의 기준으로 씀",
  "userKeys": {
   "G.meta.prompts": "게임마다 사용자가 프롬프트 스튜디오에서 덮어쓰는 값 — 생성기가 정할 것이 아님",
-  "G.meta.auditSeen": "점검 알림을 본 판(내부 표시)"
+  "G.meta.auditSeen": "점검 알림을 본 판(내부 표시)",
+  "G.meta.construct": "건조/영입은 사용자가 켜는 설정(새 게임 초안 옵션·설정 화면) — 켜지 않으면 없는 것이 정상"
  },
  "defaultOk": {
   "G.meta.balance": "밸런스 정책은 공통 기본값(수동 세대·자동 정규화)으로 충분 — 생성기가 게임마다 정할 값이 아님",
@@ -15,7 +16,6 @@
   "cvar": "건조로 바리에이션을 만들 때 붙음(생성 시점에는 없음이 정상)",
   "monster": "적·몬스터를 캐릭터로 바꿀 때 붙음 — 생성기는 몬스터를 대원에서 거름"
  },
- "generators": ["buildNewGameDraft", "buildManualGameDraft", "aiChapterGen0", "aiEventGen0"],
  "features": [
   { "id": "construct", "title": "건조/영입·원정 자원·바리에이션·상속형 이격", "commits": ["1942dc8"], "doc": "docs/research/construction.md" },
   { "id": "expedition", "title": "원정 장르(전투·아이돌·방송·경영)", "commits": ["04162f7"], "doc": "docs/research/expedition.md" },

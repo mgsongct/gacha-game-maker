@@ -12,6 +12,7 @@ import { domIds, htmlInject, saveKeys, listenerLeaks, cssCheck, sideFiles, relay
 import { analyze } from './lib/analyze.mjs';
 import { findings, compare } from './lib/ratchet.mjs';
 import { wiringReport, schemaKeys } from './lib/wiring.mjs';
+import { stageClosures } from './lib/lifecycle.mjs';
 import { bindings, violations, renameEdits } from './lib/names.mjs';
 
 const root = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w = (p, s) => { mkdirSync(join(root, p, '..'), { recursive: true }); writeFileSync(join(root, p), s); };
@@ -144,7 +145,7 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
 function buildNewGameDraft(){ const ng={meta:{},world:{}}; ng.meta.made=1; ng.world=Object.assign({},a.world); const p='JSON만 출력: {"world":{"lore":"","story":""}}'; return p; }
 function featA(){ return [G.meta.made, G.meta.never, G.world.lore, G.world.plot2, (G.meta.list||[]).length, Object.assign({on:true},G.meta.cfg).on, G.chars.map(c=>c.zzNew), G.chars.map(c=>c.zzMade)]; }
 `);
-  const u3 = await loadUnits(r3), g3 = buildGraph(u3), W = wiringReport({ fns: g3.fns, sf: stateFlow(u3, g3.fns), features: [{ id: 'a', title: 'a', fns: new Set(['featA']) }], roots: ['buildNewGameDraft'], defaults: {}, upstreamProps: new Set(),
+  const u3 = await loadUnits(r3), g3 = buildGraph(u3), W = wiringReport({ fns: g3.fns, sf: stateFlow(u3, g3.fns), features: [{ id: 'a', title: 'a', fns: new Set(['featA']) }], stages: stageClosures(u3, g3.fns), genRoots: ['buildNewGameDraft'], defaults: {}, upstreamProps: new Set(),
     games: [{ name: 'g', game: { meta: { made: 1 }, world: { lore: '설정' }, chars: [{ zzMade: 'x' }] } }] }), F = W.features[0], fl = Object.fromEntries(F.flags.map(x => [x.key, x.sev]));
   assert.ok(schemaKeys('{"world":{"lore":""}}').has('world/lore'), '스키마 키: 부모/키');
   assert.equal(fl['G.meta.made'], undefined, '생성기가 쓰고 생성물에 있음 → 문제 아님'); assert.equal(fl['G.world.lore'], undefined, 'world 스키마 키 → 생성기가 만듦');
