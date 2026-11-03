@@ -1,0 +1,911 @@
+[
+ {
+  "game": "idol-audition",
+  "title": "앙코르 시그널",
+  "frags": [
+   {
+    "id": "BATTLE_FLOW",
+    "label": "전투 흐름(스토리 안의 전투 다루기)",
+    "chars": 207,
+    "usedIn": 0
+   },
+   {
+    "id": "SCRIPT_FMT",
+    "label": "대본 형식(스토리·이벤트·메모리얼 대본)",
+    "chars": 950,
+    "usedIn": 2
+   },
+   {
+    "id": "THREAD_FMT",
+    "label": "메신저(톡) 형식",
+    "chars": 380,
+    "usedIn": 1
+   },
+   {
+    "id": "TITLE_RULE",
+    "label": "게임 이름 짓기",
+    "chars": 190,
+    "usedIn": 1
+   },
+   {
+    "id": "NAI_CHAR",
+    "label": "캐릭터 외모 태그(naiPrompt)",
+    "chars": 523,
+    "usedIn": 1
+   },
+   {
+    "id": "CHAR_STAT_RULE",
+    "label": "새 캐릭터 능력치·외모 규칙(캐릭터 생성 4곳 공통)",
+    "chars": 584,
+    "usedIn": 0
+   },
+   {
+    "id": "EXPLORATION_NAME_RULE",
+    "label": "탐사 콘텐츠 이름",
+    "chars": 127,
+    "usedIn": 1
+   },
+   {
+    "id": "JSON_STRICT",
+    "label": "JSON 출력 강조(모든 JSON 요청 끝)",
+    "chars": 107,
+    "usedIn": 0
+   },
+   {
+    "id": "IMG_GUIDE",
+    "label": "그림 태그 공통 가이드(그림 태그를 쓰는 모든 요청에 자동으로 들어감)",
+    "chars": 221,
+    "usedIn": 3
+   },
+   {
+    "id": "POS_RULE",
+    "label": "포지션(직군·함종) 설계",
+    "chars": 206,
+    "usedIn": 1
+   },
+   {
+    "id": "FACTION_RULE",
+    "label": "세력 설계 규칙(새 게임·세력 AI 채우기)",
+    "chars": 381,
+    "usedIn": 1
+   },
+   {
+    "id": "DIRECTION_GUIDE",
+    "label": "연출 문법(감정 아이콘·동작·화면 효과)",
+    "chars": 317,
+    "usedIn": 2
+   },
+   {
+    "id": "STAGE_MODES",
+    "label": "스테이지 양식(전투·이야기·회담·콘테스트) 고르기",
+    "chars": 412,
+    "usedIn": 1
+   }
+  ],
+  "rulesChars": 332,
+  "skillChars": 10408,
+  "rows": [
+   {
+    "kind": "chapter1",
+    "len": 10701,
+    "frags": [
+     "SCRIPT_FMT",
+     "THREAD_FMT",
+     "IMG_GUIDE",
+     "DIRECTION_GUIDE",
+     "STAGE_MODES"
+    ],
+    "fragPct": 21,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 3,
+    "json": 2,
+    "sample": 28
+   },
+   {
+    "kind": "chars",
+    "len": 17845,
+    "frags": [
+     "NAI_CHAR",
+     "IMG_GUIDE"
+    ],
+    "fragPct": 4,
+    "rulesIn": true,
+    "skillIn": true,
+    "fixedPct": 60,
+    "json": 2,
+    "sample": 3
+   },
+   {
+    "kind": "opening",
+    "len": 8237,
+    "frags": [
+     "SCRIPT_FMT",
+     "IMG_GUIDE",
+     "DIRECTION_GUIDE"
+    ],
+    "fragPct": 18,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 4,
+    "json": 2,
+    "sample": 28
+   },
+   {
+    "kind": "skill-문가을-1",
+    "len": 4305,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "skill-백소하-1",
+    "len": 4322,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "skill-서지안-1",
+    "len": 4572,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "skill-오은별-1",
+    "len": 4489,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "skill-주다온-1",
+    "len": 4300,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 2
+   },
+   {
+    "kind": "skill-차하린-1",
+    "len": 4307,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "world",
+    "len": 3288,
+    "frags": [
+     "TITLE_RULE",
+     "EXPLORATION_NAME_RULE",
+     "POS_RULE",
+     "FACTION_RULE"
+    ],
+    "fragPct": 27,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 2
+   }
+  ],
+  "repeated": [
+   {
+    "chars": 2121,
+    "n": 2,
+    "head": "멤버: 차하린(SSR, 새벽별 엔터테인먼트, 열정속성 퍼포머, 새벽별 엔터테인먼트의 센터 지망 연습생. 데뷔 직전까지 갔던 경",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 950,
+    "n": 2,
+    "head": "대본은 하나의 문자열이고 줄마다 줄바꿈(\\n)으로 나눈다(쉼표로 잇거나 배열로 쓰지 않는다). 대본 형식(한 줄에 하나): \"",
+    "frag": "SCRIPT_FMT"
+   },
+   {
+    "chars": 611,
+    "n": 2,
+    "head": "메인 플롯(작가용 비밀 설정 포함): 새벽별의 연습생들은 첫 순위 발표에서 최하위권을 기록하며 팀 내 센터 자리와 방향성을 두",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 525,
+    "n": 2,
+    "head": "- 새벽별 엔터테인먼트 [플레이어블 소속 · 지금 플레이어와 우호]: 망원동 상가 3층의 연습실 하나로 시작한 신생 기획사다.",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 332,
+    "n": 3,
+    "head": "플레이어(실장님)의 성별은 정하지 않는다. 성별이 드러나는 호칭은 피한다. 플레이어(실장님)의 외모: 단정한 셔츠에 사원증을 ",
+    "frag": "RULES(조각 아님)"
+   },
+   {
+    "chars": 495,
+    "n": 2,
+    "head": "- 시그널 팬연합 [중립 · 지금 플레이어와 중립 · 3장부터 우호 예정(새벽별의 진심 어린 무대에 반한 회원들이 생겨나며 공",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 473,
+    "n": 2,
+    "head": "- 오로라TV 스타라인 제작국 [중립 · 지금 플레이어와 중립 · 5장부터 적대 예정(실장님이 투표 보정의 흔적을 쫓기 시작하",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 435,
+    "n": 2,
+    "head": "상세 설정: 10년 전 첫 시즌 이후 「스타라인」은 아이돌이 되는 가장 빠른 길이자 유일한 길처럼 여겨진다. 매 회차 연습생들",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 432,
+    "n": 2,
+    "head": "- 크라운 엔터테인먼트 [적대 세력 · 지금 플레이어와 적대]: 매 시즌 데뷔조 과반을 배출해 온 업계 1위 대형 기획사다. ",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 399,
+    "n": 2,
+    "head": "- 블랙 렌즈 [적대 세력 · 지금 플레이어와 적대]: 연습생의 과거와 사생활을 캐내 영상으로 퍼뜨리는 폭로 채널 집단이다. ",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 173,
+    "n": 3,
+    "head": "- 그림 종류마다 태그 대상이 다르다. 캐릭터(naiPrompt)=외모만. CG=장소·구도·행동·분위기(외모 제외). 배경=사",
+    "frag": "IMG_GUIDE"
+   },
+   {
+    "chars": 160,
+    "n": 2,
+    "head": "게임 \"앙코르 시그널\". 세계관 \"스타라인의 서울\": 국민 투표로 데뷔조를 뽑는 서바이벌 오디션 「스타라인」이 모든 화제를 삼",
+    "frag": "하드코딩"
+   }
+  ],
+  "conflicts": [
+   {
+    "name": "처음 동료: 아는 사이 vs 첫 만남",
+    "desc": "대원 단계는 처음부터 동료를 \"이미 아는 사이\"로, 오프닝은 \"첫 만남\"을 요구"
+   },
+   {
+    "name": "표정 목록 없음",
+    "desc": "\"표정 목록에서 고른다\"는데 표정 목록이 주어지지 않음"
+   },
+   {
+    "name": "세력 고르게 vs 플레이어블만",
+    "desc": "\"세력을 고르게 나누라\"면서 대원은 플레이어블(또는 나중 우호) 소속만 허용"
+   },
+   {
+    "name": "value 백분율 vs 예시 소수",
+    "desc": "규칙은 value를 백분율(150)로, 예시는 1.8 같은 소수"
+   },
+   {
+    "name": "효과 목록에 없는 예시 타입",
+    "desc": "스키마 예시의 crit_up이 효과 타입 목록에 없음(글 AI 보고)"
+   },
+   {
+    "name": "반드시 전투 vs 전투 없는 아이디어",
+    "desc": "모든 장의 마지막 스테이지를 전투로 강제 — 입력 아이디어가 전투 없는 장르여도"
+   },
+   {
+    "name": "사람 제외 도감 vs 사람 적",
+    "desc": "적 도감은 사람 제외인데 장르에 따라 적이 모두 사람"
+   },
+   {
+    "name": "원본 속성 이름 고정 문구",
+    "desc": "스킬 팔레트 지시에 원본 속성 이름 「홍·녹·청」이 고정 문구로"
+   }
+  ],
+  "genreConflict": true
+ },
+ {
+  "game": "sky-knights",
+  "title": "게일 크레스트",
+  "frags": [
+   {
+    "id": "BATTLE_FLOW",
+    "label": "전투 흐름(스토리 안의 전투 다루기)",
+    "chars": 207,
+    "usedIn": 8
+   },
+   {
+    "id": "SCRIPT_FMT",
+    "label": "대본 형식(스토리·이벤트·메모리얼 대본)",
+    "chars": 953,
+    "usedIn": 10
+   },
+   {
+    "id": "THREAD_FMT",
+    "label": "메신저(톡) 형식",
+    "chars": 380,
+    "usedIn": 2
+   },
+   {
+    "id": "TITLE_RULE",
+    "label": "게임 이름 짓기",
+    "chars": 190,
+    "usedIn": 1
+   },
+   {
+    "id": "NAI_CHAR",
+    "label": "캐릭터 외모 태그(naiPrompt)",
+    "chars": 523,
+    "usedIn": 4
+   },
+   {
+    "id": "CHAR_STAT_RULE",
+    "label": "새 캐릭터 능력치·외모 규칙(캐릭터 생성 4곳 공통)",
+    "chars": 584,
+    "usedIn": 0
+   },
+   {
+    "id": "EXPLORATION_NAME_RULE",
+    "label": "탐사 콘텐츠 이름",
+    "chars": 127,
+    "usedIn": 1
+   },
+   {
+    "id": "JSON_STRICT",
+    "label": "JSON 출력 강조(모든 JSON 요청 끝)",
+    "chars": 107,
+    "usedIn": 0
+   },
+   {
+    "id": "IMG_GUIDE",
+    "label": "그림 태그 공통 가이드(그림 태그를 쓰는 모든 요청에 자동으로 들어감)",
+    "chars": 221,
+    "usedIn": 6
+   },
+   {
+    "id": "POS_RULE",
+    "label": "포지션(직군·함종) 설계",
+    "chars": 206,
+    "usedIn": 1
+   },
+   {
+    "id": "FACTION_RULE",
+    "label": "세력 설계 규칙(새 게임·세력 AI 채우기)",
+    "chars": 381,
+    "usedIn": 1
+   },
+   {
+    "id": "DIRECTION_GUIDE",
+    "label": "연출 문법(감정 아이콘·동작·화면 효과)",
+    "chars": 317,
+    "usedIn": 10
+   },
+   {
+    "id": "STAGE_MODES",
+    "label": "스테이지 양식(전투·이야기·회담·콘테스트) 고르기",
+    "chars": 412,
+    "usedIn": 3
+   }
+  ],
+  "rulesChars": 334,
+  "skillChars": 10408,
+  "rows": [
+   {
+    "kind": "chapter-다음_날_밤_용광로가_대부분_꺼진_조선소에-s3-l5qkuv",
+    "len": 2008,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 3
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리는_피난선을_이끌고_-s1-1ai1cd",
+    "len": 998,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 2
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s1-a6keqn",
+    "len": 1948,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 2
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s2-k8wx6i",
+    "len": 1947,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 2
+   },
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2",
+    "len": 31059,
+    "frags": [
+     "BATTLE_FLOW",
+     "SCRIPT_FMT",
+     "NAI_CHAR",
+     "IMG_GUIDE",
+     "DIRECTION_GUIDE",
+     "STAGE_MODES"
+    ],
+    "fragPct": 8,
+    "rulesIn": true,
+    "skillIn": true,
+    "fixedPct": 35,
+    "json": 2,
+    "sample": 8
+   },
+   {
+    "kind": "chapter-다음_메인_챕터_3장_를_구성하라_대본은_-rzuue6",
+    "len": 32847,
+    "frags": [
+     "BATTLE_FLOW",
+     "SCRIPT_FMT",
+     "NAI_CHAR",
+     "IMG_GUIDE",
+     "DIRECTION_GUIDE",
+     "STAGE_MODES"
+    ],
+    "fragPct": 8,
+    "rulesIn": true,
+    "skillIn": true,
+    "fixedPct": 33,
+    "json": 2,
+    "sample": 8
+   },
+   {
+    "kind": "chapter-다음_종이_울린_뒤_이십_초가_비어_있습니다-s4-7h9p13",
+    "len": 1761,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 2
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-0g2ojz",
+    "len": 19482,
+    "frags": [
+     "BATTLE_FLOW",
+     "SCRIPT_FMT",
+     "DIRECTION_GUIDE"
+    ],
+    "fragPct": 8,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 2,
+    "json": 2,
+    "sample": 8
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-8wi0pv",
+    "len": 19515,
+    "frags": [
+     "BATTLE_FLOW",
+     "SCRIPT_FMT",
+     "DIRECTION_GUIDE"
+    ],
+    "fragPct": 8,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 2,
+    "json": 2,
+    "sample": 8
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh",
+    "len": 19393,
+    "frags": [
+     "BATTLE_FLOW",
+     "SCRIPT_FMT",
+     "DIRECTION_GUIDE"
+    ],
+    "fragPct": 8,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 2,
+    "json": 2,
+    "sample": 8
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "frags": [
+     "BATTLE_FLOW",
+     "SCRIPT_FMT",
+     "DIRECTION_GUIDE"
+    ],
+    "fragPct": 8,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 2,
+    "json": 2,
+    "sample": 8
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y",
+    "len": 19488,
+    "frags": [
+     "BATTLE_FLOW",
+     "SCRIPT_FMT",
+     "DIRECTION_GUIDE"
+    ],
+    "fragPct": 8,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 2,
+    "json": 2,
+    "sample": 8
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-x33jt1",
+    "len": 19381,
+    "frags": [
+     "BATTLE_FLOW",
+     "SCRIPT_FMT",
+     "DIRECTION_GUIDE"
+    ],
+    "fragPct": 8,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 2,
+    "json": 2,
+    "sample": 8
+   },
+   {
+    "kind": "chapter-다음엔_덜_떨게요_아마도요_다른_설명이-s2-u1jg5a",
+    "len": 2193,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 2
+   },
+   {
+    "kind": "chapter-다음은_검은_돛의_그림자_의_대본을_처음부-11mkbb",
+    "len": 3555,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 0
+   },
+   {
+    "kind": "chapter-다음은_스토리에_여러_번_나온_조연들이다_-bfix2y",
+    "len": 1381,
+    "frags": [
+     "NAI_CHAR",
+     "IMG_GUIDE"
+    ],
+    "fragPct": 54,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 0
+   },
+   {
+    "kind": "chapter-다음은_완성된_대본에서_확인한_사건_기록이다-9qn5kt",
+    "len": 3868,
+    "frags": [
+     "THREAD_FMT"
+    ],
+    "fragPct": 10,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 9,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "chapter-이_입력은_게임_작가의_이야기_기억_정리_작-s2-x36yek",
+    "len": 1011,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 0
+   },
+   {
+    "kind": "chapter1",
+    "len": 11842,
+    "frags": [
+     "SCRIPT_FMT",
+     "THREAD_FMT",
+     "IMG_GUIDE",
+     "DIRECTION_GUIDE",
+     "STAGE_MODES"
+    ],
+    "fragPct": 19,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 3,
+    "json": 2,
+    "sample": 28
+   },
+   {
+    "kind": "chars",
+    "len": 18236,
+    "frags": [
+     "NAI_CHAR",
+     "IMG_GUIDE"
+    ],
+    "fragPct": 4,
+    "rulesIn": true,
+    "skillIn": true,
+    "fixedPct": 59,
+    "json": 2,
+    "sample": 3
+   },
+   {
+    "kind": "opening",
+    "len": 9355,
+    "frags": [
+     "SCRIPT_FMT",
+     "IMG_GUIDE",
+     "DIRECTION_GUIDE"
+    ],
+    "fragPct": 16,
+    "rulesIn": true,
+    "skillIn": false,
+    "fixedPct": 4,
+    "json": 2,
+    "sample": 28
+   },
+   {
+    "kind": "skill-넬-1",
+    "len": 4307,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "skill-루시안-1",
+    "len": 4292,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "skill-브람-1",
+    "len": 4288,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "skill-비비안-1",
+    "len": 4501,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "skill-이브-1",
+    "len": 4538,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "skill-카시아-1",
+    "len": 4296,
+    "frags": [],
+    "fragPct": 0,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 1
+   },
+   {
+    "kind": "world",
+    "len": 3283,
+    "frags": [
+     "TITLE_RULE",
+     "EXPLORATION_NAME_RULE",
+     "POS_RULE",
+     "FACTION_RULE"
+    ],
+    "fragPct": 28,
+    "rulesIn": false,
+    "skillIn": false,
+    "fixedPct": 0,
+    "json": 2,
+    "sample": 2
+   }
+  ],
+  "repeated": [
+   {
+    "chars": 10418,
+    "n": 3,
+    "head": "스킬 작성 규칙: 스킬 JSON은 skills:{version:2,passive,active,ultimate}. 슬롯은 {na",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 3817,
+    "n": 3,
+    "head": "단원: 카시아(SSR, 질풍문장 기사단, 질풍속성 선봉, 옛 질풍문장 기사단 총장의 마지막 종자였던 기사. 기사단이 해산된 뒤",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 953,
+    "n": 10,
+    "head": "대본은 하나의 문자열이고 줄마다 줄바꿈(\\n)으로 나눈다(쉼표로 잇거나 배열로 쓰지 않는다). 대본 형식(한 줄에 하나): \"",
+    "frag": "SCRIPT_FMT"
+   },
+   {
+    "chars": 4502,
+    "n": 2,
+    "head": "이 이야기에서 처음 등장하는 신규 단원 2명을 newCharacters에 만든다. 희귀도를 섞는다: 1명은 SSR 또는 SR,",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 3798,
+    "n": 2,
+    "head": "단원: 카시아(SSR, 질풍문장 기사단, 질풍속성 선봉, 옛 질풍문장 기사단 총장의 마지막 종자였던 기사. 기사단이 해산된 뒤",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 1012,
+    "n": 7,
+    "head": "몬스터 도감(말하는 동료·NPC·메신저 상대가 아니다. 대사는 울음·짧은 위협 정도): 잔해 까마귀(와류수): 폭풍에 부서진 ",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 701,
+    "n": 10,
+    "head": "메인 플롯(작가용 비밀 설정 포함): 부유석은 아득한 옛날 운해를 헤엄치던 거대한 하늘고래 '천경'들의 굳은 심장이며, 군도의",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 615,
+    "n": 10,
+    "head": "- 와류수 [괴물·마물 · 지금 플레이어와 적대]: 잿빛 폭풍 '아가리'가 지나간 자리에 나타나는 괴물 무리다. 기류와 번개,",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 561,
+    "n": 10,
+    "head": "- 검은 돛 공적단 [적대 세력 · 지금 플레이어와 적대 · 3장부터 우호 예정(선장 로웬이 옛 부단장임이 밝혀지고, 의회라는",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 532,
+    "n": 10,
+    "head": "상세 설정: 아주 오래전 지상은 끝없는 구름의 바다 '운해' 아래로 가라앉았고, 살아남은 사람들은 부유석이 박힌 섬 위에서 하",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 486,
+    "n": 10,
+    "head": "- 백운 의회 [적대 세력 · 지금 플레이어와 적대]: 수도섬 아우렐리아를 다스리며 군도 전체의 부유석 거래와 항로 허가를 쥔",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 2271,
+    "n": 2,
+    "head": "단원: 카시아(SSR, 질풍문장 기사단, 질풍속성 선봉, 옛 질풍문장 기사단 총장의 마지막 종자였던 기사. 기사단이 해산된 뒤",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 756,
+    "n": 6,
+    "head": "4. 백익호 습격: 운해 표면을 스치는 저공 항로. 마테오의 비행정이 앞서 정찰하고, 이브가 운해의 난기류를 읽어 바람꼬리를 ",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 425,
+    "n": 10,
+    "head": "- 운해 순례회 [중립 · 지금 플레이어와 중립]: 종루섬 에코벨에 모여 사는 순례자 공동체다. 폭풍을 하늘이 내리는 심판이라",
+    "frag": "하드코딩"
+   },
+   {
+    "chars": 693,
+    "n": 6,
+    "head": "2. 황동의 청문회: 증기 경적과 시장 소음이 가득한 자유항 코그웰에 도착한다. 넬은 고향에 돌아와 들뜨고, 마테오는 땅에 내",
+    "frag": "하드코딩"
+   }
+  ],
+  "conflicts": [
+   {
+    "name": "처음 동료: 아는 사이 vs 첫 만남",
+    "desc": "대원 단계는 처음부터 동료를 \"이미 아는 사이\"로, 오프닝은 \"첫 만남\"을 요구"
+   },
+   {
+    "name": "표정 목록 없음",
+    "desc": "\"표정 목록에서 고른다\"는데 표정 목록이 주어지지 않음"
+   },
+   {
+    "name": "세력 고르게 vs 플레이어블만",
+    "desc": "\"세력을 고르게 나누라\"면서 대원은 플레이어블(또는 나중 우호) 소속만 허용"
+   },
+   {
+    "name": "value 백분율 vs 예시 소수",
+    "desc": "규칙은 value를 백분율(150)로, 예시는 1.8 같은 소수"
+   },
+   {
+    "name": "효과 목록에 없는 예시 타입",
+    "desc": "스키마 예시의 crit_up이 효과 타입 목록에 없음(글 AI 보고)"
+   },
+   {
+    "name": "반드시 전투 vs 전투 없는 아이디어",
+    "desc": "모든 장의 마지막 스테이지를 전투로 강제 — 입력 아이디어가 전투 없는 장르여도"
+   },
+   {
+    "name": "사람 제외 도감 vs 사람 적",
+    "desc": "적 도감은 사람 제외인데 장르에 따라 적이 모두 사람"
+   },
+   {
+    "name": "원본 속성 이름 고정 문구",
+    "desc": "스킬 팔레트 지시에 원본 속성 이름 「홍·녹·청」이 고정 문구로"
+   }
+  ],
+  "genreConflict": false
+ }
+]

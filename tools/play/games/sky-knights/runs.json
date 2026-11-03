@@ -911,5 +911,1482 @@
    ]
   },
   "errors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T07:51:49.719Z",
+  "pending": [
+   "chapter-다음_메인_챕터_3장_를_구성하라_대본은_-qlg"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_3장_를_구성하라_대본은_-qlg",
+    "len": 32847,
+    "max_tokens": 32000,
+    "at": 1793692305575,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)"
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 32774
+   }
+  ],
+  "ms": 15,
+  "chapter": null,
+  "errors": []
+ },
+ {
+  "phase": "new",
+  "at": "2026-11-03T07:53:05.816Z",
+  "pending": [],
+  "commitAtCall": 5,
+  "log": [
+   {
+    "kind": "world",
+    "len": 3283,
+    "max_tokens": 32000,
+    "at": 1793692381640,
+    "outLen": 8505
+   },
+   {
+    "kind": "chars",
+    "len": 18236,
+    "max_tokens": 32000,
+    "at": 1793692381647,
+    "outLen": 42699
+   },
+   {
+    "kind": "opening",
+    "len": 9355,
+    "max_tokens": 32000,
+    "at": 1793692381666,
+    "outLen": 5206
+   },
+   {
+    "kind": "chapter1",
+    "len": 11842,
+    "max_tokens": 32000,
+    "at": 1793692381668,
+    "outLen": 12335
+   },
+   {
+    "kind": "skill-루시안-1",
+    "len": 4292,
+    "max_tokens": 16000,
+    "at": 1793692381679,
+    "outLen": 1654
+   }
+  ],
+  "toasts": [],
+  "ailog": [
+   {
+    "ok": true,
+    "reqLen": 4219
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 4/4 1장 스토리와 메신저를 만드는 중",
+    "reqLen": 11769
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 3/4 오프닝, 배경·소품·음악 목록, 배너를 만드는 중",
+    "reqLen": 9282
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 2/4 단원 6명을 만드는 중",
+    "reqLen": 18163
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 1/4 세계관과 게임 정의를 만드는 중",
+    "reqLen": 3210
+   }
+  ],
+  "ms": 77,
+  "stat": [],
+  "pageErrors": []
+ },
+ {
+  "phase": "skills",
+  "at": "2026-11-03T07:53:25.715Z",
+  "pending": [],
+  "log": [],
+  "toasts": [],
+  "ailog": [],
+  "todo": [],
+  "pageErrors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T07:53:31.135Z",
+  "pending": [
+   "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-1hn"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-qlg",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692406279,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692407005,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692407008,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19421,
+    "max_tokens": 32000,
+    "at": 1793692407011,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19395,
+    "max_tokens": 32000,
+    "at": 1793692407013,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-1hn",
+    "len": 1948,
+    "max_tokens": 16000,
+    "at": 1793692407015,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "이야기 기억 정리 실패: pending response. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요."
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 1875
+   },
+   {
+    "ok": true,
+    "reqLen": 19322
+   },
+   {
+    "ok": true,
+    "reqLen": 19348
+   },
+   {
+    "ok": true,
+    "reqLen": 18439
+   },
+   {
+    "ok": true,
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 750,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 0,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "pageErrors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T07:54:01.771Z",
+  "pending": [
+   "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-80g"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-qlg",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692436931,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692437655,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692437658,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19421,
+    "max_tokens": 32000,
+    "at": 1793692437661,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19395,
+    "max_tokens": 32000,
+    "at": 1793692437663,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-1hn",
+    "len": 1948,
+    "max_tokens": 16000,
+    "at": 1793692437664,
+    "outLen": 716
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-80g",
+    "len": 1947,
+    "max_tokens": 16000,
+    "at": 1793692437665,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "이야기 기억 정리 실패: pending response. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요."
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 1874
+   },
+   {
+    "ok": true,
+    "reqLen": 1875
+   },
+   {
+    "ok": true,
+    "reqLen": 19322
+   },
+   {
+    "ok": true,
+    "reqLen": 19348
+   },
+   {
+    "ok": true,
+    "reqLen": 18439
+   },
+   {
+    "ok": true,
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 749,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 0,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "pageErrors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T07:55:11.142Z",
+  "pending": [
+   "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+   "chapter-다음에_태워_줄게_어디_갔다_왔어_나-8wi0pv",
+   "chapter-다음에_태워_줄게_어디_갔다_왔어_나-0g2ojz",
+   "chapter-이_입력은_게임_작가의_이야기_기억_정리_작-s2-x36yek"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692497251,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692497994,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692497997,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692499504,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-8wi0pv",
+    "len": 19515,
+    "max_tokens": 32000,
+    "at": 1793692501012,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-8wi0pv",
+    "len": 19515,
+    "max_tokens": 32000,
+    "at": 1793692502519,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-0g2ojz",
+    "len": 19482,
+    "max_tokens": 32000,
+    "at": 1793692504028,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-0g2ojz",
+    "len": 19482,
+    "max_tokens": 32000,
+    "at": 1793692505535,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s1-a6keqn",
+    "len": 1948,
+    "max_tokens": 16000,
+    "at": 1793692507041,
+    "outLen": 716
+   },
+   {
+    "kind": "chapter-이_입력은_게임_작가의_이야기_기억_정리_작-s2-x36yek",
+    "len": 1011,
+    "max_tokens": 16000,
+    "at": 1793692507042,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "이야기 기억 정리 실패: pending response. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요."
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 938
+   },
+   {
+    "ok": true,
+    "reqLen": 1875
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19409
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19409
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19442
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19442
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 18439
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 18439
+   },
+   {
+    "ok": true,
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 9803,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 0,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "pageErrors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T07:55:47.251Z",
+  "pending": [
+   "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+   "chapter-다음에_태워_줄게_어디_갔다_왔어_나-8wi0pv",
+   "chapter-다음에_태워_줄게_어디_갔다_왔어_나-0g2ojz",
+   "chapter-이_입력은_게임_작가의_이야기_기억_정리_작-s2-x36yek"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692533385,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692534109,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692534112,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692535620,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-8wi0pv",
+    "len": 19515,
+    "max_tokens": 32000,
+    "at": 1793692537127,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-8wi0pv",
+    "len": 19515,
+    "max_tokens": 32000,
+    "at": 1793692538634,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-0g2ojz",
+    "len": 19482,
+    "max_tokens": 32000,
+    "at": 1793692540145,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-0g2ojz",
+    "len": 19482,
+    "max_tokens": 32000,
+    "at": 1793692541652,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s1-a6keqn",
+    "len": 1948,
+    "max_tokens": 16000,
+    "at": 1793692543158,
+    "outLen": 716
+   },
+   {
+    "kind": "chapter-이_입력은_게임_작가의_이야기_기억_정리_작-s2-x36yek",
+    "len": 1011,
+    "max_tokens": 16000,
+    "at": 1793692543159,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "이야기 기억 정리 실패: pending response. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요."
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 938
+   },
+   {
+    "ok": true,
+    "reqLen": 1875
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19409
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19409
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19442
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19442
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 18439
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 18439
+   },
+   {
+    "ok": true,
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 9786,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 0,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "pageErrors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T07:58:59.921Z",
+  "pending": [
+   "chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y",
+   "chapter-다음엔_덜_떨게요_아마도요_다른_설명이-s2-u1jg5a",
+   "chapter-다음은_스토리에_여러_번_나온_조연들이다_-bfix2y"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692732027,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692732765,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692732768,
+    "outLen": 1910
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y",
+    "len": 19488,
+    "max_tokens": 32000,
+    "at": 1793692732770,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y",
+    "len": 19488,
+    "max_tokens": 32000,
+    "at": 1793692734279,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-0g2ojz",
+    "len": 19482,
+    "max_tokens": 32000,
+    "at": 1793692735786,
+    "outLen": 1478
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s1-a6keqn",
+    "len": 1948,
+    "max_tokens": 16000,
+    "at": 1793692735788,
+    "outLen": 716
+   },
+   {
+    "kind": "chapter-다음엔_덜_떨게요_아마도요_다른_설명이-s2-u1jg5a",
+    "len": 2193,
+    "max_tokens": 16000,
+    "at": 1793692735788,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음은_스토리에_여러_번_나온_조연들이다_-bfix2y",
+    "len": 1381,
+    "max_tokens": 4000,
+    "at": 1793692735795,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "이야기 기억 정리 실패: pending response. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요.",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)"
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 1308
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 2120
+   },
+   {
+    "ok": true,
+    "reqLen": 1875
+   },
+   {
+    "ok": true,
+    "reqLen": 19409
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19415
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19415
+   },
+   {
+    "ok": true,
+    "reqLen": 18439
+   },
+   {
+    "ok": true,
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 3777,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 0,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "pageErrors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T07:59:33.939Z",
+  "pending": [
+   "chapter-다음에_태워_줄게_어디_갔다_왔어_나-x33jt1",
+   "chapter-다음_날_밤_용광로가_대부분_꺼진_조선소에-s3-l5qkuv"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692766042,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692766796,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692766799,
+    "outLen": 1910
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y",
+    "len": 19488,
+    "max_tokens": 32000,
+    "at": 1793692766801,
+    "outLen": 1723
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-x33jt1",
+    "len": 19381,
+    "max_tokens": 32000,
+    "at": 1793692766804,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-x33jt1",
+    "len": 19381,
+    "max_tokens": 32000,
+    "at": 1793692768314,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s1-a6keqn",
+    "len": 1948,
+    "max_tokens": 16000,
+    "at": 1793692769820,
+    "outLen": 716
+   },
+   {
+    "kind": "chapter-다음엔_덜_떨게요_아마도요_다른_설명이-s2-u1jg5a",
+    "len": 2193,
+    "max_tokens": 16000,
+    "at": 1793692769821,
+    "outLen": 785
+   },
+   {
+    "kind": "chapter-다음_날_밤_용광로가_대부분_꺼진_조선소에-s3-l5qkuv",
+    "len": 2008,
+    "max_tokens": 16000,
+    "at": 1793692769821,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음은_스토리에_여러_번_나온_조연들이다_-bfix2y",
+    "len": 1381,
+    "max_tokens": 4000,
+    "at": 1793692769827,
+    "outLen": 419
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "이야기 기억 정리 실패: pending response. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요."
+  ],
+  "ailog": [
+   {
+    "ok": true,
+    "reqLen": 1308
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 1935
+   },
+   {
+    "ok": true,
+    "reqLen": 2120
+   },
+   {
+    "ok": true,
+    "reqLen": 1875
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19308
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19308
+   },
+   {
+    "ok": true,
+    "reqLen": 19415
+   },
+   {
+    "ok": true,
+    "reqLen": 18439
+   },
+   {
+    "ok": true,
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 3793,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 0,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "pageErrors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T08:00:00.116Z",
+  "pending": [
+   "chapter-다음_종이_울린_뒤_이십_초가_비어_있습니다-s4-7h9p13"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692795257,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692795995,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692795998,
+    "outLen": 1910
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y",
+    "len": 19488,
+    "max_tokens": 32000,
+    "at": 1793692796001,
+    "outLen": 1723
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-x33jt1",
+    "len": 19381,
+    "max_tokens": 32000,
+    "at": 1793692796003,
+    "outLen": 1478
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s1-a6keqn",
+    "len": 1948,
+    "max_tokens": 16000,
+    "at": 1793692796005,
+    "outLen": 716
+   },
+   {
+    "kind": "chapter-다음엔_덜_떨게요_아마도요_다른_설명이-s2-u1jg5a",
+    "len": 2193,
+    "max_tokens": 16000,
+    "at": 1793692796006,
+    "outLen": 785
+   },
+   {
+    "kind": "chapter-다음_날_밤_용광로가_대부분_꺼진_조선소에-s3-l5qkuv",
+    "len": 2008,
+    "max_tokens": 16000,
+    "at": 1793692796006,
+    "outLen": 865
+   },
+   {
+    "kind": "chapter-다음_종이_울린_뒤_이십_초가_비어_있습니다-s4-7h9p13",
+    "len": 1761,
+    "max_tokens": 16000,
+    "at": 1793692796007,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음은_스토리에_여러_번_나온_조연들이다_-bfix2y",
+    "len": 1381,
+    "max_tokens": 4000,
+    "at": 1793692796016,
+    "outLen": 419
+   }
+  ],
+  "toasts": [
+   "이야기 기억 정리 실패: pending response. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요."
+  ],
+  "ailog": [
+   {
+    "ok": true,
+    "reqLen": 1308
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 1688
+   },
+   {
+    "ok": true,
+    "reqLen": 1935
+   },
+   {
+    "ok": true,
+    "reqLen": 2120
+   },
+   {
+    "ok": true,
+    "reqLen": 1875
+   },
+   {
+    "ok": true,
+    "reqLen": 19308
+   },
+   {
+    "ok": true,
+    "reqLen": 19415
+   },
+   {
+    "ok": true,
+    "reqLen": 18439
+   },
+   {
+    "ok": true,
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 766,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 0,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "pageErrors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T08:00:20.035Z",
+  "pending": [
+   "chapter-다음은_검은_돛의_그림자_의_대본을_처음부-11mkbb"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692815093,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692815894,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692815897,
+    "outLen": 1910
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y",
+    "len": 19488,
+    "max_tokens": 32000,
+    "at": 1793692815899,
+    "outLen": 1723
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-x33jt1",
+    "len": 19381,
+    "max_tokens": 32000,
+    "at": 1793692815902,
+    "outLen": 1478
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s1-a6keqn",
+    "len": 1948,
+    "max_tokens": 16000,
+    "at": 1793692815903,
+    "outLen": 716
+   },
+   {
+    "kind": "chapter-다음엔_덜_떨게요_아마도요_다른_설명이-s2-u1jg5a",
+    "len": 2193,
+    "max_tokens": 16000,
+    "at": 1793692815905,
+    "outLen": 785
+   },
+   {
+    "kind": "chapter-다음_날_밤_용광로가_대부분_꺼진_조선소에-s3-l5qkuv",
+    "len": 2008,
+    "max_tokens": 16000,
+    "at": 1793692815905,
+    "outLen": 865
+   },
+   {
+    "kind": "chapter-다음_종이_울린_뒤_이십_초가_비어_있습니다-s4-7h9p13",
+    "len": 1761,
+    "max_tokens": 16000,
+    "at": 1793692815906,
+    "outLen": 847
+   },
+   {
+    "kind": "chapter-다음은_검은_돛의_그림자_의_대본을_처음부-11mkbb",
+    "len": 3555,
+    "max_tokens": 16000,
+    "at": 1793692815907,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음은_스토리에_여러_번_나온_조연들이다_-bfix2y",
+    "len": 1381,
+    "max_tokens": 4000,
+    "at": 1793692815915,
+    "outLen": 419
+   }
+  ],
+  "toasts": [
+   "이야기 기억 정리 실패: pending response. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요."
+  ],
+  "ailog": [
+   {
+    "ok": true,
+    "reqLen": 1308
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 3482
+   },
+   {
+    "ok": true,
+    "reqLen": 1688
+   },
+   {
+    "ok": true,
+    "reqLen": 1935
+   },
+   {
+    "ok": true,
+    "reqLen": 2120
+   },
+   {
+    "ok": true,
+    "reqLen": 1875
+   },
+   {
+    "ok": true,
+    "reqLen": 19308
+   },
+   {
+    "ok": true,
+    "reqLen": 19415
+   },
+   {
+    "ok": true,
+    "reqLen": 18439
+   },
+   {
+    "ok": true,
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 831,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 0,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "pageErrors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T08:00:59.545Z",
+  "pending": [
+   "chapter-다음은_완성된_대본에서_확인한_사건_기록이다-9qn5kt"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692854657,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692855425,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692855428,
+    "outLen": 1910
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y",
+    "len": 19488,
+    "max_tokens": 32000,
+    "at": 1793692855431,
+    "outLen": 1723
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-x33jt1",
+    "len": 19381,
+    "max_tokens": 32000,
+    "at": 1793692855433,
+    "outLen": 1478
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s1-a6keqn",
+    "len": 1948,
+    "max_tokens": 16000,
+    "at": 1793692855435,
+    "outLen": 716
+   },
+   {
+    "kind": "chapter-다음엔_덜_떨게요_아마도요_다른_설명이-s2-u1jg5a",
+    "len": 2193,
+    "max_tokens": 16000,
+    "at": 1793692855436,
+    "outLen": 785
+   },
+   {
+    "kind": "chapter-다음_날_밤_용광로가_대부분_꺼진_조선소에-s3-l5qkuv",
+    "len": 2008,
+    "max_tokens": 16000,
+    "at": 1793692855438,
+    "outLen": 865
+   },
+   {
+    "kind": "chapter-다음_종이_울린_뒤_이십_초가_비어_있습니다-s4-7h9p13",
+    "len": 1761,
+    "max_tokens": 16000,
+    "at": 1793692855438,
+    "outLen": 847
+   },
+   {
+    "kind": "chapter-다음은_검은_돛의_그림자_의_대본을_처음부-11mkbb",
+    "len": 3555,
+    "max_tokens": 16000,
+    "at": 1793692855439,
+    "outLen": 3194
+   },
+   {
+    "kind": "chapter-다음은_완성된_대본에서_확인한_사건_기록이다-9qn5kt",
+    "len": 3868,
+    "max_tokens": 16000,
+    "at": 1793692855440,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음은_스토리에_여러_번_나온_조연들이다_-bfix2y",
+    "len": 1381,
+    "max_tokens": 4000,
+    "at": 1793692855449,
+    "outLen": 419
+   }
+  ],
+  "toasts": [
+   "상세 기억은 저장했지만 관계·후속 대화 정리는 실패했어요."
+  ],
+  "ailog": [
+   {
+    "ok": true,
+    "reqLen": 1308
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 3795
+   },
+   {
+    "ok": true,
+    "reqLen": 3482
+   },
+   {
+    "ok": true,
+    "reqLen": 1688
+   },
+   {
+    "ok": true,
+    "reqLen": 1935
+   },
+   {
+    "ok": true,
+    "reqLen": 2120
+   },
+   {
+    "ok": true,
+    "reqLen": 1875
+   },
+   {
+    "ok": true,
+    "reqLen": 19308
+   },
+   {
+    "ok": true,
+    "reqLen": 19415
+   },
+   {
+    "ok": true,
+    "reqLen": 18439
+   },
+   {
+    "ok": true,
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 800,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 0,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "pageErrors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T08:01:45.891Z",
+  "pending": [],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-8xr9o2",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692900992,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-jlqzyh",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692901753,
+    "outLen": 1662
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qq6yaf",
+    "len": 18512,
+    "max_tokens": 32000,
+    "at": 1793692901755,
+    "outLen": 1910
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-tufb2y",
+    "len": 19488,
+    "max_tokens": 32000,
+    "at": 1793692901758,
+    "outLen": 1723
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-x33jt1",
+    "len": 19381,
+    "max_tokens": 32000,
+    "at": 1793692901761,
+    "outLen": 1478
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리의_갑판_위로_차고_-s1-a6keqn",
+    "len": 1948,
+    "max_tokens": 16000,
+    "at": 1793692901762,
+    "outLen": 716
+   },
+   {
+    "kind": "chapter-다음엔_덜_떨게요_아마도요_다른_설명이-s2-u1jg5a",
+    "len": 2193,
+    "max_tokens": 16000,
+    "at": 1793692901763,
+    "outLen": 785
+   },
+   {
+    "kind": "chapter-다음_날_밤_용광로가_대부분_꺼진_조선소에-s3-l5qkuv",
+    "len": 2008,
+    "max_tokens": 16000,
+    "at": 1793692901764,
+    "outLen": 865
+   },
+   {
+    "kind": "chapter-다음_종이_울린_뒤_이십_초가_비어_있습니다-s4-7h9p13",
+    "len": 1761,
+    "max_tokens": 16000,
+    "at": 1793692901765,
+    "outLen": 847
+   },
+   {
+    "kind": "chapter-다음은_검은_돛의_그림자_의_대본을_처음부-11mkbb",
+    "len": 3555,
+    "max_tokens": 16000,
+    "at": 1793692901765,
+    "outLen": 3194
+   },
+   {
+    "kind": "chapter-다음은_완성된_대본에서_확인한_사건_기록이다-9qn5kt",
+    "len": 3868,
+    "max_tokens": 16000,
+    "at": 1793692901767,
+    "outLen": 2995
+   },
+   {
+    "kind": "chapter-다음은_스토리에_여러_번_나온_조연들이다_-bfix2y",
+    "len": 1381,
+    "max_tokens": 4000,
+    "at": 1793692901771,
+    "outLen": 419
+   }
+  ],
+  "toasts": [],
+  "ailog": [
+   {
+    "ok": true,
+    "reqLen": 1308
+   },
+   {
+    "ok": true,
+    "reqLen": 3795
+   },
+   {
+    "ok": true,
+    "reqLen": 3482
+   },
+   {
+    "ok": true,
+    "reqLen": 1688
+   },
+   {
+    "ok": true,
+    "reqLen": 1935
+   },
+   {
+    "ok": true,
+    "reqLen": 2120
+   },
+   {
+    "ok": true,
+    "reqLen": 1875
+   },
+   {
+    "ok": true,
+    "reqLen": 19308
+   },
+   {
+    "ok": true,
+    "reqLen": 19415
+   },
+   {
+    "ok": true,
+    "reqLen": 18439
+   },
+   {
+    "ok": true,
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 787,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 2,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "pageErrors": []
  }
 ]

@@ -17,7 +17,7 @@ export async function withPage(fn, { tag = 'play', viewport } = {}) {
     if (!f.startsWith(WWW) || !existsSync(f)) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'content-type': TYPES[extname(f)] || 'application/octet-stream' }); r.end(readFileSync(f)); }).listen(0);
   const b = await chromium.launch(), page = await b.newPage(), errors = [];
   if (viewport) await page.setViewportSize(viewport);
-  page.on('pageerror', e => errors.push(String(e))); await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  page.on('pageerror', e => errors.push(String(e.stack || e).split('\n').slice(0, 4).join(' ← '))); await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
   await page.goto(`http://127.0.0.1:${srv.address().port}/?t=${tag}`);
   await page.waitForFunction(() => typeof buildNewGameDraft === 'function' && typeof G === 'object', null, { timeout: 20000 });
   try { return { out: await fn(page), errors }; } finally { await b.close(); srv.close(); }

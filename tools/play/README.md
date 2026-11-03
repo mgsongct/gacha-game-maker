@@ -15,6 +15,7 @@ node tools/play/generate.mjs <게임 폴더> chapter [--stages 4] [--dir "지시
 node tools/play/qa.mjs <게임 폴더> [game.json]      # QA·플레이 점검 → qa/<파일>.md · .json
 node tools/play/shots.mjs <게임 폴더> [game.json]   # 새 플레이어로 화면 플레이·캡처 → shots/
 node tools/play/faults.mjs [시나리오…]              # 생성기 실패 주입 → reports/faults.md
+node tools/play/prompts.mjs <게임 폴더…>            # 생성 프롬프트 점검(스튜디오 조각 비율·되풀이·충돌·샘플 이름) → reports/prompts.md
 node tools/play/test.mjs                           # 도구 자체 검사(fixtures/mini)
 node tools/play/rekind.mjs <게임 폴더> [--dry]       # kind 규칙이 바뀌었을 때 prompts/·responses/ 이름 옮기기
 ```
@@ -52,6 +53,7 @@ node tools/play/rekind.mjs <게임 폴더> [--dry]       # kind 규칙이 바뀌
 | 적·배너 | 적 속성이 게임 속성 목록에 없음, 픽업 대상이 없는 대원·아직 못 만난 대원 | 중 |
 | 앱 자체 점검 | 콘텐츠 점검(`auditScan`)·개성 검수·시나리오 설계·세력 점수·밸런스·배경/소품 인물 태그 | 하·정보 |
 | 대본 | 읽기 오류, 등록 안 된 화자, 첫 등장 위반(등장 계획), 없는 배경·음악, 영어 섞임, 1장 분량(지시: 전 15~25·후 8~15줄) | 상·중·하 |
+| 건조·원정 | 생성기가 건조·원정 방식을 설정했는지, 자원 이름 기본값, 파견 보상이 시간·인원과 맞는지, (켰을 때) 대표 투입별 분류 개방·희귀도·캐릭터 확률, 건조되지 않는 대원, 원정 자원 수입 | 중·하 |
 | 플레이 | 새 플레이어로 첫 10연(시드 고정) → 자동 편성 → 메인 장 전투를 레벨 1·10·20 × 시드 20으로 시뮬레이션: 첫 전투 승률 50% 미만, 레벨 20에서도 0%, 레벨 1에서 15초 안에 100%(너무 쉬움) | 상·중·하 |
 
 검사를 늘릴 때는 `lib/qa.mjs`에 `F(등급, 영역, 내용)`을 추가하고, `fixtures/mini/responses`에 그 문제를 하나 심은 뒤 `test.mjs`에 잡히는지 확인을 넣습니다(정적 분석 도구와 같은 규칙).
@@ -60,8 +62,8 @@ node tools/play/rekind.mjs <게임 폴더> [--dry]       # kind 규칙이 바뀌
 
 | 폴더 | 입력 | 상태 |
 |---|---|---|
-| `games/sky-knights` | 하늘섬 군도·몰락한 기사단 재건·폭풍의 정체(판타지 전투물), 대원 6명 + 다음 장 | 글 AI: Claude 에이전트 |
-| `games/idol-audition` | 신생 기획사 서바이벌 오디션(전투 대신 무대 대결·팬 투표), 대원 6명 | 글 AI: Claude 에이전트 |
+| `games/sky-knights` | 하늘섬 군도·몰락한 기사단 재건·폭풍의 정체(판타지 전투물), 대원 6명 + 2장(새 대원 2명) | 완료 · 글 AI: Claude 에이전트 |
+| `games/idol-audition` | 신생 기획사 서바이벌 오디션(전투 대신 무대 대결·팬 투표), 대원 6명 | 완료 · 글 AI: Claude 에이전트 (`NOTES.md`) |
 
 점검 결과의 종합과 개선 안건은 [docs/research/maker-review.md](../../docs/research/maker-review.md).
 

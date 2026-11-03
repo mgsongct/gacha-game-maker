@@ -69,11 +69,28 @@ export async function runQA(game, input) { const { out, errors } = await withPag
     Object.values(G.meta.terms || {}).filter(v => typeof v === 'string' && v.trim()).forEach(v => { const j = jong(v); if (j > 0 && j !== 8 && new RegExp(v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '로(?![가-힣])').test(ui)) bad.add(`${v}로`); if (j === 0 && new RegExp(v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '으로').test(ui)) bad.add(`${v}으로`); });
     const both = (ui.match(/[가-힣]+(을\(를\)|이\(가\)|은\(는\)|과\(와\))/g) || []).slice(0, 4); R.uiText = ui.replace(/\s+/g, ' ').slice(0, 600);
     if (bad.size) F('하', '화면 문장', `생성된 용어에 맞지 않는 조사: ${[...bad].join(', ')}`); if (both.length) F('하', '화면 문장', `조사를 고르지 못한 표기: ${both.join(', ')}`); }
+  // ⑥ 건조(자원 투입식 영입)·원정 — 생성기가 설정했는지, 사용자가 켜면 생성된 대원으로 어떤 테이블이 되는지
+  { const C = { on: !!(G.meta.construct && G.meta.construct.on), configured: !!G.meta.construct, expedition: (G.meta.expedition && G.meta.expedition.mode) || '(기본 combat)', resTerms: ['res1', 'res2', 'res3', 'res4'].map(k => G.meta.terms[k]) };
+    if (!C.configured) F('중', '건조·원정', `생성기가 건조(자원 투입식 영입)를 설정하지 않음 — 꺼진 채 시작, 자원 이름 ${C.resTerms.join('/')}(기본값)${/아이돌|방송|기획사|스트리머|가게|카페/.test(JSON.stringify(G.world).slice(0, 4000)) && C.expedition.includes('combat') ? `, 원정은 전투형(${C.expedition}) — 세계관과 맞는 원정 방식(방송·스트리머·경영)이 있는데 고르지 않음` : ''}`);
+    const D = (G.dispatches || []).map(d => ({ name: d.name, hours: d.hours, need: d.need, reward: d.reward, val: (d.reward.gold || 0) + (d.reward.exp || 0) * 300 + (d.reward.wmat || 0) * 600 + (d.reward.core || 0) * 2500 }));
+    C.dispatches = D.map(d => `${d.name} ${d.hours}h·${d.need}명 → ${JSON.stringify(d.reward)}`);
+    if (D.length > 1) { const byH = [...D].sort((a, b) => a.hours * a.need - b.hours * b.need), lo = byH[0], hi = byH.at(-1); if (lo.val > hi.val) F('중', '건조·원정', `파견 보상이 시간·인원과 거꾸로: 「${lo.name}」(${lo.hours}시간·${lo.need}명) 보상 > 「${hi.name}」(${hi.hours}시간·${hi.need}명) — 보상이 순서대로 고정 표에서 붙음`); }
+    const keep = G.meta.construct; G.meta.construct = Object.assign({ on: true }, keep || {}); try { conMeta(); const cfg = CON(), pool = conPool(), inputs = { '최소 30×4': [30, 30, 30, 30], '균등 300×4': [300, 300, 300, 300], '공격 쏠림 100/600/100/100': [100, 600, 100, 100], '균등 500×4': [500, 500, 500, 500], '최대 999×4': [999, 999, 999, 999] };
+      C.groups = (cfg.groups || []).map(g => `${g.name}(${JSON.stringify(g.match)})`); C.start = cfg.start; C.buy = cfg.buy; const seen = new Set();
+      C.tables = Object.entries(inputs).map(([k, t]) => { const r = GGMConstruct.rates(t, cfg), tb = GGMConstruct.table(t, cfg, pool); tb.rows.filter(x => x.p > 0).forEach(x => seen.add(x.id));
+        return { input: k, open: r.groups.filter(g => g.open).map(g => `${g.name} ${g.p.toFixed(0)}%`).join(' · '), rarity: `R ${(r.rarity[1] || 0).toFixed(0)} / SR ${(r.rarity[2] || 0).toFixed(0)} / SSR ${(r.rarity[3] || 0).toFixed(1)}`, rows: tb.rows.filter(x => x.p > 0).sort((a, b) => b.p - a.p).slice(0, 6).map(x => `${(charById(x.id) || {}).name} ${x.p.toFixed(1)}%`).join(', ') }; });
+      C.poolSize = pool.length; C.never = pool.filter(c => !seen.has(c.id)).map(c => (charById(c.id) || {}).name);
+      if (C.never.length) F('중', '건조·원정', `어떤 투입으로도 건조되지 않는 대원: ${C.never.join(', ')}`);
+      const byRole = cnt(pool, c => c.role); Object.entries(byRole).filter(([, n]) => n === 1).forEach(([r]) => F('하', '건조·원정', `건조 분류 「${(ROLE && ROLE[r]) || r}」 후보가 1명 — 그 분류를 열면 같은 대원만 나옴`));
+      const inc = (G.dispatches || []).map(d => conDispReward(d.hours, d.need)), perH = (G.dispatches || []).map((d, i) => Object.values(inc[i]).reduce((a, v) => a + v, 0) / d.hours);
+      C.expIncome = (G.dispatches || []).map((d, i) => `${d.name} ${Object.values(inc[i]).reduce((a, v) => a + v, 0)}(시간당 ${Math.round(perH[i])})`);
+    } catch (e) { C.err = e.message; } finally { G.meta.construct = keep; }
+    R.construct = C; }
   // ⑤ 플레이
   const realRandom = Math.random; Math.random = rnd;
   P().owned = {}; P().squad = []; P().gems = Math.max(P().gems, 3000); P().firstTen = true; P().pity = 0; P().cleared = {};
   const b0 = curBanner(); let pulled = [];
-  try { await pull(10); await new Promise(r => setTimeout(r, 300)); closeOv(); pulled = (P().history || []).slice(0, 10).map(id => { const c = charById(id); return c ? `${RL[c.rarity]} ${c.name}` : id; }); } catch (e) { pulled = ['오류: ' + e.message]; }
+  try { await pull(10); await new Promise(r => setTimeout(r, 300)); try { GC.timers.forEach(clearTimeout); } catch (e) {} /* 건너뛰기와 같이 연출 타이머를 지우고 닫음 */ closeOv(); pulled = (P().history || []).slice(0, 10).map(id => { const c = charById(id); return c ? `${RL[c.rarity]} ${c.name}` : id; }); } catch (e) { pulled = ['오류: ' + e.message]; }
   R.firstPull = { banner: b0 && b0.name, results: pulled, owned: Object.keys(P().owned).map(id => charById(id)?.name), squad: P().squad.map(id => charById(id)?.name) };
   if (R.firstPull.owned.length < 4) F('중', '플레이', `첫 10연 뒤 서로 다른 대원 ${R.firstPull.owned.length}명 — 편성 ${Math.min(4, R.firstPull.owned.length)}명으로 시작`);
   const squad = P().squad.map(charById).filter(Boolean); squad.forEach(c => { try { v2Ensure(c); } catch (e) {} });
@@ -102,6 +119,7 @@ export function md(R, name) {
     '## 앱 자체 점검', '', `- 콘텐츠 점검 ${R.audit.total}건: ${R.audit.rules.join(' · ') || '없음'}`, `- 개성 검수 평균 ${R.persona.avg}점: ${R.persona.detail.map(d => `${d.n} ${d.score}`).join(', ')}`, `- 시나리오 설계: ${R.plan.join(', ') || '문제 없음'}`, `- 세력 점수 ${R.faction.score}: ${R.faction.issues.join(', ') || '문제 없음'}`, `- 배경·소품 인물 태그: ${R.imgPerson.length}건`, '',
     '## 대본', '', `- 대사 ${R.scriptQA.sayLines}줄 · 선택지 ${R.scriptQA.choices} · 분기 ${R.scriptQA.branches} · 연출 명령 ${JSON.stringify(R.scriptQA.commands)}`, `- 표정 ${Object.keys(R.scriptQA.faces).length}종: ${Object.entries(R.scriptQA.faces).map(([k, v]) => `${k}×${v}`).join(', ')}`, `- 등록 안 된 화자: ${Object.entries(R.scriptQA.unknownSpeakers).map(([k, v]) => `${k}×${v}`).join(', ') || '없음'}`, `- 첫 등장 위반: ${R.scriptQA.debutViolations.join(' / ') || '없음'}`, '',
     '## 생성 기록', '', R.folder ? `- 프롬프트 ${R.folder.prompts}개 · ${R.folder.chars}자 · 새 게임 호출 ${R.folder.calls ?? '-'}회(저장 시점 ${R.folder.commitAtCall ?? '-'}번째) · 인라인 스킬 통과 ${R.folder.inlineSkillPass ?? '-'} · 공통 규칙의 속성 상성 설명: ${R.rulesElemText || '-'}` : '- (게임 폴더 정보 없음)', R.folder && R.folder.mainSteps ? `- 기본 단계 요청 크기(자): ${R.folder.mainSteps.join(' · ')}` : '', '',
+    '## 건조·원정', '', R.construct ? [`- 생성 상태: 건조 ${R.construct.configured ? (R.construct.on ? '켜짐' : '설정됨·꺼짐') : '설정 없음(꺼짐)'} · 원정 방식 ${R.construct.expedition} · 자원 이름 ${R.construct.resTerms.join('/')}`, `- 파견: ${(R.construct.dispatches || []).join(' · ')}`, `- (사용자가 켰을 때) 분류: ${(R.construct.groups || []).join(', ')} · 시작 자원 ${JSON.stringify(R.construct.start)} · 구매 ${JSON.stringify(R.construct.buy)} · 후보 ${R.construct.poolSize}명 · 건조 불가 ${(R.construct.never || []).join(', ') || '없음'}`, `- 원정 1회 건조 자원: ${(R.construct.expIncome || []).join(' · ')}`, '', t(['투입', '열린 분류', '희귀도(%)', '확률 상위'], (R.construct.tables || []).map(x => [x.input, x.open, x.rarity, x.rows]))].join('\n') : '', '',
     '## 플레이', '', `- 첫 10연(${R.firstPull.banner}): ${R.firstPull.results.join(', ')}`, `- 편성: ${R.squadStats.join(' · ')}`, '',
     R.battles.length ? t(['장', '스테이지', '양식', '레벨 1 승률·시간', '레벨 10', '레벨 20'], R.battles.flatMap(ch => ch.stages.map(s => [ch.chapter, `${s.n} ${s.title}`, s.mode, s.lv1 ? `${s.lv1.win}% · ${s.lv1.time}초` : '-', s.lv10 ? `${s.lv10.win}%` : '-', s.lv20 ? `${s.lv20.win}%` : '-']))) : '편성할 대원이 없어 전투를 돌리지 못함', ''].join('\n');
 }
