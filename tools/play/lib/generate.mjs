@@ -20,6 +20,7 @@ export async function runGenerate({ phase, responses = {}, input = null, game = 
         const body = opts.body, msgs = body.messages, first = msgs[0].content, prompt = typeof first === 'string' ? first : first.map(b => b.text || '').join('');
         let kind = kindOf(prompt); if (msgs.length > 1) kind += '-cont' + (msgs.length - 1) / 2;
         const rec = { kind, len: prompt.length, max_tokens: body.max_tokens, at: Date.now() }; log.push(rec); const r = responses[kind];
+        await new Promise(res => setTimeout(res, 30)); /* 실제 네트워크처럼 매크로태스크로 응답 — 즉시 응답하면 앱의 setTimeout 콜백(백그라운드 작업)이 생성이 끝날 때까지 못 돌아 실제와 순서가 달라짐 */
         if (r == null) { pending.add(kind); await window.__onPrompt(kind, prompt); rec.pending = true; return { status: 529, text: JSON.stringify({ type: 'error', error: { type: 'overloaded_error', message: 'pending response' } }) }; }
         if (typeof r === 'object') { rec.injected = r.status; return r; }
         rec.outLen = r.length;
@@ -30,7 +31,7 @@ export async function runGenerate({ phase, responses = {}, input = null, game = 
         let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [, v] of Object.entries(recs)) if (/"chapters"/.test(v)) { try { saved = JSON.parse(v); result.commitAtCall = log.length; } catch (e) {} } return orig(recs); };
         window.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
         const stat = []; const mo = new MutationObserver(() => { const s = document.getElementById('ng_stat'); if (s && s.textContent && stat.at(-1) !== s.textContent) stat.push(s.textContent); }); mo.observe(document.body, { subtree: true, childList: true, characterData: true });
-        const t0 = performance.now(); try { await buildNewGameDraft(btn, input, PJ().active); } catch (e) { result.thrown = String(e && (e.message || e.code) || e); }
+        const t0 = performance.now(); try { await newGame(btn, input); } /* 실제 진입점(NEW_GAME_SOURCE를 켜고 끝나면 원래 게임으로) */ catch (e) { result.thrown = String(e && (e.message || e.code) || e); }
         result.ms = Math.round(performance.now() - t0); await settle(settleMs); mo.disconnect(); result.stat = stat; result.game = saved;
         let draft = null; try { draft = appStorage.getItem('ggm-ng-draft'); } catch (e) {} result.draftKept = !!draft;
       } else {

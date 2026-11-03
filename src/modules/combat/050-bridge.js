@@ -289,7 +289,7 @@ async function v2GenerateSkills(c,concept='',onProgress=()=>{}){
    message='응답 해석 · 역할·효과 개수·수치·발동 조건 검사';tick();onProgress(message);
    const kit=v2PrepareGenerated(response?.skills,designC);c.skillDesignLog.push({kind:'success',attempt,text:`${C.generation(c)}세대 역할·효과 개수·전력 예산 검사 완료`});onProgress('스킬 설계 완료 · 기준 편성 모의 전투 검사 준비');return kit;
   }catch(e){
-   v2CheckCancelled(controller.signal);feedback=v2FailureText(e);c.skillDesignLog.push({kind:'failure',attempt,text:feedback});onProgress(`${attempt}차 실패: ${feedback}`);
+   v2CheckCancelled(controller.signal);const why=v2FailureText(e);if(!['network','timeout','rate_limited','upstream_error','overloaded','server_error'].includes(e?.code))feedback=why;/* 서버·네트워크 같은 일시 오류는 모델 잘못이 아니라 다음 프롬프트 피드백에 넣지 않음 */c.skillDesignLog.push({kind:'failure',attempt,text:why});onProgress(`${attempt}차 실패: ${why}`);
    if(['bad_key','no_ai','model_not_found','refused','low_credit','not_granted','quota','payment_required','insufficient_quota','sa_bad'].includes(e?.code)||(!e?.code&&!(e instanceof SyntaxError)&&!responseFormatError(e)))throw e;
    if(['network','timeout','rate_limited','upstream_error'].includes(e?.code)&&attempt>=3)throw e;
   }
