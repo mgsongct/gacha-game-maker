@@ -1,0 +1,729 @@
+{
+ "findings": [
+  {
+   "sev": "중",
+   "area": "기본값 섞임",
+   "msg": "재료 던전 이름이 기본값 그대로: 스킬 교본 회수"
+  },
+  {
+   "sev": "하",
+   "area": "기본값 섞임",
+   "msg": "용어 6개가 기본값 그대로: wMat=스킬 교본, construct=영입, res1=연료, res2=탄약, res3=합금, res4=부품"
+  },
+  {
+   "sev": "하",
+   "area": "기본값 섞임",
+   "msg": "상점 NPC·대사가 기본값 그대로(「보급관」)"
+  },
+  {
+   "sev": "하",
+   "area": "기본값 섞임",
+   "msg": "영입 자원 이름이 기본값 그대로: 연료/탄약/합금/부품"
+  },
+  {
+   "sev": "중",
+   "area": "생성 프롬프트",
+   "msg": "공통 규칙(RULES)의 속성 상성 설명이 실제와 다름: 청량>열정(실제 청량>우아), 우아>몽환(실제 우아>열정) — 모든 생성 요청에 틀린 상성이 들어감"
+  },
+  {
+   "sev": "중",
+   "area": "뽑기",
+   "msg": "R 대원이 1명뿐 — 그 등급 확률(R)이 모두 한 사람에게 몰려 중복이 쏟아짐"
+  },
+  {
+   "sev": "중",
+   "area": "대본",
+   "msg": "등록되지 않은 화자 「FD」 3줄(초상·표정·톡이 연결되지 않음)"
+  },
+  {
+   "sev": "중",
+   "area": "대본",
+   "msg": "등록되지 않은 화자 「마정연」 1줄(초상·표정·톡이 연결되지 않음)"
+  },
+  {
+   "sev": "중",
+   "area": "대본",
+   "msg": "등록되지 않은 화자 「제이 한」 1줄(초상·표정·톡이 연결되지 않음)"
+  },
+  {
+   "sev": "중",
+   "area": "대본",
+   "msg": "등록되지 않은 화자 「크라운 연습생」 2줄(초상·표정·톡이 연결되지 않음)"
+  },
+  {
+   "sev": "중",
+   "area": "대본",
+   "msg": "등록되지 않은 화자 「도하은」 2줄(초상·표정·톡이 연결되지 않음)"
+  },
+  {
+   "sev": "중",
+   "area": "대본",
+   "msg": "등록되지 않은 화자 「MC」 2줄(초상·표정·톡이 연결되지 않음)"
+  },
+  {
+   "sev": "중",
+   "area": "대본",
+   "msg": "등록되지 않은 화자 「서민혁」 1줄(초상·표정·톡이 연결되지 않음)"
+  },
+  {
+   "sev": "하",
+   "area": "분량",
+   "msg": "1장 2: 전 35줄·후 0줄(지시: 전 15~25·후 8~15)"
+  },
+  {
+   "sev": "하",
+   "area": "화면 문장",
+   "msg": "생성된 용어에 맞지 않는 조사: 캐스팅로"
+  },
+  {
+   "sev": "하",
+   "area": "화면 문장",
+   "msg": "조사를 고르지 못한 표기: 멤버을(를)"
+  },
+  {
+   "sev": "중",
+   "area": "플레이",
+   "msg": "첫 10연 뒤 서로 다른 대원 3명 — 편성 3명으로 시작"
+  },
+  {
+   "sev": "하",
+   "area": "난이도",
+   "msg": "1장 마지막 줄의 이름 4(보스): 첫 편성·레벨 1로 25초 만에 승률 100% — 성장 없이 깸"
+  },
+  {
+   "sev": "상",
+   "area": "생성 프롬프트",
+   "msg": "프롬프트에 원본 샘플 이름 18개(새벽등대, 새벽등대 사무소, 회색구 골목, 사무소 옥상, 폐선로, 헬릭스 물류창고…)가 들어감 — chapter1, opening"
+  },
+  {
+   "sev": "중",
+   "area": "생성 프롬프트",
+   "msg": "서버·네트워크 오류 문구가 \"직전 실패를 수정하라\"는 재요청 프롬프트에 들어감: skill-문가을-2, skill-문가을-3, skill-백소하-2, skill-백소하-3"
+  }
+ ],
+ "meta": {
+  "title": "앙코르 시그널",
+  "sub": "Encore Signal",
+  "theme": "neon",
+  "terms": {
+   "player": "실장님",
+   "currency": "프리즘",
+   "gold": "활동비",
+   "expMat": "연습 일지",
+   "wMat": "스킬 교본",
+   "core": "스포트 배지",
+   "gearMat": "튜닝 큐브",
+   "transcMat": "골든 앙코르",
+   "gacha": "캐스팅",
+   "ops": "무대",
+   "crew": "멤버",
+   "talk": "별톡",
+   "dispatch": "외부 스케줄",
+   "farm": "트레이닝",
+   "pass": "응원 패스",
+   "event": "페스티벌",
+   "weapon": "시그니처 마이크",
+   "files": "비하인드 파일",
+   "skin": "무대 의상",
+   "enhance": "레슨",
+   "limit": "포텐 개방",
+   "abyss": "버스킹 로드",
+   "construct": "영입",
+   "res1": "연료",
+   "res2": "탄약",
+   "res3": "합금",
+   "res4": "부품"
+  },
+  "elems": [
+   "열정>몽환",
+   "몽환>청량",
+   "청량>우아",
+   "우아>열정"
+  ],
+  "farms": [
+   "심야 연습실",
+   "지역 행사 무대",
+   "스킬 교본 회수",
+   "리허설 스테이지"
+  ]
+ },
+ "world": {
+  "name": "스타라인의 서울",
+  "summary": "국민 투표로 데뷔조를 뽑는 서바이벌 오디션 「스타라인」이 모든 화제를 삼키는 서울. 플레이어는 연습실 하나뿐인 신생 기획사 새벽별 엔터테인먼트의 실장으로, 대표가 쓰러진 회사를 떠맡아 여섯 명의 연습생을 데뷔 무대까지 이끌어야 한다.",
+  "plotLen": 590,
+  "loreLen": 428,
+  "factions": [
+   "새벽별 엔터테인먼트/playable",
+   "크라운 엔터테인먼트/hostile",
+   "오로라TV 스타라인 제작국/neutral",
+   "시그널 팬연합/neutral",
+   "블랙 렌즈/hostile"
+  ],
+  "plan": false
+ },
+ "chars": [
+  {
+   "name": "차하린",
+   "rarity": "SSR",
+   "role": "atk",
+   "elem": "열정",
+   "faction": "새벽별 엔터테인먼트",
+   "debut": "start",
+   "profileLen": 101,
+   "lines": 8,
+   "persona": 14,
+   "skills": "센터의 자존심 / 킬링 파트 / 스포트라이트 독점",
+   "skillWarn": "",
+   "weapon": "레드 브레이커",
+   "look": "1girl, solo, long hair, black hair, red streaks, high ponytail, sidelocks, sharp eyes, red eyes, tall, slender, athletic, red cropped jacket"
+  },
+  {
+   "name": "문가을",
+   "rarity": "SR",
+   "role": "def",
+   "elem": "우아",
+   "faction": "새벽별 엔터테인먼트",
+   "debut": "start",
+   "profileLen": 109,
+   "lines": 8,
+   "persona": 14,
+   "skills": "맏언니의 등 / 다시, 처음부터 / 우리라는 무대",
+   "skillWarn": "",
+   "weapon": "가을빛 하모니",
+   "look": "1girl, solo, long hair, wavy hair, brown hair, low ponytail, hair over shoulder, scrunchie, brown eyes, gentle eyes, mole under eye, beige c"
+  },
+  {
+   "name": "주다온",
+   "rarity": "SR",
+   "role": "atk",
+   "elem": "청량",
+   "faction": "새벽별 엔터테인먼트",
+   "debut": "start",
+   "profileLen": 107,
+   "lines": 8,
+   "persona": 14,
+   "skills": "멈추지 않는 비트 / 칼군무 러시 / 프리스타일 배틀",
+   "skillWarn": "",
+   "weapon": "스플래시 비트",
+   "look": "1girl, solo, short hair, bob cut, mint green hair, two-tone hair, black inner hair, green eyes, bright eyes, freckles, petite, toned, white "
+  },
+  {
+   "name": "백소하",
+   "rarity": "SSR",
+   "role": "def",
+   "elem": "몽환",
+   "faction": "새벽별 엔터테인먼트",
+   "debut": "stage",
+   "profileLen": 112,
+   "lines": 8,
+   "persona": 14,
+   "skills": "흔들리지 않는 음정 / 고요한 하이노트 / 막차의 노래",
+   "skillWarn": "",
+   "weapon": "라스트 트레인",
+   "look": "1girl, solo, long hair, straight hair, silver hair, blunt bangs, hair over one eye, half-closed eyes, purple eyes, pale skin, slender, laven"
+  },
+  {
+   "name": "서지안",
+   "rarity": "SR",
+   "role": "sup",
+   "elem": "몽환",
+   "faction": "새벽별 엔터테인먼트",
+   "debut": "start",
+   "profileLen": 121,
+   "lines": 8,
+   "persona": 14,
+   "skills": "카메라는 나를 따라와 / 엔딩 요정 / 직캠 1위",
+   "skillWarn": "",
+   "weapon": "미라주 렌즈",
+   "look": "1girl, solo, long hair, wavy hair, lavender hair, purple eyes, long eyelashes, mole under mouth, tall, slender, long legs, black off-shoulde"
+  },
+  {
+   "name": "오은별",
+   "rarity": "R",
+   "role": "sup",
+   "elem": "청량",
+   "faction": "새벽별 엔터테인먼트",
+   "debut": "start",
+   "profileLen": 106,
+   "lines": 8,
+   "persona": 14,
+   "skills": "화음 한 줄 / 괜찮아 코러스 / 다 같이, 하나 둘 셋!",
+   "skillWarn": "",
+   "weapon": "스타더스트 콜",
+   "look": "1girl, solo, short twintails, light brown hair, star hair ornament, hairclip, round eyes, blue eyes, petite, white cropped jacket, light blu"
+  }
+ ],
+ "dist": {
+  "rarity": {
+   "SSR": 2,
+   "SR": 3,
+   "R": 1
+  },
+  "role": {
+   "atk": 2,
+   "def": 2,
+   "sup": 2
+  },
+  "elem": {
+   "열정": 1,
+   "우아": 1,
+   "청량": 2,
+   "몽환": 2
+  },
+  "faction": {
+   "새벽별 엔터테인먼트": 6
+  }
+ },
+ "chapters": [
+  {
+   "kind": "main",
+   "title": "1장 마지막 줄의 이름",
+   "logline": "꼴찌 기획사의 첫 녹화, 막차 플랫폼에서 들려온 노래 한 소절",
+   "stages": [
+    {
+     "title": "첫 녹화, 레벨 평가",
+     "mode": "contest",
+     "enemies": [],
+     "field": "",
+     "pre": 20,
+     "post": 13
+    },
+    {
+     "title": "플랫폼의 유령",
+     "mode": "story",
+     "enemies": [],
+     "field": "",
+     "pre": 35,
+     "post": 0
+    },
+    {
+     "title": "홍대 자리 싸움",
+     "mode": "battle",
+     "enemies": [
+      "크라운 연습생 댄스조(열정) 1141/108/44",
+      "크라운 연습생 보컬조(우아) 1372/86/62",
+      "크라운 연습생 랩조(몽환) 1019/119/37"
+     ],
+     "field": "",
+     "pre": 21,
+     "post": 11
+    },
+    {
+     "title": "1차 미션: 정면 승부",
+     "mode": "battle",
+     "enemies": [
+      "크라운 연습생 댄스조(열정) 1258/113/50",
+      "크라운 연습생 보컬조(우아) 1489/93/66",
+      "도하은(우아,보스) 4786/92/51"
+     ],
+     "field": "",
+     "pre": 23,
+     "post": 15
+    }
+   ]
+  }
+ ],
+ "banners": [
+  {
+   "name": "상시 캐스팅: 새벽별 오디션",
+   "type": "std",
+   "active": true,
+   "pickup": [],
+   "rate": 50
+  },
+  {
+   "name": "센터의 증명",
+   "type": "pickup",
+   "active": true,
+   "pickup": [
+    "차하린"
+   ],
+   "rate": 50
+  },
+  {
+   "name": "새벽별 패밀리 캐스팅",
+   "type": "pool",
+   "active": true,
+   "pickup": [],
+   "rate": 50
+  }
+ ],
+ "lib": {
+  "bg": 11,
+  "prop": 5,
+  "bgm": 9,
+  "sfx": 13,
+  "enemy": 7,
+  "icon": 7
+ },
+ "threads": [
+  {
+   "title": "빈자리",
+   "char": "차하린",
+   "lines": 12
+  },
+  {
+   "title": "첫차",
+   "char": "백소하",
+   "lines": 13
+  },
+  {
+   "title": "보여 주고 싶은 숫자",
+   "char": "서지안",
+   "lines": 13
+  }
+ ],
+ "npcs": [],
+ "rulesElemText": "열정>몽환, 몽환>청량, 청량>열정, 우아>몽환",
+ "sampleNames": [
+  "새벽등대",
+  "헬릭스 컨소시엄",
+  "회색구 시민회",
+  "회색구 연합",
+  "새벽등대 사무소",
+  "회색구 골목",
+  "사무소 옥상",
+  "폐선로",
+  "헬릭스 물류창고",
+  "낙성 분화구",
+  "의무실",
+  "옛 항구",
+  "카지노 뒷골목",
+  "정비실",
+  "포장마차",
+  "오델의 집",
+  "관리관 숙소",
+  "하트 에이스",
+  "헬릭스 상자",
+  "성핵 추적 장치",
+  "임명장"
+ ],
+ "audit": {
+  "total": 55,
+  "rules": [
+   "c_skills(upgrade) 스킬이 지금 전투 규칙(밸런스 검사)과 맞지 않아요: 6",
+   "c_symbol(upgrade) 상징 컬러·아이템이 정해지지 않았어요(바리에이션 디자인에 쓰여요): 6",
+   "c_img(missing) 그림(스탠딩·상반신·일러스트·무기)이 아직 없어요: 6",
+   "c_afftalk(missing) 호감도에 따라 열리는 인연 톡이 없어요: 6",
+   "c_memorial(missing) 메모리얼(높은 호감도 특별 장면·로비 대사)이 없어요: 6",
+   "g_codex(upgrade) 도감에 게임 규칙(상성·역할)이 기록되지 않았어요: 1",
+   "g_spots(upgrade) 일정(장소 방문) 장소가 없어요: 1",
+   "l_img(missing) 배경·소품·CG·적 그림이 아직 없어요: 23"
+  ]
+ },
+ "persona": {
+  "avg": 82,
+  "detail": [
+   {
+    "n": "차하린",
+    "score": 79,
+    "issues": [
+     "대사에 말투(어미·말버릇·대표 대사)가 드러나지 않아요",
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "문가을",
+    "score": 87,
+    "issues": [
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "주다온",
+    "score": 79,
+    "issues": [
+     "대사에 말투(어미·말버릇·대표 대사)가 드러나지 않아요",
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "백소하",
+    "score": 79,
+    "issues": [
+     "대사에 말투(어미·말버릇·대표 대사)가 드러나지 않아요",
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "서지안",
+    "score": 79,
+    "issues": [
+     "대사에 말투(어미·말버릇·대표 대사)가 드러나지 않아요",
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "오은별",
+    "score": 87,
+    "issues": [
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   }
+  ]
+ },
+ "plan": [
+  "로그라인이 없어요",
+  "막 구성이 없어요"
+ ],
+ "faction": {
+  "score": 98,
+  "issues": [
+   "정체가 정해지지 않은 적 1종: 도하은"
+  ]
+ },
+ "balance": [
+  {
+   "n": "차하린",
+   "dev": 0.12671594508975703
+  },
+  {
+   "n": "문가을",
+   "dev": 0.01038062283737018
+  },
+  {
+   "n": "주다온",
+   "dev": 0.13875598086124397
+  },
+  {
+   "n": "백소하",
+   "dev": -0.04848966613672501
+  },
+  {
+   "n": "서지안",
+   "dev": 0.14754098360655732
+  },
+  {
+   "n": "오은별",
+   "dev": 0.14436090225563913
+  }
+ ],
+ "imgPerson": [],
+ "scriptQA": {
+  "sayLines": 123,
+  "choices": 8,
+  "branches": 0,
+  "unknownSpeakers": {
+   "FD": 3,
+   "마정연": 1,
+   "제이 한": 1,
+   "크라운 연습생": 2,
+   "도하은": 2,
+   "MC": 2,
+   "서민혁": 1
+  },
+  "missingBg": {},
+  "missingBgm": {},
+  "faces": {
+   "눈물": 4,
+   "진지": 21,
+   "땀": 3,
+   "화남": 4,
+   "의문": 1,
+   "미소": 17,
+   "반짝": 1,
+   "걱정": 5,
+   "놀람": 1,
+   "홍조": 1
+  },
+  "commands": {
+   "음악": 14,
+   "소품": 3,
+   "소품끝": 3,
+   "효과": 6,
+   "효과음": 2,
+   "배경": 1,
+   "사진": 1,
+   "스티커": 2
+  },
+  "longLines": 0,
+  "english": [],
+  "parseErrors": [],
+  "debutViolations": [],
+  "places": 8
+ },
+ "uiText": "STANDARD 상시 캐스팅: 새벽별 오디션 차하린 확률 업 SEASON PASS Lv.0 8 ! 1 3 Encore Signal 앙코르 시그널 첫 캐스팅로 멤버을(를) 만나세요 캐시 상점 상점 COMBAT 무대 출격 1-1 첫 녹화, 레벨 평가 MAIN STORY 무대 CHAPTER 01 진행 중 1장 마지막 줄의 이름 꼴찌 기획사의 첫 녹화, 막차 플랫폼에서 들려온 노래 한 소절 0 / 4 CHAPTER 02 다음 이야기 ＋ 다음 장 만들기 글 AI를 등록하면 다음 장을 만들 수 있어요. ← 옆으로 넘겨서 장을 고르세요 → 적 스탯 자동조정 · 새 스킬 기준 상시 캐스팅: 새벽별 오디션 센터의 증명 새벽별 패밀리 캐스팅 ✦ 신규 ★ 픽업 ＋ ‹ › 상반신 미등록 앙코르 시그널 Encore Signal STAN DARD RECRUITMENT 상시 캐스팅: 새벽별 오디션 SSR 차하린 새벽별 엔터테인먼트 SSR 확정까지 150회 112회부터 SSR 확률이 점점 올라가요 모집 포인트 0/200 교환 첫 10회는 SSR 1명 확정 1회 ◆ 120 10회 ◆ 1,200 · SR 이상 1명 보장 ◆ 프리즘 충전 확률 정보 SSR 1명 4% SR 3명 18% R 1명",
+ "firstPull": {
+  "banner": "상시 캐스팅: 새벽별 오디션",
+  "results": [
+   "SSR 차하린",
+   "R 오은별",
+   "R 오은별",
+   "R 오은별",
+   "R 오은별",
+   "R 오은별",
+   "SR 서지안",
+   "R 오은별",
+   "R 오은별",
+   "R 오은별"
+  ],
+  "owned": [
+   "오은별",
+   "서지안",
+   "차하린"
+  ],
+  "squad": [
+   "오은별",
+   "서지안",
+   "차하린"
+  ]
+ },
+ "battles": [
+  {
+   "chapter": "1장 마지막 줄의 이름",
+   "stages": [
+    {
+     "n": 1,
+     "title": "첫 녹화, 레벨 평가",
+     "mode": "contest"
+    },
+    {
+     "n": 2,
+     "title": "플랫폼의 유령",
+     "mode": "story"
+    },
+    {
+     "n": 3,
+     "title": "홍대 자리 싸움",
+     "mode": "battle",
+     "boss": false,
+     "lv1": {
+      "win": 100,
+      "time": 15
+     },
+     "lv10": {
+      "win": 100,
+      "time": 10
+     },
+     "lv20": {
+      "win": 100,
+      "time": 9
+     }
+    },
+    {
+     "n": 4,
+     "title": "1차 미션: 정면 승부",
+     "mode": "battle",
+     "boss": true,
+     "lv1": {
+      "win": 100,
+      "time": 25
+     },
+     "lv10": {
+      "win": 100,
+      "time": 18
+     },
+     "lv20": {
+      "win": 100,
+      "time": 14
+     }
+    }
+   ]
+  }
+ ],
+ "squadStats": [
+  "오은별(R 하모니) 체력1932 공격115 방어109",
+  "서지안(SR 하모니) 체력1587 공격121 방어93",
+  "차하린(SSR 퍼포머) 체력1950 공격224 방어91"
+ ],
+ "pageErrors": [],
+ "folder": {
+  "prompts": 22,
+  "chars": 119592,
+  "sampleInPrompts": {
+   "새벽등대": [
+    "chapter1",
+    "opening"
+   ],
+   "새벽등대 사무소": [
+    "chapter1",
+    "opening"
+   ],
+   "회색구 골목": [
+    "chapter1",
+    "opening"
+   ],
+   "사무소 옥상": [
+    "chapter1",
+    "opening"
+   ],
+   "폐선로": [
+    "chapter1",
+    "opening"
+   ],
+   "헬릭스 물류창고": [
+    "chapter1",
+    "opening"
+   ],
+   "낙성 분화구": [
+    "chapter1",
+    "opening"
+   ],
+   "의무실": [
+    "chapter1",
+    "opening"
+   ],
+   "옛 항구": [
+    "chapter1",
+    "opening"
+   ],
+   "카지노 뒷골목": [
+    "chapter1",
+    "opening"
+   ],
+   "정비실": [
+    "chapter1",
+    "opening"
+   ],
+   "포장마차": [
+    "chapter1",
+    "opening"
+   ],
+   "오델의 집": [
+    "chapter1",
+    "opening"
+   ],
+   "관리관 숙소": [
+    "chapter1",
+    "opening"
+   ],
+   "하트 에이스": [
+    "chapter1",
+    "opening"
+   ],
+   "헬릭스 상자": [
+    "chapter1",
+    "opening"
+   ],
+   "성핵 추적 장치": [
+    "chapter1",
+    "opening"
+   ],
+   "임명장": [
+    "chapter1",
+    "opening"
+   ]
+  },
+  "inlineSkillPass": "6/6",
+  "commitAtCall": 4,
+  "calls": 4,
+  "mainSteps": [
+   "world:3288",
+   "chars:17845",
+   "opening:8237",
+   "chapter1:10701"
+  ]
+ }
+}

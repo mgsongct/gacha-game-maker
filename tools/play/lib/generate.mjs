@@ -44,7 +44,8 @@ export async function runGenerate({ phase, responses = {}, input = null, game = 
       } else {
         G = fix(JSON.parse(game)); applyMeta(); window.reloadGame = () => {};
         if (phase === 'skills') {
-          const todo = G.chars.filter(c => !c.alt && (c.skillGenerationWarning || !c.skillDesignLog || !c.skillDesignLog.length));
+          const defNames = c => JSON.stringify(Object.values(GGMCombat.generationDefaults(c) || {}).filter(x => x && x.name).map(x => x.name)), kitNames = c => JSON.stringify(Object.values(c.skills || {}).filter(x => x && x.name).map(x => x.name));
+          const todo = G.chars.filter(c => !c.alt && (c.skillGenerationWarning || kitNames(c) === defNames(c))); // 임시 상태이거나 기본 스킬 그대로인 대원만(인라인 스킬이 검증을 통과했으면 건드리지 않음)
           result.todo = todo.map(c => c.name + ' | ' + (c.skillGenerationWarning || '설계 기록 없음'));
           for (const c of todo) { try { const kit = await v2GenerateSkills(c, '', () => {}); c.skills = kit; delete c.skillGenerationWarning; } catch (e) { c.skillGenerationWarning = String(e.message || e.code || e); } }
         } else {

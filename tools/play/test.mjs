@@ -25,7 +25,7 @@ assert.ok(Object.keys(prompts).every(k => /^skill-/.test(k)), '응답이 없는 
 const R = await runQA(JSON.stringify(gen.game), input), has = (area, re) => R.findings.some(f => f.area === area && re.test(f.msg));
 assert.ok(has('대본', /등록되지 않은 화자 「유령」/), '등록 안 된 화자');
 assert.ok(has('등장 계획', /네오/), '첫 등장 위반(네오가 1스테이지에서 말함)');
-assert.ok(has('대본', /없는 배경 「없는곳」/), '없는 배경');
+assert.ok(has('대본', /없는 장소·배경 「없는곳」/), '없는 배경');
 assert.ok(!R.findings.some(f => f.area === '기본값 섞임' && f.sev === '상'), '플롯·설정·세력을 다 채운 게임에는 상 등급 기본값 섞임이 없음');
 assert.ok(R.findings.some(f => f.area === '기본값 섞임' && /재료 던전/.test(f.msg)), '재료 던전 이름을 안 준 고정 응답 → 기본 이름이 남은 것을 잡음');
 

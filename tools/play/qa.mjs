@@ -6,13 +6,13 @@
 //   node tools/play/qa.mjs <게임 폴더> [game.json]
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
-import { runQA, md } from './lib/qa.mjs';
+import { runQA, md, folderQA } from './lib/qa.mjs';
 
 const dir = resolve(process.argv[2] || ''), file = process.argv[3] || 'game.json';
 if (!process.argv[2] || !existsSync(join(dir, file))) { console.log('사용법: node tools/play/qa.mjs <게임 폴더> [game.json]'); process.exit(2); }
 const game = readFileSync(join(dir, file), 'utf8'), input = existsSync(join(dir, 'input.json')) ? JSON.parse(readFileSync(join(dir, 'input.json'), 'utf8')) : {};
 
-const R = await runQA(game, input), name = basename(file, '.json'); mkdirSync(join(dir, 'qa'), { recursive: true });
+const R = folderQA(dir, await runQA(game, input)), name = basename(file, '.json'); mkdirSync(join(dir, 'qa'), { recursive: true });
 writeFileSync(join(dir, 'qa', name + '.json'), JSON.stringify(R, null, 1)); writeFileSync(join(dir, 'qa', name + '.md'), md(R, name));
 const n = s => R.findings.filter(f => f.sev === s).length;
 console.log(`QA ${R.meta.title}: 발견 상 ${n('상')} · 중 ${n('중')} · 하 ${n('하')} → ${join(dir, 'qa', name + '.md')}`); R.findings.filter(f => f.sev !== '하').slice(0, 12).forEach(f => console.log(`  [${f.sev}] ${f.area}: ${f.msg}`));

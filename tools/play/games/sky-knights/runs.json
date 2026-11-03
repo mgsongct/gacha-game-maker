@@ -253,5 +253,663 @@
   "ms": 4552,
   "stat": [],
   "errors": []
+ },
+ {
+  "phase": "new",
+  "at": "2026-11-03T07:36:48.568Z",
+  "pending": [
+   "chapter1"
+  ],
+  "log": [
+   {
+    "kind": "world",
+    "len": 3283,
+    "max_tokens": 32000,
+    "at": 1793691399948,
+    "outLen": 8505
+   },
+   {
+    "kind": "chars",
+    "len": 18236,
+    "max_tokens": 32000,
+    "at": 1793691399956,
+    "outLen": 42699
+   },
+   {
+    "kind": "opening",
+    "len": 9355,
+    "max_tokens": 32000,
+    "at": 1793691399975,
+    "outLen": 5206
+   },
+   {
+    "kind": "chapter1",
+    "len": 11842,
+    "max_tokens": 32000,
+    "at": 1793691399978,
+    "pending": true
+   },
+   {
+    "kind": "skill-루시안-1",
+    "len": 4292,
+    "max_tokens": 16000,
+    "at": 1793691399986,
+    "outLen": 1654
+   },
+   {
+    "kind": "chapter1",
+    "len": 11842,
+    "max_tokens": 32000,
+    "at": 1793691401492,
+    "pending": true
+   },
+   {
+    "kind": "chapter1",
+    "len": 11842,
+    "max_tokens": 32000,
+    "at": 1793691402998,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 104개를 업그레이드할 수 있어요"
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "stage": "새 게임 4/4 1장 스토리와 메신저를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 11769
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 4/4 1장 스토리와 메신저를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 11769
+   },
+   {
+    "ok": false,
+    "stage": "새 게임 4/4 1장 스토리와 메신저를 만드는 중",
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 11769
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 4/4 1장 스토리와 메신저를 만드는 중",
+    "reqLen": 4219
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 3/4 오프닝, 배경·소품·음악 목록, 배너를 만드는 중",
+    "reqLen": 9282
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 2/4 단원 6명을 만드는 중",
+    "reqLen": 18163
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 1/4 세계관과 게임 정의를 만드는 중",
+    "reqLen": 3210
+   }
+  ],
+  "ms": 4558,
+  "stat": [],
+  "errors": []
+ },
+ {
+  "phase": "new",
+  "at": "2026-11-03T07:41:31.820Z",
+  "pending": [],
+  "log": [
+   {
+    "kind": "world",
+    "len": 3283,
+    "max_tokens": 32000,
+    "at": 1793691687668,
+    "outLen": 8505
+   },
+   {
+    "kind": "chars",
+    "len": 18236,
+    "max_tokens": 32000,
+    "at": 1793691687676,
+    "outLen": 42699
+   },
+   {
+    "kind": "opening",
+    "len": 9355,
+    "max_tokens": 32000,
+    "at": 1793691687696,
+    "outLen": 5206
+   },
+   {
+    "kind": "chapter1",
+    "len": 11842,
+    "max_tokens": 32000,
+    "at": 1793691687698,
+    "outLen": 12335
+   },
+   {
+    "kind": "skill-루시안-1",
+    "len": 4292,
+    "max_tokens": 16000,
+    "at": 1793691687711,
+    "outLen": 1654
+   }
+  ],
+  "toasts": [],
+  "ailog": [
+   {
+    "ok": true,
+    "reqLen": 4219
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 4/4 1장 스토리와 메신저를 만드는 중",
+    "reqLen": 11769
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 3/4 오프닝, 배경·소품·음악 목록, 배너를 만드는 중",
+    "reqLen": 9282
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 2/4 단원 6명을 만드는 중",
+    "reqLen": 18163
+   },
+   {
+    "ok": true,
+    "stage": "새 게임 1/4 세계관과 게임 정의를 만드는 중",
+    "reqLen": 3210
+   }
+  ],
+  "ms": 58,
+  "stat": [],
+  "errors": []
+ },
+ {
+  "phase": "skills",
+  "at": "2026-11-03T07:41:37.387Z",
+  "pending": [
+   "skill-카시아-1",
+   "skill-카시아-2",
+   "skill-카시아-3",
+   "skill-브람-1",
+   "skill-브람-2",
+   "skill-브람-3",
+   "skill-넬-1",
+   "skill-넬-2",
+   "skill-넬-3",
+   "skill-이브-1",
+   "skill-이브-2",
+   "skill-이브-3",
+   "skill-비비안-1",
+   "skill-비비안-2",
+   "skill-비비안-3"
+  ],
+  "log": [
+   {
+    "kind": "skill-카시아-1",
+    "len": 4296,
+    "max_tokens": 16000,
+    "at": 1793691697241,
+    "pending": true
+   },
+   {
+    "kind": "skill-카시아-2",
+    "len": 4349,
+    "max_tokens": 16000,
+    "at": 1793691697246,
+    "pending": true
+   },
+   {
+    "kind": "skill-카시아-3",
+    "len": 4349,
+    "max_tokens": 16000,
+    "at": 1793691697249,
+    "pending": true
+   },
+   {
+    "kind": "skill-브람-1",
+    "len": 4288,
+    "max_tokens": 16000,
+    "at": 1793691697253,
+    "pending": true
+   },
+   {
+    "kind": "skill-브람-2",
+    "len": 4341,
+    "max_tokens": 16000,
+    "at": 1793691697257,
+    "pending": true
+   },
+   {
+    "kind": "skill-브람-3",
+    "len": 4341,
+    "max_tokens": 16000,
+    "at": 1793691697259,
+    "pending": true
+   },
+   {
+    "kind": "skill-넬-1",
+    "len": 4307,
+    "max_tokens": 16000,
+    "at": 1793691697261,
+    "pending": true
+   },
+   {
+    "kind": "skill-넬-2",
+    "len": 4360,
+    "max_tokens": 16000,
+    "at": 1793691697263,
+    "pending": true
+   },
+   {
+    "kind": "skill-넬-3",
+    "len": 4360,
+    "max_tokens": 16000,
+    "at": 1793691697265,
+    "pending": true
+   },
+   {
+    "kind": "skill-이브-1",
+    "len": 4538,
+    "max_tokens": 16000,
+    "at": 1793691697271,
+    "pending": true
+   },
+   {
+    "kind": "skill-이브-2",
+    "len": 4591,
+    "max_tokens": 16000,
+    "at": 1793691697273,
+    "pending": true
+   },
+   {
+    "kind": "skill-이브-3",
+    "len": 4591,
+    "max_tokens": 16000,
+    "at": 1793691697275,
+    "pending": true
+   },
+   {
+    "kind": "skill-비비안-1",
+    "len": 4501,
+    "max_tokens": 16000,
+    "at": 1793691697283,
+    "pending": true
+   },
+   {
+    "kind": "skill-비비안-2",
+    "len": 4554,
+    "max_tokens": 16000,
+    "at": 1793691697286,
+    "pending": true
+   },
+   {
+    "kind": "skill-비비안-3",
+    "len": 4554,
+    "max_tokens": 16000,
+    "at": 1793691697288,
+    "pending": true
+   }
+  ],
+  "toasts": [],
+  "ailog": [
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4481
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4481
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4428
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4518
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4518
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4465
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4287
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4287
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4234
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4268
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4268
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4215
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4276
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4276
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 4223
+   }
+  ],
+  "todo": [
+   "카시아 | no log",
+   "브람 | no log",
+   "넬 | no log",
+   "이브 | no log",
+   "비비안 | no log"
+  ],
+  "errors": []
+ },
+ {
+  "phase": "skills",
+  "at": "2026-11-03T07:43:11.856Z",
+  "pending": [],
+  "log": [
+   {
+    "kind": "skill-카시아-1",
+    "len": 4296,
+    "max_tokens": 16000,
+    "at": 1793691791746,
+    "outLen": 1713
+   },
+   {
+    "kind": "skill-브람-1",
+    "len": 4288,
+    "max_tokens": 16000,
+    "at": 1793691791752,
+    "outLen": 1639
+   },
+   {
+    "kind": "skill-넬-1",
+    "len": 4307,
+    "max_tokens": 16000,
+    "at": 1793691791754,
+    "outLen": 1599
+   },
+   {
+    "kind": "skill-이브-1",
+    "len": 4538,
+    "max_tokens": 16000,
+    "at": 1793691791758,
+    "outLen": 1693
+   },
+   {
+    "kind": "skill-비비안-1",
+    "len": 4501,
+    "max_tokens": 16000,
+    "at": 1793691791760,
+    "outLen": 1623
+   }
+  ],
+  "toasts": [],
+  "ailog": [
+   {
+    "ok": true,
+    "reqLen": 4428
+   },
+   {
+    "ok": true,
+    "reqLen": 4465
+   },
+   {
+    "ok": true,
+    "reqLen": 4234
+   },
+   {
+    "ok": true,
+    "reqLen": 4215
+   },
+   {
+    "ok": true,
+    "reqLen": 4223
+   }
+  ],
+  "todo": [
+   "카시아 | pending response",
+   "브람 | pending response",
+   "넬 | pending response",
+   "이브 | pending response",
+   "비비안 | pending response"
+  ],
+  "errors": []
+ },
+ {
+  "phase": "skills",
+  "at": "2026-11-03T07:43:17.438Z",
+  "pending": [],
+  "log": [],
+  "toasts": [],
+  "ailog": [],
+  "todo": [],
+  "errors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T07:43:29.667Z",
+  "pending": [
+   "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-qlg"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-qlg",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793691805559,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)"
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 30986
+   }
+  ],
+  "ms": 13,
+  "chapter": null,
+  "errors": []
+ },
+ {
+  "phase": "chapter",
+  "at": "2026-11-03T07:50:25.508Z",
+  "pending": [
+   "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+   "chapter-다음_날_아침_바람꼬리는_피난선을_이끌고_-sfe"
+  ],
+  "log": [
+   {
+    "kind": "chapter-다음_메인_챕터_2장_를_구성하라_대본은_-qlg",
+    "len": 31059,
+    "max_tokens": 32000,
+    "at": 1793692208613,
+    "outLen": 23322
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692209346,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19393,
+    "max_tokens": 32000,
+    "at": 1793692210853,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 18592,
+    "max_tokens": 32000,
+    "at": 1793692212361,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 18592,
+    "max_tokens": 32000,
+    "at": 1793692213867,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19515,
+    "max_tokens": 32000,
+    "at": 1793692215375,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19515,
+    "max_tokens": 32000,
+    "at": 1793692216882,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19482,
+    "max_tokens": 32000,
+    "at": 1793692218389,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음에_태워_줄게_어디_갔다_왔어_나-qdj",
+    "len": 19482,
+    "max_tokens": 32000,
+    "at": 1793692219896,
+    "pending": true
+   },
+   {
+    "kind": "chapter-다음_날_아침_바람꼬리는_피난선을_이끌고_-sfe",
+    "len": 998,
+    "max_tokens": 16000,
+    "at": 1793692221402,
+    "pending": true
+   }
+  ],
+  "toasts": [
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "요청이 많아요. 잠시 후 다시 시도해 주세요. (서버: pending response)",
+   "이야기 기억 정리 실패: pending response. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요."
+  ],
+  "ailog": [
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 925
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19409
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19409
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19442
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19442
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 18519
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 18519
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19320
+   },
+   {
+    "ok": false,
+    "err": "rate_limited (요청이 많아요. 잠시 후 다시 시도해 주세요.) · pending response",
+    "reqLen": 19320
+   },
+   {
+    "ok": true,
+    "reqLen": 30986
+   }
+  ],
+  "ms": 12800,
+  "chapter": {
+   "title": "검은 돛의 그림자",
+   "nb": 12,
+   "nt": 0,
+   "nc": [
+    "마테오",
+    "아델"
+   ]
+  },
+  "errors": []
  }
 ]
