@@ -14,6 +14,7 @@ function playStoryStage(ch,s){ playStory(s.title,[s.pre,s.post].filter(Boolean).
     render(); checkTriggers(); }); }
 function startBattle(chId,stId){
   const ch=G.chapters.find(x=>x.id===chId), s=ch&&ch.stages.find(x=>x.id===stId); if(!s) return;
+  if(s.mode==='debate'||s.mode==='contest') return openModeStage(ch,s); // 회담·콘테스트(0488)
   if(sortieOn()&&!s.story&&(s.enemies||[]).length&&['main','event'].includes(ch.kind||'main')) return sortieBegin(ch,s); // 출격 경로(0487)
   startStage(s,{kind:ch.kind||'main',ch});
 }

@@ -15,6 +15,7 @@
 | [direction.md](direction.md) | 커뮤 연출: 감정 아이콘·캐릭터 동작·화면 효과·두 사람 무대·스티커, AI 연출 입히기, 공유 보관함·자동 재사용·중복 합치기 | `src/main/0462-direction.js`, `0565-asset-library.js`, 대본 엔진 `0460` |
 | [formation-sortie.md](formation-sortie.md) | 대열(근접·원거리·지원, 후열 보호·엄호·자리 상성), 출격 경로(진격·퇴각·갈림길·체력 유지), 일러스트만으로 되는 전투 체계 조사 | `src/main/0487-formation-sortie.js`, 엔진 `030-core.js`(formation) |
 | [factions-cast.md](factions-cast.md) | 세력 설계(종류·목적·관계·장별 적대/우호), 적·몬스터 도감과 몬스터의 커뮤 대상화 차단, 첫 등장 전 픽업 잠금·적대 세력 잠금·만나지 않은 보유 캐릭터 안내 | `src/main/0445-factions.js`, 뽑기 `0500`, 장 생성 `0250` |
+| [stage-modes.md](stage-modes.md) | 스테이지 양식: 회담(추궁·증거·설득·신뢰도)·콘테스트(개성 기반 매력·심사위원 취향·분위기), AI가 장마다 조합(STAGE_MODES·스키마·검증) | `src/main/0488-stage-modes.js`, `buildStages`(`0250`) |
 | [content-audit.md](content-audit.md) | 콘텐츠 점검·업그레이드: 생성 기능 향상·구버전 생성물(genVer) 감지, 자동 변환·AI 채우기·지정 변환·되돌리기, 규칙 추가 방법 | `src/main/0535-content-audit.js` |
 | [variants.md](variants.md) | 바리에이션(이격·영의): 공통 템플릿, 조건으로 자동 적용, **상속형 관리(원본 + 수정치)**, 캐릭터 특징을 반영한 디자인 프롬프트 | 같은 파일들 + `src/main/0065-inherit.js`, `aiAltChar`(`src/main/0290-season-rotation.js`) |
 

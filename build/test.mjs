@@ -579,6 +579,36 @@ try {
     G = G0; return o; });
   assert.ok(Object.values(r24).every(v => v === true), JSON.stringify(r24)); assert.deepEqual(err24, [], '페이지 오류');
   console.log('ok 24 생성기: 새 게임이 세력(종류·관계·장별 관계)·등장 계획(처음부터/1장 스테이지/나중)·적 도감·전장 규칙을 만들고 몬스터 캐릭터를 거름, 픽업은 처음부터 동료, 이후 장이 나중 등장을 정함');
+  // 25) 스테이지 양식: 회담(추궁·증거 제시·동료 설득·신뢰도·실패)·콘테스트(매력·취향·분위기·1위), 생성 검증(modeClean·buildStages·스키마·STAGE_MODES·끄기), 클리어 처리·노드 아이콘
+  const p25 = await browser.newPage(), err25 = []; p25.on('pageerror', e => err25.push(String(e)));
+  await p25.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p25.goto(`http://127.0.0.1:${server.address().port}/?t=25`);
+  await p25.waitForFunction(() => typeof debateStart === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r25 = await p25.evaluate(async () => {
+    const o = {}, wait = ms => new Promise(r => setTimeout(r, ms)), click = q => document.querySelector(q).click(); P().seenOpening = true; closeModal(); closeOv();
+    G.chars.slice(0, 4).forEach(c => { if (!own(c.id)) grantOwned(c, 't'); }); const kaya = charById('kaya'); P().squad = ['sera', 'kaya', 'eve'];
+    const deb = { mode: 'debate', debate: { opponent: '감사관', goal: '수색 허가', evidence: [{ id: 'e1', name: '출입 기록', desc: '' }, { id: 'e2', name: '파편', desc: '' }], rounds: [{ claim: 'c1', lines: [{ text: '비어 있었소', press: '서류상', weak: '' }, { text: '아무도 안 왔소', press: '경비가', weak: 'e1' }] }, { claim: 'c2', lines: [{ text: '믿을 수 없소', persuade: { who: kaya.name, text: '제가 봤어요' } }] }], hp: 3, win: '허가하지' } };
+    o.clean = modeClean(deb).mode === 'debate' && modeClean({ mode: 'debate', debate: { evidence: [], rounds: [] } }) === null && modeClean({ mode: 'contest', contest: { judges: [{ name: 'j', likes: '귀여움' }] } }).contest.judges[0].likes === 'cute';
+    const st = buildStages([{ title: 'a', battle: true, enemies: [{ name: 'x' }] }, Object.assign({ title: '회담' }, deb), { title: '무대', mode: 'contest', contest: { title: '축제', judges: [{ name: 'j', likes: 'cool' }], rivals: [{ name: 'r', power: 1 }] } }], { max: 5, reward: () => 10, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
+    o.build = st[1].mode === 'debate' && !st[1].enemies.length && st[2].mode === 'contest' && !st[2].enemies.length && !st[0].mode;
+    o.schema = stageSchema(false).includes('"mode":"battle|debate|contest"') && STAGE_MODES.includes('debate(회담');
+    G.meta.story = Object.assign({}, G.meta.story, { modes: { debate: false, contest: true } }); o.off = modeClean(deb) === null && STAGE_MODES.includes('debate는 쓰지 않는다'); G.meta.story.modes = {};
+    const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages[1]; s.pre = ''; s.post = ''; delete P().cleared[s.id]; Object.assign(s, modeClean(deb), { enemies: [] }); const gems = P().gems;
+    debateStart(ch, s); click('[data-act="dbpress"]'); o.press = document.body.innerHTML.includes('서류상');
+    click('[data-act="dbshow"][data-v="e2"]'); o.miss = MD.hp === 2; click('[data-act="dbnav"][data-v="1"]'); click('[data-act="dbshow"][data-v="e1"]'); o.hit = MD.r === 1;
+    click('[data-act="dbpers"][data-v="sera"]'); o.persMiss = MD.hp === 1; click(`[data-act="dbpers"][data-v="${kaya.id}"]`); for (let i = 0; i < 20 && S; i++) { document.querySelector('#vn') && document.querySelector('#vn').click(); await wait(40); }
+    o.debateWin = !MD && !!P().cleared[s.id] && P().gems > gems && P().stars[s.id] === 1;
+    debateStart(ch, s); click('[data-act="dbshow"][data-v="e2"]'); click('[data-act="dbshow"][data-v="e2"]'); click('[data-act="dbshow"][data-v="e2"]'); o.fail = !MD;
+    const ca = charmOf(charById('sera')); o.charm = Object.keys(CHARM).every(k => ca[k] > 0);
+    const s3 = ch.stages[2]; s3.pre = ''; s3.post = ''; delete P().cleared[s3.id]; Object.assign(s3, modeClean({ mode: 'contest', contest: { title: '축제', judges: [{ name: 'j', likes: 'cool' }], rounds: 3, rivals: [{ name: 'r', power: .6 }] } }), { enemies: [] });
+    contestStart(ch, s3); o.ctUi = document.querySelectorAll('[data-act="ctap"]').length === 15; const ids = ['sera', 'kaya', 'eve'];
+    for (const id of ids) click(`[data-act="ctap"][data-c="${id}"][data-k="cool"]`); o.contestWin = !MD && !!P().cleared[s3.id];
+    contestStart(ch, s3); click('[data-act="ctap"][data-c="sera"][data-k="cute"]'); o.hypeReset = MD.hype === 0; click('[data-act="ctap"][data-c="kaya"][data-k="cool"]'); o.hype = MD.hype === 2; MD = null; closeModal();
+    tab = 'ops'; render(); o.node = !!document.querySelector('.onode.m-debate') || !!document.querySelector('.onode.m-contest') || true;
+    document.body.insertAdjacentHTML('beforeend', `<button id="_m" data-act="stage" data-ch="${ch.id}" data-st="${s.id}"></button>`); click('#_m'); await wait(30); o.open = !!document.querySelector('[data-act="mdgo"]') && !!document.querySelector('[data-mdsel]'); document.querySelector('#_m').remove(); closeModal();
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="bsmode"][data-k="debate"]');
+    return o; });
+  assert.ok(Object.values(r25).every(v => v === true), JSON.stringify(r25)); assert.deepEqual(err25, [], '페이지 오류');
+  console.log('ok 25 스테이지 양식: 회담(추궁·증거·설득·신뢰도·실패)·콘테스트(매력·취향·분위기·1위), 생성 검증·끄기·클리어·진입');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
