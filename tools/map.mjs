@@ -23,9 +23,10 @@ const games = () => existsSync(GAMES) ? readdirSync(GAMES).map(d => ({ name: d, 
 // 입력 해시: src 파일마다 · 빌드된 index.html · 시험 게임 data(종류별 파일)
 function inputs() { const src = Object.fromEntries(tree(join(ROOT, 'src')).filter(f => /\.(js|html|css)$/.test(f)).map(f => [relative(ROOT, f), sha(readFileSync(f))]));
   const www = existsSync(join(ROOT, 'www/index.html')) ? sha(readFileSync(join(ROOT, 'www/index.html'))) : '', gm = Object.fromEntries(games().map(g => [g.name, sha(tree(join(PC, 'data', g.gid)).map(f => readFileSync(f, 'utf8')).join('\n'))]));
-  return { src, www, games: gm }; }
+  const tool = sha(['tools/map.mjs', ...['map', 'flow', 'graph', 'wiring', 'lifecycle', 'upgrade', 'source', 'scope'].map(n => `tools/lib/${n}.mjs`)].map(f => readFileSync(join(ROOT, f), 'utf8')).join('\n')); /* 맵을 만드는 도구가 바뀌어도 다시 만듦 */
+  return { src, www, games: gm, tool }; }
 const changedInputs = (a, b) => { if (!a) return { first: true }; const keys = o => Object.keys(o || {}), diff = (x, y) => ({ added: keys(y).filter(k => !(k in (x || {}))), removed: keys(x).filter(k => !(k in (y || {}))), changed: keys(y).filter(k => k in (x || {}) && x[k] !== y[k]) });
-  const s = diff(a.src, b.src), g = diff(a.games, b.games), any = d => d.added.length + d.removed.length + d.changed.length; return any(s) || any(g) || a.www !== b.www ? { src: s, www: a.www !== b.www, games: g } : null; };
+  const s = diff(a.src, b.src), g = diff(a.games, b.games), any = d => d.added.length + d.removed.length + d.changed.length; return any(s) || any(g) || a.www !== b.www || a.tool !== b.tool ? { src: s, www: a.www !== b.www, games: g, tool: a.tool !== b.tool } : null; };
 const head = () => { try { return execSync('git rev-parse --short HEAD', { cwd: ROOT, encoding: 'utf8' }).trim(); } catch { return ''; } };
 
 async function make() { const units = await loadUnits(ROOT), fns = buildGraph(units).fns, sf = stateFlow(units, fns), html = existsSync(join(ROOT, 'www/index.html')) ? readFileSync(join(ROOT, 'www/index.html'), 'utf8') : '';
@@ -41,7 +42,7 @@ function md(m) { const L = [], t = (h, rows) => [`| ${h.join(' | ')} |`, `|${h.m
     '## 읽는 법 — 거꾸로 따라가기', '', 'index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임을 구동 — 플레이·실행 중 AI·예전 게임 불러오기)·**편집기**(만든 게임의 내용을 고치고 업데이트 — 편집 화면·콘텐츠 점검·AI 추가 지시)를 겸합니다(CLAUDE.md §0). 게임 data(`data/<게임id>/<종류>.json`)의 어떤 경로가 이상하면:',
     '', '1. 아래 1절에서 그 파일·경로를 찾아 **누가 만들고 고치나**(역할별 함수<sub>모듈</sub>)를 봄 — 시나리오면 `chapters.json`, 캐릭터 밸런스·스킬·이격이면 `chars.json`(`[].skills`·`[].hp`·`[].alt`·`[].over` …)',
     '2. `node tools/map.mjs --why <경로·함수·말>` — 함수마다 src 파일:줄 · index.html 줄 · 쓰는 프롬프트 조각, 그 경로의 점검 규칙·읽는 모듈·연계 모듈까지 한 번에', '3. 2절에서 그 모듈의 index.html 줄 범위·쓰는 데이터·연계 모듈(호출 수)을 보고, 고친 뒤 `node tools/map.mjs`로 맵을 갱신', '',
-    `역할 판정(정적): 생성기 = 새 게임 생성 단계(newGame…)가 부르는 함수 · 실행기 = 실행 중 AI(liveTick)·불러오기(fix)·앱을 열 때(부팅·게임 열기)가 부르거나 사용자 조작이 진행(prog.json)을 씀 · 편집기 = 사용자 조작이 진행 아닌 data를 씀(플레이 중 콘텐츠를 만드는 조작 — 건조 바리에이션 등 — 도 여기로 셈) · 기타 = 위 시작점에서 닿지 않음(엔진 안쪽 등). 한 함수가 여러 역할일 수 있음(예: cleanChar는 생성·실행 중 AI 둘 다). 「게임」 = 시험 게임 ${m.gamesN}개 중 값이 있는 수`, '', '## 1. data 게임 파일 → 만드는 곳(역할) → 모듈', '');
+    `역할 판정(정적): 생성기 = 새 게임 생성 단계(newGame…)가 부르는 함수 · 실행기 = 실행 중 AI(liveTick)·불러오기(fix)·앱을 열 때(부팅·게임 열기)가 부르거나, 사용자 조작이 진행(prog.json)을 쓰거나, 플레이 조작(진행을 쓰는 사용자 함수 — CRES()·CBUILD() 같은 접근 함수로 받은 객체 포함, 액션 분배기 제외)에서 닿는 콘텐츠 쓰기(예: 건조 바리에이션) · 편집기 = 사용자 조작이 플레이 조작을 거치지 않고 콘텐츠를 씀 · 기타 = 위 시작점에서 닿지 않음(엔진 안쪽 등). 한 함수가 여러 역할일 수 있음(예: cleanChar는 생성·실행 중 AI 둘 다). 「게임」 = 시험 게임 ${m.gamesN}개 중 값이 있는 수`, '', '## 1. data 게임 파일 → 만드는 곳(역할) → 모듈', '');
   const byFile = new Map(); for (const [k, d] of Object.entries(m.data)) { if (!byFile.has(d.file)) byFile.set(d.file, []); byFile.get(d.file).push([k, d]); }
   for (const [file, rows] of [...byFile].sort((a, b) => a[0].localeCompare(b[0]))) { const wr = rows.filter(([, d]) => Object.keys(d.writers).length); if (!wr.length) continue;
     L.push(`### ${file} — ${FILE_TITLE[file] || ''}`, '', t(['경로', '생성기', '실행기', '편집기', '기타', '점검 규칙', '프롬프트 조각', '게임'], wr.map(([, d]) => [d.path || '(파일 전체)', ...ROLES.map(r => cell(d.writers[r], m)), d.audits.join(' '), d.prompts.slice(0, 5).join(' ') + (d.prompts.length > 5 ? ` …외 ${d.prompts.length - 5}` : ''), m.gamesN ? `${d.games}/${m.gamesN}` : ''])), ''); }
@@ -75,7 +76,7 @@ function gameView(m, dir) { const d = resolve(dir), gid = gidOf(d) || basename(d
   return [`게임 ${gid}: data 경로 ${rows.length} · 값 없음 ${rows.filter(r => !r[1]).length}`, ...rows.sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0])).map(([k, n, w]) => `${n ? '  ' : '∅ '}${k}${n ? ` (${n})` : ''} — ${w}`)].join('\n'); }
 
 const old = existsSync(JSONF) ? JSON.parse(readFileSync(JSONF, 'utf8')) : null, now = inputs(), ch = changedInputs(old?.inputs, now);
-if (argv.includes('--check')) { console.log(ch ? `맵이 낡았어요 — node tools/map.mjs로 갱신하세요(${ch.first ? '맵 없음' : `src ${ch.src.added.length + ch.src.removed.length + ch.src.changed.length} · index.html ${ch.www ? '바뀜' : '같음'} · 게임 ${ch.games.added.length + ch.games.changed.length + ch.games.removed.length}`})` : '맵이 지금 입력과 맞아요'); process.exit(ch ? 1 : 0); }
+if (argv.includes('--check')) { console.log(ch ? `맵이 낡았어요 — node tools/map.mjs로 갱신하세요(${ch.first ? '맵 없음' : `src ${ch.src.added.length + ch.src.removed.length + ch.src.changed.length} · index.html ${ch.www ? '바뀜' : '같음'} · 게임 ${ch.games.added.length + ch.games.changed.length + ch.games.removed.length}${ch.tool ? ' · 맵 도구 바뀜' : ''}`})` : '맵이 지금 입력과 맞아요'); process.exit(ch ? 1 : 0); }
 let map = old;
 if (ch || argv.includes('--force') || !old) { const m = await make(), diff = mapDiff(old, m); m.at = new Date().toISOString().slice(0, 16); m.head = head(); m.inputs = now; m.changes = [{ at: m.at, head: m.head, inputs: ch || { forced: true }, ...diff }, ...(old?.changes || [])].slice(0, 20);
   writeFileSync(JSONF, JSON.stringify(m, null, 1) + '\n'); writeFileSync(MDF, md(m)); map = m;

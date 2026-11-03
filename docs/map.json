@@ -19,14 +19,13 @@
    "file": "banners.json",
    "path": "",
    "writers": {
-    "편집기": [
+    "실행기": [
      "aiPickupStory",
-     "handleNavigationAndToolsAction",
-     "handleStoryAndAuthoringAction",
      "puStoryBg"
     ],
-    "실행기": [
-     "aiPickupStory"
+    "편집기": [
+     "handleNavigationAndToolsAction",
+     "handleStoryAndAuthoringAction"
     ],
     "생성기": [
      "buildManualGameDraft",
@@ -179,9 +178,7 @@
      "seasonStart"
     ],
     "편집기": [
-     "addPickupFor",
-     "readBanner",
-     "seasonStart"
+     "readBanner"
     ]
    },
    "readers": [
@@ -216,9 +213,6 @@
    "writers": {
     "실행기": [
      "addPickupFor"
-    ],
-    "편집기": [
-     "addPickupFor"
     ]
    },
    "readers": [],
@@ -236,10 +230,7 @@
      "rotatePickups"
     ],
     "편집기": [
-     "addPickupFor",
-     "aiPickupStory",
-     "readBanner",
-     "rotatePickups"
+     "readBanner"
     ]
    },
    "readers": [
@@ -276,9 +267,6 @@
    "writers": {
     "실행기": [
      "addPickupFor"
-    ],
-    "편집기": [
-     "addPickupFor"
     ]
    },
    "readers": [],
@@ -296,11 +284,8 @@
      "rotatePickups"
     ],
     "편집기": [
-     "addPickupFor",
-     "aiPickupStory",
      "handleNavigationAndToolsAction",
-     "readBanner",
-     "rotatePickups"
+     "readBanner"
     ]
    },
    "readers": [
@@ -338,9 +323,6 @@
    "writers": {
     "실행기": [
      "aiPickupStory"
-    ],
-    "편집기": [
-     "aiPickupStory"
     ]
    },
    "readers": [
@@ -375,9 +357,6 @@
    "writers": {
     "실행기": [
      "addPickupFor"
-    ],
-    "편집기": [
-     "addPickupFor"
     ]
    },
    "readers": [
@@ -398,7 +377,6 @@
      "addPickupFor"
     ],
     "편집기": [
-     "addPickupFor",
      "handleNavigationAndToolsAction"
     ]
    },
@@ -464,11 +442,9 @@
      "rotatePickups"
     ],
     "편집기": [
-     "addPickupFor",
      "handleNavigationAndToolsAction",
      "readBanner",
-     "renameEverywhere",
-     "rotatePickups"
+     "renameEverywhere"
     ]
    },
    "readers": [
@@ -539,9 +515,6 @@
    "path": "[].newAt",
    "writers": {
     "실행기": [
-     "addPickupFor"
-    ],
-    "편집기": [
      "addPickupFor",
      "gateCheck"
     ]
@@ -585,9 +558,7 @@
      "rotatePickups"
     ],
     "편집기": [
-     "addPickupFor",
      "handleNavigationAndToolsAction",
-     "rotatePickups",
      "storyPurge"
     ]
    },
@@ -672,7 +643,6 @@
      "repairRefs"
     ],
     "편집기": [
-     "addPickupFor",
      "readBanner",
      "storyPurge"
     ]
@@ -708,7 +678,6 @@
      "fix"
     ],
     "편집기": [
-     "addPickupFor",
      "readBanner"
     ]
    },
@@ -799,7 +768,6 @@
      "addPickupFor"
     ],
     "편집기": [
-     "addPickupFor",
      "readBanner"
     ]
    },
@@ -838,9 +806,6 @@
    "path": "[].until",
    "writers": {
     "실행기": [
-     "addPickupFor"
-    ],
-    "편집기": [
      "addPickupFor"
     ]
    },
@@ -1700,7 +1665,8 @@
      "readChForm"
     ],
     "실행기": [
-     "module:modules/combat/050-bridge.js#v2BalanceChapter"
+     "module:modules/combat/050-bridge.js#v2BalanceChapter",
+     "module:modules/combat/050-bridge.js#v2PrepareStage"
     ]
    },
    "readers": [
@@ -1758,7 +1724,8 @@
      "buildNewGameDraft"
     ],
     "실행기": [
-     "module:modules/combat/050-bridge.js#v2BalanceChapter"
+     "module:modules/combat/050-bridge.js#v2BalanceChapter",
+     "module:modules/combat/050-bridge.js#v2PrepareStage"
     ]
    },
    "readers": [
@@ -3411,11 +3378,11 @@
    "writers": {
     "실행기": [
      "aiAltChar",
+     "conMakeVariant",
      "fix"
     ],
     "편집기": [
-     "aiAltChar",
-     "conMakeVariant"
+     "aiAltChar"
     ]
    },
    "readers": [
@@ -3466,11 +3433,11 @@
    "path": "[].alt",
    "writers": {
     "실행기": [
-     "aiAltChar"
-    ],
-    "편집기": [
      "aiAltChar",
      "conMakeVariant"
+    ],
+    "편집기": [
+     "aiAltChar"
     ]
    },
    "readers": [
@@ -3567,11 +3534,11 @@
    "path": "[].altCanon",
    "writers": {
     "실행기": [
-     "aiAltChar"
-    ],
-    "편집기": [
      "aiAltChar",
      "conMakeVariant"
+    ],
+    "편집기": [
+     "aiAltChar"
     ]
    },
    "readers": [
@@ -3796,7 +3763,7 @@
    "file": "chars.json",
    "path": "[].cvar",
    "writers": {
-    "편집기": [
+    "실행기": [
      "conMakeVariant"
     ]
    },
@@ -4299,7 +4266,6 @@
     "편집기": [
      "aiAltChar",
      "aiNewPickupChar",
-     "conMakeVariant",
      "fwRead",
      "readCharForm",
      "regenApply"
@@ -4307,6 +4273,7 @@
     "실행기": [
      "aiAltChar",
      "aiNewPickupChar",
+     "conMakeVariant",
      "fix"
     ],
     "생성기": [
@@ -5055,7 +5022,6 @@
     ],
     "편집기": [
      "addNewChars",
-     "addPickupFor",
      "handleNavigationAndToolsAction",
      "readCharForm"
     ]
@@ -5372,12 +5338,12 @@
    "path": "[].naiPrompt",
    "writers": {
     "편집기": [
-     "conMakeVariant",
      "readCharForm",
      "regenApply"
     ],
     "실행기": [
      "cleanChar",
+     "conMakeVariant",
      "fix"
     ],
     "생성기": [
@@ -5460,11 +5426,11 @@
    "path": "[].naiStyle",
    "writers": {
     "실행기": [
-     "aiAltChar"
-    ],
-    "편집기": [
      "aiAltChar",
      "conMakeVariant"
+    ],
+    "편집기": [
+     "aiAltChar"
     ]
    },
    "readers": [
@@ -5511,7 +5477,6 @@
     "편집기": [
      "aiAltChar",
      "aiNewPickupChar",
-     "conMakeVariant",
      "drHarmony",
      "readCharForm",
      "regenApply"
@@ -5521,7 +5486,8 @@
     ],
     "실행기": [
      "aiAltChar",
-     "aiNewPickupChar"
+     "aiNewPickupChar",
+     "conMakeVariant"
     ]
    },
    "readers": [
@@ -6234,13 +6200,13 @@
      "addNewChars",
      "aiAltChar",
      "aiNewPickupChar",
+     "conMakeVariant",
      "fix"
     ],
     "편집기": [
      "addNewChars",
      "aiAltChar",
      "aiNewPickupChar",
-     "conMakeVariant",
      "readCharForm"
     ]
    },
@@ -7374,12 +7340,12 @@
    "path": "[].voiceId",
    "writers": {
     "실행기": [
-     "aiAltChar"
+     "aiAltChar",
+     "conMakeVariant"
     ],
     "편집기": [
      "aiAltChar",
      "applySharedArchive",
-     "conMakeVariant",
      "handleSettingsAndAudioAction",
      "pubContent",
      "shareDefinition"
@@ -7723,10 +7689,6 @@
    "path": "[].active",
    "writers": {
     "실행기": [
-     "liveTick",
-     "seasonStart"
-    ],
-    "편집기": [
      "liveTick",
      "seasonStart"
     ]
@@ -8689,7 +8651,7 @@
    "file": "lib.json",
    "path": "[].id",
    "writers": {
-    "편집기": [
+    "실행기": [
      "conMakeVariant"
     ]
    },
@@ -9046,8 +9008,10 @@
    "path": "[].naiPrompt",
    "writers": {
     "편집기": [
-     "conMakeVariant",
      "regenParseCharacter"
+    ],
+    "실행기": [
+     "conMakeVariant"
     ]
    },
    "readers": [
@@ -9065,11 +9029,11 @@
    "path": "[].name",
    "writers": {
     "편집기": [
-     "conMakeVariant",
      "handleNavigationAndToolsAction",
      "regenParseCharacter"
     ],
     "실행기": [
+     "conMakeVariant",
      "fix"
     ]
    },
@@ -9314,7 +9278,7 @@
    "file": "lib.json",
    "path": "[].rarity",
    "writers": {
-    "편집기": [
+    "실행기": [
      "conMakeVariant"
     ]
    },
@@ -9827,8 +9791,10 @@
    "file": "meta.json",
    "path": "artTags",
    "writers": {
+    "실행기": [
+     "bpRead"
+    ],
     "편집기": [
-     "bpRead",
      "handleSetupAction",
      "handleStoryAndAuthoringAction"
     ],
@@ -10127,6 +10093,9 @@
    "file": "meta.json",
    "path": "construct",
    "writers": {
+    "실행기": [
+     "conMeta"
+    ],
     "편집기": [
      "conMeta"
     ],
@@ -10335,6 +10304,9 @@
    "file": "meta.json",
    "path": "expedition",
    "writers": {
+    "실행기": [
+     "exMeta"
+    ],
     "편집기": [
      "exMeta"
     ],
@@ -11442,9 +11414,12 @@
    "file": "meta.json",
    "path": "variants",
    "writers": {
-    "편집기": [
+    "실행기": [
      "VARIANTS",
      "conSave"
+    ],
+    "편집기": [
+     "VARIANTS"
     ],
     "생성기": [
      "ngWorldExtras"
@@ -12131,7 +12106,8 @@
    "path": "avatar",
    "writers": {
     "실행기": [
-     "avatarObj"
+     "avatarObj",
+     "playerDraw"
     ],
     "생성기": [
      "artReuse",
@@ -12142,7 +12118,7 @@
    "readers": [
     [
      "src/main/0160-free-chat.js",
-     3
+     4
     ],
     [
      "src/main/0015-prompt-studio/",
@@ -12150,6 +12126,10 @@
     ],
     [
      "src/main/0020-ai-connect.js",
+     1
+    ],
+    [
+     "src/main/0510-actions/",
      1
     ]
    ],
@@ -12405,7 +12385,9 @@
    "path": "cbuild",
    "writers": {
     "실행기": [
-     "CBUILD"
+     "CBUILD",
+     "conBuild",
+     "conSave"
     ],
     "생성기": [
      "conStartNew"
@@ -12414,7 +12396,7 @@
    "readers": [
     [
      "src/main/0505-construct.js",
-     1
+     6
     ]
    ],
    "audits": [],
@@ -12496,7 +12478,11 @@
    "path": "cres",
    "writers": {
     "실행기": [
-     "CRES"
+     "CRES",
+     "conBuild",
+     "conBuy",
+     "conSave",
+     "giveReward"
     ],
     "생성기": [
      "conStartNew"
@@ -12505,6 +12491,10 @@
    "readers": [
     [
      "src/main/0505-construct.js",
+     4
+    ],
+    [
+     "src/main/0090-growth.js",
      1
     ]
    ],
@@ -12656,7 +12646,8 @@
    "path": "cxSeen",
    "writers": {
     "실행기": [
-     "cxSeenSet"
+     "cxSeenSet",
+     "openCx"
     ],
     "기타": [
      "cxNew"
@@ -12665,7 +12656,11 @@
    "readers": [
     [
      "src/main/0300-codex.js",
-     2
+     5
+    ],
+    [
+     "src/main/0510-actions/",
+     1
     ]
    ],
    "audits": [],
@@ -12691,21 +12686,46 @@
    "path": "dboard",
    "writers": {
     "실행기": [
-     "DBOARD"
+     "DBOARD",
+     "dispClaim",
+     "handleStoryAndAuthoringAction"
     ]
    },
    "readers": [
     [
      "src/main/0274-dispatch.js",
-     1
+     4
     ],
     [
      "src/main/0275-expedition.js",
      1
+    ],
+    [
+     "src/main/0510-actions/",
+     1
     ]
    ],
    "audits": [],
-   "prompts": [],
+   "prompts": [
+    "CTX_ALT_CANON",
+    "CTX_ALT_SIDE",
+    "CTX_BIBLE",
+    "CTX_NPCS",
+    "CTX_PLAYER_PLOT",
+    "CTX_SOURCE",
+    "EPISODE",
+    "EPISODE_AFTER",
+    "EPISODE_SECRET",
+    "REL_CTX",
+    "REL_NONE",
+    "REL_STRANGER",
+    "SM_MEMO",
+    "STAGE_REWRITE",
+    "STAGE_REWRITE_BATTLE",
+    "STAGE_REWRITE_STORY",
+    "THREAD_WRITE",
+    "WORLD_QUICK"
+   ],
    "games": 0
   },
   "prog.json › dgBg": {
@@ -12757,17 +12777,42 @@
    "path": "dm",
    "writers": {
     "실행기": [
-     "dm"
+     "bump",
+     "dm",
+     "handleNavigationAndToolsAction"
     ]
    },
    "readers": [
     [
      "src/main/0090-growth.js",
+     3
+    ],
+    [
+     "src/main/0180-ui-scroll.js",
+     2
+    ],
+    [
+     "src/main/0510-actions/",
      1
     ]
    ],
    "audits": [],
-   "prompts": [],
+   "prompts": [
+    "BGM_PROMPT",
+    "CG_ART",
+    "CTX_ALT_CANON",
+    "CTX_ALT_SIDE",
+    "CTX_BIBLE",
+    "CTX_NPCS",
+    "CTX_PLAYER_PLOT",
+    "CTX_SOURCE",
+    "ENEMY_ART",
+    "LIB_ITEM_ART",
+    "LIB_ITEM_BG",
+    "LIB_ITEM_PROP",
+    "OPENING_REWRITE",
+    "OUTFIT_ART"
+   ],
    "games": 2
   },
   "prog.json › exped": {
@@ -12775,13 +12820,19 @@
    "path": "exped",
    "writers": {
     "실행기": [
-     "EXS"
+     "EXS",
+     "exClaim",
+     "exLibSettle",
+     "exOffers",
+     "exRest",
+     "exSetCond",
+     "exStart"
     ]
    },
    "readers": [
     [
      "src/main/0275-expedition.js",
-     3
+     16
     ],
     [
      "src/main/0090-growth.js",
@@ -12864,17 +12915,31 @@
    "path": "fchat",
    "writers": {
     "실행기": [
-     "FC"
+     "FC",
+     "fcOf",
+     "handleMessengerAction"
     ]
    },
    "readers": [
     [
+     "src/main/0100-messenger.js",
+     3
+    ],
+    [
      "src/main/0160-free-chat.js",
-     1
+     2
     ]
    ],
    "audits": [],
-   "prompts": [],
+   "prompts": [
+    "CTX_ALT_CANON",
+    "CTX_ALT_SIDE",
+    "CTX_BIBLE",
+    "CTX_NPCS",
+    "CTX_PLAYER_PLOT",
+    "CTX_SOURCE",
+    "THREAD_REPLY"
+   ],
    "games": 0
   },
   "prog.json › fcPhoto": {
@@ -13165,17 +13230,35 @@
    "path": "gifts",
    "writers": {
     "실행기": [
-     "GI"
+     "GI",
+     "addGifts",
+     "handleCharactersAction"
     ]
    },
    "readers": [
     [
      "src/main/0130-gift.js",
+     3
+    ],
+    [
+     "src/main/0510-actions/",
      1
     ]
    ],
    "audits": [],
-   "prompts": [],
+   "prompts": [
+    "CHAR_LINES",
+    "CHAR_LINES_MORE",
+    "CTX_ALT_CANON",
+    "CTX_ALT_SIDE",
+    "CTX_BIBLE",
+    "CTX_NPCS",
+    "CTX_PLAYER_PLOT",
+    "CTX_SOURCE",
+    "ENEMY_ART_FILL",
+    "ENEMY_ART_REDO",
+    "STANDING_ART"
+   ],
    "games": 0
   },
   "prog.json › giftSeen": {
@@ -13661,7 +13744,7 @@
    "readers": [
     [
      "src/main/0220-mail.js",
-     1
+     4
     ],
     [
      "src/main/0510-actions/",
@@ -14122,12 +14205,27 @@
    "path": "raid",
    "writers": {
     "실행기": [
-     "RAID"
+     "RAID",
+     "handleCombatAndFormationAction",
+     "raidBoss",
+     "raidEnd"
     ]
    },
    "readers": [
     [
      "src/main/0110-challenge-raid.js",
+     4
+    ],
+    [
+     "src/main/0120-abyss.js",
+     1
+    ],
+    [
+     "src/main/0180-ui-scroll.js",
+     1
+    ],
+    [
+     "src/main/0510-actions/",
      1
     ]
    ],
@@ -14140,13 +14238,27 @@
    "path": "rogue",
    "writers": {
     "실행기": [
-     "RG"
+     "RG",
+     "handleCombatAndFormationAction",
+     "rgFinish",
+     "rgStart"
+    ],
+    "기타": [
+     "abyssHTML"
     ]
    },
    "readers": [
     [
      "src/main/0120-abyss.js",
-     1
+     15
+    ],
+    [
+     "src/main/0180-ui-scroll.js",
+     2
+    ],
+    [
+     "src/main/0510-actions/",
+     2
     ]
    ],
    "audits": [],
@@ -14252,12 +14364,17 @@
    "path": "sched",
    "writers": {
     "실행기": [
-     "SCHED"
+     "SCHED",
+     "schedVisit"
     ]
    },
    "readers": [
     [
      "src/main/0135-schedule.js",
+     3
+    ],
+    [
+     "src/main/0180-ui-scroll.js",
      1
     ]
    ],
@@ -14417,17 +14534,24 @@
    "path": "shop",
    "writers": {
     "실행기": [
+     "handleEconomyAction",
      "shopDay"
     ]
    },
    "readers": [
     [
      "src/main/0190-shop.js",
+     2
+    ],
+    [
+     "src/main/0510-actions/",
      1
     ]
    ],
    "audits": [],
-   "prompts": [],
+   "prompts": [
+    "SHOP_LINES"
+   ],
    "games": 2
   },
   "prog.json › shopBuy": {
@@ -14605,17 +14729,42 @@
    "path": "stam",
    "writers": {
     "실행기": [
-     "stam"
+     "handleStoryAndAuthoringAction",
+     "stam",
+     "stamUse"
     ]
    },
    "readers": [
     [
      "src/main/0090-growth.js",
+     4
+    ],
+    [
+     "src/main/0510-actions/",
      1
     ]
    ],
    "audits": [],
-   "prompts": [],
+   "prompts": [
+    "CTX_ALT_CANON",
+    "CTX_ALT_SIDE",
+    "CTX_BIBLE",
+    "CTX_NPCS",
+    "CTX_PLAYER_PLOT",
+    "CTX_SOURCE",
+    "EPISODE",
+    "EPISODE_AFTER",
+    "EPISODE_SECRET",
+    "REL_CTX",
+    "REL_NONE",
+    "REL_STRANGER",
+    "SM_MEMO",
+    "STAGE_REWRITE",
+    "STAGE_REWRITE_BATTLE",
+    "STAGE_REWRITE_STORY",
+    "THREAD_WRITE",
+    "WORLD_QUICK"
+   ],
    "games": 0
   },
   "prog.json › staminaCapVersion": {
@@ -14821,13 +14970,14 @@
    "path": "tower",
    "writers": {
     "실행기": [
-     "TOWER"
+     "TOWER",
+     "towerEnd"
     ]
    },
    "readers": [
     [
      "src/main/0125-tower.js",
-     1
+     4
     ]
    ],
    "audits": [],
@@ -14987,7 +15137,6 @@
    "path": "",
    "writers": {
     "편집기": [
-     "dailyTalks",
      "handleStoryAndAuthoringAction",
      "storyPurge"
     ],
@@ -15493,6 +15642,9 @@
    "file": "world.json",
    "path": "codexNotes",
    "writers": {
+    "실행기": [
+     "cxNotes"
+    ],
     "편집기": [
      "cxNotes"
     ]
@@ -17542,6 +17694,22 @@
    "www": 7994,
    "prompts": []
   },
+  "updStam": {
+   "name": "updStam",
+   "file": "src/main/0090-growth.js",
+   "module": "src/main/0090-growth.js",
+   "line": 26,
+   "www": 8006,
+   "prompts": []
+  },
+  "stamUse": {
+   "name": "stamUse",
+   "file": "src/main/0090-growth.js",
+   "module": "src/main/0090-growth.js",
+   "line": 27,
+   "www": 8007,
+   "prompts": []
+  },
   "openStam": {
    "name": "openStam",
    "file": "src/main/0090-growth.js",
@@ -17564,6 +17732,14 @@
    "module": "src/main/0090-growth.js",
    "line": 35,
    "www": 8015,
+   "prompts": []
+  },
+  "bump": {
+   "name": "bump",
+   "file": "src/main/0090-growth.js",
+   "module": "src/main/0090-growth.js",
+   "line": 36,
+   "www": 8016,
    "prompts": []
   },
   "passLv": {
@@ -17766,6 +17942,22 @@
    "www": 8140,
    "prompts": []
   },
+  "roomItems": {
+   "name": "roomItems",
+   "file": "src/main/0100-messenger.js",
+   "module": "src/main/0100-messenger.js",
+   "line": 44,
+   "www": 8141,
+   "prompts": []
+  },
+  "roomDel": {
+   "name": "roomDel",
+   "file": "src/main/0100-messenger.js",
+   "module": "src/main/0100-messenger.js",
+   "line": 49,
+   "www": 8146,
+   "prompts": []
+  },
   "phNewList": {
    "name": "phNewList",
    "file": "src/main/0100-messenger.js",
@@ -17828,6 +18020,22 @@
    "module": "src/main/0110-challenge-raid.js",
    "line": 7,
    "www": 8214,
+   "prompts": []
+  },
+  "raidTriesLeft": {
+   "name": "raidTriesLeft",
+   "file": "src/main/0110-challenge-raid.js",
+   "module": "src/main/0110-challenge-raid.js",
+   "line": 12,
+   "www": 8219,
+   "prompts": []
+  },
+  "raidEnd": {
+   "name": "raidEnd",
+   "file": "src/main/0110-challenge-raid.js",
+   "module": "src/main/0110-challenge-raid.js",
+   "line": 13,
+   "www": 8220,
    "prompts": []
   },
   "pixSprite": {
@@ -17934,6 +18142,14 @@
    "www": 8515,
    "prompts": []
   },
+  "dgMove": {
+   "name": "dgMove",
+   "file": "src/main/0120-abyss.js",
+   "module": "src/main/0120-abyss.js",
+   "line": 299,
+   "www": 8525,
+   "prompts": []
+  },
   "rgRunHTML2": {
    "name": "rgRunHTML2",
    "file": "src/main/0120-abyss.js",
@@ -17966,6 +18182,14 @@
    "www": 8575,
    "prompts": []
   },
+  "abyssHTML": {
+   "name": "abyssHTML",
+   "file": "src/main/0120-abyss.js",
+   "module": "src/main/0120-abyss.js",
+   "line": 370,
+   "www": 8596,
+   "prompts": []
+  },
   "challengeHTML": {
    "name": "challengeHTML",
    "file": "src/main/0120-abyss.js",
@@ -17982,12 +18206,68 @@
    "www": 8633,
    "prompts": []
   },
+  "rgCount": {
+   "name": "rgCount",
+   "file": "src/main/0120-abyss.js",
+   "module": "src/main/0120-abyss.js",
+   "line": 410,
+   "www": 8636,
+   "prompts": []
+  },
   "rgEnemies": {
    "name": "rgEnemies",
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 420,
    "www": 8646,
+   "prompts": []
+  },
+  "rgStart": {
+   "name": "rgStart",
+   "file": "src/main/0120-abyss.js",
+   "module": "src/main/0120-abyss.js",
+   "line": 428,
+   "www": 8654,
+   "prompts": []
+  },
+  "rgBattle": {
+   "name": "rgBattle",
+   "file": "src/main/0120-abyss.js",
+   "module": "src/main/0120-abyss.js",
+   "line": 429,
+   "www": 8655,
+   "prompts": []
+  },
+  "rogueEnd": {
+   "name": "rogueEnd",
+   "file": "src/main/0120-abyss.js",
+   "module": "src/main/0120-abyss.js",
+   "line": 433,
+   "www": 8659,
+   "prompts": []
+  },
+  "rgReward": {
+   "name": "rgReward",
+   "file": "src/main/0120-abyss.js",
+   "module": "src/main/0120-abyss.js",
+   "line": 442,
+   "www": 8668,
+   "prompts": []
+  },
+  "rgFinish": {
+   "name": "rgFinish",
+   "file": "src/main/0120-abyss.js",
+   "module": "src/main/0120-abyss.js",
+   "line": 443,
+   "www": 8669,
+   "prompts": []
+  },
+  "rgNode": {
+   "name": "rgNode",
+   "file": "src/main/0120-abyss.js",
+   "module": "src/main/0120-abyss.js",
+   "line": 445,
+   "www": 8671,
    "prompts": []
   },
   "TOWER": {
@@ -18014,6 +18294,14 @@
    "www": 8699,
    "prompts": []
   },
+  "towerEnd": {
+   "name": "towerEnd",
+   "file": "src/main/0125-tower.js",
+   "module": "src/main/0125-tower.js",
+   "line": 22,
+   "www": 8702,
+   "prompts": []
+  },
   "towerHTML": {
    "name": "towerHTML",
    "file": "src/main/0125-tower.js",
@@ -18028,6 +18316,14 @@
    "module": "src/main/0130-gift.js",
    "line": 4,
    "www": 8714,
+   "prompts": []
+  },
+  "addGifts": {
+   "name": "addGifts",
+   "file": "src/main/0130-gift.js",
+   "module": "src/main/0130-gift.js",
+   "line": 5,
+   "www": 8715,
    "prompts": []
   },
   "giftLikes": {
@@ -18125,6 +18421,14 @@
    "www": 8780,
    "prompts": []
   },
+  "schedHTML": {
+   "name": "schedHTML",
+   "file": "src/main/0135-schedule.js",
+   "module": "src/main/0135-schedule.js",
+   "line": 27,
+   "www": 8782,
+   "prompts": []
+  },
   "openNewPickup": {
    "name": "openNewPickup",
    "file": "src/main/0140-pickup-new.js",
@@ -18219,6 +18523,14 @@
    "module": "src/main/0160-free-chat.js",
    "line": 32,
    "www": 8890,
+   "prompts": []
+  },
+  "fcOf": {
+   "name": "fcOf",
+   "file": "src/main/0160-free-chat.js",
+   "module": "src/main/0160-free-chat.js",
+   "line": 33,
+   "www": 8891,
    "prompts": []
   },
   "fcSend": {
@@ -18866,12 +19178,28 @@
    "www": 9822,
    "prompts": []
   },
+  "mailCount": {
+   "name": "mailCount",
+   "file": "src/main/0220-mail.js",
+   "module": "src/main/0220-mail.js",
+   "line": 10,
+   "www": 9827,
+   "prompts": []
+  },
   "mailTick": {
    "name": "mailTick",
    "file": "src/main/0220-mail.js",
    "module": "src/main/0220-mail.js",
    "line": 11,
    "www": 9828,
+   "prompts": []
+  },
+  "openMail": {
+   "name": "openMail",
+   "file": "src/main/0220-mail.js",
+   "module": "src/main/0220-mail.js",
+   "line": 19,
+   "www": 9836,
    "prompts": []
   },
   "trigDesc": {
@@ -19683,6 +20011,14 @@
    "www": 10986,
    "prompts": []
   },
+  "dispList": {
+   "name": "dispList",
+   "file": "src/main/0274-dispatch.js",
+   "module": "src/main/0274-dispatch.js",
+   "line": 30,
+   "www": 10992,
+   "prompts": []
+  },
   "dispClaim": {
    "name": "dispClaim",
    "file": "src/main/0274-dispatch.js",
@@ -19723,12 +20059,60 @@
    "www": 11010,
    "prompts": []
   },
+  "exBizOf": {
+   "name": "exBizOf",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 9,
+   "www": 11011,
+   "prompts": []
+  },
+  "exCond": {
+   "name": "exCond",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 10,
+   "www": 11012,
+   "prompts": []
+  },
+  "exSetCond": {
+   "name": "exSetCond",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 11,
+   "www": 11013,
+   "prompts": []
+  },
+  "exJobOf": {
+   "name": "exJobOf",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 12,
+   "www": 11014,
+   "prompts": []
+  },
+  "exResting": {
+   "name": "exResting",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 13,
+   "www": 11015,
+   "prompts": []
+  },
   "exBusyIds": {
    "name": "exBusyIds",
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 15,
    "www": 11017,
+   "prompts": []
+  },
+  "exOffers": {
+   "name": "exOffers",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 20,
+   "www": 11022,
    "prompts": []
   },
   "exStart": {
@@ -19739,12 +20123,60 @@
    "www": 11023,
    "prompts": []
   },
+  "exRest": {
+   "name": "exRest",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 25,
+   "www": 11027,
+   "prompts": []
+  },
   "exClaim": {
    "name": "exClaim",
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 26,
    "www": 11028,
+   "prompts": []
+  },
+  "exLibSettle": {
+   "name": "exLibSettle",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 33,
+   "www": 11035,
+   "prompts": []
+  },
+  "exBizState": {
+   "name": "exBizState",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 35,
+   "www": 11037,
+   "prompts": []
+  },
+  "exBizSettle": {
+   "name": "exBizSettle",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 36,
+   "www": 11038,
+   "prompts": []
+  },
+  "exAssign": {
+   "name": "exAssign",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 38,
+   "www": 11040,
+   "prompts": []
+  },
+  "exStatus": {
+   "name": "exStatus",
+   "file": "src/main/0275-expedition.js",
+   "module": "src/main/0275-expedition.js",
+   "line": 42,
+   "www": 11044,
    "prompts": []
   },
   "exCharRow": {
@@ -20043,12 +20475,28 @@
    "www": 11339,
    "prompts": []
   },
+  "cxCard": {
+   "name": "cxCard",
+   "file": "src/main/0300-codex.js",
+   "module": "src/main/0300-codex.js",
+   "line": 35,
+   "www": 11340,
+   "prompts": []
+  },
   "codexHTML": {
    "name": "codexHTML",
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 39,
    "www": 11344,
+   "prompts": []
+  },
+  "openCx": {
+   "name": "openCx",
+   "file": "src/main/0300-codex.js",
+   "module": "src/main/0300-codex.js",
+   "line": 49,
+   "www": 11354,
    "prompts": []
   },
   "cxDeepen": {
@@ -21350,6 +21798,14 @@
    "module": "src/main/0505-construct.js",
    "line": 29,
    "www": 13312,
+   "prompts": []
+  },
+  "conReadInput": {
+   "name": "conReadInput",
+   "file": "src/main/0505-construct.js",
+   "module": "src/main/0505-construct.js",
+   "line": 44,
+   "www": 13327,
    "prompts": []
   },
   "conBuild": {
@@ -22856,16 +23312,17 @@
    ],
    "fns": 37,
    "roles": {
-    "실행기": 7
+    "실행기": 10
    },
    "writes": [
+    "prog.json › cres",
     "prog.json › dm",
     "prog.json › gems",
     "prog.json › gold",
     "prog.json › stam",
     "prog.json › staminaCapVersion"
    ],
-   "reads": 40,
+   "reads": 41,
    "neighbors": [
     [
      "src/main/0060-util.js",
@@ -22914,7 +23371,7 @@
    "fns": 29,
    "roles": {},
    "writes": [],
-   "reads": 13,
+   "reads": 14,
    "neighbors": [
     [
      "src/main/0060-util.js",
@@ -22962,7 +23419,7 @@
    ],
    "fns": 6,
    "roles": {
-    "실행기": 1
+    "실행기": 3
    },
    "writes": [
     "prog.json › raid"
@@ -23016,13 +23473,14 @@
    "fns": 70,
    "roles": {
     "편집기": 1,
-    "실행기": 1
+    "실행기": 3,
+    "기타": 1
    },
    "writes": [
     "chars.json › [].cards",
     "prog.json › rogue"
    ],
-   "reads": 26,
+   "reads": 27,
    "neighbors": [
     [
      "src/main/0060-util.js",
@@ -23070,7 +23528,7 @@
    ],
    "fns": 9,
    "roles": {
-    "실행기": 1
+    "실행기": 2
    },
    "writes": [
     "prog.json › tower"
@@ -23123,7 +23581,7 @@
    ],
    "fns": 9,
    "roles": {
-    "실행기": 2
+    "실행기": 3
    },
    "writes": [
     "prog.json › curBanner",
@@ -23178,7 +23636,7 @@
    "fns": 10,
    "roles": {
     "생성기": 2,
-    "실행기": 3
+    "실행기": 4
    },
    "writes": [
     "meta.json › spots",
@@ -23261,8 +23719,7 @@
    ],
    "fns": 9,
    "roles": {
-    "편집기": 16,
-    "실행기": 18
+    "실행기": 19
    },
    "writes": [
     "banners.json",
@@ -23331,7 +23788,7 @@
    ],
    "fns": 16,
    "roles": {
-    "실행기": 9
+    "실행기": 11
    },
    "writes": [
     "prog.json › avatar",
@@ -23416,7 +23873,7 @@
     "chars.json › [].scg",
     "prog.json › farmV"
    ],
-   "reads": 84,
+   "reads": 88,
    "neighbors": [
     [
      "src/main/0060-util.js",
@@ -24210,7 +24667,7 @@
    ],
    "fns": 6,
    "roles": {
-    "실행기": 1
+    "실행기": 2
    },
    "writes": [
     "prog.json › dboard"
@@ -24263,8 +24720,8 @@
    ],
    "fns": 29,
    "roles": {
-    "편집기": 1,
-    "실행기": 2
+    "실행기": 9,
+    "편집기": 1
    },
    "writes": [
     "meta.json › expedition",
@@ -24319,8 +24776,7 @@
    ],
    "fns": 7,
    "roles": {
-    "실행기": 5,
-    "편집기": 5
+    "실행기": 5
    },
    "writes": [
     "banners.json › [].bg",
@@ -24378,7 +24834,7 @@
    "fns": 28,
    "roles": {
     "실행기": 23,
-    "편집기": 20,
+    "편집기": 13,
     "기타": 1
    },
    "writes": [
@@ -24451,7 +24907,7 @@
    "fns": 21,
    "roles": {
     "기타": 2,
-    "실행기": 2,
+    "실행기": 4,
     "편집기": 2
    },
    "writes": [
@@ -24712,8 +25168,7 @@
    ],
    "fns": 8,
    "roles": {
-    "편집기": 1,
-    "실행기": 2
+    "실행기": 3
    },
    "writes": [
     "meta.json › artTags",
@@ -25540,8 +25995,7 @@
    ],
    "fns": 22,
    "roles": {
-    "편집기": 1,
-    "실행기": 11
+    "실행기": 12
    },
    "writes": [
     "banners.json › [].newAt",
@@ -25603,9 +26057,9 @@
    ],
    "fns": 31,
    "roles": {
-    "편집기": 17,
-    "생성기": 3,
-    "실행기": 2
+    "실행기": 24,
+    "편집기": 2,
+    "생성기": 3
    },
    "writes": [
     "chars.json › [].age",
@@ -25760,7 +26214,7 @@
    "fns": 14,
    "roles": {
     "편집기": 70,
-    "실행기": 21
+    "실행기": 29
    },
    "writes": [
     "banners.json",
@@ -25817,7 +26271,11 @@
     "prog.json › csFull",
     "prog.json › curBanner",
     "prog.json › curEvent",
+    "prog.json › dboard",
+    "prog.json › dm",
     "prog.json › fcPhoto",
+    "prog.json › fchat",
+    "prog.json › gifts",
     "prog.json › gold",
     "prog.json › lobbyMode",
     "prog.json › mail",
@@ -25826,10 +26284,14 @@
     "prog.json › prepNever",
     "prog.json › presets",
     "prog.json › prompt",
+    "prog.json › raid",
+    "prog.json › rogue",
     "prog.json › scene",
     "prog.json › seen",
+    "prog.json › shop",
     "prog.json › skinOwn",
     "prog.json › squad",
+    "prog.json › stam",
     "prog.json › useCg",
     "rels.json",
     "threads.json",
@@ -25847,7 +26309,7 @@
     "world.json › plot",
     "world.json › summary"
    ],
-   "reads": 131,
+   "reads": 140,
    "neighbors": [
     [
      "src/main/0060-util.js",
@@ -26398,7 +26860,7 @@
    ],
    "fns": 67,
    "roles": {
-    "실행기": 20,
+    "실행기": 22,
     "편집기": 14,
     "생성기": 17
    },
@@ -26627,8 +27089,8 @@
   }
  },
  "gamesN": 2,
- "at": "2026-11-03T23:16",
- "head": "2a0c2e5",
+ "at": "2026-11-03T23:32",
+ "head": "411bea9",
  "inputs": {
   "src": {
    "src/boot/durable-storage.js": "9e1fdc434852",
@@ -26764,9 +27226,551 @@
   "games": {
    "idol-audition": "a443d928bb99",
    "sky-knights": "c782aafba942"
-  }
+  },
+  "tool": "84ffb63474b0"
  },
  "changes": [
+  {
+   "at": "2026-11-03T23:32",
+   "head": "411bea9",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-03T23:30",
+   "head": "411bea9",
+   "inputs": {
+    "forced": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-03T23:30",
+   "head": "411bea9",
+   "inputs": {
+    "forced": true
+   },
+   "fns": {
+    "added": [
+     "updStam",
+     "stamUse",
+     "bump",
+     "roomItems",
+     "roomDel",
+     "raidTriesLeft",
+     "raidEnd",
+     "dgMove",
+     "abyssHTML",
+     "rgCount",
+     "rgStart",
+     "rgBattle",
+     "rogueEnd",
+     "rgReward",
+     "rgFinish",
+     "rgNode",
+     "towerEnd",
+     "addGifts",
+     "schedHTML",
+     "fcOf",
+     "mailCount",
+     "openMail",
+     "dispList",
+     "exBizOf",
+     "exCond",
+     "exSetCond",
+     "exJobOf",
+     "exResting",
+     "exOffers",
+     "exRest",
+     "exLibSettle",
+     "exBizState",
+     "exBizSettle",
+     "exAssign",
+     "exStatus",
+     "cxCard",
+     "openCx",
+     "conReadInput"
+    ],
+    "removed": [],
+    "moved": []
+   },
+   "data": [
+    {
+     "path": "banners.json",
+     "added": [
+      "실행기:puStoryBg"
+     ],
+     "removed": [
+      "편집기:aiPickupStory",
+      "편집기:puStoryBg"
+     ]
+    },
+    {
+     "path": "banners.json › [].active",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor",
+      "편집기:seasonStart"
+     ]
+    },
+    {
+     "path": "banners.json › [].alt",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor"
+     ]
+    },
+    {
+     "path": "banners.json › [].bg",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor",
+      "편집기:aiPickupStory",
+      "편집기:rotatePickups"
+     ]
+    },
+    {
+     "path": "banners.json › [].collab",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor"
+     ]
+    },
+    {
+     "path": "banners.json › [].desc",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor",
+      "편집기:aiPickupStory",
+      "편집기:rotatePickups"
+     ]
+    },
+    {
+     "path": "banners.json › [].eventId",
+     "added": [],
+     "removed": [
+      "편집기:aiPickupStory"
+     ]
+    },
+    {
+     "path": "banners.json › [].gate",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor"
+     ]
+    },
+    {
+     "path": "banners.json › [].id",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor"
+     ]
+    },
+    {
+     "path": "banners.json › [].name",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor",
+      "편집기:rotatePickups"
+     ]
+    },
+    {
+     "path": "banners.json › [].newAt",
+     "added": [
+      "실행기:gateCheck"
+     ],
+     "removed": [
+      "편집기:addPickupFor",
+      "편집기:gateCheck"
+     ]
+    },
+    {
+     "path": "banners.json › [].pickup",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor",
+      "편집기:rotatePickups"
+     ]
+    },
+    {
+     "path": "banners.json › [].pool",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor"
+     ]
+    },
+    {
+     "path": "banners.json › [].rate",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor"
+     ]
+    },
+    {
+     "path": "banners.json › [].type",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor"
+     ]
+    },
+    {
+     "path": "banners.json › [].until",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor"
+     ]
+    },
+    {
+     "path": "chapters.json › [].stages[].combatBalance",
+     "added": [
+      "실행기:module:modules/combat/050-bridge.js#v2PrepareStage"
+     ],
+     "removed": []
+    },
+    {
+     "path": "chapters.json › [].stages[].enemies",
+     "added": [
+      "실행기:module:modules/combat/050-bridge.js#v2PrepareStage"
+     ],
+     "removed": []
+    },
+    {
+     "path": "chars.json › [].age",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "chars.json › [].alt",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "chars.json › [].altCanon",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "chars.json › [].cvar",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "chars.json › [].faction",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "chars.json › [].limited",
+     "added": [],
+     "removed": [
+      "편집기:addPickupFor"
+     ]
+    },
+    {
+     "path": "chars.json › [].naiPrompt",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "chars.json › [].naiStyle",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "chars.json › [].name",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "chars.json › [].rarity",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "chars.json › [].voiceId",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "events.json › [].active",
+     "added": [],
+     "removed": [
+      "편집기:liveTick",
+      "편집기:seasonStart"
+     ]
+    },
+    {
+     "path": "lib.json › [].id",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "lib.json › [].naiPrompt",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "lib.json › [].name",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "lib.json › [].rarity",
+     "added": [
+      "실행기:conMakeVariant"
+     ],
+     "removed": [
+      "편집기:conMakeVariant"
+     ]
+    },
+    {
+     "path": "meta.json › artTags",
+     "added": [
+      "실행기:bpRead"
+     ],
+     "removed": [
+      "편집기:bpRead"
+     ]
+    },
+    {
+     "path": "meta.json › construct",
+     "added": [
+      "실행기:conMeta"
+     ],
+     "removed": []
+    },
+    {
+     "path": "meta.json › expedition",
+     "added": [
+      "실행기:exMeta"
+     ],
+     "removed": []
+    },
+    {
+     "path": "meta.json › variants",
+     "added": [
+      "실행기:VARIANTS",
+      "실행기:conSave"
+     ],
+     "removed": [
+      "편집기:conSave"
+     ]
+    },
+    {
+     "path": "prog.json › avatar",
+     "added": [
+      "실행기:playerDraw"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › cbuild",
+     "added": [
+      "실행기:conBuild",
+      "실행기:conSave"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › cres",
+     "added": [
+      "실행기:conBuild",
+      "실행기:conBuy",
+      "실행기:conSave",
+      "실행기:giveReward"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › cxSeen",
+     "added": [
+      "실행기:openCx"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › dboard",
+     "added": [
+      "실행기:dispClaim",
+      "실행기:handleStoryAndAuthoringAction"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › dm",
+     "added": [
+      "실행기:bump",
+      "실행기:handleNavigationAndToolsAction"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › exped",
+     "added": [
+      "실행기:exClaim",
+      "실행기:exLibSettle",
+      "실행기:exOffers",
+      "실행기:exRest",
+      "실행기:exSetCond",
+      "실행기:exStart"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › fchat",
+     "added": [
+      "실행기:fcOf",
+      "실행기:handleMessengerAction"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › gifts",
+     "added": [
+      "실행기:addGifts",
+      "실행기:handleCharactersAction"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › raid",
+     "added": [
+      "실행기:handleCombatAndFormationAction",
+      "실행기:raidBoss",
+      "실행기:raidEnd"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › rogue",
+     "added": [
+      "실행기:handleCombatAndFormationAction",
+      "실행기:rgFinish",
+      "실행기:rgStart",
+      "기타:abyssHTML"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › sched",
+     "added": [
+      "실행기:schedVisit"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › shop",
+     "added": [
+      "실행기:handleEconomyAction"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › stam",
+     "added": [
+      "실행기:handleStoryAndAuthoringAction",
+      "실행기:stamUse"
+     ],
+     "removed": []
+    },
+    {
+     "path": "prog.json › tower",
+     "added": [
+      "실행기:towerEnd"
+     ],
+     "removed": []
+    },
+    {
+     "path": "threads.json",
+     "added": [],
+     "removed": [
+      "편집기:dailyTalks"
+     ]
+    },
+    {
+     "path": "world.json › codexNotes",
+     "added": [
+      "실행기:cxNotes"
+     ],
+     "removed": []
+    }
+   ]
+  },
   {
    "at": "2026-11-03T23:16",
    "head": "2a0c2e5",

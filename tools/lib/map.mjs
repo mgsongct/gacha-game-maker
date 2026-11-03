@@ -2,8 +2,8 @@
 //   data 경로마다 만드는·고치는 함수를 역할별로, 그 함수의 src 모듈과 index.html 줄, 점검 규칙·프롬프트 조각, 읽는 모듈·연계 모듈을 이어 둠 —
 //   게임에서 무엇이 이상하면(시나리오·캐릭터 밸런스·스킬·이격 …) data 경로에서 거꾸로 index.html → 모듈로 따라감
 //   역할: 생성기 = 새 게임 생성 단계가 부르는 함수 · 실행기 = 실행 중 AI(liveTick)·불러오기(fix)·앱을 열 때(부팅·게임 열기)가 부르는 함수, 또는 사용자 조작이 진행(prog.json)을 씀(플레이)
-//         편집기 = 사용자 조작이 진행 아닌 data(콘텐츠)를 씀(편집 화면·점검·AI 추가 지시 — 플레이 중 콘텐츠를 만드는 조작, 예: 건조 바리에이션도 여기로 셈:
-//         진행을 CRES()·CBUILD() 같은 접근 함수로 써서 정적으로 플레이 조작인지 가르지 못함) · 기타 = 위 단계 시작점에서 닿지 않음(엔진 안쪽 등)
+//         플레이 조작(진행을 쓰는 사용자 함수 — P().x 또는 CRES()·CBUILD() 같은 접근 함수로 받은 객체에 씀)에서 닿는 콘텐츠 쓰기도 실행기(예: 건조 바리에이션)
+//         편집기 = 사용자 조작이 플레이 조작을 거치지 않고 진행 아닌 data(콘텐츠)를 씀(편집 화면·점검·AI 추가 지시) · 기타 = 위 단계 시작점에서 닿지 않음(엔진 안쪽 등)
 import { walk } from './source.mjs';
 import { generatorVocab, constLiterals, INFRA } from './wiring.mjs';
 import { stageRoots } from './lifecycle.mjs';
@@ -97,17 +97,45 @@ function duckParams(fns, PT, fieldTypes) { let n = 0;
   return n; }
 // 단계 시작점: 생성·실행 중 AI·불러오기·사용자(액션 처리기·main 리스너 — lib/lifecycle.mjs) + 모듈 안 클릭 리스너가 부르는 함수(전투 편집기 등)도 사용자
 //   + 시작: 앱을 열 때 도는 최상위 문장(부팅·게임 열기 — setTimeout(()=>skillResume()) 등)과 load·저장소 준비 리스너가 부르는 함수 → 실행기
+// 진행 접근 함수: P()의 한 칸을 돌려줌 — return p.cres 처럼 바로, 또는 let b=p.dboard … return b 처럼 그 칸을 담은 변수로 → 칸 이름
+const PROG_BASE = /^(P\(\)|G\.prog)$/;
+export function progAccessors(fns) { const out = new Map();
+  for (const f of fns.values()) { if (!f.top) continue; const alias = new Set(), slot = new Map(), keyOf = t => { const m = /^([\w$]+|P\(\))\.(\w+)\b/.exec(String(t || '')); return m && (PROG_BASE.test(m[1]) || alias.has(m[1])) ? m[2] : null; };
+    walk(f.node, n => { if (n.type === 'variable_declarator' && PROG_BASE.test(n.childForFieldName('value')?.text || '')) alias.add(n.childForFieldName('name')?.text); });
+    walk(f.node, n => { const decl = n.type === 'variable_declarator', asg = n.type === 'assignment_expression' && n.childForFieldName('left')?.type === 'identifier'; if (!decl && !asg) return; const nm = n.childForFieldName(decl ? 'name' : 'left')?.text, k = keyOf(n.childForFieldName(decl ? 'value' : 'right')?.text); if (nm && k) slot.set(nm, k); });
+    walk(f.node, n => { if (n.type !== 'return_statement') return; const r = n.namedChildren[0]; const k = r?.type === 'member_expression' ? keyOf(r.text) : r?.type === 'identifier' ? slot.get(r.text) : null; if (k) out.set(f.name, k); }); }
+  return out; }
+// 쓰기인가(멤버·첨자 사슬): x.a = … · x[k] -= … · x.a.push(…) · x.n++ · delete x.a
+function writtenAt(n) { let m = n;
+  for (let up = m.parent; up && (up.type === 'member_expression' || up.type === 'subscript_expression') && same(up.childForFieldName('object'), m); up = up.parent) { if (up.type === 'member_expression' && up.parent?.type === 'call_expression' && same(up.parent.childForFieldName('function'), up) && MUT.test(up.childForFieldName('property')?.text || '')) return true; m = up; }
+  const par = m.parent; if (!par || same(m, n)) return false; /* 받은 객체 자체를 바꿔 끼우는 것(r=…)은 진행 쓰기가 아님 */
+  if ((par.type === 'assignment_expression' || par.type === 'augmented_assignment_expression') && same(par.childForFieldName('left'), m)) return true;
+  return par.type === 'update_expression' || (par.type === 'unary_expression' && /^delete\b/.test(par.text)); }
+// 함수마다 진행 접근 함수(CRES·CBUILD 등)로 받은 객체에 쓰는 칸과 읽는 칸 — 받아 둔 변수의 칸을 바꾸거나 늘리거나, 접근 함수 결과에 바로 쓰는 것 → 함수 키별 쓰기·읽기 칸 모음
+export function accessorUse(fns, acc) { const out = new Map();
+  for (const f of fns.values()) { if (!f.top || acc.has(f.name)) continue; const bound = new Map(), rec = { w: new Set(), r: new Set() };
+    walk(f.node, n => { if (n.type !== 'variable_declarator') return; const v = n.childForFieldName('value'), cal = v?.type === 'call_expression' ? v.childForFieldName('function')?.text : null; if (acc.has(cal)) bound.set(n.childForFieldName('name')?.text, acc.get(cal)); });
+    walk(f.node, n => { const k = n.type === 'identifier' ? bound.get(n.text) : n.type === 'call_expression' && n.childForFieldName('arguments')?.namedChildren.length === 0 ? acc.get(n.childForFieldName('function')?.text) : null; if (!k) return;
+      if (n.type === 'identifier' && (n.parent?.type === 'variable_declarator' && same(n.parent.childForFieldName('name'), n))) return; rec[writtenAt(n) ? 'w' : 'r'].add(k); });
+    if (rec.w.size || rec.r.size) out.set(f.key, rec); }
+  return out; }
 const LOAD_EV = /^['"](load|DOMContentLoaded|ggm-storage-ok|pageshow)['"]$/;
 function calleesIn(node, nameMap, out) { walk(node, m => { if (m.type === 'call_expression' && m.childForFieldName('function')?.type === 'identifier') { const k = nameMap.get(m.childForFieldName('function').text); if (k) out.add(k); } }); }
 const declOnly = st => FNT.has(st.type) || ((st.type === 'lexical_declaration' || st.type === 'variable_declaration') && st.namedChildren.every(d => FNT.has(d.childForFieldName('value')?.type)));
-function stagesOf(units, fns, nameMap, sf) { const R = stageRoots(units, fns), user = new Set(), start = new Set();
+function stagesOf(units, fns, nameMap, sf, progW = new Set()) { const R = stageRoots(units, fns), user = new Set(), start = new Set();
   for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression' || !/addEventListener$/.test(n.childForFieldName('function')?.text || '')) return; const as = n.childForFieldName('arguments')?.namedChildren || [], cb = as.find(a => FNT.has(a.type)); if (cb) calleesIn(cb, nameMap, LOAD_EV.test(as[0]?.text || '') ? start : user); });
   for (const u of units) for (const st of u.tree.rootNode.namedChildren) { if (declOnly(st)) continue; const lis = st.type === 'expression_statement' && st.namedChildren[0]?.type === 'call_expression' && /addEventListener$/.test(st.namedChildren[0].childForFieldName('function')?.text || ''); if (!lis) calleesIn(st, nameMap, start); } /* 리스너 등록문은 위에서 갈랐음 */
   R.사용자 = [...new Set([...R.사용자, ...user])]; R.시작 = [...start];
   /* 닿는 함수: 호출 그래프 + 이름으로 부르는 모듈 함수(main → 전투 모듈 등 단위를 넘는 호출). 공용 도구(render·toast·mark …)는 건너뜀 — lib/wiring.mjs closure와 같은 깊이 */
   const calls = new Map(); for (const f of fns.values()) { if (!f.top) continue; const s = new Set(f.calls.keys()); calleesIn(f.node, nameMap, s); calls.set(f.key, s); }
   const reach = (roots, depth) => { const seen = new Map(); let q = roots.filter(r => fns.has(r)).map(r => [r, 0]); while (q.length) { const [k, d] = q.shift(); if (seen.has(k)) continue; seen.set(k, d); if (d >= depth) continue; for (const c of calls.get(k) || []) { const g = fns.get(c); if (g && g.top && !INFRA.test(g.name) && !seen.has(c)) q.push([c, d + 1]); } } return seen; };
-  return Object.fromEntries(Object.entries(R).map(([k, roots]) => [k, reach(roots, k === '불러오기' ? 2 : k === '사용자' ? 4 : k === '시작' ? 3 : 5)])); }
+  const S = Object.fromEntries(Object.entries(R).map(([k, roots]) => [k, reach(roots, k === '불러오기' ? 2 : k === '사용자' ? 4 : k === '시작' ? 3 : 5)]));
+  /* 플레이 조작: 사용자 단계에서 진행(prog — 직접 P().x든 CRES()·CBUILD() 같은 접근 함수로 받은 객체든)을 쓰는 함수, 모든 기능으로 넘기는 액션 분배기는 뺌.
+     실행기(플레이) = 플레이 조작에서 두 단계 안(예: 건조 conBuild → 바리에이션 conMakeVariant) · 편집기 = 사용자 시작점에서 플레이 조작을 거치지 않고 닿는 것 */
+  const play = [...progW].filter(k => S.사용자.has(k) && !/^handle\w+Action$/.test(fns.get(k)?.name || '')), playSet = new Set(play);
+  S.플레이 = reach(play, 2); const ed = new Map(); let q = R.사용자.filter(r => fns.has(r) && !playSet.has(r)).map(r => [r, 0]);
+  while (q.length) { const [k, d] = q.shift(); if (ed.has(k)) continue; ed.set(k, d); if (d >= 4) continue; for (const c of calls.get(k) || []) { const g = fns.get(c); if (g && g.top && !INFRA.test(g.name) && !ed.has(c) && !playSet.has(c)) q.push([c, d + 1]); } }
+  S.편집 = ed; return S; }
 // 상태 키(G.chars · G.meta.x · G.world.x · P().x) → [data 파일, 경로]. 종류(DATA_TYPES — 앱 0525가 나누는 파일)에 없으면 game.json
 export function keyPath(key, types) { const a = String(key).split('.');
   if (a[0] === 'P()') return ['prog.json', a.slice(1).join('.')]; if (a[0] !== 'G' || a.length < 2) return null;
@@ -117,20 +145,22 @@ export const entPath = (t, f) => [`${ENT[t][0]}.json`, `${ENT[t][1]}.${f}`];
 export const pathKey = ([file, p]) => p ? `${file} › ${p}` : file;
 function pfIds(node) { const s = new Set(); walk(node, n => { if (n.type !== 'call_expression' || !/^(pf|promptFrag)$/.test(n.childForFieldName('function')?.text || '')) return; const a = n.childForFieldName('arguments')?.namedChildren[0]; if (a?.type === 'string') s.add(a.text.slice(1, -1)); }); return s; }
 // 역할: (함수, 쓰는 파일) → 생성기·실행기·편집기·기타
-export function rolesOf(S, k, file) { const r = new Set(), gen = S.생성.has(k); if (gen) r.add('생성기'); if (S['실행 중 AI'].has(k) || S.불러오기.has(k) || S.시작?.has(k)) r.add('실행기'); if (S.사용자.has(k) && !gen) r.add(file === 'prog.json' ? '실행기' : '편집기'); if (!r.size) r.add('기타'); return [...r]; }
+export function rolesOf(S, k, file) { const r = new Set(), gen = S.생성.has(k); if (gen) r.add('생성기'); if (S['실행 중 AI'].has(k) || S.불러오기.has(k) || S.시작?.has(k)) r.add('실행기'); if (S.사용자.has(k) && !gen) { const play = !!S.플레이?.has(k); if (file === 'prog.json' || play) r.add('실행기'); if (file !== 'prog.json' && (!play || S.편집?.has(k))) r.add('편집기'); } /* 콘텐츠: 플레이 조작에서 닿으면 실행기, 플레이를 거치지 않고도 닿으면 편집기도 */ if (!r.size) r.add('기타'); return [...r]; }
 
 // 종류 추적 준비: 이름 → 함수 키, 단계(역할), 생성 함수, 매개변수 종류(호출 전파 + 구조 판정)
-function typing(units, fns, sf) { const nameMap = new Map();
+function typing(units, fns, sf) { const nameMap = new Map(), acc = progAccessors(fns), use = accessorUse(fns, acc);
   for (const f of fns.values()) if (f.top && (!nameMap.has(f.name) || f.unit === 'main')) nameMap.set(f.name, f.key);
-  const S = stagesOf(units, fns, nameMap, sf), fac = factories(fns, nameMap), PT = paramTypes(fns, nameMap, fac), fieldTypes = new Map(), ctxOf = f => bindingsOf(f.node, PT.get(f.key), fac, fac.get(f.name));
+  const progW = new Set([...sf.list.filter(x => x.key.startsWith('P().')).flatMap(x => [...x.w]), ...[...use].filter(([, u]) => u.w.size).map(([k]) => k)]);
+  const S = stagesOf(units, fns, nameMap, sf, progW), fac = factories(fns, nameMap), PT = paramTypes(fns, nameMap, fac), fieldTypes = new Map(), ctxOf = f => bindingsOf(f.node, PT.get(f.key), fac, fac.get(f.name));
   for (const f of fns.values()) if (f.top) for (const tf of fieldsOf(ctxOf(f)).keys()) { const [t, fld] = tf.split('.'); if (!fieldTypes.has(fld)) fieldTypes.set(fld, new Set()); fieldTypes.get(fld).add(t); }
   if (duckParams(fns, PT, fieldTypes)) paramTypes(fns, nameMap, fac, PT); /* 구조로 정한 매개변수 종류도 호출 따라 넘김 */
-  return { nameMap, S, ctxOf }; }
+  return { nameMap, S, ctxOf, use }; }
 // data 경로마다 쓰는 함수(역할)·읽는 함수: 상태 키 · 생성 중인 게임(ng.*) · 엔티티 필드. entFields: 필드 이름 → 종류들
 function collectData(fns, sf, T, types) { const data = new Map(), entFields = new Map(), D = kp => { const k = pathKey(kp); if (!data.has(k)) data.set(k, { file: kp[0], path: kp[1], w: new Map(), r: new Set(), audits: new Set() }); return data.get(k); };
   const W = (kp, fk) => { if (kp && fns.has(fk)) { const d = D(kp); if (!d.w.has(fk)) d.w.set(fk, rolesOf(T.S, fk, kp[0])); } }, R = (kp, fk) => { if (kp && fns.has(fk)) D(kp).r.add(fk); };
   for (const x of sf.list) { const kp = keyPath(x.key, types); x.w.forEach(w => W(kp, w)); x.r.forEach(r => R(kp, r)); }
   for (const [k, ws] of generatorVocab(fns, T.S.생성.keys(), new Set()).writes) [...ws].forEach(w => W(keyPath(k, types), w));
+  for (const [fk, u] of T.use) { u.w.forEach(k => W(['prog.json', k], fk)); u.r.forEach(k => R(['prog.json', k], fk)); } /* 진행 접근 함수로 받은 객체(CRES() …) */
   for (const f of fns.values()) { if (!f.top) continue; for (const [tf, rw] of fieldsOf(T.ctxOf(f))) { const [t, fld] = tf.split('.'), kp = entPath(t, fld); if (rw.w) W(kp, f.key); if (rw.r) R(kp, f.key); if (!entFields.has(fld)) entFields.set(fld, new Set()); entFields.get(fld).add(t); } }
   return { data, entFields }; }
 // 점검 규칙 → 그 규칙이 보는 필드·키의 경로. 여러 규칙이 거르기로만 같이 읽는 필드(예: 이격 제외 !c.alt — 규칙 6개 넘게)와 파일 전체(G.chars 등)는 빼서 잡음 없이
