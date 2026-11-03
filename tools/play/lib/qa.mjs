@@ -112,7 +112,7 @@ export async function runQA(game, input) { const { out, errors } = await withPag
       if (b && t0) { const v = await conMakeVariant(b, t0), base0 = String(v.profile || '');
         const tagOk = String(v.naiPrompt || '').includes(String(t0.prompt || '').split(',')[0].trim());
         b.profile = String(b.profile || '') + ' [QA 상속 확인]'; mark('c:' + b.id); await new Promise(r => setTimeout(r, 200));
-        const v2 = G.chars.find(x => x.id === v.id), inherited = String(v2 && v2.profile || '').includes('[QA 상속 확인]') || (typeof inheritStore === 'function' && !JSON.stringify(inheritStore(v2, new Set(G.chars.filter(x => !x.alt).map(x => x.id)))).includes('[QA 상속 확인]'));
+        const v2 = G.chars.find(x => x.id === v.id), inherited = String(v2.profile).includes('[QA 상속 확인]') && !('profile' in (v2.over || {})); // 기본 캐릭터를 고친 것이 이격에 반영되고, 이격이 프로필을 따로 갖지 않음
         V.made.push({ base: b.name, tpl: t0.name, name: v.name, rarity: RL[v.rarity], tagOk, look: String(v.naiPrompt || '').slice(0, 160), inherited });
         if (!tagOk) F('중', '바리에이션', `이격 「${v.name}」 외형 태그에 템플릿 의상(${t0.prompt})이 들어가지 않음`);
         if (!inherited) F('중', '바리에이션', `기본 캐릭터 ${b.name}의 프로필 수정이 이격 「${v.name}」에 반영되지 않음(상속)`); }

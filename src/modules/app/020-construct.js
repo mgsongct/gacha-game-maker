@@ -72,10 +72,13 @@ function condMatch(cond,ch,ctx){cond=cond||{};ctx=ctx||{};const o=ctx.own||{},ha
  if(has(cond.cleared)&&!cond.cleared.every(id=>ctx.cleared&&ctx.cleared[id]))return false;
  return true;}
 /* 이미지 프롬프트: 원래 캐릭터의 외모 태그 + 기본형 의상 태그 + 상징 컬러·상징 아이템 */
-const CLOTHES=/(dress|coat|jacket|shirt|blouse|skirt|pants|shorts|uniform|bodysuit|armor|armour|suit|robe|kimono|hoodie|sweater|vest|cape|cloak|gloves|boots|shoes|heels|stockings|thighhighs|pantyhose|leotard|swimsuit|bikini|outfit|clothes|clothing|attire|costume|apron|corset|tie|necktie|scarf|hat|cap|helmet|holding )/i;
+// 의상·장비 태그(기본형 의상으로 바꿀 때 빼는 것) — 갑옷 부위·무기 태그도(무기는 상징 아이템으로 따로 들어감)
+const CLOTHES=/(dress|coat|jacket|shirt|blouse|skirt|pants|shorts|uniform|bodysuit|armor|armour|suit|robe|kimono|hoodie|sweater|vest|cape|cloak|gloves|boots|shoes|heels|stockings|thighhighs|pantyhose|leotard|swimsuit|bikini|outfit|clothes|clothing|attire|costume|apron|corset|tie|necktie|scarf|hat|cap|helmet|holding |breastplate|pauldron|gauntlet|greaves|tabard|surcoat|chainmail|bracer|vambrace|sash|belt|harness|holster|sword|rifle|pistol|gun|staff|spear|lance|bow|shield|blade|dagger|katana|axe|hammer|scythe|whip|wand)/i;
 const COMPO=/^(full body|standing|straight-on|simple background|white background|cowboy shot|upper body|portrait|looking at viewer|arms at sides)$/i;
 const tags=s=>String(s||'').split(',').map(t=>t.trim()).filter(Boolean);
-function symbolColor(ch){if(ch.symColor)return String(ch.symColor);const m=tags(ch.naiPrompt).map(t=>t.match(/^([a-z]+(?: [a-z]+)?) (hair|eyes)$/i)).find(Boolean);return m?m[1]:'';}
+// 상징 컬러: "<색> hair/eyes"의 색 — 길이·모양 단어(long crimson hair의 long, short hair의 short)는 색이 아님
+const NOT_COLOR=/^(very |)(short|long|medium|messy|straight|wavy|curly|shiny|spiky|floating|wet|braided|twin|side|low|high|half|bob|hime|drill|flipped|ahoge|swept|parted|tied|loose|big|small|narrow|half-closed|closed|wide|sharp|tareme|tsurime|glowing)( |$)/i;
+function symbolColor(ch){if(ch.symColor)return String(ch.symColor);for(const t of tags(ch.naiPrompt)){const m=t.match(/^(.+) (hair|eyes)$/i);if(!m)continue;const w=m[1].split(' ').filter(x=>!NOT_COLOR.test(x+' '));if(w.length&&w.length<=2)return w.join(' ');}return '';}
 function symbolItem(ch){if(ch.symItem)return String(ch.symItem);const w=ch.weapon||{};return tags(w.prompt).filter(t=>!/^(no humans|object focus|simple background|white background|sci-fi|fantasy)$/i.test(t)).slice(0,2).join(', ');}
 function variantPrompt(ch,tpl){
  const look=tags(ch.naiPrompt).filter(t=>!CLOTHES.test(t)&&!COMPO.test(t)),color=symbolColor(ch),item=symbolItem(ch);

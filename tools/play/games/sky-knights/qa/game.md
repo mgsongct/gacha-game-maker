@@ -1,6 +1,6 @@
 # QA·플레이 보고서 — 게일 크레스트 (game)
 
-생성: `node tools/play/qa.mjs` · 2026-11-03T09:57
+생성: `node tools/play/qa.mjs` · 2026-11-03T10:32
 
 ## 발견 (20) — 상 1 · 중 6 · 하 13
 
@@ -82,7 +82,7 @@
 - 생성 상태: 건조 설정 없음(꺼짐) · 원정 방식 (기본 combat) · 자원 이름 연료/탄약/합금/부품
 - 파견: 항로 순찰 · 상선 호위 · 부유석 탐사 · 리벳항 수리 지원 · 기상 관측 · 운해 정찰
 - (사용자가 켰을 때) 분류: 후방({"role":"sup"}), 선봉({"role":"atk"}), 수호({"role":"def"}) · 시작 자원 600 · 구매 {"gems":60,"amt":300} · 후보 4명 · 건조 불가 없음
-- 원정 1회 건조 자원: 게시판 의뢰 30개의 건조 자원: 평균 855 · 시간당 평균 150 · 자원 보상 없는 의뢰 0
+- 원정 1회 건조 자원: 게시판 의뢰 30개의 건조 자원: 평균 905 · 시간당 평균 150 · 자원 보상 없는 의뢰 0
 
 | 투입 | 열린 분류 | 희귀도(%) | 확률 상위 |
 |---|---|---|---|
@@ -103,7 +103,7 @@
 | 공연의상2 | 300/100/300/400 | 30% | {} | 브람, 넬, 루시안 | 1 |
 | 공연의상3 | 100/300/300/400 | 30% | {} | 브람, 넬, 루시안 | 1 |
 
-- 만들어 본 이격: 브람 → 「브람(수영복)」(R) · 템플릿 의상 태그 들어감 · 기본 캐릭터 수정 반영(상속) 됨 · 외형 `1boy, solo, short hair, grey hair, thick beard, brown eyes, scar on nose, very tall, muscular male, broad shoulders, riveted plates, brass fittings, tower shiel`
+- 만들어 본 이격: 브람 → 「브람(수영복)」(R) · 템플릿 의상 태그 들어감 · 기본 캐릭터 수정 반영(상속) 됨 · 외형 `1boy, solo, short hair, grey hair, thick beard, brown eyes, scar on nose, very tall, muscular male, broad shoulders, riveted plates, brass fittings, swimsuit, b`
 
 
 ## 플레이

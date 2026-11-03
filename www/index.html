@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.22'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.23'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -2165,10 +2165,13 @@ function condMatch(cond,ch,ctx){cond=cond||{};ctx=ctx||{};const o=ctx.own||{},ha
  if(has(cond.cleared)&&!cond.cleared.every(id=>ctx.cleared&&ctx.cleared[id]))return false;
  return true;}
 /* 이미지 프롬프트: 원래 캐릭터의 외모 태그 + 기본형 의상 태그 + 상징 컬러·상징 아이템 */
-const CLOTHES=/(dress|coat|jacket|shirt|blouse|skirt|pants|shorts|uniform|bodysuit|armor|armour|suit|robe|kimono|hoodie|sweater|vest|cape|cloak|gloves|boots|shoes|heels|stockings|thighhighs|pantyhose|leotard|swimsuit|bikini|outfit|clothes|clothing|attire|costume|apron|corset|tie|necktie|scarf|hat|cap|helmet|holding )/i;
+// 의상·장비 태그(기본형 의상으로 바꿀 때 빼는 것) — 갑옷 부위·무기 태그도(무기는 상징 아이템으로 따로 들어감)
+const CLOTHES=/(dress|coat|jacket|shirt|blouse|skirt|pants|shorts|uniform|bodysuit|armor|armour|suit|robe|kimono|hoodie|sweater|vest|cape|cloak|gloves|boots|shoes|heels|stockings|thighhighs|pantyhose|leotard|swimsuit|bikini|outfit|clothes|clothing|attire|costume|apron|corset|tie|necktie|scarf|hat|cap|helmet|holding |breastplate|pauldron|gauntlet|greaves|tabard|surcoat|chainmail|bracer|vambrace|sash|belt|harness|holster|sword|rifle|pistol|gun|staff|spear|lance|bow|shield|blade|dagger|katana|axe|hammer|scythe|whip|wand)/i;
 const COMPO=/^(full body|standing|straight-on|simple background|white background|cowboy shot|upper body|portrait|looking at viewer|arms at sides)$/i;
 const tags=s=>String(s||'').split(',').map(t=>t.trim()).filter(Boolean);
-function symbolColor(ch){if(ch.symColor)return String(ch.symColor);const m=tags(ch.naiPrompt).map(t=>t.match(/^([a-z]+(?: [a-z]+)?) (hair|eyes)$/i)).find(Boolean);return m?m[1]:'';}
+// 상징 컬러: "<색> hair/eyes"의 색 — 길이·모양 단어(long crimson hair의 long, short hair의 short)는 색이 아님
+const NOT_COLOR=/^(very |)(short|long|medium|messy|straight|wavy|curly|shiny|spiky|floating|wet|braided|twin|side|low|high|half|bob|hime|drill|flipped|ahoge|swept|parted|tied|loose|big|small|narrow|half-closed|closed|wide|sharp|tareme|tsurime|glowing)( |$)/i;
+function symbolColor(ch){if(ch.symColor)return String(ch.symColor);for(const t of tags(ch.naiPrompt)){const m=t.match(/^(.+) (hair|eyes)$/i);if(!m)continue;const w=m[1].split(' ').filter(x=>!NOT_COLOR.test(x+' '));if(w.length&&w.length<=2)return w.join(' ');}return '';}
 function symbolItem(ch){if(ch.symItem)return String(ch.symItem);const w=ch.weapon||{};return tags(w.prompt).filter(t=>!/^(no humans|object focus|simple background|white background|sci-fi|fantasy)$/i.test(t)).slice(0,2).join(', ');}
 function variantPrompt(ch,tpl){
  const look=tags(ch.naiPrompt).filter(t=>!CLOTHES.test(t)&&!COMPO.test(t)),color=symbolColor(ch),item=symbolItem(ch);
@@ -12669,7 +12672,7 @@ const CON_RES=GGMConstruct.RES;
 // 특수 레시피(소속·특정 캐릭터 확률 업). 분류 확률은 groups가 정해서 기본은 비워 둬요. 예: {id:'rc_x',name:'새벽 설계',min:[400,400,400,600],effect:{type:'faction',value:'새벽등대',up:3},hint:'부품을 넉넉히'}
 const CON_RECIPES=[];
 function conMeta(){ const m=G.meta; if(!m.construct||typeof m.construct!=='object') m.construct={on:false}; if(!Array.isArray(m.construct.recipes)) m.construct.recipes=clone(CON_RECIPES); return m.construct; }
-function CON(){ const c=GGMConstruct.config(conMeta()); c.groups.forEach(g=>{ const d=GGMConstruct.DEFAULTS.groups.find(x=>x.id===g.id); if(d&&g.name===d.name&&g.match&&ROLE[g.match.role]) g.name=ROLE[g.match.role]; }); return c; } /* 기본 분류 이름(지원·공격·방어)은 이 게임의 역할 이름으로 보여요 */
+function CON(){ const c=GGMConstruct.config(conMeta()); c.groups=c.groups.map(g=>{ const d=GGMConstruct.DEFAULTS.groups.find(x=>x.id===g.id); return d&&g.name===d.name&&g.match&&ROLE[g.match.role]?Object.assign({},g,{name:ROLE[g.match.role]}):g; }); return c; } // 저장된 분류는 그대로 두고 보여 줄 때만 /* 기본 분류 이름(지원·공격·방어)은 이 게임의 역할 이름으로 보여요 */
 /* 새 게임을 건조/영입이 켜진 채로 시작: 시작 자원 지급(설정에서 켤 때와 같은 양) */
 function conStartNew(ng){ ng.meta.construct=Object.assign({},ng.meta.construct||{},{on:true}); const s=GGMConstruct.config(ng.meta.construct).start; ng.prog.cres=Object.fromEntries(CON_RES.map(k=>[k,s])); ng.prog.cbuild={n:0,found:{},log:[],input:null,started:Date.now()}; }
 function conOn(){ return !!(G.meta.construct&&G.meta.construct.on); }
@@ -12691,10 +12694,12 @@ function conPool(){ return G.chars.filter(c=>!c.limited&&!c.cvar&&!c.alt&&castOk
 
 async function conMakeVariant(b,tpl){
   const rr=tpl.rarity==='same'||!tpl.rarity?String(b.rarity):String(tpl.rarity); let c=null;
-  if(SAMPLE){ try{ c=await aiAltChar(b,`${tpl.name}. ${GGMConstruct.designBrief(b,tpl)}`,rr,null); }catch(e){ c=null; } }
+  const brief=`${tpl.name}. ${GGMConstruct.designBrief(b,tpl)}`;
+  if(SAMPLE){ try{ c=await aiAltChar(b,brief,rr,null); }catch(e){ c=null; } }
+  if(c&&c.name===`${b.name}(${brief.replace(/[()]/g,'').slice(0,6)})`) c.name=`${b.name}(${tpl.name})`; // AI가 이름을 못 지으면 aiAltChar가 디자인 지시 앞 글자로 지어 깨짐 → 기본형 이름으로
   if(!c){ // AI가 없거나 실패: 원래 캐릭터를 바탕으로 규칙대로 만들어요(이름·외모 태그 + 기본형 의상 태그 + 상징 컬러·아이템)
     const o=clone(b); delete o.id; o.name=`${b.name}(${tpl.name})`; o.naiPrompt=GGMConstruct.variantPrompt(b,tpl); o.rarity=+rr;
-    o.profile=`${b.profile||''}\n[${tpl.name}] ${b.name}의 ${tpl.name} 모습.`.trim(); c=cleanChar(o); G.chars.push(c); }
+    c=cleanChar(o); G.chars.push(c); } // 프로필 등은 기본 캐릭터를 그대로 물려받음(바꾸면 수정치로 굳어 기본 캐릭터를 고쳐도 반영 안 됨) — 이 모습의 차이는 이름·외모 태그
   c.alt=b.id; c.cvar=tpl.id; c.altCanon=false; c.rarity=+rr||b.rarity; c.faction=b.faction||c.faction; if(b.age) c.age=b.age; if(b.voiceId) c.voiceId=b.voiceId; if(b.naiStyle) c.naiStyle=b.naiStyle;
   const want=String(tpl.prompt||'').split(',')[0].trim(); if(want&&!String(c.naiPrompt||'').includes(want)) c.naiPrompt=GGMConstruct.variantPrompt(Object.assign({},b,{naiPrompt:c.naiPrompt||b.naiPrompt}),tpl);
   mark('c:'+c.id); return c; }
@@ -12702,7 +12707,7 @@ async function conMakeVariant(b,tpl){
 let CONJOB=false;
 function conReadInput(){ const cfg=CON(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:(CBUILD().input||[])[i]||cfg.min; }); }
 async function conBuild(){
-  if(CONJOB||NEW_GAME_SOURCE) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
+  if(CONJOB||NEW_GAME_SOURCE||!conOn()) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
   const cfg=CON(), input=GGMConstruct.normalize(conReadInput(),cfg), r=CRES(), lack=CON_RES.filter((k,i)=>r[k]<input[i]);
   if(lack.length){ toast(`${lack.map(k=>T(k)).join('·')}이(가) 모자라요`); return; }
   const variants=conVariantChoices(input), res=GGMConstruct.roll(input,cfg,conPool(),variants);

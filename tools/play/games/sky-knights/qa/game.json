@@ -742,7 +742,7 @@
   "poolSize": 4,
   "never": [],
   "expIncome": [
-   "게시판 의뢰 30개의 건조 자원: 평균 855 · 시간당 평균 150 · 자원 보상 없는 의뢰 0"
+   "게시판 의뢰 30개의 건조 자원: 평균 905 · 시간당 평균 150 · 자원 보상 없는 의뢰 0"
   ]
  },
  "firstPull": {
@@ -988,7 +988,7 @@
     "name": "브람(수영복)",
     "rarity": "R",
     "tagOk": true,
-    "look": "1boy, solo, short hair, grey hair, thick beard, brown eyes, scar on nose, very tall, muscular male, broad shoulders, riveted plates, brass fittings, tower shiel",
+    "look": "1boy, solo, short hair, grey hair, thick beard, brown eyes, scar on nose, very tall, muscular male, broad shoulders, riveted plates, brass fittings, swimsuit, b",
     "inherited": true
    }
   ]

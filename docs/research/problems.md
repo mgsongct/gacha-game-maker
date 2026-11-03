@@ -21,14 +21,14 @@
 
 | ID | 문제 | 근거 | 상태 |
 |---|---|---|---|
-| C1 | 상징 컬러가 머리 길이 단어("short"·"long")로 잡혀 바리에이션 프롬프트가 `short color scheme outfit` | modules/app/020 `symbolColor` | 🔧 |
-| C2 | 바리에이션 프롬프트에서 옛 의상 태그(breastplate·pauldrons·tabard, holding 없는 무기)가 안 빠짐 | 020 `CLOTHES` | 🔧 |
-| C3 | AI 경로 바리에이션 이름이 `카시아(수영복. 의)`처럼 깨짐(기본형 이름과 디자인 지시를 한 글로 넘김) | 0505 `conMakeVariant` → `aiAltChar` | 🔧 |
-| C4 | 규칙 경로 바리에이션이 프로필에 "[수영복] …"을 덧붙여 `over.profile`로 굳음 — 기본 캐릭터 프로필을 고쳐도 반영 안 됨(상속 설계 위반) | 0505 `conMakeVariant` | 🔧 |
-| C5 | `CON()`이 기본 분류 이름을 역할 이름으로 바꿀 때 저장된 배열을 직접 고쳐 설정 저장 때 굳음(2차 수정에서 내가 넣음) | 0505 `CON` | 🔧 |
-| C6 | `conBuild`가 건조가 꺼져 있는지 확인 안 함(화면만 막음) | 0505 | 🔧 |
+| C1 | 상징 컬러가 머리 길이 단어("short"·"long")로 잡혀 바리에이션 프롬프트가 `short color scheme outfit` | modules/app/020 `symbolColor` | ✅ 길이·모양 단어 제외 |
+| C2 | 바리에이션 프롬프트에서 옛 의상 태그(breastplate·pauldrons·tabard, holding 없는 무기)가 안 빠짐 | 020 `CLOTHES` | ✅ 갑옷 부위·무기 태그 제외 |
+| C3 | AI 경로 바리에이션 이름이 `카시아(수영복. 의)`처럼 깨짐(기본형 이름과 디자인 지시를 한 글로 넘김) | 0505 `conMakeVariant` → `aiAltChar` | ✅ 깨진 대체 이름을 기본형 이름으로 |
+| C4 | 규칙 경로 바리에이션이 프로필에 "[수영복] …"을 덧붙여 `over.profile`로 굳음 — 기본 캐릭터 프로필을 고쳐도 반영 안 됨(상속 설계 위반) | 0505 `conMakeVariant` | ✅ 규칙 경로는 프로필을 물려받음(테스트 8) |
+| C5 | `CON()`이 기본 분류 이름을 역할 이름으로 바꿀 때 저장된 배열을 직접 고쳐 설정 저장 때 굳음(2차 수정에서 내가 넣음) | 0505 `CON` | ✅ 보여 줄 때만 역할 이름 |
+| C6 | `conBuild`가 건조가 꺼져 있는지 확인 안 함(화면만 막음) | 0505 | ✅ |
 | C7 | 바리에이션 레시피를 4번째 자원 300~400으로 낮춘 뒤 균형 투입의 상당수가 바리에이션이 됨, `variants.md`는 400 기준 | 020 `VARIANT_DEFAULTS` | ❓ 수치 — 기록 |
-| C8 | QA의 상속 점검이 늘 참(도구 오류) | `tools/play/lib/qa.mjs` | 🔧 |
+| C8 | QA의 상속 점검이 늘 참(도구 오류) | `tools/play/lib/qa.mjs` | ✅ 실제 반영·수정치 없음 확인 |
 
 ## 3. 원정 장르 (`04162f7`)
 

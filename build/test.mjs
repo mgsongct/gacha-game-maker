@@ -71,6 +71,9 @@ try {
   assert.ok(!K.condMatch({ stats: [{ k: 'atk', op: '>=', v: 200 }] }, ch, {}) && !K.condMatch({ cleared: ['s11'] }, ch, { cleared: {} }) && K.condMatch({}, ch, {}));
   const vp = K.variantPrompt(ch, tpl);
   assert.ok(/swimsuit/.test(vp) && /long crimson hair/.test(vp) && /crimson color scheme/.test(vp) && /long sniper rifle with red scope motif/.test(vp) && !/bodysuit|coat|holding/.test(vp), vp);
+  assert.equal(K.symbolColor({ naiPrompt: '1girl, short hair, crimson eyes' }), 'crimson', '상징 컬러: 길이 단어(short)는 색이 아님');
+  assert.equal(K.symbolColor({ naiPrompt: 'long dark blue hair, amber eyes' }), 'dark blue');
+  const vk = K.variantPrompt({ naiPrompt: '1girl, silver hair, breastplate, pauldrons, dark blue tabard, longsword' }, { prompt: 'swimsuit' }); assert.ok(/swimsuit/.test(vk) && !/breastplate|pauldron|tabard|longsword/.test(vk), '옛 갑옷·무기 태그를 뺌: ' + vk);
   console.log('ok 7  건조 엔진: 분류 캡(자원별 최소·비율) 해제로 확률 테이블 구성, 총량으로 희귀도 캡, 특수 레시피·바리에이션·조건·디자인 프롬프트');
 
   // 10) 원정 엔진: 인지도 등급(배정 → 선택), 컨디션 회복·휴식·저하, 방송·콘텐츠 보상, 경영 실적·평판
@@ -162,8 +165,9 @@ try {
     [400, 100, 100, 400].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild();
     const v = G.chars.find(x => x.cvar === 'v_swim'), vb = v && charById(v.alt); out.variant = v && { base: vb && vb.name, baseOwned: !!(vb && own(vb.id)), name: v.name, owned: !!own(v.id), prompt: v.naiPrompt, inGacha: bannerPool(G.banners[0]).includes(v) };
     out.found = !!CBUILD().found['v:v_swim']; out.log = CBUILD().log.length;
+    if (v) { vb.profile = String(vb.profile || '') + ' 상속확인'; mark('c:' + vb.id); const v2 = charById(v.id); out.inherit = String(v2.profile).endsWith(' 상속확인') && !('profile' in (v2.over || {})); } // 규칙 경로 이격은 기본 캐릭터 프로필을 물려받음
     // 분류 이름은 게임의 역할 이름으로
-    const r0 = ROLE.atk; ROLE.atk = '돌격'; out.groupName = CON().groups.find(g => g.id === 'g_atk').name; ROLE.atk = r0;
+    const r0 = ROLE.atk; ROLE.atk = '돌격'; out.groupName = CON().groups.find(g => g.id === 'g_atk').name; out.groupStored = !JSON.stringify(G.meta.construct || {}).includes('돌격'); ROLE.atk = r0;
     // 뽑기: 픽업 표시 확률 = 실제 확률, 천장·확정은 픽업 배너끼리 이어짐(예전 배너별 값 이어받기), 닫힌 배너의 모집 포인트 정산
     const ssr = G.chars.filter(c => c.rarity === 3 && !c.limited && castOk(c)), p = P();
     if (ssr.length >= 2) { const b1 = { id: 'tb1', type: 'pickup', name: '픽업1', pickup: [ssr[0].id], pool: { mode: 'all' }, rate: 50 }, b2 = { id: 'tb2', type: 'pickup', name: '픽업2', pickup: [ssr[1].id], pool: { mode: 'all' }, rate: 50 }; G.banners.push(b1, b2);
@@ -173,7 +177,7 @@ try {
     return out;
   });
   assert.ok(r8.panel && r8.on && r8.page, JSON.stringify(r8));
-  assert.equal(r8.groupName, '돌격'); if (r8.pickupRate != null) { assert.ok(Math.abs(r8.pickupRate - 50) <= 4, '픽업 표시 50% = 실제 ' + r8.pickupRate + '%'); assert.ok(r8.migrate && r8.shared && r8.settle, JSON.stringify(r8)); }
+  assert.equal(r8.groupName, '돌격'); assert.ok(r8.groupStored, '역할 이름은 보여 줄 때만(저장된 분류는 그대로)'); assert.ok(r8.inherit, '규칙 경로 이격이 기본 캐릭터 프로필 수정을 물려받음'); if (r8.pickupRate != null) { assert.ok(Math.abs(r8.pickupRate - 50) <= 4, '픽업 표시 50% = 실제 ' + r8.pickupRate + '%'); assert.ok(r8.migrate && r8.shared && r8.settle, JSON.stringify(r8)); }
   assert.ok(Object.values(r8.start).every(v => v >= 600)); assert.equal(r8.bought, 300); assert.equal(r8.gems, 10000 - 60); assert.equal(r8.disp, 2); assert.equal(r8.spent, 30); assert.equal(r8.n1, 1);
   assert.ok(r8.variant && r8.variant.owned && r8.variant.baseOwned && r8.variant.name === r8.variant.base + '(수영복)' && /swimsuit/.test(r8.variant.prompt) && !r8.variant.inGacha, JSON.stringify(r8.variant));
   assert.ok(r8.found && r8.log === 2 && r8.cond.length === 1); assert.deepEqual(err8, [], '페이지 오류');

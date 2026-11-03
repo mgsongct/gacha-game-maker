@@ -5,7 +5,7 @@ const CON_RES=GGMConstruct.RES;
 // 특수 레시피(소속·특정 캐릭터 확률 업). 분류 확률은 groups가 정해서 기본은 비워 둬요. 예: {id:'rc_x',name:'새벽 설계',min:[400,400,400,600],effect:{type:'faction',value:'새벽등대',up:3},hint:'부품을 넉넉히'}
 const CON_RECIPES=[];
 function conMeta(){ const m=G.meta; if(!m.construct||typeof m.construct!=='object') m.construct={on:false}; if(!Array.isArray(m.construct.recipes)) m.construct.recipes=clone(CON_RECIPES); return m.construct; }
-function CON(){ const c=GGMConstruct.config(conMeta()); c.groups.forEach(g=>{ const d=GGMConstruct.DEFAULTS.groups.find(x=>x.id===g.id); if(d&&g.name===d.name&&g.match&&ROLE[g.match.role]) g.name=ROLE[g.match.role]; }); return c; } /* 기본 분류 이름(지원·공격·방어)은 이 게임의 역할 이름으로 보여요 */
+function CON(){ const c=GGMConstruct.config(conMeta()); c.groups=c.groups.map(g=>{ const d=GGMConstruct.DEFAULTS.groups.find(x=>x.id===g.id); return d&&g.name===d.name&&g.match&&ROLE[g.match.role]?Object.assign({},g,{name:ROLE[g.match.role]}):g; }); return c; } // 저장된 분류는 그대로 두고 보여 줄 때만 /* 기본 분류 이름(지원·공격·방어)은 이 게임의 역할 이름으로 보여요 */
 /* 새 게임을 건조/영입이 켜진 채로 시작: 시작 자원 지급(설정에서 켤 때와 같은 양) */
 function conStartNew(ng){ ng.meta.construct=Object.assign({},ng.meta.construct||{},{on:true}); const s=GGMConstruct.config(ng.meta.construct).start; ng.prog.cres=Object.fromEntries(CON_RES.map(k=>[k,s])); ng.prog.cbuild={n:0,found:{},log:[],input:null,started:Date.now()}; }
 function conOn(){ return !!(G.meta.construct&&G.meta.construct.on); }
@@ -27,10 +27,12 @@ function conPool(){ return G.chars.filter(c=>!c.limited&&!c.cvar&&!c.alt&&castOk
 
 async function conMakeVariant(b,tpl){
   const rr=tpl.rarity==='same'||!tpl.rarity?String(b.rarity):String(tpl.rarity); let c=null;
-  if(SAMPLE){ try{ c=await aiAltChar(b,`${tpl.name}. ${GGMConstruct.designBrief(b,tpl)}`,rr,null); }catch(e){ c=null; } }
+  const brief=`${tpl.name}. ${GGMConstruct.designBrief(b,tpl)}`;
+  if(SAMPLE){ try{ c=await aiAltChar(b,brief,rr,null); }catch(e){ c=null; } }
+  if(c&&c.name===`${b.name}(${brief.replace(/[()]/g,'').slice(0,6)})`) c.name=`${b.name}(${tpl.name})`; // AI가 이름을 못 지으면 aiAltChar가 디자인 지시 앞 글자로 지어 깨짐 → 기본형 이름으로
   if(!c){ // AI가 없거나 실패: 원래 캐릭터를 바탕으로 규칙대로 만들어요(이름·외모 태그 + 기본형 의상 태그 + 상징 컬러·아이템)
     const o=clone(b); delete o.id; o.name=`${b.name}(${tpl.name})`; o.naiPrompt=GGMConstruct.variantPrompt(b,tpl); o.rarity=+rr;
-    o.profile=`${b.profile||''}\n[${tpl.name}] ${b.name}의 ${tpl.name} 모습.`.trim(); c=cleanChar(o); G.chars.push(c); }
+    c=cleanChar(o); G.chars.push(c); } // 프로필 등은 기본 캐릭터를 그대로 물려받음(바꾸면 수정치로 굳어 기본 캐릭터를 고쳐도 반영 안 됨) — 이 모습의 차이는 이름·외모 태그
   c.alt=b.id; c.cvar=tpl.id; c.altCanon=false; c.rarity=+rr||b.rarity; c.faction=b.faction||c.faction; if(b.age) c.age=b.age; if(b.voiceId) c.voiceId=b.voiceId; if(b.naiStyle) c.naiStyle=b.naiStyle;
   const want=String(tpl.prompt||'').split(',')[0].trim(); if(want&&!String(c.naiPrompt||'').includes(want)) c.naiPrompt=GGMConstruct.variantPrompt(Object.assign({},b,{naiPrompt:c.naiPrompt||b.naiPrompt}),tpl);
   mark('c:'+c.id); return c; }
@@ -38,7 +40,7 @@ async function conMakeVariant(b,tpl){
 let CONJOB=false;
 function conReadInput(){ const cfg=CON(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:(CBUILD().input||[])[i]||cfg.min; }); }
 async function conBuild(){
-  if(CONJOB||NEW_GAME_SOURCE) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
+  if(CONJOB||NEW_GAME_SOURCE||!conOn()) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
   const cfg=CON(), input=GGMConstruct.normalize(conReadInput(),cfg), r=CRES(), lack=CON_RES.filter((k,i)=>r[k]<input[i]);
   if(lack.length){ toast(`${lack.map(k=>T(k)).join('·')}이(가) 모자라요`); return; }
   const variants=conVariantChoices(input), res=GGMConstruct.roll(input,cfg,conPool(),variants);

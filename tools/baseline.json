@@ -458,7 +458,7 @@
     "줄": 9,
     "중첩": 8
    },
-   "text": "(최상위)→document.addEventListener @src/main/0505-construct.js (src/main/0505-construct.js:130) 복잡도 12 · 9줄 · 중첩 8"
+   "text": "(최상위)→document.addEventListener @src/main/0505-construct.js (src/main/0505-construct.js:132) 복잡도 12 · 9줄 · 중첩 8"
   },
   {
    "key": "복잡한 분배기 case|handleImagesAndAssetsAction facego",
@@ -1238,11 +1238,11 @@
   {
    "key": "도구 복잡한 함수|tool:tools/play/lib/qa.mjs runQA→page.evaluate @tools/play/lib/qa.mjs",
    "num": {
-    "복잡도": 132,
+    "복잡도": 130,
     "줄": 121,
     "중첩": 7
    },
-   "text": "runQA→page.evaluate @tools/play/lib/qa.mjs (tools/play/lib/qa.mjs:4) 복잡도 132 · 121줄 · 중첩 7"
+   "text": "runQA→page.evaluate @tools/play/lib/qa.mjs (tools/play/lib/qa.mjs:4) 복잡도 130 · 121줄 · 중첩 7"
   },
   {
    "key": "도구 복잡한 함수|tool:build/test.mjs (최상위)→p22.evaluate @build/test.mjs",
@@ -1251,7 +1251,7 @@
     "줄": 34,
     "중첩": 1
    },
-   "text": "(최상위)→p22.evaluate @build/test.mjs (build/test.mjs:494) 복잡도 42 · 34줄 · 중첩 1"
+   "text": "(최상위)→p22.evaluate @build/test.mjs (build/test.mjs:498) 복잡도 42 · 34줄 · 중첩 1"
   },
   {
    "key": "도구 빈 catch|build/test.mjs",
