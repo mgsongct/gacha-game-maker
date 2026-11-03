@@ -39,7 +39,7 @@ const passLv=()=>Math.min(PASS_MAX,Math.floor(P().pass.xp/PASS_PER));
 function passReward(l){return l%10===0?{gems:1000}:l%5===0?{core:10}:l%3===0?{wmat:15}:l%2===0?{exp:30}:{gold:8000};}
 function passClaimable(){const n=passLv();let k=0;for(let l=1;l<=n;l++)if(!P().pass.got.includes(l))k++;return k+MISSIONS.filter(m=>(dm().cnt[m.k]||0)>=m.goal&&!dm().got[m.k]).length;}
 const dispDone=()=>Object.values(P().disp).filter(d=>Date.now()>=d.start+d.hours*3600e3).length;
-const busyIds=()=>new Set(Object.values(P().disp).flatMap(d=>d.chars));
+const busyIds=()=>new Set([...Object.values(P().disp).flatMap(d=>d.chars),...exBusyIds()]); // 원정 모드(방송·스트리머·경영)에서 일하는·쉬는·배치된 캐릭터 포함
 function linePop(c,text,face){
   if(!c||!text) return; document.querySelectorAll('.linepop').forEach(x=>x.remove());
   const d=document.createElement('div'); d.className='linepop'; d.innerHTML=`<div class="lp-art">${art(c,'',{face})}</div><div class="lp-t"><b>${esc(c.name)}</b><span>${esc(sub(text))}</span></div>`;

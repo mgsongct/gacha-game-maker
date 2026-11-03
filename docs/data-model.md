@@ -54,6 +54,7 @@ const P = () => G.prog;      // 진행 상태 단축
 | `gems`, `gold`, `mat{exp,wmat,core,gearMat,transcMat}` | 재화·재료 |
 | `owned{[charId]: {lv,exp,dup,aff,wlv,skin,transc,seen[],skillTraining,...}}` | 보유 캐릭터. `grantOwned()`(가챠·건조 공통)가 생성 |
 | `cres{res1..res4}`, `cbuild{n,input,found,log}` | 건조/영입 자원·기록 ([research/construction.md](research/construction.md)) |
+| `exped{fame,cond,jobs,offers,streak,lib,libAt,biz}` | 원정 모드(방송·스트리머·경영) 진행 ([research/expedition.md](research/expedition.md)) |
 | `squad[]` (최대 4), `sec` | 편성, 로비 비서 |
 | `pity`, `pities{[bannerId]}`, `guar{}`, `spark{}`, `history[]`, `hist2[]` | 가챠 천장·확정·포인트·기록 |
 | `settings{ssr,sr,pity,...}` | 확률 설정 (천장 기본 150) |

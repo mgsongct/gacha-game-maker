@@ -160,6 +160,12 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - 이격 상속 `src/main/0065-inherit.js`: `mark()`에서 `inheritOnMark`, `fix()`에서 `inheritAll`, `flush()`에서 `inheritStore`
 - 설계·수치: [research/construction.md](research/construction.md), [research/variants.md](research/variants.md)
 
+## 8-2. 원정 모드
+
+- 엔진 `GGMExpedition`(`src/modules/app/030-expedition.js`, 순수): `tierOf`, `condNow`, `idolOffers`/`idolResult`, `streamResult`/`libIncome`, `bizPerformance`/`bizSettle`
+- 화면·상태 `src/main/0275-expedition.js`: 탭 `disp`가 `dispPageHTML()` → 전투형이면 기존 `dispHTML`, 아니면 `exHTML`. `exBusyIds`를 `busyIds`(0090)에 합쳐 일하는 캐릭터는 전투 불가. 설정 `openExSet`
+- 설계·수치: [research/expedition.md](research/expedition.md)
+
 ## 9. 성장 · 경제 · 콘텐츠
 
 - 성장(성장·성장 곡선 섹션): 레벨(최대 120, 71~ 초월승급), 돌파, 스킬 강화, 전용 무기, 호감도(`addAff`, 레벨별 대사·에피소드 해금). 비용 공식은 `GGMCombat.growthCost/limitBreakCost` 등.

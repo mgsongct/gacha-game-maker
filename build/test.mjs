@@ -70,6 +70,29 @@ try {
   assert.ok(/swimsuit/.test(vp) && /long crimson hair/.test(vp) && /crimson color scheme/.test(vp) && /long sniper rifle with red scope motif/.test(vp) && !/bodysuit|coat|holding/.test(vp), vp);
   console.log('ok 7  건조 엔진: 분류 캡(자원별 최소·비율) 해제로 확률 테이블 구성, 총량으로 희귀도 캡, 특수 레시피·바리에이션·조건·디자인 프롬프트');
 
+  // 10) 원정 엔진: 인지도 등급(배정 → 선택), 컨디션 회복·휴식·저하, 방송·콘텐츠 보상, 경영 실적·평판
+  const X = createRequire(import.meta.url)(join(ROOT, 'src/modules/app/030-expedition.js')), H = 3600e3;
+  assert.equal(X.tierOf(0, {}).name, '신인'); assert.equal(X.tierOf(700, {}).name, '인기'); assert.equal(X.tierOf(99999, {}).name, '톱');
+  const o0 = X.idolOffers(0, {}, seq(11)), o5 = X.idolOffers(5000, {}, seq(11));
+  assert.ok(o0.offers.length === 1 && !o0.choice && o0.offers[0].assigned && ['local', 'sign', 'ad'].includes(o0.offers[0].id), JSON.stringify(o0));
+  assert.ok(o5.offers.length === 6 && o5.choice && o5.offers.every(x => !x.assigned));
+  const payOf = (o, id) => (o.offers.find(x => x.id === id) || {}).pay; const both = o5.offers.find(x => x.id === o0.offers[0].id);
+  if (both) assert.ok(both.pay > o0.offers[0].pay * 3, '톱 등급은 보수가 크게 올라요');
+  assert.equal(X.condNow({ v: 20, at: 0 }, 2 * H, {}), 32); assert.equal(X.condNow({ v: 20, at: 0, rest: 2 * H }, 2 * H, {}), 56); assert.equal(X.condNow({ v: 50, at: 5 * H }, 2 * H, {}), 50);
+  assert.ok(X.condFactor(10, {}) < 1 && X.condFactor(80, {}) === 1);
+  const job = { pay: 1000, fame: 10, cond: 20 }; assert.equal(X.idolResult(job, 80, 0, {}).cond, 20); assert.equal(X.idolResult(job, 80, 3, {}).cond, 30); assert.ok(X.idolResult(job, 10, 0, {}).gold < 1000);
+  const pf = X.config({}).streamer.platforms, P2 = id => pf.find(x => x.id === id);
+  assert.ok(X.streamResult(P2('live'), 2000, 80, {}, () => .5).gold > X.streamResult(P2('live'), 0, 80, {}, () => .5).gold);
+  assert.ok(X.streamResult(P2('vod'), 0, 80, {}).lib > 0 && X.streamResult(P2('short'), 0, 80, {}, () => 0).viral);
+  const lib = [{ at: 0, base: 1000 }]; assert.ok(X.libIncome(lib, 0, 24 * H, {}) > X.libIncome(lib, 14 * 24 * H, 15 * 24 * H, {}) * 3);
+  const chars = { a: { spd: 120, atk: 180, hp: 1200, def: 70 } };
+  assert.equal(X.bizPerformance({}, chars, {}, {}).perf, 0);
+  const pA = X.bizPerformance({ floor: ['a'] }, chars, { a: 100 }, {}).perf, pB = X.bizPerformance({ floor: ['a'], kitchen: ['a'] }, chars, { a: 100 }, {}).perf;
+  assert.ok(pA > 0 && pB > pA); assert.ok(X.bizPerformance({ floor: ['a'] }, chars, { a: 5 }, {}).perf < pA, '컨디션이 낮으면 실적↓');
+  const s1 = X.bizSettle(.9, 0, 5, {}), s2 = X.bizSettle(.9, 800, 5, {}), s3 = X.bizSettle(.2, 500, 5, {});
+  assert.ok(s1.rep > 0 && s2.gold > s1.gold && s3.rep < 500 && X.bizSettle(.9, 0, 100, {}).hours === 24);
+  console.log('ok 10 원정 엔진: 인지도 등급(배정 1건 → 선택 6건·보수↑), 컨디션·휴식·연속 출연, 영상·라이브·숏폼, 경영 실적×평판(파트 합산)');
+
   let chromium; try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch (e) {}
   if (!chromium) { console.log('skip 4  playwright 없음: 브라우저 실행 검사 생략'); process.exit(0); }
   const www = join(tmp, 'www'); cpSync(join(ROOT, 'www'), www, { recursive: true }); writeFileSync(join(www, 'index.html'), html);
@@ -171,6 +194,29 @@ try {
   assert.ok(r9b.faction === '상속테스트' && r9b.base === '상속테스트' && r9b.skill === '원본스킬수정' && r9b.elemDiff && r9b.atk && r9b.reset && r9b.orphan, JSON.stringify(r9b));
   assert.deepEqual(err9, [], '페이지 오류');
   console.log('ok 9  상속형 이격: 저장은 수정치만(over), 원본 수정(소속·스킬·능력치)이 이격에 반영, 바꾼 속성은 유지, 되돌리기, 다시 열어도 같음');
+
+  // 11) 원정 모드별 실제 흐름: 방송 출연(배정→출연→보상·인지도, 휴식, 톱이면 선택), 스트리머(영상→라이브러리 수익), 경영(배치→정산·평판), 전투 불가
+  const p11 = await browser.newPage(), err11 = []; p11.on('pageerror', e => err11.push(String(e)));
+  await p11.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p11.goto(`http://127.0.0.1:${server.address().port}/?t=11`);
+  await p11.waitForFunction(() => typeof exSave === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r11 = await p11.evaluate(async () => {
+    const o = {}, setMode = async m => { openExSet(); document.querySelector(`[name=ex_mode][value=${m}]`).checked = true; appConfirm = async () => true; await exSave(); };
+    const c = G.chars.filter(x => !x.alt)[0]; if (!own(c.id)) grantOwned(c, 't'); const id = c.id, back = (jid, h) => { EXS().jobs[jid].start -= h * 3600e3; };
+    await setMode('idol'); tab = 'disp'; render(); o.idolPage = !!document.querySelector('[data-act="exjob"]');
+    const off = exOffers(id); o.assigned = off.offers.length === 1 && !off.choice; const g0 = P().gold, c0 = exCond(id);
+    exStart(id, off.offers[0]); o.busy = busyIds().has(id); o.condDrop = c0 - (EXS().cond[id].v); const jid = Object.keys(EXS().jobs)[0]; back(jid, 10); exClaim(jid);
+    o.gold = P().gold > g0; o.fame = EXS().fame[id] > 0; exRest(id, 4); o.resting = exResting(id) && busyIds().has(id);
+    EXS().fame[id] = 5000; delete EXS().offers[id]; EXS().cond[id] = { v: 90, at: Date.now() }; const top = exOffers(id); o.top = top.choice && top.offers.length > 1; render(); o.topPage = document.querySelectorAll('[data-act="exjob"]').length > 1;
+    await setMode('streamer'); render(); o.streamPage = !!document.querySelector('[data-act="exstream"]');
+    exStart(id, EXC().streamer.platforms.find(p => p.kind === 'vod')); const j2 = Object.keys(EXS().jobs)[0]; back(j2, 10); exClaim(j2); o.lib = EXS().lib.length;
+    EXS().libAt -= 24 * 3600e3; EXS().lib.forEach(v => { v.at -= 24 * 3600e3; }); const g1 = P().gold; exLibSettle(); o.libGold = P().gold > g1;
+    await setMode('business'); render(); o.bizPage = !!document.querySelector('[data-exassign]');
+    exAssign('floor', 0, id); o.bizBusy = busyIds().has(id); EXS().biz.at -= 5 * 3600e3; EXS().cond[id].at -= 5 * 3600e3; EXS().biz.rep = 500; const g2 = P().gold, rep0 = EXS().biz.rep;
+    exBizSettle(true); o.bizGold = P().gold > g2; o.repMoved = EXS().biz.rep !== rep0; o.bizCond = exCond(id) < 100;
+    await setMode('combat'); render(); o.combatPage = !!document.querySelector('[data-act="dispset"],[data-act="dispredo"]'); o.freed = !busyIds().has(id);
+    return o; });
+  assert.ok(Object.values(r11).every(v => v === true || (typeof v === 'number' && v > 0)), JSON.stringify(r11)); assert.deepEqual(err11, [], '페이지 오류');
+  console.log('ok 11 원정 모드: 방송 출연(배정→출연→보수·인지도·컨디션, 휴식, 톱이면 선택), 스트리머(영상 라이브러리 수익), 경영(배치·정산·평판), 일하는 중 전투 불가');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
