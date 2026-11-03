@@ -2,6 +2,8 @@
 
 tree-sitter(`web-tree-sitter` + `tree-sitter-javascript`)로 소스를 구문 트리로 읽고, ast-grep(`@ast-grep/napi`) 패턴으로 품질 규칙을 찾아요. 빌드와 같은 순서로 `src/main/`을 한 스크립트로 이어 붙여 분석하고(이 앱은 main이 한 스크립트라 파일끼리 함수를 바로 부름), 결과의 줄 번호는 원본 파일로 돌려 줘요.
 
+분석 대상: `src/main/`(한 스크립트) · `src/modules/**` · `src/boot/*.js` · `src/index.html` · **`src/style/*.css`**(ast-grep CSS) · **부속 파일** `www/sw.js` · `proxy/**` · `build/*.mjs` · `tools/**`(JS 파싱) · `pc/*.py`(python3가 있으면 구문 검사)
+
 ```bash
 npm ci --prefix tools
 node tools/check.mjs            # 요약 + tools/out/report.md · flow.mmd · report.json
@@ -25,7 +27,14 @@ node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(
 | 데이터 ↔ 화면 | `G.meta.x`·`G.world.x`·`G.x`·`P().x`(별칭 `const p=P()`, `G.prog` = `P()` 포함)를 쓰는 함수·읽는 함수, 화면 함수(`…HTML`·`…Panel`·`render`·`open…`) | 여러 곳에서 쓰는 상태(소유자 분산), 쓰기만 하는 키, 화면에 안 보이는 설정. `flow.mmd`(Mermaid: 쓰는 함수 → 상태 → 화면) |
 | 다중화·파편화 | 같은 본문 함수(주석·공백 무시 해시), 3번 이상 되풀이되는 60자 이상 문자열(흩어진 프롬프트·문구), 문서 전역 클릭 리스너 수 | 경고·목록 |
 | ast-grep 규칙 | `document.addEventListener('click', $$$)`, `try {…} catch ($E) {}`(빈 catch — 파싱 대체·저장소 대체·동기 대체·의도 표시(주석)·**비동기 작업(경고 — `quietErr(e,'위치')`로 기록)**), `$EL.innerHTML = $V`의 esc() 없는 `${x.name}` | 목록 |
-| 안 쓰는 코드 | 선언 말고는 코드·문자열·HTML 어디에도 이름이 없는 함수·최상위 변수 | 목록 |
+| 안 쓰는 코드 | 선언 말고는 코드·문자열·HTML·브라우저 테스트(`build/test.mjs`) 어디에도 이름이 없는 함수·최상위 변수(`fix.mjs`와 같은 기준) | 목록 |
+| DOM id 참조 | 찾는 쪽: `$('#x')`·`getElementById('x')`·`querySelector('#x …')`·`closest` / 만드는 쪽: `id="x"`·`.id='x'`·`setAttribute('id')`·**도우미 인자**(`onoff('sd_bon')` → `id="${id}"`)·접두사(`id="row_${i}"`, 한 글자 접두사는 뒤가 숫자일 때만). 선택자 목록(`'#a,.b'`)은 하나라도 맞으면 통과 | 아무도 만들지 않는 id를 찾는 코드 **경고**(지운 화면의 흔적 — 늘 null) |
+| HTML 주입 | **모든 HTML 템플릿**(태그가 든 \`…\`)의 `${…}` 중 esc() 없는 글(`.name`·`.title`·`.desc`·`.text`·`.prompt`… — `||`·`??`·삼항 가지까지), 상수 표에서 온 값(`UPPER.x`·`UPPER.map(v=>…)`·`Object.entries(UPPER)`·`const v=UPPER[k]`)은 통과. 용어 `T()`·`sub()`는 함수 안에서 `<`를 거르지 않으면 같이 잡음 | **경고**(AI·가져온 게임·공유받은 게임의 글이 태그로 실행 — 키 유출 위험) |
+| 저장 키 | `mark('x')`·`mark('c:'+id)` ↔ `writeKey`의 `k==='x'`·`k.startsWith('x')` | 모르는 키 **경고**(전체 스냅샷엔 들어가도 PC·클라우드 문서 저장에서 빠짐) |
+| 전역 리스너 누수 | `document`·`window`·전역 `addEventListener`를 여러 번 도는 곳(다른 함수가 부르는 함수·이벤트 콜백)에서 붙임 — `once`·`signal`·같은 이벤트·같은 처리기 `removeEventListener`가 없으면. 즉시 실행·최상위·한 번만 부르는 초기화는 제외 | **경고** |
+| CSS | 파싱 오류(ast-grep ERROR)·**괄호 짝**(주석·문자열 빼고 — 닫히지 않은 `{`는 ast-grep이 조용히 복구해서 따로 셈), 코드·HTML 어디에도 없는 클래스 선택자(동적 접두사 `ls-${…}`·`'r-'+k`는 씀) | 오류 · 안 쓰는 클래스 목록 |
+| 부속 파일 | 서비스 워커·중계 서버(Cloudflare·Vercel)·빌드·도구 스크립트 tree-sitter 파싱, PC 서버 파이썬 `ast.parse` | **오류** |
+| 중계 서버 허용 주소 | 두 중계 서버의 `ALLOW_HOSTS`가 같은지, 앱이 부르는 API 주소(호출 첫 인자·`base`/`url`/`endpoint` 값·`…DEF`/`…ENDPOINT` 상수의 https 주소 중 API 모양)가 목록에 있는지 | **경고**(웹 버전 중계에서 host not allowed) |
 
 ## 규칙 늘리기
 - tree-sitter 분석은 `lib/graph.mjs`(구조)·`lib/flow.mjs`(흐름), ast-grep 패턴은 `lib/quality.mjs`의 `sgRules`
@@ -35,3 +44,6 @@ node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(
 - 멤버 호출(`obj.method()`)·문자열로 부르는 함수(`window[name]()`)는 그래프에 안 들어가요(안 쓰는 함수 판단은 이름 문자열 검색이라 안전한 쪽)
 - 상태 흐름은 `G`·`P()`와 같은 함수 안 별칭만 따라가요. 다른 함수로 넘긴 객체(`c`, `ch`)의 변경은 저장 표시 검사에서 빠져요
 - 화면에 안 보이는 설정은 휴리스틱(화면 함수 이름 규칙)이라 내부 표시값이 섞일 수 있어요
+- HTML 주입은 글 모양 속성 이름(`.name`·`.desc`…)과 `T()`·`sub()`만 봐요. 지역 변수에 담았다 넣는 글(`const n=c.name; …${n}`)이나 다른 함수가 만든 HTML 조각은 못 따라가요
+- DOM id는 정적 문자열만 봐요(`$('#'+id)`처럼 이어 붙인 선택자는 건너뜀). 안 쓰는 CSS 클래스는 이름 검색이라, 문자열을 쪼개 만드는 클래스는 쓰는 것으로 못 볼 수 있어요(목록만, 오류·경고 아님)
+- 리스너 누수는 "다른 함수가 부르는 함수"를 여러 번 도는 것으로 봐요. 실제로 한 번만 부르면 경고가 지나칠 수 있어요

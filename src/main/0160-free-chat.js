@@ -17,7 +17,6 @@ function readPlayerForm(){ const p=P(); if($('#pf_name')) p.player=$('#pf_name')
   if($('#pf_gender')){ const g=$('#pf_gender').value.trim().slice(0,40); p.genderTxt=g; p.gender=/^(남|남성|남자|male|man)$/i.test(g)?'m':/^(여|여성|여자|female|woman)$/i.test(g)?'f':''; }
   if($('#pf_gsel')){ p.gender=$('#pf_gsel').value; p.genderTxt=''; }
   if($('#pf_look')) p.look=$('#pf_look').value.trim().slice(0,400); if($('#pf_bio')) p.bio=$('#pf_bio').value.trim().slice(0,1500); if($('#pf_hide')) p.hideEyes=$('#pf_hide').checked;if($('#pf_nai'))naiBlocksSave(avatarObj(),'prompt','pf_nai'); mark('prog'); }
-function readHero(){ if(!$('#ng_h_name')) return null; return {name:$('#ng_h_name').value.trim().slice(0,12),call:$('#ng_h_call')?$('#ng_h_call').value.trim().slice(0,12):'',gender:$('#ng_h_gender').value.trim().slice(0,40),look:$('#ng_h_look').value.trim().slice(0,400),hide:$('#ng_h_hide').checked}; }
 const genderCode=g=>/^(남|남성|남자|male|man)$/i.test(g||'')?'m':/^(여|여성|여자|female|woman)$/i.test(g||'')?'f':'';
 async function heroTags(hr){ const r=await aiJSON(`플레이어 캐릭터의 외모 설명을 NovelAI 영어 태그로 바꿔라.\n성별·성 정체성: ${hr.gender||'정하지 않음'}\n외모: ${hr.look}\n규칙: 설명에 맞는 인원 태그(1boy, 1girl, 1other 중 하나)와 solo로 시작한다. 성인이다. 머리, ${hr.hide?'':'눈, '}체형, 옷, 장신구 같은 외모 태그만 쓴다. 자세·구도·배경·화풍 태그는 쓰지 않는다.\nJSON만 출력: {"tags":"..."}`,null,'quick');
   let tags=String((r&&r.tags)||'').trim(); if(!tags) return '';

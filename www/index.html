@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.16'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.17'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -4632,7 +4632,8 @@ const TERM_LABEL={player:'플레이어 호칭',currency:'유료 재화',gold:'�
 function explorationName(value){return typeof value==='string'&&value.trim()?value.replace(/\s+/g,' ').trim().slice(0,12):'미지 탐사';}
 const EXPLORATION_NAME_RULE_BASE='탐사 콘텐츠 이름(terms.abyss)은 세계관에 어울리는 2~12자 이름으로 짓는다. 파티를 편성해 여러 구역에서 전투·발견·사건을 겪고 돌아오는 반복 탐사 콘텐츠다. 지하·심연을 전제하지 말고, 다른 메뉴 이름과 구분한다.';
 pfDef('EXPLORATION_NAME_RULE','탐사 콘텐츠 이름',()=>EXPLORATION_NAME_RULE_BASE);
-function T(k){const t=(typeof G!=='undefined'&&G&&G.meta&&G.meta.terms)||{};return t[k]||DEFAULT_META.terms[k]||k;}
+// 용어는 AI·가져온 게임·직접 입력에서 와서 화면 템플릿 70여 곳에 그대로 들어가요. 태그가 될 < >는 빼고 " 는 ” 로 바꿔 돌려줘요(HTML 주입 방지, tools: esc() 없이 HTML에 넣는 글)
+function T(k){const t=(typeof G!=='undefined'&&G&&G.meta&&G.meta.terms)||{};return String(t[k]||DEFAULT_META.terms[k]||k).replace(/[<>]/g,'').replace(/"/g,'”');}
 function applyMeta(){
   const m=G.meta; ELEMS=m.elems.map(e=>e.n);
   Object.keys(ECOL).forEach(k=>delete ECOL[k]); Object.keys(BEATS).forEach(k=>delete BEATS[k]);
@@ -7062,7 +7063,7 @@ function checkTriggers(silent){
   if(fresh.length){ mark('prog'); if(!silent) notify(fresh[0],fresh.length-1); updateBadge(); }
 }
 function unread(){return Object.entries(P().inbox).filter(([id,s])=>!s.done&&threadChar(threadById(id))).length;}
-function updateBadge(){const b=$('#phBadge'); if(b) b.textContent=unread()||'';}
+function updateBadge(){const b=document.querySelector('.lb-ico[data-act="phone"]'); if(!b) return; const n=unread(); let e=b.querySelector('em'); if(!n){ if(e) e.remove(); return; } if(!e){ e=document.createElement('em'); b.appendChild(e); } e.textContent=n;} // 로비 대화 아이콘 배지(예전 #phBadge는 화면에 없음)
 function notify(t,more){
   const c=threadChar(t); const first=parseScript(t.script).find(l=>l.type==='say'&&!isMe(l.who));
   const n=$('#notif');
@@ -7821,7 +7822,6 @@ function readPlayerForm(){ const p=P(); if($('#pf_name')) p.player=$('#pf_name')
   if($('#pf_gender')){ const g=$('#pf_gender').value.trim().slice(0,40); p.genderTxt=g; p.gender=/^(남|남성|남자|male|man)$/i.test(g)?'m':/^(여|여성|여자|female|woman)$/i.test(g)?'f':''; }
   if($('#pf_gsel')){ p.gender=$('#pf_gsel').value; p.genderTxt=''; }
   if($('#pf_look')) p.look=$('#pf_look').value.trim().slice(0,400); if($('#pf_bio')) p.bio=$('#pf_bio').value.trim().slice(0,1500); if($('#pf_hide')) p.hideEyes=$('#pf_hide').checked;if($('#pf_nai'))naiBlocksSave(avatarObj(),'prompt','pf_nai'); mark('prog'); }
-function readHero(){ if(!$('#ng_h_name')) return null; return {name:$('#ng_h_name').value.trim().slice(0,12),call:$('#ng_h_call')?$('#ng_h_call').value.trim().slice(0,12):'',gender:$('#ng_h_gender').value.trim().slice(0,40),look:$('#ng_h_look').value.trim().slice(0,400),hide:$('#ng_h_hide').checked}; }
 const genderCode=g=>/^(남|남성|남자|male|man)$/i.test(g||'')?'m':/^(여|여성|여자|female|woman)$/i.test(g||'')?'f':'';
 async function heroTags(hr){ const r=await aiJSON(`플레이어 캐릭터의 외모 설명을 NovelAI 영어 태그로 바꿔라.\n성별·성 정체성: ${hr.gender||'정하지 않음'}\n외모: ${hr.look}\n규칙: 설명에 맞는 인원 태그(1boy, 1girl, 1other 중 하나)와 solo로 시작한다. 성인이다. 머리, ${hr.hide?'':'눈, '}체형, 옷, 장신구 같은 외모 태그만 쓴다. 자세·구도·배경·화풍 태그는 쓰지 않는다.\nJSON만 출력: {"tags":"..."}`,null,'quick');
   let tags=String((r&&r.tags)||'').trim(); if(!tags) return '';
@@ -12742,7 +12742,7 @@ case 'swlink': openUrl(t.dataset.url); break;
 case 'swskipall': appStorage.setItem(SETUP_KEY,'1'); if(PJ().active!=='main'){ await flush(); const pj=PJ(); if(!pj.list.some(x=>x.id==='main')) pj.list.unshift({id:'main',title:DEFAULT_META.title}); pj.active='main'; appStorage.setItem(PJKEY,JSON.stringify(pj)); reloadGame(); break; } SW=null; showStart(); break;
 case 'swgo1': swRead(); SW.step=1; renderSetup(); break;
 case 'swsub': { const a=($('#sw_sub')||{}).value; if(!String(a||'').trim()){ toast('구독 주소를 붙여 넣어 주세요'); break; } swRead(); swSave(); appStorage.setItem(SETUP_KEY,'1'); try{ sessionStorage.setItem('ggm-picked','1'); }catch(e){} await subscribe(String(a).trim(),t); break; }
-case 'swdone': swRead(); swSave(); if(PJ().active!=='main'){ appStorage.setItem(SETUP_KEY,'1'); await flush(); try{ sessionStorage.setItem('ggm-picked','1'); }catch(e){} const pj=PJ(); if(!pj.list.some(x=>x.id==='main')) pj.list.unshift({id:'main',title:DEFAULT_META.title}); pj.active='main'; appStorage.setItem(PJKEY,JSON.stringify(pj)); reloadGame(); break; } { const hr=readHero(); if(hr){ const pp=P(); pp.player=hr.name; if(hr.call&&hr.call!==T('player')){ G.meta.terms.player=hr.call; mark('meta'); } pp.genderTxt=hr.gender; pp.gender=genderCode(hr.gender); pp.look=hr.look; pp.hideEyes=hr.hide; pp.nameAsked=true; mark('prog'); } } { const v=$('#ng_style')?$('#ng_style').value.trim():''; if(v){ G.meta.artTags=v; mark('meta'); } } appStorage.setItem(SETUP_KEY,'1'); SW=null; render(); showStart(); toast('설정을 저장했어요'); break;
+case 'swdone': swRead(); swSave(); if(PJ().active!=='main'){ appStorage.setItem(SETUP_KEY,'1'); await flush(); try{ sessionStorage.setItem('ggm-picked','1'); }catch(e){} const pj=PJ(); if(!pj.list.some(x=>x.id==='main')) pj.list.unshift({id:'main',title:DEFAULT_META.title}); pj.active='main'; appStorage.setItem(PJKEY,JSON.stringify(pj)); reloadGame(); break; } { const v=$('#ng_style')?$('#ng_style').value.trim():''; if(v){ G.meta.artTags=v; mark('meta'); } } appStorage.setItem(SETUP_KEY,'1'); SW=null; render(); showStart(); toast('설정을 저장했어요'); break;
 case 'swstytest': { swRead(); swSave(); if(!imgReady()){ toast(imgNeed()); break; } const r0=$('#sw_sres'); t.disabled=true; if(r0) r0.textContent='그리는 중… 20초쯤 걸려요';
       try{ const b=await naiDraw('char','1girl, solo, long hair, smile, jacket, hand on hip',{styleId:swStyleId()}); if(SW.stPrev) URL.revokeObjectURL(SW.stPrev); SW.stPrev=URL.createObjectURL(b); renderSetup(); }
       catch(err){ toast(naiErr(err,'시험 그리기 실패')); if(r0) r0.textContent=''; t.disabled=false; } break; }
@@ -13383,9 +13383,9 @@ case 'ailinesmore': { const cur=k=>lines($('#'+k).value), L0=cur('f_lines'), H0=
 case 'upsave': { const o=LV(), md=$('#up_mode').value; Object.assign(o,{repo:$('#up_repo').value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/$/,''),branch:$('#up_br').value.trim()||'main',path:$('#up_path').value.trim()||'www/index.html',token:$('#up_tok').value.trim(),auto:md!=='off',mode:md==='off'?'ask':md}); saveLV(o); closeModal(); if(o.auto) checkUpdate(true); else toast('업데이트 확인을 껐어요'); break; }
 case 'upgo': {if(appStorage.failed||document.getElementById('save-warning'))break; const c=charById(id), k=t.dataset.k; if(!c) break; if(k==='enh') enhance(c); else if(k==='enhmax') enhance(c,true); else if(k==='lb') limitBreak(c); else if(k==='wup') weaponUp(c); else if(k==='transc') transcendUp(c); try{await flush();}catch(e){break;} openChar(id); render(); break; }
 case 'wai': { const c=charById(id); if(!c) break; const ed=a==='wai';
-      const nm=(ed&&$('#f_wn')&&$('#f_wn').value.trim())||String(c.weapon.name||''), ds=(ed&&$('#f_wd')&&$('#f_wd').value.trim())||String(c.weapon.desc||''), cur=(ed?($('#f_wp')&&$('#f_wp').value.trim()):($('#wp_scene')&&$('#wp_scene').value.trim()))||String(c.weapon.prompt||'');
+      const nm=(ed&&$('#f_wn')&&$('#f_wn').value.trim())||String(c.weapon.name||''), ds=(ed&&$('#f_wd')&&$('#f_wd').value.trim())||String(c.weapon.desc||''), cur=(ed&&$('#f_wp')&&$('#f_wp').value.trim())||String(c.weapon.prompt||'');
       const p2=await weaponPromptAI([{c,name:nm,desc:ds,cur}],t); if(!p2[0]){ toast('쓰지 못했어요. AI 기록을 확인해 주세요'); break; }
-      if(ed){ if($('#f_wp')) $('#f_wp').value=p2[0]; toast(T('weapon')+' 프롬프트를 썼어요. 저장을 눌러 주세요'); } else { c.weapon.prompt=p2[0]; mark('c:'+c.id); const inp=$('#wp_scene'); if(inp) inp.value=p2[0]; toast(T('weapon')+' 프롬프트를 썼어요'); } break; }
+      if(ed){ if($('#f_wp')) $('#f_wp').value=p2[0]; toast(T('weapon')+' 프롬프트를 썼어요. 저장을 눌러 주세요'); } else { c.weapon.prompt=p2[0]; mark('c:'+c.id); toast(T('weapon')+' 프롬프트를 썼어요'); } break; }
 case 'wfixall': { const wb=G.chars.filter(c=>c.weapon&&wpBad(c.weapon.prompt)); if(!wb.length){ toast('정리할 '+T('weapon')+' 프롬프트가 없어요'); break; } const lb=t.textContent; t.disabled=true; t.textContent='AI로 정리하는 중…';
       try{ const n=await fixWeaponPrompts(G.chars); toast(n>0?`${T('weapon')} 프롬프트 ${n}개를 ${T('weapon')}만 나오게 정리했어요`:'정리하지 못했어요. AI 기록을 확인해 주세요'); }finally{ if(t.isConnected){ t.disabled=false; t.textContent=lb; } } openPrep(false); break; }
 case 'regengo': { const c=charById(id); if(!c) break; const sel={}, reqs={}; document.querySelectorAll('#modal [data-rgsel]').forEach(ch=>{ if(ch.checked) sel[ch.dataset.rgsel]=true; }); document.querySelectorAll('#modal [data-rgreqi]').forEach(i=>{ const v=i.value.trim(); if(v) reqs[i.dataset.rgreqi]=v; });

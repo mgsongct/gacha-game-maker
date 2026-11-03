@@ -19,7 +19,7 @@ function checkTriggers(silent){
   if(fresh.length){ mark('prog'); if(!silent) notify(fresh[0],fresh.length-1); updateBadge(); }
 }
 function unread(){return Object.entries(P().inbox).filter(([id,s])=>!s.done&&threadChar(threadById(id))).length;}
-function updateBadge(){const b=$('#phBadge'); if(b) b.textContent=unread()||'';}
+function updateBadge(){const b=document.querySelector('.lb-ico[data-act="phone"]'); if(!b) return; const n=unread(); let e=b.querySelector('em'); if(!n){ if(e) e.remove(); return; } if(!e){ e=document.createElement('em'); b.appendChild(e); } e.textContent=n;} // 로비 대화 아이콘 배지(예전 #phBadge는 화면에 없음)
 function notify(t,more){
   const c=threadChar(t); const first=parseScript(t.script).find(l=>l.type==='say'&&!isMe(l.who));
   const n=$('#notif');

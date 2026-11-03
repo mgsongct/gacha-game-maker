@@ -624,6 +624,30 @@ try {
     return o; });
   assert.ok(Object.values(r26).every(v => v === true), JSON.stringify(r26)); assert.deepEqual(err26, [], '페이지 오류');
   console.log('ok 26 정리 후 동작: 그림 지우기 대상·리롤 초안 함수, 조용한 오류 기록, 재화 단일 경로, 지운 액션이 분배 표에서 빠짐');
+
+  // 27) 자기점검 보강(tools: HTML 주입·DOM id)으로 고친 것: 용어 T()는 HTML 안전, 대화 배지는 화면에 없는 #phBadge 대신 로비 아이콘을 바로 고침
+  const p27 = await browser.newPage(), err27 = []; p27.on('pageerror', e => err27.push(String(e)));
+  await p27.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p27.goto(`http://127.0.0.1:${server.address().port}/?t=27`);
+  await p27.waitForFunction(() => typeof updateBadge === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r27 = await p27.evaluate(async () => {
+    const o = {}; P().seenOpening = true;
+    const bad = '<img src=x onerror="window.__XSS__=1">';
+    ['crew', 'talk', 'gacha', 'weapon'].forEach(k => { G.meta.terms[k] = bad + k; });
+    o.term = T('crew') === 'img src=x onerror=”window.__XSS__=1”crew' && T('player') === G.meta.terms.player;
+    for (const t of ['lobby', 'crew', 'contract', 'studio']) { tab = t; render(); }
+    if (G.chars[0]) openChar(G.chars[0].id);
+    await new Promise(r => setTimeout(r, 300));
+    o.noTag = !document.querySelector('img[src="x"]') && window.__XSS__ === undefined;
+    if (document.querySelector('#modal:not([hidden])')) closeModal?.();
+    tab = 'lobby'; render(); const btn = () => document.querySelector('.lb-ico[data-act="phone"]');
+    o.icon = !!btn();
+    for (const s of Object.values(P().inbox)) s.done = true; updateBadge(); o.zero = !btn().querySelector('em');
+    let th = G.threads.find(t => threadChar(t)); if (!th) { th = { id: 'tt27', charId: G.chars[0].id, script: '' }; G.threads.push(th); }
+    P().inbox[th.id] = { at: Date.now(), t0: Date.now(), pos: 0, pick: 0, done: false, log: [] }; updateBadge(); o.one = btn().querySelector('em')?.textContent === '1';
+    P().inbox[th.id].done = true; updateBadge(); o.cleared = !btn().querySelector('em');
+    return o; });
+  assert.ok(Object.values(r27).every(v => v === true), JSON.stringify(r27)); assert.deepEqual(err27, [], '페이지 오류');
+  console.log('ok 27 자기점검 보강 결과: 용어(T)에 넣은 태그가 화면에서 실행되지 않음(가져온 게임·AI 용어), 대화 배지가 로비 아이콘에 바로 반영');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);

@@ -1,15 +1,18 @@
 # 자기점검 보고서
 
-생성: `node tools/check.mjs` · 2026-11-03T05:58 · 12.6초
+생성: `node tools/check.mjs` · 2026-11-03T06:26 · 9.9초
 
 | 항목 | 값 |
 |---|---|
-| 분석 단위 | main(한 스크립트 88파일 9840줄) + 모듈·부트 15개 |
-| 함수(최상위) | 1765 · 호출 간선 7043 |
+| 분석 단위 | main(한 스크립트 88파일 9840줄) + 모듈·부트 15개 + CSS 20개 + 부속 파일 17개(파이썬 2) |
+| 함수(최상위) | 1764 · 호출 간선 7037 |
 | 오류 | 0 |
 | 경고 | 0 |
 | 화면 액션 | 분배 표 535 · 발신 665 · 처리 665 · 처리기 없음 0 · 발신 없는 처리기 0 · 중복 처리 0 |
 | 상태 변경 함수 | 66 (저장 표시 없음 0) |
+| DOM id | 만드는 id 567 · 찾는 id 465 · 없는 id 0 |
+| HTML 주입 | esc() 없는 글 0 (HTML 안전하지 않은 함수: sub) |
+| CSS | 클래스 1001 · 오류 0 · 안 쓰는 클래스 36 |
 
 ## 오류 (0)
 
@@ -18,13 +21,13 @@
 ## 병목·경합 후보 (팬인 × 복잡도)
 | 함수 | 위치 | 부르는 함수 | 호출 수 | 부르는 함수 수(팬아웃) | 복잡도 | 상태 변경 |
 |---|---|---|---|---|---|---|
-| T | src/main/0010-rules.js:49 | 186 | 556 | 0 | 7 |  |
+| T | src/main/0010-rules.js:50 | 185 | 555 | 0 | 7 |  |
 | esc | src/main/0060-util.js:10 | 277 | 1246 | 0 | 2 |  |
-| mark | src/main/0070-save.js:121 | 184 | 361 | 3 | 6 |  |
-| P | src/main/0060-util.js:13 | 193 | 347 | 0 | 1 |  |
+| mark | src/main/0070-save.js:121 | 184 | 359 | 3 | 6 |  |
+| P | src/main/0060-util.js:13 | 192 | 346 | 0 | 1 |  |
 | openModal | src/main/0230-modal.js:4 | 128 | 150 | 1 | 3 |  |
 | render | src/main/0180-ui-scroll.js:33 | 58 | 158 | 17 | 20 |  |
-| $ | src/main/0060-util.js:4 | 161 | 856 | 0 | 1 |  |
+| $ | src/main/0060-util.js:4 | 159 | 845 | 0 | 1 |  |
 | toast | src/main/0060-util.js:22 | 159 | 576 | 0 | 1 |  |
 | imgSrc | src/main/0080-storage-integration.js:57 | 66 | 150 | 2 | 10 |  |
 | head | src/main/0230-modal.js:10 | 122 | 131 | 0 | 1 |  |
@@ -41,11 +44,11 @@
 - 비동기(타이머·이벤트)를 거치는 순환 0개: 없음
 
 ## 가장 깊은 호출 사슬 (콜스택)
-- 깊이 21: handleNavigationAndToolsAction → liveTick → seasonStart → aiPickupStory → aiEventGen → artAfterAI → artRun → main#go@801876 → runPrep → naiDrawItem → naiDrawItem0 → ensureLibPrompts → mark → naiBlocksGame → main#remember@71739 → naiBlocksRemember → naiBlocksUpgrade → naiBlocksKnownStyle → naiStyle → joinTags → tagList
-- 깊이 19: handleStoryAndAuthoringAction → puStoryBg → aiEventGen → artAfterAI → artRun → main#go@801876 → runPrep → naiDrawItem → naiDrawItem0 → ensureLibPrompts → mark → naiBlocksGame → main#remember@71739 → naiBlocksRemember → naiBlocksUpgrade → naiBlocksKnownStyle → naiStyle → joinTags → tagList
-- 깊이 19: handleEconomyAction → puStoryBg → aiEventGen → artAfterAI → artRun → main#go@801876 → runPrep → naiDrawItem → naiDrawItem0 → ensureLibPrompts → mark → naiBlocksGame → main#remember@71739 → naiBlocksRemember → naiBlocksUpgrade → naiBlocksKnownStyle → naiStyle → joinTags → tagList
-- 깊이 18: handleCombatAndFormationAction → dgMove → main#go@329730 → dgEnter → rgBattle → startStage → stamUse → openStam → stam → mark → naiBlocksGame → main#remember@71739 → naiBlocksRemember → naiBlocksUpgrade → naiBlocksKnownStyle → naiStyle → joinTags → tagList
-- 깊이 18: handleImagesAndAssetsAction → openNaiGen → registerNaiJob → artRun → main#go@801876 → runPrep → naiDrawItem → naiDrawItem0 → ensureLibPrompts → mark → naiBlocksGame → main#remember@71739 → naiBlocksRemember → naiBlocksUpgrade → naiBlocksKnownStyle → naiStyle → joinTags → tagList
+- 깊이 21: handleNavigationAndToolsAction → liveTick → seasonStart → aiPickupStory → aiEventGen → artAfterAI → artRun → main#go@801956 → runPrep → naiDrawItem → naiDrawItem0 → ensureLibPrompts → mark → naiBlocksGame → main#remember@71907 → naiBlocksRemember → naiBlocksUpgrade → naiBlocksKnownStyle → naiStyle → joinTags → tagList
+- 깊이 19: handleStoryAndAuthoringAction → puStoryBg → aiEventGen → artAfterAI → artRun → main#go@801956 → runPrep → naiDrawItem → naiDrawItem0 → ensureLibPrompts → mark → naiBlocksGame → main#remember@71907 → naiBlocksRemember → naiBlocksUpgrade → naiBlocksKnownStyle → naiStyle → joinTags → tagList
+- 깊이 19: handleEconomyAction → puStoryBg → aiEventGen → artAfterAI → artRun → main#go@801956 → runPrep → naiDrawItem → naiDrawItem0 → ensureLibPrompts → mark → naiBlocksGame → main#remember@71907 → naiBlocksRemember → naiBlocksUpgrade → naiBlocksKnownStyle → naiStyle → joinTags → tagList
+- 깊이 18: handleCombatAndFormationAction → dgMove → main#go@330114 → dgEnter → rgBattle → startStage → stamUse → openStam → stam → mark → naiBlocksGame → main#remember@71907 → naiBlocksRemember → naiBlocksUpgrade → naiBlocksKnownStyle → naiStyle → joinTags → tagList
+- 깊이 18: handleImagesAndAssetsAction → openNaiGen → registerNaiJob → artRun → main#go@801956 → runPrep → naiDrawItem → naiDrawItem0 → ensureLibPrompts → mark → naiBlocksGame → main#remember@71907 → naiBlocksRemember → naiBlocksUpgrade → naiBlocksKnownStyle → naiStyle → joinTags → tagList
 
 ## 복잡한 함수 (분기 ≥40 · 120줄 이상 · 중첩 ≥7) — 40
 | 함수 | 위치 | 복잡도 | 줄 | 중첩 |
@@ -61,7 +64,7 @@
 | fix | src/main/0070-save.js:41 | 78 | 75 | 4 |
 | damage | src/modules/combat/030-core.js:685 | 74 | 40 | 4 |
 | effectText | src/modules/combat/010-catalog.js:5 | 70 | 2 | 2 |
-| fcSend | src/main/0160-free-chat.js:37 | 69 | 39 | 3 |
+| fcSend | src/main/0160-free-chat.js:36 | 69 | 39 | 3 |
 | naiGenerate0 | src/main/0030-character-regen.js:533 | 68 | 62 | 4 |
 | studioHTML | src/main/0180-ui-scroll.js:553 | 68 | 81 | 1 |
 | liveTick | src/main/0290-season-rotation.js:69 | 64 | 43 | 4 |
@@ -102,6 +105,15 @@
 - 문서 전역 클릭 리스너 35개: src/main/0025-prompt-studio.js, src/main/0040-sound.js, src/main/0060-util.js, src/main/0065-inherit.js, src/main/0080-storage-integration.js, src/main/0125-tower.js, src/main/0130-gift.js, src/main/0135-schedule.js, src/main/0185-game-rules.js, src/main/0187-balance.js, src/main/0275-expedition.js, src/main/0330-casting.js, src/main/0445-factions.js, src/main/0455-persona.js, src/main/0465-story-plan.js, src/main/0485-battle-rules.js, src/main/0487-formation-sortie.js, src/main/0488-stage-modes.js, src/main/0505-construct.js, src/main/0510-actions/130-dispatch.js, src/main/0520-backup-storage.js, src/main/0525-data-folder.js, src/main/0530-story-memory.js, src/main/0535-content-audit.js, src/main/0560-image-candidates.js, src/main/0565-asset-library.js, src/modules/combat/040-effects.js, src/modules/combat/050-bridge.js, src/modules/combat/070-equipment.js, src/modules/combat/080-training.js, src/modules/combat/090-practice.js
 - 3번 이상 되풀이되는 긴 문자열 0개
 - 빈 catch 150개: 파싱 대체 31 · 동기 대체 64 · 저장소 대체 53 · 의도 표시 2 — 비동기 작업은 quietErr()로 기록하세요(경고)
-- esc() 없이 innerHTML에 넣는 이름·글 0곳: 
+- esc() 없이 HTML 템플릿에 넣는 이름·글·용어 0곳: 
 - 안 쓰는 함수 0개: 
 - 안 쓰는 최상위 변수·상수 0개: 
+
+## 저장·리스너·중계
+- 저장 키(writeKey): meta·world·opening·prog · 접두사 c:·ch:·l:·t: — 모르는 키 0
+- 떼지 않는 전역 리스너 0개
+- 중계 서버 허용 주소: proxy/worker.js 17개 · proxy/vercel/api/proxy.js 17개 — 차이 0 · 앱 API 주소 11개 중 허용 안 됨 0
+
+## CSS (src/style)
+- 파싱 오류·괄호 짝 0개
+- 코드·HTML 어디에도 없는 클래스 선택자 36개(지운 화면의 흔적 — 동적 접두사 `ls-${…}`는 씀으로 봄): `.lobby-stage` (src/style/0010-base.css:61), `.shade` (src/style/0010-base.css:62), `.vname` (src/style/0010-base.css:63), `.phbtn` (src/style/0010-base.css:70), `.nbadge` (src/style/0010-base.css:72), `.lobby-name` (src/style/0010-base.css:77), `.float` (src/style/0010-base.css:79), `.trio` (src/style/0010-base.css:99), `.bigart` (src/style/0010-base.css:133), `.picking` (src/style/0010-base.css:413), `.lb-menu` (src/style/0020-v3-theme-tactical-default-skins.css:54), `.lvrow` (src/style/0020-v3-theme-tactical-default-skins.css:78), `.cs-acts` (src/style/0030-lobby-nav-char-screen-pickup-shops.css:156), `.cs-stars` (src/style/0030-lobby-nav-char-screen-pickup-shops.css:161), `.styrow` (src/style/0030-lobby-nav-char-screen-pickup-shops.css:193), `.styhead` (src/style/0030-lobby-nav-char-screen-pickup-shops.css:194), `.lb-tl` (src/style/0080-desktop.css:28), `.lb-ban` (src/style/0080-desktop.css:28), `.ph-tabs` (src/style/0090-free-chat.css:2), `.fc-tag` (src/style/0090-free-chat.css:5), `.ch-boss` (src/style/0110-challenge-raid.css:7), `.sw-genre` (src/style/0120-2026-10-07-2.css:24), `.sw-pj` (src/style/0120-2026-10-07-2.css:34), `.sw-list` (src/style/0120-2026-10-07-2.css:54), `.disc-bg` (src/style/0120-2026-10-07-2.css:77), `.disc-t` (src/style/0120-2026-10-07-2.css:79), `.disc-rate` (src/style/0120-2026-10-07-2.css:83), `.disc-go` (src/style/0120-2026-10-07-2.css:84), `.collab-b` (src/style/0130-lobby-cleanup.css:88), `.look-who` (src/style/0150-cards.css:51), `.ca` (src/style/0160-card-battle.css:14), `.ca-n` (src/style/0160-card-battle.css:16), `.it-aoe` (src/style/0160-card-battle.css:19), `.ca-art` (src/style/0160-card-battle.css:21), `.cb-al` (src/style/0160-card-battle.css:27), `.dgb` (src/style/0160-card-battle.css:50)

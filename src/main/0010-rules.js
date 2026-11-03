@@ -46,7 +46,8 @@ const TERM_LABEL={player:'플레이어 호칭',currency:'유료 재화',gold:'�
 function explorationName(value){return typeof value==='string'&&value.trim()?value.replace(/\s+/g,' ').trim().slice(0,12):'미지 탐사';}
 const EXPLORATION_NAME_RULE_BASE='탐사 콘텐츠 이름(terms.abyss)은 세계관에 어울리는 2~12자 이름으로 짓는다. 파티를 편성해 여러 구역에서 전투·발견·사건을 겪고 돌아오는 반복 탐사 콘텐츠다. 지하·심연을 전제하지 말고, 다른 메뉴 이름과 구분한다.';
 pfDef('EXPLORATION_NAME_RULE','탐사 콘텐츠 이름',()=>EXPLORATION_NAME_RULE_BASE);
-function T(k){const t=(typeof G!=='undefined'&&G&&G.meta&&G.meta.terms)||{};return t[k]||DEFAULT_META.terms[k]||k;}
+// 용어는 AI·가져온 게임·직접 입력에서 와서 화면 템플릿 70여 곳에 그대로 들어가요. 태그가 될 < >는 빼고 " 는 ” 로 바꿔 돌려줘요(HTML 주입 방지, tools: esc() 없이 HTML에 넣는 글)
+function T(k){const t=(typeof G!=='undefined'&&G&&G.meta&&G.meta.terms)||{};return String(t[k]||DEFAULT_META.terms[k]||k).replace(/[<>]/g,'').replace(/"/g,'”');}
 function applyMeta(){
   const m=G.meta; ELEMS=m.elems.map(e=>e.n);
   Object.keys(ECOL).forEach(k=>delete ECOL[k]); Object.keys(BEATS).forEach(k=>delete BEATS[k]);
