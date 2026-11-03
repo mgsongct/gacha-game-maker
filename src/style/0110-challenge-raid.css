@@ -1,0 +1,40 @@
+/* ===== 도전 ===== */
+.ch-card{margin:12px 0;padding:14px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--rose);position:relative;overflow:hidden}
+.ch-card.raid{border-left-color:#ff5a5a}.ch-card.rog{border-left-color:#9a86ff}
+.ch-h i{display:block;font-style:normal;font-size:.62rem;letter-spacing:.2em;font-weight:800;color:var(--rose)}
+.ch-card.raid .ch-h i{color:#ff7a7a}.ch-card.rog .ch-h i{color:#b4a6ff}
+.ch-h h3{margin:2px 0 4px;font-family:var(--hd);font-size:1.4rem}.ch-h>span{display:block;font-size:.82rem;color:var(--sub);line-height:1.5}
+.ch-boss{position:relative;height:170px;display:grid;place-items:center;margin:8px 0;background:radial-gradient(circle,color-mix(in srgb,var(--ec) 25%,transparent),transparent 70%)}
+.ch-boss .en-img{max-height:100%;max-width:70%;object-fit:contain}.ch-boss .shape{width:110px;height:110px}.ch-boss .el{position:absolute;top:6px;left:6px}
+.rd-bar{position:relative;height:18px;background:var(--panel2);border:1px solid var(--line);margin-top:6px}
+.rd-bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#ff5a5a,#ffb400)}
+.rd-bar span{position:relative;display:block;text-align:center;font-size:.72rem;font-weight:700;line-height:18px;color:#fff;text-shadow:0 1px 2px #000}
+.rd-ms{display:flex;gap:4px;margin-top:6px}.rd-ms span{flex:1;text-align:center;font-size:.68rem;padding:2px 0;border:1px solid var(--line);color:var(--sub)}.rd-ms span.on{background:#ffb400;color:#111;border-color:#ffb400;font-weight:700}
+.rd-big{font-family:var(--en);font-size:2.4rem;font-weight:800;color:#ffd35a;line-height:1.1;margin:6px 0}.rd-big small{display:block;font-size:.7rem;color:#ccc;letter-spacing:.1em}
+.ch-sub{margin:12px 0 6px;font-size:.9rem}
+.rg-nodes,.rg-picks{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.rg-node,.rg-relic{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);text-align:center}
+.rg-node em{font-style:normal;font-size:1.5rem;line-height:1}.rg-node b,.rg-relic b{font-size:.88rem}.rg-node span,.rg-relic span{font-size:.68rem;color:var(--sub);line-height:1.35}
+.rg-node.n-elite{border-color:#ff7a7a}.rg-node.n-boss{border-color:#ffb400;grid-column:1/-1}.rg-node.n-rest{border-color:#4fd18b}.rg-node.n-treasure{border-color:#9a86ff}
+.rg-relic{border-color:#9a86ff}
+.rg-sq{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.rg-u{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.72rem}.rg-u.down{filter:grayscale(1);opacity:.5}
+.rg-a{width:100%;aspect-ratio:1;overflow:hidden;background:var(--panel2)}.rg-a .art{width:100%;height:220%;object-fit:contain;object-position:50% 0}
+.rg-u .hpb{width:100%;height:5px;background:var(--panel2)}.rg-u .hpb i{display:block;height:100%;background:#4fd18b}
+.rg-rel{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}.rg-rel span{font-size:.7rem;padding:2px 8px;background:rgba(154,134,255,.15);border:1px solid rgba(154,134,255,.5)}
+.rg-msg{color:#b4a6ff!important;font-weight:600}
+
+.fc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.fc-it{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;background:var(--panel2);border:1px solid var(--line)}
+.fc-it img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:50% 8%}
+.fc-empty{width:100%;aspect-ratio:3/4;display:grid;place-items:center;font-size:.7rem;color:var(--sub);border:1px dashed var(--line)}
+.fc-it b{font-size:.78rem}.fc-it .row{gap:4px}.fc-it .btn.sm{padding:3px 7px;font-size:.7rem}
+
+.vn-char.up .art.upimg{height:100%;align-self:flex-end;object-position:50% 100%}
+.cs-art.up .art.upimg{height:100%;object-position:50% 100%}
+.up-box img{object-fit:contain;background:repeating-conic-gradient(#2a2d36 0 25%,#1d2027 0 50%) 0 0/16px 16px}
+
+.gf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.gf-it{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;background:var(--panel2);border:1px solid var(--line);color:var(--ink)}
+.gf-it em{font-style:normal;font-size:1.8rem;line-height:1.1}.gf-it b{font-size:.82rem}.gf-it span{font-size:.7rem;color:var(--sub)}
+.gf-like{font-style:normal;color:#ff6a9a;font-weight:700}.gf-meh{font-style:normal;opacity:.7}

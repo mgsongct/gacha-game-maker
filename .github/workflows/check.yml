@@ -1,0 +1,14 @@
+name: check
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }   # build/test.mjs 2b가 원본 커밋(13a3fe9)을 읽어요
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node build/build.mjs --check   # www/index.html이 src/와 같은지 (src만 고치고 빌드를 잊으면 실패)
+      - run: python3 pc/test_store.py
+      - run: node build/test.mjs            # playwright가 없으면 4~6(브라우저) 건너뜀
+      - run: node build/compare.mjs         # 원본 대비 바뀐 모듈 목록 (로그 확인용)

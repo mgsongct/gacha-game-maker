@@ -1,0 +1,63 @@
+/* ===== PC 화면 ===== */
+body.desk{--colw:min(540px,calc(100dvh * .68));--colL:calc((100vw - var(--colw)) / 2);background:#05040a}
+body.desk::before{content:"";position:fixed;inset:-40px;background:var(--deskbg,none) center/cover,radial-gradient(ellipse at 50% 40%,color-mix(in srgb,var(--rose) 18%,transparent),transparent 65%);filter:blur(26px) brightness(.32) saturate(1.2);z-index:-1;pointer-events:none}
+body.desk #app{max-width:var(--colw);background:var(--bg);box-shadow:0 0 0 1px rgba(255,255,255,.06),0 0 80px rgba(0,0,0,.7)}
+body.desk .tabs-in,body.desk .sheet{max-width:var(--colw)}
+body.desk .tabs,body.desk .modal,body.desk .ov,body.desk #phone,body.desk #notif,body.desk .gate,body.desk .buyfx,body.desk .lbrev{left:var(--colL);right:var(--colL)}
+body.desk .tabs{border-left:1px solid var(--line);border-right:1px solid var(--line)}
+body.desk ::-webkit-scrollbar{width:8px;height:8px}body.desk ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:8px}
+body.desk button:not(:disabled),body.desk [data-act]{cursor:pointer}
+body.desk .btn:hover{filter:brightness(1.12)}body.desk .tab:hover b{color:var(--rose)}
+#deskSide{position:fixed;top:50%;transform:translateY(-50%);left:max(24px,calc(var(--colL) - 280px));width:240px;color:#e9e5f2;z-index:1;display:none}
+@media (min-width:1180px){ body.desk #deskSide{display:block} }
+/* PC 가로 화면: 로비는 창 전체, 다른 화면은 가운데 넓게 */
+body.desk.wide{--colw:100vw;--colL:0px}
+body.desk.wide #app{max-width:none;box-shadow:none;background:transparent}
+body.desk.wide #deskSide{display:none!important}
+body.desk.wide .top{padding:8px 28px}
+body.desk.wide:not(.on-lobby) #view{width:100%;max-width:1180px;margin:0 auto;padding-left:24px;padding-right:24px;box-sizing:border-box}
+body.desk.wide .tabs{left:0;right:0}
+body.desk.wide.on-lobby .tabs{background:linear-gradient(180deg,transparent,rgba(5,4,10,.92) 40%);border:0}
+body.desk.wide .grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+body.desk.wide .banner{max-width:980px;margin-left:auto;margin-right:auto}
+body.desk.wide .tabs-in{max-width:760px}
+body.desk.wide .modal{left:0;right:0;align-items:center}
+body.desk.wide .sheet{max-width:760px;border-radius:14px;max-height:90%}
+body.desk.wide #phone{left:auto;right:28px;width:430px;top:24px;bottom:24px;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+body.desk.wide .lobby{height:calc(100dvh - 120px);min-height:0}
+@media (max-height:560px){ body.desk.wide .top{padding:2px 16px} body.desk.wide .tab{padding:4px 0 5px} body.desk.wide .tab i{display:none} body.desk.wide .lobby{height:calc(100dvh - 82px)} body.desk.wide .lb-tl .lb-ban,body.desk.wide .lb-season{transform:scale(.8);transform-origin:top left} body.desk.wide .lobby.short .lb-id{display:none} body.desk.wide .lobby.short .lb-left,body.desk.wide .lobby.short .lb-right{display:grid;grid-template-columns:repeat(2,44px);gap:2px 4px} body.desk.wide .lobby.short .lb-right{direction:rtl} }
+body.desk.wide .lb-stage .lobby-art{left:18%;width:64%;height:98%}
+body.desk.wide .lb-stage .ph.lobby-art{left:35%;width:30%}
+body.desk.wide .froster{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+body.desk.wide .ov,body.desk.wide .lbrev,body.desk.wide #notif,body.desk.wide .gate,body.desk.wide .buyfx{left:0;right:0}
+/* 로비 일러스트: 세로 그림을 가운데 폰 크기로, 양옆은 검게 흐려지게 */
+body.desk.wide .lobby.ill .lb-stage{background:#000!important}
+body.desk.wide .lobby-ill{left:0;right:0;margin:0 auto;width:auto;max-width:100%;height:100%;object-fit:contain;object-position:50% 0;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 86%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 86%,transparent 100%)}
+body.desk.wide .lobby.lbsz-fit .lobby-ill{top:0;height:100%}
+/* 타이틀: 로비처럼 가운데 폰 크기 그림 + 제목은 화면 정중앙 */
+body.desk.wide .title .t-ill{inset:0;background:#000;animation:none}
+body.desk.wide .title .t-ill img{display:block;width:auto;max-width:100%;height:100%;margin:0 auto;object-fit:contain;object-position:50% 0;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 86%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 86%,transparent 100%)}
+body.desk.wide .title .t-char{right:auto;left:50%;width:min(60vh,46vw);margin-left:calc(min(60vh,46vw) / -2)}
+body.desk.wide .title .t-logo{left:max(7%,calc(env(safe-area-inset-left,0px) + 16px));right:7%;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 132px);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;text-align:left;pointer-events:none}
+body.desk.wide .title .t-kr{font-size:clamp(36px,min(8vw,14dvh),132px)}
+/* 로비 아래쪽: 대사는 작은 상자로, 상점·출격은 캐릭터 양옆 가운데 폭으로 */
+body.desk.wide .lobby .lb-foot{left:max(10px,calc(50% - 470px));right:max(10px,calc(50% - 470px))}
+body.desk.wide .lobby .bubble,body.desk.wide .lobby.ill .bubble{align-self:center;max-width:440px;width:auto;margin:0 auto;font-size:.86rem;padding:7px 12px}
+body.desk.wide .lobby .lb-bottom{justify-content:space-between}
+body.desk.wide .lobby .lb-sortie{flex:0 0 300px;margin-left:auto}
+/* 전투: 아래 대원 칸은 작게 가운데, 버스트 통은 크게, 필살 컷인은 화질이 깨지지 않게 폭 제한 */
+body.desk.wide .bt-al{max-width:640px;width:100%;margin:0 auto;gap:8px}
+body.desk.wide .au-art{height:96px}
+body.desk.wide .scut-band{left:calc(50% - 620px);right:calc(50% - 620px);top:16%;bottom:16%}
+body.desk.wide .scut-st{right:calc(50% - 520px);width:520px}
+body.desk.wide .scut-t{left:calc(50% - 560px)}
+body.desk.wide .cutin{left:calc(50% - 560px);right:calc(50% - 560px)}
+
+.ds-logo i{display:block;font-style:normal;font-size:.62rem;letter-spacing:.32em;color:var(--rose);font-weight:800}
+.ds-logo b{display:block;font-family:var(--hd);font-size:2rem;line-height:1.15;margin:4px 0}
+.ds-logo span{font-size:.75rem;letter-spacing:.2em;opacity:.6}
+.ds-keys{margin-top:26px;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-left:3px solid var(--rose)}
+.ds-keys h4{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;opacity:.8}.ds-keys p{margin:6px 0;font-size:.85rem}
+kbd{display:inline-block;min-width:1.4em;padding:1px 6px;font:600 .75rem/1.4 var(--en,monospace);text-align:center;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-bottom-width:2px}
+.ds-foot{margin-top:14px;font-size:.72rem;opacity:.5}
+

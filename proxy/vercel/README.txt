@@ -8,7 +8,7 @@ Cloudflare Workers 판(../worker.js)과 똑같이 동작하니 둘 중 편한 �
 2. vercel.com → Add New → Project → 그 저장소를 고르고 Deploy.
    (폴더 안에 넣었다면 Root Directory를 그 폴더로 지정)
 3. 프로젝트 Settings → Environment Variables에 ALLOW_ORIGIN = 내 웹 주소(예: https://내아이디.github.io)를 넣고 다시 배포.
-   공식 웹(https://jjhk0803.github.io)으로만 쓸 거면 넣지 않아도 돼요.
+   이 포크의 웹(https://mgsongct.github.io)으로만 쓸 거면 넣지 않아도 돼요.
 4. 앱 설정 → 화면·연출 → 중계 서버 설정에 https://내프로젝트.vercel.app 을 넣어요.
 
 참고

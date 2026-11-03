@@ -1,0 +1,48 @@
+/* Persistent game records. Small preferences stay in localStorage; images keep their original keys. */
+(function(root){
+'use strict';
+const managed=k=>k==='starfall-projects'||/^starfall-contract-v1(?:-|$)/.test(k), live=k=>k==='starfall-live-html'||k==='starfall-live-prev';
+function create(env=root){
+ const cache=new Map(),baseline=new Map(),pending=new Map();let db=null,tail=Promise.resolve(),error=null,revision=0;
+ const ls=env.localStorage,fs=env.Capacitor?.Plugins?.Filesystem;
+ function report(e){error=e;env.dispatchEvent?.(new env.CustomEvent('ggm-storage-error',{detail:{message:String(e.message||e)}}));}
+ function tx(stores,mode,fn){return new Promise((resolve,reject)=>{const t=db.transaction(stores,mode,mode==='readwrite'?{durability:'strict'}:{});let result;try{result=fn(t);}catch(e){t.abort();reject(e);return;}t.oncomplete=()=>resolve(result);t.onerror=t.onabort=()=>reject(t.error||Error('저장 작업이 취소되었습니다'));});}
+ const getDisk=k=>new Promise((res,rej)=>{const q=db.transaction('records').objectStore('records').get(k);q.onsuccess=()=>res(q.result??null);q.onerror=()=>rej(q.error);});
+ function conflict(){const e=Error('다른 메이커 화면에서 저장한 최신 기록이 있습니다. 이 화면의 변경 내용을 백업한 뒤 다른 화면을 닫고 다시 실행해 주세요. 최신 기록은 덮어쓰지 않았습니다.');e.code='storage_conflict';return e;}
+ // Compare and write inside ONE transaction. A check made before opening it has a race window.
+ async function checked(changes,stores=[],work,guardsOnly=false){let failure=null;try{await tx([...new Set(['records',...stores])],'readwrite',t=>{const s=t.objectStore('records');let left=changes.length;const write=()=>{if(!guardsOnly)for(const[k,v]of changes)v===null?s.delete(k):s.put(v,k);if(work)work(t);};if(!left){write();return;}for(const[k,v]of changes){const q=s.get(k);q.onsuccess=()=>{if(failure)return;const disk=q.result??null;if(disk!==(baseline.get(k)??null)&&disk!==v){failure=conflict();t.abort();return;}if(!--left)write();};}});}catch(e){throw failure||e;}for(const[k,v]of changes)v===null?baseline.delete(k):baseline.set(k,v);}
+ async function assertCurrent(k){if(db&&(await getDisk(k))!==(baseline.get(k)??null)){const e=conflict();report(e);throw e;}}
+ async function recoverProjects(){const games=[...cache].filter(([k])=>k!=='starfall-projects');if(!games.length){const raw=cache.get('starfall-projects');if(raw){let p;try{p=JSON.parse(raw);}catch(e){throw Error('게임 목록을 읽지 못했습니다. 기존 기록을 초기화하지 않았습니다.');}if(p?.active!=='main')throw Error('선택한 게임의 저장 데이터가 없습니다. 빈 게임으로 덮어쓰지 않고 중단합니다.');}return;}let pj;try{pj=JSON.parse(cache.get('starfall-projects'));}catch(e){}if(!pj||!Array.isArray(pj.list))pj={active:'main',list:[]};const key=id=>id==='main'?'starfall-contract-v1':'starfall-contract-v1-'+id;const exists=id=>cache.has(key(id));const seen=new Set();pj.list=pj.list.filter(x=>x&&typeof x.id==='string'&&!seen.has(x.id)&&(seen.add(x.id),true));for(const[k,v]of games){const id=k==='starfall-contract-v1'?'main':k.slice('starfall-contract-v1-'.length);if(!seen.has(id)){pj.list.push({id,title:JSON.parse(v).meta?.title||'복구된 게임'});seen.add(id);}}if(!exists(pj.active))pj.active=pj.list.find(x=>exists(x.id)).id;const json=JSON.stringify(pj);if(json!==cache.get('starfall-projects')){await checked([['starfall-projects',json]]);cache.set('starfall-projects',json);}}
+ async function open(){if(db)return db;db=await new Promise((res,rej)=>{const q=env.indexedDB.open('starfall-img',2);q.onupgradeneeded=()=>{for(const name of ['img','records','staging'])if(!q.result.objectStoreNames.contains(name))q.result.createObjectStore(name);};q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);q.onblocked=()=>rej(Error('다른 메이커 화면을 닫은 뒤 다시 실행해 주세요'));});db.onversionchange=()=>{db.close();db=null;};return db;}
+ async function init(){
+  if(!env.indexedDB)return api; // Legacy engines remain usable, with explicit failure reporting on quota errors.
+  await open();const interrupted=env.sessionStorage?.getItem('ggm-backup-staging');if(interrupted){await discard(interrupted);env.sessionStorage.removeItem('ggm-backup-staging');}await new Promise((res,rej)=>{const q=db.transaction('records').objectStore('records').openCursor();q.onsuccess=()=>{const c=q.result;if(!c){res();return;}if(managed(c.key))cache.set(c.key,c.value);c.continue();};q.onerror=()=>rej(q.error);});
+  const old=[];for(let i=0;i<ls.length;i++){const k=ls.key(i);if(managed(k))old.push([k,ls.getItem(k)]);}
+  for(const [k,v]of old){if(!cache.has(k)){if(k!=='starfall-projects'&&!Array.isArray(JSON.parse(v)?.chars))throw Error('기존 게임 데이터를 확인하지 못했습니다');await tx(['records'],'readwrite',t=>t.objectStore('records').put(v,k));if(await getDisk(k)!==v)throw Error('기존 저장 데이터 이전을 확인하지 못했습니다');cache.set(k,v);}ls.removeItem(k);}
+  for(const [k,v]of cache){baseline.set(k,v);if(k==='starfall-projects')continue;const g=JSON.parse(v);if(!g||!Array.isArray(g.chars))throw Error('저장 데이터를 읽지 못했습니다. 초기화하지 않고 중단합니다.');}
+  await recoverProjects();
+  // New shells read these files before starting the game. Older shells must keep their boot copy until APK replacement.
+  if(env.__STORAGE_SHELL__){for(const k of ['starfall-live-html','starfall-live-prev']){const v=ls.getItem(k);if(v){await writeLive(k,v);if(await readLive(k)!==v)throw Error('기존 업데이트 파일 이전을 확인하지 못했습니다');ls.removeItem(k);}}}
+  return api;
+ }
+ function queue(){tail=tail.catch(()=>{}).then(async()=>{if(!pending.size)return;const batch=[...pending];await checked(batch.map(([k,r])=>[k,r.value]));for(const[k,r]of batch)if(pending.get(k)===r)pending.delete(k);error=null;env.dispatchEvent?.(new env.CustomEvent('ggm-storage-ok'));});tail.catch(report);return tail;}
+ function setItem(k,v){v=String(v);if(db&&managed(k)){cache.set(k,v);pending.set(k,{value:v,rev:++revision});queue();}else{try{ls.setItem(k,v);}catch(e){report(e);throw e;}}}
+ function getItem(k){return db&&managed(k)?cache.get(k)??null:ls.getItem(k);}
+ function removeItem(k){if(db&&managed(k)){cache.delete(k);pending.set(k,{value:null,rev:++revision});queue();}else ls.removeItem(k);}
+ async function drain(){if(pending.size)queue();await tail;if(error&&!pending.size&&error.code!=='storage_conflict')error=null;if(error)throw error;}
+ async function readLive(k){if(fs&&env.__STORAGE_SHELL__){try{return (await fs.readFile({path:'updates/'+k+'.html',directory:'DATA',encoding:'utf8'})).data;}catch(e){if(/not.*exist|ENOENT|not.*found/i.test(String(e.message||e)))return null;throw e;}}
+  return db?await getDisk(k):ls.getItem(k);}
+ async function writeLive(k,v){if(fs&&env.__STORAGE_SHELL__){const path='updates/'+k+'-'+Date.now()+'.tmp';await fs.writeFile({path,data:v,directory:'DATA',encoding:'utf8',recursive:true});const r=await fs.readFile({path,directory:'DATA',encoding:'utf8'});if(r.data!==v)throw Error('업데이트 파일 확인에 실패했습니다');await fs.rename({from:path,to:'updates/'+k+'.html',directory:'DATA',toDirectory:'DATA'});}
+  else if(db)await tx(['records'],'readwrite',t=>t.objectStore('records').put(v,k));else ls.setItem(k,v);}
+ async function saveLive(html){const old=await readLive('starfall-live-html')||ls.getItem('starfall-live-html');if(old)await writeLive('starfall-live-prev',old);await writeLive('starfall-live-html',html);if(!env.__STORAGE_SHELL__)throw Error('이 APK는 새 저장 방식을 시작할 수 없습니다. 새 APK를 삭제 없이 덮어 설치해 주세요.');}
+ async function clear(){await drain();if(db)await tx(['records','staging','img'],'readwrite',t=>{for(const n of ['records','staging','img'])t.objectStore(n).clear();});cache.clear();baseline.clear();ls.clear();if(fs)try{await fs.rmdir({path:'updates',directory:'DATA',recursive:true});}catch(e){if(!/not.*exist|ENOENT|not.*found/i.test(String(e.message||e)))throw e;}}
+ async function stage(id,record){await open();await tx(['staging'],'readwrite',t=>t.objectStore('staging').put(record,id));}
+ async function discard(prefix){if(!db)return;await tx(['staging'],'readwrite',t=>{const q=t.objectStore('staging').openCursor();q.onsuccess=()=>{const c=q.result;if(c){if(String(c.key).startsWith(prefix))c.delete();c.continue();}};});}
+ async function commitRecords(records,prefix=null,namespace=''){await drain();const changes=Object.entries(records);if(changes.some(([k,v])=>!managed(k)||typeof v!=='string'))throw Error('게임 저장 항목을 확인해 주세요');if(!db){const previous=changes.map(([k])=>[k,ls.getItem(k)]);try{for(const[k,v]of changes)ls.setItem(k,v);}catch(e){for(const[k,v]of previous)try{v===null?ls.removeItem(k):ls.setItem(k,v);}catch(ignore){}throw e;}return;}await checked(changes,prefix?['staging','img']:[],prefix?t=>{const q=t.objectStore('staging').openCursor();q.onsuccess=()=>{const c=q.result;if(c){if(String(c.key).startsWith(prefix)){const r=c.value;t.objectStore('img').put(r.blob,r.global?r.key:namespace+r.key);c.delete();}c.continue();}};}:null);for(const[k,v]of changes)cache.set(k,v);}
+ async function commitImport(prefix,key,json,namespace,extra={}){return commitRecords({[key]:json,...extra},prefix,namespace);}
+ async function mediaWrite(k,value,guard){await drain();try{await checked(guard?[[guard,baseline.get(guard)??null]]:[],['img'],t=>value===null?t.objectStore('img').delete(k):t.objectStore('img').put(value,k),true);}catch(e){report(e);throw e;}}
+ const api={init,open,getItem,setItem,removeItem,drain,assertCurrent,mediaWrite,commitRecords,readLive,writeLive,saveLive,clear,stage,discard,commitImport,get durable(){return !!db;},get failed(){return error;},get pending(){return pending.size;},get length(){return new Set([...Array.from({length:ls.length},(_,i)=>ls.key(i)),...cache.keys()]).size;},key(i){return [...new Set([...Array.from({length:ls.length},(_,j)=>ls.key(j)),...cache.keys()])][i]??null;}};return api;
+}
+root.GGMStorage={create,managed};
+})(typeof window==='undefined'?globalThis:window);
+

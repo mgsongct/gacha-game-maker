@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<script>
+<!--@ boot/head.js -->
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14161a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="가챠 메이커">
+<title>가챠 게임 메이커</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;600;700&family=Rajdhani:wght@500;700&family=Nanum+Myeongjo:wght@700;800&family=Cinzel:wght@600&family=Hahmlet:wght@700;900&family=Song+Myung&family=Orbit&family=Gasoek+One&family=Bagel+Fat+One&display=swap" rel="stylesheet">
+<style>
+<!--@ style/ -->
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand">&nbsp;</div>
+    <div class="res"><span class="r-gold" title="일반 재화"><i class="rico" id="ic_gold">●</i><b id="gold">0</b></span><span class="r-stam" title="행동력" data-act="stamopen" id="stamBox"><i class="rico">⚡</i><b id="stamV">0</b></span><span class="r-gem" title="유료 재화" data-act="go" data-to="cash"><i class="rico" id="ic_gems">◆</i><b id="gems">0</b></span></div>
+  </header>
+  <main id="view"></main>
+</div>
+<nav class="tabs" aria-label="메뉴"><div class="tabs-in">
+  <button class="tab" data-tab="crew"><b id="tb_crew">대원</b><i>UNITS</i></button>
+  <button class="tab" data-tab="ops"><b id="tb_ops">작전</b><i>COMBAT</i></button>
+  <button class="tab home" data-tab="lobby"><span class="dia"></span><b>로비</b><i>HOME</i></button>
+  <button class="tab" data-tab="contract"><b id="tb_gacha">계약</b><i>RECRUIT</i></button>
+  <button class="tab" data-tab="studio"><b>설정</b><i>SYSTEM</i></button>
+</div></nav>
+<div class="ov" id="ov" hidden></div>
+<div id="phone" hidden></div>
+<div class="modal" id="modal" hidden></div>
+<div id="notif"></div>
+<input type="file" id="file" accept="image/*" hidden>
+<input type="file" id="afile" accept="audio/*" hidden>
+<!-- Backups use content validation: Android providers may not recognize custom extensions in accept. -->
+<input type="file" id="durable-backup-file" hidden>
+<input type="file" id="bkfile" hidden>
+<input type="file" id="drfile" accept=".json,.txt,application/json,text/plain" hidden>
+
+<!--@modules modules/app/ ggm-app- -->
+<!-- COMBAT_V2_BUNDLE -->
+<!--@modules modules/combat/ ggm-combat- -->
+<!-- /COMBAT_V2_BUNDLE -->
+<script id="ggm-durable-storage">
+<!--@ boot/durable-storage.js -->
+</script>
+<script type="text/ggm-main" id="ggm-main">
+<!--@ main/ -->
+</script>
+<script id="ggm-storage-boot">
+<!--@ boot/storage-boot.js -->
+</script>
+</body>
+</html>
