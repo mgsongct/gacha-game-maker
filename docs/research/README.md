@@ -8,6 +8,7 @@
 | [expedition.md](expedition.md) | 원정(파견)의 장르별 확장: 전투형 원정 · 방송 출연(인지도 등급에 따라 배정→선택, 컨디션·휴식기) · 스트리머(플랫폼·영상 라이브러리·라이브) · 경영(파트 배치, 실적×평판 정산) | `src/modules/app/030-expedition.js`(엔진), `src/main/0275-expedition.js`(화면·상태) |
 | [game-rules.md](game-rules.md) | 게임 규칙 공개·편집: 속성 추가·제거·상성표·반응, 포지션(직군·함종, 기능 설계), 속성 상성(이기는 속성·배율), 역할 기본 능력치·속도, 희귀도 배율, 진영 시너지, 진영·역할·속성 관계 배율, 도감 기록 | `src/main/0185-game-rules.js`, 전투 엔진 `src/modules/combat/030-core.js` |
 | [balance.md](balance.md) | 밸런스 관리: 세대 인플레 제어(고정·자동 상승), AI 능력치 편차 점검·보수(성향 유지), 생성 시 자동 보정, 구캐릭터 AS(전투 보정·리마스터) | `src/main/0187-balance.js`, 엔진 `genBoost` |
+| [character.md](character.md) | 캐릭터 개성·매력: 개성 시트·프로필 템플릿·개성 검수(빠짐·흔함·겹침·말투), AI 채우기·다듬기·평가, 인연 톡(호감도 단계)·메모리얼 | `src/main/0455-persona.js` |
 | [content-audit.md](content-audit.md) | 콘텐츠 점검·업그레이드: 생성 기능 향상·구버전 생성물(genVer) 감지, 자동 변환·AI 채우기·지정 변환·되돌리기, 규칙 추가 방법 | `src/main/0535-content-audit.js` |
 | [variants.md](variants.md) | 바리에이션(이격·영의): 공통 템플릿, 조건으로 자동 적용, **상속형 관리(원본 + 수정치)**, 캐릭터 특징을 반영한 디자인 프롬프트 | 같은 파일들 + `src/main/0065-inherit.js`, `aiAltChar`(`src/main/0290-season-rotation.js`) |
 

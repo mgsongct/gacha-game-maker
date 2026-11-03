@@ -230,7 +230,7 @@ try {
     tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="audopen"]') && !!document.body.innerHTML.includes('생성 기능 향상');
     await auditFix(R('c_age'), [A]); o.ageFixed = !has('c_age', A); await auditFix(R('c_symbol'), [A]); o.symbol = !!A.symColor;
     auditUndo(); o.undo = !A.symColor && has('c_symbol', A);
-    let asked = ''; SAMPLE = { json: async p => { asked = p; return /"pre"/.test(p) ? { pre: '[사무소]\n세라: 시작하자.' } : /반말/.test(p) ? { lines: ['반말1', '반말2', '반말3'] } : { lines: ['대사1', '대사2', '대사3', '대사4'] }; } };
+    let asked = ''; SAMPLE = { json: async p => { asked = p; return /"pre"/.test(p) ? { pre: '[사무소]\n세라: 시작하자.' } : /다음 지시대로/.test(p) ? { lines: ['반말1', '반말2', '반말3'] } : { lines: ['대사1', '대사2', '대사3', '대사4'] }; } };
     await auditFix(R('c_lines'), [A]); o.aiFill = A.lines.length === 4 && !has('c_lines', A) && /평소 대사/.test(asked);
     await auditConvert([A], ['lines'], '대사를 모두 반말로'); o.convert = A.lines[0] === '반말1'; auditUndo(); o.convertUndo = A.lines[0] === '대사1';
     await auditFix(R('s_script'), [st]); o.stage = /세라: 시작하자/.test(st.pre); st.pre = preBefore;
@@ -297,6 +297,31 @@ try {
     return o; });
   assert.ok(Object.values(r14).every(v => v === true), JSON.stringify(r14)); assert.deepEqual(err14, [], '페이지 오류');
   console.log('ok 14 밸런스: 능력치 편차 점검·보수(성향 유지·기준값)·생성 시 자동 보정, 세대 고정·자동 상승, 구캐릭터 AS 전투 보정(엔진)·리마스터, 점검 규칙, 되돌리기');
+
+  // 15) 캐릭터 개성·매력: 개성 시트·프로필 템플릿·검수(빠짐·흔함·겹침·말투), AI 채우기·다듬기, 인연 톡(호감도 해금), 메모리얼(로비 대사), 상속, 점검 규칙
+  const p15 = await browser.newPage(), err15 = []; p15.on('pageerror', e => err15.push(String(e)));
+  await p15.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p15.goto(`http://127.0.0.1:${server.address().port}/?t=15`);
+  await p15.waitForFunction(() => typeof personaReview === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r15 = await p15.evaluate(async () => {
+    const o = {}, sera = charById('sera'); o.sample = !!(sera.persona && sera.persona.gap) && personaReview(sera).score > 40 && ctx().includes('반전 매력');
+    const copy = cleanChar({ name: '복사', role: 'atk', persona: sera.persona, lines: sera.lines }); G.chars.push(copy); o.dup = personaReview(copy).issues.some(x => x.msg.includes('세라'));
+    const gen = cleanChar({ name: '흔함', role: 'sup', persona: { traits: ['밝음', '친절', '상냥'], ending: '~냥' }, lines: ['안녕하세요', '좋은 아침', '힘내요'] }); G.chars.push(gen);
+    const rg = personaReview(gen); o.generic = rg.issues.some(x => x.msg.includes('흔해요')) && rg.issues.some(x => x.msg.includes('말투')) && rg.score < personaReview(sera).score;
+    SAMPLE = { json: async p => /인연 톡/.test(p) ? { threads: [2, 4, 6, 8].map(lv => ({ lv, title: '톡' + lv, script: `흔함: 안녕~냥 ${lv}\n선택: 응 | 아니` })) } : /메모리얼/.test(p) ? { title: '별빛 약속', script: '[옥상]\n흔함: 고마워~냥', lines: ['기억할게~냥', '또 와~냥'] } : { persona: { traits: ['겁 많은 수호자', '고양이 말투', '밤샘 연구'], self: '나', ending: '~냥', quirk: '냥냥', catch: '지켜줄게~냥', gap: '겁쟁이인데 위기에선 제일 앞에 선다', flaw: '거절을 못 한다', want: '평온한 하루', fear: '천둥' }, pfields: { 생일: '3월 3일', 신장: '158cm' }, lines: ['좋은 아침이다~냥', '지켜줄게~냥', '냥냥, 힘내자', '천둥은 싫어~냥'] } };
+    await personaAI(gen, 'fill'); o.fill = gen.persona.gap && gen.persona.traits.includes('밝음') && gen.pfields.생일 === '3월 3일';
+    await personaAI(gen, 'improve', { lines: true }); o.improve = gen.persona.traits.includes('겁 많은 수호자') && gen.lines[0] === '좋은 아침이다~냥' && personaReview(gen).score > rg.score;
+    if (!own(gen.id)) grantOwned(gen, 't'); const n = await talkAffGen(gen); o.talk = n === 4 && affThreads(gen).length === 4;
+    const ok = await memorialGen(gen); o.memo = ok && gen.memorial.lv === 8 && !memoOpen(gen);
+    P().seenOpening = true; addAff(gen, 100000); checkTriggers(true); o.unlock = memoOpen(gen) && affThreads(gen).every(t => P().inbox[t.id]);
+    P().memoOn = { [gen.id]: true }; o.lobby = affLinePool0(gen).includes('기억할게~냥');
+    const alt = cleanChar({ name: '흔함(수영복)', role: 'sup', persona: gen.persona }); alt.alt = gen.id; G.chars.push(alt); mark('c:' + alt.id); gen.persona = { ...gen.persona, catch: '원본이 바꾼 대사' }; mark('c:' + gen.id); o.inherit = alt.persona.catch === '원본이 바꾼 대사';
+    openChar(gen.id); o.infoTab = document.body.innerHTML.includes('개성') && document.body.innerHTML.includes('인연 톡'); closeModal();
+    openPersona(gen.id); document.querySelector('[data-ps="catch"]').value = '바꾼 대사'; document.querySelector('[data-act="pssave"]').click(); o.edit = gen.persona.catch === '바꾼 대사'; closeModal();
+    const hanna = charById('hanna'); o.audit = auditScan().some(g => g.rule.id === 'c_afftalk' && g.items.includes(hanna)) && auditScan().some(g => g.rule.id === 'c_memorial' && g.items.includes(hanna));
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="psopen"]'); openPersonaAll(); document.querySelector('#ps_tpl').value = 'idol'; document.querySelector('#ps_tpl').dispatchEvent(new Event('change', { bubbles: true })); document.querySelector('[data-act="pscfg"]').click(); o.tpl = PERSONA_CFG().tpl.includes('팬덤 이름'); closeModal();
+    return o; });
+  assert.ok(Object.values(r15).every(v => v === true), JSON.stringify(r15)); assert.deepEqual(err15, [], '페이지 오류');
+  console.log('ok 15 캐릭터 개성: 개성 시트·검수(겹침·흔함·말투)·AI 채우기·다듬기, 인연 톡(호감도 해금), 메모리얼(로비 대사), 상속, 점검 규칙, 프로필 템플릿');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
