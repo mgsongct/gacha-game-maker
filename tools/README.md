@@ -40,6 +40,12 @@ node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(
 | 부속 파일 | 서비스 워커·중계 서버(Cloudflare·Vercel)·빌드·도구 스크립트 tree-sitter 파싱, PC 서버 파이썬 `ast.parse` | **오류** |
 | 중계 서버 허용 주소 | 두 중계 서버의 `ALLOW_HOSTS`가 같은지, 앱이 부르는 API 주소(호출 첫 인자·`base`/`url`/`endpoint` 값·`…DEF`/`…ENDPOINT` 상수의 https 주소 중 API 모양)가 목록에 있는지 | **경고**(웹 버전 중계에서 host not allowed) |
 
+## 데이터 생애주기 (`node tools/lifecycle.mjs [--ref <원안 git 기준>]`)
+게임 데이터 키(G.meta.*·G.world.*·G.*·P().*)마다 **누가 언제 쓰는지**를 원안(포크 전, 기본 `49cec7a` — 원본 index.html을 src/로 나눈 커밋)과 지금 트리에서 뽑아 비교해요(`lib/lifecycle.mjs`, 결과 `out/lifecycle.md`).
+- 단계: **생성**(newGame·buildNewGameDraft … 새 게임 초안, 만드는 중인 `ng.*` 포함) · **실행 중 AI**(`liveTick` — 게임이 구동되는 동안 시즌·장·이벤트·픽업·의상·톡을 AI가 만드는 원안의 경로) · **사용자**(`handle*Action` 처리기와 최상위 이벤트 리스너가 부르는 함수) · **불러오기**(fix·defaults·applyMeta)
+- 포크가 더한 키(원안에 없던 키)가 원안의 생성·실행 경계 어디에 붙었는지: 아무 단계도 안 씀 · 사용자 조작으로만 씀 · 생성·실행 중 AI 밖
+- 한계: 동적 키 쓰기(`P()[k]=v`)는 못 따라가요(아무도 안 씀으로 나옴 — 도구 문제인지 코드 문제인지 따로 가림)
+
 ## 포크 기능 배선 점검 (`node tools/wiring.mjs [--strict] [--update-baseline]`)
 생성기가 포크 기능의 데이터를 만드는지, 생성된 게임에 실제로 들어갔는지를 tree-sitter로 맞춰 봐요(`lib/wiring.mjs`, 목록 `fork-features.json`). 결과 `out/wiring.md`.
 

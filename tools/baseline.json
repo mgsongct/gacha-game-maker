@@ -8,7 +8,7 @@
     "줄": 89,
     "중첩": 2
    },
-   "text": "buildNewGameDraft (src/main/0250-story-factory.js:231) 복잡도 150 · 89줄 · 중첩 2"
+   "text": "buildNewGameDraft (src/main/0250-story-factory.js:230) 복잡도 150 · 89줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|cbPlay",
@@ -188,7 +188,7 @@
     "줄": 28,
     "중첩": 2
    },
-   "text": "aiEventGen0 (src/main/0250-story-factory.js:170) 복잡도 55 · 28줄 · 중첩 2"
+   "text": "aiEventGen0 (src/main/0250-story-factory.js:169) 복잡도 55 · 28줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|buildManualGameDraft",
@@ -197,7 +197,7 @@
     "줄": 40,
     "중첩": 3
    },
-   "text": "buildManualGameDraft (src/main/0250-story-factory.js:321) 복잡도 55 · 40줄 · 중첩 3"
+   "text": "buildManualGameDraft (src/main/0250-story-factory.js:320) 복잡도 55 · 40줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|contractHTML0",
@@ -1239,19 +1239,19 @@
    "key": "도구 복잡한 함수|tool:tools/play/lib/qa.mjs runQA",
    "num": {
     "복잡도": 2,
-    "줄": 123,
+    "줄": 121,
     "중첩": 1
    },
-   "text": "runQA (tools/play/lib/qa.mjs:4) 복잡도 2 · 123줄 · 중첩 1"
+   "text": "runQA (tools/play/lib/qa.mjs:4) 복잡도 2 · 121줄 · 중첩 1"
   },
   {
    "key": "도구 복잡한 함수|tool:tools/play/lib/qa.mjs runQA→page.evaluate @tools/play/lib/qa.mjs",
    "num": {
-    "복잡도": 137,
-    "줄": 123,
+    "복잡도": 132,
+    "줄": 121,
     "중첩": 7
    },
-   "text": "runQA→page.evaluate @tools/play/lib/qa.mjs (tools/play/lib/qa.mjs:4) 복잡도 137 · 123줄 · 중첩 7"
+   "text": "runQA→page.evaluate @tools/play/lib/qa.mjs (tools/play/lib/qa.mjs:4) 복잡도 132 · 121줄 · 중첩 7"
   },
   {
    "key": "도구 복잡한 함수|tool:build/test.mjs (최상위)→p22.evaluate @build/test.mjs",

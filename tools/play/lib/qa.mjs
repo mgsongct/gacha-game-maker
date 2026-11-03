@@ -72,9 +72,7 @@ export async function runQA(game, input) { const { out, errors } = await withPag
   // ⑥ 건조(자원 투입식 영입)·원정 — 생성기가 설정했는지, 사용자가 켜면 생성된 대원으로 어떤 테이블이 되는지
   { const C = { on: !!(G.meta.construct && G.meta.construct.on), configured: !!G.meta.construct, expedition: (G.meta.expedition && G.meta.expedition.mode) || '(기본 combat)', resTerms: ['res1', 'res2', 'res3', 'res4'].map(k => G.meta.terms[k]) };
     if (!C.configured) F('중', '건조·원정', `생성기가 건조(자원 투입식 영입)를 설정하지 않음 — 꺼진 채 시작, 자원 이름 ${C.resTerms.join('/')}(기본값)${/아이돌|방송|기획사|스트리머|가게|카페/.test(JSON.stringify(G.world).slice(0, 4000)) && C.expedition.includes('combat') ? `, 원정은 전투형(${C.expedition}) — 세계관과 맞는 원정 방식(방송·스트리머·경영)이 있는데 고르지 않음` : ''}`);
-    const D = (G.dispatches || []).map(d => ({ name: d.name, hours: d.hours, need: d.need, reward: d.reward, val: (d.reward.gold || 0) + (d.reward.exp || 0) * 300 + (d.reward.wmat || 0) * 600 + (d.reward.core || 0) * 2500 }));
-    C.dispatches = D.map(d => `${d.name} ${d.hours}h·${d.need}명 → ${JSON.stringify(d.reward)}`);
-    if (D.length > 1) { const byH = [...D].sort((a, b) => a.hours * a.need - b.hours * b.need), lo = byH[0], hi = byH.at(-1); if (lo.val > hi.val) F('중', '건조·원정', `파견 보상이 시간·인원과 거꾸로: 「${lo.name}」(${lo.hours}시간·${lo.need}명) 보상 > 「${hi.name}」(${hi.hours}시간·${hi.need}명) — 보상이 순서대로 고정 표에서 붙음`); }
+    C.dispatches = (G.dispatches || []).map(d => d.name); // 파견 목록은 이름·설명 견본(원안 설계) — 의뢰는 게시판(dispOffer)이 매일 뽑음
     const keep = G.meta.construct; G.meta.construct = Object.assign({ on: true }, keep || {}); try { conMeta(); const cfg = CON(), pool = conPool(), inputs = { '최소 30×4': [30, 30, 30, 30], '균등 300×4': [300, 300, 300, 300], '공격 쏠림 100/600/100/100': [100, 600, 100, 100], '균등 500×4': [500, 500, 500, 500], '최대 999×4': [999, 999, 999, 999] };
       C.groups = (cfg.groups || []).map(g => `${g.name}(${JSON.stringify(g.match)})`); C.start = cfg.start; C.buy = cfg.buy; const seen = new Set();
       C.tables = Object.entries(inputs).map(([k, t]) => { const r = GGMConstruct.rates(t, cfg), tb = GGMConstruct.table(t, cfg, pool); tb.rows.filter(x => x.p > 0).forEach(x => seen.add(x.id));
@@ -82,8 +80,8 @@ export async function runQA(game, input) { const { out, errors } = await withPag
       C.poolSize = pool.length; C.never = pool.filter(c => !seen.has(c.id)).map(c => (charById(c.id) || {}).name);
       if (C.never.length) F('중', '건조·원정', `어떤 투입으로도 건조되지 않는 대원: ${C.never.join(', ')}`);
       const byRole = cnt(pool, c => c.role); Object.entries(byRole).filter(([, n]) => n === 1).forEach(([r]) => F('하', '건조·원정', `건조 분류 「${(ROLE && ROLE[r]) || r}」 후보가 1명 — 그 분류를 열면 같은 대원만 나옴`));
-      const inc = (G.dispatches || []).map(d => conDispReward(d.hours, d.need)), perH = (G.dispatches || []).map((d, i) => Object.values(inc[i]).reduce((a, v) => a + v, 0) / d.hours);
-      C.expIncome = (G.dispatches || []).map((d, i) => `${d.name} ${Object.values(inc[i]).reduce((a, v) => a + v, 0)}(시간당 ${Math.round(perH[i])})`);
+      const offers = Array.from({ length: 30 }, () => dispOffer([])), inc = offers.map(o => Object.fromEntries(Object.entries(o.reward).filter(([k]) => /^res/.test(k)))), perH = offers.map((o, i) => Object.values(inc[i]).reduce((a, v) => a + v, 0) / o.hours); // 게시판이 실제로 뽑는 의뢰 30개(건조가 켜져 있을 때 자원 보상)
+      C.expIncome = [`게시판 의뢰 30개의 건조 자원: 평균 ${Math.round(inc.reduce((a, r) => a + Object.values(r).reduce((x, v) => x + v, 0), 0) / offers.length)} · 시간당 평균 ${Math.round(perH.reduce((a, v) => a + v, 0) / offers.length)} · 자원 보상 없는 의뢰 ${inc.filter(r => !Object.keys(r).length).length}`];
     } catch (e) { C.err = e.message; } finally { G.meta.construct = keep; }
     R.construct = C; }
   // ⑤ 플레이
