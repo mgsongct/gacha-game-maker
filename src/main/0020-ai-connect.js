@@ -163,8 +163,6 @@ function jsonRepair(t){ let out='', inS=false, esc=false; const st=[];
   while(st.length){ out=out.replace(/[\s,]+$/,''); out+=st.pop(); }
   return out; }
 const TMO={quick:60000,default:300000,complex:600000};
-const JSON_STRICT_BASE='\n\n[중요] 응답 전체가 올바른 JSON 하나여야 한다. 문자열 안의 줄바꿈은 \\n으로, 큰따옴표는 \\"로 쓴다. 마지막 항목 뒤에 쉼표를 두지 않는다. JSON 앞뒤에 설명을 붙이지 않는다.';
-pfDef('JSON_STRICT','JSON 출력 강조(모든 JSON 요청 끝)',()=>JSON_STRICT_BASE);
 
 /* Vertex 서비스 계정 토큰 */
 const TOKC={};

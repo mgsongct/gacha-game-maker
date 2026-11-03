@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.33'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.34'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -4621,18 +4621,7 @@ function elemLine(){ const m=G&&G.meta&&Array.isArray(G.meta.elems)&&G.meta.elem
 function jo(w,a,b){ w=String(w??''); const c=w.charCodeAt(w.length-1)-0xAC00, j=c>=0&&c<=11171?c%28:-1; if(j<0) return w+(a==='으로'?'(으)로':a+'('+b+')'); return w+((j>0&&!(a==='으로'&&j===8))?a:b); }
 // 이미 만든 이벤트 소재를 알려 줘서 같은 얘기를 또 하지 않게 해요
 function evPastHint(skip){ const L=(G.events||[]).filter(e=>e&&e.id!==skip).slice(-12).map(e=>`${e.title}${e.desc?'('+String(e.desc).slice(0,40)+')':''}`); return L.length?`\n지금까지 나온 이벤트(소재·사건·결말을 반복하지 않고 새로운 소재로 쓴다): ${L.join(' / ')}`:''; }
-const BATTLE_FLOW_BASE='\n전투 흐름: 스테이지마다 전투가 있는 건 게임 구조일 뿐이다. 데이트·일상·대화 장면 한가운데에 갑작스러운 습격을 만들어 전투에 억지 개연성을 붙이지 않는다. pre는 장면이 자연스럽게 마무리되는 곳에서 끝내고, 전투는 훈련·의뢰·순찰 중 마주친 적 정도로 한 줄만 언급하거나 아예 언급하지 않아도 된다. post도 전투를 길게 되짚지 말고 이야기의 흐름을 이어 간다.';
-pfDef('BATTLE_FLOW','전투 흐름(스토리 안의 전투 다루기)',()=>BATTLE_FLOW_BASE);
-function scriptFmt(){return `대본은 하나의 문자열이고 줄마다 줄바꿈(\\n)으로 나눈다(쉼표로 잇거나 배열로 쓰지 않는다). 대본 형식(한 줄에 하나): "이름: 대사" / 표정을 바꾸려면 "이름[표정]: 대사" (표정은 각 캐릭터의 표정 목록에서 고른다. 목록이 없는 캐릭터는 ${FACE_BASIC.join('·')} 중에서) / 그 외 문장은 나레이션 / [배경: 배경이름]은 배경 전환 / [장소이름]은 장소 자막과 배경 전환 / [소품: 소품이름]은 소품 클로즈업, [소품 끝]으로 닫음 / ${DIRECTION_GUIDE} / [효과음: 이름] / [음악: 음악이름]은 배경음 전환, [음악 끝]은 정지 / [톡: 캐릭터이름]부터 [톡 끝]까지는 휴대폰 메신저 화면으로 대화가 진행되는 장면 / [CG: CG이름]은 일러스트 한 장을 화면 가득 보여 주고, [CG 끝]으로 닫음 / "선택: 보기1 | 보기2"는 플레이어 선택지이고, 이어지는 줄 앞에 "1) "이나 "2) "를 붙이면 그 선택을 했을 때만 나온다. 플레이어 대사는 "${T('player')}: "로 쓰고, 플레이어를 부를 때는 보통 호칭 "${T('player')}"을 그대로 쓰며, 이름을 불러야 할 때만 {${T('player')}}으로 쓴다. 배경, 소품, 음악, 효과음은 가능한 한 기존 목록의 이름을 그대로 쓴다. 기존 인물이 적으로 나오거나 적이었던 인물이 동료가 되면 이름을 바꾸지 않고 같은 이름을 그대로 쓴다(그림이 이어지도록).`;}
-function threadFmt(){return `메신저 형식(한 줄에 하나): "캐릭터이름: 메시지" / "선택: 답장1 | 답장2"는 플레이어 답장 선택지(고른 답장이 전송됨). 플레이어의 말은 반드시 선택지로만 쓰고 "나: 메시지"처럼 플레이어 대사를 직접 쓰지 않는다(플레이어가 멋대로 말하면 안 된다). 선택지 없이 플레이어 반응이 필요하면 선택지 1개짜리로 쓴다, 이어지는 줄 앞에 "1) " 같은 번호를 붙이면 그 답장을 골랐을 때만 나온다 / [사진: 소품 또는 배경 이름]은 사진 전송 / [스티커: 하트|땀|화남|놀람|의문|음표|눈물|홍조|반짝]은 감정 스티커(가끔만). 실제 메신저처럼 짧은 메시지를 여러 번 나눠 보내고, ㅋㅋ와 이모지를 써도 된다. 세계관과 메인 스토리의 사건, 떡밥을 자연스럽게 언급한다.`;}
 Object.defineProperty(window,'RULES',{get:rulesText});
-pfDef('SCRIPT_FMT','대본 형식(스토리·이벤트·메모리얼 대본)',scriptFmt);
-pfDef('THREAD_FMT','메신저(톡) 형식',threadFmt);
-const TITLE_RULE_BASE="게임 이름은 요즘 서브컬처 가챠 게임처럼 짧고 느낌 있게 짓는다(실제 게임 이름은 쓰지 않는다): 2~4글자 한자어·합성어(예: 심연잔향, 성흔, 월하), 또는 영어 두 단어를 한글로 읽은 이름(예: 어비스 에코, 노바 레퀴엠). '~의 ~'처럼 풀어 쓴 이름이나 설명 같은 이름은 피한다. sub는 영문 제목(예: Abyss Echo). ";
-pfDef('TITLE_RULE','게임 이름 짓기',()=>TITLE_RULE_BASE);
-const NAI_CHAR_BASE='naiPrompt는 NovelAI용 영어 태그 문자열. "1girl, solo"(남자는 "1boy, solo")로 시작하고, 나이를 직접 나타내는 태그(mature female, adult woman 등)는 기본으로 넣지 않는다. 캐릭터 설정상 꼭 필요할 때만 스스로 판단해서 넣는다. V4 이상 모델 기준의 자연스러운 태그로 머리, 눈, 체형, 의상, 장신구, 들고 있는 무기 같은 외모 태그만 쓴다. 자세, 구도, 배경, 화풍 태그는 쓰지 않는다(앱이 따로 붙인다). 엘프처럼 귀가 뾰족한 종족이면 elf, pointy ears를 꼭 넣고, 사람이면 귀 모양 태그를 넣지 않는다(앱이 사람에게는 뾰족한 귀를 막는다). 의상·장신구·무기는 이 게임의 세계관·소속·직업·계급에 꼭 맞게 고르고, 세계관에 어울리지 않는 요소(현대 배경의 중세 갑옷, 판타지 배경의 교복·스마트폰 따위)는 쓰지 않는다. 무기를 든 모습을 넣을 때는 그 캐릭터의 전용 무기와 같은 무기만 쓴다. 아군·동료에게 적 전용 태그(faceless)는 쓰지 않는다.';
-pfDef('NAI_CHAR','캐릭터 외모 태그(naiPrompt)',()=>NAI_CHAR_BASE);
-pfDef('CHAR_STAT_RULE','새 캐릭터 능력치·외모 규칙(캐릭터 생성 4곳 공통)',()=>'희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. '+NAI_CHAR);
 const ROLE = {atk:'공격',def:'방어',sup:'지원'};
 const ROLE_EN={atk:'ASSAULT',def:'GUARD',sup:'SUPPORT'};
 const KIND = {dmg:'단일 공격',aoe:'전체 공격',heal:'전체 회복',shield:'전체 보호막',buff:'전체 공격력 강화'};
@@ -4653,8 +4642,6 @@ const DEFAULT_META={materialTermNamesVersion:1,title:'낙성계약',sub:'STARFAL
 const TERM_LABEL={player:'플레이어 호칭',currency:'유료 재화',gold:'일반 재화',expMat:'경험치 재료',wMat:'스킬 강화 재료',core:'승급(Lv1~70) 재료',gearMat:'장비 강화 재료',transcMat:'초월승급(Lv71~120) 재료',gacha:'뽑기 이름',ops:'전투 메뉴',crew:'아군 호칭',talk:'메신저 앱',dispatch:'파견',farm:'재료 던전',pass:'패스',event:'이벤트',weapon:'전용 무기',files:'캐릭터 기록',skin:'스킨',enhance:'강화',limit:'돌파',abyss:'로그라이크 탐험',construct:'건조/영입 메뉴',res1:'건조 자원 1',res2:'건조 자원 2',res3:'건조 자원 3',res4:'건조 자원 4 (바리에이션)'};
 // Names are metadata only; saved runs and reward identifiers remain unchanged.
 function explorationName(value){return typeof value==='string'&&value.trim()?value.replace(/\s+/g,' ').trim().slice(0,12):'미지 탐사';}
-const EXPLORATION_NAME_RULE_BASE='탐사 콘텐츠 이름(terms.abyss)은 세계관에 어울리는 2~12자 이름으로 짓는다. 파티를 편성해 여러 구역에서 전투·발견·사건을 겪고 돌아오는 반복 탐사 콘텐츠다. 지하·심연을 전제하지 말고, 다른 메뉴 이름과 구분한다.';
-pfDef('EXPLORATION_NAME_RULE','탐사 콘텐츠 이름',()=>EXPLORATION_NAME_RULE_BASE);
 // 용어는 AI·가져온 게임·직접 입력에서 와서 화면 템플릿 70여 곳에 그대로 들어가요. 태그가 될 < >는 빼고 " 는 ” 로 바꿔 돌려줘요(HTML 주입 방지, tools: esc() 없이 HTML에 넣는 글)
 function T(k){const t=(typeof G!=='undefined'&&G&&G.meta&&G.meta.terms)||{};return String(t[k]||DEFAULT_META.terms[k]||k).replace(/[<>]/g,'').replace(/"/g,'”');}
 function applyMeta(){
@@ -4833,8 +4820,6 @@ function jsonRepair(t){ let out='', inS=false, esc=false; const st=[];
   while(st.length){ out=out.replace(/[\s,]+$/,''); out+=st.pop(); }
   return out; }
 const TMO={quick:60000,default:300000,complex:600000};
-const JSON_STRICT_BASE='\n\n[중요] 응답 전체가 올바른 JSON 하나여야 한다. 문자열 안의 줄바꿈은 \\n으로, 큰따옴표는 \\"로 쓴다. 마지막 항목 뒤에 쉼표를 두지 않는다. JSON 앞뒤에 설명을 붙이지 않는다.';
-pfDef('JSON_STRICT','JSON 출력 강조(모든 JSON 요청 끝)',()=>JSON_STRICT_BASE);
 
 /* Vertex 서비스 계정 토큰 */
 const TOKC={};
@@ -5285,6 +5270,53 @@ function naiSkinParts(base,response){
 function pfDef(id,label,get,where){ const R=window.__PF||(window.__PF={}); R[id]={id,label,get,where:where||''}; Object.defineProperty(window,id,{get:()=>promptFrag(id),configurable:true}); }
 function promptOv(){ try{ return (G&&G.meta&&G.meta.prompts)||{}; }catch(e){ return {}; } } // G는 0070에서 생겨요(그 전 호출은 기본값)
 function promptFrag(id){ const f=(window.__PF||{})[id]; if(!f) return ''; const base=f.get(), o=promptOv()[id]; if(!o) return base; const t=o.text&&o.text.trim()?o.text:base; return o.add&&o.add.trim()?t+'\n'+o.add.trim():t; }
+/* ===== 조각 모음: 글 AI에 보내는 지시문은 모두 여기 한곳에(파편화 방지) =====
+   고칠 때는 여기서 고치고, 게임마다 다르게 할 것은 스튜디오 화면(덮어쓰기·덧붙이기·AI 다듬기)에서. 호출 지점은 ${ID}로 넣기만 하고,
+   명단·수치 같은 데이터와 스키마(데이터 계약)만 각 기능 파일에 둬요. 도구가 다른 파일의 pfDef·지시문을 잡아요(tools/lib/prompts.mjs). */
+// ── 공통 형식
+const BATTLE_FLOW_BASE='\n전투 흐름: 스테이지마다 전투가 있는 건 게임 구조일 뿐이다. 데이트·일상·대화 장면 한가운데에 갑작스러운 습격을 만들어 전투에 억지 개연성을 붙이지 않는다. pre는 장면이 자연스럽게 마무리되는 곳에서 끝내고, 전투는 훈련·의뢰·순찰 중 마주친 적 정도로 한 줄만 언급하거나 아예 언급하지 않아도 된다. post도 전투를 길게 되짚지 말고 이야기의 흐름을 이어 간다.';
+pfDef('BATTLE_FLOW','전투 흐름(스토리 안의 전투 다루기)',()=>BATTLE_FLOW_BASE);
+function scriptFmt(){return `대본은 하나의 문자열이고 줄마다 줄바꿈(\\n)으로 나눈다(쉼표로 잇거나 배열로 쓰지 않는다). 대본 형식(한 줄에 하나): "이름: 대사" / 표정을 바꾸려면 "이름[표정]: 대사" (표정은 각 캐릭터의 표정 목록에서 고른다. 목록이 없는 캐릭터는 ${FACE_BASIC.join('·')} 중에서) / 그 외 문장은 나레이션 / [배경: 배경이름]은 배경 전환 / [장소이름]은 장소 자막과 배경 전환 / [소품: 소품이름]은 소품 클로즈업, [소품 끝]으로 닫음 / ${DIRECTION_GUIDE} / [효과음: 이름] / [음악: 음악이름]은 배경음 전환, [음악 끝]은 정지 / [톡: 캐릭터이름]부터 [톡 끝]까지는 휴대폰 메신저 화면으로 대화가 진행되는 장면 / [CG: CG이름]은 일러스트 한 장을 화면 가득 보여 주고, [CG 끝]으로 닫음 / "선택: 보기1 | 보기2"는 플레이어 선택지이고, 이어지는 줄 앞에 "1) "이나 "2) "를 붙이면 그 선택을 했을 때만 나온다. 플레이어 대사는 "${T('player')}: "로 쓰고, 플레이어를 부를 때는 보통 호칭 "${T('player')}"을 그대로 쓰며, 이름을 불러야 할 때만 {${T('player')}}으로 쓴다. 배경, 소품, 음악, 효과음은 가능한 한 기존 목록의 이름을 그대로 쓴다. 기존 인물이 적으로 나오거나 적이었던 인물이 동료가 되면 이름을 바꾸지 않고 같은 이름을 그대로 쓴다(그림이 이어지도록).`;}
+function threadFmt(){return `메신저 형식(한 줄에 하나): "캐릭터이름: 메시지" / "선택: 답장1 | 답장2"는 플레이어 답장 선택지(고른 답장이 전송됨). 플레이어의 말은 반드시 선택지로만 쓰고 "나: 메시지"처럼 플레이어 대사를 직접 쓰지 않는다(플레이어가 멋대로 말하면 안 된다). 선택지 없이 플레이어 반응이 필요하면 선택지 1개짜리로 쓴다, 이어지는 줄 앞에 "1) " 같은 번호를 붙이면 그 답장을 골랐을 때만 나온다 / [사진: 소품 또는 배경 이름]은 사진 전송 / [스티커: 하트|땀|화남|놀람|의문|음표|눈물|홍조|반짝]은 감정 스티커(가끔만). 실제 메신저처럼 짧은 메시지를 여러 번 나눠 보내고, ㅋㅋ와 이모지를 써도 된다. 세계관과 메인 스토리의 사건, 떡밥을 자연스럽게 언급한다.`;}
+pfDef('SCRIPT_FMT','대본 형식(스토리·이벤트·메모리얼 대본)',scriptFmt);
+pfDef('THREAD_FMT','메신저(톡) 형식',threadFmt);
+const TITLE_RULE_BASE="게임 이름은 요즘 서브컬처 가챠 게임처럼 짧고 느낌 있게 짓는다(실제 게임 이름은 쓰지 않는다): 2~4글자 한자어·합성어(예: 심연잔향, 성흔, 월하), 또는 영어 두 단어를 한글로 읽은 이름(예: 어비스 에코, 노바 레퀴엠). '~의 ~'처럼 풀어 쓴 이름이나 설명 같은 이름은 피한다. sub는 영문 제목(예: Abyss Echo). ";
+pfDef('TITLE_RULE','게임 이름 짓기',()=>TITLE_RULE_BASE);
+const NAI_CHAR_BASE='naiPrompt는 NovelAI용 영어 태그 문자열. "1girl, solo"(남자는 "1boy, solo")로 시작하고, 나이를 직접 나타내는 태그(mature female, adult woman 등)는 기본으로 넣지 않는다. 캐릭터 설정상 꼭 필요할 때만 스스로 판단해서 넣는다. V4 이상 모델 기준의 자연스러운 태그로 머리, 눈, 체형, 의상, 장신구, 들고 있는 무기 같은 외모 태그만 쓴다. 자세, 구도, 배경, 화풍 태그는 쓰지 않는다(앱이 따로 붙인다). 엘프처럼 귀가 뾰족한 종족이면 elf, pointy ears를 꼭 넣고, 사람이면 귀 모양 태그를 넣지 않는다(앱이 사람에게는 뾰족한 귀를 막는다). 의상·장신구·무기는 이 게임의 세계관·소속·직업·계급에 꼭 맞게 고르고, 세계관에 어울리지 않는 요소(현대 배경의 중세 갑옷, 판타지 배경의 교복·스마트폰 따위)는 쓰지 않는다. 무기를 든 모습을 넣을 때는 그 캐릭터의 전용 무기와 같은 무기만 쓴다. 아군·동료에게 적 전용 태그(faceless)는 쓰지 않는다.';
+pfDef('NAI_CHAR','캐릭터 외모 태그(naiPrompt)',()=>NAI_CHAR_BASE);
+pfDef('CHAR_STAT_RULE','새 캐릭터 능력치·외모 규칙(캐릭터 생성 4곳 공통)',()=>'희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. '+NAI_CHAR);
+const EXPLORATION_NAME_RULE_BASE='탐사 콘텐츠 이름(terms.abyss)은 세계관에 어울리는 2~12자 이름으로 짓는다. 파티를 편성해 여러 구역에서 전투·발견·사건을 겪고 돌아오는 반복 탐사 콘텐츠다. 지하·심연을 전제하지 말고, 다른 메뉴 이름과 구분한다.';
+pfDef('EXPLORATION_NAME_RULE','탐사 콘텐츠 이름',()=>EXPLORATION_NAME_RULE_BASE);
+const JSON_STRICT_BASE='\n\n[중요] 응답 전체가 올바른 JSON 하나여야 한다. 문자열 안의 줄바꿈은 \\n으로, 큰따옴표는 \\"로 쓴다. 마지막 항목 뒤에 쉼표를 두지 않는다. JSON 앞뒤에 설명을 붙이지 않는다.';
+pfDef('JSON_STRICT','JSON 출력 강조(모든 JSON 요청 끝)',()=>JSON_STRICT_BASE);
+// ── 세계관·규칙
+const POS_RULE_BASE='포지션은 4~8개, 세계관의 군 편제·직업·함종 같은 분류로 짓는다. base는 전투 기본형(atk 공격·def 방어·sup 지원). t는 기능 보정(%: hp atk def spd dmg 주는피해 taken 받는피해 heal 회복량 crit 치명타%p, sp 시작 SP 0~50, threat 위협도 -80~150). 보정은 -40~+40 안에서 장단점이 같이 있게.';
+pfDef('POS_RULE','포지션(직군·함종) 설계',()=>POS_RULE_BASE);
+const EXPEDITION_RULE_BASE='파견은 6개 — 이름·설명만 쓴다(실제 의뢰의 시간·인원·보상은 게임의 파견 게시판이 매일 정한다). expedition은 파견(원정) 방식이다: 전투·모험 세계관은 combat(지역에 보내 자원을 가져옴), 아이돌·연예계는 idol(방송·행사 출연), 방송인·크리에이터는 streamer(콘텐츠 제작), 가게·회사 경영은 business(파트에 배치해 영업). 세계관에 가장 맞는 하나를 고르고, dispatches 이름도 그 방식에 맞게 짓는다. expeditionNames는 고른 방식의 이름을 세계관에 맞게 짓는다(combat이면 비워 둔다). fame은 인기 수치 이름(idol의 인지도, streamer의 구독자, business의 평판에 해당). jobs는 idol이면 7개(작은 일→큰 무대 순으로 지역 방송·팬 사인회·광고 촬영·음악 방송·예능 고정·드라마 출연·단독 콘서트에 해당하는 일), streamer면 3개(긴 영상·생방송·짧은 영상에 해당하는 매체), business면 4개(손님 응대·만들기·홍보·관리에 해당하는 파트 — 세계관의 가게·사업 종류에 맞게, 식당을 전제하지 않는다). 각 2~10자.';
+pfDef('EXPEDITION_RULE','파견(원정) 방식·이름(새 게임 세계관 단계)',()=>EXPEDITION_RULE_BASE);
+pfDef('PROFILE_TPL_RULE','캐릭터 프로필 항목 틀(새 게임 세계관 단계)',()=>`profileTemplate은 캐릭터 프로필 항목 틀이다: ${Object.entries(PROFILE_TPLS).map(([k,v])=>`${k}(${v.slice(0,4).join('·')}${v.length>4?' …':''})`).join(', ')} 중 세계관에 맞는 하나를 고른다.`);
+const VARIANT_RULE_BASE='variants는 같은 캐릭터의 다른 모습(특별 의상) 기본형 4~6개다: 교복·수영복·갑옷·무대의상처럼 여러 캐릭터에게 공통으로 입힐 수 있는 틀을 이 세계관에 맞게 짓는다(계절·행사·직업·의식 등). cond에는 그 틀이 어울리는 역할(atk/def/sup)·소속·속성만 넣고, 모두에게 어울리면 비운다. 위에서 정한 세력·속성 이름을 그대로 쓴다.';
+pfDef('VARIANT_RULE','바리에이션 기본형(새 게임 세계관 단계)',()=>VARIANT_RULE_BASE);
+// ── 세력·등장
+const CAST_LOCK_RULE_BASE='첫 등장 장면이 정해진 대원은 그 장면에서만 처음 만난다. 정해진 장면이 없는 대원은 메인 스토리의 새 장을 쓸 때 이야기 흐름에 맞으면 첫 만남 장면으로 처음 등장시킨다. 이벤트·외전·메신저에서는 아직 만나지 않은 사이다.';
+pfDef('CAST_LOCK_RULE','아직 등장하지 않은 대원 다루기(장·이벤트·톡)',()=>CAST_LOCK_RULE_BASE);
+pfDef('FACTION_RULE','세력 설계 규칙(새 게임·세력 AI 채우기)',()=>'세력은 3~6개: 플레이어블 소속(kind playable) 1~3개, 적대 세력(hostile) 1개 이상, 적 몬스터의 근원이 되는 괴물·마물 무리(monster) 1개 이상(사람 세력만인 세계관이면 생략 가능), 중립(neutral) 0~2개. 세력마다 개요 3~4문장·목적·지도자·거점·이념·숨겨진 사실, 다른 세력과의 관계(rel: {"세력 이름":"관계 한 단어 — 이유"}). 몬스터 무리는 정체·기원(origin)·습성(nature)·약점(weakness). 처음엔 적대였다가 나중에 우호가 되는(또는 반대) 세력이 있으면 stance에 [{"ch":장 번호,"s":"ally|neutral|hostile","why":""}]. 몬스터는 말하는 동료·NPC가 아니다.');
+pfDef('CAST_DEBUT_RULE','새 게임 대원의 첫 등장(debut)·소속',()=>`각 ${T('crew')}에 debut 항목: "start"(처음부터 함께하는 동료 — 프롤로그에서 처음 만나 1장부터 이미 아는 사이로 나오고 처음부터 뽑을 수 있음, 4~6명), 1장 스테이지 번호(그 스테이지에서 처음 만나는 인물 — 그 스테이지를 깨야 뽑기에 합류), "later"(2장 이후 첫 등장 — 그때까지 뽑기에 안 나옴). faction은 세력 목록 중 플레이어블 소속(또는 stance로 나중에 우호가 되는 세력)의 이름을 그대로 쓰고, 그 세력들 사이에서 고르게 나눈다. 몬스터·괴물은 ${T('crew')}으로 만들지 않는다.`);
+const CAST_PLAN_RULE_BASE='등장 계획을 반드시 지킨다: 처음부터 함께하는 동료는 프롤로그에서 처음 만나고 1장부터는 이미 아는 사이다(1장에 첫 만남 장면으로 쓰지 않는다). 1장에서 처음 만나는 인물은 정해진 스테이지에서 처음 등장하고 그 전에는 나오지 않는다. 나중 등장 인물은 프롤로그와 1장에 내지 않는다.';
+pfDef('CAST_PLAN_RULE','등장 계획 지키기(새 게임 오프닝·1장)',()=>CAST_PLAN_RULE_BASE);
+const BESTIARY_RULE_BASE='적은 세력 목록의 적대·괴물 세력에 속하게 하고(faction), bestiary에 새 적(사람·캐릭터가 아닌 적)마다 정체·습성·약점을 쓴다. 몬스터는 말하는 동료·NPC가 아니다.';
+pfDef('BESTIARY_RULE','적 소속·적 도감(새 게임 1장)',()=>BESTIARY_RULE_BASE);
+const CAST_RARITY_RULE_BASE='희귀도는 R이 가장 많게 한다 — 뽑기·영입의 대부분이 R이라 R이 1~2명뿐이면 같은 대원만 되풀이해 나온다.';
+pfDef('CAST_RARITY_RULE','새 게임 대원 희귀도 분포',()=>CAST_RARITY_RULE_BASE);
+// ── 스토리·연출
+pfDef('DIRECTION_GUIDE','연출 문법(감정 아이콘·동작·화면 효과)',()=>`연출: 이름 뒤 대괄호에 표정·감정·동작을 |로 함께 쓸 수 있다(예: "세라[미소|하트|점프]: 정말?"). 감정 아이콘: ${Object.keys(EMOTES).join('·')}. 동작: 점프·흔들·떨림·끄덕·갸웃·다가옴·물러남·퇴장·쓰러짐. 대사 없이 [연출: 이름 감정 동작]. 화면 효과: [효과: 흔들림|강한흔들림|플래시|붉은섬광|암전|페이드|집중선|비|눈|벚꽃|회상|비네트] (집중선·비·눈·벚꽃·회상·비네트는 [효과: 비 끝]처럼 끝을 쓴다). 메신저에서는 [스티커: 감정 아이콘 이름]. 감정이 크게 움직이는 순간에만 쓰고 남발하지 않는다.`);
+const PLAN_WRITE_RULE_BASE='이 장의 분기가 있다면 장 전체에서 한 번만, 전체 구성에서 그 선택이 일어나는 스테이지에서만 쓴다.';
+pfDef('PLAN_WRITE_RULE','시나리오 설계의 분기 쓰기(스테이지 집필)',()=>PLAN_WRITE_RULE_BASE);
+const FINALE_RULE_BASE='finale(장의 마지막 스테이지 형식)은 장르에 맞게 정한다: 전투가 중심인 세계관이면 battle(마지막 스테이지는 반드시 보스전, battle:true), 무대·투표로 경쟁하면 contest(결승 콘테스트, mode "contest", enemies는 빈 배열), 논쟁·협상·재판이 중심이면 debate(결정적인 회담, mode "debate", enemies는 빈 배열).';
+pfDef('FINALE_RULE','장의 마지막 스테이지 형식(장르에 따라)',()=>FINALE_RULE_BASE);
+const STAGE_WRITE_RULE_BASE='회담·콘테스트 스테이지는 그 전(pre)과 후(post)만 대본으로 쓴다. 회담 자체(추궁·증거·설득)와 콘테스트의 무대 경연(매력 어필·심사)은 게임이 진행하므로 대본에 쓰지 않는다.';
+pfDef('STAGE_WRITE_RULE','회담·콘테스트 스테이지의 대본 범위(스테이지 집필)',()=>STAGE_WRITE_RULE_BASE);
+pfDef('STAGE_MODES','스테이지 양식(전투·이야기·회담·콘테스트) 고르기',()=>{ const m=modesCfg(); if(!m.debate&&!m.contest) return '스테이지는 battle(전투) 또는 이야기 스테이지만 쓴다.'; return `스테이지 양식(mode): 대부분은 battle(전투). 이야기에 맞으면 한 장에 0~2개를 다른 양식으로${m.debate?'':'(debate는 쓰지 않는다)'}${m.contest?'':'(contest는 쓰지 않는다)'}: debate(회담 — 협상·재판·심문·설득·거짓말 들추기 장면. 상대의 주장 줄 3~5개 중 모순이 있는 줄에 weak=그 모순을 밝히는 증거 id, 또는 persuade={who:설득할 수 있는 ${T('crew')} 이름,text}. 증거는 앞선 이야기에서 얻은 물건·증언·기록으로 3~5개. 라운드 1~3개), contest(콘테스트 — 축제·오디션·무대·대회·사교 파티. 심사위원 1~3명과 각자 좋아하는 매력 likes(${Object.keys(CHARM).join('|')}), 경쟁자 1~3명 power 0.8~1.3). battle:false인 이야기 스테이지도 섞을 수 있다. 회담·콘테스트 스테이지는 enemies를 빈 배열로 둔다.`; });
 
 /* 그림 프롬프트 가드: 사람이 나오면 안 되는 그림에서 사람 태그를 빼요 */
 const IMG_NOHUMAN={bg:'no humans, scenery',map:'no humans, scenery',prop:'no humans, object focus',icon:'no humans, object focus'};
@@ -8721,8 +8753,6 @@ async function rulesAIFill(){ const res=await rulesAIData(null); if(!res) return
 function rulesMissingDesc(){ return G.meta.elems.some(e=>!e.d)||Object.keys(ROLE).some(k=>!((G.meta.rules||{}).roleDesc||{})[k]); }
 function rulesNotInCodex(){ return !(G.world.codex||[]).some(x=>x.title==='[규칙] 속성 상성'); }
 const POS_SCHEMA='"positions":[{"name":"포지션 이름(2~4자)","base":"atk|def|sup","range":"melee|ranged|support","desc":"기능 한 줄","t":{"hp":0,"atk":0,"def":0,"spd":0,"dmg":0,"taken":0,"heal":0,"crit":0,"sp":0,"threat":0}}]';
-const POS_RULE_BASE='포지션은 4~8개, 세계관의 군 편제·직업·함종 같은 분류로 짓는다. base는 전투 기본형(atk 공격·def 방어·sup 지원). t는 기능 보정(%: hp atk def spd dmg 주는피해 taken 받는피해 heal 회복량 crit 치명타%p, sp 시작 SP 0~50, threat 위협도 -80~150). 보정은 -40~+40 안에서 장단점이 같이 있게.';
-pfDef('POS_RULE','포지션(직군·함종) 설계',()=>POS_RULE_BASE);
 function posClean(list){ return (Array.isArray(list)?list:[]).slice(0,10).map(p=>({id:'p_'+uid(),name:String(p.name||'포지션').slice(0,10),base:ROLE[p.base]?p.base:'atk',desc:String(p.desc||'').slice(0,80),range:RANGE[p.range]?p.range:'',t:Object.fromEntries(POS_TRAITS.map(([k])=>[k,Math.max(-80,Math.min(150,Math.round(+((p.t||{})[k])||0)))]).filter(([,v])=>v))})).filter(p=>p.name); }
 async function rulesPosAI(btn){ rulesRead(); const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 세계관에 맞는 ${T('crew')} 포지션(직군·병과·함종 같은 분류)을 설계하라. ${POS_RULE}\nJSON만 출력: {${POS_SCHEMA}}`,btn,'default'); const L=posClean(r&&r.positions); if(!L.length) return; RD.positions=L; openRules(true); toast(`포지션 ${L.length}개를 설계했어요. 저장을 눌러 주세요`); }
 async function rulesRecalc(){ if(!(await appConfirm(`기본형·희귀도 기준으로 모든 ${T('crew')}의 체력·공격·방어·속도를 다시 계산할까요? 직접 고친 능력치도 바뀌어요(이격은 원본 비율을 따라가요).`))) return; if(!rulesSave()) return;
@@ -9480,9 +9510,6 @@ function openFarmSquad(st){ openFormation(st,{kind:'farm',extra:`data-k="${st.fa
 async function aiChapterGen(dir,n,cast,t){ const snap=artSnap(); const r=await aiChapterGen0(dir,n,cast,t); if(r) artAfterAI(snap,'새 이야기 「'+r.ch.title+'」'); return r; }
 /* ===== 스토리 공장: 구성 → 스테이지마다 집필 → 마무리(요약·관계·톡) ===== */
 const DETAIL_RULE='장면마다 장소의 분위기(빛·소리·온도), 인물의 표정과 몸짓, 속마음이 드러나는 짧은 나레이션을 넣는다. 대사는 인물마다 말투가 확실히 다르고 주고받는 리듬이 살아 있게 쓴다. 한 장면에서 두 사람 이상이 서로에게 반응하게 하고, 관계 기록(누가 누구와 어떤 사이인지, 최근에 무슨 일이 있었는지)이 대사와 행동에 묻어나게 한다. 설명으로 때우지 말고 행동과 대화로 보여 준다. 긴장 사이에 숨 고르는 작은 순간(농담, 버릇, 사소한 배려)을 한 번은 넣는다. 표정 지시([표정])와 효과·음악 지시를 장면에 맞게 쓴다.';
-// 새 게임 대원 단계의 희귀도 지시(프롬프트 스튜디오 조각) — 사람 수는 호출 지점이 줌
-const CAST_RARITY_RULE_BASE='희귀도는 R이 가장 많게 한다 — 뽑기·영입의 대부분이 R이라 R이 1~2명뿐이면 같은 대원만 되풀이해 나온다.';
-pfDef('CAST_RARITY_RULE','새 게임 대원 희귀도 분포',()=>CAST_RARITY_RULE_BASE);
 const THREAD_DUP_RULE='threads는 본편 대본 속 [톡] 장면과 다른 별개의 메신저 대화다. 본편에서 이미 나눈 말을 되풀이하지 말고, 그 스테이지가 끝난 뒤의 후일담·사적인 속마음·다음 일에 대한 이야기로 쓴다.';
 const NPC_SCHEMA='"newNpcs":[{"name":"","role":"한 단어","profile":"1~2문장","speech":"말투 한 줄","naiPrompt":"NovelAI 영어 외형 태그. 1girl, solo 또는 1boy, solo로 시작"}]';
 function npcRule(noNew){ const ns=G.npcs||[]; return `${ns.length?`NPC(${ns.map(n=>n.name).join(', ')})는 이 세계에 사는 조연이다. 이야기에 어울리는 NPC를 1명 이상 장면에 등장시켜 대사를 준다(대사 이름은 NPC 이름 그대로). `:''}`+(noNew?'':`이름과 대사가 있는 새 조연(의뢰인, 상인, 적 간부, 옛 지인 등)이 필요하면 newNpcs에 넣는다(${T('crew')}가 아니다. 이미 있는 인물은 다시 만들지 않는다. 0~2명).`); }
@@ -10296,10 +10323,8 @@ function openAiEvent(){
 /* 엔진: modules/app/030-expedition.js (GGMExpedition). 설정: G.meta.expedition(바꾼 값만) · 진행: P().exped
    combat 모드는 기존 파견(dispHTML·dispOffer) 그대로. 나머지 모드는 이 파일의 화면을 써요. 문서: docs/research/expedition.md */
 const EX_MODE_LABEL={combat:['전투형 원정','지역에 보내 자원을 가져와요 (칸코레·소녀전선류)'],idol:['방송 출연','방송국·스폰서 일정에 나가 보수와 인지도를 얻어요 (아이돌 육성류)'],streamer:['콘텐츠 방송','플랫폼을 골라 영상·라이브·숏폼을 올려 수익과 구독자를 모아요 (스트리머·버튜버류)'],business:['경영','파트에 배치해 일하게 하고, 전체 실적과 평판으로 수익이 나와요 (상점·기업 경영류)']};
-// 새 게임 세계관 단계의 파견(원정) 지시(프롬프트 스튜디오 조각): 방식 고르기와 그 이름. 이름을 적용하는 계산은 원정 엔진(GGMExpedition.fromWorld — 수치는 엔진 기본값, 이름만)
+// 새 게임 세계관 단계의 원정 스키마(지시문은 프롬프트 스튜디오의 EXPEDITION_RULE, 이름을 적용하는 계산은 원정 엔진 GGMExpedition.fromWorld — 수치는 기본값, 이름만)
 const EXPEDITION_SCHEMA='"expedition":"'+GGMExpedition.MODES.join('|')+'","expeditionNames":{"fame":"","jobs":[""]}';
-const EXPEDITION_RULE_BASE='파견은 6개 — 이름·설명만 쓴다(실제 의뢰의 시간·인원·보상은 게임의 파견 게시판이 매일 정한다). expedition은 파견(원정) 방식이다: 전투·모험 세계관은 combat(지역에 보내 자원을 가져옴), 아이돌·연예계는 idol(방송·행사 출연), 방송인·크리에이터는 streamer(콘텐츠 제작), 가게·회사 경영은 business(파트에 배치해 영업). 세계관에 가장 맞는 하나를 고르고, dispatches 이름도 그 방식에 맞게 짓는다. expeditionNames는 고른 방식의 이름을 세계관에 맞게 짓는다(combat이면 비워 둔다). fame은 인기 수치 이름(idol의 인지도, streamer의 구독자, business의 평판에 해당). jobs는 idol이면 7개(작은 일→큰 무대 순으로 지역 방송·팬 사인회·광고 촬영·음악 방송·예능 고정·드라마 출연·단독 콘서트에 해당하는 일), streamer면 3개(긴 영상·생방송·짧은 영상에 해당하는 매체), business면 4개(손님 응대·만들기·홍보·관리에 해당하는 파트 — 세계관의 가게·사업 종류에 맞게, 식당을 전제하지 않는다). 각 2~10자.';
-pfDef('EXPEDITION_RULE','파견(원정) 방식·이름(새 게임 세계관 단계)',()=>EXPEDITION_RULE_BASE);
 function exMeta(){ if(!G.meta.expedition||typeof G.meta.expedition!=='object') G.meta.expedition={mode:'combat'}; return G.meta.expedition; }
 function EXC(){ return GGMExpedition.config(exMeta()); }
 function exMode(){ return (G.meta.expedition&&G.meta.expedition.mode)||'combat'; }
@@ -11577,10 +11602,8 @@ function factionCtx(){ const F=factions(), now=mainNow(), L=[];
     L.push(`- ${f.name} [${FKIND[f.kind]} · 지금 플레이어와 ${FSTANCE[st]}${nxt?` · ${nxt.ch}장부터 ${FSTANCE[nxt.s]} 예정(${nxt.why||''}, 아직 드러내지 않음)`:''}]: ${f.desc||''}${f.goal?' 목적: '+f.goal+'.':''}${f.leader?' 지도자: '+f.leader+'.':''}${f.base?' 거점: '+f.base+'.':''}${f.ideology?' 이념: '+f.ideology+'.':''}${f.kind==='monster'?`${f.origin?' 정체: '+f.origin+'.':''}${f.nature?' 습성: '+f.nature+'.':''}${f.weakness?' 약점: '+f.weakness+'.':''}`:''}${Object.keys(f.rel).length?' 다른 세력과: '+Object.entries(f.rel).map(([k,v])=>k+' '+v).join(', ')+'.':''}${mem.length?' 소속 '+T('crew')+': '+mem.join(', ')+(st==='hostile'?' (지금은 적으로 나올 수 있음)':''):''}`); });
   const M=monsterNames().filter(l=>l.desc||enemyFaction(l)); const crew=G.chars.filter(c=>!c.monster&&!c.npc&&!c.alt), unmet=crew.filter(c=>own(c.id)&&!metInStory(c)), lock=crew.filter(c=>!own(c.id)&&((c.debut&&!debutOk(c))||c.debutLater));
   return `\n세력(설정을 지키고, 관계 변화는 정해진 장에서만):\n${L.join('\n')||'없음'}\n${M.length?'몬스터 도감(말하는 동료·NPC·메신저 상대가 아니다. 대사는 울음·짧은 위협 정도): '+M.map(l=>`${l.name}${enemyFaction(l)?'('+enemyFaction(l)+')':''}: ${[l.desc,l.nature,l.weak&&'약점 '+l.weak].filter(Boolean).join(' / ')}`).join('; ')+'\n':''}${unmet.length?`이미 계약으로 합류해 함께 작전 중인 ${T('crew')}(스토리에서 첫 만남처럼 쓰지 않는다): ${unmet.map(c=>c.name).join(', ')}\n`:''}${castLockCtx(lock)}`; }
-// 아직 등장하지 않은 대원(실행 중 장·이벤트·톡의 AI 컨텍스트): 명단은 여기서, 지시문은 프롬프트 스튜디오 조각
+// 아직 등장하지 않은 대원(실행 중 장·이벤트·톡의 AI 컨텍스트): 명단은 여기서, 지시문은 프롬프트 스튜디오의 CAST_LOCK_RULE
 // "나중 등장" 대원은 정해진 장면이 없어 새 장을 쓸 때 흐름에 맞으면 첫 등장(debutResolve가 첫 등장 스테이지를 정해 잠금이 풀림)
-const CAST_LOCK_RULE_BASE='첫 등장 장면이 정해진 대원은 그 장면에서만 처음 만난다. 정해진 장면이 없는 대원은 메인 스토리의 새 장을 쓸 때 이야기 흐름에 맞으면 첫 만남 장면으로 처음 등장시킨다. 이벤트·외전·메신저에서는 아직 만나지 않은 사이다.';
-pfDef('CAST_LOCK_RULE','아직 등장하지 않은 대원 다루기(장·이벤트·톡)',()=>CAST_LOCK_RULE_BASE);
 function castLockCtx(lock){ if(!lock.length) return ''; const N=L=>L.map(c=>c.name).join(', '), fixed=lock.filter(c=>c.debut), later=lock.filter(c=>!c.debut);
   return `아직 만나지 않은 ${T('crew')} — ${fixed.length?`첫 등장 장면이 정해짐: ${N(fixed)}`:''}${fixed.length&&later.length?' / ':''}${later.length?`정해진 장면 없음: ${N(later)}`:''}\n${CAST_LOCK_RULE}\n`; }
 // 깊이 점검
@@ -11651,19 +11674,11 @@ function monsterFromGen(x){ const name=String(x.name||'').trim(); if(!name||G.li
 function firstSpeak(c){ const re=new RegExp('(^|\\n)'+String(c.name).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(\\s*\\[[^\\]]*\\])?\\s*[:：]'), M=G.chapters.filter(ch=>ch.kind==='main'); for(let k=0;k<M.length;k++) for(const s of M[k].stages||[]) if(re.test((s.pre||'')+'\n'+(s.post||''))) return {k,s}; return null; }
 
 /* 생성기 연계(새 게임·장·이벤트 생성) */
-pfDef('FACTION_RULE','세력 설계 규칙(새 게임·세력 AI 채우기)',()=>'세력은 3~6개: 플레이어블 소속(kind playable) 1~3개, 적대 세력(hostile) 1개 이상, 적 몬스터의 근원이 되는 괴물·마물 무리(monster) 1개 이상(사람 세력만인 세계관이면 생략 가능), 중립(neutral) 0~2개. 세력마다 개요 3~4문장·목적·지도자·거점·이념·숨겨진 사실, 다른 세력과의 관계(rel: {"세력 이름":"관계 한 단어 — 이유"}). 몬스터 무리는 정체·기원(origin)·습성(nature)·약점(weakness). 처음엔 적대였다가 나중에 우호가 되는(또는 반대) 세력이 있으면 stance에 [{"ch":장 번호,"s":"ally|neutral|hostile","why":""}]. 몬스터는 말하는 동료·NPC가 아니다.');
 const FACTION_SCHEMA='[{"name":"","kind":"playable|hostile|neutral|monster","desc":"","goal":"","leader":"","base":"","ideology":"","secret":"","origin":"","nature":"","weakness":"","rel":{},"stance":[]}]';
 const BESTIARY_SCHEMA='"bestiary":[{"name":"이 이야기에 새로 나온 적 이름 그대로(사람·캐릭터인 적 제외)","faction":"속한 적대·괴물 세력 이름","desc":"정체 한 문장","nature":"습성","weak":"약점"}]';
-// 새 게임 대원 단계의 첫 등장·소속 지시(프롬프트 스튜디오 조각)
-pfDef('CAST_DEBUT_RULE','새 게임 대원의 첫 등장(debut)·소속',()=>`각 ${T('crew')}에 debut 항목: "start"(처음부터 함께하는 동료 — 프롤로그에서 처음 만나 1장부터 이미 아는 사이로 나오고 처음부터 뽑을 수 있음, 4~6명), 1장 스테이지 번호(그 스테이지에서 처음 만나는 인물 — 그 스테이지를 깨야 뽑기에 합류), "later"(2장 이후 첫 등장 — 그때까지 뽑기에 안 나옴). faction은 세력 목록 중 플레이어블 소속(또는 stance로 나중에 우호가 되는 세력)의 이름을 그대로 쓰고, 그 세력들 사이에서 고르게 나눈다. 몬스터·괴물은 ${T('crew')}으로 만들지 않는다.`);
-// 오프닝·1장의 등장 계획: 명단은 castPlanData, 지시문은 조각(프롤로그 = 처음부터 동료와의 첫 만남 — 원안의 "첫 동료들과의 강렬한 만남")
-const CAST_PLAN_RULE_BASE='등장 계획을 반드시 지킨다: 처음부터 함께하는 동료는 프롤로그에서 처음 만나고 1장부터는 이미 아는 사이다(1장에 첫 만남 장면으로 쓰지 않는다). 1장에서 처음 만나는 인물은 정해진 스테이지에서 처음 등장하고 그 전에는 나오지 않는다. 나중 등장 인물은 프롤로그와 1장에 내지 않는다.';
-pfDef('CAST_PLAN_RULE','등장 계획 지키기(새 게임 오프닝·1장)',()=>CAST_PLAN_RULE_BASE);
+// 오프닝·1장의 등장 계획 명단(지시문은 프롬프트 스튜디오의 CAST_PLAN_RULE — 프롤로그 = 처음부터 동료와의 첫 만남, 원안의 "첫 동료들과의 강렬한 만남")
 function castPlanData(L){ const N=X=>X.map(c=>c.name).join(', '), st=L.filter(c=>!c.__deb&&!c.debutLater), d=L.filter(c=>c.__deb), lt=L.filter(c=>c.debutLater);
   return `등장 계획 — 처음부터 함께하는 동료: ${N(st)||'없음'}${d.length?' / 1장에서 처음 만나는 인물: '+d.map(c=>`${c.name}(${c.__deb}번째 스테이지)`).join(', '):''}${lt.length?' / 나중 등장: '+N(lt):''}\n${CAST_PLAN_RULE}`; }
-// 새 게임 1장의 적 소속·적 도감 지시(조각)
-const BESTIARY_RULE_BASE='적은 세력 목록의 적대·괴물 세력에 속하게 하고(faction), bestiary에 새 적(사람·캐릭터가 아닌 적)마다 정체·습성·약점을 쓴다. 몬스터는 말하는 동료·NPC가 아니다.';
-pfDef('BESTIARY_RULE','적 소속·적 도감(새 게임 1장)',()=>BESTIARY_RULE_BASE);
 // 생성된 대원의 소속 이름이 세계관 세력 이름과 조금 다르면(띄어쓰기·줄임) 그 세력 이름으로 — 없는 세력이면 그대로(factions()가 플레이어블로 추가)
 function factionMatch(F,name){ const k=x=>String(x||'').replace(/\s+/g,''), n=k(name); if(!n) return name; const hit=(F||[]).find(f=>k(f.name)===n)||(F||[]).find(f=>n.length>=2&&(k(f.name).includes(n)||n.includes(k(f.name)))); return hit?hit.name:name; }
 function factionClean(list){ const S=(v,n)=>String(v||'').trim().slice(0,n||300); return (Array.isArray(list)?list:[]).slice(0,8).map(x=>({name:S(x&&x.name,30),kind:FKIND[x&&x.kind]?x.kind:'neutral',desc:S(x&&x.desc,400),goal:S(x&&x.goal),leader:S(x&&x.leader,80),base:S(x&&x.base,80),ideology:S(x&&x.ideology),secret:S(x&&x.secret),origin:S(x&&x.origin),nature:S(x&&x.nature),weakness:S(x&&x.weakness),
@@ -11812,8 +11827,6 @@ const PERSONA_FIELDS=[['traits','핵심 성격 (3개)','list'],['self','1인칭'
   ['gap','반전 매력','text'],['flaw','결점·약점','text'],['want','원하는 것','text'],['fear','두려워하는 것','text'],['likes','좋아하는 것','list'],['dislikes','싫어하는 것','list'],['hobby','취미','text'],['motif','상징 (모티프)','text']];
 const PROFILE_TPLS={basic:['생일','신장','출신','특기'],org:['소속','직책','생일','신장','출신','특기'],operator:['코드네임','출신','생일','신장','전투 경력','특기','임상 소견'],fantasy:['종족','출신','생일','신장','계약','특기'],idol:['소속사','데뷔','생일','신장','담당','팬덤 이름'],streamer:['활동명','플랫폼','데뷔','구독자 애칭','방송 장르','생일']};
 const PROFILE_TPL_SCHEMA='"profileTemplate":"'+Object.keys(PROFILE_TPLS).join('|')+'"'; // 새 게임 세계관 단계 스키마
-// 새 게임 세계관 단계의 프로필 항목 틀 고르기(프롬프트 스튜디오 조각) — 고를 수 있는 틀은 PROFILE_TPLS에서
-pfDef('PROFILE_TPL_RULE','캐릭터 프로필 항목 틀(새 게임 세계관 단계)',()=>`profileTemplate은 캐릭터 프로필 항목 틀이다: ${Object.entries(PROFILE_TPLS).map(([k,v])=>`${k}(${v.slice(0,4).join('·')}${v.length>4?' …':''})`).join(', ')} 중 세계관에 맞는 하나를 고른다.`);
 const PERSONA_GENERIC=/^(친절|상냥|착함|착한|밝음|밝은|명랑|쿨|쿨함|차가움|차가운|귀여움|귀여운|활발|활발함|성실|성실함|다정|다정함|조용|조용함|무뚝뚝|츤데레|냉정|냉정함|따뜻함|강함|용감|용감함|똑똑함|진지함)$/;
 function PERSONA_CFG(){ const d={tpl:PROFILE_TPLS.basic,affLv:[2,4,6,8],memoLv:8}; return Object.assign(d,G.meta.persona||{}); }
 const pStrs=v=>(Array.isArray(v)?v:String(v||'').split(/[,，·/]/)).map(x=>String(x||'').trim()).filter(Boolean).slice(0,8);
@@ -12109,15 +12122,11 @@ async function directScript(text,btn){ const src=String(text||''); if(!src.trim(
   const r=await aiJSON(`${RULES}\n${DIRECTION_GUIDE}\n\n아래 대본에 연출만 더하라. 대사·나레이션·선택지 글자는 한 글자도 바꾸지 않고, 줄을 지우거나 순서를 바꾸지 않는다. 더할 수 있는 것: 이름 뒤 [표정|감정|동작], 줄 사이 [연출: 이름 감정 동작], [효과: …]. 감정이 크게 움직이는 줄에만(전체 줄의 20~35%) 넣고, 같은 감정을 연달아 쓰지 않는다.\n\n대본:\n${src}\n\nJSON만 출력: {"script":"연출을 더한 대본 전체"}`,btn,'complex');
   const out=r&&nl(r.script); if(!out) return null; if(dirStrip(out)!==dirStrip(src)) return null; return out; }
 async function directStage(s){ let ok=false; for(const k of ['pre','post']){ if(!s[k]) continue; const o=await directScript(s[k]); if(o){ s[k]=o; ok=true; } } if(ok){ s.dirV=1; auditMarkObj(s); } return ok; }
-pfDef('DIRECTION_GUIDE','연출 문법(감정 아이콘·동작·화면 효과)',()=>`연출: 이름 뒤 대괄호에 표정·감정·동작을 |로 함께 쓸 수 있다(예: "세라[미소|하트|점프]: 정말?"). 감정 아이콘: ${Object.keys(EMOTES).join('·')}. 동작: 점프·흔들·떨림·끄덕·갸웃·다가옴·물러남·퇴장·쓰러짐. 대사 없이 [연출: 이름 감정 동작]. 화면 효과: [효과: 흔들림|강한흔들림|플래시|붉은섬광|암전|페이드|집중선|비|눈|벚꽃|회상|비네트] (집중선·비·눈·벚꽃·회상·비네트는 [효과: 비 끝]처럼 끝을 쓴다). 메신저에서는 [스티커: 감정 아이콘 이름]. 감정이 크게 움직이는 순간에만 쓰고 남발하지 않는다.`);
 /* ===== 시나리오 설계 (사전 설계 → 장마다 빌드) ===== */
 /* 그때그때 즉흥으로 쓰지 않고, 큰 틀(로그라인·주제·결말·막 구성)·숨겨진 반전(진실·공개 장·복선)·분기(선택 → 이후 장에 반영)·캐릭터 아크를
    먼저 설계해 두고, 장을 쓸 때 그 장에 필요한 것만(막 목표·심을 복선·지금 밝힐 반전·아직 숨길 것·분기 결과) AI에 넘겨요.
    G.world.plan = {logline,theme,ending,acts[{name,upto,goal}],twists[{id,truth,reveal,clues[{ch,hint}],who}],branches[{id,at,question,options[{label,result}]}],arcs[{name,start,change,end}],notes}
    분기: 대본에 "[분기: id]" 다음 줄의 선택지를 고르면 P().flags[id]=번호(1부터) → 다음 장을 쓸 때 반영. 문서: docs/research/story-design.md */
-// 스테이지 집필에 설계를 넘길 때의 분기 지시(프롬프트 스튜디오 조각)
-const PLAN_WRITE_RULE_BASE='이 장의 분기가 있다면 장 전체에서 한 번만, 전체 구성에서 그 선택이 일어나는 스테이지에서만 쓴다.';
-pfDef('PLAN_WRITE_RULE','시나리오 설계의 분기 쓰기(스테이지 집필)',()=>PLAN_WRITE_RULE_BASE);
 function PLAN(){ const w=G.world; if(!w.plan||typeof w.plan!=='object') w.plan={}; const p=w.plan; for(const k of ['acts','twists','branches','arcs']) if(!Array.isArray(p[k])) p[k]=[]; return p; }
 function planHas(){ const p=G.world.plan; return !!(p&&(p.logline||(p.acts||[]).length||(p.twists||[]).length)); }
 function planActOf(n){ return PLAN().acts.find(a=>n<=(+a.upto||999))||PLAN().acts.at(-1)||null; }
@@ -12444,16 +12453,12 @@ document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); 
      같은 사람을 연달아 쓰면 분위기가 깨지고, 취향을 맞추거나 다른 사람으로 이어 가면 분위기가 오름. 1위면 통과.
    - 생성 연계: 조각 STAGE_MODES(프롬프트 스튜디오)를 장·이벤트·새 게임 1장 프롬프트에 넣고, stageSchema의 mode·debate·contest를
      buildStages가 검증(modeClean). 잘못되면 전투로. 설정에서 양식별로 끔. 문서: docs/research/stage-modes.md */
-// 장의 마지막(클라이맥스) 스테이지 형식 — 세계관 단계가 장르에 맞게 고름(G.meta.story.finale). 지시문은 프롬프트 스튜디오 조각, 값은 호출 지점이 줌
-const FINALE_RULE_BASE='finale(장의 마지막 스테이지 형식)은 장르에 맞게 정한다: 전투가 중심인 세계관이면 battle(마지막 스테이지는 반드시 보스전, battle:true), 무대·투표로 경쟁하면 contest(결승 콘테스트, mode "contest", enemies는 빈 배열), 논쟁·협상·재판이 중심이면 debate(결정적인 회담, mode "debate", enemies는 빈 배열).';
-pfDef('FINALE_RULE','장의 마지막 스테이지 형식(장르에 따라)',()=>FINALE_RULE_BASE);
+// 장의 마지막(클라이맥스) 스테이지 형식 — 세계관 단계가 장르에 맞게 고름(G.meta.story.finale). 지시문은 프롬프트 스튜디오의 FINALE_RULE, 값은 여기서
 const FINALE_SCHEMA='"finale":"battle|contest|debate"'; // 새 게임 세계관 단계 스키마
 const FINALE_END={battle:'보스전과',contest:'결승 무대와',debate:'결정적인 회담과'};
 const finaleOf=f=>['contest','debate'].includes(f)?f:'battle';
 const finaleRule=()=>`이 게임의 finale: ${storyCfg().finale}. ${FINALE_RULE}`, finaleEnd=()=>FINALE_END[storyCfg().finale];
-// 스테이지 집필(writeStages): 회담·콘테스트는 그 자체를 게임이 진행하므로 대본은 그 전·후만(전투 흐름 안내도 빼요)
-const STAGE_WRITE_RULE_BASE='회담·콘테스트 스테이지는 그 전(pre)과 후(post)만 대본으로 쓴다. 회담 자체(추궁·증거·설득)와 콘테스트의 무대 경연(매력 어필·심사)은 게임이 진행하므로 대본에 쓰지 않는다.';
-pfDef('STAGE_WRITE_RULE','회담·콘테스트 스테이지의 대본 범위(스테이지 집필)',()=>STAGE_WRITE_RULE_BASE);
+// 스테이지 집필(writeStages)의 스테이지 종류 표시 — 회담·콘테스트면 프롬프트 스튜디오의 STAGE_WRITE_RULE(대본은 그 전·후만)을 붙임
 const STAGE_KIND={debate:'회담 스테이지',contest:'콘테스트 스테이지'};
 function stageWhat(s){ return s.story?' — 전투 없는 이야기 스테이지':STAGE_KIND[s.mode]?` — ${STAGE_KIND[s.mode]}. ${STAGE_WRITE_RULE}`:' — 전투 전(pre)과 전투 후(post)'; }
 const CHARM={cool:'멋',cute:'귀여움',beauty:'아름다움',smart:'지성',tough:'강인함'};
@@ -12471,7 +12476,6 @@ function modeClean(s){ const mode=String(s&&s.mode||'').trim(), cfg=modesCfg();
   if(mode==='contest'&&cfg.contest&&s.contest){ const c=s.contest, judges=(Array.isArray(c.judges)?c.judges:[]).slice(0,3).map(j=>({name:S_(j.name,20)||'심사위원',likes:CHARM[j.likes]?j.likes:Object.keys(CHARM).find(k=>CHARM[k]===j.likes)||'cool'}));
     if(judges.length) return {mode:'contest',contest:{title:S_(c.title,40)||'콘테스트',judges,rounds:Math.max(2,Math.min(5,+c.rounds||3)),rivals:(Array.isArray(c.rivals)?c.rivals:[]).slice(0,3).map(r=>({name:S_(r.name,20)||'경쟁자',power:Math.max(.6,Math.min(1.6,+r.power||1))})).filter(r=>r.name)}}; }
   return null; }
-pfDef('STAGE_MODES','스테이지 양식(전투·이야기·회담·콘테스트) 고르기',()=>{ const m=modesCfg(); if(!m.debate&&!m.contest) return '스테이지는 battle(전투) 또는 이야기 스테이지만 쓴다.'; return `스테이지 양식(mode): 대부분은 battle(전투). 이야기에 맞으면 한 장에 0~2개를 다른 양식으로${m.debate?'':'(debate는 쓰지 않는다)'}${m.contest?'':'(contest는 쓰지 않는다)'}: debate(회담 — 협상·재판·심문·설득·거짓말 들추기 장면. 상대의 주장 줄 3~5개 중 모순이 있는 줄에 weak=그 모순을 밝히는 증거 id, 또는 persuade={who:설득할 수 있는 ${T('crew')} 이름,text}. 증거는 앞선 이야기에서 얻은 물건·증언·기록으로 3~5개. 라운드 1~3개), contest(콘테스트 — 축제·오디션·무대·대회·사교 파티. 심사위원 1~3명과 각자 좋아하는 매력 likes(${Object.keys(CHARM).join('|')}), 경쟁자 1~3명 power 0.8~1.3). battle:false인 이야기 스테이지도 섞을 수 있다. 회담·콘테스트 스테이지는 enemies를 빈 배열로 둔다.`; });
 const MODE_SCHEMA=`"mode":"battle|debate|contest","debate":{"opponent":"상대 이름","goal":"이 회담의 목표","evidence":[{"id":"e1","name":"","desc":""}],"rounds":[{"claim":"상대 주장 요약","lines":[{"text":"상대의 말","press":"추궁하면 나오는 대답","weak":"모순을 밝히는 증거 id 또는 빈칸","persuade":{"who":"","text":""}}]}],"win":"","lose":""},"contest":{"title":"","judges":[{"name":"","likes":"${Object.keys(CHARM).join('|')}"}],"rounds":3,"rivals":[{"name":"","power":1}]}`;
 function modeIcon(s){ return s&&s.mode==='debate'?'⚖':s&&s.mode==='contest'?'✦':''; }
 
@@ -12729,12 +12733,10 @@ function flipAll(){
 /* 엔진: modules/app/020-construct.js (GGMConstruct). 여기서는 게임 상태·화면·AI 연결만.
    설정: G.meta.construct(바꾼 값만 저장) · G.meta.variants(바리에이션 공통 설정) · 진행: P().cres(자원) · P().cbuild(기록·발견한 레시피) */
 const CON_RES=GGMConstruct.RES;
-// 새 게임 세계관 단계의 바리에이션 지시(프롬프트 스튜디오 조각)와 결과 정리(엔진 GGMConstruct.variantsFrom + id)
+// 새 게임 세계관 단계의 바리에이션 결과 정리(엔진 GGMConstruct.variantsFrom + id). 지시문은 프롬프트 스튜디오의 VARIANT_RULE
 // 새 게임 세계관 단계 스키마: 건조 메뉴·자원 이름(terms), 바리에이션 기본형
 const CON_TERMS_SCHEMA='"construct":"자원을 넣어 새 동료를 데려오는 메뉴 이름(2~4자)","res1":"그 메뉴에 넣는 자원 1(2~4자, 세계관 고유)","res2":"자원 2","res3":"자원 3","res4":"자원 4(귀한 것 — 특별 의상·바리에이션의 열쇠)"';
 const VARIANT_SCHEMA='"variants":[{"name":"바리에이션 기본형 이름(2~6자)","prompt":"그 의상의 영어 이미지 태그(쉼표로)","brief":"디자인 지시 한 줄","cond":{"roles":["atk|def|sup 중 어울리는 역할만"],"factions":["어울리는 소속만"],"elems":["어울리는 속성만"]}}]';
-const VARIANT_RULE_BASE='variants는 같은 캐릭터의 다른 모습(특별 의상) 기본형 4~6개다: 교복·수영복·갑옷·무대의상처럼 여러 캐릭터에게 공통으로 입힐 수 있는 틀을 이 세계관에 맞게 짓는다(계절·행사·직업·의식 등). cond에는 그 틀이 어울리는 역할(atk/def/sup)·소속·속성만 넣고, 모두에게 어울리면 비운다. 위에서 정한 세력·속성 이름을 그대로 쓴다.';
-pfDef('VARIANT_RULE','바리에이션 기본형(새 게임 세계관 단계)',()=>VARIANT_RULE_BASE);
 function variantsFromAI(list,ng){ return GGMConstruct.variantsFrom(list,{factions:((ng.world||{}).factions||[]).map(f=>f.name),elems:(ng.meta.elems||DEFAULT_META.elems).map(e=>e.n)}).map(v=>Object.assign({id:'v_'+uid()},v)); }
 // 특수 레시피(소속·특정 캐릭터 확률 업). 분류 확률은 groups가 정해서 기본은 비워 둬요. 예: {id:'rc_x',name:'새벽 설계',min:[400,400,400,600],effect:{type:'faction',value:'새벽등대',up:3},hint:'부품을 넉넉히'}
 const CON_RECIPES=[];

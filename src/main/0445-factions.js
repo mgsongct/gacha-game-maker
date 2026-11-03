@@ -32,10 +32,8 @@ function factionCtx(){ const F=factions(), now=mainNow(), L=[];
     L.push(`- ${f.name} [${FKIND[f.kind]} · 지금 플레이어와 ${FSTANCE[st]}${nxt?` · ${nxt.ch}장부터 ${FSTANCE[nxt.s]} 예정(${nxt.why||''}, 아직 드러내지 않음)`:''}]: ${f.desc||''}${f.goal?' 목적: '+f.goal+'.':''}${f.leader?' 지도자: '+f.leader+'.':''}${f.base?' 거점: '+f.base+'.':''}${f.ideology?' 이념: '+f.ideology+'.':''}${f.kind==='monster'?`${f.origin?' 정체: '+f.origin+'.':''}${f.nature?' 습성: '+f.nature+'.':''}${f.weakness?' 약점: '+f.weakness+'.':''}`:''}${Object.keys(f.rel).length?' 다른 세력과: '+Object.entries(f.rel).map(([k,v])=>k+' '+v).join(', ')+'.':''}${mem.length?' 소속 '+T('crew')+': '+mem.join(', ')+(st==='hostile'?' (지금은 적으로 나올 수 있음)':''):''}`); });
   const M=monsterNames().filter(l=>l.desc||enemyFaction(l)); const crew=G.chars.filter(c=>!c.monster&&!c.npc&&!c.alt), unmet=crew.filter(c=>own(c.id)&&!metInStory(c)), lock=crew.filter(c=>!own(c.id)&&((c.debut&&!debutOk(c))||c.debutLater));
   return `\n세력(설정을 지키고, 관계 변화는 정해진 장에서만):\n${L.join('\n')||'없음'}\n${M.length?'몬스터 도감(말하는 동료·NPC·메신저 상대가 아니다. 대사는 울음·짧은 위협 정도): '+M.map(l=>`${l.name}${enemyFaction(l)?'('+enemyFaction(l)+')':''}: ${[l.desc,l.nature,l.weak&&'약점 '+l.weak].filter(Boolean).join(' / ')}`).join('; ')+'\n':''}${unmet.length?`이미 계약으로 합류해 함께 작전 중인 ${T('crew')}(스토리에서 첫 만남처럼 쓰지 않는다): ${unmet.map(c=>c.name).join(', ')}\n`:''}${castLockCtx(lock)}`; }
-// 아직 등장하지 않은 대원(실행 중 장·이벤트·톡의 AI 컨텍스트): 명단은 여기서, 지시문은 프롬프트 스튜디오 조각
+// 아직 등장하지 않은 대원(실행 중 장·이벤트·톡의 AI 컨텍스트): 명단은 여기서, 지시문은 프롬프트 스튜디오의 CAST_LOCK_RULE
 // "나중 등장" 대원은 정해진 장면이 없어 새 장을 쓸 때 흐름에 맞으면 첫 등장(debutResolve가 첫 등장 스테이지를 정해 잠금이 풀림)
-const CAST_LOCK_RULE_BASE='첫 등장 장면이 정해진 대원은 그 장면에서만 처음 만난다. 정해진 장면이 없는 대원은 메인 스토리의 새 장을 쓸 때 이야기 흐름에 맞으면 첫 만남 장면으로 처음 등장시킨다. 이벤트·외전·메신저에서는 아직 만나지 않은 사이다.';
-pfDef('CAST_LOCK_RULE','아직 등장하지 않은 대원 다루기(장·이벤트·톡)',()=>CAST_LOCK_RULE_BASE);
 function castLockCtx(lock){ if(!lock.length) return ''; const N=L=>L.map(c=>c.name).join(', '), fixed=lock.filter(c=>c.debut), later=lock.filter(c=>!c.debut);
   return `아직 만나지 않은 ${T('crew')} — ${fixed.length?`첫 등장 장면이 정해짐: ${N(fixed)}`:''}${fixed.length&&later.length?' / ':''}${later.length?`정해진 장면 없음: ${N(later)}`:''}\n${CAST_LOCK_RULE}\n`; }
 // 깊이 점검
@@ -106,19 +104,11 @@ function monsterFromGen(x){ const name=String(x.name||'').trim(); if(!name||G.li
 function firstSpeak(c){ const re=new RegExp('(^|\\n)'+String(c.name).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(\\s*\\[[^\\]]*\\])?\\s*[:：]'), M=G.chapters.filter(ch=>ch.kind==='main'); for(let k=0;k<M.length;k++) for(const s of M[k].stages||[]) if(re.test((s.pre||'')+'\n'+(s.post||''))) return {k,s}; return null; }
 
 /* 생성기 연계(새 게임·장·이벤트 생성) */
-pfDef('FACTION_RULE','세력 설계 규칙(새 게임·세력 AI 채우기)',()=>'세력은 3~6개: 플레이어블 소속(kind playable) 1~3개, 적대 세력(hostile) 1개 이상, 적 몬스터의 근원이 되는 괴물·마물 무리(monster) 1개 이상(사람 세력만인 세계관이면 생략 가능), 중립(neutral) 0~2개. 세력마다 개요 3~4문장·목적·지도자·거점·이념·숨겨진 사실, 다른 세력과의 관계(rel: {"세력 이름":"관계 한 단어 — 이유"}). 몬스터 무리는 정체·기원(origin)·습성(nature)·약점(weakness). 처음엔 적대였다가 나중에 우호가 되는(또는 반대) 세력이 있으면 stance에 [{"ch":장 번호,"s":"ally|neutral|hostile","why":""}]. 몬스터는 말하는 동료·NPC가 아니다.');
 const FACTION_SCHEMA='[{"name":"","kind":"playable|hostile|neutral|monster","desc":"","goal":"","leader":"","base":"","ideology":"","secret":"","origin":"","nature":"","weakness":"","rel":{},"stance":[]}]';
 const BESTIARY_SCHEMA='"bestiary":[{"name":"이 이야기에 새로 나온 적 이름 그대로(사람·캐릭터인 적 제외)","faction":"속한 적대·괴물 세력 이름","desc":"정체 한 문장","nature":"습성","weak":"약점"}]';
-// 새 게임 대원 단계의 첫 등장·소속 지시(프롬프트 스튜디오 조각)
-pfDef('CAST_DEBUT_RULE','새 게임 대원의 첫 등장(debut)·소속',()=>`각 ${T('crew')}에 debut 항목: "start"(처음부터 함께하는 동료 — 프롤로그에서 처음 만나 1장부터 이미 아는 사이로 나오고 처음부터 뽑을 수 있음, 4~6명), 1장 스테이지 번호(그 스테이지에서 처음 만나는 인물 — 그 스테이지를 깨야 뽑기에 합류), "later"(2장 이후 첫 등장 — 그때까지 뽑기에 안 나옴). faction은 세력 목록 중 플레이어블 소속(또는 stance로 나중에 우호가 되는 세력)의 이름을 그대로 쓰고, 그 세력들 사이에서 고르게 나눈다. 몬스터·괴물은 ${T('crew')}으로 만들지 않는다.`);
-// 오프닝·1장의 등장 계획: 명단은 castPlanData, 지시문은 조각(프롤로그 = 처음부터 동료와의 첫 만남 — 원안의 "첫 동료들과의 강렬한 만남")
-const CAST_PLAN_RULE_BASE='등장 계획을 반드시 지킨다: 처음부터 함께하는 동료는 프롤로그에서 처음 만나고 1장부터는 이미 아는 사이다(1장에 첫 만남 장면으로 쓰지 않는다). 1장에서 처음 만나는 인물은 정해진 스테이지에서 처음 등장하고 그 전에는 나오지 않는다. 나중 등장 인물은 프롤로그와 1장에 내지 않는다.';
-pfDef('CAST_PLAN_RULE','등장 계획 지키기(새 게임 오프닝·1장)',()=>CAST_PLAN_RULE_BASE);
+// 오프닝·1장의 등장 계획 명단(지시문은 프롬프트 스튜디오의 CAST_PLAN_RULE — 프롤로그 = 처음부터 동료와의 첫 만남, 원안의 "첫 동료들과의 강렬한 만남")
 function castPlanData(L){ const N=X=>X.map(c=>c.name).join(', '), st=L.filter(c=>!c.__deb&&!c.debutLater), d=L.filter(c=>c.__deb), lt=L.filter(c=>c.debutLater);
   return `등장 계획 — 처음부터 함께하는 동료: ${N(st)||'없음'}${d.length?' / 1장에서 처음 만나는 인물: '+d.map(c=>`${c.name}(${c.__deb}번째 스테이지)`).join(', '):''}${lt.length?' / 나중 등장: '+N(lt):''}\n${CAST_PLAN_RULE}`; }
-// 새 게임 1장의 적 소속·적 도감 지시(조각)
-const BESTIARY_RULE_BASE='적은 세력 목록의 적대·괴물 세력에 속하게 하고(faction), bestiary에 새 적(사람·캐릭터가 아닌 적)마다 정체·습성·약점을 쓴다. 몬스터는 말하는 동료·NPC가 아니다.';
-pfDef('BESTIARY_RULE','적 소속·적 도감(새 게임 1장)',()=>BESTIARY_RULE_BASE);
 // 생성된 대원의 소속 이름이 세계관 세력 이름과 조금 다르면(띄어쓰기·줄임) 그 세력 이름으로 — 없는 세력이면 그대로(factions()가 플레이어블로 추가)
 function factionMatch(F,name){ const k=x=>String(x||'').replace(/\s+/g,''), n=k(name); if(!n) return name; const hit=(F||[]).find(f=>k(f.name)===n)||(F||[]).find(f=>n.length>=2&&(k(f.name).includes(n)||n.includes(k(f.name)))); return hit?hit.name:name; }
 function factionClean(list){ const S=(v,n)=>String(v||'').trim().slice(0,n||300); return (Array.isArray(list)?list:[]).slice(0,8).map(x=>({name:S(x&&x.name,30),kind:FKIND[x&&x.kind]?x.kind:'neutral',desc:S(x&&x.desc,400),goal:S(x&&x.goal),leader:S(x&&x.leader,80),base:S(x&&x.base,80),ideology:S(x&&x.ideology),secret:S(x&&x.secret),origin:S(x&&x.origin),nature:S(x&&x.nature),weakness:S(x&&x.weakness),

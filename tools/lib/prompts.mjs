@@ -43,6 +43,11 @@ export function inlinePrompts(units) { const bases = fragBases(units), calls = a
 // 위치(최상위 선언)별로 모음 — 보고서 표
 export const promptSites = rows => [...rows.reduce((m, r) => { const x = m.get(r.site) || { site: r.site, n: 0, chars: 0 }; x.n++; x.chars += r.chars; return m.set(r.site, x); }, new Map()).values()].sort((a, b) => b.chars - a.chars);
 
+// 조각이 한곳에 모였는지: 프롬프트 스튜디오는 지시문을 파편화되지 않게 한곳에 모아 두고 거기서 개선하는 곳(사용자) — pfDef 등록이 여러 파일에 있으면 흩어진 것
+export function fragmentFiles(units) { const files = new Map();
+  for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'call_expression' && callee(n) === 'pfDef') { const f = u.loc(n).split(':')[0]; files.set(f, (files.get(f) || 0) + 1); } });
+  const all = [...files].sort((a, b) => b[1] - a[1]); return { home: all[0]?.[0] || null, stray: all.slice(1).map(([file, n]) => ({ file, n })) }; }
+
 // 순수 모듈 경계: 머리 주석에 "순수·DOM-free·Pure"라고 밝힌 모듈(규칙 엔진 — 건조·원정·전투 코어, 전투 코어는 Web Worker에서도 돎)은
 // DOM·브라우저 전역·앱 상태(G·P()·render·toast·aiJSON 등)를 참조하면 안 됨(docs/build.md §3, docs/modules.md §6·§8-1·§8-2)
 const APP_GLOBALS = new Set(['document', 'window', 'localStorage', 'sessionStorage', 'navigator', 'G', 'P', 'render', 'toast', 'mark', 'flush', 'appStorage', 'SAMPLE', 'aiJSON', 'T', 'ctx', 'openModal', 'closeModal', 'esc', '$']);

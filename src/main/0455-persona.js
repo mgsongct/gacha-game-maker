@@ -8,8 +8,6 @@ const PERSONA_FIELDS=[['traits','핵심 성격 (3개)','list'],['self','1인칭'
   ['gap','반전 매력','text'],['flaw','결점·약점','text'],['want','원하는 것','text'],['fear','두려워하는 것','text'],['likes','좋아하는 것','list'],['dislikes','싫어하는 것','list'],['hobby','취미','text'],['motif','상징 (모티프)','text']];
 const PROFILE_TPLS={basic:['생일','신장','출신','특기'],org:['소속','직책','생일','신장','출신','특기'],operator:['코드네임','출신','생일','신장','전투 경력','특기','임상 소견'],fantasy:['종족','출신','생일','신장','계약','특기'],idol:['소속사','데뷔','생일','신장','담당','팬덤 이름'],streamer:['활동명','플랫폼','데뷔','구독자 애칭','방송 장르','생일']};
 const PROFILE_TPL_SCHEMA='"profileTemplate":"'+Object.keys(PROFILE_TPLS).join('|')+'"'; // 새 게임 세계관 단계 스키마
-// 새 게임 세계관 단계의 프로필 항목 틀 고르기(프롬프트 스튜디오 조각) — 고를 수 있는 틀은 PROFILE_TPLS에서
-pfDef('PROFILE_TPL_RULE','캐릭터 프로필 항목 틀(새 게임 세계관 단계)',()=>`profileTemplate은 캐릭터 프로필 항목 틀이다: ${Object.entries(PROFILE_TPLS).map(([k,v])=>`${k}(${v.slice(0,4).join('·')}${v.length>4?' …':''})`).join(', ')} 중 세계관에 맞는 하나를 고른다.`);
 const PERSONA_GENERIC=/^(친절|상냥|착함|착한|밝음|밝은|명랑|쿨|쿨함|차가움|차가운|귀여움|귀여운|활발|활발함|성실|성실함|다정|다정함|조용|조용함|무뚝뚝|츤데레|냉정|냉정함|따뜻함|강함|용감|용감함|똑똑함|진지함)$/;
 function PERSONA_CFG(){ const d={tpl:PROFILE_TPLS.basic,affLv:[2,4,6,8],memoLv:8}; return Object.assign(d,G.meta.persona||{}); }
 const pStrs=v=>(Array.isArray(v)?v:String(v||'').split(/[,，·/]/)).map(x=>String(x||'').trim()).filter(Boolean).slice(0,8);

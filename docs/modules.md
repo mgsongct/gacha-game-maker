@@ -156,7 +156,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 ## 8-1. 건조/영입 · 원정 · 바리에이션
 
 - 엔진 `GGMConstruct`(`src/modules/app/020-construct.js`, 순수): `rates`(분류 개방·비중, 희귀도 캡) → `table`(캐릭터별 확률) → `roll`. `condMatch`(바리에이션 적용 조건), `variantPrompt`/`designBrief`(디자인 프롬프트), `variantsFrom`(새 게임이 만든 바리에이션 기본형 정리)
-- 생성기 연결 `src/main/0505-construct.js`: 세계관 단계 스키마 `CON_TERMS_SCHEMA`·`VARIANT_SCHEMA`, 조각 `VARIANT_RULE`, `variantsFromAI`(엔진 정리 + id)
+- 생성기 연결 `src/main/0505-construct.js`: 세계관 단계 스키마 `CON_TERMS_SCHEMA`·`VARIANT_SCHEMA`, `variantsFromAI`(엔진 정리 + id)
 - 화면·상태 `src/main/0505-construct.js`: `constructHTML`(탭 `construct`, 계약 화면 위 진입), `conBuild`, `conBuy`, `conDispReward`(파견 보상에 자원), `conMakeVariant`(AI `aiAltChar` 또는 규칙), 설정 `openConSet`
 - 이격 상속 `src/main/0065-inherit.js`: `mark()`에서 `inheritOnMark`, `fix()`에서 `inheritAll`, `flush()`에서 `inheritStore`
 - 설계·수치: [research/construction.md](research/construction.md), [research/variants.md](research/variants.md)
@@ -164,7 +164,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 ## 8-2. 원정 모드
 
 - 엔진 `GGMExpedition`(`src/modules/app/030-expedition.js`, 순수): `tierOf`, `condNow`, `idolOffers`/`idolResult`, `streamResult`/`libIncome`, `bizPerformance`/`bizSettle`, `fromWorld`/`namesApply`(새 게임 세계관 단계의 방식·이름 → `G.meta.expedition`, 수치는 기본값)
-- 생성기 연결 `src/main/0275-expedition.js`: 스키마 `EXPEDITION_SCHEMA`, 조각 `EXPEDITION_RULE`
+- 생성기 연결 `src/main/0275-expedition.js`: 스키마 `EXPEDITION_SCHEMA`
 - 화면·상태 `src/main/0275-expedition.js`: 탭 `disp`가 `dispPageHTML()` → 전투형이면 기존 `dispHTML`, 아니면 `exHTML`. `exBusyIds`를 `busyIds`(0090)에 합쳐 일하는 캐릭터는 전투 불가. 설정 `openExSet`
 - 설계·수치: [research/expedition.md](research/expedition.md)
 
@@ -183,20 +183,20 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 ## 8-2-3. 캐릭터 개성·인연 톡·메모리얼
 
 - `src/main/0455-persona.js`: `c.persona`·`c.pfields`·`c.memorial`, `personaReview`(검수 점수), `personaAI`(채우기·다듬기), `personaAIReview`, `talkAffGen`(aff 트리거 톡), `memorialGen`, `memoOn`(로비 대사 → `affLinePool0`), 캐릭터 정보 탭 `personaHTML`
-- 생성기 연결: 프로필 틀 `PROFILE_TPLS`·스키마 `PROFILE_TPL_SCHEMA`·조각 `PROFILE_TPL_RULE`
+- 생성기 연결: 프로필 틀 `PROFILE_TPLS`·스키마 `PROFILE_TPL_SCHEMA`
 - `personaBrief`가 `ctx()`에 들어가 모든 AI 생성이 말투를 지킴. 새 캐릭터 스키마(`charSchema`)에 persona·pfields
 - 설계: [research/character.md](research/character.md)
 
 ## 8-2-4. 시나리오 설계
 
-- `src/main/0465-story-plan.js`: 장을 쓰기 전 자동 설계 `planEnsure`(aiChapterGen0), 집필 조각 `PLAN_WRITE_RULE`, `G.world.plan`(로그라인·주제·결말·막·반전·분기·아크·메모), `planCtx(n)`(장 n에 필요한 설계만 → `aiChapterGen0` 프롬프트), `planCheck`(복선·공개·분기 점검), `planAI`(새로·다듬기·잇기), 편집 `openPlan`
+- `src/main/0465-story-plan.js`: 장을 쓰기 전 자동 설계 `planEnsure`(aiChapterGen0), `G.world.plan`(로그라인·주제·결말·막·반전·분기·아크·메모), `planCtx(n)`(장 n에 필요한 설계만 → `aiChapterGen0` 프롬프트), `planCheck`(복선·공개·분기 점검), `planAI`(새로·다듬기·잇기), 편집 `openPlan`
 - 분기: 대본 `[분기: id]` → `vnCmd`가 `S.branch` → `vnpick`이 `storyFlag` → `P().flags[id]={n,label}`
 - 설계: [research/story-design.md](research/story-design.md)
 
 ## 8-2-5. 프롬프트 스튜디오
 
-- `src/main/0025-prompt-studio.js`: 조각 등록 `pfDef(id,label,get)` → `window[id]` 게터 → `promptFrag(id)`(게임별 덮어쓰기·덧붙이기 `G.meta.prompts`). 조각은 그 기능 파일에서 등록: SCRIPT_FMT·THREAD_FMT·BATTLE_FLOW·TITLE_RULE·NAI_CHAR·EXPLORATION_NAME_RULE(0010), JSON_STRICT(0020), POS_RULE(0185), IMG_GUIDE, CAST_RARITY_RULE(0250), EXPEDITION_RULE(0275), CAST_DEBUT_RULE·CAST_PLAN_RULE·CAST_LOCK_RULE·BESTIARY_RULE(0445), PROFILE_TPL_RULE(0455), PLAN_WRITE_RULE(0465), DIRECTION_GUIDE(0462), FINALE_RULE·STAGE_WRITE_RULE·STAGE_MODES(0488), VARIANT_RULE(0505)
-- 원칙: 생성기(0250·0260)는 단계 흐름과 데이터 명단만, 지시문은 조각으로, 데이터 계약(스키마)은 기능 파일 상수로 — 도구가 스튜디오 밖 지시문을 늘리지 않게 봄(`tools/lib/prompts.mjs`)
+- `src/main/0025-prompt-studio.js`: 조각 등록 `pfDef(id,label,get)` → `window[id]` 게터 → `promptFrag(id)`(게임별 덮어쓰기·덧붙이기 `G.meta.prompts`). 조각은 모두 이 파일의 「조각 모음」 한곳에 있어요(파편화 방지 — 고칠 때는 여기서, 게임별로는 스튜디오 화면에서): SCRIPT_FMT·THREAD_FMT·BATTLE_FLOW·TITLE_RULE·NAI_CHAR·CHAR_STAT_RULE·EXPLORATION_NAME_RULE·JSON_STRICT(공통 형식), POS_RULE·EXPEDITION_RULE·PROFILE_TPL_RULE·VARIANT_RULE(세계관·규칙), FACTION_RULE·CAST_LOCK_RULE·CAST_DEBUT_RULE·CAST_PLAN_RULE·BESTIARY_RULE·CAST_RARITY_RULE(세력·등장), DIRECTION_GUIDE·PLAN_WRITE_RULE·FINALE_RULE·STAGE_WRITE_RULE·STAGE_MODES(스토리·연출), IMG_GUIDE
+- 지시문은 스튜디오 한곳에, 명단·수치 같은 데이터와 데이터 계약(스키마)은 각 기능 파일에. 도구가 다른 파일의 `pfDef`(오류)와 스튜디오 밖 지시문(늘면 실패)을 잡음(`tools/lib/prompts.mjs`)
 - 그림 가드 `imgGuard(kind,tags)`: `composeNai`가 배경·소품·지도·아이콘에서 사람 태그를 빼고 `no humans` 머리말을 붙임
 - 교훈 `plList/plHit/plAdd`(appStorage `ggm-plessons`) → `llmWrap`이 `plInject`로 끼움. 점검 규칙 `l_imgperson`
 - 설계: [research/prompts.md](research/prompts.md)
@@ -210,7 +210,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8-2-7. 연출 엔진 · 에셋 관리
 
-- `src/main/0462-direction.js`: `EMOTES`·`MOTIONS`·`SCREEN_FX`, 파싱 `dirSplit`(parseScript가 `L.dir`), 무대 `vnStage`(두 사람), `vnDirectSay`·`vnDirectCmd`(vnShow·vnCmd), `autoEmote`, `emoteHTML`(메신저 스티커 `w:'k'`·로비 `lobbyEmote`), AI `directScript`·`directStage`, 조각 `DIRECTION_GUIDE`, 점검 `s_direct`
+- `src/main/0462-direction.js`: `EMOTES`·`MOTIONS`·`SCREEN_FX`, 파싱 `dirSplit`(parseScript가 `L.dir`), 무대 `vnStage`(두 사람), `vnDirectSay`·`vnDirectCmd`(vnShow·vnCmd), `autoEmote`, `emoteHTML`(메신저 스티커 `w:'k'`·로비 `lobbyEmote`), AI `directScript`·`directStage`, 점검 `s_direct`
 - `src/main/0565-asset-library.js`: 공유 보관함 `shList/shPut/shTake/shAdopt`(addLib·scanScriptAssets), `libUsage`, `libDupes/libMerge`(alias), 화면 `openAssets`
 - 설계: [research/direction.md](research/direction.md)
 
@@ -222,12 +222,12 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8-2-9. 세력 · 적 도감 · 등장/영입
 
-- `src/main/0445-factions.js`: `factions()`(kind·rel·stance 정리), `stanceAt`·`stanceApply`(장 생성 `stance`), `factionCtx`·`castLockCtx`(ctx), 생성기 연결 `factionMatch`·`castPlanData`·조각 `CAST_DEBUT_RULE`·`CAST_PLAN_RULE`·`CAST_LOCK_RULE`·`BESTIARY_RULE`, `factionReview`·`factionAI`, `monsterNames`·`isMonsterLike`·`monsterFromGen`(addNewChars·addNpcs)·`charToMonster`, `castLock/castOk`(bannerPool·conPool), `metInStory`·`firstSpeak`, 화면 `openWorldDesign`
+- `src/main/0445-factions.js`: `factions()`(kind·rel·stance 정리), `stanceAt`·`stanceApply`(장 생성 `stance`), `factionCtx`·`castLockCtx`(ctx), 생성기 연결 `factionMatch`·`castPlanData`, `factionReview`·`factionAI`, `monsterNames`·`isMonsterLike`·`monsterFromGen`(addNewChars·addNpcs)·`charToMonster`, `castLock/castOk`(bannerPool·conPool), `metInStory`·`firstSpeak`, 화면 `openWorldDesign`
 - 점검 `w_faction`·`c_monster`·`c_debut` · 설계: [research/factions-cast.md](research/factions-cast.md)
 
 ## 8-2-10. 스테이지 양식(회담·콘테스트)
 
-- `src/main/0488-stage-modes.js`: `modeClean`(buildStages·새 게임 1장), `STAGE_MODES`·`MODE_SCHEMA`(stageSchema), 장의 마지막 스테이지 `finaleOf`·`FINALE_SCHEMA`·조각 `FINALE_RULE`·`finaleRule`/`finaleEnd`, 집필 `stageWhat`·조각 `STAGE_WRITE_RULE`, `openModeStage`(stage 액션·startBattle), 회담 `debateStart/debateDraw/debateHit/debateMiss`, 콘테스트 `charmOf`·`contestStart/contestAppeal`, 클리어 `modeClear`
+- `src/main/0488-stage-modes.js`: `modeClean`(buildStages·새 게임 1장), `STAGE_MODES`·`MODE_SCHEMA`(stageSchema), 장의 마지막 스테이지 `finaleOf`·`FINALE_SCHEMA`·`finaleRule`/`finaleEnd`, 집필 `stageWhat`, `openModeStage`(stage 액션·startBattle), 회담 `debateStart/debateDraw/debateHit/debateMiss`, 콘테스트 `charmOf`·`contestStart/contestAppeal`, 클리어 `modeClear`
 - 설계: [research/stage-modes.md](research/stage-modes.md)
 
 ## 8-3. 콘텐츠 점검·업그레이드
