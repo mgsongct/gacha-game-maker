@@ -66,6 +66,7 @@ function cxDeepenPrompt({e}){ return `${pf('CODEX_DEEPEN',{RULES,ctx:ctx(),title
 /* src/main/0330-casting.js */
 function autoNpcsPrompt({names,lines}){ return `${pf('AUTO_NPCS',{castRule:castRule(),world:String(G.world.summary||'').slice(0,300),names:names.map(n=>`- ${n}: ${lines(n).slice(0,200)}`).join('\n'),NAI_CHAR})}\nJSON만 출력: {"npcs":[{"name":"","role":"한 줄","look":"한국어 외모","naiPrompt":""}]}`; }
 /* src/main/0445-factions.js */
+function stanceAIPrompt({F,main}){ return `${RULES}\n${ctx()}\n\n메인 장:\n${main.map((ch,i)=>`${i+1}장 「${ch.title}」: ${String(ch.memory?.brief||ch.summary||ch.logline||'').slice(0,300)||'(요약 없음)'}`).join('\n')||'(아직 없음)'}\n\n세력: ${JSON.stringify(F.map(f=>({name:f.name,kind:f.kind,desc:String(f.desc||'').slice(0,200),rel:f.rel||{}}))).slice(0,3000)}\n\n${pf('STANCE_AI',{last:main.length})}\nJSON만 출력: {"stance":[{"faction":"세력 이름","ch":1,"s":"ally|neutral|hostile","why":"한 줄 이유"}]}`; }
 function factionAIPrompt({F,instruction,M}){ return `${RULES}\n${ctx()}\n\n${pf(F.length?'FACTION_AI_IMPROVE':'FACTION_AI_NEW',{rule:FACTION_RULE,now:mainNow()})}${instruction?'\n추가 지시: '+instruction:''}
 적(몬스터) 목록: ${M.map(l=>l.name).join(', ')||'없음'} — ${BESTIARY_AI_RULE}
 기존 세력: ${JSON.stringify(F.map(f=>({name:f.name,kind:f.kind,desc:f.desc}))).slice(0,3000)}

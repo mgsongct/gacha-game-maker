@@ -34,6 +34,13 @@ function factionReview(){ const out=[], F=factions(); if(F.length<2) out.push({w
   const M=monsterNames(), nod=M.filter(l=>!l.desc); if(nod.length) out.push({w:Math.min(20,nod.length*2),msg:`정체가 정해지지 않은 적 ${nod.length}종: ${nod.slice(0,6).map(l=>l.name).join(', ')}${nod.length>6?' …':''}`});
   const bad=[...G.chars.filter(c=>!c.monster&&isMonsterLike(c)),...(G.npcs||[]).filter(n=>!n.monster&&isMonsterLike(n))]; if(bad.length) out.push({w:10,msg:`몬스터로 보이는 캐릭터·NPC: ${bad.map(x=>x.name).join(', ')}`});
   const score=Math.max(0,100-out.reduce((a,x)=>a+x.w,0)); return {score,issues:out}; }
+/* 세력 장별 태도 보완(점검 w_stance·실행 중 자동 채움): 장을 만들 때만 생기는 태도가 예전 게임엔 비어 종류 기본값으로만 돌아요 —
+   이미 쓴 메인 장 이야기로 세력마다 1장의 처음 관계와 바뀐 장을 정해 넣어요. 답에 없는 세력은 종류 기본값을 1장 태도로 적어 둬요(다시 비었다고 잡히지 않게) */
+async function stanceAI(){ const F=factions().filter(f=>f.kind!=='monster'), main=G.chapters.filter(ch=>ch.kind==='main'); if(!F.length||!main.length) return false;
+  const r=await aiJSON(stanceAIPrompt({F,main}),null,'default'); if(!r) return false;
+  (Array.isArray(r.stance)?r.stance:[]).forEach(x=>{ const f=facByName(String(x&&x.faction||'').trim()), ch=Math.max(1,Math.min(main.length,Math.round(+(x&&x.ch)||1))); if(!f||f.kind==='monster'||!FSTANCE[x.s]) return; f.stance=(f.stance||[]).filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); });
+  F.forEach(f=>{ if(!Array.isArray(f.stance)) f.stance=[]; if(!f.stance.length) f.stance.push({ch:1,s:stanceAt(f,1),why:''}); f.stance.sort((a,b)=>a.ch-b.ch); });
+  mark('world'); return true; }
 async function factionAI(btn,instruction){ const F=factions(), M=monsterNames();
   const r=await aiJSON(factionAIPrompt({F,instruction,M}),btn,'complex');
   if(!r) return false; const S=(v,n)=>String(v||'').trim().slice(0,n||300);

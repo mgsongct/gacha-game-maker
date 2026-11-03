@@ -2143,6 +2143,18 @@ function table(input,c,pool){
   for(const k of avail){const m=mem.filter(p=>p.rarity===k),U=m.reduce((a,p)=>a+up(p),0);for(const p of m)add(p,g.p*pr[k]/100*up(p)/U);}}
  const S=[...rows.values()].reduce((a,b)=>a+b,0);
  return {info,rows:[...rows].map(([id,v])=>({id,p:S>0?v/S*100:0})).sort((a,b)=>b.p-a.p)};}
+/* 나올 대원이 없는 투입(열린 분류에 지금 허용되는 희귀도의 대원이 없음 — 예: 최소 투입은 R만 나오는데 열린 분류에 SR만 있음)일 때
+   나올 수 있는 가장 적은 투입: 지금 투입을 각 분류의 개방 최소치까지 올리고 × 분류 총량·희귀도 개방 총량(SR·SSR)까지 고르게(단위 step) 올린 후보 중
+   확률표에 대원이 있고 총량이 가장 적은 것. 지금 투입으로 나오면 그대로(changed:false), 어떤 투입으로도 안 나오면 null
+   why: 지금 투입이 비는 까닭 — 열린 분류와 그 분류 대원의 희귀도, 지금 나오는 희귀도 */
+function suggest(input,c,pool){
+ const cfg=config(c),base=normalize(input,cfg),t0=table(base,cfg,pool);if(t0.rows.length)return {input:base,changed:false};
+ const i0=t0.info,why={open:i0.groups.filter(g=>g.open).map(g=>({name:g.name,rarity:[...new Set(pool.filter(p=>inGroup(p,g.match)).map(p=>+p.rarity))].sort()})),allowed:[1,2,3].filter(k=>k===1||i0.open[k])};
+ const up=(v,goal)=>{const r=v.slice(),tot=()=>r.reduce((a,b)=>a+b,0);for(let n=0;n<400&&tot()<goal;n++){const room=r.map((x,i)=>x<cfg.max?i:-1).filter(i=>i>=0);if(!room.length)break;const each=Math.max(cfg.step,Math.ceil((goal-tot())/room.length/cfg.step)*cfg.step);room.forEach(i=>{r[i]=Math.min(cfg.max,r[i]+each);});}return r;};
+ let best=null;
+ for(const g of [{min:[0,0,0,0]},...cfg.groups]){const v=base.map((x,i)=>clamp(Math.max(x,+(g.min||[])[i]||0),cfg.min,cfg.max));
+  for(const goal of [0,+g.total||0,cfg.sr.open,cfg.ssr.open]){const w=up(v,goal),tot=w.reduce((a,b)=>a+b,0);if(best&&tot>=best.total)continue;if(table(w,cfg,pool).rows.length)best={input:w,total:tot};}}
+ return best?{input:best.input,changed:true,why}:null;}
 function weighted(items,weight,rng){const w=items.map(weight),s=w.reduce((a,b)=>a+b,0);if(!(s>0))return items[Math.floor(rng()*items.length)];let x=rng()*s;for(let i=0;i<items.length;i++){x-=w[i];if(x<0)return items[i];}return items[items.length-1];}
 /* roll: pool = 건조로 나올 수 있는 캐릭터들 [{id,rarity,role,faction}], variants = 이번 투입으로 열린 바리에이션 후보 [{tpl, bases:[...]}] */
 function roll(input,c,pool,variants,rng=Math.random){
@@ -2191,7 +2203,7 @@ function variantsFrom(list,o={}){if(!Array.isArray(list))return [];const F=o.fac
  return list.filter(v=>v&&typeof v==='object').map(v=>({name:String(v.name||'').replace(/[<>"'&`]/g,'').trim().slice(0,12),prompt:String(v.prompt||'').replace(/[^\x20-\x7e]/g,'').replace(/\s+/g,' ').replace(/^[ ,]+|[ ,]+$/g,'').slice(0,200),brief:String(v.brief||'').slice(0,160),cond:v.cond&&typeof v.cond==='object'?v.cond:{}}))
   .filter(v=>v.name&&v.prompt&&!seen.has(v.name)&&seen.add(v.name)).slice(0,6).map((v,i)=>{const L=(x,ok)=>(Array.isArray(x)?x:[]).map(s=>String(s).trim()).filter(ok),c={factions:L(v.cond.factions,s=>F.includes(s)),roles:L(v.cond.roles,s=>R.includes(s)),elems:L(v.cond.elems,s=>E.includes(s))};
    Object.keys(c).forEach(k=>{if(!c[k].length)delete c[k];});const d=VARIANT_DEFAULTS[i%VARIANT_DEFAULTS.length];return {name:v.name,prompt:v.prompt,brief:v.brief,chance:d.chance,recipe:{min:d.recipe.min.slice()},rarity:'same',on:true,cond:c};});}
-const api={RES,DEFAULTS,VARIANT_DEFAULTS,variantsFrom,config,normalize,matches,rates,table,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
+const api={RES,DEFAULTS,VARIANT_DEFAULTS,variantsFrom,config,normalize,matches,rates,table,suggest,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
 root.GGMConstruct=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);
 </script>
@@ -4771,6 +4783,7 @@ pfDef('REL_SEED','인물 관계도 넓히기',()=>`인물 설정과 지금까지
 pfDef('CHAR_LINES_RULE','로비 대사 쓰기(대원 스키마)',()=>`(아침·밤·오랜만·일상·감정 등 상황을 다양하게). 다른 인물의 이름이나 아직 드러나지 않은 사건·적대 관계는 쓰지 않는다(플레이어가 아직 모를 수 있다)`);
 pfDef('CTX_BESTIARY','몬스터 도감 머리말(실행 중 컨텍스트)',()=>`몬스터 도감(말하는 동료·NPC·메신저 상대가 아니다. 대사는 울음·짧은 위협 정도): `);
 pfDef('CTX_UNMET','뽑았지만 스토리에서 아직 안 만난 대원',()=>`이미 계약으로 합류해 함께 작전 중인 {crew}(스토리에서 첫 만남처럼 쓰지 않는다): {names}\n`,'자리: {crew} {names}');
+pfDef('STANCE_AI','세력 장별 태도 보완(예전 게임·점검 w_stance)',()=>`이 게임의 세력마다 플레이어 쪽과의 관계가 메인 장을 따라 어떻게 이어지고 바뀌는지 정하라. 세력마다 1장의 처음 관계를 하나 넣고, 이미 쓴 장의 이야기에서 관계가 바뀐 장이 있으면 그 장 번호와 바뀐 관계·이유(한 줄)를 넣는다. 이야기에 없는 변화는 만들지 않는다(관계가 그대로인 세력은 1장 하나만). 관계는 ally(우호)·neutral(중립)·hostile(적대) 중 하나, faction은 아래 세력 이름 그대로, ch는 1~{last} 사이 장 번호.`,'자리: {last}');
 pfDef('FACTION_AI_IMPROVE','세력·몬스터 다듬기(AI 채우기)',()=>`이 게임의 세력과 몬스터 설정을 깊이 있게 다듬고 빈 곳을 채워라(이미 있는 이름·사실은 바꾸지 않는다). {rule} 지금 메인 스토리는 {now}장 진행 중(이미 지난 장의 관계는 지금 대본과 어긋나지 않게).`,'자리: {rule} {now}');
 pfDef('FACTION_AI_NEW','세력·몬스터 만들기(AI 채우기)',()=>`이 게임의 세력과 몬스터 설정을 깊이 있게 만들어라. {rule} 지금 메인 스토리는 {now}장 진행 중(이미 지난 장의 관계는 지금 대본과 어긋나지 않게).`,'자리: {rule} {now}');
 pfDef('BESTIARY_AI_RULE','적 도감 채우기(AI 채우기)',()=>`각각 어느 무리(faction)인지, 정체(desc)·습성(nature)·약점(weak)을 한 줄씩. 사람·캐릭터인 적은 넣지 않는다.`);
@@ -5079,6 +5092,7 @@ function cxDeepenPrompt({e}){ return `${pf('CODEX_DEEPEN',{RULES,ctx:ctx(),title
 /* src/main/0330-casting.js */
 function autoNpcsPrompt({names,lines}){ return `${pf('AUTO_NPCS',{castRule:castRule(),world:String(G.world.summary||'').slice(0,300),names:names.map(n=>`- ${n}: ${lines(n).slice(0,200)}`).join('\n'),NAI_CHAR})}\nJSON만 출력: {"npcs":[{"name":"","role":"한 줄","look":"한국어 외모","naiPrompt":""}]}`; }
 /* src/main/0445-factions.js */
+function stanceAIPrompt({F,main}){ return `${RULES}\n${ctx()}\n\n메인 장:\n${main.map((ch,i)=>`${i+1}장 「${ch.title}」: ${String(ch.memory?.brief||ch.summary||ch.logline||'').slice(0,300)||'(요약 없음)'}`).join('\n')||'(아직 없음)'}\n\n세력: ${JSON.stringify(F.map(f=>({name:f.name,kind:f.kind,desc:String(f.desc||'').slice(0,200),rel:f.rel||{}}))).slice(0,3000)}\n\n${pf('STANCE_AI',{last:main.length})}\nJSON만 출력: {"stance":[{"faction":"세력 이름","ch":1,"s":"ally|neutral|hostile","why":"한 줄 이유"}]}`; }
 function factionAIPrompt({F,instruction,M}){ return `${RULES}\n${ctx()}\n\n${pf(F.length?'FACTION_AI_IMPROVE':'FACTION_AI_NEW',{rule:FACTION_RULE,now:mainNow()})}${instruction?'\n추가 지시: '+instruction:''}
 적(몬스터) 목록: ${M.map(l=>l.name).join(', ')||'없음'} — ${BESTIARY_AI_RULE}
 기존 세력: ${JSON.stringify(F.map(f=>({name:f.name,kind:f.kind,desc:f.desc}))).slice(0,3000)}
@@ -9651,7 +9665,39 @@ function openShk(){
     <div class="row" style="margin-top:14px"><button class="btn" data-act="shksave">저장</button></div>`);
 }
 const CASH_PACKS=[{id:'g1',gems:60,bonus:0},{id:'g2',gems:300,bonus:30},{id:'g3',gems:980,bonus:110},{id:'g4',gems:1980,bonus:260},{id:'g5',gems:3280,bonus:600},{id:'g6',gems:6480,bonus:1600}];
+/* 자원 보급(₩0): 건조 자원(건조를 켰을 때)과 성장 재료를 낱개로 — 유료 상점 기분만 내는 무료 상점이라 모자란 자원은 여기서 채워요 */
+const CASH_RES=()=>[...(conOn()?[...CON_RES.map(k=>({id:'cr_'+k,name:T(k)+' 보급',give:{[k]:1000},ico:conResIcon(k)})),{id:'cr_con',name:T('construct')+' 자원 꾸러미',give:Object.fromEntries(CON_RES.map(k=>[k,1000]))}]:[]),
+ {id:'cr_gold',name:T('gold')+' 보급',give:{gold:100000}},{id:'cr_exp',name:T('expMat')+' 보급',give:{exp:300}},{id:'cr_wmat',name:T('wMat')+' 보급',give:{wmat:200}},{id:'cr_core',name:T('core')+' 보급',give:{core:50}},{id:'cr_gear',name:T('gearMat')+' 보급',give:{gearMat:100}},{id:'cr_transc',name:T('transcMat')+' 보급',give:{transcMat:30}}];
+/* 모자란 재화·자원을 캐시 상점에서 ₩0으로 보충 — 모자라다고 멈추지 않게(건조·자원 보급). need={키:모자란 양}, why=무엇에 쓰는지. 보충했으면 true(묻는 창에서 취소하면 false) */
+async function cashTopUp(need,why){ const give=Object.fromEntries(Object.entries(need||{}).filter(([,v])=>v>0).map(([k,v])=>[k,Math.ceil(v)])); if(!Object.keys(give).length) return true;
+  if(!(await appConfirm(`${why||''}${rewardText(give)}이(가) 모자라요. 캐시 상점에서 ₩0으로 보충할까요?`))) return false;
+  giveReward(give); buyFx('₩0 보충',rewardText(give)); return true; }
 const CASH_PKGS=()=>[{id:'pk1',name:'성장 지원 패키지',give:{gold:50000,exp:200,wmat:100,core:50}},{id:'pk2',name:T('limit')+' 패키지',give:{core:40,gems:300}},{id:'pk3',name:'10연 '+T('gacha')+' 패키지',give:{gems:COST*10}}];
+/* 캐시 상점 화면: 젬 그림·월간 카드 지급·화면·구매 연출 */
+function gemArt(t){const n=Math.min(6,t);let g='';for(let i=0;i<n;i++){const x=12+((i*37)%56),y=40-((i*23)%30),s=1-i*0.06;g+=`<g transform="translate(${x} ${y}) scale(${s.toFixed(2)})"><path d="M6 0h20l8 10-18 22L-2 10z" fill="#5fc8ff" stroke="#e8fbff" stroke-width="1.5"/><path d="M-2 10h36M13 0l3 32 3-32" stroke="#e8fbff" stroke-width="1" fill="none" opacity=".7"/></g>`;}return `<svg viewBox="0 0 90 76">${g}</svg>`;}
+function cashTick(){
+  const p=P(), mo=p.cash&&p.cash.month; if(!mo||!mo.until) return;
+  if(Date.now()<mo.until&&mo.last!==today()){ mo.last=today(); sendMail({from:'캐시 상점',title:'월간 보급 카드 오늘의 지급',body:`월간 보급 카드 남은 기간 ${Math.ceil((mo.until-Date.now())/864e5)}일`,reward:{gems:100},days:7}); setTimeout(()=>toast('우편함에 월간 보급 카드가 도착했어요'),300); }
+}
+function cashHTML(){
+  const p=P(), mo=p.cash.month, act=mo.until>Date.now(), days=act?Math.ceil((mo.until-Date.now())/864e5):0;
+  return `${pageHead('캐시 상점','CASH SHOP','lobby')}
+  <div class="cashhero"><i>PREMIUM STORE</i><h2>◆ ${esc(T('currency'))} 충전소</h2><div class="bal">${rIco('gems')}${nf(p.gems)}</div><p>나만의 게임이라 전부 무료예요. 마음껏 충전하세요.</p></div>
+  <h3 class="sec">월간 보급 카드</h3>
+  <div class="cs-card month hot"><div class="t"><b>월간 보급 카드</b><span class="muted" style="color:#cfe6ff">즉시 ◆300 + 30일 동안 매일 ◆100 (매일 우편함으로 와요)</span>${act?`<div style="margin-top:4px;color:#7fd8ff">남은 기간 ${days}일 · 오늘 ${mo.last===today()?'받음':'미수령'}</div>`:''}</div><button class="btn sm" data-act="cashmonth">${act?'연장':'무료'}</button></div>
+  <h3 class="sec">${esc(T('currency'))}</h3>
+  <div class="cash-grid">${CASH_PACKS.map((k,i)=>{const first=!p.cash.first[k.id];return `<div class="cs-card gem hot t${i+1}">${first?'<span class="rib">첫 구매 2배</span>':''}<div class="gv">${gemArt(i+1)}</div><div class="amt">${nf(k.gems)}<small>${first?'+'+nf(k.gems)+' 첫 구매 보너스':k.bonus?'+'+nf(k.bonus)+' 보너스':'&nbsp;'}</small></div><button class="btn" data-act="cashbuy" data-id="${k.id}">₩0 무료</button></div>`;}).join('')}</div>
+  <h3 class="sec">패키지</h3>
+  ${CASH_PKGS().map(k=>`<div class="cs-card pkg"><span class="wthumb">${rIcon(k.give)}</span><div class="t"><b>${esc(k.name)}</b><span class="muted" style="color:#e9d9b0">${rewardText(k.give)}</span></div><button class="btn sm" data-act="cashpkg" data-id="${k.id}">무료</button></div>`).join('')}
+  <h3 class="sec">자원 보급</h3>
+  ${CASH_RES().map(k=>`<div class="cs-card pkg"><span class="wthumb">${k.ico||rIcon(k.give)}</span><div class="t"><b>${esc(k.name)}</b><span class="muted" style="color:#e9d9b0">${rewardText(k.give)}</span></div><button class="btn sm" data-act="cashpkg" data-id="${k.id}">₩0</button></div>`).join('')}${skinPkgHTML()}`;
+}
+function buyFx(big,sub2){
+  const d=document.createElement('div'); d.className='buyfx';
+  let sp=''; for(let i=0;i<18;i++){const a=i/18*Math.PI*2,r=120+Math.random()*120; sp+=`<i class="sp" style="--dx:${Math.round(Math.cos(a)*r)}px;--dy:${Math.round(Math.sin(a)*r)}px;animation-delay:${(Math.random()*.15).toFixed(2)}s"></i>`;}
+  d.innerHTML=`<div class="rays"></div><div class="ring"></div>${sp}<div class="core">${RICON.gems}<b>${big}</b><span>${sub2||''}</span></div>`;
+  d.addEventListener('click',()=>d.remove()); document.body.appendChild(d); sfx('확인'); setTimeout(()=>d.remove(),1800);
+}
 /* ===== 자동 스킨 상점: 2주마다 캐릭터 한 명의 새 의상을 만들어 캐시 상점 패키지로 팔아요(재화는 게임 안 유료 재화) ===== */
 const SKIN_PRICE=1280;
 const skinHave=k=>!k||!k.shop||!!(P().skinOwn||{})[k.id];
@@ -9680,28 +9726,6 @@ async function skinAuto(notes,period){
 function skinPkgHTML(){ const a=skinShopList(), so=P().skinOwn||{};
   return `<h3 class="sec">${esc(T('skin'))} 패키지</h3><div class="row" style="margin:0 0 6px"><span class="muted" style="flex:1;font-size:.8rem">${P().live.on.season?'시즌이 바뀔 때마다':esc(cycLabel('rotate'))+'마다'} ${esc(T('crew'))} 한 명의 새 ${esc(T('skin'))}이 자동으로 나와요 (설정 → 시즌 운영에서 끄기)</span><button class="btn sm ghost" data-act="skinnew">✦ 지금 하나 만들기</button></div>${a.length?'':'<p class="muted" style="font-size:.8rem">아직 판매 중인 '+esc(T('skin'))+'이 없어요.</p>'}${a.map(({c,k},i)=>{ const got=!!so[k.id], src=skinPreviewSrc(c,k);
     return `<div class="cs-card pkg skinpkg">${i===0&&!got?'<span class="rib" style="position:absolute;left:8px;top:6px;background:#ff3d7f;padding:1px 8px;font-size:.62rem;font-weight:700">NEW</span>':''}<span class="wthumb" style="width:64px;height:84px;overflow:hidden">${src?`<img src="${esc(src)}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:50% 12%">`:''}</span><div class="t"><b>${esc(c.name)} 「${esc(k.name)}」</b><span class="muted" style="color:#e9d9b0">${esc(k.desc||T('skin'))}${imgSrc(k)?'':' · 그림은 '+T('skin')+' 편집에서 그릴 수 있어요'}</span></div><span style="display:flex;flex-direction:column;gap:4px"><button class="btn sm" data-act="skinbuy" data-id="${k.id}" ${got?'disabled':''}>${got?'보유':rIco('gems')+nf(k.price||SKIN_PRICE)}</button>${got?'':`<button class="btn sm ghost" data-act="skinpkgdel" data-id="${k.id}">지우기</button>`}</span></div>`; }).join('')}`; }
-function gemArt(t){const n=Math.min(6,t);let g='';for(let i=0;i<n;i++){const x=12+((i*37)%56),y=40-((i*23)%30),s=1-i*0.06;g+=`<g transform="translate(${x} ${y}) scale(${s.toFixed(2)})"><path d="M6 0h20l8 10-18 22L-2 10z" fill="#5fc8ff" stroke="#e8fbff" stroke-width="1.5"/><path d="M-2 10h36M13 0l3 32 3-32" stroke="#e8fbff" stroke-width="1" fill="none" opacity=".7"/></g>`;}return `<svg viewBox="0 0 90 76">${g}</svg>`;}
-function cashTick(){
-  const p=P(), mo=p.cash&&p.cash.month; if(!mo||!mo.until) return;
-  if(Date.now()<mo.until&&mo.last!==today()){ mo.last=today(); sendMail({from:'캐시 상점',title:'월간 보급 카드 오늘의 지급',body:`월간 보급 카드 남은 기간 ${Math.ceil((mo.until-Date.now())/864e5)}일`,reward:{gems:100},days:7}); setTimeout(()=>toast('우편함에 월간 보급 카드가 도착했어요'),300); }
-}
-function cashHTML(){
-  const p=P(), mo=p.cash.month, act=mo.until>Date.now(), days=act?Math.ceil((mo.until-Date.now())/864e5):0;
-  return `${pageHead('캐시 상점','CASH SHOP','lobby')}
-  <div class="cashhero"><i>PREMIUM STORE</i><h2>◆ ${esc(T('currency'))} 충전소</h2><div class="bal">${rIco('gems')}${nf(p.gems)}</div><p>나만의 게임이라 전부 무료예요. 마음껏 충전하세요.</p></div>
-  <h3 class="sec">월간 보급 카드</h3>
-  <div class="cs-card month hot"><div class="t"><b>월간 보급 카드</b><span class="muted" style="color:#cfe6ff">즉시 ◆300 + 30일 동안 매일 ◆100 (매일 우편함으로 와요)</span>${act?`<div style="margin-top:4px;color:#7fd8ff">남은 기간 ${days}일 · 오늘 ${mo.last===today()?'받음':'미수령'}</div>`:''}</div><button class="btn sm" data-act="cashmonth">${act?'연장':'무료'}</button></div>
-  <h3 class="sec">${esc(T('currency'))}</h3>
-  <div class="cash-grid">${CASH_PACKS.map((k,i)=>{const first=!p.cash.first[k.id];return `<div class="cs-card gem hot t${i+1}">${first?'<span class="rib">첫 구매 2배</span>':''}<div class="gv">${gemArt(i+1)}</div><div class="amt">${nf(k.gems)}<small>${first?'+'+nf(k.gems)+' 첫 구매 보너스':k.bonus?'+'+nf(k.bonus)+' 보너스':'&nbsp;'}</small></div><button class="btn" data-act="cashbuy" data-id="${k.id}">₩0 무료</button></div>`;}).join('')}</div>
-  <h3 class="sec">패키지</h3>
-  ${CASH_PKGS().map(k=>`<div class="cs-card pkg"><span class="wthumb">${rIcon(k.give)}</span><div class="t"><b>${esc(k.name)}</b><span class="muted" style="color:#e9d9b0">${rewardText(k.give)}</span></div><button class="btn sm" data-act="cashpkg" data-id="${k.id}">무료</button></div>`).join('')}${skinPkgHTML()}`;
-}
-function buyFx(big,sub2){
-  const d=document.createElement('div'); d.className='buyfx';
-  let sp=''; for(let i=0;i<18;i++){const a=i/18*Math.PI*2,r=120+Math.random()*120; sp+=`<i class="sp" style="--dx:${Math.round(Math.cos(a)*r)}px;--dy:${Math.round(Math.sin(a)*r)}px;animation-delay:${(Math.random()*.15).toFixed(2)}s"></i>`;}
-  d.innerHTML=`<div class="rays"></div><div class="ring"></div>${sp}<div class="core">${RICON.gems}<b>${big}</b><span>${sub2||''}</span></div>`;
-  d.addEventListener('click',()=>d.remove()); document.body.appendChild(d); sfx('확인'); setTimeout(()=>d.remove(),1800);
-}
 
 /* =========================================================
    처음 실행 설정 (AI 키)
@@ -12225,6 +12249,13 @@ function factionReview(){ const out=[], F=factions(); if(F.length<2) out.push({w
   const M=monsterNames(), nod=M.filter(l=>!l.desc); if(nod.length) out.push({w:Math.min(20,nod.length*2),msg:`정체가 정해지지 않은 적 ${nod.length}종: ${nod.slice(0,6).map(l=>l.name).join(', ')}${nod.length>6?' …':''}`});
   const bad=[...G.chars.filter(c=>!c.monster&&isMonsterLike(c)),...(G.npcs||[]).filter(n=>!n.monster&&isMonsterLike(n))]; if(bad.length) out.push({w:10,msg:`몬스터로 보이는 캐릭터·NPC: ${bad.map(x=>x.name).join(', ')}`});
   const score=Math.max(0,100-out.reduce((a,x)=>a+x.w,0)); return {score,issues:out}; }
+/* 세력 장별 태도 보완(점검 w_stance·실행 중 자동 채움): 장을 만들 때만 생기는 태도가 예전 게임엔 비어 종류 기본값으로만 돌아요 —
+   이미 쓴 메인 장 이야기로 세력마다 1장의 처음 관계와 바뀐 장을 정해 넣어요. 답에 없는 세력은 종류 기본값을 1장 태도로 적어 둬요(다시 비었다고 잡히지 않게) */
+async function stanceAI(){ const F=factions().filter(f=>f.kind!=='monster'), main=G.chapters.filter(ch=>ch.kind==='main'); if(!F.length||!main.length) return false;
+  const r=await aiJSON(stanceAIPrompt({F,main}),null,'default'); if(!r) return false;
+  (Array.isArray(r.stance)?r.stance:[]).forEach(x=>{ const f=facByName(String(x&&x.faction||'').trim()), ch=Math.max(1,Math.min(main.length,Math.round(+(x&&x.ch)||1))); if(!f||f.kind==='monster'||!FSTANCE[x.s]) return; f.stance=(f.stance||[]).filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); });
+  F.forEach(f=>{ if(!Array.isArray(f.stance)) f.stance=[]; if(!f.stance.length) f.stance.push({ch:1,s:stanceAt(f,1),why:''}); f.stance.sort((a,b)=>a.ch-b.ch); });
+  mark('world'); return true; }
 async function factionAI(btn,instruction){ const F=factions(), M=monsterNames();
   const r=await aiJSON(factionAIPrompt({F,instruction,M}),btn,'complex');
   if(!r) return false; const S=(v,n)=>String(v||'').trim().slice(0,n||300);
@@ -13274,11 +13305,19 @@ async function conMakeVariant(b,tpl){
   mark('c:'+c.id); return c; }
 
 let CONJOB=false;
-function conReadInput(){ const cfg=CON(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:(CBUILD().input||[])[i]||cfg.min; }); }
+/* 처음(아직 건조한 적 없음) 투입: 최소 투입으로 나올 대원이 없으면(열린 분류에 지금 나오는 희귀도의 대원이 없음) 나올 수 있는 가장 적은 투입 — 첫 건조가 빈손이 되지 않게 */
+function conDefaultInput(){ const cfg=CON(), v=[cfg.min,cfg.min,cfg.min,cfg.min], s=GGMConstruct.suggest(v,cfg,conPool()); return s?s.input:v; }
+function conReadInput(){ const B=CBUILD(), d=B.input||conDefaultInput(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:d[i]; }); }
+/* 나올 대원이 없는 까닭(엔진 suggest의 why) — 화면·확인 창 글 */
+function conEmptyWhy(why){ if(!why) return ''; const rr=a=>a.map(k=>RL[k]).join('·'); return why.open.length?`열린 분류 ${why.open.map(g=>`「${g.name}」(${g.rarity.length?rr(g.rarity):'대원 없음'})`).join(', ')}에 지금 투입으로 나오는 희귀도(${rr(why.allowed)})의 ${T('crew')}이(가) 없어요`:'이 투입으로 열리는 분류가 없어요'; }
 async function conBuild(){
   if(CONJOB||NEW_GAME_SOURCE||!conOn()) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
-  const cfg=CON(), input=GGMConstruct.normalize(conReadInput(),cfg), r=CRES(), lack=CON_RES.filter((k,i)=>r[k]<input[i]);
-  if(lack.length){ toast(`${lack.map(k=>T(k)).join('·')}이(가) 모자라요`); return; }
+  const cfg=CON(), r=CRES(); let input=GGMConstruct.normalize(conReadInput(),cfg);
+  /* 나올 대원이 없는 투입이면 멈추지 않고 나올 수 있게 맞춘 투입을 권해요(PL1 — 예: 최소 투입은 R만인데 열린 분류에 SR만 있음) */
+  const sg=GGMConstruct.suggest(input,cfg,conPool()); if(!sg){ toast(`${T('construct')}로 나올 ${T('crew')}이(가) 없어요(건조 대상 대원이 없음)`); return; }
+  if(sg.changed){ if(!(await appConfirm(`${conEmptyWhy(sg.why)}.\n투입을 ${sg.input.join(' / ')}(으)로 올려 ${T('construct')}할까요?`))) return; input=sg.input; }
+  /* 자원이 모자라도 멈추지 않고 캐시 상점에서 ₩0으로 보충해요(나만의 게임이라 무료) */
+  const lack=CON_RES.filter((k,i)=>r[k]<input[i]); if(lack.length&&!(await cashTopUp(Object.fromEntries(lack.map(k=>[k,input[CON_RES.indexOf(k)]-r[k]])),`${T('construct')}에 `))) return;
   const variants=conVariantChoices(input), res=GGMConstruct.roll(input,cfg,conPool(),variants);
   if(res.kind==='none'){ toast(`${T('construct')}로 나올 ${T('crew')}이(가) 없어요`); return; }
   CONJOB=true;
@@ -13298,20 +13337,21 @@ async function conBuild(){
     if(res.kind==='variant'&&imgReady()&&!imgSrc(c)) setTimeout(()=>runPrep(['char'],it=>it.c&&it.c.id===c.id),1500);
   } finally{ CONJOB=false; }
 }
-function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems){ toast(`${T('currency')}이(가) 모자라요`); return; } pay({gems:cfg.buy.gems}); CRES()[k]+=cfg.buy.amt; mark('prog'); render(); }
+async function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems&&!(await cashTopUp({gems:cfg.buy.gems-p.gems},'자원 보급에 '))) return; pay({gems:cfg.buy.gems}); CRES()[k]+=cfg.buy.amt; mark('prog'); render(); }
 
 function conNeedText(n){ const out=[]; (n.min||[]).forEach((v,i)=>{ if(v>GGMConstruct.DEFAULTS.min&&v>CON().min) out.push(`${T(CON_RES[i])} ${nf(v)}↑`); }); (n.max||[]).forEach((v,i)=>{ if(v!=null) out.push(`${T(CON_RES[i])} ${nf(v)}↓`); }); if(n.total) out.push(`총 ${nf(n.total)}↑`); Object.entries(n.share||{}).forEach(([i,[lo,hi]])=>out.push(`${T(CON_RES[i])} 비율 ${Math.round((lo||0)*100)}~${Math.round((hi==null?1:hi)*100)}%`)); return out.join(' · ')||'조건 없음'; }
 function conInfoHTML(input){
-  const cfg=CON(), t=GGMConstruct.table(input,cfg,conPool()), i=t.info, B=CBUILD(), vs=conVariantChoices(i.input).filter(v=>v.bases.length), pct=v=>(Math.round(v*10)/10)+'%';
+  const cfg=CON(), t=GGMConstruct.table(input,cfg,conPool()), i=t.info, B=CBUILD(), vs=conVariantChoices(i.input).filter(v=>v.bases.length), pct=v=>(Math.round(v*10)/10)+'%', sg=t.rows.length?null:GGMConstruct.suggest(input,cfg,conPool());
   return `<p style="margin:0 0 6px">총 <b>${nf(i.total)}</b> · 희귀도 캡: SR ${i.open[2]?`<b>개방 ${pct(i.rarity[2])}</b>`:`잠김 <span class="muted">(총 ${nf(cfg.sr.open)}↑)</span>`} · SSR ${i.open[3]?`<b>개방 ${pct(i.rarity[3])}</b>`:`잠김 <span class="muted">(총 ${nf(cfg.ssr.open)}↑)</span>`}</p>
     <div style="font-size:.85rem;margin:0 0 6px">${i.groups.map(g=>`<div style="display:flex;justify-content:space-between;gap:8px;${g.open?'':'opacity:.55'}"><span>${g.open?'🔓':'🔒'} <b>${esc(g.name)}</b> <span class="muted">${esc(conNeedText(g.need))}</span></span><b>${g.open?pct(g.p):'—'}</b></div>`).join('')}</div>
+    ${sg&&sg.changed?`<p style="margin:4px 0 6px;color:#ffb347">⚠ ${esc(conEmptyWhy(sg.why))}. <button class="btn sm" data-act="conpreset" data-v="${esc(sg.input.join(','))}">나올 수 있게 맞추기 (${esc(sg.input.join(' / '))})</button></p>`:''}
     ${t.rows.length?`<details><summary class="muted" style="font-size:.82rem">이번 투입의 확률 테이블 (${t.rows.length}명)</summary><div style="font-size:.8rem;columns:2;margin-top:4px">${t.rows.map(r=>{ const c=charById(r.id); return c?`<div>${RL[c.rarity]} ${esc(c.name)} <b>${pct(r.p)}</b></div>`:''; }).join('')}</div></details>`:`<p class="muted" style="margin:0">열린 분류에 나올 ${esc(T('crew'))}이(가) 없어요. 다른 분류를 열어 보세요.</p>`}
     ${i.recipes.length?`<p style="margin:6px 0 0">특수 레시피: ${i.recipes.map(x=>B.found[x.id]?`<b>${esc(x.name)}</b>`:'<b>??? (미발견)</b>').join(', ')}</p>`:''}
     ${vs.length?`<p style="margin:4px 0 0">✦ 바리에이션 기회: ${vs.map(v=>`${esc(v.tpl.name)} ${pct(+v.tpl.chance||0)} (${v.bases.length}명)`).join(', ')}</p>`:''}`; }
 function conEntryHTML(){ if(!conOn()) return ''; return `<div class="panel" style="margin-bottom:10px;display:flex;gap:10px;align-items:center;justify-content:space-between"><div><b>${esc(T('construct'))}</b><div class="muted" style="font-size:.8rem">${CON_RES.map(k=>esc(T(k))).join('·')}을(를) 넣어 ${esc(T('crew'))}·바리에이션 영입</div></div><button class="btn sm" data-act="go" data-to="construct">열기</button></div>`; }
 function constructHTML(){
   if(!conOn()) return pageHead(T('construct'),'CONSTRUCT','contract')+`<div class="panel"><p>설정 → 게임에서 ${esc(T('construct'))}을(를) 켜 주세요.</p></div>`;
-  const cfg=CON(), B=CBUILD(), input=GGMConstruct.normalize(B.input||[cfg.min,cfg.min,cfg.min,cfg.min],cfg), found=(cfg.recipes||[]).filter(x=>B.found[x.id]), vfound=VARIANTS().filter(t=>B.found['v:'+t.id]);
+  const cfg=CON(), B=CBUILD(), input=GGMConstruct.normalize(B.input||conDefaultInput(),cfg), found=(cfg.recipes||[]).filter(x=>B.found[x.id]), vfound=VARIANTS().filter(t=>B.found['v:'+t.id]);
   const presets=[['최소',[cfg.min,cfg.min,cfg.min,cfg.min]],['균형',[300,300,300,300]],['고급',[999,999,999,999]],...cfg.groups.filter(g=>B.found['g:'+g.id]).map(g=>[g.name+' 개방',(g.min||[]).map((v,i)=>Math.max(v,cfg.min))]),...found.map(x=>[x.name,x.min]),...vfound.map(t=>['✦'+t.name,t.recipe.min])];
   return `${pageHead(T('construct'),'CONSTRUCT','contract')}${conResBar()}
   <div class="panel" style="margin-top:10px"><h3>자원 투입 <span class="muted" style="font-size:.8rem">(${cfg.min}~${cfg.max})</span></h3>
@@ -14257,7 +14297,7 @@ case 'shkai': { const c=$('#sk_char').value?charById($('#sk_char').value):null, 
       if(r){ ['hello','buy','poor'].forEach(k=>{ if(Array.isArray(r[k])&&r[k].length) $('#sk_'+k).value=r[k].map(String).join('\n'); }); toast('대사를 채웠어요. 저장을 눌러 주세요'); } break; }
 case 'cashbuy': { const k=CASH_PACKS.find(x=>x.id===id); if(!k) break; const first=!p.cash.first[k.id], n=k.gems+(first?k.gems:k.bonus); p.cash.first[k.id]=true; p.cash.total+=n; giveReward({gems:n}); mark('prog'); render(); buyFx('+'+nf(n),`◆ ${T('currency')}${first?' · 첫 구매 2배':''}`); break; }
 case 'cashmonth': { const mo=p.cash.month, base=Math.max(Date.now(),mo.until||0); mo.until=base+30*864e5; giveReward({gems:300}); mark('prog'); render(); buyFx('+300','월간 보급 카드 · 30일'); cashTick(); render(); break; }
-case 'cashpkg': { const k=CASH_PKGS().find(x=>x.id===id); if(!k) break; giveReward(k.give); render(); buyFx(k.name,rewardText(k.give)); break; }
+case 'cashpkg': { const k=[...CASH_PKGS(),...CASH_RES()].find(x=>x.id===id); if(!k) break; giveReward(k.give); render(); buyFx(k.name,rewardText(k.give)); break; }
   }
 }
 
@@ -14680,6 +14720,7 @@ const AUDIT_RULES=[
  {id:'g_rules',scope:'game',kind:'upgrade',since:3,label:'속성·역할 설명이 없어요(게임 규칙·도감에 표시돼요)',test:()=>rulesMissingDesc(),fix:{mode:'ai-rules'}},
  {id:'g_pos',scope:'game',kind:'upgrade',since:9,label:'세계관에 맞춘 포지션이 없어요(기본 공격·방어·지원으로 돌아가요 — AI로 설계해 캐릭터에 배정)',test:()=>!(Array.isArray(G.meta.positions)&&G.meta.positions.length),fix:{mode:'ai-run',run:()=>posAI()}},
  {id:'g_codex',scope:'game',kind:'upgrade',since:3,label:'도감에 게임 규칙(상성·역할)이 기록되지 않았어요',test:()=>rulesNotInCodex(),fix:{mode:'auto',run:()=>{ rulesCodex(); }}},
+ {id:'w_stance',scope:'game',kind:'upgrade',since:10,label:'세력과 플레이어의 관계 변화(장별 태도)가 없어요(세력 종류 기본값으로만 돌아요 — 이미 쓴 장 이야기로 채워요)',test:()=>G.chapters.some(ch=>ch.kind==='main')&&factions().some(f=>f.kind!=='monster')&&factions().filter(f=>f.kind!=='monster').every(f=>!(f.stance||[]).length),fix:{mode:'ai-run',run:()=>stanceAI()}},
  {id:'w_faction',scope:'game',kind:'upgrade',since:8,label:'세력·몬스터 설정이 얕아요(종류·목적·관계·정체가 비어 있음)',test:()=>factionReview().score<70,fix:{mode:'ai-run',run:()=>factionAI()}},
  {id:'c_monster',scope:'char',kind:'missing',since:1,label:'몬스터로 보이는 캐릭터예요(톡·일정·인연 대상이 되면 안 돼요 → 적으로 전환)',test:c=>!c.monster&&!c.alt&&isMonsterLike(c),fix:{mode:'auto',run:c=>charToMonster(c)}},
  {id:'c_debut',scope:'char',kind:'upgrade',since:8,label:'스토리 중간에 처음 나오는데 처음부터 뽑을 수 있는 캐릭터예요(첫 등장 스테이지 전엔 잠그기)',test:c=>!c.debut&&!own(c.id)&&!c.alt&&!c.monster&&!!firstSpeak(c)&&firstSpeak(c).k>0,fix:{mode:'auto',run:c=>{ const f=firstSpeak(c); if(f){ c.debut=f.s.id; delete c.debutLater; } }}},
@@ -14690,7 +14731,7 @@ const AUDIT_RULES=[
  {id:'c_spot',scope:'char',kind:'upgrade',since:5,label:'일정 장소에서 만날 때의 장면이 없어요(기본 장면으로 나와요)',test:c=>!c.alt&&!c.npc&&spots().length>0&&spots().some(s=>!(c.spotTalk||{})[s.id]),fix:{mode:'ai-run',run:c=>spotTalkAI(c)}},
  {id:'l_imgperson',scope:'lib',kind:'missing',since:1,label:'배경·소품 그림 프롬프트에 사람 태그가 섞여 있어요(사람 그림이 돼요)',test:l=>!!IMG_NOHUMAN[l.kind]&&!!l.prompt&&imgGuard(l.kind,l.prompt).removed.length>0,fix:{mode:'auto',run:l=>{ plHit('img-person-'+l.kind,l.prompt); l.prompt=imgGuard(l.kind,l.prompt).out; }}},
  {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
-function auditVer(){ return Math.max(...AUDIT_RULES.map(r=>r.since)); } // 점검 판: 9 = 프로필 항목·포지션 보완(생성 규칙은 그대로라 auditGenVer는 8)
+function auditVer(){ return Math.max(...AUDIT_RULES.map(r=>r.since)); } // 점검 판: 9 = 프로필 항목·포지션 보완, 10 = 세력 장별 태도 보완(생성 규칙은 그대로라 auditGenVer는 8)
 function auditTargets(scope){ if(scope==='char') return G.chars; if(scope==='lib') return G.lib; if(scope==='game') return [G.meta]; if(scope==='stage') return G.chapters.filter(ch=>ch.kind==='main'||ch.kind==='event').flatMap(ch=>ch.stages||[]); return []; }
 function auditName(r,o){ if(r.scope==='game') return G.meta.title||'게임'; if(r.scope==='stage'){ const ch=G.chapters.find(c=>(c.stages||[]).includes(o)); return `${ch?ch.title+' · ':''}${o.title||o.id}`; } return o.name||o.id; }
 function auditScan(only){ const out=[]; for(const r of AUDIT_RULES){ const items=auditTargets(r.scope).filter(o=>(!only||only(o,r))&&(()=>{ try{ return r.test(o); }catch(e){ return false; } })()); if(items.length) out.push({rule:r,items}); } return out; }
@@ -14781,9 +14822,9 @@ document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); 
    채우는 방법은 콘텐츠 점검(0535) 규칙의 고치기를 그대로 써요(auditFixOne). 자동이 기본이고, 사용자는 콘텐츠 점검·각 화면에서
    직접 고치거나 AI에 추가 지시할 수 있어요. 설정 → 라이브 운영의 "빈 콘텐츠 자동 채움"으로 끌 수 있어요(live.on.fill) */
 const LIVE_FILL_AUTO=['g_spots','g_codex','c_symbol','c_pos','c_range','s_rules']; // 규칙으로 채움(일정 장소만 글 AI가 있으면 AI로 — auditAutoRun) — 빈 것은 매번
-const LIVE_FILL_AI=['g_pos','c_persona','c_pfields','c_afftalk','c_memorial','c_spot','s_direct']; // AI로 채움 — 한 번에 LIVE_FILL_MAX개까지
+const LIVE_FILL_AI=['g_pos','w_stance','c_persona','c_pfields','c_afftalk','c_memorial','c_spot','s_direct']; // AI로 채움 — 한 번에 LIVE_FILL_MAX개까지
 const LIVE_FILL_OWNED=new Set(['c_afftalk','c_memorial','c_spot']);              // 만날 수 있는(보유한) 대원부터
-const LIVE_FILL_NAME={g_spots:'일정 장소',g_codex:'도감 규칙',c_symbol:'상징 컬러·아이템',c_pos:'포지션',c_range:'사거리',s_rules:'전장 규칙',g_pos:'포지션 설계',c_persona:'개성 시트',c_pfields:'프로필 항목',c_afftalk:'인연 톡',c_memorial:'메모리얼',c_spot:'일정 장면',s_direct:'대본 연출'};
+const LIVE_FILL_NAME={g_spots:'일정 장소',g_codex:'도감 규칙',c_symbol:'상징 컬러·아이템',c_pos:'포지션',c_range:'사거리',s_rules:'전장 규칙',g_pos:'포지션 설계',w_stance:'세력 관계 변화',c_persona:'개성 시트',c_pfields:'프로필 항목',c_afftalk:'인연 톡',c_memorial:'메모리얼',c_spot:'일정 장면',s_direct:'대본 연출'};
 const LIVE_FILL_MAX=4;
 async function liveFill(notes){ if(subLocked()) return 0; const done={}, add=id=>{ done[id]=(done[id]||0)+1; }, group=id=>auditScan().find(g=>g.rule.id===id);
   for(const id of LIVE_FILL_AUTO){ const g=group(id); if(!g) continue; for(const o of g.items) if(await auditFixOne(g.rule,o)) add(id); }

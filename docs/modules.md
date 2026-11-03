@@ -184,9 +184,9 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8-1. 건조/영입 · 원정 · 바리에이션
 
-- 엔진 `GGMConstruct`(`src/modules/app/020-construct.js`, 순수): `rates`(분류 개방·비중, 희귀도 캡) → `table`(캐릭터별 확률) → `roll`. `condMatch`(바리에이션 적용 조건), `variantPrompt`/`designBrief`(디자인 프롬프트), `variantsFrom`(새 게임이 만든 바리에이션 기본형 정리)
+- 엔진 `GGMConstruct`(`src/modules/app/020-construct.js`, 순수): `rates`(분류 개방·비중, 희귀도 캡) → `table`(캐릭터별 확률) → `roll`. `suggest`(나올 대원이 없는 투입이면 나올 수 있는 가장 적은 투입과 그 까닭 — 첫 건조 빈손 방지). `condMatch`(바리에이션 적용 조건), `variantPrompt`/`designBrief`(디자인 프롬프트), `variantsFrom`(새 게임이 만든 바리에이션 기본형 정리)
 - 생성기 연결 `src/main/0505-construct.js`: 세계관 단계 스키마 `CON_TERMS_SCHEMA`·`VARIANT_SCHEMA`, `variantsFromAI`(엔진 정리 + id)
-- 화면·상태 `src/main/0505-construct.js`: `constructHTML`(탭 `construct`, 계약 화면 위 진입), `conBuild`, `conBuy`, `conDispReward`(파견 보상에 자원), `conMakeVariant`(AI `aiAltChar` 또는 규칙), 설정 `openConSet`
+- 화면·상태 `src/main/0505-construct.js`: `constructHTML`(탭 `construct`, 계약 화면 위 진입 — 처음 기본 투입 `conDefaultInput`, 빈 투입 안내 `conEmptyWhy`), `conBuild`(빈 투입이면 맞춘 투입으로, 자원이 모자라면 캐시 상점 ₩0 보충 `cashTopUp`), `conBuy`, `conDispReward`(파견 보상에 자원), `conMakeVariant`(AI `aiAltChar` 또는 규칙), 설정 `openConSet`
 - 이격 상속 `src/main/0065-inherit.js`: `mark()`에서 `inheritOnMark`, `fix()`에서 `inheritAll`, `flush()`에서 `inheritStore`
 - 설계·수치: [research/construction.md](research/construction.md), [research/variants.md](research/variants.md)
 
@@ -253,7 +253,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8-2-9. 세력 · 적 도감 · 등장/영입
 
-- `src/main/0445-factions.js`: `factions()`(kind·rel·stance 정리), `stanceAt`·`stanceApply`(장 생성 `stance`), `factionCtx`·`castLockCtx`(ctx), 생성기 연결 `factionMatch`·`castPlanData`, `factionReview`·`factionAI`, `monsterNames`·`isMonsterLike`·`monsterFromGen`(addNewChars·addNpcs)·`charToMonster`, `castLock/castOk`(bannerPool·conPool), `metInStory`·`firstSpeak`, 화면 `openWorldDesign`
+- `src/main/0445-factions.js`: `factions()`(kind·rel·stance 정리), `stanceAt`·`stanceApply`(장 생성 `stance`), 예전 게임 보완 `stanceAI`(점검 `w_stance`·실행 중 자동 채움), `factionCtx`·`castLockCtx`(ctx), 생성기 연결 `factionMatch`·`castPlanData`, `factionReview`·`factionAI`, `monsterNames`·`isMonsterLike`·`monsterFromGen`(addNewChars·addNpcs)·`charToMonster`, `castLock/castOk`(bannerPool·conPool), `metInStory`·`firstSpeak`, 화면 `openWorldDesign`
 - 점검 `w_faction`·`c_monster`·`c_debut` · 설계: [research/factions-cast.md](research/factions-cast.md)
 
 ## 8-2-10. 스테이지 양식(회담·콘테스트)
@@ -274,7 +274,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 - 성장(성장·성장 곡선 섹션): 레벨(최대 120, 71~ 초월승급), 돌파, 스킬 강화, 전용 무기, 호감도(`addAff`, 레벨별 대사·에피소드 해금). 비용 공식은 `GGMCombat.growthCost/limitBreakCost` 등.
 - 일일/주간 카운터: `dm()` / `bump(key)`(미션·패스 진행).
-- 상점: 보급 상점(일일), 캐시 상점(전부 무료 재화), 이벤트 상점, 자동 스킨 상점.
+- 상점: 보급 상점(일일), 캐시 상점(전부 무료 재화 — 자원 보급 `CASH_RES`: 건조 자원·성장 재료 ₩0, 모자라면 멈추지 않고 ₩0 보충 `cashTopUp` — `src/main/0190-shop.js` — 화면 `cashHTML`도 같은 파일), 이벤트 상점, 자동 스킨 상점.
 - 파견(`dispatches`), 재료 던전(`meta.farms`), 레이드, 심연 탐사(로그라이크·카드 전투, `RG()`).
 - **라이브 운영** `liveTick()`: 켤 때·화면 복귀 때 주기(`LIVE_CYC`)마다 AI로 새 톡/이벤트/챕터/픽업/스킨을 자동 생성, 시즌 로테이션(`SEASONS`). 구독 게임은 자동 생성 안 함.
 

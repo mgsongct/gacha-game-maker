@@ -211,6 +211,11 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   assert.ok(MM.envy.some(e => e.fn === 'misplaced' && e.to === 'src/main/020-b.js') && !MM.envy.some(e => e.fn === 'aOwn'), '다른 모듈 일을 하는 함수: ' + JSON.stringify(MM.envy));
   assert.ok(MM.scattered.some(x => x.key === 'G.meta.box' && x.owner === 'src/main/010-a.js' && x.files.length === 3) && MM.foreign.filter(x => x.key === 'G.meta.box').length === 2, '파편화·남의 상태 쓰기: ' + JSON.stringify(MM.scattered));
   assert.ok(MM.mods.find(m => m.file === 'src/main/010-a.js').title === '가', '모듈 제목'); rmSync(r8, { recursive: true, force: true }); }
+// 점검 규칙 읽기(구버전 감지·보완 커버리지): 규칙 test·fix가 읽는 엔티티 필드 — 게임 단위 규칙의 목록 콜백 안 필드(factions().every(f=>f.stance))도
+{ const r12 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r12, 'src/main'), { recursive: true }); const { auditRules } = await import('./lib/upgrade.mjs');
+  writeFileSync(join(r12, 'src/main/010-a.js'), "function factions(){ return G.world.factions; }\nfunction stanceAI(){ return 1; }\nconst AUDIT_RULES=[\n {id:'w_stance',scope:'game',since:10,test:()=>factions().every(f=>!(f.stance||[]).length),fix:{mode:'ai-run',run:()=>stanceAI()}},\n {id:'c_pf',scope:'char',since:9,test:c=>!c.alt&&!Object.keys(c.pfields||{}).length,fix:{mode:'ai-persona'}}];\n");
+  const U = await loadUnits(r12), g = buildGraph(U).fns, R = auditRules(U, g, stateFlow(U, g)), by = id => R.find(x => x.id === id) || {};
+  assert.ok(by('w_stance').fields.includes('stance') && by('w_stance').since === 10 && by('c_pf').fields.includes('pfields') && by('c_pf').scope === 'char', '점검 규칙 읽기: ' + JSON.stringify(R)); rmSync(r12, { recursive: true, force: true }); }
 // 공용 기반 모듈은 파일 단위로 셈: 두 파일을 폴더 모듈 하나로 묶어도 판정이 그대로(모듈 단위로 세면 "부르는 모듈 수"가 줄어 공용에서 빠졌음)
 { const r11 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r11, 'src/main'), { recursive: true });
   writeFileSync(join(r11, 'src/main/005-u.js'), 'function u(){ return 1; }\n'); writeFileSync(join(r11, 'src/main/010-x.js'), 'function x(){ return u(); }\n'); writeFileSync(join(r11, 'src/main/020-y.js'), 'function y(){ return u(); }\n'); writeFileSync(join(r11, 'src/main/030-z.js'), 'function z(){ return 3; }\n');

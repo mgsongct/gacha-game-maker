@@ -81,10 +81,12 @@
     "next": [
      "c_spot 0→6"
     ],
-    "res": "놓침",
+    "res": "보완됨(자동)",
     "notice": true,
-    "hit": [],
-    "err": "글 AI 요청 1"
+    "hit": [
+     "w_stance 1"
+    ],
+    "err": "글 AI 요청 2"
    },
    {
     "what": "캐릭터.debutLater",
@@ -176,10 +178,12 @@
     "next": [
      "c_spot 0→8"
     ],
-    "res": "놓침",
+    "res": "보완됨(자동)",
     "notice": true,
-    "hit": [],
-    "err": "글 AI 요청 1"
+    "hit": [
+     "w_stance 1"
+    ],
+    "err": "글 AI 요청 2"
    },
    {
     "what": "캐릭터.debutLater",

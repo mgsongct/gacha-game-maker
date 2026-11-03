@@ -36,7 +36,7 @@ case 'shkai': { const c=$('#sk_char').value?charById($('#sk_char').value):null, 
       if(r){ ['hello','buy','poor'].forEach(k=>{ if(Array.isArray(r[k])&&r[k].length) $('#sk_'+k).value=r[k].map(String).join('\n'); }); toast('대사를 채웠어요. 저장을 눌러 주세요'); } break; }
 case 'cashbuy': { const k=CASH_PACKS.find(x=>x.id===id); if(!k) break; const first=!p.cash.first[k.id], n=k.gems+(first?k.gems:k.bonus); p.cash.first[k.id]=true; p.cash.total+=n; giveReward({gems:n}); mark('prog'); render(); buyFx('+'+nf(n),`◆ ${T('currency')}${first?' · 첫 구매 2배':''}`); break; }
 case 'cashmonth': { const mo=p.cash.month, base=Math.max(Date.now(),mo.until||0); mo.until=base+30*864e5; giveReward({gems:300}); mark('prog'); render(); buyFx('+300','월간 보급 카드 · 30일'); cashTick(); render(); break; }
-case 'cashpkg': { const k=CASH_PKGS().find(x=>x.id===id); if(!k) break; giveReward(k.give); render(); buyFx(k.name,rewardText(k.give)); break; }
+case 'cashpkg': { const k=[...CASH_PKGS(),...CASH_RES()].find(x=>x.id===id); if(!k) break; giveReward(k.give); render(); buyFx(k.name,rewardText(k.give)); break; }
   }
 }
 

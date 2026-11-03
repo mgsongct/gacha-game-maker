@@ -62,4 +62,36 @@ function openShk(){
     <div class="row" style="margin-top:14px"><button class="btn" data-act="shksave">저장</button></div>`);
 }
 const CASH_PACKS=[{id:'g1',gems:60,bonus:0},{id:'g2',gems:300,bonus:30},{id:'g3',gems:980,bonus:110},{id:'g4',gems:1980,bonus:260},{id:'g5',gems:3280,bonus:600},{id:'g6',gems:6480,bonus:1600}];
+/* 자원 보급(₩0): 건조 자원(건조를 켰을 때)과 성장 재료를 낱개로 — 유료 상점 기분만 내는 무료 상점이라 모자란 자원은 여기서 채워요 */
+const CASH_RES=()=>[...(conOn()?[...CON_RES.map(k=>({id:'cr_'+k,name:T(k)+' 보급',give:{[k]:1000},ico:conResIcon(k)})),{id:'cr_con',name:T('construct')+' 자원 꾸러미',give:Object.fromEntries(CON_RES.map(k=>[k,1000]))}]:[]),
+ {id:'cr_gold',name:T('gold')+' 보급',give:{gold:100000}},{id:'cr_exp',name:T('expMat')+' 보급',give:{exp:300}},{id:'cr_wmat',name:T('wMat')+' 보급',give:{wmat:200}},{id:'cr_core',name:T('core')+' 보급',give:{core:50}},{id:'cr_gear',name:T('gearMat')+' 보급',give:{gearMat:100}},{id:'cr_transc',name:T('transcMat')+' 보급',give:{transcMat:30}}];
+/* 모자란 재화·자원을 캐시 상점에서 ₩0으로 보충 — 모자라다고 멈추지 않게(건조·자원 보급). need={키:모자란 양}, why=무엇에 쓰는지. 보충했으면 true(묻는 창에서 취소하면 false) */
+async function cashTopUp(need,why){ const give=Object.fromEntries(Object.entries(need||{}).filter(([,v])=>v>0).map(([k,v])=>[k,Math.ceil(v)])); if(!Object.keys(give).length) return true;
+  if(!(await appConfirm(`${why||''}${rewardText(give)}이(가) 모자라요. 캐시 상점에서 ₩0으로 보충할까요?`))) return false;
+  giveReward(give); buyFx('₩0 보충',rewardText(give)); return true; }
 const CASH_PKGS=()=>[{id:'pk1',name:'성장 지원 패키지',give:{gold:50000,exp:200,wmat:100,core:50}},{id:'pk2',name:T('limit')+' 패키지',give:{core:40,gems:300}},{id:'pk3',name:'10연 '+T('gacha')+' 패키지',give:{gems:COST*10}}];
+/* 캐시 상점 화면: 젬 그림·월간 카드 지급·화면·구매 연출 */
+function gemArt(t){const n=Math.min(6,t);let g='';for(let i=0;i<n;i++){const x=12+((i*37)%56),y=40-((i*23)%30),s=1-i*0.06;g+=`<g transform="translate(${x} ${y}) scale(${s.toFixed(2)})"><path d="M6 0h20l8 10-18 22L-2 10z" fill="#5fc8ff" stroke="#e8fbff" stroke-width="1.5"/><path d="M-2 10h36M13 0l3 32 3-32" stroke="#e8fbff" stroke-width="1" fill="none" opacity=".7"/></g>`;}return `<svg viewBox="0 0 90 76">${g}</svg>`;}
+function cashTick(){
+  const p=P(), mo=p.cash&&p.cash.month; if(!mo||!mo.until) return;
+  if(Date.now()<mo.until&&mo.last!==today()){ mo.last=today(); sendMail({from:'캐시 상점',title:'월간 보급 카드 오늘의 지급',body:`월간 보급 카드 남은 기간 ${Math.ceil((mo.until-Date.now())/864e5)}일`,reward:{gems:100},days:7}); setTimeout(()=>toast('우편함에 월간 보급 카드가 도착했어요'),300); }
+}
+function cashHTML(){
+  const p=P(), mo=p.cash.month, act=mo.until>Date.now(), days=act?Math.ceil((mo.until-Date.now())/864e5):0;
+  return `${pageHead('캐시 상점','CASH SHOP','lobby')}
+  <div class="cashhero"><i>PREMIUM STORE</i><h2>◆ ${esc(T('currency'))} 충전소</h2><div class="bal">${rIco('gems')}${nf(p.gems)}</div><p>나만의 게임이라 전부 무료예요. 마음껏 충전하세요.</p></div>
+  <h3 class="sec">월간 보급 카드</h3>
+  <div class="cs-card month hot"><div class="t"><b>월간 보급 카드</b><span class="muted" style="color:#cfe6ff">즉시 ◆300 + 30일 동안 매일 ◆100 (매일 우편함으로 와요)</span>${act?`<div style="margin-top:4px;color:#7fd8ff">남은 기간 ${days}일 · 오늘 ${mo.last===today()?'받음':'미수령'}</div>`:''}</div><button class="btn sm" data-act="cashmonth">${act?'연장':'무료'}</button></div>
+  <h3 class="sec">${esc(T('currency'))}</h3>
+  <div class="cash-grid">${CASH_PACKS.map((k,i)=>{const first=!p.cash.first[k.id];return `<div class="cs-card gem hot t${i+1}">${first?'<span class="rib">첫 구매 2배</span>':''}<div class="gv">${gemArt(i+1)}</div><div class="amt">${nf(k.gems)}<small>${first?'+'+nf(k.gems)+' 첫 구매 보너스':k.bonus?'+'+nf(k.bonus)+' 보너스':'&nbsp;'}</small></div><button class="btn" data-act="cashbuy" data-id="${k.id}">₩0 무료</button></div>`;}).join('')}</div>
+  <h3 class="sec">패키지</h3>
+  ${CASH_PKGS().map(k=>`<div class="cs-card pkg"><span class="wthumb">${rIcon(k.give)}</span><div class="t"><b>${esc(k.name)}</b><span class="muted" style="color:#e9d9b0">${rewardText(k.give)}</span></div><button class="btn sm" data-act="cashpkg" data-id="${k.id}">무료</button></div>`).join('')}
+  <h3 class="sec">자원 보급</h3>
+  ${CASH_RES().map(k=>`<div class="cs-card pkg"><span class="wthumb">${k.ico||rIcon(k.give)}</span><div class="t"><b>${esc(k.name)}</b><span class="muted" style="color:#e9d9b0">${rewardText(k.give)}</span></div><button class="btn sm" data-act="cashpkg" data-id="${k.id}">₩0</button></div>`).join('')}${skinPkgHTML()}`;
+}
+function buyFx(big,sub2){
+  const d=document.createElement('div'); d.className='buyfx';
+  let sp=''; for(let i=0;i<18;i++){const a=i/18*Math.PI*2,r=120+Math.random()*120; sp+=`<i class="sp" style="--dx:${Math.round(Math.cos(a)*r)}px;--dy:${Math.round(Math.sin(a)*r)}px;animation-delay:${(Math.random()*.15).toFixed(2)}s"></i>`;}
+  d.innerHTML=`<div class="rays"></div><div class="ring"></div>${sp}<div class="core">${RICON.gems}<b>${big}</b><span>${sub2||''}</span></div>`;
+  d.addEventListener('click',()=>d.remove()); document.body.appendChild(d); sfx('확인'); setTimeout(()=>d.remove(),1800);
+}
