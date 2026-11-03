@@ -1,0 +1,8 @@
+/* ===== 아이폰·웹 ===== */
+@supports (-webkit-touch-callout:none){ input.in,select.in,textarea.in,input,select,textarea{font-size:16px!important} }
+html{-webkit-text-size-adjust:100%}
+body{-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+.a2hs{margin:0 0 10px;padding-left:20px;line-height:1.8}.a2hs li{margin-bottom:4px}
+.kbd{display:inline-block;padding:0 6px;border:1px solid var(--line);background:var(--panel2);font-size:.85em}
+.ap-pre{margin:6px 0 2px}.ap-pre .chip{font-size:.75rem;padding:4px 10px}
+

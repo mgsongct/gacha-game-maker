@@ -42,11 +42,15 @@ async function dataExportZip(game,gid){ // 현재 게임 하나 → zip Blob
  entries.push({name:`data/${gid}/media.json`,data:jsonBytes(meta)});
  return zipMake(entries);}
 async function dataReadZip(file){ // zip → {game, media:[{key,blob}], title}
- const z=await zipRead(file),ix=z.get('data/index.json');if(!ix)throw Error('data/index.json이 없어요. 데이터 폴더 zip이 맞는지 확인해 주세요');
- const index=JSON.parse(await ix.text()),gid=index?.games?.[0]?.id;if(index.format!=='ggm-data'||!gid||!/^[\w-]{1,64}$/.test(gid))throw Error('데이터 폴더 정보가 올바르지 않아요');
- const files={},re=new RegExp('^data/'+gid+'/([a-z]+)\\.json$');for(const[name,b]of z){const m=name.match(re);if(m&&m[1]!=='media')files[m[1]]=JSON.parse(await b.text());}
+ const z0=await zipRead(file),ixName=[...z0.keys()].filter(n=>/(^|\/)index\.json$/.test(n)&&!/\/media\//.test(n)).sort((a,b)=>a.length-b.length)[0];
+ if(!ixName)throw Error('index.json이 없어요. 데이터 폴더 zip이 맞는지 확인해 주세요');
+ // 압축을 풀어 고친 뒤 다시 묶으면 맨 앞에 폴더가 붙거나 data/가 빠질 수 있어요: index.json이 있는 곳을 data/로 봐요
+ const base=ixName.slice(0,-'index.json'.length),z=new Map([...z0].filter(([n])=>n.startsWith(base)).map(([n,b])=>['data/'+n.slice(base.length),b]));
+ const readJSON=async(name,b)=>{try{return JSON.parse(await b.text());}catch(e){throw Error(name+' 을(를) 읽지 못했어요(JSON 문법 확인): '+e.message);}};
+ const index=await readJSON('index.json',z.get('data/index.json')),gid=index?.games?.[0]?.id;if(index.format!=='ggm-data'||!gid||!/^[\w-]{1,64}$/.test(gid))throw Error('데이터 폴더 정보가 올바르지 않아요');
+ const files={},re=new RegExp('^data/'+gid+'/([a-z]+)\\.json$');for(const[name,b]of z){const m=name.match(re);if(m&&m[1]!=='media')files[m[1]]=await readJSON(name,b);}
  const game=dataJoin(files);if(!Array.isArray(game.chars))throw Error('chars.json이 없거나 올바르지 않아요');
- const mj=z.get(`data/${gid}/media.json`),mm=mj?JSON.parse(await mj.text()):{},media=[];
+ const mj=z.get(`data/${gid}/media.json`),mm=mj?await readJSON('media.json',mj):{},media=[];
  for(const[k,v]of Object.entries(mm)){if(!/^[\w-]{1,80}$/.test(k))throw Error('자료 이름이 올바르지 않아요: '+k);const b=z.get(`data/${gid}/media/${k}`);if(!b)throw Error('자료 파일이 빠졌어요: '+k);media.push({key:k,blob:new Blob([b],{type:String(v?.type||'')})});}
  return {game,media,title:index.games[0].title||game.meta?.title||'가져온 게임'};}
 

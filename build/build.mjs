@@ -5,7 +5,7 @@
 //   node build/build.mjs --src D --out F --no-version   (테스트용)
 //
 // src/index.html 템플릿 지시어 (한 줄 전체를 차지):
-//   <!--@ path -->                파일 내용을 그대로 넣음. path가 /로 끝나면 폴더 안 파일을 이름순으로 이어 붙임
+//   <!--@ path -->                파일 내용을 그대로 넣음. path가 /로 끝나면 폴더 안 파일을 이름순으로 이어 붙임(하위 폴더 포함)
 //   <!--@modules dir id-prefix -->  폴더 안 파일마다 <script type="text/ggm-module" id="<id-prefix><이름>"> 블록 생성
 //                                  (파일명 앞 숫자- 와 .js 는 id에서 뺌: 020-catalog.js → ggm-combat-catalog)
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
@@ -17,6 +17,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DIRECTIVE = /^<!--@(modules)?\s+(\S+)(?:\s+(\S+))?\s*-->$/;
 
 const files = dir => readdirSync(dir).filter(f => !f.startsWith('.') && statSync(join(dir, f)).isFile()).sort();
+// 폴더 포함: 이름순, 하위 폴더는 그 자리에서 다시 이름순으로 (main/0510-actions/ → 0500 다음, 0520 앞)
+const tree = dir => readdirSync(dir).filter(f => !f.startsWith('.')).sort().flatMap(f => statSync(join(dir, f)).isDirectory() ? tree(join(dir, f)) : [join(dir, f)]);
 const text = f => {
   const s = readFileSync(f, 'utf8');
   if (s && !s.endsWith('\n')) throw Error(`줄바꿈으로 끝나야 해요: ${f}`);
@@ -35,9 +37,10 @@ export function build(src) {
       if (!prefix) throw Error(`id 접두사가 필요해요: ${line}`);
       for (const f of files(p)) {
         const id = prefix + f.replace(/^\d+-/, '').replace(/\.js$/, '');
+        if (!/^[a-z0-9-]+$/.test(id)) throw Error(`모듈 파일 이름은 영문 소문자·숫자·-만 써요: ${f}`);
         out += `<script type="text/ggm-module" id="${id}">\n${text(join(p, f))}</script>\n`;
       }
-    } else out += path.endsWith('/') ? files(p).map(f => text(join(p, f))).join('') : text(p);
+    } else out += path.endsWith('/') ? tree(p).map(text).join('') : text(p);
   });
   return out;
 }

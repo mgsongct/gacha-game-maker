@@ -2,7 +2,7 @@
 
 ## 0. 시작 전에 꼭 알아둘 것
 
-1. **포크에서 업데이트 채널이 원본을 가리킵니다.** 그대로 두면 앱(APK·PC 서버)이 원본 저장소의 새 빌드를 받아 **내 수정본을 덮어씁니다.** §6 참고.
+1. **업데이트 채널은 이 포크(`mgsongct/gacha-game-maker`)로 바꿔 두었습니다(빌드 2026.11.03.1부터).** 원본 zip의 PC 서버나 예전 빌드는 원본 저장소에서 `index.html`을 받아 오므로 이 포크의 기능이 빠진 원본 앱이 뜹니다. §6 참고.
 2. **라이선스 CC BY-NC-ND 4.0** (`LICENSE.md`): 개인 사용은 자유지만 **수정본 재배포·판매는 금지**입니다. 포크 커스텀은 개인 용도로 쓰고, 수정본을 공개 배포하려면 원저작자 허락을 받으세요.
 3. 소스는 `src/`에 있고 `node build/build.mjs`로 `www/index.html`을 만듭니다([build.md](build.md)). 아래에서 "섹션"·"모듈"은 `src/main/*.js`, `src/modules/*/*.js` 파일을 뜻합니다.
 
@@ -124,15 +124,17 @@ case 'myact': { const c = charById(id); /* ... */ mark('c:'+c.id); render(); bre
    `build`와 HTML의 `BUILT`가 다르거나 해시가 틀리면 앱이 업데이트를 거부합니다.
 4. `notice: {id, title, body}`를 넣으면 앱 우편함으로 공지가 갑니다.
 
-## 6. 포크용으로 바꿔야 할 하드코딩
+## 6. 포크용 설정 (적용됨)
 
 | 위치 | 값 | 영향 |
 |---|---|---|
-| `www/index.html` `RELEASE_REPO` / `RELEASE_REPO_OLD` (앱 업데이트 섹션) | `jjhk0803/gacha-game-maker`, `jjhk0803/starfall-contract` | 앱 업데이트·웹 업데이트 알림이 어디서 `version.json`을 읽는지. **포크라면 `mgsongct/gacha-game-maker`로**, OLD 폴백은 제거 권장 |
-| 같은 파일, 부팅 실패 화면·설정 화면 링크 (`jjhk0803` grep) | Releases URL, 저작권 표기 | 안내 링크. 저작권 표기는 라이선스상 유지 |
-| `proxy/worker.js` `ALLOW_ORIGIN` | `https://jjhk0803.github.io` | 내 Pages 주소(`https://mgsongct.github.io`)로 바꾸지 않으면 중계 서버가 403 |
-| `proxy/vercel` 환경 변수 `ALLOW_ORIGIN` | – | 위와 동일 |
-| PC 서버 `ggm-server.py` `REPO` (또는 실행 시 `GGM_REPO` 환경 변수) | `jjhk0803/gacha-game-maker` | 서버가 받아 오는 `www/` 출처. 바꾸지 않으면 원본 앱이 뜸 |
+| `src/main/0420-app-update.js` `RELEASE_REPO` | `mgsongct/gacha-game-maker` | 앱 업데이트·웹 업데이트 알림이 읽는 `version.json`. 원본으로 두면 앱이 원본 빌드로 덮어씀. 예전 원본 저장소(`starfall-contract`)로 가는 폴백은 제거 |
+| `pc/ggm-server.py` `REPO`·`BRANCH` (`GGM_REPO`·`GGM_BRANCH`) | `mgsongct/gacha-game-maker` · `main` | PC 서버가 켤 때 받는 `www/`. 서버 창에 `앱 빌드: …`가 나와서 어느 앱이 떴는지 확인 가능. `--no-update`는 받지 않고 로컬 `www/` 사용 |
+| `proxy/worker.js` `ALLOW_ORIGIN`, `proxy/vercel` 기본값 | `https://mgsongct.github.io` | 다른 출처에서는 중계 서버가 403 |
+| 부팅 실패 화면·설정 화면의 APK 링크, `version.json`의 `apk.url` | 원본 Releases (유지) | APK 설치 파일은 원본에만 있어요 |
+| 저작권·공식 배포처 표기 | 원본 (유지) | 라이선스상 유지 |
 | 앱 설정 → 앱 업데이트에서 저장소 지정(`LV().repo`) | – | 코드 수정 없이 기기별로 채널 변경 가능 |
+
+**주의**: PC 서버와 앱은 이 포크의 **`main` 브랜치**에서 받습니다. PR을 머지하기 전에는 `main`이 아직 원본과 같으므로, 미리 써 보려면 `GGM_BRANCH=<브랜치>`로 켜거나 직접 빌드한 `www/`를 `pc/www/`에 두고 `--no-update`로 켜세요.
 
 APK 셸은 원본 것을 그대로 쓰게 되며, 셸이 부팅 시 라이브 패치로 위 채널의 HTML을 실행합니다. 셸 자체(Capacitor 프로젝트)는 이 저장소에 없습니다.

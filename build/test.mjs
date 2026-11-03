@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 import { build } from './build.mjs';
 import { split } from './split.mjs';
+import { original as upstreamHtml } from './compare.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const original = readFileSync(join(ROOT, 'www/index.html'), 'utf8');
@@ -24,6 +25,9 @@ try {
   split(original, join(tmp, 'rt'));
   assert.equal(build(join(tmp, 'rt')), original);
   console.log('ok 2  split → build 왕복 동일');
+  let base = null; try { base = upstreamHtml(); } catch (e) {}
+  if (base) { split(base, join(tmp, 'base')); assert.equal(build(join(tmp, 'base')), base); console.log('ok 2b 원본(13a3fe9 = jjhk0803 2026.10.24.1)도 나눴다 합치면 바이트 단위로 같음'); }
+  else console.log('skip 2b 원본 커밋 없음(git)');
 
   const src = join(tmp, 'src'); cpSync(join(ROOT, 'src'), src, { recursive: true });
   writeFileSync(join(src, 'modules/app/020-hello.js'), 'window.__HELLO_MODULE__=typeof GGMStorage;\n');
@@ -69,6 +73,15 @@ try {
   assert.ok(r5.same, '내보낸 zip을 다시 읽으면 게임 내용이 같아야 해요');
   for (const f of ['data/index.json', 'data/main/chars.json', 'data/main/chapters.json', 'data/main/world.json', 'data/main/prog.json', 'data/main/game.json', 'data/main/media.json', 'data/main/media/' + r5.cid]) assert.ok(r5.names.includes(f), '없음: ' + f);
   assert.deepEqual(r5.media, [[r5.cid, 'image/png', 7]]);
+  // 사용자가 압축을 풀고 고친 뒤 다시 묶은 경우: 맨 앞 폴더가 붙고 deflate로 압축돼도 읽혀야 해요
+  const rez = await p2.evaluate(async () => {
+    const z = await zipRead(window.__ZIP__), entries = [];
+    for (const [n, b] of z) { let d = new Uint8Array(await b.arrayBuffer()); if (n.endsWith('chars.json')) { const c = JSON.parse(new TextDecoder().decode(d)); c[0].name = '직접수정'; d = new TextEncoder().encode(JSON.stringify(c)); } entries.push({ name: 'my-folder/' + n, data: d }); }
+    const r = await dataReadZip(zipMake(entries)); let bad = '';
+    try { await dataReadZip(zipMake(entries.map(e => e.name.endsWith('world.json') ? { ...e, data: new TextEncoder().encode('{oops') } : e))); } catch (e) { bad = e.message; }
+    return { name: r.game.chars[0].name, media: r.media.length, bad };
+  });
+  assert.equal(rez.name, '직접수정'); assert.equal(rez.media, 1); assert.match(rez.bad, /world\.json/);
   await p2.evaluate(() => { appConfirm = async () => true; dataImport(window.__ZIP__); });
   await p2.waitForEvent('load', { timeout: 20000 });
   await p2.waitForFunction(() => typeof PJ === 'function' && typeof G === 'object' && typeof idbGet === 'function', null, { timeout: 15000 });

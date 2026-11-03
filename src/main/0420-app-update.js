@@ -2,7 +2,8 @@
 const LVKEY='starfall-live';
 
 /* ---- public release channel ---- */
-const RELEASE_REPO='jjhk0803/gacha-game-maker', RELEASE_REPO_OLD='jjhk0803/starfall-contract';
+// 이 포크의 업데이트 채널. 원본(jjhk0803)을 가리키면 앱이 원본 빌드를 받아 포크 수정본을 덮어써요. APK 설치 파일은 원본 Releases에만 있어요
+const RELEASE_REPO='mgsongct/gacha-game-maker';
 function verCmp(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(let i=0;i<Math.max(a.length,b.length);i++){const x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
 function updRepo(o){return String((o&&o.repo)||RELEASE_REPO).trim();}
 async function sha256hex(text){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}

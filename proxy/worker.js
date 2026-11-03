@@ -1,7 +1,7 @@
 // 가챠 게임 메이커 — 아이폰·웹 버전용 중계 서버 (Cloudflare Workers)
 // 브라우저가 직접 부르지 못하는 AI 서비스만 이 서버를 거쳐요.
 // 아래 ALLOW_ORIGIN을 내 GitHub Pages 주소로 바꾸면 다른 사이트는 이 서버를 못 써요.
-const ALLOW_ORIGIN = 'https://jjhk0803.github.io';
+const ALLOW_ORIGIN = 'https://mgsongct.github.io';
 const ALLOW_HOSTS = [
   'api.anthropic.com', 'generativelanguage.googleapis.com', 'aiplatform.googleapis.com', 'oauth2.googleapis.com',
   'api.openai.com', 'openrouter.ai', 'ollama.com', 'api.deepseek.com', 'api.llmgateway.io', 'image.novelai.net', 'api.fish.audio', 'api.elevenlabs.io',

@@ -19,7 +19,11 @@ python3 pc/test_store.py     # PC 서버 data 폴더 저장 검사
 ```
 
 ```bash
-node build/split.mjs [upstream.html] [src]   # 단일 HTML → src (원본 업데이트 가져오기)
+node build/split.mjs [upstream.html] [출력 폴더]   # 단일 HTML → src (원본 업데이트 가져오기). 폴더가 있으면 --force 필요
+```
+
+```bash
+node build/compare.mjs [git참조|html]   # 원본(기본 13a3fe9 = jjhk0803 2026.10.24.1) 대비 더한·뺀·바뀐 모듈 목록
 ```
 
 ## 1. `src/` 구조
@@ -31,12 +35,13 @@ src/
 │ ├ head.js             <head> 부트: BUILT(=APP_BUILD), REQUIRED_APK, 구형 환경 라이브 패치
 │ ├ durable-storage.js  GGMStorage (즉시 실행)
 │ └ storage-boot.js     부팅: 저장소 init → 모듈 → main 실행 (즉시 실행, 문서 맨 끝)
-├ style/app.css         전체 CSS (테마 :root[data-skin=…])
+├ style/                CSS. /* ===== 제목 ===== */ 마다 파일 하나(0010-base … 0160-card-battle). 번호 순서 = cascade 순서
 ├ modules/              지연 실행 모듈. 파일 하나 = <script type="text/ggm-module" id="ggm-<폴더>-<이름>">
 │ ├ app/010-confirm.js           → id ggm-app-confirm
 │ └ combat/010-catalog.js … 090-practice.js  → ggm-combat-catalog … (전투 v2)
 └ main/                 앱 본체 ggm-main. 파일 이름순으로 이어 붙여 <script> 하나가 됨
-  ├ 0010-rules.js  0020-ai-connect.js  …  0500-gacha.js  0510-actions.js  0520-backup-storage.js  0525-data-folder.js  …  0570-modal-nav.js
+  ├ 0010-rules.js  0020-ai-connect.js  …  0500-gacha.js  0520-backup-storage.js  0525-data-folder.js  …  0570-modal-nav.js
+  └ 0510-actions/        클릭 액션: 010-setup.js … 120-messenger.js (handle*Action 하나씩), 130-dispatch.js(APP_ACTION_HANDLERS·전역 리스너), 140-share-export.js
 ```
 
 `main/` 파일과 원래 섹션의 대응은 [architecture.md §2 섹션 지도](architecture.md#ggm-main-섹션-지도)와 같습니다(파일 이름은 `build/split.mjs`의 `NAMES` 표).
@@ -48,7 +53,7 @@ src/
 | 지시어 | 결과 |
 |---|---|
 | `<!--@ boot/head.js -->` | 파일 내용을 그 자리에 넣음 |
-| `<!--@ main/ -->` | 폴더 안 파일을 **이름순**으로 이어 붙임 |
+| `<!--@ main/ -->` | 폴더 안 파일을 **이름순**으로 이어 붙임. 하위 폴더도 그 자리에서 이름순으로(예: `main/0510-actions/` 는 `0500-gacha.js` 다음) |
 | `<!--@modules modules/combat/ ggm-combat- -->` | 폴더 안 파일마다 `<script type="text/ggm-module" id="ggm-combat-<이름>">…</script>` 생성. 이름 = 파일명에서 `숫자-`와 `.js`를 뺀 것 |
 
 모든 소스 파일은 줄바꿈(`\n`)으로 끝나야 합니다(아니면 빌드 오류). CRLF는 쓰지 마세요(`.gitattributes`가 LF로 고정).
@@ -99,14 +104,15 @@ git fetch upstream && git show upstream/main:www/index.html > /tmp/upstream.html
 node build/split.mjs /tmp/upstream.html /tmp/upstream-src && diff -ru src /tmp/upstream-src
 ```
 
-내 수정이 없는 파트는 그대로 복사하고, 겹치는 파트만 손으로 합칩니다. 원본에 새 섹션 제목이 생기면 `main/NNNN-part.js`로 나오니 `build/split.mjs`의 `NAMES`에 이름을 추가하세요.
+`node build/compare.mjs /tmp/upstream.html`로 원본에서 바뀐 모듈을 먼저 보고, 내 수정이 없는 파트는 그대로 복사하고, 겹치는 파트만 손으로 합칩니다. 큰 섹션을 폴더로 나누는 규칙은 `split.mjs`의 `SUBSPLIT`에 있어요. 원본에 새 섹션 제목이 생기면 `main/NNNN-part.js`로 나오니 `build/split.mjs`의 `NAMES`에 이름을 추가하세요.
 
-## 7. 검증 (`build/test.mjs`)
+## 7. 검증 (`build/test.mjs`, GitHub Actions `check`에서도 실행)
 
 | # | 확인 내용 |
 |---|---|
 | 1 | `src` 빌드 결과 == `www/index.html` (바이트 단위) |
 | 2 | `split` → `build` 왕복이 원본과 동일 |
+| 2b | **원본 커밋(13a3fe9 = jjhk0803 2026.10.24.1)** 도 나눴다 합치면 바이트 단위로 같음 |
 | 3 | 임시 복사본에 `modules/app/020-hello.js`, `main/0545-hello.js` 추가와 기존 파일 수정 → 빌드 결과에서 제 순서 |
 | 4 | 그 결과를 Chromium(Playwright)으로 실행 → 추가 모듈·파트·수정 코드 실행, 앱 화면 렌더링, 페이지 오류 0 (Playwright가 없으면 건너뜀) |
 | 5 | 실제 빌드에서 데이터 폴더 zip 내보내기 → 다시 읽으면 같은 내용 → 새 게임으로 가져오기(그림 포함) |

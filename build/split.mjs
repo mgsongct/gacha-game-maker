@@ -2,7 +2,7 @@
 // 단일 index.html → src/ 파트들로 나누기. 원본(upstream) 새 릴리스를 받아올 때 씀.
 //   node build/split.mjs [입력 html=www/index.html] [출력 폴더=src]
 // 출력 폴더를 통째로 다시 만들어요. src를 직접 고쳤다면 먼저 커밋해 두고 diff로 합치세요.
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -25,8 +25,16 @@ const NAMES = {
   '인물 관계도': 'relations-memory', '대본 엔진': 'script-engine', '타이틀과 오프닝': 'title-opening', '전투': 'battle',
   '보스 패턴': 'boss-patterns', '계약 연출': 'gacha', '이벤트': 'actions', 'BACKUP_STORAGE_MODULE': 'backup-storage',
   'STORY_MEMORY_MODULE': 'story-memory', '시작': 'start', '독립 앱 전용': 'standalone-app',
-  'IMAGE_CANDIDATES_MODULE': 'image-candidates', 'MODAL_NAV_MODULE': 'modal-nav',
+  'IMAGE_CANDIDATES_MODULE': 'image-candidates', 'MODAL_NAV_MODULE': 'modal-nav', 'DATA_FOLDER_MODULE': 'data-folder',
+  // CSS 섹션
+  '그림체·첫 그림': 'art-style-first', '갠톡': 'free-chat', '던전': 'abyss-dungeon', '카드': 'cards', '카드 전투': 'card-battle', '로비 정리': 'lobby-cleanup',
 };
+// 큰 섹션은 폴더로 더 나눠요: 섹션 이름 → [줄 패턴, 파일 이름(또는 매치 → 이름)]
+const kebab = s => s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+const SUBSPLIT = {
+  actions: [[/^async function handle(\w+)Action\(/, m => kebab(m[1])], [/^const APP_ACTION_HANDLERS=/, 'dispatch'], [/^\/\* Share archives /, 'share-export']],
+};
+const slug = t => nameOf(t) !== 'part' ? nameOf(t) : (t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'part');
 const nameOf = title => {
   const t = title.trim(), keys = Object.keys(NAMES).sort((a, b) => b.length - a.length);
   return NAMES[t] || NAMES[keys.find(k => t.startsWith(k + ':') || t.startsWith(k + ' ') || t.startsWith(k + '(') || t === k)] || 'part';
@@ -36,10 +44,16 @@ function sectionTitle(lines, i) {
   const l = lines[i];
   if (/^\/\* =+$/.test(l)) return lines[i + 1] || '';
   let m = l.match(/^\/\* ={3,} (.+?) ={3,}/); if (m) return m[1];
-  m = l.match(/^\/\* ([A-Z_]+_MODULE) \*\//); return m ? m[1] : null;
+  m = l.match(/^\/\* ([A-Z_]+_MODULE)(?: \*\/|$)/); return m ? m[1] : null;
 }
 const lines2text = b => b.length ? b.join('\n') + '\n' : '';
 const pad = n => String(n).padStart(4, '0');
+// 줄 배열을 SUBSPLIT 규칙으로 나눔 → [[이름, 줄들]] (첫 조각 앞의 머리말은 첫 조각에 붙여요)
+function subsplit(body, rules) {
+  const out = []; let name = null, start = 0;
+  body.forEach((l, k) => { for (const [re, nm] of rules) { const m = l.match(re); if (m) { if (name !== null) out.push([name, body.slice(start, k)]), start = k; name = typeof nm === 'function' ? nm(m) : nm; break; } } });
+  if (name === null) return null; out.push([name, body.slice(start)]); return out;
+}
 
 export function split(html, out) {
   if (html.includes('\r')) throw Error('CRLF 줄바꿈은 지원하지 않아요');
@@ -65,12 +79,19 @@ export function split(html, out) {
       i = end + 1; continue;
     }
     endRun();
-    if (l === '<style>') { const { body, end } = block(i); put('style/app.css', lines2text(body)); tpl.push(l, '<!--@ style/app.css -->', '</style>'); i = end + 1; continue; }
+    if (l === '<style>') { // CSS는 /* ===== 제목 ===== */ 마다 파일 하나. 순서가 곧 우선순위(cascade)라 번호 순서를 지켜요
+      const { body, end } = block(i); let start = 0, n = 0, title = 'base';
+      const flush = to => { if (to > start) put(`style/${pad(n += 10)}-${slug(title)}.css`, lines2text(body.slice(start, to))); start = to; };
+      body.forEach((l2, k) => { const m2 = l2.match(/^\/\* ={3,} (.+?) ={3,} \*\/$/); if (m2) { flush(k); title = m2[1].replace(/^[\d.]+\s*:?\s*/, '') || m2[1]; } });
+      flush(body.length); tpl.push(l, '<!--@ style/ -->', '</style>'); i = end + 1; continue; }
     if (l === '<script>') { const { body, end } = block(i); put('boot/head.js', lines2text(body)); tpl.push(l, '<!--@ boot/head.js -->', '</script>'); i = end + 1; continue; }
     if ((m = l.match(/^<script id="ggm-([a-z0-9-]+)">$/))) { const { body, end } = block(i), p = `boot/${m[1]}.js`; put(p, lines2text(body)); tpl.push(l, `<!--@ ${p} -->`, '</script>'); i = end + 1; continue; }
     if (l === '<script type="text/ggm-main" id="ggm-main">') {
       const { body, end } = block(i); let start = 0, n = 0, title = '';
-      const flush = to => { if (to > start) put(`main/${pad(n += 10)}-${nameOf(title)}.js`, lines2text(body.slice(start, to))); start = to; };
+      const flush = to => {
+        if (to <= start) return; const name = `main/${pad(n += 10)}-${nameOf(title)}`, part = body.slice(start, to), rules = SUBSPLIT[nameOf(title)], pieces = rules && subsplit(part, rules);
+        if (pieces) pieces.forEach(([nm, b], j) => put(`${name}/${pad((j + 1) * 10).slice(1)}-${nm}.js`, lines2text(b))); else put(name + '.js', lines2text(part));
+        start = to; };
       body.forEach((_, k) => { const t = sectionTitle(body, k); if (t !== null && k > 0) { flush(k); title = t; } else if (t !== null) title = t; });
       flush(body.length); tpl.push(l, '<!--@ main/ -->', '</script>'); i = end + 1; continue;
     }
@@ -82,7 +103,8 @@ export function split(html, out) {
 
 const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) {
-  const input = resolve(process.argv[2] || join(ROOT, 'www/index.html')), out = resolve(process.argv[3] || join(ROOT, 'src'));
+  const args = process.argv.slice(2).filter(a => a !== '--force'), input = resolve(args[0] || join(ROOT, 'www/index.html')), out = resolve(args[1] || join(ROOT, 'src'));
+  if (existsSync(out) && !process.argv.includes('--force')) { console.error(`${out}이(가) 이미 있어요. 통째로 다시 만들어지니 다른 폴더를 주거나 --force를 붙이세요.`); process.exit(1); }
   split(readFileSync(input, 'utf8'), out);
   console.log(`나눔: ${input} → ${out}`);
 }

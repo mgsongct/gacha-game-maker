@@ -1,0 +1,70 @@
+/* ===== 갠톡 ===== */
+.ph-tabs{display:flex;background:var(--panel);border-bottom:1px solid var(--line)}
+.ph-tabs button{flex:1;padding:10px 0;font-weight:700;color:var(--sub);border-bottom:2px solid transparent}
+.ph-tabs button.on{color:var(--ink);border-bottom-color:var(--rose)}
+.fc-tag{font-size:.62rem;font-weight:700;padding:1px 5px;margin-left:4px;background:var(--rose);color:var(--rose-ink);vertical-align:middle}
+.ph-sw{flex:none;height:38px;padding:0 10px}
+
+.lobby .lb-far{position:absolute;inset:-14px;z-index:0;background-size:cover;background-position:center;transform:translate3d(calc(var(--px,0)*-10px),calc(var(--py,0)*-6px),0) scale(1.04);will-change:transform}
+.lobby.layer .lb-stage{background:transparent!important}
+.lobby.layer .lb-stage{transform:translate3d(calc(var(--px,0)*6px),calc(var(--py,0)*3px),0)}
+.lobby.layer .lobby-art{animation:breathe 4.5s ease-in-out infinite alternate}
+.lobby-pose{object-fit:contain;object-position:50% 100%}
+.lbl-pair{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:start}
+.lbl-prev{position:relative;aspect-ratio:3/4;overflow:hidden;border:1px solid var(--line);background:#111}
+.lbl-prev .lbl-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background-size:cover;background-position:center}
+.lbl-prev .lbl-ch{position:absolute;left:0;right:0;bottom:0;margin:auto;height:92%;width:100%;object-fit:contain;object-position:50% 100%}
+.lbl-side{display:flex;flex-direction:column;gap:4px}
+.lb-season{position:absolute;left:50%;transform:translateX(-50%);top:124px;white-space:nowrap;z-index:6;display:flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;background:rgba(14,16,20,.82);border:1px solid rgba(255,255,255,.16);color:#fff;font-size:.74rem}
+.lb-season i{font-style:normal}.lb-season b{font-family:var(--hd)}.lb-season span{color:var(--rose);font-weight:700}
+body.desk .lb-season{top:84px}
+.season-now{display:flex;gap:12px;align-items:center;padding:12px;background:var(--panel);border:1px solid var(--line)}
+.season-now em{font-style:normal;font-size:1.8rem}.season-now b{display:block;font-family:var(--hd)}.season-now span{color:var(--sub);font-size:.84rem}
+#bootsync{position:fixed;inset:0;z-index:2147482000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+#bootsync .bs-box{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+#bootsync b{font-family:var(--hd)}
+#bootsync .linkb{color:var(--sub);font-size:.82rem}
+#devlock{position:fixed;inset:0;z-index:2147483000;background:rgba(6,6,12,.88);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px}
+#devlock .dl-box{max-width:360px;width:100%;background:var(--panel);border:1px solid var(--line);padding:26px 22px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+#devlock .dl-ico{font-size:2rem;color:var(--rose)}
+#devlock b{font-family:var(--hd);font-size:1.15rem}
+#devlock p{margin:0;color:var(--sub);font-size:.9rem;line-height:1.6}
+#devlock small{color:var(--sub);font-size:.76rem}
+#devlock .btn{width:100%;margin-top:6px}
+#devlock .dl-spin,#bootsync .dl-spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--rose);border-radius:50%;animation:dlspin .8s linear infinite}
+@keyframes dlspin{to{transform:rotate(360deg)}}
+.pk-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:6;width:34px;height:54px;background:rgba(0,0,0,.35);color:#fff;font-size:1.6rem;line-height:1;border:1px solid rgba(255,255,255,.18)}
+.pk-nav.l{left:6px}.pk-nav.r{right:6px}
+.pk-dots{position:absolute;left:0;right:0;top:8px;z-index:6;display:flex;justify-content:center;gap:5px;pointer-events:none}
+.pk-dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35)}
+.pk-dots i.on{background:var(--rose);width:16px;border-radius:3px}
+.pk-hero{touch-action:pan-y}
+.pk-hero.sl-r .pk-art,.pk-hero.sl-r .pk-ghost{animation:pkslr .32s ease-out}
+.pk-hero.sl-l .pk-art,.pk-hero.sl-l .pk-ghost{animation:pksll .32s ease-out}
+@keyframes pkslr{from{transform:translateX(40px);opacity:.2}}
+@keyframes pksll{from{transform:translateX(-40px);opacity:.2}}
+.gf-full{margin:0 0 10px;padding:10px 12px;background:rgba(255,90,140,.1);border:1px solid rgba(255,90,140,.35);color:#ff8fb0;font-size:.88rem}
+.gf-it:disabled{opacity:.45}
+.phone{position:relative}
+.ph-menu{position:absolute;inset:0;z-index:5;background:rgba(0,0,0,.45);display:flex;align-items:flex-end}
+.ph-sheet{width:100%;background:var(--panel);border-top:1px solid var(--line);padding:10px 10px calc(env(safe-area-inset-bottom,0px) + 10px);display:flex;flex-direction:column;animation:sheet .2s ease-out}
+.ph-sheet .ph-mt{text-align:center;padding:6px 0 10px;color:var(--sub);font-size:.85rem}
+.ph-sheet button{padding:14px 12px;text-align:left;font-weight:700;color:var(--ink);border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.ph-sheet button small{color:var(--sub);font-weight:400}
+.ph-sheet button.danger{color:#ff5277}
+.ph-sheet button:disabled{opacity:.4}
+.ph-sheet .ph-cancel{justify-content:center;color:var(--sub)}
+.ph-top .ph-done{font-weight:700;color:inherit;padding:0 6px;width:auto;min-width:30px;white-space:nowrap}
+.ph-chat .sys.empty:not(:only-child){display:none}
+.ph-chat.selmode .phsel{cursor:pointer;border-radius:12px;outline:1px dashed transparent}
+.ph-chat.selmode .phsel:hover,.ph-chat.selmode .phsel:active{outline-color:#ff5277;background:rgba(255,82,119,.08)}
+.ph-chat.selmode .phsel>*{pointer-events:none}
+.ph-add{flex:1;overflow-y:auto;padding:12px 14px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.ph-add .tall{min-height:220px}
+.ph-sw2{align-self:center;font-size:.8rem;color:var(--sub);padding:4px 8px}
+.ph-in[hidden]{display:none!important}
+.fc-go{font-size:.78rem;font-weight:700;color:var(--rose);padding:4px 10px;border:1px solid var(--rose)}
+.ph-in.fcin{flex-direction:row;align-items:flex-end;gap:8px}
+.ph-in.fcin textarea{flex:1;resize:none;min-height:38px;max-height:120px;padding:8px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;line-height:1.4;border-radius:18px}
+.ph-in.fcin .btn{flex:none;height:38px}
+

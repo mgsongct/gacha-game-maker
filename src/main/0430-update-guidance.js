@@ -44,7 +44,6 @@ async function checkUpdate(manual){
   let man=null;
   const getMan=async base=>{ try{ const r=await http(base+'version.json?t='+Date.now(),{timeout:20000}); if(r.status<400) return JSON.parse(r.text||(r.bytes?new TextDecoder().decode(r.bytes):'')); }catch(e){} return null; };
   man=await getMan(raw);
-  if(!man&&!o.repo){ const alt=`https://raw.githubusercontent.com/${RELEASE_REPO_OLD}/${branch}/`; man=await getMan(alt); if(man) raw=alt; }
   o.checked=Date.now(); saveLV(o);
   if(!man||!man.build){ if(o.repo) return checkUpdatePrivate(manual); if(manual) toast('업데이트 정보를 받지 못했어요. 인터넷을 확인해 주세요'); return; }
   if(man.feedback){ o.feedback=String(man.feedback); saveLV(o); }

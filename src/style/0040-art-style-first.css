@@ -1,0 +1,8 @@
+/* ===== 2026.10.07.13 그림체·첫 그림 ===== */
+.sty-prev{display:grid;place-items:center;margin-top:8px}.sty-prev img{max-height:280px;max-width:100%;background:repeating-conic-gradient(#2a2d36 0 25%,#1d2027 0 50%) 0 0/16px 16px}
+.bp-prev{height:min(46vh,380px);display:grid;place-items:center;background:repeating-conic-gradient(#22252d 0 25%,#1a1c22 0 50%) 0 0/18px 18px;border:1px solid rgba(255,255,255,.12);margin:10px 0}
+.bp-prev img{max-width:100%;max-height:min(46vh,380px);object-fit:contain;animation:sheet .4s ease-out}
+.bp-prev span{color:#9aa1ad;font-size:.85rem;animation:blink 1.4s infinite}
+.bp-bar{height:6px;background:rgba(255,255,255,.12)}.bp-bar i{display:block;height:100%;width:0;background:var(--rose);transition:width .4s}
+.bp-btns .btn{font-size:.9rem}
+

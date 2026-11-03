@@ -53,11 +53,23 @@ try:
     assert len([x for x in hist if x.startswith('state-')]) == 3
     print('ok 5  앱에서 지운 게임 폴더는 history/deleted-* 로 옮김, 저장마다 전체 백업 유지')
 
+    cf = os.path.join(D, 'main', 'chars.json'); chars = json.load(open(cf, encoding='utf-8')); chars[0]['name'] = '세라(수정)'
+    json.dump(chars, open(cf, 'w', encoding='utf-8'), ensure_ascii=False)  # PC에서 직접 고침
+    code, got = call('GET', '/api/store/state')
+    assert code == 200 and got['devId'] == 'pc-data' and got['at'] > 400 and json.loads(got['ls']['starfall-contract-v1'])['chars'][0]['name'] == '세라(수정)', got.get('devId')
+    assert call('POST', '/api/store/state', dict(st, at=got['at'] + 1, baseAt=400, ls=ls3))[0] == 409  # 고친 걸 모르는 기기는 덮어쓰지 못함
+    assert call('POST', '/api/store/state', dict(st, at=got['at'] + 1, baseAt=got['at'], ls=got['ls']))[0] == 200
+    assert call('GET', '/api/store/state')[1].get('device') == 't'  # 서버가 쓴 뒤로는 직접 수정 아님
+    open(cf, 'w').write('[{"id": "sera",')  # 문법 오류
+    code, got = call('GET', '/api/store/state')
+    assert code == 500 and 'main' in got['error'] and 'chars.json' in got['error'], got
+    print('ok 6  data 폴더를 직접 고치면 새 저장으로 표시(앱이 받아 감, 모르는 기기는 409), JSON 오류는 파일 이름으로 알림')
+
     shutil.rmtree(D); json.dump(dict(st, ls=ls), open(os.path.join(S.DATA, 'state.json'), 'w'))  # 예전 서버 형식
     assert S.migrate() and not S.migrate()
     code, got = call('GET', '/api/store/state')
     assert sorted(os.listdir(D)) == ['g2', 'index.json', 'main'] and all(json.loads(got['ls'][k]) == json.loads(v) for k, v in ls.items())
-    print('ok 6  예전 state.json → data 폴더 이전 (한 번만, 내용 같음)')
+    print('ok 7  예전 state.json → data 폴더 이전 (한 번만, 내용 같음)')
     srv.shutdown()
 finally:
     shutil.rmtree(tmp, ignore_errors=True)

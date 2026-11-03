@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.10.24.1'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.1'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -3114,7 +3114,7 @@ function launch(host,a,z,fx,color,palette){
   delay=flight(fx);const beam=node(host,'v2-fx-beam',color,a.x,a.y);
   if(beam)beam.style.width=Math.hypot(dx,dy)+'px';
   animate(beam,[{transform:`rotate(${angle}deg) scaleX(0)`,opacity:1},{transform:`rotate(${angle}deg) scaleX(1)`,opacity:1,offset:.4},{transform:`rotate(${angle}deg) scaleX(1) scaleY(0)`,opacity:0}],550*tempo());
- }else if(fx==='번개')delay=100*tempo();
+ }
  const battle=typeof B!=='undefined'?B:null,previewToken=host.dataset.previewToken;
  const timer=setTimeout(()=>{pending.delete(timer);if(battle&&B!==battle||previewToken&&host.dataset.previewToken!==previewToken)return;impact(host,z,fx,color);},delay);pending.add(timer);
  return delay;
@@ -10568,7 +10568,8 @@ function openProxySet(){
 const LVKEY='starfall-live';
 
 /* ---- public release channel ---- */
-const RELEASE_REPO='jjhk0803/gacha-game-maker', RELEASE_REPO_OLD='jjhk0803/starfall-contract';
+// 이 포크의 업데이트 채널. 원본(jjhk0803)을 가리키면 앱이 원본 빌드를 받아 포크 수정본을 덮어써요. APK 설치 파일은 원본 Releases에만 있어요
+const RELEASE_REPO='mgsongct/gacha-game-maker';
 function verCmp(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(let i=0;i<Math.max(a.length,b.length);i++){const x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
 function updRepo(o){return String((o&&o.repo)||RELEASE_REPO).trim();}
 async function sha256hex(text){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
@@ -10622,7 +10623,6 @@ async function checkUpdate(manual){
   let man=null;
   const getMan=async base=>{ try{ const r=await http(base+'version.json?t='+Date.now(),{timeout:20000}); if(r.status<400) return JSON.parse(r.text||(r.bytes?new TextDecoder().decode(r.bytes):'')); }catch(e){} return null; };
   man=await getMan(raw);
-  if(!man&&!o.repo){ const alt=`https://raw.githubusercontent.com/${RELEASE_REPO_OLD}/${branch}/`; man=await getMan(alt); if(man) raw=alt; }
   o.checked=Date.now(); saveLV(o);
   if(!man||!man.build){ if(o.repo) return checkUpdatePrivate(manual); if(manual) toast('업데이트 정보를 받지 못했어요. 인터넷을 확인해 주세요'); return; }
   if(man.feedback){ o.feedback=String(man.feedback); saveLV(o); }
@@ -12524,11 +12524,15 @@ async function dataExportZip(game,gid){ // 현재 게임 하나 → zip Blob
  entries.push({name:`data/${gid}/media.json`,data:jsonBytes(meta)});
  return zipMake(entries);}
 async function dataReadZip(file){ // zip → {game, media:[{key,blob}], title}
- const z=await zipRead(file),ix=z.get('data/index.json');if(!ix)throw Error('data/index.json이 없어요. 데이터 폴더 zip이 맞는지 확인해 주세요');
- const index=JSON.parse(await ix.text()),gid=index?.games?.[0]?.id;if(index.format!=='ggm-data'||!gid||!/^[\w-]{1,64}$/.test(gid))throw Error('데이터 폴더 정보가 올바르지 않아요');
- const files={},re=new RegExp('^data/'+gid+'/([a-z]+)\\.json$');for(const[name,b]of z){const m=name.match(re);if(m&&m[1]!=='media')files[m[1]]=JSON.parse(await b.text());}
+ const z0=await zipRead(file),ixName=[...z0.keys()].filter(n=>/(^|\/)index\.json$/.test(n)&&!/\/media\//.test(n)).sort((a,b)=>a.length-b.length)[0];
+ if(!ixName)throw Error('index.json이 없어요. 데이터 폴더 zip이 맞는지 확인해 주세요');
+ // 압축을 풀어 고친 뒤 다시 묶으면 맨 앞에 폴더가 붙거나 data/가 빠질 수 있어요: index.json이 있는 곳을 data/로 봐요
+ const base=ixName.slice(0,-'index.json'.length),z=new Map([...z0].filter(([n])=>n.startsWith(base)).map(([n,b])=>['data/'+n.slice(base.length),b]));
+ const readJSON=async(name,b)=>{try{return JSON.parse(await b.text());}catch(e){throw Error(name+' 을(를) 읽지 못했어요(JSON 문법 확인): '+e.message);}};
+ const index=await readJSON('index.json',z.get('data/index.json')),gid=index?.games?.[0]?.id;if(index.format!=='ggm-data'||!gid||!/^[\w-]{1,64}$/.test(gid))throw Error('데이터 폴더 정보가 올바르지 않아요');
+ const files={},re=new RegExp('^data/'+gid+'/([a-z]+)\\.json$');for(const[name,b]of z){const m=name.match(re);if(m&&m[1]!=='media')files[m[1]]=await readJSON(name,b);}
  const game=dataJoin(files);if(!Array.isArray(game.chars))throw Error('chars.json이 없거나 올바르지 않아요');
- const mj=z.get(`data/${gid}/media.json`),mm=mj?JSON.parse(await mj.text()):{},media=[];
+ const mj=z.get(`data/${gid}/media.json`),mm=mj?await readJSON('media.json',mj):{},media=[];
  for(const[k,v]of Object.entries(mm)){if(!/^[\w-]{1,80}$/.test(k))throw Error('자료 이름이 올바르지 않아요: '+k);const b=z.get(`data/${gid}/media/${k}`);if(!b)throw Error('자료 파일이 빠졌어요: '+k);media.push({key:k,blob:new Blob([b],{type:String(v?.type||'')})});}
  return {game,media,title:index.games[0].title||game.meta?.title||'가져온 게임'};}
 

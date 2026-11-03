@@ -1,0 +1,12 @@
+/* ===== 2026.10.07.15 ===== */
+.el,.fe .el,.fslot .el,.fr .el,.cc .el{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.55);font-size:.72rem!important;font-weight:700;letter-spacing:0}
+.vn-char.up{overflow:hidden}
+.vn-char.up .art{height:172%;align-self:flex-start;object-fit:contain;object-position:50% 0}
+.vn-char.up img.art{transform-origin:50% 25%}
+.cs-art.up{overflow:hidden;top:8%;height:auto}
+.cs-art.up .art{height:165%}
+.cs-art.up img.art{object-position:50% 0;transform-origin:50% 25%}
+.cs-frame{position:absolute;left:12px;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:4;padding:4px 12px;font-size:.75rem;font-weight:700;color:#fff;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3)}
+
+
+.cs-sheet [data-character-preview]{cursor:zoom-in}.cs-sheet [data-character-preview]:focus-visible{outline:2px solid var(--rose);outline-offset:-3px}.standing-box img{object-fit:contain}

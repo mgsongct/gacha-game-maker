@@ -137,4 +137,4 @@
 | `/api/lease` | 한 번에 한 기기만 플레이 |
 | `POST /api/update` | `www/` 최신화 |
 
-환경 변수: `GGM_PORT`(8790), `GGM_REPO`(기본 `jjhk0803/gacha-game-maker` — 포크라면 바꿔야 함), `GGM_DATA_DIR`(기본 서버 폴더의 `data/`). 옵션: `--no-tunnel`, `--no-update`(GitHub에서 `www/` 받지 않음 — 직접 빌드한 앱 시험용).
+환경 변수: `GGM_PORT`(8790), `GGM_REPO`(기본 이 포크 `mgsongct/gacha-game-maker`), `GGM_BRANCH`(기본 `main`), `GGM_DATA_DIR`(기본 서버 폴더의 `data/`). 옵션: `--no-tunnel`, `--no-update`(GitHub에서 `www/` 받지 않음 — 직접 빌드한 앱 시험용).

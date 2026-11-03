@@ -6,9 +6,11 @@
 # 필요: Python 3.8 이상. 창을 닫으면 주소가 사라져요(다음 실행 때 새 주소 + 새 QR).
 import base64, hashlib, http.server, json, os, platform, re, secrets, shutil, socket, socketserver, stat, subprocess, sys, tarfile, threading, time, urllib.error, urllib.parse, urllib.request, webbrowser
 
-SERVER_VER = '2026.11.03.1'
+SERVER_VER = '2026.11.03.2'
 PORT = int(os.environ.get('GGM_PORT', '8790'))
-REPO = os.environ.get('GGM_REPO', 'jjhk0803/gacha-game-maker')
+# 켤 때 www/를 받아 오는 곳. 이 포크의 빌드를 써요(원본으로 두면 원본 index.html로 덮어써져요). GGM_BRANCH로 브랜치도 고를 수 있어요
+REPO = os.environ.get('GGM_REPO', 'mgsongct/gacha-game-maker')
+BRANCH = os.environ.get('GGM_BRANCH', 'main')
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, 'ggm-data')
 WWW = os.path.join(HERE, 'www')
@@ -49,6 +51,19 @@ def put_json(fp, o):
     if os.path.exists(fp) and open(fp, 'rb').read() == b: return
     awrite(fp, b)
 
+def jload(fp):
+    try: return json.load(open(fp, encoding='utf-8'))
+    except Exception as e: raise ValueError(f'{os.path.relpath(fp, os.path.dirname(GAMES))} 을(를) 읽지 못했어요(직접 고쳤다면 JSON 문법을 확인해 주세요): {e}')
+
+def data_sig():
+    """data 폴더 파일들의 (경로, 크기, 수정 시각) 요약. 서버가 쓴 뒤와 다르면 누가 직접 고친 거예요"""
+    h = hashlib.sha256()
+    for root, dirs, fs in os.walk(GAMES):
+        dirs.sort()
+        for x in sorted(fs):
+            if x.endswith('.json'): st = os.stat(os.path.join(root, x)); h.update(f'{os.path.relpath(os.path.join(root, x), GAMES)}|{st.st_size}|{st.st_mtime_ns}\n'.encode())
+    return h.hexdigest()
+
 def save_games(ls, stamp):
     """ls의 게임 기록을 폴더로 나눠 쓰고, 나머지 ls와 게임 id 목록을 돌려줘요."""
     os.makedirs(GAMES, exist_ok=True); rest, games, projects = {}, {}, None
@@ -79,17 +94,27 @@ def save_games(ls, stamp):
 
 def load_state(f):
     """state.json + data 폴더 → 앱이 보낸 모양 그대로의 전체 상태"""
-    st = json.load(open(f, encoding='utf-8'))
-    gids = st.pop('_dataGames', None)
-    if gids is None: return st  # 예전 형식(게임이 state.json 안에): 다음 저장 때 폴더로 나눠요
+    st = jload(f)
+    if '_dataGames' not in st: return st  # 예전 형식(게임이 state.json 안에): 다음 저장 때 폴더로 나눠요
+    sig = data_sig()
+    if st.get('_dataSig') and sig != st['_dataSig']:
+        # data 폴더를 직접 고쳤어요: 새 저장으로 표시해서 앱이 받아 가게 해요(앱은 받기 전까지 자동 저장으로 덮어쓰지 않아요)
+        st.update(at=int(time.time() * 1000), device='PC data 폴더(직접 수정)', devId='pc-data', _dataSig=sig)
+        awrite(f, json.dumps(st, ensure_ascii=False).encode())
+    st = dict(st); gids = st.pop('_dataGames'); st.pop('_dataSig', None)
     ls = dict(st.get('ls') or {})
     ix = os.path.join(GAMES, 'index.json')
-    if os.path.exists(ix) and not json.load(open(ix, encoding='utf-8')).get('generated'): ls[PROJECTS] = json.dumps(json.load(open(ix, encoding='utf-8')), ensure_ascii=False, separators=(',', ':'))
+    if os.path.exists(ix):
+        pj = jload(ix)
+        if not pj.get('generated'): ls[PROJECTS] = json.dumps(pj, ensure_ascii=False, separators=(',', ':'))
     for gid in gids:
-        d = os.path.join(GAMES, gid); g = json.load(open(os.path.join(d, 'game.json'), encoding='utf-8'))
+        d = os.path.join(GAMES, gid)
+        if not os.path.isfile(os.path.join(d, 'game.json')): raise ValueError(f'data/{gid}/game.json 이 없어요. 폴더를 지웠다면 PC 백업(ggm-data/history)에서 되살려 주세요')
+        g = jload(os.path.join(d, 'game.json'))
         for t in TYPES:
             fp = os.path.join(d, t + '.json')
-            if os.path.exists(fp): g[t] = json.load(open(fp, encoding='utf-8'))
+            if os.path.exists(fp): g[t] = jload(fp)
+        if not isinstance(g.get('chars'), list): raise ValueError(f'data/{gid}/chars.json 이 없거나 배열이 아니에요')
         ls[game_key(gid)] = json.dumps(g, ensure_ascii=False, separators=(',', ':'))
     st['ls'] = ls
     return st
@@ -105,20 +130,24 @@ def migrate():
 
 def save_state(f, st, stamp):
     rest, gids = save_games(st['ls'], stamp)
-    awrite(f, json.dumps(dict(st, ls=rest, _dataGames=gids), ensure_ascii=False).encode())  # 게임 폴더를 다 쓴 뒤 마지막에
+    awrite(f, json.dumps(dict(st, ls=rest, _dataGames=gids, _dataSig=data_sig()), ensure_ascii=False).encode())  # 게임 폴더를 다 쓴 뒤 마지막에
 
 # ---------- 게임 파일 받기 (항상 최신) ----------
 FILES = ['index.html', 'manifest.webmanifest', 'sw.js', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png']
 def update_www():
     ok = 0
     for f in FILES:
-        url = f'https://raw.githubusercontent.com/{REPO}/main/www/{f}?t={int(time.time())}'
+        url = f'https://raw.githubusercontent.com/{REPO}/{BRANCH}/www/{f}?t={int(time.time())}'
         try:
             data = urllib.request.urlopen(url, timeout=30).read()
             open(os.path.join(WWW, f), 'wb').write(data); ok += 1
         except Exception as e:
             if not os.path.exists(os.path.join(WWW, f)): log('  ! 받지 못함:', f, e)
-    log(f'게임 파일 확인 완료 ({ok}/{len(FILES)} 최신)')
+    log(f'게임 파일 확인 완료 ({ok}/{len(FILES)} 최신, {REPO}@{BRANCH})')
+
+def www_build():
+    try: return (re.search(r"var BUILT='([^']+)'", open(os.path.join(WWW, 'index.html'), encoding='utf-8').read()) or [None, '?'])[1]
+    except Exception: return '없음'
 
 # ---------- HTTP 서버 ----------
 HOP = {'connection', 'keep-alive', 'proxy-authenticate', 'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'upgrade', 'host', 'origin', 'referer', 'cookie', 'content-length', 'x-ggm-key', 'accept-encoding'}
@@ -311,6 +340,7 @@ if __name__ == '__main__':
     log('가챠 게임 메이커 PC 서버'); log('게임 데이터:', GAMES); log('설정·그림·백업:', DATA)
     if migrate(): log('예전 저장(state.json 한 파일)을 data 폴더로 나눴어요. 원본은 ggm-data/history에 있어요')
     if '--no-update' not in sys.argv: update_www()  # --no-update: www/를 그대로 씀(포크·로컬 빌드 시험용)
+    log('앱 빌드:', www_build(), '(www/index.html)')
     srv = Srv(('0.0.0.0', PORT), H)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     log(f'이 PC에서 열기: http://127.0.0.1:{PORT}/?pc={KEY}')

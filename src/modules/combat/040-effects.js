@@ -113,7 +113,7 @@ function launch(host,a,z,fx,color,palette){
   delay=flight(fx);const beam=node(host,'v2-fx-beam',color,a.x,a.y);
   if(beam)beam.style.width=Math.hypot(dx,dy)+'px';
   animate(beam,[{transform:`rotate(${angle}deg) scaleX(0)`,opacity:1},{transform:`rotate(${angle}deg) scaleX(1)`,opacity:1,offset:.4},{transform:`rotate(${angle}deg) scaleX(1) scaleY(0)`,opacity:0}],550*tempo());
- }else if(fx==='번개')delay=100*tempo();
+ }
  const battle=typeof B!=='undefined'?B:null,previewToken=host.dataset.previewToken;
  const timer=setTimeout(()=>{pending.delete(timer);if(battle&&B!==battle||previewToken&&host.dataset.previewToken!==previewToken)return;impact(host,z,fx,color);},delay);pending.add(timer);
  return delay;
