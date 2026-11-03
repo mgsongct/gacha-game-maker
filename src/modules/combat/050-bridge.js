@@ -40,7 +40,7 @@ function v2Ensure(c){
  if(typeof v2SyncEquipment==='function')v2SyncEquipment(c);
  return c.skills;
 }
-function v2CharacterInput(c){v2ApplyRoleSpeed(c);return {name:c.name,profile:c.profile,skillConcept:c.skillConcept,generation:GGMCombat.generation(c),role:c.role,elem:c.elem,faction:c.faction,hp:c.hp,atk:c.atk,def:c.def,spd:c.spd,skills:v2Ensure(c)};}
+function v2CharacterInput(c){v2ApplyRoleSpeed(c);return {name:c.name,profile:c.profile,skillConcept:c.skillConcept,generation:GGMCombat.generation(c),role:c.role,pos:c.pos,elem:c.elem,faction:c.faction,hp:c.hp,atk:c.atk,def:c.def,spd:c.spd,skills:v2Ensure(c)};}
 function v2Fingerprint(c){return JSON.stringify(v2CharacterInput(c));}
 function v2QueueCharacter(c){
  v2Ensure(c);if(V2PENDING.has(c))return V2PENDING.get(c);

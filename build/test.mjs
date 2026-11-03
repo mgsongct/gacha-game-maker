@@ -241,36 +241,38 @@ try {
   assert.ok(Object.values(r12).every(v => v === true), JSON.stringify(r12)); assert.deepEqual(err12, [], '페이지 오류');
   console.log('ok 12 콘텐츠 점검: 빠진 대사·나이 태그·상징·구버전·빈 대본 감지 → 자동 변환·AI 채우기·지정 변환·되돌리기, 새 캐릭터 genVer');
 
-  // 13) 게임 규칙: 속성 상성(이기는 속성·배율)·역할 기본 능력치·희귀도 배율·진영 시너지·관계 배율을 보고 편집 → 전투 옵션·캐릭터 화면·도감에 반영
+  // 13) 게임 규칙: 속성 추가·제거·상성표·반응, 포지션(프리셋·기능·배정), 기본형 능력치, 진영 시너지, 관계 → 전투 엔진·캐릭터 화면·도감, 다시 열어도 유지
   const p13 = await browser.newPage(), err13 = []; p13.on('pageerror', e => err13.push(String(e)));
-  await p13.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); const u13 = `http://127.0.0.1:${server.address().port}/?t=13`; await p13.goto(u13);
+  await p13.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p13.goto(`http://127.0.0.1:${server.address().port}/?t=13`);
   await p13.waitForFunction(() => typeof openRules === 'function' && typeof G === 'object', null, { timeout: 15000 });
   const r13 = await p13.evaluate(async () => {
-    const o = {}, E = G.meta.elems.map(e => e.n);
-    o.defaults = BEATS[E[0]] === E[1] && v2Options().elemAdv === 1.5 && v2Options().elemDis === .75 && GGMCombat.roleSpeed({ role: 'def', name: 'x' }) === GGMCombat.roleSpeed({ role: 'def', name: 'x' });
-    const c0 = G.chars.filter(c => !c.alt)[0], before = GGMCombat.generateBaseStats({ role: 'atk', rarity: 1 }, () => .5).atk;
+    const o = {}, E = G.meta.elems.map(e => e.n), set = (k, v) => { const el = document.querySelector(`#modal [data-rk="${k}"]`); if (!el) throw Error('no ' + k); el.value = v; }, click = (act, k) => document.querySelector(`#modal [data-act="${act}"]${k ? `[data-k="${k}"]` : ''}`).click();
+    const om = v2Options().elemMat; o.defaults = om[E[0]][E[1]] === 1.5 && om[E[1]][E[0]] === .75 && om[E[0]][E[2]] === .75 && POSITIONS().length === 3 && posOf(G.chars[0]).base === G.chars[0].role;
     tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="rulesopen"]');
-    openRules(); const set = (id, v) => { document.querySelector('#' + id).value = v; };
-    set('ru_eb0', '2'); set('ru_eb1', '0'); set('ru_eb2', '1'); set('ru_adv', '2'); set('ru_ed0', '불꽃의 힘'); set('ru_rd_atk', '앞에서 싸워요'); set('ru_rb_atk_atk', '200');
-    set('ru_sn', '2'); set('ru_sa', '10'); set('ru_sd', '5');
-    document.querySelector('[data-act="rulesreladd"]').click(); const row = document.querySelector('#ru_rel [data-rel]'); row.querySelector('[data-rf="a"]').value = 'X'; row.querySelector('[data-rf="b"]').value = 'Y'; row.querySelector('[data-rf="mul"]').value = '1.3';
-    document.querySelector('[data-act="rulessave"]').click();
-    o.beats = BEATS[E[0]] === E[2] && BEATS[E[1]] === E[0]; const op = v2Options(); o.opts = op.elemAdv === 2 && op.synergy.n === 2 && op.rel[0].mul === 1.3 && op.beats[E[0]] === E[2];
-    o.roleBase = GGMCombat.generateBaseStats({ role: 'atk', rarity: 1 }, () => .5).atk === 200 && before === 120;
-    o.relMul = GGMCombat.relMul({ rel: op.rel }, { faction: 'X' }, { faction: 'Y' }) === 1.3 && GGMCombat.relMul({ rel: op.rel }, { faction: 'Y' }, { faction: 'X' }) === 1;
-    const html = rulesCharHTML(c0); o.charLine = html.includes('강함(×2)') && (c0.elem !== E[0] || html.includes('불꽃의 힘')) && (c0.role !== 'atk' || html.includes('앞에서 싸워요'));
-    o.auditBefore = auditScan().some(g => g.rule.id === 'g_codex') && auditScan().some(g => g.rule.id === 'g_rules');
-    openRules(); document.querySelector('[data-act="rulescodex"]').click(); o.codex = G.world.codex.some(x => x.title === '[규칙] 속성 상성' && x.body.includes('×2')) && G.world.codex.some(x => x.title === '[규칙] 진영 시너지'); o.auditAfter = !auditScan().some(g => g.rule.id === 'g_codex');
-    appConfirm = async () => true; const atkChar = G.chars.find(c => !c.alt && c.role === 'atk'); await rulesRecalc(); o.recalc = !atkChar || atkChar.atk >= 190; closeModal();
-    // 실제 전투 엔진: 시너지가 같은 진영 아군의 공격을 올려요
-    const mk = (id, f) => ({ name: id, role: 'atk', elem: E[0], faction: f, hp: 1000, atk: 100, def: 50, spd: 100, skills: GGMCombat.generationDefaults({ role: 'atk' }) });
-    const sim = GGMCombat.create([mk('a', 'F'), mk('b', 'F'), mk('c', 'G')].map(x => ({ ...x, kit: GGMCombat.normalize(x.skills), baseKit: GGMCombat.normalize(x.skills), ready: {} })), [{ ...mk('e', ''), kit: GGMCombat.normalize(mk('e', '').skills), baseKit: GGMCombat.normalize(mk('e', '').skills), ready: {} }], { ...v2Options(), seed: 1 });
-    o.synergy = sim.allies[0].atk === 110 && sim.allies[2].atk === 100 && sim.elemAdv === 2;
+    openRules(); set('adv', '2'); set('e.0.d', '불꽃의 힘'); click('rulesadd', 'elem'); set('e.3.n', '광'); set('e.3.beat', E[0]); set('e.0.beat', E[2]); set(`g.${E[1]}.${E[2]}`, '1.3');
+    click('rulesadd', 'reaction'); set('r.0.a', E[0]); set('r.0.b', E[2]); set('r.0.name', '증기 폭발'); set('r.0.type', 'burst'); set('r.0.value', '2'); document.querySelector('#modal [data-rk="r.0.both"]').checked = true;
+    click('rulespreset', 'squad8'); set('syn.n', '2'); set('syn.atk', '10'); click('rulesadd', 'rel'); set('l.0.by', 'pos'); set('l.0.a', '방벽'); set('l.0.b', '사수'); set('l.0.mul', '1.4');
+    click('rulessave');
+    const m = v2Options().elemMat; o.elems = G.meta.elems.length === 4 && BEATS[E[0]] === E[2] && BEATS['광'] === E[0] && m[E[0]][E[2]] === 2 && m[E[1]][E[2]] === 1.3 && m['광'][E[0]] === 2 && m[E[2]][E[0]] === 2 && m[E[0]]['광'] === .75; // 3→1도 기본 순환대로 남아 서로 유리
+    o.pos = POSITIONS().length === 8 && G.chars.every(c => posById(c.pos) && posById(c.pos).base === c.role);
+    const rel = v2Options().rel[0], wall = POSITIONS().find(p => p.name === '방벽'), snipe = POSITIONS().find(p => p.name === '사수'); o.rel = rel.by === 'pos' && rel.a === wall.id && rel.b === snipe.id;
+    // 실제 전투 엔진: 포지션 기능(방벽 체력 +15%), 반응(순서 무관 증기 폭발), 시너지
+    const kit = () => GGMCombat.generationDefaults({ role: 'atk' }), mk = (name, elem, pos, f) => ({ name, role: 'atk', pos, elem, faction: f, hp: 1000, atk: 100, def: 50, spd: 100, kit: GGMCombat.normalize(kit()), baseKit: GGMCombat.normalize(kit()), ready: {} });
+    const sim = GGMCombat.create([mk('a', E[0], wall.id, 'F'), mk('b', E[2], snipe.id, 'F')], [{ ...mk('e', E[1], '', ''), hp: 99999, maxhp: 99999 }], { ...v2Options(), seed: 3 });
+    o.trait = sim.allies[0].maxhp === 1150 && sim.allies[0].posT.threat === 80; o.synergy = sim.allies[1].atk === 110;
+    for (let i = 0; i < 400 && !sim.winner; i++) GGMCombat.step(sim); o.reaction = sim.allies.some(u => (u.reactions || 0) > 0);
+    const html = rulesCharHTML(G.chars.find(c => c.elem === E[0]) || G.chars[0]); o.charLine = html.includes('포지션') && (html.includes('증기 폭발') || !G.chars.some(c => c.elem === E[0]));
+    G.chars[0].elem = '광'; mark('c:' + G.chars[0].id); openRules(); // 4번째 속성(광) 삭제 → 그 속성 캐릭터는 첫 속성으로
+    document.querySelector('#modal [data-act="rulesedel"][data-i="3"]').click(); click('rulessave');
+    o.removed = G.meta.elems.length === 3 && !G.meta.elems.some(e => e.n === '광') && G.chars[0].elem === G.meta.elems[0].n && !('광' in BEATS);
+    openCharEdit(G.chars[1].id); o.editPos = document.querySelectorAll('#f_pos option').length === 8; closeModal();
+    openRules(); click('rulescodex'); o.codex = ['[규칙] 포지션', '[규칙] 속성 반응', '[규칙] 진영 시너지', '[규칙] 관계'].every(t => G.world.codex.some(x => x.title === t)); closeModal();
+    const nc = cleanChar({ name: '새', pos: '의무', role: 'atk' }); o.newChar = posById(nc.pos).name === '의무' && nc.role === 'sup';
     await flush(); return o; });
   await p13.reload(); await p13.waitForFunction(() => typeof G === 'object' && typeof rulesOptions === 'function', null, { timeout: 15000 });
-  const r13b = await p13.evaluate(() => ({ desc: G.meta.elems[0].d === '불꽃의 힘', adv: rulesOptions().elemAdv === 2, beat: BEATS[G.meta.elems[0].n] === G.meta.elems[2].n }));
+  const r13b = await p13.evaluate(() => ({ desc: G.meta.elems[0].d === '불꽃의 힘', n: G.meta.elems.length === 3, adv: rulesOptions().elemAdv === 2, pos: POSITIONS().length === 8, react: rulesOptions().reactions[0].name === '증기 폭발' }));
   assert.ok(Object.values(r13).every(v => v === true), JSON.stringify(r13)); assert.ok(Object.values(r13b).every(v => v === true), JSON.stringify(r13b)); assert.deepEqual(err13, [], '페이지 오류');
-  console.log('ok 13 게임 규칙: 속성 상성·배율·역할 기본 능력치·희귀도·진영 시너지·관계 배율 편집 → 전투 엔진·캐릭터 화면·도감 반영, 다시 열어도 유지');
+  console.log('ok 13 게임 규칙: 속성 추가·제거·상성표·반응(엔진에서 발동), 포지션 프리셋·기능(엔진 반영)·자동 배정·편집, 시너지·관계, 도감, 다시 열어도 유지');
   await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);

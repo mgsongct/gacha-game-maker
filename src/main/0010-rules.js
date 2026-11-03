@@ -45,7 +45,7 @@ function T(k){const t=(typeof G!=='undefined'&&G&&G.meta&&G.meta.terms)||{};retu
 function applyMeta(){
   const m=G.meta; ELEMS=m.elems.map(e=>e.n);
   Object.keys(ECOL).forEach(k=>delete ECOL[k]); Object.keys(BEATS).forEach(k=>delete BEATS[k]);
-  m.elems.forEach((e,i)=>{ECOL[e.n]=e.c;BEATS[e.n]=m.elems[(i+1)%3].n;});
+  m.elems.forEach((e,i)=>{ECOL[e.n]=e.c;BEATS[e.n]=m.elems[(i+1)%m.elems.length].n;});
   Object.assign(ROLE,m.roles); if(typeof rulesApply==='function') rulesApply(); // 게임 규칙(상성·능력치) 반영 (0185-game-rules.js)
   document.documentElement.dataset.skin=m.theme||'tactical';
   document.documentElement.style.setProperty('--acc',m.accent||'#ffb400');

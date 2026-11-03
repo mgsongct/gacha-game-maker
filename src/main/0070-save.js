@@ -66,8 +66,8 @@ function fix(g){
   // Inspect the original metadata: merged defaults already carry the new-game marker.
   if(m0.materialTermNamesVersion!==1){for(const key of ['core','gearMat','transcMat']){g.meta.terms[key]=DEFAULT_META.terms[key];for(const icon of g.lib||[])if(icon.kind==='icon'&&icon.key===key)icon.name=g.meta.terms[key]+' 아이콘';}g.meta.materialTermNamesVersion=1;g.__curveNew=true;}
   if(!g.meta.skillTrainingMaterialsVersion){g.meta.terms.wMat='스킬 교본';for(const f of g.meta.farms||[])if(f.key==='wmat')f.name='스킬 교본 회수';for(const l of g.lib||[])if(l.kind==='icon'&&l.key==='wmat')l.name='스킬 교본 아이콘';g.meta.skillTrainingMaterialsVersion=1;}
-  if(!Array.isArray(g.meta.elems)||g.meta.elems.length!==3) g.meta.elems=clone(DEFAULT_META.elems);
-  g.meta.elems=g.meta.elems.map((e,i)=>({n:String((e&&e.n)||DEFAULT_META.elems[i].n).replace(/[<>"'&`]/g,'').slice(0,4)||DEFAULT_META.elems[i].n,c:HEXC.test((e&&e.c)||'')?e.c:DEFAULT_META.elems[i].c,d:String((e&&e.d)||'').slice(0,80)}));
+  if(!Array.isArray(g.meta.elems)||g.meta.elems.length<2||g.meta.elems.length>8) g.meta.elems=clone(DEFAULT_META.elems); // 속성 2~8개 (게임 규칙에서 추가·제거)
+  g.meta.elems=g.meta.elems.map((e,i)=>({n:String((e&&e.n)||(DEFAULT_META.elems[i]||{n:'속성'+(i+1)}).n).replace(/[<>"'&`]/g,'').slice(0,4)||'속성'+(i+1),c:HEXC.test((e&&e.c)||'')?e.c:(DEFAULT_META.elems[i]||{c:'#999999'}).c,d:String((e&&e.d)||'').slice(0,80)}));
   if(!HEXC.test(g.meta.accent||'')) g.meta.accent=DEFAULT_META.accent;
   g.meta.roles=Object.assign(clone(DEFAULT_META.roles),m0.roles||{}); if(!Array.isArray(g.meta.farms)||!g.meta.farms.length) g.meta.farms=clone(DEFAULT_META.farms);
   const isDefaultGame=g.chars.some(c=>c.id==='sera');

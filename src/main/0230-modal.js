@@ -182,7 +182,7 @@ function openCharEdit(id){
     <div class="g2"><div><label class="f" for="f_name">이름</label><input class="in" id="f_name" value="${esc(c.name)}" maxlength="20"></div>
     <div><label class="f" for="f_fac">소속</label><input class="in" id="f_fac" value="${esc(c.faction)}" list="faclist"><datalist id="faclist">${[...new Set(G.chars.map(x=>x.faction).filter(Boolean))].map(f=>`<option value="${esc(f)}">`).join('')}</datalist></div></div>
     <div class="g2"><div><label class="f" for="f_rar">등급</label><select class="in" id="f_rar">${opt([[3,'SSR'],[2,'SR'],[1,'R']],c.rarity)}</select></div>
-    <div><label class="f" for="f_role">역할</label><select class="in" id="f_role">${opt(Object.entries(ROLE),c.role)}</select></div></div>
+    <div><label class="f" for="f_pos">포지션 <span class="muted" style="font-size:.75rem">(전투 기본형)</span></label><select class="in" id="f_pos">${opt(POSITIONS().map(p=>[p.id,`${p.name} (${ROLE[p.base]}형)`]),posOf(c).id)}</select></div></div>
     <div class="g2"><div><label class="f" for="f_elem">속성</label><select class="in" id="f_elem">${opt(ELEMS.map(e=>[e,e]),c.elem)}</select></div>
     <div><label class="f" for="f_lim">한정 여부</label><select class="in" id="f_lim">${opt([['0','상시'],['1','한정 (이벤트 배너에서만)']],c.limited?'1':'0')}</select></div></div>
     <div class="g4"><div><label class="f" for="f_hp">기본 체력</label><input class="in" id="f_hp" type="number" value="${c.hp}"></div><div><label class="f" for="f_atk">공격</label><input class="in" id="f_atk" type="number" value="${c.atk}"></div><div><label class="f" for="f_def">기본 방어력</label><input class="in" id="f_def" type="number" value="${c.def}"></div><div><label class="f" for="f_spd">속도</label><input class="in" id="f_spd" type="number" value="${c.spd}"></div></div>
@@ -220,7 +220,7 @@ function readCharForm(c){
   const name=$('#f_name').value.trim(); if(!name){toast('이름을 입력해 주세요');return false;}
   const aff={}; lines($('#f_aff').value).forEach(l=>{const m=l.match(/^(\d+)\s*[:：]\s*(.+)$/); if(m)(aff[m[1]]=aff[m[1]]||[]).push(m[2]);});
   const files=lines($('#f_files').value).map(l=>{const m=l.match(/^(\d)\s*[:：]\s*(.+)$/);return m?{dup:+m[1],text:m[2]}:{dup:1,text:l};});
-  Object.assign(c,{baseStatsVersion:1,name,faction:$('#f_fac').value.trim(),rarity:+$('#f_rar').value,role:$('#f_role').value,elem:$('#f_elem').value,limited:$('#f_lim').value==='1',
+  Object.assign(c,{baseStatsVersion:1,name,faction:$('#f_fac').value.trim(),rarity:+$('#f_rar').value,role:(posById($('#f_pos').value)||posOf(c)).base,pos:(posById($('#f_pos').value)||posOf(c)).id,elem:$('#f_elem').value,limited:$('#f_lim').value==='1',
     hp:num($('#f_hp').value,100,1e10,1000),atk:num($('#f_atk').value,10,9999,100),def:num($('#f_def').value,0,1e8,50),spd:num($('#f_spd').value,30,300,100),
     profile:$('#f_prof').value.trim(),intro:$('#f_intro').value.trim(),lines:lines($('#f_lines').value),affLines:aff,files,
     lvLines:lines($('#f_lv').value),dupLines:lines($('#f_dup').value),

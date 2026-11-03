@@ -4,7 +4,7 @@
    - 능력치(hp/atk/def/spd)는 절대값이 아니라 원본 대비 가중치(over.statMul)로 저장 → 원본 능력치가 오르면 같이 올라요
    - 저장할 때는 상속 항목을 빼고(inheritStore), 불러올 때·원본을 고칠 때 다시 채워요(inheritApply)
    이 파일은 0070-save.js의 fix()가 불러올 때 쓰므로, 최상위 const 없이 함수 선언만 둬요(호이스팅) */
-function inheritKeys(){ return ['faction','elem','role','rarity','skill','skills','profile','intro','lines','touch','affLines','lvLines','dupLines','files','age','voiceId','voiceName','naiStyle']; }
+function inheritKeys(){ return ['faction','elem','role','pos','rarity','skill','skills','profile','intro','lines','touch','affLines','lvLines','dupLines','files','age','voiceId','voiceName','naiStyle']; }
 function inheritStats(){ return ['hp','atk','def','spd']; }
 function inheritSame(a,b){ return JSON.stringify(a)===JSON.stringify(b); }
 function inheritDiff(c,b){ // 이격 c와 원본 b를 비교해서 다른 것만
@@ -34,7 +34,7 @@ function inheritOnMark(id){ // mark('c:'+id) 때: 이격을 고쳤으면 수정�
 function inheritReset(c,k){ // 수정치 하나(또는 전부)를 버리고 원본을 따르게
   const b=c&&c.alt&&G.chars.find(x=>x.id===c.alt); if(!b) return; if(k==='*') c.over={}; else if(k&&c.over){ if(inheritStats().includes(k)&&c.over.statMul){ delete c.over.statMul[k]; if(!Object.keys(c.over.statMul).length) delete c.over.statMul; } else delete c.over[k]; }
   inheritApply(c,b); INHERIT_SYNC=true; try{ mark('c:'+c.id); } finally{ INHERIT_SYNC=false; } }
-function inheritLabel(k){ return ({faction:'소속',elem:'속성',role:'역할',rarity:'희귀도',skill:'스킬(구형)',skills:'스킬',profile:'프로필',intro:'첫 대사',lines:'대사',touch:'터치 대사',affLines:'호감도 대사',lvLines:'레벨 대사',dupLines:'돌파 대사',files:'기밀 파일',age:'나이',voiceId:'목소리',voiceName:'목소리 이름',naiStyle:'그림체',hp:'체력',atk:'공격',def:'방어',spd:'속도'})[k]||k; }
+function inheritLabel(k){ return ({faction:'소속',elem:'속성',role:'역할',pos:'포지션',rarity:'희귀도',skill:'스킬(구형)',skills:'스킬',profile:'프로필',intro:'첫 대사',lines:'대사',touch:'터치 대사',affLines:'호감도 대사',lvLines:'레벨 대사',dupLines:'돌파 대사',files:'기밀 파일',age:'나이',voiceId:'목소리',voiceName:'목소리 이름',naiStyle:'그림체',hp:'체력',atk:'공격',def:'방어',spd:'속도'})[k]||k; }
 function inheritHTML(c){ // 캐릭터 화면의 상속 정보
   const b=c&&c.alt&&G.chars.find(x=>x.id===c.alt); if(!b||!c.over) return ''; const o=c.over, keys=Object.keys(o).filter(k=>k!=='statMul'), sm=o.statMul||{};
   const items=[...keys.map(k=>[k,inheritLabel(k)]),...Object.entries(sm).map(([k,v])=>[k,`${inheritLabel(k)} ×${v}`])];

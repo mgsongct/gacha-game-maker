@@ -55,7 +55,7 @@ function farmReward(key,lv){ const m=seasonIs('train')?2:1, i=Math.max(0,Math.mi
 function farmRec(lv){ return FARM_LV[Math.max(0,Math.min(FARM_N-1,lv-1))]; }
 function farmStage(key,lv){
   const f=G.meta.farms.find(x=>x.key===key)||{name:key}, rec=farmRec(lv), m=(1+0.06*(rec-1))*(1+0.04*lv);
-  const e=(n,i,boss)=>({name:n,elem:ELEMS[(lv+i)%3],hp:Math.round(950*m*(boss?3:1)),atk:Math.round(82*m*(boss?1.2:1)),def:Math.round(32*m),spd:92+lv*2,boss:!!boss});
+  const e=(n,i,boss)=>({name:n,elem:ELEMS[(lv+i)%ELEMS.length],hp:Math.round(950*m*(boss?3:1)),atk:Math.round(82*m*(boss?1.2:1)),def:Math.round(32*m),spd:92+lv*2,boss:!!boss});
   const en=[e('훈련 표적',0),e('훈련 표적',1)]; if(lv>=3) en.push(e('강화 표적',2)); if(lv>=6) en.push(e('훈련 교관',0,true));
   // 권장 레벨 대원 4명의 전투력보다 조금 낮게 맞춰요(10레벨 낮으면 버거워요)
   const lm=1+0.06*(rec-1), up=c=>{ const r=RMUL[c.rarity]||1; return unitPower({hp:(+c.hp||1150)*r*lm,atk:(+c.atk||130)*r*lm,def:(+c.def||60)*r*lm,spd:+c.spd||100}); };

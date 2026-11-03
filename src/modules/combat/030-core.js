@@ -573,7 +573,7 @@ function* inspectEquipment(character,option,options={}){
 }
 
 function create(allies,enemies,options={}){
- const sim={allies,enemies,time:0,ticks:0,random:rng(options.seed||1),visualRandom:rng((options.seed||1)^0x5f3759df),beats:options.beats||{},elemAdv:+options.elemAdv||1.5,elemDis:+options.elemDis||.75,rel:Array.isArray(options.rel)?options.rel:[],elems:options.elems||['홍','청','녹'],events:[],winner:null,auto:true,practice:options.practice===true,maxTime:options.practice===true?Infinity:options.maxTime||119,revivals:0,pending:[],depth:0,timedImpacts:options.timedImpacts===true,externalImpacts:options.externalImpacts===true,impactJobs:[],impactSeq:0};
+ const sim={allies,enemies,time:0,ticks:0,random:rng(options.seed||1),visualRandom:rng((options.seed||1)^0x5f3759df),beats:options.beats||{},elemAdv:+options.elemAdv||1.5,elemDis:+options.elemDis||.75,rel:Array.isArray(options.rel)?options.rel:[],elemMat:options.elemMat||null,reactions:Array.isArray(options.reactions)?options.reactions:[],aura:+options.aura||4,positions:options.positions||{},elems:options.elems||['홍','청','녹'],events:[],winner:null,auto:true,practice:options.practice===true,maxTime:options.practice===true?Infinity:options.maxTime||119,revivals:0,pending:[],depth:0,timedImpacts:options.timedImpacts===true,externalImpacts:options.externalImpacts===true,impactJobs:[],impactSeq:0};
  for(const [side,team] of [['a',allies],['e',enemies]])team.forEach((u,i)=>{
   u.side=side;u.slot=i;u.trainingDummy=sim.practice&&side==='e';u.maxhp=clamp(u.maxhp||u.hp,1,1e10,1000);u.hp=clamp(u.hp,0,u.maxhp,u.maxhp);u.atk=clamp(u.atk,1,1e8,100);u.def=clamp(u.def,0,1e8,50);u.spd=clamp(u.spd,10,300,100);u.mul=clamp(u.mul,.1,3,1);
   u.baseMaxhp=u.maxhp;u.baseElem=u.elem;u.faction=u.faction||u.c?.faction||'';
@@ -582,13 +582,23 @@ function create(allies,enemies,options={}){
   u.meleeGroup=null;u.meleeUntil=0;u.meleeDelay=0;u.lastInvincibleAt=-Infinity;u.invincibilityReadyAt=-Infinity;u.lastDamageDealt=0;u.lastDamageTaken=0;u.lastHealing=0;u.lastBlocked=0;
   for(const slot of Object.keys(SLOTS))u.ready[slot]=slot==='ultimate'?0:u.kit[slot].initial;
  });
- synergy(sim,options.synergy);
+ positionTraits(sim); synergy(sim,options.synergy);
  outcome(sim);for(const u of [...allies,...enemies])if(['battle_start','always'].includes(u.kit.passive.trigger))cast(sim,u,'passive');
  outcome(sim);return sim;
 }
 // 게임 규칙: 진영 시너지(같은 진영 n명 이상이면 공격·방어 %↑), 관계 배율(진영·역할·속성 A가 B를 공격할 때 ×mul)
 function synergy(sim,s){if(!s||!(+s.n>1)||!(+s.atk||+s.def))return;for(const team of [sim.allies,sim.enemies]){const n={};team.forEach(u=>{if(u.faction)n[u.faction]=(n[u.faction]||0)+1;});team.forEach(u=>{if(u.faction&&n[u.faction]>=+s.n){u.atk=Math.round(u.atk*(1+(+s.atk||0)/100));u.def=Math.round(u.def*(1+(+s.def||0)/100));u.synergy=u.faction;}});}}
-function relKey(u,by){return by==='faction'?u.faction||u.c?.faction:by==='role'?u.role||u.c?.role:by==='elem'?u.elem:'';}
+function relKey(u,by){return by==='faction'?u.faction||u.c?.faction:by==='role'?u.role||u.c?.role:by==='elem'?u.elem:by==='pos'?u.pos||u.c?.pos:'';}
+// 포지션 기능: 능력치 %, 주는·받는 피해 %, 회복량 %, 치명타 %p, 시작 SP, 위협도 %(적이 노릴 확률). 포지션 id가 없으면 역할 기본 포지션('role:atk' 등)
+function positionTraits(sim){for(const u of [...sim.allies,...sim.enemies]){const p=sim.positions[u.pos||u.c?.pos]||sim.positions['role:'+(u.role||u.c?.role)];if(!p)continue;u.posT=p;
+ const k=f=>Math.max(.1,1+(+p[f]||0)/100);u.maxhp=Math.round(u.maxhp*k('hp'));u.hp=Math.round(u.hp*k('hp'));u.baseMaxhp=u.maxhp;u.atk=Math.round(u.atk*k('atk'));u.def=Math.round(u.def*k('def'));u.spd=clamp(Math.round(u.spd*k('spd')),10,300,100);if(+p.sp)u.sp=clamp(u.sp+(+p.sp),0,100,u.sp);}}
+// 속성 반응: 맞은 대상에 속성 흔적(aura)이 남고, 다른 속성이 aura 초 안에 맞히면 반응. amp=피해 배율 · burst=공격력×값 추가 피해 · stun=기절(초) · vuln=받는 피해 +값%(dur초)
+function reactHit(sim,u,t,o){const none={mul:1,flat:0};if(!sim.reactions.length||o.periodic||o.fixed||!u.elem||t.hp<=0)return none;const a=t.aura;
+ if(a&&a.until>sim.time&&a.e!==u.elem){const r=sim.reactions.find(x=>x.a===a.e&&x.b===u.elem)||sim.reactions.find(x=>x.both&&x.a===u.elem&&x.b===a.e);
+  if(r){t.aura=null;const v=+r.value||0;emit(sim,{type:'status',source:u,target:t,label:r.name||'반응',reaction:r.name});u.reactions=(u.reactions||0)+1;
+   if(r.type==='amp')return {mul:Math.max(0,v||1.5),flat:0};if(r.type==='burst')return {mul:1,flat:stat(u,'atk')*(v||1)};
+   if(r.type==='stun')addStatus(sim,u,t,{type:'stun',value:Math.max(.1,v||1.5),stacks:1},'reaction');else if(r.type==='vuln')addStatus(sim,u,t,{type:'vulnerable',value:v||20,duration:+r.dur||5,stacks:1},'reaction');return none;}}
+ t.aura={e:u.elem,until:sim.time+sim.aura};return none;}
 function relMul(sim,u,t){let m=1;for(const r of sim.rel)if(r&&r.a&&r.b&&relKey(u,r.by)===r.a&&relKey(t,r.by)===r.b)m*=Math.max(0,+r.mul||1);return m;}
 function living(a){return a.filter(u=>u.hp>0);}
 function teams(sim,u){return u.side==='a'?[sim.allies,sim.enemies]:[sim.enemies,sim.allies];}
@@ -624,7 +634,7 @@ function sorted(sim,list,e){
  if(p==='무작위'){for(let i=a.length-1;i>0;i--){const j=Math.floor(sim.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
  return a.sort((x,y)=>value(y)-value(x)||x.slot-y.slot);
 }
-function weighted(sim,pool){const taunts=pool.filter(t=>amount(t,'taunt')>0),focus=pool.filter(t=>amount(t,'focus')>0),a=taunts.length?taunts:focus.length?focus:pool;const weight=t=>(t.role==='def'?3:1)*(t.slot<2?2:1)*Math.max(.1,1+amount(t,'threat')/100);let r=sim.random()*a.reduce((n,t)=>n+weight(t),0);for(const t of a){r-=weight(t);if(r<=0)return [t];}return a.slice(-1);}
+function weighted(sim,pool){const taunts=pool.filter(t=>amount(t,'taunt')>0),focus=pool.filter(t=>amount(t,'focus')>0),a=taunts.length?taunts:focus.length?focus:pool;const weight=t=>(t.role==='def'?3:1)*(t.slot<2?2:1)*Math.max(.1,1+amount(t,'threat')/100)*Math.max(.1,1+(t.posT?.threat||0)/100);let r=sim.random()*a.reduce((n,t)=>n+weight(t),0);for(const t of a){r-=weight(t);if(r<=0)return [t];}return a.slice(-1);}
 function targets(sim,u,e){
  const [friends,foes]=teams(sim,u),a=living(friends),confused=amount(u,'confuse')>0,b=confused?living(friends.filter(x=>x!==u)):living(foes);
  const one=list=>sorted(sim,list,e).slice(0,1),fallback=t=>t?.hp>0?[t]:e.fallback==='남은 효과 종료'?[]:one(e.target==='last_healed'?a:b);
@@ -666,15 +676,18 @@ function damage(sim,u,t,value,trueDamage=false,react=true,options={}){
   const raw=options.raw??stat(u,'atk')*u.mul*value;
   queueImpact(sim,u,t,options.slot,visual,!!options.basic,job=>damage(sim,u,t,value,trueDamage,react,{...options,raw,landed:true,visual:{...visual,landed:true,intentStyle:job.plan.style,hitIndex:job.plan.index,slashAngle:job.plan.angle}}));return 0;
  }
- const el=(sim.beats[u.elem]===t.elem?sim.elemAdv:sim.beats[t.elem]===u.elem?sim.elemDis:1)*relMul(sim,u,t); // 속성 상성 × 진영·역할·속성 관계(게임 규칙)
- const crit=!options.periodic&&!options.fixed&&sim.random()<Math.max(0,Math.min(1,.1+(amount(u,'crit_up')+bonus(u,'치명타 확률'))/100));
+ const el=(sim.elemMat?(sim.elemMat[u.elem]?.[t.elem]??1):(sim.beats[u.elem]===t.elem?sim.elemAdv:sim.beats[t.elem]===u.elem?sim.elemDis:1))*relMul(sim,u,t); // 속성 상성표 × 진영·역할·속성·포지션 관계(게임 규칙)
+ const crit=!options.periodic&&!options.fixed&&sim.random()<Math.max(0,Math.min(1,.1+(amount(u,'crit_up')+bonus(u,'치명타 확률')+(u.posT?.crit||0))/100));
  if(!options.periodic&&sim.random()<Math.min(1,amount(t,'dodge')/100)){emit(sim,{type:'status',source:u,target:t,label:'회피',visual:{kind:'dodge',phase:'proc'}});return 0;}
  let multiplier=options.fixed?1:1+(bonus(u,'주는 피해')+bonus(u,options.basic?'일반 공격 피해':options.slot==='ultimate'?'필살기 피해':options.slot==='active'?'액티브 피해':'')+(el>1?bonus(u,'약점 공격 피해'):0))/100;
  if(options.basic)multiplier*=1+amount(u,'basic')/100;
+ if(!options.fixed)multiplier*=Math.max(0,1+(u.posT?.dmg||0)/100)*Math.max(0,1+(t.posT?.taken||0)/100); // 포지션: 주는·받는 피해
+ const rx=reactHit(sim,u,t,options); // 속성 반응
  let d=options.raw??stat(u,'atk')*u.mul*value;
- if(!options.periodic&&!options.fixed)d*=el*(crit?Math.max(1,1.5+bonus(u,'치명타 피해')/100):1)*(.9+sim.random()*.2);
+ if(!options.periodic&&!options.fixed)d*=el*rx.mul*(crit?Math.max(1,1.5+bonus(u,'치명타 피해')/100):1)*(.9+sim.random()*.2);
  if(!trueDamage&&!options.periodic)d*=100/(100+stat(t,'def')*(1-(options.penetration||0)/100));
  d=Math.max(0,Math.round(d*Math.max(.1,multiplier)*Math.max(0,1+(Math.min(100,amount(t,'vulnerable'))+bonus(t,'받는 피해'))/100-Math.min(100,amount(t,'reduction'))/100)));
+ if(rx.flat)d+=Math.round(rx.flat);
  if(options.bossCap)d=Math.min(d,t.maxhp*.25);
  const block=t.status.find(s=>s.type==='block'&&s.remaining>0);
  if(amount(t,'invincible')>0||block){if(block&&--block.remaining<=0)removeStatus(t,block);emit(sim,{type:'damage',source:u,target:t,value:0,crit:false,slot:options.slot,basic:!!options.basic,impact:!!options.landed,periodic:!!options.periodic,delayed:!!options.delayed,visual:options.visual,origin:options.origin,blocked:true,guard:amount(t,'invincible')?'invincible':'block'});return 0;}
@@ -700,7 +713,7 @@ function heal(sim,u,t,h,react=true,visual=null){
   queueImpact(sim,u,t,visual.slot,visual,false,job=>heal(sim,u,t,h,react,{...visual,landed:true,intentStyle:job.plan.style}));return 0;
  }
  if(t.hp<=0||amount(t,'noheal')>0)return 0;
- h=Math.max(0,Math.round(h*Math.max(.1,1+bonus(u,'주는 회복량')/100)*Math.max(.1,1+bonus(t,'받는 회복량')/100)));
+ h=Math.max(0,Math.round(h*Math.max(.1,1+(bonus(u,'주는 회복량')+(u.posT?.heal||0))/100)*Math.max(.1,1+bonus(t,'받는 회복량')/100)));
  const n=Math.min(t.maxhp-t.hp,h),over=h-n;t.hp+=n;u.healing+=n;u.lastHealing=n;u.lastHealed=t;record(u,'실제 회복량',n);emit(sim,{type:'heal',source:u,target:t,value:n,visual});
  for(const s of t.status.filter(s=>s.type==='overheal'))if(over>0){const value=Math.min(s.cap,over*s.value/100);addStatus(sim,s.source,t,{...s.effect,type:'shield',basis:'고정 수치',value},s.slot,value);emit(sim,{type:'visualProc',source:s.source,target:t,visual:{kind:'overheal',phase:'convert'}});}
  if(react&&n>0){proc(sim,u,'heal_given',{target:t});proc(sim,t,'heal_received',{target:t});}return n;

@@ -124,8 +124,8 @@ case 'meta-open': openMeta(); break;
 case 'metasave': { if($('#ng_story')&&$('#ng_story').value.trim().length>100000){toast('스토리는 최대 100,000자입니다. 초과 내용은 자르지 않았습니다.');break;}const m=G.meta, old=m.elems.map(e=>e.n); if($('#mt_logo')) m.logoStyle=$('#mt_logo').value; if($('#ng_story')) m.story=readStoryForm(); if($('#mt_cast')) m.castSex=$('#mt_cast').value; if($('#mt_tone')) m.tone=$('#mt_tone').value.trim(); if($('#mt_art')){ m.artTags=$('#mt_art').value.trim(); m.artNeg=$('#mt_artn').value.trim(); }
       m.title=$('#mt_title').value.trim()||m.title; m.sub=$('#mt_sub').value.trim(); m.theme=$('#mt_theme').value; m.accent=$('#mt_acc').value;
       Object.keys(DEFAULT_META.terms).forEach(k=>{const v=$('#mt_t_'+k).value.trim(); if(k==='abyss')m.terms[k]=explorationName(v);else if(v)m.terms[k]=v;});
-      m.elems=[0,1,2].map(i=>({n:$('#mt_e'+i).value.trim()||old[i],c:$('#mt_c'+i).value,d:(m.elems[i]||{}).d||''})); // 설명(d)은 게임 규칙 화면에서 편집
-      const map={}; old.forEach((o,i)=>{map[o]=m.elems[i].n;});
+      m.elems=m.elems.map((e0,i)=>({n:($('#mt_e'+i)?.value||'').trim()||old[i],c:$('#mt_c'+i)?.value||e0.c,d:e0.d||''})); // 속성 개수·설명은 게임 규칙 화면에서 // 설명(d)은 게임 규칙 화면에서 편집
+      const map={}; old.forEach((o,i)=>{map[o]=m.elems[i].n;}); rulesRename(map);
       G.chars.forEach(c=>{if(map[c.elem])c.elem=map[c.elem];}); G.chapters.forEach(ch=>ch.stages.forEach(st=>st.enemies.forEach(e2=>{if(map[e2.elem])e2.elem=map[e2.elem];})));
       ['atk','def','sup'].forEach(k=>{m.roles[k]=$('#mt_r_'+k).value.trim()||m.roles[k];}); m.farms.forEach((f,i)=>{f.name=$('#mt_f'+i).value.trim()||f.name;});
       const pj=PJ(); const me=pj.list.find(x=>x.id===pj.active); if(me){me.title=m.title;appStorage.setItem(PJKEY,JSON.stringify(pj));}
