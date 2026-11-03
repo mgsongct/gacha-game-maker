@@ -19,6 +19,20 @@
 | [content-audit.md](content-audit.md) | 콘텐츠 점검·업그레이드: 생성 기능 향상·구버전 생성물(genVer) 감지, 자동 변환·AI 채우기·지정 변환·되돌리기, 규칙 추가 방법 | `src/main/0535-content-audit.js` |
 | [variants.md](variants.md) | 바리에이션(이격·영의): 공통 템플릿, 조건으로 자동 적용, **상속형 관리(원본 + 수정치)**, 캐릭터 특징을 반영한 디자인 프롬프트 | 같은 파일들 + `src/main/0065-inherit.js`, `aiAltChar`(`src/main/0290-season-rotation.js`) |
 
+### 점검·제안 노트 (2026-11-03, 아직 구현하지 않음)
+
+게임을 만드는 기능·만들어지는 게임·플레이 파트를 계측·코드 검토·웹 조사로 점검하고 개선 안건을 정리한 노트입니다. 구현할 때는 해당 노트의 **제안** 절을 **이 앱의 결정** 절로 바꾸고 위 표로 옮깁니다.
+
+| 노트 | 주제 | 관련 위치 |
+|---|---|---|
+| [maker-review.md](maker-review.md) | **종합 점검**: 파트별 수준(1~5), 확인된 문제 24건(재현·코드·보고 구분), P0/P1/P2 로드맵 | 아래 노트 전부 |
+| [generation-pipeline.md](generation-pipeline.md) | 새 게임 생성 계측(호출 4회·28,026자, 스킬 재시도 최대 36회), 실패 주입, 세계관 누락 시 샘플 내용 섞임, 스킬 작업 경주, 결과 검증, 캐싱·구조화 출력·비용 투명성 | `buildNewGameDraft`·`ngStep`(`0250`), `cleanChar`(`0450`), `aiCall`·`aiOne`(`0020`), `ctx`(`0440`) |
+| [sample-onboarding.md](sample-onboarding.md) | 첫 실행 마법사, 샘플 게임 지표(그림 0장·점검 104건·1장), 그림 없는 상태의 초상, 생성 대기 화면, 첫 행동 유도 | `0210-setup.js`, `0050-default-content.js`, `lobbyHTML`(`0180`) |
+| [gacha-fairness.md](gacha-fairness.md) | 뽑기 규칙·통합 확률(기대 24.8회·4.03%), 픽업 표기 50% vs 실제 75%, 배너별 천장 소멸, 확률 공개 관행·규제(한·일·중·플랫폼) | `0500-gacha.js`, 확률 화면(`0180`), `0290-season-rotation.js` |
+| [play-systems.md](play-systems.md) | 초월승급 재료 지급처 없음, 무음(ElevenLabs 없을 때), 일반 적 동일 키트, 소탕·경제 모드·상성 안내·수령 시점, 코어 루프·경제 조사 | `0090-growth.js`, `0040-sound.js`, `enemyKit`(`combat/030-core.js`), `0120`·`0125`·`0130` |
+| [narrative-quality.md](narrative-quality.md) | 1장 생성 경로(이후 장의 품질 장치 미적용), 시나리오 설계 자동화, 건너뛰기가 분기를 지나침, VN 편의, 말투 유지, 생성물 평가(LLM 채점의 편향과 쓰는 법), 스토리렛 | `0250`·`0465`·`0460-script-engine.js`, `0535` |
+| [art-consistency.md](art-consistency.md) | 참조 그리기 기본 꺼짐·강도, V5/V4.5 혼용, ComfyUI 참조 미전달, 고정·가변 외형 태그 | `0030-character-regen.js`, `NAI_DEF`(`0020`), `0330-casting.js` |
+
 ## 노트 쓰는 법
 
 각 노트는 다음 순서로 씁니다.

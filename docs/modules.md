@@ -247,7 +247,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 11. 스토리 공장 · 새 게임 · 기억
 
-- 새 게임 초안(`openDraft`)·장르 마법사(`showSetup`): 세계관 → 캐릭터 → 챕터 → 오프닝을 AI 다단계 생성. 생성 중에는 `NEW_GAME_SOURCE`가 설정되어 저장·탭 이동이 막힘.
+- 새 게임 초안(`openDraft`)·장르 마법사(`showSetup`): 세계관 → 캐릭터 → 오프닝(배경·소품·음악·배너 포함) → 1장 순서로 AI 다단계 생성(`buildNewGameDraft`, 단계별 `ngStep`이 최대 3회 시도·초안에 저장해 이어 쓰기). 1장은 이후 장과 달리 한 번의 호출로 대본까지 씀. 생성 중에는 `NEW_GAME_SOURCE`가 설정되어 저장·탭 이동이 막힘. 계측과 개선 안건은 [research/generation-pipeline.md](research/generation-pipeline.md).
 - 스토리 공장: 챕터 구성 → 스테이지마다 집필 → 요약·관계(`rels`)·톡 생성.
 - `STORY_MEMORY_MODULE`: 작가용 스토리 기억(원문 대본은 바꾸지 않음), `ctx()`가 프롬프트에 주입.
 - 캐스팅: 오프닝 전 캐릭터 그림을 확정.
