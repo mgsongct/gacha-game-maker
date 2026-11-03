@@ -102,7 +102,10 @@ try {
 
   let chromium; try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch (e) {}
   if (!chromium) { console.log('skip 4  playwright 없음: 브라우저 실행 검사 생략'); process.exit(0); }
-  const www = join(tmp, 'www'); cpSync(join(ROOT, 'www'), www, { recursive: true }); writeFileSync(join(www, 'index.html'), html);
+  // 브라우저 검사는 실제 제품(www/index.html — GGM_HTML=경로로 다른 index.html, 예: 배포본이 받은 main의 것)으로 돎. 4번의 모듈 추가 시험만 시험용 빌드(test-hello.html)
+  const www = join(tmp, 'www'), PRODUCT = process.env.GGM_HTML ? resolve(process.env.GGM_HTML) : join(ROOT, 'www/index.html'); cpSync(join(ROOT, 'www'), www, { recursive: true });
+  writeFileSync(join(www, 'index.html'), readFileSync(PRODUCT)); writeFileSync(join(www, 'test-hello.html'), html);
+  console.log(`브라우저 검사 대상: ${PRODUCT === join(ROOT, 'www/index.html') ? 'www/index.html' : PRODUCT} (BUILT ${(readFileSync(PRODUCT, 'utf8').match(/var BUILT='([^']+)'/) || [])[1]}${!process.env.GGM_HTML || readFileSync(PRODUCT, 'utf8') === build(join(ROOT, 'src')) ? ' — src 빌드와 같음' : ' — src 빌드와 다름'})`);
   const type = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.webmanifest': 'application/json', '.png': 'image/png' };
   const server = createServer((q, r) => { try { const p = join(www, decodeURIComponent(new URL(q.url, 'http://x').pathname).replace(/\/$/, '/index.html')); r.writeHead(200, { 'content-type': type[extname(p)] || 'application/octet-stream' }); r.end(readFileSync(p)); } catch (e) { r.writeHead(404); r.end(); } });
   await new Promise(ok => server.listen(0, ok));
@@ -111,7 +114,7 @@ try {
   const page = await browser.newPage(), errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); // 외부(폰트·AI) 차단
-  await page.goto(`http://127.0.0.1:${server.address().port}/`);
+  await page.goto(`http://127.0.0.1:${server.address().port}/test-hello.html`);
   await page.waitForFunction(() => window.__HELLO_MAIN__, null, { timeout: 15000 });
   const got = await page.evaluate(() => ({ m: window.__HELLO_MODULE__, main: window.__HELLO_MAIN__, ed: window.__EDITED__, view: document.querySelector('#view').innerHTML.length }));
   assert.deepEqual(errors, [], '페이지 오류');
@@ -801,7 +804,7 @@ try {
     const dist = join(tmp, 'dist'), z = zipRead(readFileSync(join(ROOT, 'gacha-game-maker-pc.zip'))); mkdirSync(dist); for (const [n, b] of z) writeFileSync(join(dist, n), b);
     const raw = createServer((q, r) => { try { const f = decodeURIComponent(new URL(q.url, 'http://x').pathname).split('/www/')[1]; r.writeHead(200); r.end(readFileSync(join(ROOT, 'www', f))); } catch (e) { r.writeHead(404); r.end(); } });
     await new Promise(ok => raw.listen(0, ok)); const port2 = 20000 + Math.floor(Math.random() * 20000), out = [];
-    const proc2 = spawn('sh', ['start.sh', '--no-tunnel'], { cwd: dist, env: { ...process.env, GGM_PORT: String(port2), GGM_RAW: `http://127.0.0.1:${raw.address().port}`, BROWSER: 'true' } }); proc2.stdout.on('data', d => out.push(String(d)));
+    const proc2 = spawn('sh', ['start.sh', '--no-tunnel'], { cwd: dist, detached: true, env: { ...process.env, GGM_PORT: String(port2), GGM_RAW: `http://127.0.0.1:${raw.address().port}`, BROWSER: 'true' } }); proc2.stdout.on('data', d => out.push(String(d))); // 프로세스 그룹: start.sh 아래 python까지 끔
     try {
       const until = async (fn, ms, what) => { const t = Date.now(); for (;;) { try { const v = await fn(); if (v) return v; } catch (e) { out.push(String(e)); } if (Date.now() - t > ms) throw Error('시간 초과: ' + what + '\n' + out.join('')); await new Promise(r => setTimeout(r, 300)); } };
       const hello = await until(async () => { const r = await fetch(`http://127.0.0.1:${port2}/api/hello`); return r.ok && r.json(); }, 20000, '배포본 서버 시작'), V = JSON.parse(readFileSync(join(ROOT, 'version.json'), 'utf8'));
@@ -812,7 +815,7 @@ try {
       await p4.waitForFunction(() => typeof G === 'object' && typeof APP_BUILD === 'string', null, { timeout: 20000 }); const built = await p4.evaluate(() => APP_BUILD); await b4.close();
       assert.equal(built, V.build, '배포본에서 도는 앱 = version.json의 빌드'); assert.deepEqual(err4, [], '페이지 오류');
       console.log('ok 33 배포본: gacha-game-maker-pc.zip(실행 파일만)을 빈 폴더에 풀고 start.sh로 켜면 빌드된 www를 받아 띄움(앱 빌드 = version.json, 서버 버전 = SERVER_VER)');
-    } finally { proc2.kill(); raw.close(); }
+    } finally { try { process.kill(-proc2.pid, 'SIGTERM'); } catch (e) { if (e.code !== 'ESRCH') throw e; } /* 이미 다 꺼졌으면 ESRCH */ proc2.stdout.destroy(); raw.close(); }
   }
 } finally { rmSync(tmp, { recursive: true, force: true }); }
 // 커버리지(CDP 정밀 커버리지): 페이지가 다시 불러오거나 이동하면 이전 문서의 실행 기록이 사라지므로, 이동을 시작할 때마다 먼저 받아 둠
