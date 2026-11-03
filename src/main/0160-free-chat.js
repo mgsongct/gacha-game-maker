@@ -1,5 +1,5 @@
 /* ===== 갠톡 (자유 채팅) ===== */
-let PHT='chat', FCBUSY=false;
+let FCBUSY=false;
 const EYE_TAG=/\b(eyes?|eyelash(es)?|pupils?|heterochromia|eyeliner|tsurime|tareme|sanpaku|jitome)\b/i;
 function avatarObj(){ const p=P(); if(!p.avatar||typeof p.avatar!=='object') p.avatar={id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null}; return p.avatar; }
 function playerFormHTML(){ const p=P(), ai=!!SAMPLE, av=p.avatar&&imgSrc(p.avatar);
@@ -17,11 +17,6 @@ function readPlayerForm(){ const p=P(); if($('#pf_name')) p.player=$('#pf_name')
   if($('#pf_gender')){ const g=$('#pf_gender').value.trim().slice(0,40); p.genderTxt=g; p.gender=/^(남|남성|남자|male|man)$/i.test(g)?'m':/^(여|여성|여자|female|woman)$/i.test(g)?'f':''; }
   if($('#pf_gsel')){ p.gender=$('#pf_gsel').value; p.genderTxt=''; }
   if($('#pf_look')) p.look=$('#pf_look').value.trim().slice(0,400); if($('#pf_bio')) p.bio=$('#pf_bio').value.trim().slice(0,1500); if($('#pf_hide')) p.hideEyes=$('#pf_hide').checked;if($('#pf_nai'))naiBlocksSave(avatarObj(),'prompt','pf_nai'); mark('prog'); }
-function heroFieldsHTML(hr){ hr=hr||{}; return `<div class="optbox" style="margin-top:10px"><b>주인공 (당신)</b> <span class="muted" style="font-size:.8rem">AI가 이 설정으로 이야기를 써요</span>
-  <div class="g2"><div><label class="f" for="ng_h_call">호칭 <span class="muted" style="font-size:.75rem">(평소에 불리는 말)</span></label><input class="in" id="ng_h_call" maxlength="12" value="${esc(hr.call||T('player'))}" placeholder="예: 지휘관"></div><div><label class="f" for="ng_h_name">이름 <span class="muted" style="font-size:.75rem">(필요할 때만)</span></label><input class="in" id="ng_h_name" maxlength="12" value="${esc(hr.name||'')}" placeholder="비우면 호칭으로만 불려요"></div></div>
-  <label class="f" for="ng_h_gender">당신의 성별은? (직접 쓰기)</label><input class="in" id="ng_h_gender" maxlength="40" value="${esc(hr.gender||'')}" placeholder="예: 남성, 여성, 논바이너리… 비우면 정하지 않아요">
-  <label class="f" for="ng_h_look">외모 (직접 쓰기, 선택)</label><textarea class="in" id="ng_h_look" maxlength="400" placeholder="예: 검은 단발, 회색 후드티">${esc(hr.look||'')}</textarea>
-  <label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="ng_h_hide" ${hr.hide?'checked':''}><span>앞머리로 눈 가리기 <span class="muted" style="font-size:.8rem">(그림 AI가 있으면 외모로 프로필 그림도 같이 그려요)</span></span></label></div>`; }
 function readHero(){ if(!$('#ng_h_name')) return null; return {name:$('#ng_h_name').value.trim().slice(0,12),call:$('#ng_h_call')?$('#ng_h_call').value.trim().slice(0,12):'',gender:$('#ng_h_gender').value.trim().slice(0,40),look:$('#ng_h_look').value.trim().slice(0,400),hide:$('#ng_h_hide').checked}; }
 const genderCode=g=>/^(남|남성|남자|male|man)$/i.test(g||'')?'m':/^(여|여성|여자|female|woman)$/i.test(g||'')?'f':'';
 async function heroTags(hr){ const r=await aiJSON(`플레이어 캐릭터의 외모 설명을 NovelAI 영어 태그로 바꿔라.\n성별·성 정체성: ${hr.gender||'정하지 않음'}\n외모: ${hr.look}\n규칙: 설명에 맞는 인원 태그(1boy, 1girl, 1other 중 하나)와 solo로 시작한다. 성인이다. 머리, ${hr.hide?'':'눈, '}체형, 옷, 장신구 같은 외모 태그만 쓴다. 자세·구도·배경·화풍 태그는 쓰지 않는다.\nJSON만 출력: {"tags":"..."}`,null,'quick');
@@ -37,11 +32,6 @@ async function playerDraw(btn){ readPlayerForm(); const p=P(); if(!p.look&&!p.av
   }catch(e){ toast(naiErr(e)); } finally{ if(btn.isConnected){ btn.disabled=false; btn.textContent=lab; } } }
 function FC(){ const p=P(); if(!p.fchat||typeof p.fchat!=='object') p.fchat={}; return p.fchat; }
 function fcOf(cid){ const f=FC(); return f[cid]||(f[cid]={log:[],sum:'',sumTo:0,at:0}); }
-function fcRowHTML(c,f){ const last=f.log.filter(l=>l.w!=='s').at(-1); return `<button class="ph-row" data-act="openfc" data-id="${esc(c.id)}"><div class="av">${art(c)}</div><div class="t"><b>${esc(c.name)} <small class="fc-tag">갠톡</small></b><span>${esc(last?(last.w==='me'?'나: ':'')+last.t:'대화를 시작해 보세요')}</span></div></button>`; }
-function phTabs(){ return `<div class="ph-tabs"><button class="${PHT==='chat'?'on':''}" data-act="phtab" data-v="chat">채팅</button><button class="${PHT==='friends'?'on':''}" data-act="phtab" data-v="friends">친구</button></div>`; }
-function friendsHTML(){ const list=G.chars.filter(c=>own(c.id));
-  if(!list.length) return `<p class="muted" style="text-align:center;padding:40px 16px">아직 ${esc(T('crew'))}이(가) 없어요.</p>`;
-  return `${SAMPLE?'':`<p class="muted" style="margin:10px 14px;font-size:.82rem">자유 채팅은 글 AI가 있어야 해요. 설정 → 글 AI에서 등록해 주세요.</p>`}${list.map(c=>{ const o=own(c.id); return `<button class="ph-row" data-act="openfc" data-id="${esc(c.id)}"><div class="av">${art(c)}</div><div class="t"><b>${esc(c.name)}</b><span>${esc(c.faction||'')} · 호감도 Lv.${affLv(o)}</span></div><span class="fc-go">대화</span></button>`; }).join('')}`; }
 function openFree(cid){ openRoom(cid); }
 function fcProgress(){ const st=(typeof mainStages==='function'?mainStages():[]).filter(s=>P().cleared[s.id]); return st.length?st.map(s=>s.code+' '+s.title).join(', '):'아직 이야기를 시작하지 않았다'; }
 async function fcSend(opt){

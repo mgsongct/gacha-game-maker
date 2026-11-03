@@ -1,11 +1,6 @@
 /* =========================================================
    타이틀과 오프닝
    ========================================================= */
-function showGate(){
-  const g=document.createElement('div'); g.className='gate';
-  g.innerHTML=`<div class="mark">19</div><h2 class="disp" style="margin:0;font-size:1.6rem">청소년 이용불가</h2><p style="max-width:320px;opacity:.85;margin:0">가챠 게임 메이커는 만 19세 이상을 위한 개인용 앱입니다. 만 19세 이상인가요?</p><div class="row" style="width:100%;max-width:320px"><button class="btn ghost" data-act="gateno">아니요</button><button class="btn" data-act="gateyes">네, 19세 이상입니다</button></div>`;
-  document.body.appendChild(g);
-}
 // 타이틀 로고 모양: 게임 정의에서 고르고, 자동이면 화면 테마에 맞춰요
 const LOGO_STYLES=[['auto','자동 (화면 테마에 맞춤)'],['stroke','가로획 명조 · 먹빛'],['star','별빛 그라데이션 · 첨탑'],['orbitline','궤도선 · 행성 외곽선'],['stencil','거친 스텐실 질감'],['regal','기품 · 명조 금빛'],['sharp','전술 · 각진 금속'],['orbit','SF · 네온'],['heavy','묵직한 장식체'],['cute','귀여운 · 파스텔']];
 /* 타이틀 줄 나누기: 띄어쓰기에서만 나누고(글자 중간에서 끊지 않음), 두 줄 길이를 비슷하게. 긴 한 단어는 줄이지 않고 글자를 작게 */

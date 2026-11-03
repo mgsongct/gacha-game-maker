@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.14'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.15'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -4609,6 +4609,7 @@ const TITLE_RULE_BASE="게임 이름은 요즘 서브컬처 가챠 게임처럼 
 pfDef('TITLE_RULE','게임 이름 짓기',()=>TITLE_RULE_BASE);
 const NAI_CHAR_BASE='naiPrompt는 NovelAI용 영어 태그 문자열. "1girl, solo"(남자는 "1boy, solo")로 시작하고, 나이를 직접 나타내는 태그(mature female, adult woman 등)는 기본으로 넣지 않는다. 캐릭터 설정상 꼭 필요할 때만 스스로 판단해서 넣는다. V4 이상 모델 기준의 자연스러운 태그로 머리, 눈, 체형, 의상, 장신구, 들고 있는 무기 같은 외모 태그만 쓴다. 자세, 구도, 배경, 화풍 태그는 쓰지 않는다(앱이 따로 붙인다). 엘프처럼 귀가 뾰족한 종족이면 elf, pointy ears를 꼭 넣고, 사람이면 귀 모양 태그를 넣지 않는다(앱이 사람에게는 뾰족한 귀를 막는다). 의상·장신구·무기는 이 게임의 세계관·소속·직업·계급에 꼭 맞게 고르고, 세계관에 어울리지 않는 요소(현대 배경의 중세 갑옷, 판타지 배경의 교복·스마트폰 따위)는 쓰지 않는다. 무기를 든 모습을 넣을 때는 그 캐릭터의 전용 무기와 같은 무기만 쓴다. 아군·동료에게 적 전용 태그(faceless)는 쓰지 않는다.';
 pfDef('NAI_CHAR','캐릭터 외모 태그(naiPrompt)',()=>NAI_CHAR_BASE);
+pfDef('CHAR_STAT_RULE','새 캐릭터 능력치·외모 규칙(캐릭터 생성 4곳 공통)',()=>'희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. '+NAI_CHAR);
 const ROLE = {atk:'공격',def:'방어',sup:'지원'};
 const ROLE_EN={atk:'ASSAULT',def:'GUARD',sup:'SUPPORT'};
 const KIND = {dmg:'단일 공격',aoe:'전체 공격',heal:'전체 회복',shield:'전체 보호막',buff:'전체 공격력 강화'};
@@ -4642,7 +4643,6 @@ function applyMeta(){
   document.title=m.title;
   const b=document.querySelector('.brand'); if(b){ b.innerHTML=`<b class="brand-t">${esc(m.title)}</b><i>${esc(m.sub)}</i>`; fitBrand(); }
 }
-const MAT={exp:'expMat',wmat:'wMat',core:'core',gearMat:'gearMat',transcMat:'transcMat'};
 
 /* =========================================================
    AI 연결: 여러 글 AI(Claude, Vertex, Gemini, OpenAI 호환) + NovelAI
@@ -5295,35 +5295,35 @@ function aiLogStats(){ const by={}; AILOG.forEach(e=>{ const k=e.stage||'기타'
 /* 화면 */
 let PS_TAB='frag';
 function promptPanel(){ const ov=Object.keys(promptOv()).length, pl=plList().filter(l=>l.on).length, bad=imgAuditScan().length;
-  return `<div class="panel pm-hide"><h3>프롬프트 스튜디오 ${bad?`<span class="badge">그림 ${bad}</span>`:''}</h3><p class="muted" style="margin:0 0 6px">AI에 보내는 프롬프트 조각 ${Object.keys(window.__PF||{}).length}개${ov?` · 고친 조각 ${ov}`:''} · 교훈 ${pl}개. 조각을 고치고 다듬거나, 그림 프롬프트(배경·소품에 사람이 나오는 문제 등)를 점검·정정하고, 고친 내용을 교훈으로 쌓아 반복을 막아요.</p><button class="btn sm" data-act="psopen">프롬프트 스튜디오</button></div>`; }
+  return `<div class="panel pm-hide"><h3>프롬프트 스튜디오 ${bad?`<span class="badge">그림 ${bad}</span>`:''}</h3><p class="muted" style="margin:0 0 6px">AI에 보내는 프롬프트 조각 ${Object.keys(window.__PF||{}).length}개${ov?` · 고친 조각 ${ov}`:''} · 교훈 ${pl}개. 조각을 고치고 다듬거나, 그림 프롬프트(배경·소품에 사람이 나오는 문제 등)를 점검·정정하고, 고친 내용을 교훈으로 쌓아 반복을 막아요.</p><button class="btn sm" data-act="pstopen">프롬프트 스튜디오</button></div>`; }
 function openStudio(tab){ if(tab) PS_TAB=tab; const tabs=[['frag','조각'],['img','그림 점검'],['lesson','교훈'],['log','AI 기록']], ov=promptOv();
   let body='';
   if(PS_TAB==='frag') body=Object.values(window.__PF||{}).map(f=>{ const o=ov[f.id]||{}; return `<details class="panel" style="padding:8px;margin:6px 0"><summary><b>${esc(f.label)}</b> <span class="muted">${esc(f.id)}${o.text?' · 덮어씀':''}${o.add?' · 덧붙임':''}</span></summary>
     <div style="font-size:.78rem;margin:6px 0 2px">기본</div><pre style="white-space:pre-wrap;font-size:.75rem;max-height:140px;overflow:auto;margin:0">${esc(f.get())}</pre>
     <label class="f">덮어쓰기 (비우면 기본)</label><textarea class="in" rows="3" data-pf="${f.id}" data-k="text">${esc(o.text||'')}</textarea>
     <label class="f">덧붙이기 (기본 뒤에 추가)</label><textarea class="in" rows="2" data-pf="${f.id}" data-k="add">${esc(o.add||'')}</textarea>
-    <div class="row" style="gap:6px;margin-top:6px"><button class="btn sm" data-act="pfsave" data-id="${f.id}">저장</button><button class="btn sm ghost" data-act="pfai" data-id="${f.id}">AI로 다듬기 제안</button>${o.text||o.add?`<button class="btn sm ghost" data-act="pfreset" data-id="${f.id}">기본으로</button>`:''}</div></details>`; }).join('');
+    <div class="row" style="gap:6px;margin-top:6px"><button class="btn sm" data-act="pstsave" data-id="${f.id}">저장</button><button class="btn sm ghost" data-act="pstai" data-id="${f.id}">AI로 다듬기 제안</button>${o.text||o.add?`<button class="btn sm ghost" data-act="pstreset" data-id="${f.id}">기본으로</button>`:''}</div></details>`; }).join('');
   else if(PS_TAB==='img'){ const L=imgAuditScan(); body=`<p class="muted" style="font-size:.82rem">배경·소품·지도·아이콘·${T('weapon')} 그림에는 사람이 나오면 안 돼요. 성능이 낮은 AI가 이런 프롬프트에 인물 태그(1girl, 머리·눈·의상)를 섞으면 모두 사람 그림이 돼요. 그릴 때는 앱이 항상 걸러 내지만(그림 가드), 저장된 프롬프트도 정리해 두면 좋아요. 정리하면 교훈으로 기록돼 다음 생성부터 AI에 주의를 줘요.</p>
-    ${L.length?L.map(x=>`<div class="panel" style="padding:8px;margin:6px 0;font-size:.8rem"><b>${esc(x.name)}</b> <span class="muted">${esc(x.kind)}</span><div class="muted">지금: ${esc(x.cur)}</div><div>정리: ${esc(x.fix)}</div>${x.removed.length?`<div style="color:var(--bad,#c55)">뺄 태그: ${esc(x.removed.join(', '))}</div>`:''}</div>`).join('')+`<button class="btn" data-act="psimgfix">모두 정리 (${L.length})</button>`:'<p>문제 있는 그림 프롬프트가 없어요 ✓</p>'}${AUDIT_UNDO?`<button class="btn ghost" data-act="psundo">되돌리기: ${esc(AUDIT_UNDO.label)}</button>`:''}`; }
+    ${L.length?L.map(x=>`<div class="panel" style="padding:8px;margin:6px 0;font-size:.8rem"><b>${esc(x.name)}</b> <span class="muted">${esc(x.kind)}</span><div class="muted">지금: ${esc(x.cur)}</div><div>정리: ${esc(x.fix)}</div>${x.removed.length?`<div style="color:var(--bad,#c55)">뺄 태그: ${esc(x.removed.join(', '))}</div>`:''}</div>`).join('')+`<button class="btn" data-act="pstimgfix">모두 정리 (${L.length})</button>`:'<p>문제 있는 그림 프롬프트가 없어요 ✓</p>'}${AUDIT_UNDO?`<button class="btn ghost" data-act="pstundo">되돌리기: ${esc(AUDIT_UNDO.label)}</button>`:''}`; }
   else if(PS_TAB==='lesson'){ const L=plList(); body=`<p class="muted" style="font-size:.82rem">고친 실수를 규칙으로 쌓아 두는 곳이에요. 켜진 교훈은 AI 요청에 자동으로 들어가요(그림: 그림 태그를 쓰는 요청에만, 전체: 모든 요청). 그림 가드가 태그를 걸러 낼 때마다 해당 교훈의 횟수가 올라가요.</p>
-    ${L.map(l=>`<div class="ep"><label style="display:flex;gap:8px;align-items:center;flex:1;min-width:0"><input type="checkbox" data-act="pltog" data-id="${l.id}" ${l.on?'checked':''}><span class="t"><b>${l.scope==='all'?'전체':'그림'}${l.hits?` · ${l.hits}번 고침`:''}</b><span class="muted">${esc(l.rule)}</span></span></label><button class="btn sm ghost" data-act="pldel" data-id="${l.id}">✕</button></div>`).join('')||'<p class="muted">아직 교훈이 없어요</p>'}
-    <label class="f" style="margin-top:8px">교훈 추가 (AI가 자꾸 하는 실수와 바른 방법)</label><textarea class="in" id="pl_new" rows="2" placeholder="예: 적 이름에 실제 게임 캐릭터 이름을 쓰지 않는다"></textarea><div class="row" style="gap:6px;margin-top:6px"><select class="in" id="pl_scope" style="max-width:140px"><option value="img">그림 요청</option><option value="all">모든 요청</option></select><button class="btn sm" data-act="pladd">추가</button></div>`; }
+    ${L.map(l=>`<div class="ep"><label style="display:flex;gap:8px;align-items:center;flex:1;min-width:0"><input type="checkbox" data-act="pstltog" data-id="${l.id}" ${l.on?'checked':''}><span class="t"><b>${l.scope==='all'?'전체':'그림'}${l.hits?` · ${l.hits}번 고침`:''}</b><span class="muted">${esc(l.rule)}</span></span></label><button class="btn sm ghost" data-act="pstldel" data-id="${l.id}">✕</button></div>`).join('')||'<p class="muted">아직 교훈이 없어요</p>'}
+    <label class="f" style="margin-top:8px">교훈 추가 (AI가 자꾸 하는 실수와 바른 방법)</label><textarea class="in" id="pl_new" rows="2" placeholder="예: 적 이름에 실제 게임 캐릭터 이름을 쓰지 않는다"></textarea><div class="row" style="gap:6px;margin-top:6px"><select class="in" id="pl_scope" style="max-width:140px"><option value="img">그림 요청</option><option value="all">모든 요청</option></select><button class="btn sm" data-act="pstladd">추가</button></div>`; }
   else { const S=aiLogStats(); body=`<p class="muted" style="font-size:.82rem">최근 AI 요청 ${AILOG.length}건. 실패가 잦은 단계는 조각을 고치거나 교훈을 더하거나, 글 AI 단계별 모델을 바꿔 보세요.</p>${S.length?`<table style="width:100%;font-size:.8rem"><tr><th align="left">단계</th><th>요청</th><th>실패</th><th align="left">주요 오류</th></tr>${S.map(s=>`<tr><td>${esc(s.stage)}</td><td align="center">${s.n}</td><td align="center">${s.fail}</td><td>${esc(Object.entries(s.errs).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([m,n])=>m+(n>1?' ×'+n:'')).join(' / '))}</td></tr>`).join('')}</table>`:'<p class="muted">기록이 없어요</p>'}<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="ailog">AI 기록 자세히</button></div>`; }
-  openModal(`${head('프롬프트 스튜디오','<button class="linkb" type="button" data-act="llmopen">글 AI 지침(상단·중단·하단·그림 태그)</button>')}<div class="row" style="gap:4px;margin-bottom:8px">${tabs.map(([k,l])=>`<button class="btn sm ${PS_TAB===k?'':'ghost'}" data-act="pstab" data-k="${k}">${l}</button>`).join('')}</div>${body}<div class="row" style="margin-top:12px"><button class="btn ghost" data-act="close">닫기</button></div>`); }
+  openModal(`${head('프롬프트 스튜디오','<button class="linkb" type="button" data-act="llmopen">글 AI 지침(상단·중단·하단·그림 태그)</button>')}<div class="row" style="gap:4px;margin-bottom:8px">${tabs.map(([k,l])=>`<button class="btn sm ${PS_TAB===k?'':'ghost'}" data-act="psttab" data-k="${k}">${l}</button>`).join('')}</div>${body}<div class="row" style="margin-top:12px"><button class="btn ghost" data-act="close">닫기</button></div>`); }
 function pfSet(id,o){ const m=G.meta; m.prompts=m.prompts||{}; if(o&&(o.text||o.add)) m.prompts[id]={text:o.text||'',add:o.add||''}; else delete m.prompts[id]; mark('meta'); }
 document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act, id=b.dataset.id, v=k=>(document.querySelector(`#modal [data-pf="${id}"][data-k="${k}"]`)||{}).value||'';
-  if(a==='psopen') openStudio();
-  else if(a==='pstab') openStudio(b.dataset.k);
-  else if(a==='pfsave'){ pfSet(id,{text:v('text').trim(),add:v('add').trim()}); toast('조각을 저장했어요'); openStudio(); }
-  else if(a==='pfreset'){ pfSet(id,null); toast('기본으로 되돌렸어요'); openStudio(); }
-  else if(a==='pfai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } const f=window.__PF[id], fails=aiLogStats().filter(s=>s.fail).slice(0,3).map(s=>s.stage+': '+Object.keys(s.errs).join('/')).join('; '), less=plList().filter(l=>l.on).map(l=>l.rule).join(' / ');
+  if(a==='pstopen') openStudio();
+  else if(a==='psttab') openStudio(b.dataset.k);
+  else if(a==='pstsave'){ pfSet(id,{text:v('text').trim(),add:v('add').trim()}); toast('조각을 저장했어요'); openStudio(); }
+  else if(a==='pstreset'){ pfSet(id,null); toast('기본으로 되돌렸어요'); openStudio(); }
+  else if(a==='pstai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } const f=window.__PF[id], fails=aiLogStats().filter(s=>s.fail).slice(0,3).map(s=>s.stage+': '+Object.keys(s.errs).join('/')).join('; '), less=plList().filter(l=>l.on).map(l=>l.rule).join(' / ');
     const r=await aiJSON(`다음은 가챠 게임 제작 앱이 AI에 보내는 프롬프트 조각 「${f.label}」이다. 성능이 낮은 AI도 오해 없이 따르도록 다듬어라: 모호한 말을 구체적으로, 금지와 허용을 분명히, 예시는 짧게, 같은 말 반복은 줄이고, 원래 의도와 규칙은 모두 지킨다.${less?' 지금까지 쌓인 교훈: '+less+'.':''}${fails?' 최근 실패: '+fails+'.':''}\n\n원문:\n${promptFrag(id)}\n\nJSON만 출력: {"text":"다듬은 조각 전체","why":"무엇을 왜 바꿨는지 한두 문장"}`,b,'complex');
     if(r&&r.text){ const el=document.querySelector(`#modal [data-pf="${id}"][data-k="text"]`); if(el){ el.value=String(r.text); el.closest('details').open=true; } toast('제안을 덮어쓰기 칸에 넣었어요. 확인 후 저장하세요'+(r.why?' — '+String(r.why).slice(0,80):'')); } }
-  else if(a==='psimgfix'){ const n=imgAuditFix(imgAuditScan()); toast(`그림 프롬프트 ${n}개를 정리하고 교훈으로 기록했어요`); openStudio(); }
-  else if(a==='psundo'){ auditUndo(); G.lib.forEach(l=>mark('l:'+l.id)); openStudio(); }
-  else if(a==='pltog'){ const L=plList(), x=L.find(l=>l.id===id); if(x){ x.on=b.checked; plSave(L); } }
-  else if(a==='pldel'){ plSave(plList().filter(l=>l.id!==id)); openStudio(); }
-  else if(a==='pladd'){ const t=($('#pl_new')||{}).value||''; if(!t.trim()){ toast('교훈 내용을 써 주세요'); return; } plAdd(t,($('#pl_scope')||{}).value); toast('교훈을 추가했어요'); openStudio(); } });
+  else if(a==='pstimgfix'){ const n=imgAuditFix(imgAuditScan()); toast(`그림 프롬프트 ${n}개를 정리하고 교훈으로 기록했어요`); openStudio(); }
+  else if(a==='pstundo'){ auditUndo(); G.lib.forEach(l=>mark('l:'+l.id)); openStudio(); }
+  else if(a==='pstltog'){ const L=plList(), x=L.find(l=>l.id===id); if(x){ x.on=b.checked; plSave(L); } }
+  else if(a==='pstldel'){ plSave(plList().filter(l=>l.id!==id)); openStudio(); }
+  else if(a==='pstladd'){ const t=($('#pl_new')||{}).value||''; if(!t.trim()){ toast('교훈 내용을 써 주세요'); return; } plAdd(t,($('#pl_scope')||{}).value); toast('교훈을 추가했어요'); openStudio(); } });
 /* CHARACTER_REGEN_MODULE */
 // Partial regeneration stages a draft; only a confirmed, still-current draft can mutate saved data.
 let REGEN=null,REGEN_JOB=null,IMGLIB=null;
@@ -5655,12 +5655,6 @@ function eraseColorData(id,W,H,px,py,o){
   }
   return {removed,color:[r,g,b]};
 }
-async function eraseColorAt(blob,px,py,o){
-  const bmp=await createImageBitmap(blob), W=bmp.width, H=bmp.height, cv=document.createElement('canvas'); cv.width=W; cv.height=H;
-  const x=cv.getContext('2d',{willReadFrequently:true}); x.drawImage(bmp,0,0); const id=x.getImageData(0,0,W,H);
-  const r=eraseColorData(id,W,H,px,py,o); if(!r.removed) return {blob,removed:0,color:r.color};
-  x.putImageData(id,0,0); return {blob:await new Promise(res=>cv.toBlob(bb=>res(bb||blob),'image/png')),removed:r.removed,color:r.color};
-}
 /* ---- cut tool canvas helpers ---- */
 const CUT_ZOOMS=[1,2,3,5,8];
 function cutCtx(){const j=CUTJOB;return j&&j.cv?j.cv.getContext('2d',{willReadFrequently:true}):null;}
@@ -5795,7 +5789,6 @@ async function cutoutWhite(blob,o){
     return await new Promise(r=>cv.toBlob(b=>r(b||blob),'image/png'));
   }catch(e){ return blob; }
 }
-async function srcToBlob(src){ return await (await fetch(src)).blob(); }
 
 /* ---- ComfyUI (local / remote server) ---- */
 function imgProvider(){return naiCfg().provider==='comfy'?'comfy':'nai';}
@@ -6568,7 +6561,6 @@ document.addEventListener('pointerdown',e=>{ if(e.button>0) return; const el=e.t
 document.addEventListener('click',e=>{ if(PET.swallow&&Date.now()-PET.swallow<400){ PET.swallow=0; e.stopPropagation(); e.preventDefault(); } },true);
 document.addEventListener('contextmenu',e=>{ if(PET.on||(e.target.closest&&e.target.closest('[data-act=poke],[data-act=cspoke],[data-act=evspoke]'))) e.preventDefault(); },true);
 function charReact(el,lv,zone){ if(!el) return; const k=zone==='body'?(lv>=6?'shy':'flinch'):lv>=7?'hop':lv>=4?'nod':'flinch'; ['r-hop','r-nod','r-flinch','r-shy'].forEach(c=>el.classList.remove(c)); void el.offsetWidth; el.classList.add('r-'+k); clearTimeout(el._rt); el._rt=setTimeout(()=>el.classList.remove('r-'+k),950); }
-function floatAt(x,y,t){const f=document.createElement('div');f.className='float';f.textContent=t;f.style.left=(x-12)+'px';f.style.top=(y-16)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),800);}
 function shootHTML(n){let s='';for(let i=0;i<n;i++)s+=`<i class="shoot" style="top:${Math.round(Math.random()*45)}%;left:${50+Math.round(Math.random()*60)}%;animation-delay:${(i*0.9+Math.random()).toFixed(1)}s"></i>`;return s;}
 
 /* ===== 캐릭터 상속 (이격·바리에이션 = 원본 + 수정치) ===== */
@@ -7313,7 +7305,6 @@ const CARD_DEF={
 const KW={연계:'직전에 쓴 카드도 공격이면 더 강해져요.',낙인:'적에게 쌓여요. 처형 카드가 낙인 수만큼 피해를 더하고 낙인을 없애요.',출혈:'적의 턴이 올 때마다 출혈 수치만큼(×리더 공격 일부) 피해를 받고 1씩 줄어요.',약화:'약화된 적은 공격이 30% 약해져요.',보존:'다음 턴이 와도 보호막의 절반이 남아요.',반격:'이번 적 턴에 공격을 받을 때마다 공격한 적에게 피해를 돌려줘요.',소멸:'한 번 쓰면 이번 전투에서는 다시 나오지 않아요.',충전:'쌓아 두었다가 해방 카드로 한 번에 터뜨려요. 전투가 끝나면 사라져요.'};
 const CARD_REWARD=['heavy','sweep','wall','aid','focus','expose','rally','combo','revive','surge','twin','slash','brand','finisher','bleed','bulwark','counter','weaken','plan','echo','charge','release','sacrifice','burnout','shieldbash','entrench','hemorrhage','flurry','spread','overdrive','rage'];
 const ROLE_CARDS={atk:['slash','brand','finisher','bleed'],def:['bulwark','counter','wall','taunt'],sup:['plan','weaken','aid','expose']};
-const CARD_ROLE={atk:'twin',def:'taunt',sup:'tactic'};
 const SK_TXT={dmg:'적 1명에게 큰 피해',aoe:'모든 적에게 피해',heal:'리더 체력 회복',shield:'큰 보호막',buff:'이번 전투 공격 증가'};
 const LEAD_AB={atk:['맹공','공격 카드를 3장 쓸 때마다 리더가 추가로 한 번 더 공격해요.'],def:['불굴','턴을 시작할 때 리더 최대 체력의 6%만큼 보호막을 얻어요.'],sup:['통찰','턴마다 카드를 1장 더 뽑아요.']};
 const ULT_MAX=6;
@@ -7393,7 +7384,6 @@ function cbStart(kind){ const run=RG().run; const en=rgEnemies({k:run.k,floor:rg
     <div class="cb-detail" id="cbDet" hidden></div>
     <div class="cb-hand fan" id="cbHand"></div></div>`;
   $('#ov').hidden=false; sceneBgm(); cbIntents(); cbTurn(true); }
-function cbAliveA(){ return CB.allies.filter(a=>a.hp>0); }
 function cbAliveE(){ return CB.enemies.filter(e=>e.hp>0); }
 function cbLog(t){ CB.log.push(t); CB.log=CB.log.slice(-3); const l=$('#cbLog'); if(l) l.innerHTML=CB.log.map(x=>`<p>${esc(x)}</p>`).join(''); }
 function cbDraw(n){ for(let k=0;k<n;k++){ if(CB.hand.length>=10) break; if(!CB.draw.length){ if(!CB.disc.length) break; CB.draw=cbShuffle(CB.disc); CB.disc=[]; } CB.hand.push(CB.draw.pop()); } }
@@ -7810,7 +7800,7 @@ function addPickupFor(c,lim){
   G.banners.push(b); P().curBanner=b.id; mark('prog'); return b;
 }
 /* ===== 갠톡 (자유 채팅) ===== */
-let PHT='chat', FCBUSY=false;
+let FCBUSY=false;
 const EYE_TAG=/\b(eyes?|eyelash(es)?|pupils?|heterochromia|eyeliner|tsurime|tareme|sanpaku|jitome)\b/i;
 function avatarObj(){ const p=P(); if(!p.avatar||typeof p.avatar!=='object') p.avatar={id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null}; return p.avatar; }
 function playerFormHTML(){ const p=P(), ai=!!SAMPLE, av=p.avatar&&imgSrc(p.avatar);
@@ -7828,11 +7818,6 @@ function readPlayerForm(){ const p=P(); if($('#pf_name')) p.player=$('#pf_name')
   if($('#pf_gender')){ const g=$('#pf_gender').value.trim().slice(0,40); p.genderTxt=g; p.gender=/^(남|남성|남자|male|man)$/i.test(g)?'m':/^(여|여성|여자|female|woman)$/i.test(g)?'f':''; }
   if($('#pf_gsel')){ p.gender=$('#pf_gsel').value; p.genderTxt=''; }
   if($('#pf_look')) p.look=$('#pf_look').value.trim().slice(0,400); if($('#pf_bio')) p.bio=$('#pf_bio').value.trim().slice(0,1500); if($('#pf_hide')) p.hideEyes=$('#pf_hide').checked;if($('#pf_nai'))naiBlocksSave(avatarObj(),'prompt','pf_nai'); mark('prog'); }
-function heroFieldsHTML(hr){ hr=hr||{}; return `<div class="optbox" style="margin-top:10px"><b>주인공 (당신)</b> <span class="muted" style="font-size:.8rem">AI가 이 설정으로 이야기를 써요</span>
-  <div class="g2"><div><label class="f" for="ng_h_call">호칭 <span class="muted" style="font-size:.75rem">(평소에 불리는 말)</span></label><input class="in" id="ng_h_call" maxlength="12" value="${esc(hr.call||T('player'))}" placeholder="예: 지휘관"></div><div><label class="f" for="ng_h_name">이름 <span class="muted" style="font-size:.75rem">(필요할 때만)</span></label><input class="in" id="ng_h_name" maxlength="12" value="${esc(hr.name||'')}" placeholder="비우면 호칭으로만 불려요"></div></div>
-  <label class="f" for="ng_h_gender">당신의 성별은? (직접 쓰기)</label><input class="in" id="ng_h_gender" maxlength="40" value="${esc(hr.gender||'')}" placeholder="예: 남성, 여성, 논바이너리… 비우면 정하지 않아요">
-  <label class="f" for="ng_h_look">외모 (직접 쓰기, 선택)</label><textarea class="in" id="ng_h_look" maxlength="400" placeholder="예: 검은 단발, 회색 후드티">${esc(hr.look||'')}</textarea>
-  <label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="ng_h_hide" ${hr.hide?'checked':''}><span>앞머리로 눈 가리기 <span class="muted" style="font-size:.8rem">(그림 AI가 있으면 외모로 프로필 그림도 같이 그려요)</span></span></label></div>`; }
 function readHero(){ if(!$('#ng_h_name')) return null; return {name:$('#ng_h_name').value.trim().slice(0,12),call:$('#ng_h_call')?$('#ng_h_call').value.trim().slice(0,12):'',gender:$('#ng_h_gender').value.trim().slice(0,40),look:$('#ng_h_look').value.trim().slice(0,400),hide:$('#ng_h_hide').checked}; }
 const genderCode=g=>/^(남|남성|남자|male|man)$/i.test(g||'')?'m':/^(여|여성|여자|female|woman)$/i.test(g||'')?'f':'';
 async function heroTags(hr){ const r=await aiJSON(`플레이어 캐릭터의 외모 설명을 NovelAI 영어 태그로 바꿔라.\n성별·성 정체성: ${hr.gender||'정하지 않음'}\n외모: ${hr.look}\n규칙: 설명에 맞는 인원 태그(1boy, 1girl, 1other 중 하나)와 solo로 시작한다. 성인이다. 머리, ${hr.hide?'':'눈, '}체형, 옷, 장신구 같은 외모 태그만 쓴다. 자세·구도·배경·화풍 태그는 쓰지 않는다.\nJSON만 출력: {"tags":"..."}`,null,'quick');
@@ -7848,11 +7833,6 @@ async function playerDraw(btn){ readPlayerForm(); const p=P(); if(!p.look&&!p.av
   }catch(e){ toast(naiErr(e)); } finally{ if(btn.isConnected){ btn.disabled=false; btn.textContent=lab; } } }
 function FC(){ const p=P(); if(!p.fchat||typeof p.fchat!=='object') p.fchat={}; return p.fchat; }
 function fcOf(cid){ const f=FC(); return f[cid]||(f[cid]={log:[],sum:'',sumTo:0,at:0}); }
-function fcRowHTML(c,f){ const last=f.log.filter(l=>l.w!=='s').at(-1); return `<button class="ph-row" data-act="openfc" data-id="${esc(c.id)}"><div class="av">${art(c)}</div><div class="t"><b>${esc(c.name)} <small class="fc-tag">갠톡</small></b><span>${esc(last?(last.w==='me'?'나: ':'')+last.t:'대화를 시작해 보세요')}</span></div></button>`; }
-function phTabs(){ return `<div class="ph-tabs"><button class="${PHT==='chat'?'on':''}" data-act="phtab" data-v="chat">채팅</button><button class="${PHT==='friends'?'on':''}" data-act="phtab" data-v="friends">친구</button></div>`; }
-function friendsHTML(){ const list=G.chars.filter(c=>own(c.id));
-  if(!list.length) return `<p class="muted" style="text-align:center;padding:40px 16px">아직 ${esc(T('crew'))}이(가) 없어요.</p>`;
-  return `${SAMPLE?'':`<p class="muted" style="margin:10px 14px;font-size:.82rem">자유 채팅은 글 AI가 있어야 해요. 설정 → 글 AI에서 등록해 주세요.</p>`}${list.map(c=>{ const o=own(c.id); return `<button class="ph-row" data-act="openfc" data-id="${esc(c.id)}"><div class="av">${art(c)}</div><div class="t"><b>${esc(c.name)}</b><span>${esc(c.faction||'')} · 호감도 Lv.${affLv(o)}</span></div><span class="fc-go">대화</span></button>`; }).join('')}`; }
 function openFree(cid){ openRoom(cid); }
 function fcProgress(){ const st=(typeof mainStages==='function'?mainStages():[]).filter(s=>P().cleared[s.id]); return st.length?st.map(s=>s.code+' '+s.title).join(', '):'아직 이야기를 시작하지 않았다'; }
 async function fcSend(opt){
@@ -7949,7 +7929,6 @@ async function phPlay(t,c,s,token){
    렌더
    ========================================================= */
 let tab='lobby', PREVTAB='lobby', RG_LIVE=false;
-const PHONE_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></svg>';
 /* 플레이 모드: 만들기·편집·AI 설정을 숨기고 게임만 해요(이 기기에만 저장) */
 // 구독한 게임은 만든 사람이 콘텐츠를 올려요: 늘 플레이 모드(편집·만들기·자체 업데이트 없음, AI 키 없이 플레이)
 function subLocked(){ try{ return !!(typeof G!=='undefined'&&G&&G.meta&&G.meta.subscr); }catch(e){ return false; } }
@@ -8571,7 +8550,7 @@ function studioHTML(){
   ${IS_NATIVE?'':`<div class="panel"><h3>아이폰·웹 연결</h3><p class="muted" style="margin:0 0 10px">웹 버전은 열 때마다 최신이에요. 일부 AI 서비스는 브라우저에서 직접 부르는 걸 막아서(CORS), 막히면 중계 서버를 거쳐요. ${webProxy()?'지금 중계 서버: <b>'+esc(webProxy())+'</b>':'중계 서버 없음'}</p>
     <label class="f" for="orient_sel">화면 방향 (휴대폰)</label><select class="in" id="orient_sel">${opt([['auto','기기 회전 따라'],['portrait','세로로 고정'],['landscape','가로로 고정']],orientPref())}</select>
     <p class="muted" style="margin:4px 0 8px;font-size:.78rem">세로로 고정하면 휴대폰을 눕혀도 세로 화면으로 해요. 앱은 새 APK부터 고정돼요(지금 앱이 지원하지 않으면 알려 드려요).</p>
-    <label class="f" for="desk_mode">PC 화면 (넓은 화면에서)</label><select class="in" id="desk_mode" data-act="deskmode">${opt([['wide','가로로 넓게 (PC 게임처럼, 추천 · 휴대폰은 가로로 돌려서)'],['auto','가운데 세로로 (휴대폰처럼) + 옆 안내'],['off','끄기 (창 전체를 씀)']],deskMode())}</select>
+    <label class="f" for="desk_mode">PC 화면 (넓은 화면에서)</label><select class="in" id="desk_mode">${opt([['wide','가로로 넓게 (PC 게임처럼, 추천 · 휴대폰은 가로로 돌려서)'],['auto','가운데 세로로 (휴대폰처럼) + 옆 안내'],['off','끄기 (창 전체를 씀)']],deskMode())}</select>
     <div class="row" style="margin-top:10px"><button class="btn sm" data-act="pxopen">중계 서버 설정</button>${IS_IOS&&!IS_STANDALONE?'<button class="btn sm ghost" data-act="a2hs">홈 화면에 추가하는 법</button>':''}</div></div>`}`,
   sound:`<div class="panel"><h3>소리</h3><p class="muted" style="margin:0 0 10px">${SND().fishKey?'Fish Audio 연결됨':'Fish Audio 미연결'} · ${SND().elKey?'ElevenLabs 연결됨':'ElevenLabs 미연결'}</p>
     <div class="row"><button class="btn sm" data-act="sndopen">소리 설정</button><button class="btn sm ghost" data-act="lib" data-k="bgm">배경음 ${done(G.lib.filter(l=>l.kind==='bgm'))}/${G.lib.filter(l=>l.kind==='bgm').length}</button><button class="btn sm ghost" data-act="lib" data-k="sfx">효과음 ${done(nx)}/${nx.length}</button><button class="btn sm ghost" data-act="bgmall">🎵 배경음 한꺼번에 작곡</button></div></div>`,
@@ -9466,7 +9445,6 @@ function openBanner(id){
     <div class="row" style="margin-top:16px"><button class="btn" data-act="bnsave">저장</button>${id&&id!=='std'?'<button class="btn ghost" data-act="bndel">삭제</button>':''}</div>`);
 }
 let BD=null;
-function openBanner2(){ const keep=BD; const id=keep.id; G.__tmpB=keep; openBannerFrom(keep); }
 function openBannerFrom(b){ const real=G.banners; const bak=BD; BD=b; const orig=G.banners.find(x=>x.id===b.id); const saved=JSON.stringify(b);
   // render from draft
   const facs=[...new Set(G.chars.map(c=>c.faction).filter(Boolean))];
@@ -10083,12 +10061,6 @@ async function openMaskPainter(src,prev,cb,po){ po=po||{}; const im=await loadIm
     else if(m==='cancel'){ d.remove(); if(po.onCancel) po.onCancel(); }
     else if(m==='save'){ const id=mx.getImageData(0,0,W,H).data; let n=0; for(let i=0;i<id.length;i+=4) if(id[i]>127) n++; if(!n){ toast('얼굴 부분을 먼저 칠해 주세요'); return; } d.remove(); cb(mk.toDataURL('image/png')); } });
   addEventListener('resize',fit,{once:false}); setTimeout(fit,30); }
-async function maskB64(dataUrl,W,H){ const im=await loadImg(dataUrl), cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d'); x.fillStyle='#000'; x.fillRect(0,0,W,H); x.imageSmoothingEnabled=false; x.drawImage(im,0,0,W,H);
-  const d=x.getImageData(0,0,W,H), on=new Uint8Array(Math.ceil(W/8)*Math.ceil(H/8)), BW=Math.ceil(W/8);
-  for(let y=0;y<H;y++) for(let q=0;q<W;q++) if(d.data[(y*W+q)*4]>127) on[(y>>3)*BW+(q>>3)]=1;
-  // NAI 인페인팅은 8픽셀 칸 단위라서, 칠한 칸은 칸 전체를 다시 그리게 맞춰요
-  for(let y=0;y<H;y++) for(let q=0;q<W;q++){ const i=(y*W+q)*4, v=on[(y>>3)*BW+(q>>3)]?255:0; d.data[i]=d.data[i+1]=d.data[i+2]=v; d.data[i+3]=255; }
-  x.putImageData(d,0,0); return cv.toDataURL('image/png').split(',')[1]; }
 // 얼굴 집중 인페인팅: 칠한 곳 주변만 잘라 크게 키워 다시 그리고, 줄여서 원본에 부드럽게 섞어요(원본의 투명 배경·흰 옷은 그대로)
 async function focusedInpaint(src,maskUrl,draw){ const o=await loadImg(src), W=o.naturalWidth||o.width, H=o.naturalHeight||o.height, cv=(w,h)=>{ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; };
   const M=cv(W,H), mx=M.getContext('2d'); mx.fillStyle='#000'; mx.fillRect(0,0,W,H); mx.drawImage(await loadImg(maskUrl),0,0,W,H);
@@ -10111,15 +10083,6 @@ async function focusedInpaint(src,maskUrl,draw){ const o=await loadImg(src), W=o
     ax.putImageData(ad,0,0); return await new Promise(res2=>A.toBlob(res2,'image/png')); }
   finally{ URL.revokeObjectURL(ru); } }
 // 인페인팅 결과에서 칠한 얼굴 부분만 원본에 부드럽게 붙여요(원본의 투명 배경·흰 옷은 그대로)
-async function inpaintMerge(origSrc,resBlob,maskUrl){ const o=await loadImg(origSrc), W=o.naturalWidth||o.width, H=o.naturalHeight||o.height, ru=URL.createObjectURL(resBlob);
-  try{ const r=await loadImg(ru), m=await loadImg(maskUrl), cv=n=>{ const c=document.createElement('canvas'); c.width=W; c.height=H; return c; };
-    const A=cv(), a=A.getContext('2d'); a.drawImage(o,0,0,W,H);
-    const B=cv(), b=B.getContext('2d'); b.drawImage(r,0,0,W,H);
-    const M=cv(), mm=M.getContext('2d'); mm.fillStyle='#000'; mm.fillRect(0,0,W,H); mm.filter=`blur(${Math.max(2,Math.round(W/160))}px)`; mm.drawImage(m,0,0,W,H); mm.filter='none';
-    const ad=a.getImageData(0,0,W,H), bd=b.getImageData(0,0,W,H).data, md=mm.getImageData(0,0,W,H).data;
-    for(let i=0;i<ad.data.length;i+=4){ const k=md[i]/255; if(k<=0) continue; ad.data[i]=ad.data[i]*(1-k)+bd[i]*k; ad.data[i+1]=ad.data[i+1]*(1-k)+bd[i+1]*k; ad.data[i+2]=ad.data[i+2]*(1-k)+bd[i+2]*k; }
-    a.putImageData(ad,0,0); return await new Promise(res=>A.toBlob(res,'image/png')); }
-  finally{ URL.revokeObjectURL(ru); } }
 /* 표정 한 장 그리기 (b: 'full'|'up') — 표정 창과 새 게임 자동 표정이 같이 써요 */
 async function faceDrawOne(c,F,f,ko,b,O,x,generationMode='automatic'){const game=G,project=PJ().active;x=x||''; const en=(FACE_PRESETS.find(p=>p[0]===ko)||[])[1]||'happy', ft=FACE_TAGS[en]||en, ew=[1.7,1.5,1.35,1.2][O.lv]||1.5, i2s=[0.72,0.64,0.56,0.48][O.lv]||0.6, emph=`${ew}::${ft}::, 1.2::expressive face::`;
   const basePr=F===c?c.naiPrompt:(F.prompt||c.naiPrompt), upO=faceUpperObj(c,F), srcO=b==='up'?upO:F, src=imgSrcRaw(srcO), frame=b==='up'?'cowboy shot':c.naiFrame, candidateEligible=imageCandidateEligible('face',b==='up'?f.up:f,c,generationMode),originalSrc=imgSrcRaw(b==='up'?f.up:f)||''; let blob;
@@ -10420,10 +10383,10 @@ function seasonNext(){ const L=P().live, en=SEASONS.filter(x=>L.seasons[x[0]]!==
 async function aiNewPickupChar(con,rr,btn,col,alt){
   if(alt) return aiAltChar(alt,con,rr,btn);
   const COL=col&&col.src?`\n콜라보 ${T('crew')}: 다른 작품 「${col.src}」${col.who?'의 「'+col.who+'」':'의 인상적인 성인 캐릭터 1명'}이(가) 이 세계에 찾아온 콜라보 게스트로 만든다. 이름·외모·성격·말투·능력은 원작에 충실하게 쓰고, 원작에서 미성년자이거나 학생인 캐릭터라면 만들지 말고 대신 그 작품의 성인 캐릭터를 고른다. 학교 배경은 쓰지 않는다. profile에 이 세계에 오게 된 계기(차원 이동·초대·사고 등)를 쓰고, faction은 "콜라보"로 한다. naiPrompt에는 원작 외모 특징을 영어 태그로 자세히 쓴다(성인 체형, mature 등 나이 태그는 넣지 않는다).`:'';
-  const r=await aiJSON(`${RULES}\n${ctx()}${COL}\n\n새 픽업 배너의 주인공이 될 신규 ${T('crew')} 1명을 만들어라. 요청: "${con||(COL?'원작 설정 그대로':'지금 세계관과 이야기 흐름에 어울리는 새 얼굴. 기존 인물과 다른 매력')}"${rr&&rr!=='ai'?` 희귀도는 ${rr}.`:''} 기존 ${T('crew')}과 이름·외모·역할이 겹치지 않게 하고, 메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다. 첫 등장(intro) 대사는 픽업 연출에 어울리게 인상적으로.\nJSON 객체만 출력: ${charSchema()}\n희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. ${NAI_CHAR}`,btn);
+  const r=await aiJSON(`${RULES}\n${ctx()}${COL}\n\n새 픽업 배너의 주인공이 될 신규 ${T('crew')} 1명을 만들어라. 요청: "${con||(COL?'원작 설정 그대로':'지금 세계관과 이야기 흐름에 어울리는 새 얼굴. 기존 인물과 다른 매력')}"${rr&&rr!=='ai'?` 희귀도는 ${rr}.`:''} 기존 ${T('crew')}과 이름·외모·역할이 겹치지 않게 하고, 메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다. 첫 등장(intro) 대사는 픽업 연출에 어울리게 인상적으로.\nJSON 객체만 출력: ${charSchema()}\n${CHAR_STAT_RULE}`,btn);
   if(!r) return null; const c=cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr; if(!c.name) c.name='이름 없음'; if(col&&col.src){ c.collab=col.src; if(!c.faction) c.faction='콜라보'; } G.chars.push(c); mark('c:'+c.id); return c; }
 async function aiAltChar(b,con,rr,btn){ const canon=!!b.__canon; b=charById(b.id)||b;
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n이격(異格) ${T('crew')} 1명을 만들어라. 기존 ${T('crew')} 「${b.name}」의 다른 모습이다. 같은 사람이라서 기억·관계·성격·말투는 그대로다.\n${canon?'이 모습은 정사다: 메인 스토리 속 성장·각성·결단으로 생긴 변화이고, 이후 메인 스토리에서는 이 모습이 이어진다. profile에 어떤 사건으로 이렇게 바뀌었는지 쓴다.':'이 모습은 외전이다: 메인 스토리와 상관없는 단발성 사건(황당한 소동, 휴가, 꿈 같은 일)이고, 이야기가 끝나면 원래대로 돌아간다. 메인 플롯을 바꾸지 않는다.'}\n이번 테마: "${con||'AI가 어울리는 테마(계절 의상, 정장, 각성, 과거의 모습 등)를 하나 고른다'}"\nname은 정확히 "${b.name}(테마를 나타내는 2~5글자)" 형식으로 쓴다. profile에는 이 모습이 된 사연과 이 모습일 때만 보이는 매력을 쓴다. 외모 묘사, 무기, 속성, 역할, 스킬은 테마에 맞게 새로 정해서 원래 모습과 다르게 플레이되도록 한다. ${T('files')}에는 이 모습과 관련된 새 비밀을 넣는다. 첫 등장(intro) 대사는 원래 말투로, 새 모습을 보여 주는 설렘이 느껴지게.\nnaiPrompt는 원래 외모 태그 "${b.naiPrompt||''}"에서 머리색·눈색·머리 모양·체형 같은 신체 특징은 그대로 두고 의상과 소품만 테마에 맞게 바꾼다.\n원래 프로필: ${String(b.profile||'').slice(0,400)}\n원래 말투: ${(b.lines||[]).slice(0,3).join(' / ')}${rr&&rr!=='ai'?`\n희귀도는 ${rr}.`:''}\nJSON 객체만 출력: ${charSchema()}\n희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. ${NAI_CHAR}`,btn);
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n이격(異格) ${T('crew')} 1명을 만들어라. 기존 ${T('crew')} 「${b.name}」의 다른 모습이다. 같은 사람이라서 기억·관계·성격·말투는 그대로다.\n${canon?'이 모습은 정사다: 메인 스토리 속 성장·각성·결단으로 생긴 변화이고, 이후 메인 스토리에서는 이 모습이 이어진다. profile에 어떤 사건으로 이렇게 바뀌었는지 쓴다.':'이 모습은 외전이다: 메인 스토리와 상관없는 단발성 사건(황당한 소동, 휴가, 꿈 같은 일)이고, 이야기가 끝나면 원래대로 돌아간다. 메인 플롯을 바꾸지 않는다.'}\n이번 테마: "${con||'AI가 어울리는 테마(계절 의상, 정장, 각성, 과거의 모습 등)를 하나 고른다'}"\nname은 정확히 "${b.name}(테마를 나타내는 2~5글자)" 형식으로 쓴다. profile에는 이 모습이 된 사연과 이 모습일 때만 보이는 매력을 쓴다. 외모 묘사, 무기, 속성, 역할, 스킬은 테마에 맞게 새로 정해서 원래 모습과 다르게 플레이되도록 한다. ${T('files')}에는 이 모습과 관련된 새 비밀을 넣는다. 첫 등장(intro) 대사는 원래 말투로, 새 모습을 보여 주는 설렘이 느껴지게.\nnaiPrompt는 원래 외모 태그 "${b.naiPrompt||''}"에서 머리색·눈색·머리 모양·체형 같은 신체 특징은 그대로 두고 의상과 소품만 테마에 맞게 바꾼다.\n원래 프로필: ${String(b.profile||'').slice(0,400)}\n원래 말투: ${(b.lines||[]).slice(0,3).join(' / ')}${rr&&rr!=='ai'?`\n희귀도는 ${rr}.`:''}\nJSON 객체만 출력: ${charSchema()}\n${CHAR_STAT_RULE}`,btn);
   if(!r) return null; const c=cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr;
   if(!c.name||c.name.indexOf(b.name)!==0) c.name=`${b.name}(${String(con||'이격').replace(/[()]/g,'').slice(0,6)})`;
   c.alt=b.id; c.altCanon=canon; c.faction=b.faction||c.faction; if(b.voiceId) c.voiceId=b.voiceId; if(b.naiStyle) c.naiStyle=b.naiStyle; if(b.age&&!c.age) c.age=b.age; if(!c.lines||!c.lines.length) c.lines=(b.lines||[]).slice(0,3);
@@ -11502,12 +11465,6 @@ function openUpdSet(){
     <div class="row" style="margin-top:14px"><button class="btn" data-act="upsave">저장하고 확인</button><button class="btn ghost" data-act="relnotes">배포 페이지</button></div>
     <div class="row" style="margin-top:8px">${hasPrev?'<button class="btn sm ghost" data-act="uprollback">이전 버전으로 되돌리기</button>':''}${o.on?'<button class="btn sm ghost" data-act="upbuiltin">설치 버전으로 돌아가기</button>':''}</div>`);
 }
-function openAiChar(){
-  openModal(`${head('AI로 새 '+T('crew')+' 만들기')}
-    <label class="f" for="ai_c">어떤 ${esc(T('crew'))}인가요?</label><textarea class="in" id="ai_c" placeholder="예: 헬릭스에서 도망친 연구원 출신. 겁이 많지만 성핵 폭주를 다룰 줄 안다. 청 속성 지원형, SSR. 실험복 아래 의외로 대담한 옷차림."></textarea>
-    <div class="row" style="margin-top:12px"><button class="btn" data-act="aichar">만들기</button></div>
-    <p class="muted">능력치, 스킬, 대사, 터치 반응, 계약 대사, NAI 프롬프트까지 채워져요.</p>`);
-}
 function openAiChapter(){
   openModal(`${head(`AI로 ${G.chapters.length+1}장 만들기`)}
     <label class="f" for="ai_d">이야기 방향</label><textarea class="in" id="ai_d" placeholder="예: 헬릭스의 비밀 연구소에 잠입한다. 세라의 과거 동료가 적으로 나온다. 중간에 미호와 단둘이 변장하고 파티장에 숨어드는 장면."></textarea>
@@ -11658,8 +11615,6 @@ function bestiaryApply(arr,g){ g=g||G; let n=0; g.meta.bestiary=g.meta.bestiary|
   const l=(g.lib||[]).find(y=>y.kind==='enemy'&&y.name===name&&!y.charId); if(l){ Object.keys(info).forEach(k=>{ if(!l[k]) l[k]=info[k]; }); if(g===G) mark('l:'+l.id); } }); if(n&&g===G) mark('meta'); return n; } // 적이 아직 자료실에 없으면 syncEnemies(0070)가 만들 때 채워요
 // 2장 이후 첫 등장(debutLater) 캐릭터가 새 장 대본에서 처음 말하면 그 스테이지를 첫 등장으로
 function debutResolve(ch){ let n=0; G.chars.filter(c=>c.debutLater).forEach(c=>{ const re=new RegExp('(^|\\n)'+String(c.name).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(\\s*\\[[^\\]]*\\])?\\s*[:：]'); const s=(ch.stages||[]).find(s=>re.test((s.pre||'')+'\n'+(s.post||''))); if(s){ c.debut=s.id; delete c.debutLater; mark('c:'+c.id); n++; } }); return n; }
-function castPlanText(chars,stages){ const st=chars.filter(c=>!c.debut&&!c.debutLater), d=chars.filter(c=>c.debut), lt=chars.filter(c=>c.debutLater), si=id=>(stages||[]).findIndex(s=>s.id===id)+1;
-  return `등장 계획(반드시 지킨다): 처음부터 함께하는 동료(이미 아는 사이, 첫 만남 장면으로 쓰지 않는다): ${st.map(c=>c.name).join(', ')||'없음'}.${d.length?` 처음 만나는 인물: ${d.map(c=>`${c.name}(${si(c.debut)||'?'}번째 스테이지에서 첫 등장)`).join(', ')} — 그 스테이지 전에는 나오지 않는다.`:''}${lt.length?` 아직 등장하지 않는 인물(이번에 내지 않는다): ${lt.map(c=>c.name).join(', ')}.`:''}`; }
 /* ===== 인물 관계도 · 스토리 기억 =====
    관계는 두 사람(대원·NPC·플레이어) 사이의 기록이에요. 로어북처럼 글에 이름이 나오면 그 사람의 관계만 골라 AI에 넣어요. */
 const REL_ME='me';
@@ -11700,7 +11655,6 @@ function relCtx(text,extra,max){ const altOut=x=>{ const c=charById(x); return !
 const REL_SCHEMA=()=>`"relations":[{"a":"인물 이름","b":"인물 이름(플레이어는 ${T('player')})","kind":"관계 2~8자(예: 첫 만남, 동료, 라이벌, 스승과 제자, 짝사랑, 적대, 은인)","note":"지금 두 사람의 관계 1~2문장","event":"이번에 둘 사이에 있었던 일 한 줄"}]`;
 const REL_RULE='relations에는 이번 이야기에서 처음 만났거나 관계가 바뀌었거나 의미 있는 일이 있었던 두 사람만 3~15쌍 쓴다(플레이어와의 관계 포함).';
 // 장별 요약(스토리 기억)
-function chText(ch,max){ return ch.stages.map((s,i)=>`[스테이지 ${i+1} ${s.title}]\n${s.pre||''}\n${s.post||''}`).join('\n').slice(0,max||9000); }
 /* 시스템이 맡는 기록: 대본·설정을 읽어 관계와 요약을 채워요(AI 호출 없이) */
 function stageCast(s,withMe){ const set=new Set(); parseScript((s.pre||'')+'\n'+(s.post||'')).forEach(L=>{ if(L.type!=='say'||isMe(L.who)) return; const r=relRef(L.who); if(r&&!r.startsWith('x:')) set.add(r); }); if(withMe&&set.size) set.add(REL_ME); return set; }
 function relNew(a,b,kind,note,src,quiet,stage){ if(!a||!b||a===b||relPair(a,b)) return 0; RELS().push(relNames({id:'r'+uid(),a,b,kind,note:(src&&note?src+': ':'')+note,hist:[],sys:true,at:Date.now(),stage:stage||''})); if(!quiet) mark('meta'); return 1; }
@@ -12160,11 +12114,6 @@ document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act
 /* =========================================================
    타이틀과 오프닝
    ========================================================= */
-function showGate(){
-  const g=document.createElement('div'); g.className='gate';
-  g.innerHTML=`<div class="mark">19</div><h2 class="disp" style="margin:0;font-size:1.6rem">청소년 이용불가</h2><p style="max-width:320px;opacity:.85;margin:0">가챠 게임 메이커는 만 19세 이상을 위한 개인용 앱입니다. 만 19세 이상인가요?</p><div class="row" style="width:100%;max-width:320px"><button class="btn ghost" data-act="gateno">아니요</button><button class="btn" data-act="gateyes">네, 19세 이상입니다</button></div>`;
-  document.body.appendChild(g);
-}
 // 타이틀 로고 모양: 게임 정의에서 고르고, 자동이면 화면 테마에 맞춰요
 const LOGO_STYLES=[['auto','자동 (화면 테마에 맞춤)'],['stroke','가로획 명조 · 먹빛'],['star','별빛 그라데이션 · 첨탑'],['orbitline','궤도선 · 행성 외곽선'],['stencil','거친 스텐실 질감'],['regal','기품 · 명조 금빛'],['sharp','전술 · 각진 금속'],['orbit','SF · 네온'],['heavy','묵직한 장식체'],['cute','귀여운 · 파스텔']];
 /* 타이틀 줄 나누기: 띄어쓰기에서만 나누고(글자 중간에서 끊지 않음), 두 줄 길이를 비슷하게. 긴 한 단어는 줄이지 않고 글자를 작게 */
@@ -12263,10 +12212,7 @@ async function startStage(s,ctx){
 }
 function bRun(){clearInterval(B.timer);B.timer=setInterval(bTick,230/(B.speed||1));}
 /* 공격 연출: 근접(공격형·방어형, 보스, 일부 적)은 카드가 대상 쪽으로 몸통박치기, 원거리(지원형, 나머지 적)는 빛줄기가 날아가요. 연출이 닿을 때 피해 숫자가 떠요 */
-const FX_LAST=new WeakMap();
-function fxC(el){ const r=el.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2}; }
 function attackFx(a,t){return GGMVFX.basic(a,t);}
-function impactFx(t){ if(!B) return; const te=uel(t), bt=document.querySelector('#ov > .bt'); if(!te||!bt||document.hidden) return; const br=bt.getBoundingClientRect(), Z=fxC(te), d=document.createElement('i'); d.className='fx-hit'; d.style.cssText=`left:${Z.x-br.left}px;top:${Z.y-br.top}px`; bt.appendChild(d); setTimeout(()=>d.remove(),420); }
 const alive=a=>a.filter(u=>u.hp>0);
 function bTick(){
   if(!B||B.over||B.paused||B.presentationBusy||B.ending) return;
@@ -12280,7 +12226,7 @@ function bTick(){
 function uel(u){return document.getElementById('u_'+(u.side==='a'?'a'+B.allies.indexOf(u):'e'+B.enemies.indexOf(u)));}
 function pop(u,t,cls=''){const e=uel(u);if(!e)return;const d=document.createElement('span');d.className='dmg '+cls;d.textContent=t;e.appendChild(d);setTimeout(()=>d.remove(),700);}
 function blog(t){B.log.push(t);if(B.log.length>6)B.log.shift();const l=$('#bLog');if(l)l.innerHTML=B.log.map(x=>`<div>${esc(x)}</div>`).join('');}
-let SCUT_AT=0, SCUT_MAN=false;
+let SCUT_MAN=false;
 // 컷인 표정: 결의·화남 같은 힘 있는 표정을 먼저, 없으면 아무 표정이나
 const CUT_FACES=['결의','화남','의기양양','진지','기합','분노','미소','웃음'];
 function cutFace(c){ const fs=facePool(c); if(!fs.length) return ''; const f=CUT_FACES.map(n=>fs.find(x=>x.name===n)).find(Boolean)||fs[0]; return f.name; }
@@ -12488,10 +12434,8 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); i
 document.addEventListener('change',e=>{ const id=e.target.dataset&&e.target.dataset.mdsel; if(id) e.target.closest('label').classList.toggle('on',e.target.checked); });
 /* ===== 보스 패턴 ===== */
 const BPATS={aoe:['광역 포격','7초마다 전원 공격',7],snipe:['집중 저격','7초마다 체력 비율이 낮은 대상 공격',7],charge:['강타','7초마다 전원 강타',7],drain:['흡혈','7초마다 피해의 30% 회복',7],barrier:['방벽','7초마다 보호막',7],curse:['저주','7초마다 적 전체 공격력 감소',7],shift:['방어 약화','7초마다 적 전체 방어력 감소',7]};
-const BPAT_KEYS=Object.keys(BPATS);
 function bossPats(e,raid){return GGMCombat.enemyPatterns(e);}
 function bossPatText(e,raid){ return bossPats(e,raid).map(k=>BPATS[k][0]).join(' · ')+' · 체력 40% 이하 광폭화 (15초 / 재사용 30초)'; }
-function bossShake(){ const bt=$('#ov > .bt'); if(bt){ bt.classList.remove('shake'); void bt.offsetWidth; bt.classList.add('shake'); } }
 function bossNext(u){return B&&B.engine&&u.ready&&u.ready.active-B.engine.time<=1;}
 function bUpdate(){
   if(!B||B.presentationBusy) return;
@@ -12632,7 +12576,7 @@ async function discover(btn){
   const x=Math.random()*100, ssr=Math.min(60,s.ssr*3), r=x<ssr?3:x<ssr+s.sr?2:1;
   const seed=rand(DISC_SEEDS), role=rand(['atk','def','sup']), elem=rand(ELEMS), fac=(G.world.factions||[]).length?rand(G.world.factions).name:'';
   openModal(`<div class="decode"><div class="dc-ring"></div><div class="dc-ring b"></div><b>신호 해독 중…</b><span>새로운 ${esc(T('crew'))}의 기록을 불러오고 있어요</span></div>`,true);
-  const res=await aiJSON(`${RULES}\n${ctx()}\n\n아직 등장하지 않은 새 ${T('crew')} 1명을 만들어라. 기존 ${T('crew')}과 이름, 외모, 성격이 겹치지 않게 한다.\n조건: 희귀도 ${r} (${RL[r]}), 역할 ${role}, 속성 ${elem}${fac?', 소속 후보 '+fac:''}, 콘셉트 힌트 "${seed}"(그대로 쓰지 말고 세계관에 맞게 비틀어라).\n메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다.\nJSON 객체만 출력: ${charSchema()}\n희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. ${NAI_CHAR}`,null,'complex');
+  const res=await aiJSON(`${RULES}\n${ctx()}\n\n아직 등장하지 않은 새 ${T('crew')} 1명을 만들어라. 기존 ${T('crew')}과 이름, 외모, 성격이 겹치지 않게 한다.\n조건: 희귀도 ${r} (${RL[r]}), 역할 ${role}, 속성 ${elem}${fac?', 소속 후보 '+fac:''}, 콘셉트 힌트 "${seed}"(그대로 쓰지 말고 세계관에 맞게 비틀어라).\n메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다.\nJSON 객체만 출력: ${charSchema()}\n${CHAR_STAT_RULE}`,null,'complex');
   if(!res){ closeModal(); return; }
   const c=cleanChar(Object.assign(res,{rarity:r,role,elem})); if(!c.name) c.name='이름 없는 '+T('crew');
   G.chars.push(c); mark('c:'+c.id); p.gems-=cost; bump('pull',10); artAfterAI(x=>x.o===c||x.c===c,'새 '+T('crew')+' '+c.name);
@@ -12993,7 +12937,7 @@ case 'newpu-ai': { const con=$('#pu_c').value.trim(), kind=$('#pu_kind')?$('#pu_
         if(story) puStoryBg(c,lim); const all=[c,...ex]; artAfterAI(y=>all.includes(y.o)||all.includes(y.c),'신규 '+T('crew')+' '+all.map(x=>x.name).join(', '));
         return {title:(c.alt?`이격 ${RL[c.rarity]} ${c.name}`:`신규 ${RL[c.rarity]} ${c.name}`)+(ex.length?` 외 ${ex.length}명`:'')+' 픽업이 열렸어요',body:`${T('gacha')} 화면에서 바로 뽑을 수 있어요.${story?'\n픽업 스토리는 이어서 뒤에서 쓰고 있어요. 다 되면 이벤트에 열려요.':''}`}; }); break; }
 case 'aichar': { const con=$('#ai_c').value.trim(); if(!con){toast('어떤 '+T('crew')+'인지 적어 주세요');break;}
-      const r=await aiJSON(`${RULES}\n${ctx()}\n\n새 ${T('crew')} 1명을 만들어라. 요청: "${con}"\n메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다.\nJSON 객체만 출력: ${charSchema()}\n희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. ${NAI_CHAR}`,t);
+      const r=await aiJSON(`${RULES}\n${ctx()}\n\n새 ${T('crew')} 1명을 만들어라. 요청: "${con}"\n메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다.\nJSON 객체만 출력: ${charSchema()}\n${CHAR_STAT_RULE}`,t);
       if(r){ const c=cleanChar(r); if(!c.name)c.name='이름 없음'; G.chars.push(c); mark('c:'+c.id); closeModal(); render(); openChar(c.id); artAfterAI(x=>x.o===c||x.c===c,'새 '+T('crew')+' '+c.name); toast(`${c.name}이(가) 추가됐어요`);} break; }
 case 'nextneedai': toast('설정 → 글 AI에서 AI를 먼저 등록해 주세요'); break;
 case 'testai': { const r=await aiJSON('연결 테스트다. {"ok":true}를 그대로 출력하라.',t,'quick'); if(r&&r.ok) toast('AI 연결 성공'); break; }
@@ -14404,7 +14348,6 @@ function imageCandidates(generate,initial={}){
  });
 }
 // Only explicitly requested manual generation offers candidates; automatic/batch work stays single.
-function imageCandidateExisting(o){return !!(o&&o.img&& !o.img.asset);}
 function imageCandidateEligible(kind,target,owner,mode='manual'){
  if(mode!=='manual')return false;
  if(kind==='enemy')return true;

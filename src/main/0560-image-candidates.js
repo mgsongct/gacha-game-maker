@@ -80,7 +80,6 @@ function imageCandidates(generate,initial={}){
  });
 }
 // Only explicitly requested manual generation offers candidates; automatic/batch work stays single.
-function imageCandidateExisting(o){return !!(o&&o.img&& !o.img.asset);}
 function imageCandidateEligible(kind,target,owner,mode='manual'){
  if(mode!=='manual')return false;
  if(kind==='enemy')return true;

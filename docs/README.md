@@ -9,6 +9,7 @@ AI로 세계관·캐릭터·스토리·그림·음성·음악을 만들고 그�
 |---|---|
 | [architecture.md](architecture.md) | 저장소 구성, `index.html` 내부 구조와 줄 지도, 부팅 순서, 실행 환경(웹/APK/PC 서버) |
 | [data-model.md](data-model.md) | 게임 상태 `G`의 스키마, 저장 계층(IndexedDB/localStorage), 저장 키 목록, 마이그레이션(`fix`) |
+| [self-check.md](self-check.md) | 자기점검 보고서(`node tools/check.mjs`): 콜 그래프·병목·순환·복잡도·액션/상태/화면 흐름·다중화·파편화. 도구 설명은 [tools/README.md](../tools/README.md) |
 | [modules.md](modules.md) | 기능 모듈별 설명과 모듈 사이 연계(AI, 그림, 소리, 대본 엔진, 전투 v2, 가챠, 메신저, 동기화, 업데이트) |
 | [build.md](build.md) | 소스 구조(`src/`), 빌드·검증 명령, 모듈 추가 방법, 원본 업데이트 가져오기 |
 | [customization.md](customization.md) | 커스텀 방법: 화면·액션 추가, 테마, 기본 콘텐츠, AI 공급자, 포크용 업데이트 채널, 배포 절차, 주의사항 |

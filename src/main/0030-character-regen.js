@@ -329,12 +329,6 @@ function eraseColorData(id,W,H,px,py,o){
   }
   return {removed,color:[r,g,b]};
 }
-async function eraseColorAt(blob,px,py,o){
-  const bmp=await createImageBitmap(blob), W=bmp.width, H=bmp.height, cv=document.createElement('canvas'); cv.width=W; cv.height=H;
-  const x=cv.getContext('2d',{willReadFrequently:true}); x.drawImage(bmp,0,0); const id=x.getImageData(0,0,W,H);
-  const r=eraseColorData(id,W,H,px,py,o); if(!r.removed) return {blob,removed:0,color:r.color};
-  x.putImageData(id,0,0); return {blob:await new Promise(res=>cv.toBlob(bb=>res(bb||blob),'image/png')),removed:r.removed,color:r.color};
-}
 /* ---- cut tool canvas helpers ---- */
 const CUT_ZOOMS=[1,2,3,5,8];
 function cutCtx(){const j=CUTJOB;return j&&j.cv?j.cv.getContext('2d',{willReadFrequently:true}):null;}
@@ -469,7 +463,6 @@ async function cutoutWhite(blob,o){
     return await new Promise(r=>cv.toBlob(b=>r(b||blob),'image/png'));
   }catch(e){ return blob; }
 }
-async function srcToBlob(src){ return await (await fetch(src)).blob(); }
 
 /* ---- ComfyUI (local / remote server) ---- */
 function imgProvider(){return naiCfg().provider==='comfy'?'comfy':'nai';}

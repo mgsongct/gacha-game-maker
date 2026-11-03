@@ -76,7 +76,7 @@ async function discover(btn){
   const x=Math.random()*100, ssr=Math.min(60,s.ssr*3), r=x<ssr?3:x<ssr+s.sr?2:1;
   const seed=rand(DISC_SEEDS), role=rand(['atk','def','sup']), elem=rand(ELEMS), fac=(G.world.factions||[]).length?rand(G.world.factions).name:'';
   openModal(`<div class="decode"><div class="dc-ring"></div><div class="dc-ring b"></div><b>신호 해독 중…</b><span>새로운 ${esc(T('crew'))}의 기록을 불러오고 있어요</span></div>`,true);
-  const res=await aiJSON(`${RULES}\n${ctx()}\n\n아직 등장하지 않은 새 ${T('crew')} 1명을 만들어라. 기존 ${T('crew')}과 이름, 외모, 성격이 겹치지 않게 한다.\n조건: 희귀도 ${r} (${RL[r]}), 역할 ${role}, 속성 ${elem}${fac?', 소속 후보 '+fac:''}, 콘셉트 힌트 "${seed}"(그대로 쓰지 말고 세계관에 맞게 비틀어라).\n메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다.\nJSON 객체만 출력: ${charSchema()}\n희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. ${NAI_CHAR}`,null,'complex');
+  const res=await aiJSON(`${RULES}\n${ctx()}\n\n아직 등장하지 않은 새 ${T('crew')} 1명을 만들어라. 기존 ${T('crew')}과 이름, 외모, 성격이 겹치지 않게 한다.\n조건: 희귀도 ${r} (${RL[r]}), 역할 ${role}, 속성 ${elem}${fac?', 소속 후보 '+fac:''}, 콘셉트 힌트 "${seed}"(그대로 쓰지 말고 세계관에 맞게 비틀어라).\n메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다.\nJSON 객체만 출력: ${charSchema()}\n${CHAR_STAT_RULE}`,null,'complex');
   if(!res){ closeModal(); return; }
   const c=cleanChar(Object.assign(res,{rarity:r,role,elem})); if(!c.name) c.name='이름 없는 '+T('crew');
   G.chars.push(c); mark('c:'+c.id); p.gems-=cost; bump('pull',10); artAfterAI(x=>x.o===c||x.c===c,'새 '+T('crew')+' '+c.name);

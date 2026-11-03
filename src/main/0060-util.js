@@ -54,6 +54,5 @@ document.addEventListener('pointerdown',e=>{ if(e.button>0) return; const el=e.t
 document.addEventListener('click',e=>{ if(PET.swallow&&Date.now()-PET.swallow<400){ PET.swallow=0; e.stopPropagation(); e.preventDefault(); } },true);
 document.addEventListener('contextmenu',e=>{ if(PET.on||(e.target.closest&&e.target.closest('[data-act=poke],[data-act=cspoke],[data-act=evspoke]'))) e.preventDefault(); },true);
 function charReact(el,lv,zone){ if(!el) return; const k=zone==='body'?(lv>=6?'shy':'flinch'):lv>=7?'hop':lv>=4?'nod':'flinch'; ['r-hop','r-nod','r-flinch','r-shy'].forEach(c=>el.classList.remove(c)); void el.offsetWidth; el.classList.add('r-'+k); clearTimeout(el._rt); el._rt=setTimeout(()=>el.classList.remove('r-'+k),950); }
-function floatAt(x,y,t){const f=document.createElement('div');f.className='float';f.textContent=t;f.style.left=(x-12)+'px';f.style.top=(y-16)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),800);}
 function shootHTML(n){let s='';for(let i=0;i<n;i++)s+=`<i class="shoot" style="top:${Math.round(Math.random()*45)}%;left:${50+Math.round(Math.random()*60)}%;animation-delay:${(i*0.9+Math.random()).toFixed(1)}s"></i>`;return s;}
 

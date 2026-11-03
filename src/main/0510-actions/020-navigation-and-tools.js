@@ -122,7 +122,7 @@ case 'newpu-ai': { const con=$('#pu_c').value.trim(), kind=$('#pu_kind')?$('#pu_
         if(story) puStoryBg(c,lim); const all=[c,...ex]; artAfterAI(y=>all.includes(y.o)||all.includes(y.c),'신규 '+T('crew')+' '+all.map(x=>x.name).join(', '));
         return {title:(c.alt?`이격 ${RL[c.rarity]} ${c.name}`:`신규 ${RL[c.rarity]} ${c.name}`)+(ex.length?` 외 ${ex.length}명`:'')+' 픽업이 열렸어요',body:`${T('gacha')} 화면에서 바로 뽑을 수 있어요.${story?'\n픽업 스토리는 이어서 뒤에서 쓰고 있어요. 다 되면 이벤트에 열려요.':''}`}; }); break; }
 case 'aichar': { const con=$('#ai_c').value.trim(); if(!con){toast('어떤 '+T('crew')+'인지 적어 주세요');break;}
-      const r=await aiJSON(`${RULES}\n${ctx()}\n\n새 ${T('crew')} 1명을 만들어라. 요청: "${con}"\n메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다.\nJSON 객체만 출력: ${charSchema()}\n희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. ${NAI_CHAR}`,t);
+      const r=await aiJSON(`${RULES}\n${ctx()}\n\n새 ${T('crew')} 1명을 만들어라. 요청: "${con}"\n메인 플롯이나 세력과 연결되는 비밀을 ${T('files')}에 넣는다.\nJSON 객체만 출력: ${charSchema()}\n${CHAR_STAT_RULE}`,t);
       if(r){ const c=cleanChar(r); if(!c.name)c.name='이름 없음'; G.chars.push(c); mark('c:'+c.id); closeModal(); render(); openChar(c.id); artAfterAI(x=>x.o===c||x.c===c,'새 '+T('crew')+' '+c.name); toast(`${c.name}이(가) 추가됐어요`);} break; }
 case 'nextneedai': toast('설정 → 글 AI에서 AI를 먼저 등록해 주세요'); break;
 case 'testai': { const r=await aiJSON('연결 테스트다. {"ok":true}를 그대로 출력하라.',t,'quick'); if(r&&r.ok) toast('AI 연결 성공'); break; }

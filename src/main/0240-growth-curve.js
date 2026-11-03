@@ -179,7 +179,6 @@ function openBanner(id){
     <div class="row" style="margin-top:16px"><button class="btn" data-act="bnsave">저장</button>${id&&id!=='std'?'<button class="btn ghost" data-act="bndel">삭제</button>':''}</div>`);
 }
 let BD=null;
-function openBanner2(){ const keep=BD; const id=keep.id; G.__tmpB=keep; openBannerFrom(keep); }
 function openBannerFrom(b){ const real=G.banners; const bak=BD; BD=b; const orig=G.banners.find(x=>x.id===b.id); const saved=JSON.stringify(b);
   // render from draft
   const facs=[...new Set(G.chars.map(c=>c.faction).filter(Boolean))];

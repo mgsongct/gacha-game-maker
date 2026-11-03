@@ -38,7 +38,6 @@ function relCtx(text,extra,max){ const altOut=x=>{ const c=charById(x); return !
 const REL_SCHEMA=()=>`"relations":[{"a":"인물 이름","b":"인물 이름(플레이어는 ${T('player')})","kind":"관계 2~8자(예: 첫 만남, 동료, 라이벌, 스승과 제자, 짝사랑, 적대, 은인)","note":"지금 두 사람의 관계 1~2문장","event":"이번에 둘 사이에 있었던 일 한 줄"}]`;
 const REL_RULE='relations에는 이번 이야기에서 처음 만났거나 관계가 바뀌었거나 의미 있는 일이 있었던 두 사람만 3~15쌍 쓴다(플레이어와의 관계 포함).';
 // 장별 요약(스토리 기억)
-function chText(ch,max){ return ch.stages.map((s,i)=>`[스테이지 ${i+1} ${s.title}]\n${s.pre||''}\n${s.post||''}`).join('\n').slice(0,max||9000); }
 /* 시스템이 맡는 기록: 대본·설정을 읽어 관계와 요약을 채워요(AI 호출 없이) */
 function stageCast(s,withMe){ const set=new Set(); parseScript((s.pre||'')+'\n'+(s.post||'')).forEach(L=>{ if(L.type!=='say'||isMe(L.who)) return; const r=relRef(L.who); if(r&&!r.startsWith('x:')) set.add(r); }); if(withMe&&set.size) set.add(REL_ME); return set; }
 function relNew(a,b,kind,note,src,quiet,stage){ if(!a||!b||a===b||relPair(a,b)) return 0; RELS().push(relNames({id:'r'+uid(),a,b,kind,note:(src&&note?src+': ':'')+note,hist:[],sys:true,at:Date.now(),stage:stage||''})); if(!quiet) mark('meta'); return 1; }

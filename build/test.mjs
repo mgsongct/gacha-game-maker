@@ -366,11 +366,11 @@ try {
     plAdd('실제 게임 이름을 쓰지 않는다', 'all'); o.all = llmWrap('대사를 써라\nJSON만 출력: {}').includes('실제 게임 이름을 쓰지 않는다');
     const bg = { id: uid(), kind: 'bg', name: '숲', prompt: '1girl, smile, forest' }; G.lib.push(bg);
     o.audit = auditScan().some(x => x.rule.id === 'l_imgperson' && x.items.includes(bg)) && imgAuditScan().some(x => x.o === bg);
-    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="psopen"]');
-    openStudio('img'); document.querySelector('[data-act="psimgfix"]').click(); o.fix = bg.prompt === 'no humans, scenery, forest' && !auditScan().some(x => x.rule.id === 'l_imgperson');
-    document.querySelector('[data-act="psundo"]').click(); o.undo = bg.prompt === '1girl, smile, forest';
-    openStudio('frag'); document.querySelector('[data-pf="TITLE_RULE"][data-k="add"]').value = '영문 금지'; document.querySelector('[data-act="pfsave"][data-id="TITLE_RULE"]').click(); o.ui = TITLE_RULE.endsWith('영문 금지') && G.meta.prompts.TITLE_RULE.add === '영문 금지';
-    openStudio('lesson'); o.lessonUI = document.querySelectorAll('[data-act="pltog"]').length >= 2; openStudio('log'); o.logUI = document.body.innerHTML.includes('AI 기록 자세히'); closeModal();
+    tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="pstopen"]');
+    closeModal(); document.querySelector('[data-act="pstopen"]').click(); o.noClash = document.body.innerHTML.includes('프롬프트 스튜디오') && !document.querySelector('#modal [data-act="psbatch"]'); openStudio('img'); document.querySelector('[data-act="pstimgfix"]').click(); o.fix = bg.prompt === 'no humans, scenery, forest' && !auditScan().some(x => x.rule.id === 'l_imgperson');
+    document.querySelector('[data-act="pstundo"]').click(); o.undo = bg.prompt === '1girl, smile, forest';
+    openStudio('frag'); document.querySelector('[data-pf="TITLE_RULE"][data-k="add"]').value = '영문 금지'; document.querySelector('[data-act="pstsave"][data-id="TITLE_RULE"]').click(); o.ui = TITLE_RULE.endsWith('영문 금지') && G.meta.prompts.TITLE_RULE.add === '영문 금지';
+    openStudio('lesson'); o.lessonUI = document.querySelectorAll('[data-act="pstltog"]').length >= 2; openStudio('log'); o.logUI = document.body.innerHTML.includes('AI 기록 자세히'); closeModal();
     return o; });
   assert.ok(Object.values(r17).every(v => v === true), JSON.stringify(r17)); assert.deepEqual(err17, [], '페이지 오류');
   console.log('ok 17 프롬프트 스튜디오: 조각 덮어쓰기·덧붙이기·기본으로, 그림 가드(배경·소품의 사람 태그 제거), 교훈 기록→요청에 주입, 그림 점검·정리·되돌리기, 점검 규칙');

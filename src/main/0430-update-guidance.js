@@ -142,12 +142,6 @@ function openUpdSet(){
     <div class="row" style="margin-top:14px"><button class="btn" data-act="upsave">저장하고 확인</button><button class="btn ghost" data-act="relnotes">배포 페이지</button></div>
     <div class="row" style="margin-top:8px">${hasPrev?'<button class="btn sm ghost" data-act="uprollback">이전 버전으로 되돌리기</button>':''}${o.on?'<button class="btn sm ghost" data-act="upbuiltin">설치 버전으로 돌아가기</button>':''}</div>`);
 }
-function openAiChar(){
-  openModal(`${head('AI로 새 '+T('crew')+' 만들기')}
-    <label class="f" for="ai_c">어떤 ${esc(T('crew'))}인가요?</label><textarea class="in" id="ai_c" placeholder="예: 헬릭스에서 도망친 연구원 출신. 겁이 많지만 성핵 폭주를 다룰 줄 안다. 청 속성 지원형, SSR. 실험복 아래 의외로 대담한 옷차림."></textarea>
-    <div class="row" style="margin-top:12px"><button class="btn" data-act="aichar">만들기</button></div>
-    <p class="muted">능력치, 스킬, 대사, 터치 반응, 계약 대사, NAI 프롬프트까지 채워져요.</p>`);
-}
 function openAiChapter(){
   openModal(`${head(`AI로 ${G.chapters.length+1}장 만들기`)}
     <label class="f" for="ai_d">이야기 방향</label><textarea class="in" id="ai_d" placeholder="예: 헬릭스의 비밀 연구소에 잠입한다. 세라의 과거 동료가 적으로 나온다. 중간에 미호와 단둘이 변장하고 파티장에 숨어드는 장면."></textarea>

@@ -45,10 +45,7 @@ async function startStage(s,ctx){
 }
 function bRun(){clearInterval(B.timer);B.timer=setInterval(bTick,230/(B.speed||1));}
 /* 공격 연출: 근접(공격형·방어형, 보스, 일부 적)은 카드가 대상 쪽으로 몸통박치기, 원거리(지원형, 나머지 적)는 빛줄기가 날아가요. 연출이 닿을 때 피해 숫자가 떠요 */
-const FX_LAST=new WeakMap();
-function fxC(el){ const r=el.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2}; }
 function attackFx(a,t){return GGMVFX.basic(a,t);}
-function impactFx(t){ if(!B) return; const te=uel(t), bt=document.querySelector('#ov > .bt'); if(!te||!bt||document.hidden) return; const br=bt.getBoundingClientRect(), Z=fxC(te), d=document.createElement('i'); d.className='fx-hit'; d.style.cssText=`left:${Z.x-br.left}px;top:${Z.y-br.top}px`; bt.appendChild(d); setTimeout(()=>d.remove(),420); }
 const alive=a=>a.filter(u=>u.hp>0);
 function bTick(){
   if(!B||B.over||B.paused||B.presentationBusy||B.ending) return;
@@ -62,7 +59,7 @@ function bTick(){
 function uel(u){return document.getElementById('u_'+(u.side==='a'?'a'+B.allies.indexOf(u):'e'+B.enemies.indexOf(u)));}
 function pop(u,t,cls=''){const e=uel(u);if(!e)return;const d=document.createElement('span');d.className='dmg '+cls;d.textContent=t;e.appendChild(d);setTimeout(()=>d.remove(),700);}
 function blog(t){B.log.push(t);if(B.log.length>6)B.log.shift();const l=$('#bLog');if(l)l.innerHTML=B.log.map(x=>`<div>${esc(x)}</div>`).join('');}
-let SCUT_AT=0, SCUT_MAN=false;
+let SCUT_MAN=false;
 // 컷인 표정: 결의·화남 같은 힘 있는 표정을 먼저, 없으면 아무 표정이나
 const CUT_FACES=['결의','화남','의기양양','진지','기합','분노','미소','웃음'];
 function cutFace(c){ const fs=facePool(c); if(!fs.length) return ''; const f=CUT_FACES.map(n=>fs.find(x=>x.name===n)).find(Boolean)||fs[0]; return f.name; }

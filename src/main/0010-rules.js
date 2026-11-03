@@ -23,6 +23,7 @@ const TITLE_RULE_BASE="게임 이름은 요즘 서브컬처 가챠 게임처럼 
 pfDef('TITLE_RULE','게임 이름 짓기',()=>TITLE_RULE_BASE);
 const NAI_CHAR_BASE='naiPrompt는 NovelAI용 영어 태그 문자열. "1girl, solo"(남자는 "1boy, solo")로 시작하고, 나이를 직접 나타내는 태그(mature female, adult woman 등)는 기본으로 넣지 않는다. 캐릭터 설정상 꼭 필요할 때만 스스로 판단해서 넣는다. V4 이상 모델 기준의 자연스러운 태그로 머리, 눈, 체형, 의상, 장신구, 들고 있는 무기 같은 외모 태그만 쓴다. 자세, 구도, 배경, 화풍 태그는 쓰지 않는다(앱이 따로 붙인다). 엘프처럼 귀가 뾰족한 종족이면 elf, pointy ears를 꼭 넣고, 사람이면 귀 모양 태그를 넣지 않는다(앱이 사람에게는 뾰족한 귀를 막는다). 의상·장신구·무기는 이 게임의 세계관·소속·직업·계급에 꼭 맞게 고르고, 세계관에 어울리지 않는 요소(현대 배경의 중세 갑옷, 판타지 배경의 교복·스마트폰 따위)는 쓰지 않는다. 무기를 든 모습을 넣을 때는 그 캐릭터의 전용 무기와 같은 무기만 쓴다. 아군·동료에게 적 전용 태그(faceless)는 쓰지 않는다.';
 pfDef('NAI_CHAR','캐릭터 외모 태그(naiPrompt)',()=>NAI_CHAR_BASE);
+pfDef('CHAR_STAT_RULE','새 캐릭터 능력치·외모 규칙(캐릭터 생성 4곳 공통)',()=>'희귀도가 높을수록 능력치 합이 높다. 지원형은 heal/shield/buff, 방어형은 체력과 방어가 높다. '+NAI_CHAR);
 const ROLE = {atk:'공격',def:'방어',sup:'지원'};
 const ROLE_EN={atk:'ASSAULT',def:'GUARD',sup:'SUPPORT'};
 const KIND = {dmg:'단일 공격',aoe:'전체 공격',heal:'전체 회복',shield:'전체 보호막',buff:'전체 공격력 강화'};
@@ -56,5 +57,4 @@ function applyMeta(){
   document.title=m.title;
   const b=document.querySelector('.brand'); if(b){ b.innerHTML=`<b class="brand-t">${esc(m.title)}</b><i>${esc(m.sub)}</i>`; fitBrand(); }
 }
-const MAT={exp:'expMat',wmat:'wMat',core:'core',gearMat:'gearMat',transcMat:'transcMat'};
 

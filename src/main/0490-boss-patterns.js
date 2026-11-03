@@ -1,9 +1,7 @@
 /* ===== 보스 패턴 ===== */
 const BPATS={aoe:['광역 포격','7초마다 전원 공격',7],snipe:['집중 저격','7초마다 체력 비율이 낮은 대상 공격',7],charge:['강타','7초마다 전원 강타',7],drain:['흡혈','7초마다 피해의 30% 회복',7],barrier:['방벽','7초마다 보호막',7],curse:['저주','7초마다 적 전체 공격력 감소',7],shift:['방어 약화','7초마다 적 전체 방어력 감소',7]};
-const BPAT_KEYS=Object.keys(BPATS);
 function bossPats(e,raid){return GGMCombat.enemyPatterns(e);}
 function bossPatText(e,raid){ return bossPats(e,raid).map(k=>BPATS[k][0]).join(' · ')+' · 체력 40% 이하 광폭화 (15초 / 재사용 30초)'; }
-function bossShake(){ const bt=$('#ov > .bt'); if(bt){ bt.classList.remove('shake'); void bt.offsetWidth; bt.classList.add('shake'); } }
 function bossNext(u){return B&&B.engine&&u.ready&&u.ready.active-B.engine.time<=1;}
 function bUpdate(){
   if(!B||B.presentationBusy) return;

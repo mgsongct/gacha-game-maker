@@ -227,12 +227,6 @@ async function openMaskPainter(src,prev,cb,po){ po=po||{}; const im=await loadIm
     else if(m==='cancel'){ d.remove(); if(po.onCancel) po.onCancel(); }
     else if(m==='save'){ const id=mx.getImageData(0,0,W,H).data; let n=0; for(let i=0;i<id.length;i+=4) if(id[i]>127) n++; if(!n){ toast('얼굴 부분을 먼저 칠해 주세요'); return; } d.remove(); cb(mk.toDataURL('image/png')); } });
   addEventListener('resize',fit,{once:false}); setTimeout(fit,30); }
-async function maskB64(dataUrl,W,H){ const im=await loadImg(dataUrl), cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d'); x.fillStyle='#000'; x.fillRect(0,0,W,H); x.imageSmoothingEnabled=false; x.drawImage(im,0,0,W,H);
-  const d=x.getImageData(0,0,W,H), on=new Uint8Array(Math.ceil(W/8)*Math.ceil(H/8)), BW=Math.ceil(W/8);
-  for(let y=0;y<H;y++) for(let q=0;q<W;q++) if(d.data[(y*W+q)*4]>127) on[(y>>3)*BW+(q>>3)]=1;
-  // NAI 인페인팅은 8픽셀 칸 단위라서, 칠한 칸은 칸 전체를 다시 그리게 맞춰요
-  for(let y=0;y<H;y++) for(let q=0;q<W;q++){ const i=(y*W+q)*4, v=on[(y>>3)*BW+(q>>3)]?255:0; d.data[i]=d.data[i+1]=d.data[i+2]=v; d.data[i+3]=255; }
-  x.putImageData(d,0,0); return cv.toDataURL('image/png').split(',')[1]; }
 // 얼굴 집중 인페인팅: 칠한 곳 주변만 잘라 크게 키워 다시 그리고, 줄여서 원본에 부드럽게 섞어요(원본의 투명 배경·흰 옷은 그대로)
 async function focusedInpaint(src,maskUrl,draw){ const o=await loadImg(src), W=o.naturalWidth||o.width, H=o.naturalHeight||o.height, cv=(w,h)=>{ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; };
   const M=cv(W,H), mx=M.getContext('2d'); mx.fillStyle='#000'; mx.fillRect(0,0,W,H); mx.drawImage(await loadImg(maskUrl),0,0,W,H);
@@ -255,15 +249,6 @@ async function focusedInpaint(src,maskUrl,draw){ const o=await loadImg(src), W=o
     ax.putImageData(ad,0,0); return await new Promise(res2=>A.toBlob(res2,'image/png')); }
   finally{ URL.revokeObjectURL(ru); } }
 // 인페인팅 결과에서 칠한 얼굴 부분만 원본에 부드럽게 붙여요(원본의 투명 배경·흰 옷은 그대로)
-async function inpaintMerge(origSrc,resBlob,maskUrl){ const o=await loadImg(origSrc), W=o.naturalWidth||o.width, H=o.naturalHeight||o.height, ru=URL.createObjectURL(resBlob);
-  try{ const r=await loadImg(ru), m=await loadImg(maskUrl), cv=n=>{ const c=document.createElement('canvas'); c.width=W; c.height=H; return c; };
-    const A=cv(), a=A.getContext('2d'); a.drawImage(o,0,0,W,H);
-    const B=cv(), b=B.getContext('2d'); b.drawImage(r,0,0,W,H);
-    const M=cv(), mm=M.getContext('2d'); mm.fillStyle='#000'; mm.fillRect(0,0,W,H); mm.filter=`blur(${Math.max(2,Math.round(W/160))}px)`; mm.drawImage(m,0,0,W,H); mm.filter='none';
-    const ad=a.getImageData(0,0,W,H), bd=b.getImageData(0,0,W,H).data, md=mm.getImageData(0,0,W,H).data;
-    for(let i=0;i<ad.data.length;i+=4){ const k=md[i]/255; if(k<=0) continue; ad.data[i]=ad.data[i]*(1-k)+bd[i]*k; ad.data[i+1]=ad.data[i+1]*(1-k)+bd[i+1]*k; ad.data[i+2]=ad.data[i+2]*(1-k)+bd[i+2]*k; }
-    a.putImageData(ad,0,0); return await new Promise(res=>A.toBlob(res,'image/png')); }
-  finally{ URL.revokeObjectURL(ru); } }
 /* 표정 한 장 그리기 (b: 'full'|'up') — 표정 창과 새 게임 자동 표정이 같이 써요 */
 async function faceDrawOne(c,F,f,ko,b,O,x,generationMode='automatic'){const game=G,project=PJ().active;x=x||''; const en=(FACE_PRESETS.find(p=>p[0]===ko)||[])[1]||'happy', ft=FACE_TAGS[en]||en, ew=[1.7,1.5,1.35,1.2][O.lv]||1.5, i2s=[0.72,0.64,0.56,0.48][O.lv]||0.6, emph=`${ew}::${ft}::, 1.2::expressive face::`;
   const basePr=F===c?c.naiPrompt:(F.prompt||c.naiPrompt), upO=faceUpperObj(c,F), srcO=b==='up'?upO:F, src=imgSrcRaw(srcO), frame=b==='up'?'cowboy shot':c.naiFrame, candidateEligible=imageCandidateEligible('face',b==='up'?f.up:f,c,generationMode),originalSrc=imgSrcRaw(b==='up'?f.up:f)||''; let blob;
