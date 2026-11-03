@@ -40,9 +40,9 @@ async function openAssets(tab){ if(tab) AM_TAB=tab; const tabs=[['shared','공�
     <div style="display:flex;flex-wrap:wrap;gap:10px">${Object.keys(EMOTES).map(k=>{ const l=G.lib.find(x=>x.kind==='emote'&&x.name===k); return `<div style="width:92px;text-align:center"><div style="height:60px">${emoteHTML(k,true).replace('class="emo big','class="emo big still')}</div><b style="font-size:.8rem">${esc(k)}</b><label class="btn sm ghost" style="display:block;margin-top:4px">그림<input type="file" accept="image/*" hidden data-amemo="${esc(k)}"></label>${l?`<button class="btn sm ghost" data-act="amemodel" data-id="${l.id}" style="margin-top:2px">기본으로</button>`:''}</div>`; }).join('')}</div>`; }
   openModal(`${head('에셋 관리','<span class="muted">공유·재사용</span>')}<div class="row" style="gap:4px;margin-bottom:8px">${tabs.map(([k,l])=>`<button class="btn sm ${AM_TAB===k?'':'ghost'}" data-act="amtab" data-k="${k}">${l}</button>`).join('')}</div>${body}<div class="row" style="margin-top:12px"><button class="btn ghost" data-act="close">닫기</button></div>`); }
 function assetPanel(){ const sh=shList().length, d=libDupes().length; return `<div class="panel pm-hide"><h3>에셋 관리 ${d?`<span class="badge">중복 ${d}</span>`:''}</h3><p class="muted" style="margin:0 0 6px">공유 보관함 ${sh}개 · 게임끼리 배경·소품·음악·감정 아이콘을 재사용하고, 중복 자료를 합치고, 안 쓰는 자료를 찾아요.</p><button class="btn sm" data-act="amopen">에셋 관리</button></div>`; }
-document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act, id=b.dataset.id;
+document.addEventListener('click',async e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act, id=el.dataset.id;
   if(a==='amopen') openAssets();
-  else if(a==='amtab') openAssets(b.dataset.k);
+  else if(a==='amtab') openAssets(el.dataset.k);
   else if(a==='amput'){ const l=G.lib.find(x=>x.id===id); if(l&&await shPut(l)) toast(`「${l.name}」을(를) 공유 보관함에 넣었어요`); else toast('넣을 그림·소리가 없어요'); openAssets(); }
   else if(a==='amtake'){ const x=shList().find(y=>y.id===id); const l=x&&await shTake(x); toast(l?`「${l.name}」을(를) 가져왔어요`:'가져오지 못했어요'); openAssets(); }
   else if(a==='amshdel'){ if(!(await appConfirm('공유 보관함에서 지울까요? 이미 가져온 게임의 자료는 그대로예요.'))) return; shSave(shList().filter(x=>x.id!==id)); try{ await idbDel('shared::'+id); }catch(_){} openAssets(); }

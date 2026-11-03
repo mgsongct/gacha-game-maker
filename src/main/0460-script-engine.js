@@ -42,7 +42,7 @@ function playStory(title,script,done){
   const fb=ls.find(l=>(l.type==='cmd'&&l.cmd==='배경')||l.type==='place'); setVnBg(fb?(fb.arg||fb.text):'');
   vnStep();
 }
-function setVnBg(name){const b=$('#vnBg');if(!b)return;b.setAttribute('style',name?bgStyle(name):'background:linear-gradient(180deg,#1b1530,#2b1a33 60%,#120e1c)');b.classList.remove('fade');void b.offsetWidth;b.classList.add('fade');}
+function setVnBg(name){const el=$('#vnBg');if(!el)return;el.setAttribute('style',name?bgStyle(name):'background:linear-gradient(180deg,#1b1530,#2b1a33 60%,#120e1c)');el.classList.remove('fade');void el.offsetWidth;el.classList.add('fade');}
 function vnStep(){
   if(!S) return;
   if(S.typing){vnFinish();return;}
@@ -73,7 +73,7 @@ function vnCmd(L){
   else if(L.cmd==='톡'){ S.phone=a; const ph=$('#vnPhone'); ph.hidden=false; $('#vnPhName').textContent=a; $('#vnPhBody').innerHTML=''; }
   else if(L.cmd==='톡끝'){ S.phone=null; $('#vnPhone').hidden=true; }
   else if(L.cmd==='음악끝') bgm(null);
-  else if(L.cmd==='소품'||L.cmd==='사진'){const p=$('#vnProp');if(a==='끝')p.hidden=true;else{p.innerHTML=libArt(a);p.hidden=false;}}
+  else if(L.cmd==='소품'||L.cmd==='사진'){const el=$('#vnProp');if(a==='끝')el.hidden=true;else{el.innerHTML=libArt(a);el.hidden=false;}}
   else if(L.cmd==='소품끝') $('#vnProp').hidden=true;
   else if(L.cmd==='효과'){const v=$('#vn'),f=$('#vnFlash');
     if(/흔들/.test(a)){v.classList.remove('shake');void v.offsetWidth;v.classList.add('shake');}
@@ -81,7 +81,7 @@ function vnCmd(L){
     if(/암전/.test(a)){f.className='vn-flash';void f.offsetWidth;f.className='vn-flash b';}}
 }
 function vnShow(L){
-  S.log.push(L); const ch=$('#vnChar');
+  S.log.push(L); const el=$('#vnChar');
   if(S.phone&&L.type==='say'){
     const me=isMe(L.who), c=me?null:vnSpeaker(L.who), body=$('#vnPhBody');
     body.insertAdjacentHTML('beforeend',`<div class="msg ${me?'me':''}">${me?'':`<div class="av sm">${c?art(c):''}</div>`}<div class="bub">${esc(sub(L.text))}</div></div>`); body.scrollTop=body.scrollHeight;
@@ -90,11 +90,11 @@ function vnShow(L){
   }
   if(L.type==='say'){
     const me=isMe(L.who), c=me?null:vnSpeaker(L.who), fz=c?(L.face||textFace(c,L.text)):'', key=c?c.id+'|'+fz:'';
-    if(c){ const fresh=!(S.stage||[]).some(x=>x.c===c); vnDirectSay(L,c,fz); if(fresh){ const sl=ch.querySelector('.vn-slot.speak'); if(sl){ sl.classList.remove('enter'); void sl.offsetWidth; sl.classList.add('enter'); } } } // 무대·연출(0462)
-    ch.classList.toggle('dim',!c);
+    if(c){ const fresh=!(S.stage||[]).some(x=>x.c===c); vnDirectSay(L,c,fz); if(fresh){ const sl=el.querySelector('.vn-slot.speak'); if(sl){ sl.classList.remove('enter'); void sl.offsetWidth; sl.classList.add('enter'); } } } // 무대·연출(0462)
+    el.classList.toggle('dim',!c);
     $('#vnName').textContent=me?playerName():L.who; $('#vnText').classList.remove('nar');
     if(c&&c.voiceId&&SND().voiceStory) speak(c,L.text); else stopVoice();
-  } else { stopVoice(); ch.classList.add('dim'); $('#vnName').textContent=''; $('#vnText').classList.add('nar'); }
+  } else { stopVoice(); el.classList.add('dim'); $('#vnName').textContent=''; $('#vnText').classList.add('nar'); }
   vnPrefetch();
   vnType(sub(L.text));
 }
@@ -102,6 +102,8 @@ function vnPrefetch(){ if(!SND().voiceStory) return; let n=0; for(let k=S.i;k<S.
 function vnType(t){S.full=t;S.typing=true;let k=0;const el=$('#vnText');el.textContent='';$('#vnNext').hidden=true;clearInterval(S.timer);const tid=S.timer=setInterval(()=>{if(!el.isConnected||!S||S.timer!==tid){clearInterval(tid);return;}k+=2;el.textContent=t.slice(0,k);if(k>=t.length)vnFinish();},28);}
 function vnFinish(){if(!S)return;clearInterval(S.timer);S.typing=false;const tx=$('#vnText'),nx=$('#vnNext');if(tx)tx.textContent=S.full;if(nx)nx.hidden=false;vnAutoNext();}
 function vnAutoNext(){if(!S||!S.auto||S.typing||S.choice)return;clearTimeout(S.autoT);const go=()=>{if(S&&S.auto&&!S.typing&&!S.choice)S.autoT=setTimeout(vnStep,600);};if(!VOICE.paused&&!VOICE.ended){VOICE.onended=go;}else S.autoT=setTimeout(vnStep,1000+S.full.length*40);}
+// 넘기기: 대본을 끝내되, 앞에 시나리오 분기([분기: id] 다음 선택지)가 있으면 그 선택지에서 멈춤 — 분기 기록이 빠지지 않게(0465). 분기 선택지가 떠 있으면 고를 때까지 기다림
+function vnSkip(){ if(!S) return; if(S.choice&&S.branch) return; const k=S.lines.findIndex((L,i)=>i>=S.i&&L.type==='cmd'&&L.cmd==='분기'); if(S.choice||k<0){ vnEnd(); return; } if(S.typing) vnFinish(); S.i=k; vnStep(); }
 function vnEnd(){if(!S)return;clearInterval(S.timer);clearTimeout(S.autoT);stopVoice();const d=S.done;S=null;closeOv();d&&d();}
 function closeOv(){$('#ov').hidden=true;$('#ov').innerHTML='';sceneBgm();}
 

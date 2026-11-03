@@ -12,25 +12,24 @@ function planCtx(n){ if(!planHas()) return ''; const p=PLAN(), act=planActOf(n),
   L.push(`\n【시나리오 설계 — 작가 전용, 대사로 그대로 말하지 않는다】${p.logline?' 로그라인: '+p.logline+'.':''}${p.theme?' 주제: '+p.theme+'.':''}${p.ending?' 목표 결말: '+p.ending+'.':''}`);
   if(act) L.push(`지금은 「${act.name}」(~${act.upto}장): ${act.goal}`);
   const now=p.twists.filter(t=>+t.reveal===n), later=p.twists.filter(t=>+t.reveal>n), clues=p.twists.flatMap(t=>(t.clues||[]).filter(c=>+c.ch===n).map(c=>({t,c})));
-  if(clues.length) L.push('이번 장에 자연스럽게 심을 복선(눈치챌 듯 말 듯, 정답을 말하지 않는다): '+clues.map(({c})=>c.hint).join(' / '));
-  if(now.length) L.push('이번 장에서 밝힐 반전: '+now.map(t=>`${t.truth}${t.who?' (관련: '+t.who+')':''}`).join(' / ')+' — 앞서 심은 복선을 회수하며 밝힌다');
+  if(clues.length) L.push(pf('PLAN_CLUES',{list:clues.map(({c})=>c.hint).join(' / ')}));
+  if(now.length) L.push(pf('PLAN_REVEAL',{list:now.map(t=>`${t.truth}${t.who?' (관련: '+t.who+')':''}`).join(' / ')}));
   if(later.length) L.push('아직 밝히지 말 진실(이번 장에서는 숨기고 어긋나지 않게만): '+later.map(t=>t.truth).join(' / '));
   const done=p.branches.filter(b=>F[b.id]&&+b.at<n); if(done.length) L.push('플레이어가 고른 분기(이후 이야기에 반영): '+done.map(b=>{ const o=(b.options||[])[F[b.id].n-1]||{}; return `${b.question} → 「${o.label||F[b.id].label}」${o.result?': '+o.result:''}`; }).join(' / '));
-  const here=p.branches.filter(b=>+b.at===n); if(here.length) L.push('이번 장의 분기: 해당 장면에 "[분기: id]" 줄을 쓰고 바로 다음 줄에 "선택: 보기1 | 보기2" 선택지를 둔다. '+here.map(b=>`id=${b.id} 질문 「${b.question}」 보기 ${(b.options||[]).map(o=>o.label).join(' | ')}`).join(' / '));
+  const here=p.branches.filter(b=>+b.at===n); if(here.length) L.push(pf('PLAN_BRANCH_HERE')+here.map(b=>`id=${b.id} 질문 「${b.question}」 보기 ${(b.options||[]).map(o=>o.label).join(' | ')}`).join(' / '));
   const arcs=p.arcs.filter(a=>a.name); if(arcs.length) L.push('캐릭터 아크(이번 장에서 조금씩 진행): '+arcs.map(a=>`${a.name}: ${a.start} → ${a.change} → ${a.end}`).join(' / '));
   if(p.notes) L.push('설계 메모: '+p.notes);
   return L.join('\n')+'\n'; }
 // 점검: 복선 없이 밝히는 반전, 공개 장 뒤에 있는 복선, 공개 장이 지났는데 대본에 없는 반전, 분기가 대본에 없음
-function planCheck(){ const p=PLAN(), main=G.chapters.filter(c=>c.kind==='main'), n=main.length, txt=i=>{ const ch=main[i-1]; return ch?(ch.stages||[]).map(s=>(s.pre||'')+'\n'+(s.post||'')).join('\n'):''; }, out=[];
+function planCheck(){ const p=PLAN(), main=G.chapters.filter(ch=>ch.kind==='main'), n=main.length, txt=i=>{ const ch=main[i-1]; return ch?(ch.stages||[]).map(s=>(s.pre||'')+'\n'+(s.post||'')).join('\n'):''; }, out=[];
   if(!p.logline) out.push('로그라인이 없어요'); if(!p.acts.length) out.push('막 구성이 없어요');
   p.twists.forEach(t=>{ const cl=(t.clues||[]).filter(c=>c.hint); if(!cl.length) out.push(`반전 「${t.truth.slice(0,20)}」에 복선이 없어요`); else if(cl.every(c=>+c.ch>=+t.reveal)) out.push(`반전 「${t.truth.slice(0,20)}」의 복선이 모두 공개 장(${t.reveal}장) 이후예요`);
     if(+t.reveal&&+t.reveal<=n&&!t.done) out.push(`${t.reveal}장이 이미 있는데 반전 「${t.truth.slice(0,20)}」 공개를 확인하지 않았어요(대본 확인 후 '공개됨' 표시)`); });
   p.branches.forEach(b=>{ if(+b.at<=n&&!txt(+b.at).includes('[분기: '+b.id+']')&&!txt(+b.at).includes('[분기:'+b.id+']')) out.push(`${b.at}장 대본에 분기 「${b.question.slice(0,20)}」([분기: ${b.id}])가 없어요`); if((b.options||[]).length<2) out.push(`분기 「${b.question.slice(0,20)}」의 보기가 2개 미만이에요`); });
   const last=p.acts.length?+p.acts.at(-1).upto:0; if(last&&n>last) out.push(`지금 ${n}장으로 설계한 막(~${last}장)을 넘었어요 — 다음 막을 설계해 주세요`);
   return out; }
-async function planAI(mode,btn,instruction){ const p=PLAN(), n=G.chapters.filter(c=>c.kind==='main').length;
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 게임의 메인 시나리오를 ${mode==='extend'?`지금 설계(${JSON.stringify(p).slice(0,3000)})를 이어서 다음 막을 덧붙여`:mode==='improve'?`지금 설계(${JSON.stringify(p).slice(0,3000)})를 더 짜임새 있게 다듬어`:'처음부터'} 설계하라. 지금 메인 스토리는 ${n}장까지 있다(이미 쓴 장의 내용과 어긋나지 않게).
-${instruction?'추가 지시: '+instruction+'\n':''}규칙: 막(act)마다 목표가 있고 장 번호 범위(upto)로 나눈다(한 막 3~5장). 숨겨진 반전 2~4개: 각 반전은 진실·공개 장·그 전에 심을 복선 2~3개(장 번호와 힌트). 공개 장은 복선보다 뒤. 분기 1~3개: 몇 장에서 플레이어가 고르고(보기 2~3개), 고른 보기가 이후 이야기에 무엇을 바꾸는지(result). 주요 ${T('crew')} 3~5명의 아크(시작 → 변화 → 끝). 결말은 하나로 정하되 분기에 따라 과정이 달라진다.
+async function planAI(mode,btn,instruction){ const p=PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').length;
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${pf('PLAN_AI',{how:pf(mode==='extend'?'PLAN_AI_EXTEND':mode==='improve'?'PLAN_AI_IMPROVE':'PLAN_AI_NEW',{plan:JSON.stringify(p).slice(0,3000)}),n,extra:instruction?'추가 지시: '+instruction+'\n':'',crew:T('crew')})}
 JSON만 출력: {"logline":"","theme":"","ending":"","acts":[{"name":"1막 이름","upto":4,"goal":""}],"twists":[{"id":"t1","truth":"","reveal":5,"who":"관련 인물","clues":[{"ch":2,"hint":""}]}],"branches":[{"id":"b1","at":3,"question":"","options":[{"label":"","result":""}]}],"arcs":[{"name":"캐릭터 이름","start":"","change":"","end":""}]}`,btn,'complex');
   if(!r) return false; const old=PLAN(), clean=planClean(r);
   if(mode==='extend'){ old.acts.push(...clean.acts.filter(a=>+a.upto>(+(old.acts.at(-1)||{}).upto||0))); old.twists.push(...clean.twists.filter(t=>!old.twists.some(x=>x.id===t.id))); old.branches.push(...clean.branches.filter(b=>!old.branches.some(x=>x.id===b.id))); clean.arcs.forEach(a=>{ if(!old.arcs.some(x=>x.name===a.name)) old.arcs.push(a); }); }
@@ -44,7 +43,7 @@ function planClean(r){ const S=(v,n)=>String(v||'').trim().slice(0,n||200), N=v=
 
 /* 화면 */
 function planPanel(){ const p=G.world.plan||{}, iss=planHas()?planCheck():[]; return `<div class="panel pm-hide"><h3>시나리오 설계 ${iss.length?`<span class="badge">점검 ${iss.length}</span>`:''}</h3><p class="muted" style="margin:0 0 6px">${planHas()?`${esc(p.logline||'')} · 막 ${(p.acts||[]).length} · 반전 ${(p.twists||[]).length} · 분기 ${(p.branches||[]).length}`:'큰 틀·플롯·반전·분기를 먼저 설계하면, 새 장을 쓸 때 AI가 그 설계를 따라요(복선은 미리, 반전은 정한 장에서).'}</p><button class="btn sm" data-act="planopen">시나리오 설계</button></div>`; }
-function openPlan(){ const p=PLAN(), n=G.chapters.filter(c=>c.kind==='main').length, F=P().flags||{}, iss=planCheck(), t=(k,v,ph,rows)=>rows?`<textarea class="in" data-pl="${k}" rows="${rows}" placeholder="${esc(ph||'')}">${esc(v||'')}</textarea>`:`<input class="in" data-pl="${k}" value="${esc(v??'')}" placeholder="${esc(ph||'')}">`, num=(k,v)=>`<input class="in" type="number" min="1" data-pl="${k}" value="${v??''}" style="max-width:70px">`;
+function openPlan(){ const p=PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').length, F=P().flags||{}, iss=planCheck(), t=(k,v,ph,rows)=>rows?`<textarea class="in" data-pl="${k}" rows="${rows}" placeholder="${esc(ph||'')}">${esc(v||'')}</textarea>`:`<input class="in" data-pl="${k}" value="${esc(v??'')}" placeholder="${esc(ph||'')}">`, num=(k,v)=>`<input class="in" type="number" min="1" data-pl="${k}" value="${v??''}" style="max-width:70px">`;
   openModal(`${head('시나리오 설계',`<span class="muted">지금 메인 ${n}장</span>`)}
   ${iss.length?`<div class="panel" style="border-color:var(--gold)"><b>점검</b><ul style="margin:4px 0;padding-left:18px;font-size:.82rem">${iss.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
   <label class="f">로그라인 (한 줄 요약)</label>${t('logline',p.logline)}<div class="g2"><div><label class="f">주제</label>${t('theme',p.theme)}</div><div><label class="f">목표 결말</label>${t('ending',p.ending)}</div></div>
@@ -62,9 +61,15 @@ function planRead(){ const p=PLAN(), lines=v=>String(v||'').split('\n').map(l=>l
   if(k.length===1){ p[k[0]]=String(v).trim(); return; } const arr={a:'acts',t:'twists',b:'branches',r:'arcs'}[k[0]], o=p[arr][+k[1]]; if(!o) return;
   if(k[2]==='clues') o.clues=lines(v).map(([ch,hint])=>({ch:Math.max(1,+ch||1),hint:hint||''})).filter(c=>c.hint); else if(k[2]==='options') o.options=lines(v).map(([label,result])=>({label,result:result||''}));
   else if(['upto','reveal','at'].includes(k[2])) o[k[2]]=Math.max(1,+v||1); else o[k[2]]=typeof v==='boolean'?v:String(v).trim(); }); }
-document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+document.addEventListener('click',async e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
   if(a==='planopen') openPlan();
   else if(a==='plansave'){ planRead(); mark('world'); toast('시나리오 설계를 저장했어요'); openPlan(); }
-  else if(a==='planadd'){ planRead(); const p=PLAN(), k=b.dataset.k, n=G.chapters.filter(c=>c.kind==='main').length; p[k].push(k==='acts'?{name:'',upto:n+4,goal:''}:k==='twists'?{id:'t'+uid().slice(0,4),truth:'',reveal:n+3,who:'',clues:[]}:k==='branches'?{id:'b'+uid().slice(0,4),at:n+1,question:'',options:[]}:{name:'',start:'',change:'',end:''}); openPlan(); }
-  else if(a==='plandel'){ planRead(); PLAN()[b.dataset.k].splice(+b.dataset.i,1); mark('world'); openPlan(); }
-  else if(a==='planai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } planRead(); if(await planAI(b.dataset.k,b,($('#pl_ins')||{}).value||'')){ toast('시나리오를 설계했어요'); openPlan(); } } });
+  else if(a==='planadd'){ planRead(); const p=PLAN(), k=el.dataset.k, n=G.chapters.filter(ch=>ch.kind==='main').length; p[k].push(k==='acts'?{name:'',upto:n+4,goal:''}:k==='twists'?{id:'t'+uid().slice(0,4),truth:'',reveal:n+3,who:'',clues:[]}:k==='branches'?{id:'b'+uid().slice(0,4),at:n+1,question:'',options:[]}:{name:'',start:'',change:'',end:''}); openPlan(); }
+  else if(a==='plandel'){ planRead(); PLAN()[el.dataset.k].splice(+el.dataset.i,1); mark('world'); openPlan(); }
+  else if(a==='planai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } planRead(); if(await planAI(el.dataset.k,el,($('#pl_ins')||{}).value||'')){ toast('시나리오를 설계했어요'); openPlan(); } } });
+/* 시나리오는 게임이 구동될 때 AI가 처리(자동이 기본): 장을 쓰기 전에 설계가 없으면 처음부터, 설계된 막이 이번 장 앞에서 끝났으면 다음 막을 이어서 설계.
+   사용자는 설정 → 시나리오 설계에서 직접 고치거나 AI에 추가 지시할 수 있어요. 구독 게임·글 AI 없음이면 하지 않음 */
+async function planEnsure(n){ if(!SAMPLE||subLocked()) return false; const last=+((PLAN().acts.at(-1)||{}).upto||0);
+  if(!planHas()) return planAI('new',null);
+  if(last&&last<n) return planAI('extend',null);
+  return false; }

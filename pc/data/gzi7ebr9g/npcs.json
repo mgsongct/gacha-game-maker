@@ -1,0 +1,116 @@
+[
+ {
+  "id": "npc_dwfsz78u",
+  "npc": true,
+  "name": "오르빈",
+  "role": "감찰관",
+  "profile": "백운 의회가 변두리 섬에 파견한 감찰관. 법조문과 봉랍을 앞세워 섬과 상회를 쥐어짜는 데 능숙하다.",
+  "speech": "느릿하고 거만한 관료 말투로, '법에 따르면 말이지'를 입버릇처럼 붙인다.",
+  "look": "",
+  "naiPrompt": "1boy, solo, slicked back hair, grey hair, thin mustache, narrow eyes, round eyewear, white coat, long coat, gold embroidery, high collar, sash, rings, holding scroll",
+  "img": null,
+  "faces": [],
+  "skins": [],
+  "lines": [],
+  "touch": {
+   "head": [],
+   "body": []
+  },
+  "affLines": {},
+  "upper": {
+   "id": "up_npc_dwfsz78u",
+   "kind": "upper",
+   "name": "오르빈 상반신",
+   "prompt": "",
+   "img": null
+  },
+  "naiBlocks": {
+   "naiPrompt": {
+    "appearance": "1boy, solo, slicked back hair, grey hair, narrow eyes",
+    "outfit": "white coat, long coat, high collar",
+    "other": "thin mustache, round eyewear, gold embroidery, sash, rings, holding scroll",
+    "style": "",
+    "combined": "1boy, solo, slicked back hair, grey hair, thin mustache, narrow eyes, round eyewear, white coat, long coat, gold embroidery, high collar, sash, rings, holding scroll",
+    "original": "1boy, solo, slicked back hair, grey hair, thin mustache, narrow eyes, round eyewear, white coat, long coat, gold embroidery, high collar, sash, rings, holding scroll",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "npc_uv3n6njv",
+  "npc": true,
+  "name": "로웬",
+  "role": "선장",
+  "profile": "검은 돛 공적단을 이끄는 선장. 검은 반가면 뒤에 얼굴을 숨기고 의회 징발선만 골라 습격하며, 약탈한 부유석의 행방은 아무도 모른다.",
+  "speech": "낮고 짧은 명령조로, 쓸데없는 말을 하지 않는다.",
+  "look": "",
+  "naiPrompt": "1boy, solo, long hair, black hair, streaked hair, low ponytail, stubble, scar across eye, half mask, black mask, black coat, long coat, torn cape, leather armor, belt, holding sword, cutlass",
+  "img": null,
+  "faces": [],
+  "skins": [],
+  "lines": [],
+  "touch": {
+   "head": [],
+   "body": []
+  },
+  "affLines": {},
+  "upper": {
+   "id": "up_npc_uv3n6njv",
+   "kind": "upper",
+   "name": "로웬 상반신",
+   "prompt": "",
+   "img": null
+  },
+  "naiBlocks": {
+   "naiPrompt": {
+    "appearance": "1boy, solo, long hair, black hair, streaked hair, low ponytail, scar across eye",
+    "outfit": "black coat, long coat, torn cape, leather armor, belt",
+    "other": "stubble, half mask, black mask, holding sword, cutlass",
+    "style": "",
+    "combined": "1boy, solo, long hair, black hair, streaked hair, low ponytail, stubble, scar across eye, half mask, black mask, black coat, long coat, torn cape, leather armor, belt, holding sword, cutlass",
+    "original": "1boy, solo, long hair, black hair, streaked hair, low ponytail, stubble, scar across eye, half mask, black mask, black coat, long coat, torn cape, leather armor, belt, holding sword, cutlass",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "npc_7hxn8m5x",
+  "npc": true,
+  "name": "마르그리트",
+  "role": "황동 상회 연합 회장이자 넬의 이모. 코그웰 대조선소를 이끌며 기사단을 공개적으로 후원한다.",
+  "profile": "",
+  "speech": "",
+  "look": "회색 머리를 단정히 틀어 올린 중년 여성. 날카로운 눈매에 가는 안경을 쓰고, 황동 단추가 달린 짙은 녹색 정장 코트와 회중시계 차림으로 늘 장부를 들고 있다.",
+  "naiPrompt": "1girl, solo, grey hair, hair bun, updo, brown eyes, sharp eyes, semi-rimless eyewear, dark green coat, long coat, brass buttons, high collar, ascot, white gloves, pocket watch, watch chain, holding book",
+  "img": null,
+  "faces": [],
+  "skins": [],
+  "lines": [],
+  "touch": {
+   "head": [],
+   "body": []
+  },
+  "affLines": {},
+  "upper": {
+   "id": "up_npc_7hxn8m5x",
+   "kind": "upper",
+   "name": "마르그리트 상반신",
+   "prompt": "",
+   "img": null
+  },
+  "naiBlocks": {
+   "naiPrompt": {
+    "appearance": "1girl, solo, grey hair, hair bun, brown eyes, sharp eyes",
+    "outfit": "dark green coat, long coat, high collar, white gloves",
+    "other": "updo, semi-rimless eyewear, brass buttons, ascot, pocket watch, watch chain, holding book",
+    "style": "",
+    "combined": "1girl, solo, grey hair, hair bun, updo, brown eyes, sharp eyes, semi-rimless eyewear, dark green coat, long coat, brass buttons, high collar, ascot, white gloves, pocket watch, watch chain, holding book",
+    "original": "1girl, solo, grey hair, hair bun, updo, brown eyes, sharp eyes, semi-rimless eyewear, dark green coat, long coat, brass buttons, high collar, ascot, white gloves, pocket watch, watch chain, holding book",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ }
+]

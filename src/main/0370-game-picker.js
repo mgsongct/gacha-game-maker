@@ -23,7 +23,7 @@ function showBootPrep(){
   $('#ov').hidden=false;
 }
 function bpRead(){ P().prepAsked=today(); if($('#bp_tags')){ G.meta.artTags=$('#bp_tags').value.trim(); mark('meta'); }
-  const cats=bootCats().map(x=>x[0]).filter(k=>{const e=document.querySelector(`[data-bpc="${k}"]`);return e&&e.checked;}); BP.cats=new Set(cats); P().bootPrep=1; mark('prog'); return cats; }
+  const cats=bootCats().map(x=>x[0]).filter(k=>{const el=document.querySelector(`[data-bpc="${k}"]`);return el&&el.checked;}); BP.cats=new Set(cats); P().bootPrep=1; mark('prog'); return cats; }
 function bootPrepRun(cats){
   $('#ov').innerHTML=`<div class="setup"><div class="sw-bg" style="${bgStyle(P().titleBg||'')}"></div><div class="sw-card">
     <div class="sw-logo"><i>DRAWING</i><b>그림 준비 중</b></div>

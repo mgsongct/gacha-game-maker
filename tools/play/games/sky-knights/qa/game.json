@@ -1,0 +1,1089 @@
+{
+ "findings": [
+  {
+   "sev": "중",
+   "area": "기본값 섞임",
+   "msg": "재료 던전 이름이 기본값 그대로: 스킬 교본 회수"
+  },
+  {
+   "sev": "하",
+   "area": "기본값 섞임",
+   "msg": "용어 6개가 기본값 그대로: wMat=스킬 교본, construct=영입, res1=연료, res2=탄약, res3=합금, res4=부품"
+  },
+  {
+   "sev": "하",
+   "area": "기본값 섞임",
+   "msg": "상점 NPC·대사가 기본값 그대로(「보급관」)"
+  },
+  {
+   "sev": "하",
+   "area": "기본값 섞임",
+   "msg": "영입 자원 이름이 기본값 그대로: 연료/탄약/합금/부품"
+  },
+  {
+   "sev": "중",
+   "area": "뽑기",
+   "msg": "R 대원이 1명뿐 — 그 등급 확률(R)이 모두 한 사람에게 몰려 중복이 쏟아짐"
+  },
+  {
+   "sev": "하",
+   "area": "그림 프롬프트",
+   "msg": "배경·소품 프롬프트에 인물 태그 1건(그릴 때 가드가 제거)"
+  },
+  {
+   "sev": "하",
+   "area": "대본",
+   "msg": "없는 음악 「설렘」 2회"
+  },
+  {
+   "sev": "하",
+   "area": "분량",
+   "msg": "1장 2: 전 37줄·후 0줄(지시: 전 15~25·후 8~15)"
+  },
+  {
+   "sev": "하",
+   "area": "분량",
+   "msg": "1장 4: 전 20줄·후 16줄(지시: 전 15~25·후 8~15)"
+  },
+  {
+   "sev": "하",
+   "area": "화면 문장",
+   "msg": "생성된 용어에 맞지 않는 조사: 서임로"
+  },
+  {
+   "sev": "하",
+   "area": "화면 문장",
+   "msg": "조사를 고르지 못한 표기: 단원을(를)"
+  },
+  {
+   "sev": "중",
+   "area": "건조·원정",
+   "msg": "생성기가 건조(자원 투입식 영입)를 설정하지 않음 — 꺼진 채 시작, 자원 이름 연료/탄약/합금/부품(기본값)"
+  },
+  {
+   "sev": "중",
+   "area": "플레이",
+   "msg": "첫 10연 뒤 서로 다른 대원 3명 — 편성 3명으로 시작"
+  },
+  {
+   "sev": "중",
+   "area": "바리에이션",
+   "msg": "바리에이션 템플릿이 모든 게임 공통 기본값 6종(수영복·교복·갑옷·공연의상1·공연의상2·공연의상3) — 생성기가 세계관에 맞게 만들지 않음"
+  },
+  {
+   "sev": "하",
+   "area": "바리에이션",
+   "msg": "모든 템플릿의 조건이 비어 있어 보유 대원 누구나 대상(속성·포지션·능력치·업적 조건 없음)"
+  },
+  {
+   "sev": "하",
+   "area": "난이도",
+   "msg": "녹슨 깃발 1: 첫 편성·레벨 1로 10초 만에 승률 100% — 성장 없이 깸"
+  },
+  {
+   "sev": "하",
+   "area": "난이도",
+   "msg": "녹슨 깃발 4(보스): 첫 편성·레벨 1로 14초 만에 승률 100% — 성장 없이 깸"
+  },
+  {
+   "sev": "상",
+   "area": "생성 프롬프트",
+   "msg": "프롬프트에 원본 샘플 이름 18개(새벽등대, 새벽등대 사무소, 회색구 골목, 사무소 옥상, 폐선로, 헬릭스 물류창고…)가 들어감 — chapter1, opening"
+  },
+  {
+   "sev": "중",
+   "area": "생성 프롬프트",
+   "msg": "서버·네트워크 오류 문구가 \"직전 실패를 수정하라\"는 재요청 프롬프트에 들어감: skill-넬-2, skill-넬-3, skill-루시안-2, skill-루시안-3"
+  },
+  {
+   "sev": "하",
+   "area": "생성",
+   "msg": "대원 생성 단계에서 쓴 인라인 스킬 중 1/8명이 앱 검증에 걸려 따로 스킬 설계 요청(루시안)"
+  }
+ ],
+ "meta": {
+  "title": "게일 크레스트",
+  "sub": "Gale Crest",
+  "theme": "fantasy",
+  "terms": {
+   "player": "기사단장",
+   "currency": "하늘결정",
+   "gold": "황동화",
+   "expMat": "기사 교범",
+   "wMat": "스킬 교본",
+   "core": "부유심",
+   "gearMat": "운철 톱니",
+   "transcMat": "폭안석",
+   "gacha": "서임",
+   "ops": "출격",
+   "crew": "단원",
+   "talk": "풍신",
+   "dispatch": "순찰 비행",
+   "farm": "보급 항로",
+   "pass": "항해 일지",
+   "event": "계절풍",
+   "weapon": "문장 병기",
+   "files": "비망록",
+   "skin": "예장",
+   "enhance": "개량",
+   "limit": "과급",
+   "abyss": "폭풍권 원정",
+   "construct": "영입",
+   "res1": "연료",
+   "res2": "탄약",
+   "res3": "합금",
+   "res4": "부품"
+  },
+  "elems": [
+   "증기>강철",
+   "강철>뇌전",
+   "뇌전>질풍",
+   "질풍>증기"
+  ],
+  "farms": [
+   "기사단 교련장",
+   "침몰 상선 인양",
+   "스킬 교본 회수",
+   "부유석 광산섬"
+  ]
+ },
+ "world": {
+  "name": "아스테른 군도",
+  "summary": "수백 개의 하늘섬이 부유석의 힘으로 떠 있는 아스테른 군도에, 섬을 통째로 삼키는 잿빛 폭풍 '아가리'가 다시 내려오기 시작했다. 플레이어는 십 년 전 반역죄로 몰락한 질풍문장 기사단의 마지막 문장을 물려받은 기사단장이 되어, 흩어진 기사들을 모으고 폭풍의 정체를 쫓는다.",
+  "plotLen": 680,
+  "loreLen": 525,
+  "factions": [
+   "질풍문장 기사단/playable",
+   "황동 상회 연합/playable",
+   "백운 의회/hostile",
+   "검은 돛 공적단/hostile",
+   "와류수/monster",
+   "운해 순례회/neutral"
+  ],
+  "plan": false
+ },
+ "chars": [
+  {
+   "name": "카시아",
+   "rarity": "SSR",
+   "role": "atk",
+   "elem": "질풍",
+   "faction": "질풍문장 기사단",
+   "debut": "start",
+   "profileLen": 104,
+   "lines": 8,
+   "persona": 14,
+   "skills": "선봉의 맹세 / 질풍 돌파 / 바람눈 일섬",
+   "skillWarn": "",
+   "weapon": "질풍검 「바람눈」",
+   "look": "1girl, solo, short hair, silver hair, asymmetrical bangs, blue eyes, sharp eyes, scar on cheek, tall female, athletic, knight, steampunk arm"
+  },
+  {
+   "name": "브람",
+   "rarity": "R",
+   "role": "def",
+   "elem": "강철",
+   "faction": "질풍문장 기사단",
+   "debut": "start",
+   "profileLen": 97,
+   "lines": 8,
+   "persona": 14,
+   "skills": "늙은 방패 / 철벽 진형 / 녹슨 성문",
+   "skillWarn": "",
+   "weapon": "대방패 「녹슨 성문」",
+   "look": "1boy, solo, short hair, grey hair, thick beard, brown eyes, scar on nose, very tall, muscular male, broad shoulders, heavy armor, steampunk "
+  },
+  {
+   "name": "넬",
+   "rarity": "SR",
+   "role": "def",
+   "elem": "증기",
+   "faction": "황동 상회 연합",
+   "debut": "start",
+   "profileLen": 100,
+   "lines": 8,
+   "persona": 14,
+   "skills": "현장 정비 / 압력 방벽 / 톱니공주 풀가동",
+   "skillWarn": "",
+   "weapon": "만능 증기 렌치 「톱니공주」",
+   "look": "1girl, solo, medium hair, messy hair, orange hair, low twintails, green eyes, freckles, petite, goggles on head, gear hair ornament, white s"
+  },
+  {
+   "name": "루시안",
+   "rarity": "SSR",
+   "role": "atk",
+   "elem": "뇌전",
+   "faction": "황동 상회 연합",
+   "debut": "start",
+   "profileLen": 95,
+   "lines": 8,
+   "persona": 14,
+   "skills": "회수 계산 / 뇌관 저격 / 최종 청산",
+   "skillWarn": "",
+   "weapon": "뇌관 장총 「청구서」",
+   "look": "1boy, solo, long hair, black hair, low ponytail, hair over one eye, purple eyes, half-closed eyes, slender, tall male, monocle, white shirt,"
+  },
+  {
+   "name": "이브",
+   "rarity": "SR",
+   "role": "sup",
+   "elem": "뇌전",
+   "faction": "질풍문장 기사단",
+   "debut": "stage",
+   "profileLen": 120,
+   "lines": 8,
+   "persona": 14,
+   "skills": "기류 예보 / 순풍 항로 / 뇌운 항법",
+   "skillWarn": "",
+   "weapon": "항법 신호총 「등대불」",
+   "look": "1girl, solo, long hair, wavy hair, dark blue hair, grey eyes, half-closed eyes, expressionless, slender, aviator goggles around neck, white "
+  },
+  {
+   "name": "비비안",
+   "rarity": "SR",
+   "role": "sup",
+   "elem": "증기",
+   "faction": "검은 돛 공적단",
+   "debut": "stage",
+   "profileLen": 89,
+   "lines": 8,
+   "persona": 14,
+   "skills": "꿰매면 그만 / 응급 봉합 / 기관장의 철야",
+   "skillWarn": "",
+   "weapon": "봉합 공구총 「검은 바늘」",
+   "look": "1girl, solo, short hair, black hair, red streaked hair, amber eyes, tired eyes, scar on lip, tall female, toned, black bandana, white shirt,"
+  },
+  {
+   "name": "마테오",
+   "rarity": "SR",
+   "role": "atk",
+   "elem": "강철",
+   "faction": "황동 상회 연합",
+   "debut": "stage",
+   "profileLen": 97,
+   "lines": 8,
+   "persona": 14,
+   "skills": "순풍 가속 / 강철 돌입 / 바람말 급강하",
+   "skillWarn": "",
+   "weapon": "강철 돌격창 「바람말 뿔」",
+   "look": "1boy, solo, short hair, spiked hair, brown hair, amber eyes, grin, tan, freckles, aviator cap, aviator goggles, bomber jacket, brown jacket,"
+  },
+  {
+   "name": "아델",
+   "rarity": "SSR",
+   "role": "def",
+   "elem": "질풍",
+   "faction": "질풍문장 기사단",
+   "debut": "stage",
+   "profileLen": 120,
+   "lines": 8,
+   "persona": 14,
+   "skills": "날개 방진 / 철익 방진 / 은익의 맹세",
+   "skillWarn": "",
+   "weapon": "날개 대방패 「은익」",
+   "look": "1girl, solo, long hair, straight hair, platinum blonde hair, high ponytail, aqua eyes, tall female, white military uniform, silver armor, pa"
+  }
+ ],
+ "dist": {
+  "rarity": {
+   "SSR": 3,
+   "R": 1,
+   "SR": 4
+  },
+  "role": {
+   "atk": 3,
+   "def": 3,
+   "sup": 2
+  },
+  "elem": {
+   "질풍": 2,
+   "강철": 2,
+   "증기": 2,
+   "뇌전": 2
+  },
+  "faction": {
+   "질풍문장 기사단": 4,
+   "황동 상회 연합": 3,
+   "검은 돛 공적단": 1
+  }
+ },
+ "chapters": [
+  {
+   "kind": "main",
+   "title": "녹슨 깃발",
+   "logline": "녹슨 요새에 깃발을 올린 날, 폭풍 속에서 고래가 울었다.",
+   "stages": [
+    {
+     "title": "요새의 둥지",
+     "mode": "battle",
+     "enemies": [
+      "잔해 까마귀(질풍) 894/94/33",
+      "잔해 까마귀(질풍) 894/94/33",
+      "녹슨 껍데기(강철) 1235/71/51"
+     ],
+     "field": "",
+     "pre": 24,
+     "post": 14
+    },
+    {
+     "title": "징발 명령서",
+     "mode": "story",
+     "enemies": [],
+     "field": "",
+     "pre": 37,
+     "post": 0
+    },
+    {
+     "title": "등대섬의 관측사",
+     "mode": "battle",
+     "enemies": [
+      "기류 늑대(뇌전) 1163/107/43",
+      "기류 늑대(뇌전) 1163/107/43",
+      "증기 망령(증기) 1124/117/37",
+      "잔해 까마귀(질풍) 1069/113/39"
+     ],
+     "field": "",
+     "pre": 24,
+     "post": 15
+    },
+    {
+     "title": "잿빛 아가리",
+     "mode": "battle",
+     "enemies": [
+      "기류 늑대(뇌전) 1257/115/46",
+      "잔해 고래(질풍,보스) 4722/98/54",
+      "녹슨 껍데기(강철) 1574/91/65"
+     ],
+     "field": "",
+     "pre": 20,
+     "post": 16
+    }
+   ]
+  },
+  {
+   "kind": "main",
+   "title": "검은 돛의 그림자",
+   "logline": "자유항을 덮친 의회의 그림자, 그리고 운해 위에서 마주친 낯익은 검.",
+   "stages": [
+    {
+     "title": "구름 위의 호위",
+     "mode": "battle",
+     "enemies": [
+      "검은 돛 약탈자(증기) 3746/275/132",
+      "검은 돛 포격수(뇌전) 3746/275/132",
+      "잔해 까마귀(질풍) 3746/275/132"
+     ],
+     "field": "",
+     "pre": 25,
+     "post": 14
+    },
+    {
+     "title": "황동의 청문회",
+     "mode": "debate",
+     "enemies": [],
+     "field": "",
+     "pre": 27,
+     "post": 14
+    },
+    {
+     "title": "떼어 낸 휘장",
+     "mode": "battle",
+     "enemies": [
+      "철익 근위병(강철) 4122/303/145",
+      "철익 저격병(뇌전) 4122/303/145",
+      "철익 근위병(강철) 4122/303/145"
+     ],
+     "field": "",
+     "pre": 25,
+     "post": 14
+    },
+    {
+     "title": "백익호 습격",
+     "mode": "battle",
+     "enemies": [
+      "검은 돛 약탈자(증기) 3152/231/111",
+      "운해 장어(뇌전) 3152/231/111",
+      "철익 근위병(강철) 3152/231/111",
+      "로웬(질풍,보스) 3152/231/111"
+     ],
+     "field": "",
+     "pre": 25,
+     "post": 15
+    }
+   ]
+  }
+ ],
+ "banners": [
+  {
+   "name": "질풍의 서임",
+   "type": "std",
+   "active": true,
+   "pickup": [],
+   "rate": 50
+  },
+  {
+   "name": "바람눈의 맹세",
+   "type": "pickup",
+   "active": true,
+   "pickup": [
+    "카시아"
+   ],
+   "rate": 50
+  },
+  {
+   "name": "황동 상회 특별 조달",
+   "type": "pool",
+   "active": true,
+   "pickup": [],
+   "rate": 50
+  }
+ ],
+ "lib": {
+  "bg": 15,
+  "prop": 7,
+  "bgm": 10,
+  "sfx": 13,
+  "enemy": 14,
+  "icon": 7,
+  "map": 1,
+  "cg": 4
+ },
+ "threads": [
+  {
+   "title": "엔진이 숨을 쉬어요",
+   "char": "넬",
+   "lines": 14
+  },
+  {
+   "title": "야간 순찰 보고",
+   "char": "카시아",
+   "lines": 15
+  },
+  {
+   "title": "기압계 일지",
+   "char": "이브",
+   "lines": 14
+  },
+  {
+   "title": "첫 번째 일기",
+   "char": "아델",
+   "lines": 13
+  },
+  {
+   "title": "늙은이의 밤",
+   "char": "브람",
+   "lines": 11
+  }
+ ],
+ "npcs": [
+  "오르빈",
+  "로웬",
+  "마르그리트"
+ ],
+ "rulesElemText": "증기>강철, 강철>뇌전, 뇌전>질풍, 질풍>증기",
+ "sampleNames": [
+  "새벽등대",
+  "헬릭스 컨소시엄",
+  "회색구 시민회",
+  "회색구 연합",
+  "새벽등대 사무소",
+  "회색구 골목",
+  "사무소 옥상",
+  "폐선로",
+  "헬릭스 물류창고",
+  "낙성 분화구",
+  "의무실",
+  "옛 항구",
+  "카지노 뒷골목",
+  "정비실",
+  "포장마차",
+  "오델의 집",
+  "관리관 숙소",
+  "하트 에이스",
+  "헬릭스 상자",
+  "성핵 추적 장치",
+  "임명장"
+ ],
+ "audit": {
+  "total": 79,
+  "rules": [
+   "c_skills(upgrade) 스킬이 지금 전투 규칙(밸런스 검사)과 맞지 않아요: 6",
+   "c_symbol(upgrade) 상징 컬러·아이템이 정해지지 않았어요(바리에이션 디자인에 쓰여요): 8",
+   "c_img(missing) 그림(스탠딩·상반신·일러스트·무기)이 아직 없어요: 8",
+   "c_afftalk(missing) 호감도에 따라 열리는 인연 톡이 없어요: 8",
+   "c_memorial(missing) 메모리얼(높은 호감도 특별 장면·로비 대사)이 없어요: 8",
+   "g_codex(upgrade) 도감에 게임 규칙(상성·역할)이 기록되지 않았어요: 1",
+   "g_spots(upgrade) 일정(장소 방문) 장소가 없어요: 1",
+   "l_imgperson(missing) 배경·소품 그림 프롬프트에 사람 태그가 섞여 있어요(사람 그림이 돼요): 1",
+   "l_img(missing) 배경·소품·CG·적 그림이 아직 없어요: 38"
+  ]
+ },
+ "persona": {
+  "avg": 85,
+  "detail": [
+   {
+    "n": "카시아",
+    "score": 87,
+    "issues": [
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "브람",
+    "score": 87,
+    "issues": [
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "넬",
+    "score": 79,
+    "issues": [
+     "대사에 말투(어미·말버릇·대표 대사)가 드러나지 않아요",
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "루시안",
+    "score": 87,
+    "issues": [
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "이브",
+    "score": 87,
+    "issues": [
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "비비안",
+    "score": 87,
+    "issues": [
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "마테오",
+    "score": 79,
+    "issues": [
+     "대사에 말투(어미·말버릇·대표 대사)가 드러나지 않아요",
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   },
+   {
+    "n": "아델",
+    "score": 87,
+    "issues": [
+     "호감도에 따라 열리는 인연 톡이 없어요",
+     "메모리얼이 없어요",
+     "인연 스토리(에피소드)가 없어요"
+    ]
+   }
+  ]
+ },
+ "plan": [
+  "로그라인이 없어요",
+  "막 구성이 없어요"
+ ],
+ "faction": {
+  "score": 96,
+  "issues": [
+   "정체가 정해지지 않은 적 2종: 검은 돛 약탈자, 철익 근위병"
+  ]
+ },
+ "balance": [
+  {
+   "n": "카시아",
+   "dev": 0.14482029598308666
+  },
+  {
+   "n": "브람",
+   "dev": 0.015902712815715647
+  },
+  {
+   "n": "넬",
+   "dev": 0.020815264527320076
+  },
+  {
+   "n": "루시안",
+   "dev": 0.0888888888888888
+  },
+  {
+   "n": "이브",
+   "dev": 0.050824175824175866
+  },
+  {
+   "n": "비비안",
+   "dev": 0.10576923076923084
+  },
+  {
+   "n": "마테오",
+   "dev": 0.01680672268907557
+  },
+  {
+   "n": "아델",
+   "dev": -0.016679904686258906
+  }
+ ],
+ "imgPerson": [
+  "bg:운해 저공 항로 -clouds surface"
+ ],
+ "scriptQA": {
+  "sayLines": 224,
+  "choices": 24,
+  "branches": 0,
+  "unknownSpeakers": {},
+  "missingBg": {},
+  "missingBgm": {
+   "설렘": 2
+  },
+  "faces": {
+   "반짝": 1
+  },
+  "commands": {
+   "음악": 28,
+   "효과": 12,
+   "효과음": 11,
+   "소품": 4,
+   "소품끝": 4,
+   "배경": 5,
+   "CG": 4,
+   "CG끝": 4,
+   "연출": 1,
+   "톡": 1,
+   "톡끝": 1,
+   "음악끝": 1,
+   "사진": 2,
+   "스티커": 3
+  },
+  "longLines": 0,
+  "english": [],
+  "parseErrors": [],
+  "debutViolations": [],
+  "places": 16
+ },
+ "uiText": "STANDARD 질풍의 서임 카시아 확률 업 SEASON PASS Lv.0 9 ! 1 3 Gale Crest 게일 크레스트 첫 서임로 단원을(를) 만나세요 캐시 상점 상점 COMBAT 출격 출격 1-1 요새의 둥지 MAIN STORY 출격 CHAPTER 01 진행 중 녹슨 깃발 녹슨 요새에 깃발을 올린 날, 폭풍 속에서 고래가 울었다. 0 / 4 CHAPTER 02 🔒 잠김 검은 돛의 그림자 앞 장을 모두 끝내면 열려요. 0 / 4 CHAPTER 03 다음 이야기 ＋ 다음 장 만들기 글 AI를 등록하면 다음 장을 만들 수 있어요. ← 옆으로 넘겨서 장을 고르세요 → 적 스탯 자동조정 · 새 스킬 기준 질풍의 서임 바람눈의 맹세 황동 상회 특별 조달 ✦ 신규 ★ 픽업 ＋ ‹ › 상반신 미등록 상반신 미등록 게일 크레스트 Gale Crest STAN DARD RECRUITMENT 질풍의 서임 SSR 카시아 질풍문장 기사단 SSR 확정까지 150회 112회부터 SSR 확률이 점점 올라가요 모집 포인트 0/200 교환 첫 10회는 SSR 1명 확정 1회 ◆ 120 10회 ◆ 1,200 · SR 이상 1명 보장 ◆ 하늘결정 충전 확률 정보 SSR 2명 4% SR 1",
+ "construct": {
+  "on": false,
+  "configured": false,
+  "expedition": "(기본 combat)",
+  "resTerms": [
+   "연료",
+   "탄약",
+   "합금",
+   "부품"
+  ],
+  "dispatches": [
+   "항로 순찰",
+   "상선 호위",
+   "부유석 탐사",
+   "리벳항 수리 지원",
+   "기상 관측",
+   "운해 정찰"
+  ],
+  "groups": [
+   "후방({\"role\":\"sup\"})",
+   "선봉({\"role\":\"atk\"})",
+   "수호({\"role\":\"def\"})"
+  ],
+  "start": 600,
+  "buy": {
+   "gems": 60,
+   "amt": 300
+  },
+  "tables": [
+   {
+    "input": "최소 30×4",
+    "open": "후방 100%",
+    "rarity": "R 100 / SR 0 / SSR 0.0",
+    "rows": ""
+   },
+   {
+    "input": "균등 300×4",
+    "open": "후방 33% · 선봉 33% · 수호 33%",
+    "rarity": "R 79 / SR 21 / SSR 0.0",
+    "rows": "브람 79.2%, 넬 20.8%"
+   },
+   {
+    "input": "공격 쏠림 100/600/100/100",
+    "open": "후방 19% · 선봉 62% · 수호 19%",
+    "rarity": "R 81 / SR 19 / SSR 0.0",
+    "rows": "브람 81.3%, 넬 18.7%"
+   },
+   {
+    "input": "균등 500×4",
+    "open": "후방 33% · 선봉 33% · 수호 33%",
+    "rarity": "R 71 / SR 26 / SSR 3.0",
+    "rows": "브람 68.7%, 넬 28.4%, 카시아 1.5%, 루시안 1.5%"
+   },
+   {
+    "input": "최대 999×4",
+    "open": "후방 33% · 선봉 33% · 수호 33%",
+    "rarity": "R 50 / SR 40 / SSR 10.0",
+    "rows": "넬 45.5%, 브람 45.5%, 카시아 4.5%, 루시안 4.5%"
+   }
+  ],
+  "poolSize": 4,
+  "never": [],
+  "expIncome": [
+   "게시판 의뢰 30개의 건조 자원: 평균 905 · 시간당 평균 150 · 자원 보상 없는 의뢰 0"
+  ]
+ },
+ "firstPull": {
+  "banner": "질풍의 서임",
+  "results": [
+   "SSR 루시안",
+   "R 브람",
+   "R 브람",
+   "R 브람",
+   "R 브람",
+   "R 브람",
+   "SR 넬",
+   "R 브람",
+   "R 브람",
+   "R 브람"
+  ],
+  "owned": [
+   "브람",
+   "넬",
+   "루시안"
+  ],
+  "squad": [
+   "브람",
+   "넬",
+   "루시안"
+  ]
+ },
+ "battles": [
+  {
+   "chapter": "녹슨 깃발",
+   "stages": [
+    {
+     "n": 1,
+     "title": "요새의 둥지",
+     "mode": "battle",
+     "boss": false,
+     "lv1": {
+      "win": 100,
+      "time": 10
+     },
+     "lv10": {
+      "win": 100,
+      "time": 8
+     },
+     "lv20": {
+      "win": 100,
+      "time": 6
+     }
+    },
+    {
+     "n": 2,
+     "title": "징발 명령서",
+     "mode": "story"
+    },
+    {
+     "n": 3,
+     "title": "등대섬의 관측사",
+     "mode": "battle",
+     "boss": false,
+     "lv1": {
+      "win": 100,
+      "time": 15
+     },
+     "lv10": {
+      "win": 100,
+      "time": 12
+     },
+     "lv20": {
+      "win": 100,
+      "time": 10
+     }
+    },
+    {
+     "n": 4,
+     "title": "잿빛 아가리",
+     "mode": "battle",
+     "boss": true,
+     "lv1": {
+      "win": 100,
+      "time": 14
+     },
+     "lv10": {
+      "win": 100,
+      "time": 12
+     },
+     "lv20": {
+      "win": 100,
+      "time": 10
+     }
+    }
+   ]
+  },
+  {
+   "chapter": "검은 돛의 그림자",
+   "stages": [
+    {
+     "n": 1,
+     "title": "구름 위의 호위",
+     "mode": "battle",
+     "boss": false,
+     "lv1": {
+      "win": 95,
+      "time": 25
+     },
+     "lv10": {
+      "win": 100,
+      "time": 18
+     },
+     "lv20": {
+      "win": 100,
+      "time": 14
+     }
+    },
+    {
+     "n": 2,
+     "title": "황동의 청문회",
+     "mode": "debate"
+    },
+    {
+     "n": 3,
+     "title": "떼어 낸 휘장",
+     "mode": "battle",
+     "boss": false,
+     "lv1": {
+      "win": 100,
+      "time": 34
+     },
+     "lv10": {
+      "win": 100,
+      "time": 24
+     },
+     "lv20": {
+      "win": 100,
+      "time": 18
+     }
+    },
+    {
+     "n": 4,
+     "title": "백익호 습격",
+     "mode": "battle",
+     "boss": true,
+     "lv1": {
+      "win": 90,
+      "time": 35
+     },
+     "lv10": {
+      "win": 100,
+      "time": 24
+     },
+     "lv20": {
+      "win": 100,
+      "time": 19
+     }
+    }
+   ]
+  }
+ ],
+ "variants": {
+  "templates": [
+   {
+    "name": "수영복",
+    "prompt": "swimsuit, beach, summer, sunlight",
+    "chance": 35,
+    "recipe": "300/100/100/300",
+    "cond": "{}",
+    "eligible": [
+     "브람",
+     "넬",
+     "루시안"
+    ],
+    "affordable": 2
+   },
+   {
+    "name": "교복",
+    "prompt": "blazer, formal school-style uniform cosplay, adult",
+    "chance": 35,
+    "recipe": "100/300/100/300",
+    "cond": "{}",
+    "eligible": [
+     "브람",
+     "넬",
+     "루시안"
+    ],
+    "affordable": 2
+   },
+   {
+    "name": "갑옷",
+    "prompt": "fantasy plate armor, ornate armor, cape",
+    "chance": 35,
+    "recipe": "100/100/300/300",
+    "cond": "{}",
+    "eligible": [
+     "브람",
+     "넬",
+     "루시안"
+    ],
+    "affordable": 2
+   },
+   {
+    "name": "공연의상1",
+    "prompt": "idol stage costume, frills, stage lights",
+    "chance": 30,
+    "recipe": "300/300/100/400",
+    "cond": "{}",
+    "eligible": [
+     "브람",
+     "넬",
+     "루시안"
+    ],
+    "affordable": 1
+   },
+   {
+    "name": "공연의상2",
+    "prompt": "elegant evening gown, concert stage, spotlight",
+    "chance": 30,
+    "recipe": "300/100/300/400",
+    "cond": "{}",
+    "eligible": [
+     "브람",
+     "넬",
+     "루시안"
+    ],
+    "affordable": 1
+   },
+   {
+    "name": "공연의상3",
+    "prompt": "rock band stage outfit, leather, electric guitar",
+    "chance": 30,
+    "recipe": "100/300/300/400",
+    "cond": "{}",
+    "eligible": [
+     "브람",
+     "넬",
+     "루시안"
+    ],
+    "affordable": 1
+   }
+  ],
+  "made": [
+   {
+    "base": "브람",
+    "tpl": "수영복",
+    "name": "브람(수영복)",
+    "rarity": "R",
+    "tagOk": true,
+    "look": "1boy, solo, short hair, grey hair, thick beard, brown eyes, scar on nose, very tall, muscular male, broad shoulders, riveted plates, brass fittings, swimsuit, b",
+    "inherited": true
+   }
+  ]
+ },
+ "squadStats": [
+  "브람(R 수호) 체력3332 공격129 방어179",
+  "넬(SR 수호) 체력2978 공격113 방어166",
+  "루시안(SSR 선봉) 체력1664 공격234 방어81"
+ ],
+ "pageErrors": [],
+ "folder": {
+  "prompts": 40,
+  "chars": 322365,
+  "sampleInPrompts": {
+   "새벽등대": [
+    "chapter1",
+    "opening"
+   ],
+   "새벽등대 사무소": [
+    "chapter1",
+    "opening"
+   ],
+   "회색구 골목": [
+    "chapter1",
+    "opening"
+   ],
+   "사무소 옥상": [
+    "chapter1",
+    "opening"
+   ],
+   "폐선로": [
+    "chapter1",
+    "opening"
+   ],
+   "헬릭스 물류창고": [
+    "chapter1",
+    "opening"
+   ],
+   "낙성 분화구": [
+    "chapter1",
+    "opening"
+   ],
+   "의무실": [
+    "chapter1",
+    "opening"
+   ],
+   "옛 항구": [
+    "chapter1",
+    "opening"
+   ],
+   "카지노 뒷골목": [
+    "chapter1",
+    "opening"
+   ],
+   "정비실": [
+    "chapter1",
+    "opening"
+   ],
+   "포장마차": [
+    "chapter1",
+    "opening"
+   ],
+   "오델의 집": [
+    "chapter1",
+    "opening"
+   ],
+   "관리관 숙소": [
+    "chapter1",
+    "opening"
+   ],
+   "하트 에이스": [
+    "chapter1",
+    "opening"
+   ],
+   "헬릭스 상자": [
+    "chapter1",
+    "opening"
+   ],
+   "성핵 추적 장치": [
+    "chapter1",
+    "opening"
+   ],
+   "임명장": [
+    "chapter1",
+    "opening"
+   ]
+  },
+  "inlineSkillPass": "7/8",
+  "commitAtCall": 5,
+  "calls": 5,
+  "mainSteps": [
+   "world:3283",
+   "chars:18236",
+   "opening:9355",
+   "chapter1:11842"
+  ]
+ }
+}

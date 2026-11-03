@@ -1,0 +1,1 @@
+{"opening":{"lines":["밤이 온다."],"prologue":"[배경: 등대]\n하나: 시작이야.\n두리: 그래, 불을 지키자.\n유령: 누구냐…"},"backgrounds":[{"name":"등대","prompt":"no humans, scenery, lighthouse, night"}],"props":[],"music":[],"banners":{"std":"상시 서약","pickup":{"name":"불꽃의 맹세","char":"하나"}}}

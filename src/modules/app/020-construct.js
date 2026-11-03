@@ -44,8 +44,10 @@ function table(input,c,pool){
   const mem=pool.filter(p=>inGroup(p,g.match)),rar=[3,2,1].filter(k=>k<=g.maxRarity&&(k===1||info.open[k])),pr={};let left=0;
   for(const k of rar)pr[k]=k===1?100-rar.filter(x=>x>1).reduce((a,x)=>a+info.rarity[x],0):info.rarity[k];
   const has=k=>mem.some(p=>p.rarity===k),avail=rar.filter(has);if(!avail.length)continue;
-  for(const k of rar)if(!has(k)){left+=pr[k];pr[k]=0;}
-  const sum=avail.reduce((a,k)=>a+pr[k],0);for(const k of avail){const share=sum>0?pr[k]/sum*(sum+left):(100/avail.length),m=mem.filter(p=>p.rarity===k),U=m.reduce((a,p)=>a+up(p),0);for(const p of m)add(p,g.p*share/100*up(p)/U);}}
+  /* 후보가 없는 희귀도 칸은 같은 분류의 더 낮은 희귀도로만 내려요. 더 낮은 칸도 없으면 그 몫은 버리고(마지막에 전체를 다시 100%로) — 위로 올리면 희귀도 캡을 넘어요
+     (예전: R이 없는 분류는 R 몫이 전부 SR로 가서, 표시 SR 21%인 투입에서 실제 SR이 70%를 넘었어요) */
+  for(const k of rar)if(!has(k)){const low=avail.filter(x=>x<k).sort((a,b)=>b-a)[0];if(low)pr[low]+=pr[k];pr[k]=0;}
+  for(const k of avail){const m=mem.filter(p=>p.rarity===k),U=m.reduce((a,p)=>a+up(p),0);for(const p of m)add(p,g.p*pr[k]/100*up(p)/U);}}
  const S=[...rows.values()].reduce((a,b)=>a+b,0);
  return {info,rows:[...rows].map(([id,v])=>({id,p:S>0?v/S*100:0})).sort((a,b)=>b.p-a.p)};}
 function weighted(items,weight,rng){const w=items.map(weight),s=w.reduce((a,b)=>a+b,0);if(!(s>0))return items[Math.floor(rng()*items.length)];let x=rng()*s;for(let i=0;i<items.length;i++){x-=w[i];if(x<0)return items[i];}return items[items.length-1];}
@@ -70,10 +72,13 @@ function condMatch(cond,ch,ctx){cond=cond||{};ctx=ctx||{};const o=ctx.own||{},ha
  if(has(cond.cleared)&&!cond.cleared.every(id=>ctx.cleared&&ctx.cleared[id]))return false;
  return true;}
 /* 이미지 프롬프트: 원래 캐릭터의 외모 태그 + 기본형 의상 태그 + 상징 컬러·상징 아이템 */
-const CLOTHES=/(dress|coat|jacket|shirt|blouse|skirt|pants|shorts|uniform|bodysuit|armor|armour|suit|robe|kimono|hoodie|sweater|vest|cape|cloak|gloves|boots|shoes|heels|stockings|thighhighs|pantyhose|leotard|swimsuit|bikini|outfit|clothes|clothing|attire|costume|apron|corset|tie|necktie|scarf|hat|cap|helmet|holding )/i;
+// 의상·장비 태그(기본형 의상으로 바꿀 때 빼는 것) — 갑옷 부위·무기 태그도(무기는 상징 아이템으로 따로 들어감)
+const CLOTHES=/(dress|coat|jacket|shirt|blouse|skirt|pants|shorts|uniform|bodysuit|armor|armour|suit|robe|kimono|hoodie|sweater|vest|cape|cloak|gloves|boots|shoes|heels|stockings|thighhighs|pantyhose|leotard|swimsuit|bikini|outfit|clothes|clothing|attire|costume|apron|corset|tie|necktie|scarf|hat|cap|helmet|holding |breastplate|pauldron|gauntlet|greaves|tabard|surcoat|chainmail|bracer|vambrace|sash|belt|harness|holster|sword|rifle|pistol|gun|staff|spear|lance|bow|shield|blade|dagger|katana|axe|hammer|scythe|whip|wand)/i;
 const COMPO=/^(full body|standing|straight-on|simple background|white background|cowboy shot|upper body|portrait|looking at viewer|arms at sides)$/i;
 const tags=s=>String(s||'').split(',').map(t=>t.trim()).filter(Boolean);
-function symbolColor(ch){if(ch.symColor)return String(ch.symColor);const m=tags(ch.naiPrompt).map(t=>t.match(/^([a-z]+(?: [a-z]+)?) (hair|eyes)$/i)).find(Boolean);return m?m[1]:'';}
+// 상징 컬러: "<색> hair/eyes"의 색 — 길이·모양 단어(long crimson hair의 long, short hair의 short)는 색이 아님
+const NOT_COLOR=/^(very |)(short|long|medium|messy|straight|wavy|curly|shiny|spiky|floating|wet|braided|twin|side|low|high|half|bob|hime|drill|flipped|ahoge|swept|parted|tied|loose|big|small|narrow|half-closed|closed|wide|sharp|tareme|tsurime|glowing)( |$)/i;
+function symbolColor(ch){if(ch.symColor)return String(ch.symColor);for(const t of tags(ch.naiPrompt)){const m=t.match(/^(.+) (hair|eyes)$/i);if(!m)continue;const w=m[1].split(' ').filter(x=>!NOT_COLOR.test(x+' '));if(w.length&&w.length<=2)return w.join(' ');}return '';}
 function symbolItem(ch){if(ch.symItem)return String(ch.symItem);const w=ch.weapon||{};return tags(w.prompt).filter(t=>!/^(no humans|object focus|simple background|white background|sci-fi|fantasy)$/i.test(t)).slice(0,2).join(', ');}
 function variantPrompt(ch,tpl){
  const look=tags(ch.naiPrompt).filter(t=>!CLOTHES.test(t)&&!COMPO.test(t)),color=symbolColor(ch),item=symbolItem(ch);
@@ -88,6 +93,11 @@ const VARIANT_DEFAULTS=[
  {id:'v_stage1',name:'공연의상1',prompt:'idol stage costume, frills, stage lights',chance:30,recipe:{min:[300,300,100,500]}},
  {id:'v_stage2',name:'공연의상2',prompt:'elegant evening gown, concert stage, spotlight',chance:30,recipe:{min:[500,100,300,500]}},
  {id:'v_stage3',name:'공연의상3',prompt:'rock band stage outfit, leather, electric guitar',chance:30,recipe:{min:[100,500,300,500]}}].map(v=>Object.assign({on:true,rarity:'same',brief:'',cond:{}},v));
-const api={RES,DEFAULTS,VARIANT_DEFAULTS,config,normalize,matches,rates,table,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
+// 새 게임 세계관 단계의 바리에이션 기본형 정리: 이름·영어 태그만, 조건은 이 게임에 있는 역할·소속·속성만 남김. 레시피·확률은 VARIANT_DEFAULTS와 같은 값을 순서대로(id는 앱이 붙임)
+function variantsFrom(list,o={}){if(!Array.isArray(list))return [];const F=o.factions||[],E=o.elems||[],R=['atk','def','sup'],seen=new Set();
+ return list.filter(v=>v&&typeof v==='object').map(v=>({name:String(v.name||'').replace(/[<>"'&`]/g,'').trim().slice(0,12),prompt:String(v.prompt||'').replace(/[^\x20-\x7e]/g,'').replace(/\s+/g,' ').replace(/^[ ,]+|[ ,]+$/g,'').slice(0,200),brief:String(v.brief||'').slice(0,160),cond:v.cond&&typeof v.cond==='object'?v.cond:{}}))
+  .filter(v=>v.name&&v.prompt&&!seen.has(v.name)&&seen.add(v.name)).slice(0,6).map((v,i)=>{const L=(x,ok)=>(Array.isArray(x)?x:[]).map(s=>String(s).trim()).filter(ok),c={factions:L(v.cond.factions,s=>F.includes(s)),roles:L(v.cond.roles,s=>R.includes(s)),elems:L(v.cond.elems,s=>E.includes(s))};
+   Object.keys(c).forEach(k=>{if(!c[k].length)delete c[k];});const d=VARIANT_DEFAULTS[i%VARIANT_DEFAULTS.length];return {name:v.name,prompt:v.prompt,brief:v.brief,chance:d.chance,recipe:{min:d.recipe.min.slice()},rarity:'same',on:true,cond:c};});}
+const api={RES,DEFAULTS,VARIANT_DEFAULTS,variantsFrom,config,normalize,matches,rates,table,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
 root.GGMConstruct=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

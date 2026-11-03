@@ -7,12 +7,12 @@ function sealSVG(){
 }
 let GC=null;
 /* 공유 팩 해금: 받은 게임(meta.gated)에서는 픽업·이벤트가 메인 스토리 진행(깬 스테이지 수 gate)에 맞춰 차례로 열려요 */
-function mainCleared(){ const p=P(); return G.chapters.filter(c=>c.kind==='main').reduce((n,ch)=>n+ch.stages.filter(s=>p.cleared[s.id]).length,0); }
+function mainCleared(){ const p=P(); return G.chapters.filter(ch=>ch.kind==='main').reduce((n,ch)=>n+ch.stages.filter(s=>p.cleared[s.id]).length,0); }
 function gateOpen(x){ return !G.meta.gated||!x||!(x.gate>0)||mainCleared()>=x.gate; }
 function bnOpen(b){ if(b.active===false||!gateOpen(b)) return false; if(b.pin&&b.until&&b.until<=Date.now()) return false; const ev=b.eventId&&G.events.find(e=>e.id===b.eventId); return !ev||gateOpen(ev); }
 function gateCheck(){ if(!G.meta.gated) return; const p=P(); p.gateSeen=p.gateSeen||[]; const n=[];
-  G.events.forEach(e=>{ if(e.gate>0&&gateOpen(e)&&!p.gateSeen.includes(e.id)){ p.gateSeen.push(e.id); n.push(e.title); sendMail({from:'운영팀',title:`새 ${T('event')} 「${e.title}」가 열렸어요`,body:`메인 스토리를 진행해서 새 ${T('event')}이(가) 열렸어요. ${T('event')} 화면에서 확인해 보세요.`,days:30}); } });
-  G.banners.forEach(b=>{ if(b.gate>0&&!b.eventId&&bnOpen(b)&&!p.gateSeen.includes(b.id)){ p.gateSeen.push(b.id); n.push(b.name); b.newAt=Date.now(); sendMail({from:'운영팀',title:`「${b.name}」 배너가 열렸어요`,body:`${b.desc||''}\n${T('gacha')} 화면에서 확인해 보세요.`,days:30}); } });
+  G.events.forEach(ev=>{ if(ev.gate>0&&gateOpen(ev)&&!p.gateSeen.includes(ev.id)){ p.gateSeen.push(ev.id); n.push(ev.title); sendMail({from:'운영팀',title:`새 ${T('event')} 「${ev.title}」가 열렸어요`,body:`메인 스토리를 진행해서 새 ${T('event')}이(가) 열렸어요. ${T('event')} 화면에서 확인해 보세요.`,days:30}); } });
+  G.banners.forEach(bn=>{ if(bn.gate>0&&!bn.eventId&&bnOpen(bn)&&!p.gateSeen.includes(bn.id)){ p.gateSeen.push(bn.id); n.push(bn.name); bn.newAt=Date.now(); sendMail({from:'운영팀',title:`「${bn.name}」 배너가 열렸어요`,body:`${bn.desc||''}\n${T('gacha')} 화면에서 확인해 보세요.`,days:30}); } });
   if(n.length){ mark('prog'); setTimeout(()=>toast('📮 새로 열렸어요: '+n.join(', ')),1600); } }
 function curBanner(){const bs=G.banners.filter(bnOpen);return bs.find(b=>b.id===P().curBanner)||bs[0]||null;}
 function bannerPool(b){
@@ -25,14 +25,25 @@ function bannerPool(b){
   if(pool.length&&!pool.some(c=>c.rarity===3)) G.chars.filter(c=>c.rarity===3&&!c.limited&&castOk(c)).forEach(c=>pool.push(c));
   // R·SR이 없는 배너(픽업 캐릭터만 있는 배너, 소속 한정 등)도 상시 R·SR을 넣어 낮은 등급 자리에 SSR이 끼지 않게
   if(pool.length) [1,2].forEach(r=>{ if(!pool.some(c=>c.rarity===r)) G.chars.filter(c=>c.rarity===r&&!c.limited&&castOk(c)).forEach(c=>pool.push(c)); });
-  return pool.length?pool:G.chars;
+  if(pool.length) return pool; const open=G.chars.filter(c=>!c.limited&&castOk(c)); return open.length?open:G.chars; // 비면 열린(첫 등장·적대·몬스터 잠금 아닌) 캐릭터로 — 예전엔 모든 캐릭터라 잠긴 캐릭터가 나왔음
 }
 const SPARK=200;
+/* 천장·픽업 확정은 픽업 배너끼리 이어져요(시즌이 바뀌어 배너가 닫혀도 다음 픽업 배너로). 상시는 따로, 픽업 없는 배너(소속 모집 등)는 배너별.
+   예전 저장(배너별 값)은 처음 읽을 때 픽업 배너들 중 가장 큰 천장·남은 확정을 이어받아요 */
+function pityKey(b){ return !b||b.id==='std'?'std':(b.pickup||[]).length?'pickup':b.id; }
+function pityGet(b){ const p=P(),k=pityKey(b); if(k==='std') return p.pity||0; p.pities=p.pities||{};
+  if(k==='pickup'&&p.pities.pickup==null){ const old=G.banners.filter(bn=>bn.id!=='std'&&(bn.pickup||[]).length); p.pities.pickup=Math.max(0,...old.map(x=>p.pities[x.id]||0)); p.guar=p.guar||{}; if(p.guar.pickup==null) p.guar.pickup=old.some(x=>p.guar[x.id]); }
+  return p.pities[k]||0; }
+function pitySet(b,v){ const p=P(),k=pityKey(b); if(k==='std') p.pity=v; else p.pities[k]=v; }
+function guarGet(b){ pityGet(b); return !!(P().guar||{})[pityKey(b)]; }
+/* 배너가 닫힐 때 남은 모집 포인트는 1포인트당 ◆ COST/10으로 바꿔 우편으로 보내요(포인트가 말없이 사라지지 않게) */
+function sparkSettle(b){ const p=P(), n=(p.spark||{})[b.id]||0; if(!n) return 0; const gems=n*Math.round(COST/10); p.spark[b.id]=0;
+  sendMail({from:'운영팀',title:`「${b.name}」 모집 포인트 정산`,body:`배너가 끝나 남은 모집 포인트 ${n}점을 ${T('currency')} ${nf(gems)}개로 바꿔 드려요.`,reward:{gems}}); return gems; }
 function softRate(s,pity){ const start=Math.floor(s.pity*0.75); return pity>start?Math.min(100,s.ssr+(pity-start)*Math.max(2,(100-s.ssr)/Math.max(1,s.pity-start))*0.5):s.ssr; }
 function rollOne(guarSR,forceSSR,b){
-  b=b||curBanner()||G.banners[0]; const p=P(),s=p.settings; const pk=b.id==='std'?'pity':null;
+  b=b||curBanner()||G.banners[0]; const p=P(),s=p.settings, gk=pityKey(b);
   p.guar=p.guar||{}; p.spark=p.spark||{}; p.hist2=p.hist2||[];
-  const pity=(pk?p.pity:(p.pities[b.id]||0))+1; p.total++;
+  const pity=pityGet(b)+1; p.total++;
   const ssrRate=softRate(s,pity);
   let r=(forceSSR||pity>=s.pity)?3:(()=>{const x=Math.random()*100;return x<ssrRate?3:x<ssrRate+s.sr?2:1;})();
   if(r<2&&guarSR) r=2;
@@ -40,10 +51,12 @@ function rollOne(guarSR,forceSSR,b){
   /* 그 등급이 풀에 없으면 가장 가까운 등급으로 바꿔요(예전엔 아무나 나와서 R 자리에 SSR이 섞였어요). 위로 올릴 땐 SSR 확률을 넘지 않게 SR까지만 */
   if(!cand.length){ const order=r===1?[2,3]:r===2?[1,3]:[2,1]; for(const q of order){ if(q===3&&r<3&&pool.some(c=>c.rarity<3)) continue; const x=pool.filter(c=>c.rarity===q); if(x.length){ cand=x; r=q; break; } } if(!cand.length) cand=pool; }
   const ups=cand.filter(c=>(b.pickup||[]).includes(c.id));
+  /* 픽업에 실패하면 픽업이 아닌 같은 등급에서 골라요 — 표시한 확률(rate%)이 실제 확률이 되게(예전엔 실패해도 후보에 픽업이 남아 50% 표기가 실제 75%였어요) */
+  const rest=cand.filter(c=>!ups.includes(c));
   let c;
-  if(ups.length&&r===3&&p.guar[b.id]){ c=rand(ups); p.guar[b.id]=false; }
-  else { c=ups.length&&Math.random()*100<(b.rate||50)?rand(ups):rand(cand); if(r===3&&ups.length) p.guar[b.id]=!(b.pickup||[]).includes(c.id); }
-  const np=c.rarity===3?0:pity; if(pk) p.pity=np; else p.pities[b.id]=np;
+  if(ups.length&&r===3&&p.guar[gk]){ c=rand(ups); p.guar[gk]=false; }
+  else { c=ups.length&&(!rest.length||Math.random()*100<(b.rate||50))?rand(ups):rand(rest.length?rest:cand); if(r===3&&ups.length) p.guar[gk]=!(b.pickup||[]).includes(c.id); }
+  pitySet(b,c.rarity===3?0:pity);
   p.spark[b.id]=(p.spark[b.id]||0)+1;
   return grantOwned(c,b.name);
 }
@@ -57,8 +70,8 @@ function grantOwned(c,source){
   return {c,isNew,refund};
 }
 function openSpark(bid){
-  const b=G.banners.find(x=>x.id===bid)||curBanner(); if(!b) return; const p=P(), pts=(p.spark||{})[b.id]||0;
-  const ups=(b.pickup||[]).map(charById).filter(Boolean), list=ups.length?ups:bannerPool(b).filter(c=>c.rarity===3);
+  const b=G.banners.find(bn=>bn.id===bid)||curBanner(); if(!b) return; const p=P(), pts=(p.spark||{})[b.id]||0;
+  const ups=(b.pickup||[]).map(charById).filter(c=>c&&castOk(c)), list=ups.length?ups:bannerPool(b).filter(c=>c.rarity===3&&castOk(c)); // 모집 포인트 교환도 잠긴 캐릭터는 빼요
   openModal(`${head('모집 포인트 교환',`<span class="muted">${esc(b.name)} · ${pts}/${SPARK}</span>`)}
     <p class="muted" style="margin:0 0 10px">이 배너에서 1회 뽑을 때마다 1포인트가 쌓여요. ${SPARK}포인트로 원하는 ${esc(T('crew'))}을(를) 바로 데려올 수 있어요. 이미 있으면 ${esc(T('limit'))} +1이 돼요.</p>
     <div class="spk">${list.map(c=>`<button class="spk-c r${c.rarity}" data-act="sparkgo" data-id="${c.id}" data-b="${b.id}" ${pts>=SPARK?'':'disabled'}><div class="sa">${art(c)}</div><b>${esc(c.name)}</b><span>${own(c.id)?T('limit')+' '+own(c.id).dup+'/5':'미보유'}</span></button>`).join('')||'<p class="muted">교환할 수 있는 '+esc(T('crew'))+'이(가) 없어요.</p>'}</div>`);
@@ -71,9 +84,9 @@ function openHistory(){
 async function pull(n){
   if(appStorage.failed||document.getElementById('save-warning')){storageWarning('저장을 먼저 복구해 주세요.');return;}
   if(!G.chars.length){toast(T('gacha')+'할 '+T('crew')+'이(가) 없어요.');return;}
-  const b=curBanner(); if(!b){toast('열린 배너가 없어요');return;} const cost=n*COST; if(P().gems<cost){toast(`${T('currency')}이(가) ${nf(cost-P().gems)}개 모자라요.`);return;}
+  const bn=curBanner(); if(!bn){toast('열린 배너가 없어요');return;} const cost=n*COST; if(P().gems<cost){toast(`${T('currency')}이(가) ${nf(cost-P().gems)}개 모자라요.`);return;}
   pay({gems:cost}); bump('pull',n); const res=[]; const ft=n===10&&P().firstTen; if(ft) P().firstTen=false;
-  for(let i=0;i<n;i++) res.push(rollOne(n===10&&i===9&&!res.some(x=>x.c.rarity>=2),ft&&i===9&&!res.some(x=>x.c.rarity===3),b));
+  for(let i=0;i<n;i++) res.push(rollOne(n===10&&i===9&&!res.some(x=>x.c.rarity>=2),ft&&i===9&&!res.some(x=>x.c.rarity===3),bn));
   mark('prog'); try{await flush();}catch(e){render();return;} render(); playGacha(res);
 }
 const playGacha=noSkin(playGacha0);
@@ -93,7 +106,7 @@ function playGacha0(res){
   const T=(ms,f)=>GC.timers.push(setTimeout(f,ms));
   sfx('계약진'); T(700,()=>{$('#gcStreak').classList.add('fall');sfx('낙하');});
   if(fake) T(1350,()=>{$('#gcStreak').style.setProperty('--sc',RCOL[3]);$('#gcSeal').classList.add('gold');try{navigator.vibrate&&navigator.vibrate(120);}catch(e){}});
-  T(1720,()=>{sfx('섬광');const f=$('#gcFlash');f.style.setProperty('--fc',top===3?'#fff3c4':RCOL[top]);f.classList.add('on');$('#gcSeal').classList.add('go');$('#gcStreak').style.opacity=0;});
+  T(1720,()=>{sfx('섬광');const el=$('#gcFlash');el.style.setProperty('--fc',top===3?'#fff3c4':RCOL[top]);el.classList.add('on');$('#gcSeal').classList.add('go');$('#gcStreak').style.opacity=0;});
   T(1950,()=>{$('#gcStage').hidden=false;$('.gc .skipb').hidden=true;if(res.length===1)T(600,()=>revealCard(0));});
 }
 const revealCard=noSkin(revealCard0);

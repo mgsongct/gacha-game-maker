@@ -30,7 +30,7 @@ function emoKey(t){ t=String(t||'').trim(); return EMOTES[t]?t:EMO_ALIAS[t]||'';
 function emoteHTML(name,big){ const k=emoKey(name); if(!k) return ''; const l=typeof G!=='undefined'&&G&&G.lib.find(x=>x.kind==='emote'&&x.name===k), s=l&&imgSrc(l);
   return `<i class="emo ${big?'big':''} e-${EMOTES[k].a}" data-emo="${esc(k)}">${s?`<img src="${esc(s)}" alt="${esc(k)}">`:EMOTES[k].svg}</i>`; }
 // "미소|하트|점프" → {face,emo,motion}
-function dirSplit(s){ const o={face:'',emo:'',motion:''}; String(s||'').split(/[|,·/]/).map(x=>x.trim()).filter(Boolean).forEach(t=>{ if(!o.emo&&emoKey(t)) o.emo=emoKey(t); else if(!o.motion&&MOTIONS[t]) o.motion=t; else if(!o.face) o.face=t; }); return o; }
+function dirSplit(s){ const o={face:'',emo:'',motion:''}; String(s||'').split(/[|,·/]/).map(x=>x.trim()).forEach((t,i)=>{ if(!t) return; if(i===0&&FACE_BASIC.includes(t)) o.face=t; /* 첫 칸(빈 칸 포함 위치 — [|놀람]은 표정 없음+감정)이 기본 표정 이름이면 표정(화남·놀람·슬픔·당황은 감정 이름과 겹침) — 기존 이름[표정] 문법 유지 */ else if(!o.emo&&emoKey(t)) o.emo=emoKey(t); else if(!o.motion&&MOTIONS[t]) o.motion=t; else if(!o.face) o.face=t; }); return o; }
 function autoEmote(text){ const t=String(text||'').trim(); for(const [k,d] of Object.entries(EMOTES)) if(d.k&&d.k.test(t)) return k; return ''; }
 function dirMode(){ const m=P().vnDirect; return m==='script'||m==='off'?m:'auto'; }
 // 무대: 최근 두 사람을 좌우로, 말하는 사람은 밝게
@@ -42,10 +42,10 @@ function slotOf(name){ const c=vnSpeaker(name); return c?vnStage(c,(S.stage||[])
 function vnEmote(slot,emo){ if(!slot||!emo||dirMode()==='off') return; slot.querySelectorAll('.emo').forEach(x=>x.remove()); slot.insertAdjacentHTML('beforeend',emoteHTML(emo)); const i=slot.lastElementChild; setTimeout(()=>i&&i.remove(),1800); if(EMOTES[emo]&&/하트|놀람|화남/.test(emo)) try{ sfx(emo==='하트'?'확인':'타격'); }catch(e){} }
 function vnMotion(slot,m){ if(!slot||!m||dirMode()==='off') return; const cls=MOTIONS[m]; if(!cls) return; Object.values(MOTIONS).forEach(x=>slot.classList.remove(x)); void slot.offsetWidth; slot.classList.add(cls); if(cls!=='m-exit'&&cls!=='m-near'&&cls!=='m-far') setTimeout(()=>slot.classList.remove(cls),900);
   if(cls==='m-exit') setTimeout(()=>{ S&&S.stage&&(S.stage=S.stage.filter(x=>x.c.id!==slot.dataset.cid)); slot.remove(); },600); }
-function vnScreen(arg){ const v=$('#vn'), f=$('#vnFlash'); if(!v) return; const end=/끝$/.test(arg), key=String(arg).replace(/\s*끝$/,'').replace(/\s+/g,''), k=SCREEN_FX[key]; if(!k) return false;
+function vnScreen(arg){ const v=$('#vn'), el=$('#vnFlash'); if(!v) return; const end=/끝$/.test(arg), key=String(arg).replace(/\s*끝$/,'').replace(/\s+/g,''), k=SCREEN_FX[key]; if(!k) return false;
   if(FX_KEEP.includes(k)){ v.classList.toggle('fx-'+k,!end); return true; }
   if(k==='shake'||k==='shake2'){ v.classList.remove('shake','shake2'); void v.offsetWidth; v.classList.add(k); }
-  else { f.className='vn-flash'; void f.offsetWidth; f.className='vn-flash '+k; } return true; }
+  else { el.className='vn-flash'; void el.offsetWidth; el.className='vn-flash '+k; } return true; }
 // 대본 엔진(0460)이 부르는 곳
 function vnDirectSay(L,c,fz){ const d=L.dir||{}, slot=vnStage(c,fz); if(dirMode()==='off') return; vnMotion(slot,d.motion); vnEmote(slot,d.emo||(dirMode()==='auto'&&!d.face&&!d.motion?autoEmote(L.text):'')); }
 function vnDirectCmd(L){ if(L.cmd==='연출'){ const [who,...rest]=String(L.arg).split(/\s+/), slot=slotOf(who), d=dirSplit(rest.join('|')); vnMotion(slot,d.motion); vnEmote(slot,d.emo); return true; }
@@ -58,7 +58,6 @@ function lobbyEmote(el,line,zone){ if(dirMode()==='off'||!el) return; const k=au
 function dirStrip(t){ return parseScript(t).filter(L=>L.type==='say'||L.type==='nar'||L.type==='choice').map(L=>L.type==='choice'?L.opts.join('|'):(L.who||'')+':'+L.text).join('\n'); }
 function dirCount(t){ return parseScript(t).filter(L=>(L.type==='say'&&L.dir&&(L.dir.emo||L.dir.motion))||(L.type==='cmd'&&(L.cmd==='연출'||(L.cmd==='효과'&&!/흔들림|플래시|암전/.test(L.arg))))).length; }
 async function directScript(text,btn){ const src=String(text||''); if(!src.trim()) return null;
-  const r=await aiJSON(`${RULES}\n${DIRECTION_GUIDE}\n\n아래 대본에 연출만 더하라. 대사·나레이션·선택지 글자는 한 글자도 바꾸지 않고, 줄을 지우거나 순서를 바꾸지 않는다. 더할 수 있는 것: 이름 뒤 [표정|감정|동작], 줄 사이 [연출: 이름 감정 동작], [효과: …]. 감정이 크게 움직이는 줄에만(전체 줄의 20~35%) 넣고, 같은 감정을 연달아 쓰지 않는다.\n\n대본:\n${src}\n\nJSON만 출력: {"script":"연출을 더한 대본 전체"}`,btn,'complex');
+  const r=await aiJSON(`${pf('DIRECT_SCRIPT',{RULES,DIRECTION_GUIDE,src})}\n\nJSON만 출력: {"script":"연출을 더한 대본 전체"}`,btn,'complex');
   const out=r&&nl(r.script); if(!out) return null; if(dirStrip(out)!==dirStrip(src)) return null; return out; }
 async function directStage(s){ let ok=false; for(const k of ['pre','post']){ if(!s[k]) continue; const o=await directScript(s[k]); if(o){ s[k]=o; ok=true; } } if(ok){ s.dirV=1; auditMarkObj(s); } return ok; }
-pfDef('DIRECTION_GUIDE','연출 문법(감정 아이콘·동작·화면 효과)',()=>`연출: 이름 뒤 대괄호에 표정·감정·동작을 |로 함께 쓸 수 있다(예: "세라[미소|하트|점프]: 정말?"). 감정 아이콘: ${Object.keys(EMOTES).join('·')}. 동작: 점프·흔들·떨림·끄덕·갸웃·다가옴·물러남·퇴장·쓰러짐. 대사 없이 [연출: 이름 감정 동작]. 화면 효과: [효과: 흔들림|강한흔들림|플래시|붉은섬광|암전|페이드|집중선|비|눈|벚꽃|회상|비네트] (집중선·비·눈·벚꽃·회상·비네트는 [효과: 비 끝]처럼 끝을 쓴다). 메신저에서는 [스티커: 감정 아이콘 이름]. 감정이 크게 움직이는 순간에만 쓰고 남발하지 않는다.`);

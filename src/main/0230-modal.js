@@ -5,7 +5,7 @@ function openModal(html,lock,cls){const m=$('#modal');m.innerHTML=`<div class="s
 let MBACK=null; // 하위 창(스킨·표정·목소리)을 닫으면 돌아갈 화면
 function closeModal(){if(typeof regenCancel==='function'&&!regenCancel())return;v2CancelEditorGeneration();if(typeof v2CloseGearEditor==='function')v2CloseGearEditor();const m=$('#modal');m.hidden=true;m.innerHTML='';m.dataset.lock='';NAIJOB=null;}
 // 상단바 게임 이름: 한 줄로, 넘치면 글자를 줄여요(최소 0.7배, 그래도 넘치면 …)
-function fitBrand(){ const t=document.querySelector('.brand .brand-t'); if(!t) return; t.style.fontSize=''; let f=1; for(let i=0;i<8&&t.scrollWidth>t.clientWidth+1&&f>0.7;i++){ f-=0.05; t.style.fontSize=f+'em'; } }
+function fitBrand(){ const el=document.querySelector('.brand .brand-t'); if(!el) return; el.style.fontSize=''; let f=1; for(let i=0;i<8&&el.scrollWidth>el.clientWidth+1&&f>0.7;i++){ f-=0.05; el.style.fontSize=f+'em'; } }
 addEventListener('resize',()=>{ clearTimeout(window.__fbT); window.__fbT=setTimeout(fitBrand,150); });
 const head=(t,sub2='')=>`<div class="sheet-head"><div><h2>${t}</h2>${sub2}</div><button class="x" data-act="close" aria-label="닫기">×</button></div>`;
 function opt(list,cur){return list.map(([v,l])=>`<option value="${esc(v)}" ${String(v)===String(cur)?'selected':''}>${esc(l)}</option>`).join('');}
@@ -39,7 +39,7 @@ function openShare(){
     <p>지금 게임(<b>${esc(G.meta.title)}</b>)의 세계관, ${esc(T('crew'))}, 스토리, 배너, 이벤트를 .ggmpack 파일 하나로 묶어요. 큰 그림도 조금씩 나누어 저장해요. 받은 사람은 설정 → 데이터 → 공유 팩 불러오기에서 <b>새 게임으로 추가</b>할 수 있어요.</p>
     <div class="optbox"><label class="f"><input type="checkbox" id="sh_img" checked> 그림 넣기 (${ni}장, 파일이 커져요)</label>
     <label class="f"><input type="checkbox" id="sh_aud"> 배경음·효과음 넣기 (${na}개)</label></div>
-    <label class="f"><input type="checkbox" id="sh_gate" checked> 픽업·${esc(T('event'))}을 스토리 진행에 맞춰 차례로 열기 <span class="muted" style="font-size:.78rem">(${G.events.length}개 ${esc(T('event'))} · ${G.banners.filter(b=>b.id!=='std'&&!b.eventId).length}개 픽업. 끄면 처음부터 모두 열려요)</span></label>
+    <label class="f"><input type="checkbox" id="sh_gate" checked> 픽업·${esc(T('event'))}을 스토리 진행에 맞춰 차례로 열기 <span class="muted" style="font-size:.78rem">(${G.events.length}개 ${esc(T('event'))} · ${G.banners.filter(bn=>bn.id!=='std'&&!bn.eventId).length}개 픽업. 끄면 처음부터 모두 열려요)</span></label>
     <p class="muted">그림체: ${String(G.meta.artTags||'').trim()?'게임 정의의 그림체가 들어가요.':'게임 정의에 그림체가 비어 있어서, 지금 설정의 기본 그림체를 넣어 보내요.'} 받은 사람이 새 그림을 그릴 때 이 그림체를 써요.</p>
     <p class="muted">들어가지 않는 것: API 키, NovelAI 토큰, 업데이트 토큰, 내 진행 상황(보유 ${esc(T('crew'))}, 재화), 플레이어 이름, 캐릭터 음성과 목소리 ID.</p>
     <p class="muted">작가 이름 태그로 그린 그림이나 실제 성우를 닮은 목소리는 아는 사람끼리만 돌려 보고, 공개 커뮤니티에 올리지 마세요.</p>
@@ -172,7 +172,7 @@ function openChar(id){
     <div class="cs-body">${sec('equip',equip)}${sec('story',story)}${sec('look',look)}${sec('info',info)}</div>
   </div>`,false,'cs-sheet');
   characterDetailPreviewTargets($('#modal'));
-  const s2=$('#modal .sheet'); if(s2){ s2.dataset.cid=id; if(old)s2.scrollTop=keep; }
+  const el=$('#modal .sheet'); if(el){ el.dataset.cid=id; if(old)el.scrollTop=keep; }
   if(o&&o.dup>=5&&o.cgNew&&lbs){ o.cgNew=false; mark('prog'); setTimeout(()=>lbReveal(c),500); }
 }
 function openCharEdit(id){
@@ -183,7 +183,7 @@ function openCharEdit(id){
     <div><label class="f" for="f_fac">소속</label><input class="in" id="f_fac" value="${esc(c.faction)}" list="faclist"><datalist id="faclist">${[...new Set(G.chars.map(x=>x.faction).filter(Boolean))].map(f=>`<option value="${esc(f)}">`).join('')}</datalist></div></div>
     <div class="g2"><div><label class="f" for="f_rar">등급</label><select class="in" id="f_rar">${opt([[3,'SSR'],[2,'SR'],[1,'R']],c.rarity)}</select></div>
     <div><label class="f" for="f_pos">포지션 <span class="muted" style="font-size:.75rem">(전투 기본형)</span></label><select class="in" id="f_pos">${opt(POSITIONS().map(p=>[p.id,`${p.name} (${ROLE[p.base]}형)`]),posOf(c).id)}</select></div></div>
-    <div class="g2"><div><label class="f" for="f_elem">속성</label><select class="in" id="f_elem">${opt(ELEMS.map(e=>[e,e]),c.elem)}</select></div>
+    <div class="g2"><div><label class="f" for="f_elem">속성</label><select class="in" id="f_elem">${opt(ELEMS.map(elem=>[elem,elem]),c.elem)}</select></div>
     <div><label class="f" for="f_lim">한정 여부</label><select class="in" id="f_lim">${opt([['0','상시'],['1','한정 (이벤트 배너에서만)']],c.limited?'1':'0')}</select></div></div>
     <div class="g4"><div><label class="f" for="f_hp">기본 체력</label><input class="in" id="f_hp" type="number" value="${c.hp}"></div><div><label class="f" for="f_atk">공격</label><input class="in" id="f_atk" type="number" value="${c.atk}"></div><div><label class="f" for="f_def">기본 방어력</label><input class="in" id="f_def" type="number" value="${c.def}"></div><div><label class="f" for="f_spd">속도</label><input class="in" id="f_spd" type="number" value="${c.spd}"></div></div>
     <p class="muted">아래는 심연탐사 호환용 스킬입니다. 일반 전투 스킬은 캐릭터 상세의 「일반 전투 스킬 편집 · AI 생성」에서 설정하세요.</p>

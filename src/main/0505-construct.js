@@ -2,10 +2,17 @@
 /* 엔진: modules/app/020-construct.js (GGMConstruct). 여기서는 게임 상태·화면·AI 연결만.
    설정: G.meta.construct(바꾼 값만 저장) · G.meta.variants(바리에이션 공통 설정) · 진행: P().cres(자원) · P().cbuild(기록·발견한 레시피) */
 const CON_RES=GGMConstruct.RES;
+// 새 게임 세계관 단계의 바리에이션 결과 정리(엔진 GGMConstruct.variantsFrom + id). 지시문은 프롬프트 스튜디오의 VARIANT_RULE
+// 새 게임 세계관 단계 스키마: 건조 메뉴·자원 이름(terms), 바리에이션 기본형
+const CON_TERMS_SCHEMA='"construct":"자원을 넣어 새 동료를 데려오는 메뉴 이름(2~4자)","res1":"그 메뉴에 넣는 자원 1(2~4자, 세계관 고유)","res2":"자원 2","res3":"자원 3","res4":"자원 4(귀한 것 — 특별 의상·바리에이션의 열쇠)"';
+const VARIANT_SCHEMA='"variants":[{"name":"바리에이션 기본형 이름(2~6자)","prompt":"그 의상의 영어 이미지 태그(쉼표로)","brief":"디자인 지시 한 줄","cond":{"roles":["atk|def|sup 중 어울리는 역할만"],"factions":["어울리는 소속만"],"elems":["어울리는 속성만"]}}]';
+function variantsFromAI(list,ng){ return GGMConstruct.variantsFrom(list,{factions:((ng.world||{}).factions||[]).map(f=>f.name),elems:(ng.meta.elems||DEFAULT_META.elems).map(e=>e.n)}).map(v=>Object.assign({id:'v_'+uid()},v)); }
 // 특수 레시피(소속·특정 캐릭터 확률 업). 분류 확률은 groups가 정해서 기본은 비워 둬요. 예: {id:'rc_x',name:'새벽 설계',min:[400,400,400,600],effect:{type:'faction',value:'새벽등대',up:3},hint:'부품을 넉넉히'}
 const CON_RECIPES=[];
 function conMeta(){ const m=G.meta; if(!m.construct||typeof m.construct!=='object') m.construct={on:false}; if(!Array.isArray(m.construct.recipes)) m.construct.recipes=clone(CON_RECIPES); return m.construct; }
-function CON(){ return GGMConstruct.config(conMeta()); }
+function CON(){ const c=GGMConstruct.config(conMeta()); c.groups=c.groups.map(g=>{ const d=GGMConstruct.DEFAULTS.groups.find(x=>x.id===g.id); return d&&g.name===d.name&&g.match&&ROLE[g.match.role]?Object.assign({},g,{name:ROLE[g.match.role]}):g; }); return c; } // 저장된 분류는 그대로 두고 보여 줄 때만 /* 기본 분류 이름(지원·공격·방어)은 이 게임의 역할 이름으로 보여요 */
+/* 새 게임을 건조/영입이 켜진 채로 시작: 시작 자원 지급(설정에서 켤 때와 같은 양) */
+function conStartNew(ng){ ng.meta.construct=Object.assign({},ng.meta.construct||{},{on:true}); const s=GGMConstruct.config(ng.meta.construct).start; ng.prog.cres=Object.fromEntries(CON_RES.map(k=>[k,s])); ng.prog.cbuild={n:0,found:{},log:[],input:null,started:Date.now()}; }
 function conOn(){ return !!(G.meta.construct&&G.meta.construct.on); }
 function VARIANTS(){ if(!Array.isArray(G.meta.variants)) G.meta.variants=clone(GGMConstruct.VARIANT_DEFAULTS); return G.meta.variants; }
 function CRES(){ const p=P(); if(!p.cres||typeof p.cres!=='object') p.cres={}; CON_RES.forEach(k=>{ if(!(p.cres[k]>=0)) p.cres[k]=0; }); return p.cres; }
@@ -18,17 +25,19 @@ function conResBar(){ const r=CRES(); return `<div class="row" style="gap:6px;fl
 function conDispReward(hours,need){ const pts=Math.pow(hours,0.85)*(1+0.35*(need-1)), ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2), r={}; ks.forEach(k=>{ r[k]=Math.max(10,Math.round(pts*60/10)*10); }); return r; }
 
 /* 바리에이션 후보: 레시피가 맞고, 조건에 맞는 보유 캐릭터 중 아직 그 바리에이션이 없는 캐릭터 */
-function conVariantOf(b,tpl){ return G.chars.find(x=>x.alt===b.id&&x.cvar===tpl.id); }
-function conTargets(tpl){ return G.chars.filter(b=>!b.alt&&!b.cvar&&own(b.id)&&GGMConstruct.condMatch(tpl.cond,b,{own:own(b.id),affLv:affLv(own(b.id)),cleared:P().cleared})); }
+function conVariantOf(b,tpl){ return G.chars.find(c=>c.alt===b.id&&c.cvar===tpl.id); }
+function conTargets(tpl){ return G.chars.filter(c=>!c.alt&&!c.cvar&&own(c.id)&&GGMConstruct.condMatch(tpl.cond,c,{own:own(c.id),affLv:affLv(own(c.id)),cleared:P().cleared})); }
 function conVariantChoices(input){ return VARIANTS().filter(t=>t.on!==false&&GGMConstruct.matches(t.recipe,input)).map(tpl=>({tpl,bases:conTargets(tpl).filter(b=>{ const v=conVariantOf(b,tpl); return !(v&&own(v.id)); })})); }
 function conPool(){ return G.chars.filter(c=>!c.limited&&!c.cvar&&!c.alt&&castOk(c)).map(c=>({id:c.id,rarity:c.rarity,role:c.role,faction:c.faction,elem:c.elem})); }
 
 async function conMakeVariant(b,tpl){
   const rr=tpl.rarity==='same'||!tpl.rarity?String(b.rarity):String(tpl.rarity); let c=null;
-  if(SAMPLE){ try{ c=await aiAltChar(b,`${tpl.name}. ${GGMConstruct.designBrief(b,tpl)}`,rr,null); }catch(e){ c=null; } }
+  const brief=`${tpl.name}. ${GGMConstruct.designBrief(b,tpl)}`;
+  if(SAMPLE){ try{ c=await aiAltChar(b,brief,rr,null); }catch(e){ c=null; } }
+  if(c&&c.name===`${b.name}(${brief.replace(/[()]/g,'').slice(0,6)})`) c.name=`${b.name}(${tpl.name})`; // AI가 이름을 못 지으면 aiAltChar가 디자인 지시 앞 글자로 지어 깨짐 → 기본형 이름으로
   if(!c){ // AI가 없거나 실패: 원래 캐릭터를 바탕으로 규칙대로 만들어요(이름·외모 태그 + 기본형 의상 태그 + 상징 컬러·아이템)
     const o=clone(b); delete o.id; o.name=`${b.name}(${tpl.name})`; o.naiPrompt=GGMConstruct.variantPrompt(b,tpl); o.rarity=+rr;
-    o.profile=`${b.profile||''}\n[${tpl.name}] ${b.name}의 ${tpl.name} 모습.`.trim(); c=cleanChar(o); G.chars.push(c); }
+    c=cleanChar(o); G.chars.push(c); } // 프로필 등은 기본 캐릭터를 그대로 물려받음(바꾸면 수정치로 굳어 기본 캐릭터를 고쳐도 반영 안 됨) — 이 모습의 차이는 이름·외모 태그
   c.alt=b.id; c.cvar=tpl.id; c.altCanon=false; c.rarity=+rr||b.rarity; c.faction=b.faction||c.faction; if(b.age) c.age=b.age; if(b.voiceId) c.voiceId=b.voiceId; if(b.naiStyle) c.naiStyle=b.naiStyle;
   const want=String(tpl.prompt||'').split(',')[0].trim(); if(want&&!String(c.naiPrompt||'').includes(want)) c.naiPrompt=GGMConstruct.variantPrompt(Object.assign({},b,{naiPrompt:c.naiPrompt||b.naiPrompt}),tpl);
   mark('c:'+c.id); return c; }
@@ -36,7 +45,7 @@ async function conMakeVariant(b,tpl){
 let CONJOB=false;
 function conReadInput(){ const cfg=CON(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:(CBUILD().input||[])[i]||cfg.min; }); }
 async function conBuild(){
-  if(CONJOB||NEW_GAME_SOURCE) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
+  if(CONJOB||NEW_GAME_SOURCE||!conOn()) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
   const cfg=CON(), input=GGMConstruct.normalize(conReadInput(),cfg), r=CRES(), lack=CON_RES.filter((k,i)=>r[k]<input[i]);
   if(lack.length){ toast(`${lack.map(k=>T(k)).join('·')}이(가) 모자라요`); return; }
   const variants=conVariantChoices(input), res=GGMConstruct.roll(input,cfg,conPool(),variants);
@@ -125,14 +134,14 @@ async function conSave(){ let adv; try{ adv=JSON.parse($('#con_adv').value); }ca
   if(m.on&&!wasOn&&!CBUILD().started){ CBUILD().started=Date.now(); const r=CRES(), s=CON().start; CON_RES.forEach(k=>{ r[k]+=s; }); toast(`${T('construct')}을(를) 켰어요. 시작 자원 ${nf(s)}씩 드려요`); }
   mark('meta','prog'); closeModal(); render(); }
 
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
   if(a==='conbuild') conBuild();
-  else if(a==='conbuy') conBuy(b.dataset.k);
-  else if(a==='conpreset'){ const v=b.dataset.v.split(',').map(Number); v.forEach((x,i)=>{ const n=$('#con_'+i), r=$('#con_r'+i); if(n) n.value=x; if(r) r.value=x; }); const info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(GGMConstruct.normalize(v,CON())); CBUILD().input=GGMConstruct.normalize(v,CON()); }
+  else if(a==='conbuy') conBuy(el.dataset.k);
+  else if(a==='conpreset'){ const v=el.dataset.v.split(',').map(Number); v.forEach((x,i)=>{ const n=$('#con_'+i), r=$('#con_r'+i); if(n) n.value=x; if(r) r.value=x; }); const info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(GGMConstruct.normalize(v,CON())); CBUILD().input=GGMConstruct.normalize(v,CON()); }
   else if(a==='contoggle'){ if(conOn()){ conMeta().on=false; mark('meta'); render(); } else openConSet(); }
   else if(a==='conset') openConSet();
   else if(a==='consave') conSave();
   else if(a==='convadd'){ CONV=[...conReadVariants(),{id:'v_'+uid(),name:'새 바리에이션',prompt:'',brief:'',chance:30,recipe:{min:[200,200,200,400]},rarity:'same',on:true,cond:{}}]; $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); }
-  else if(a==='convdel'){ CONV=conReadVariants(); CONV.splice(+b.dataset.i,1); $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); } });
-document.addEventListener('input',e=>{ const i=e.target.dataset&&e.target.dataset.con; if(i==null) return; const v=e.target.value; const n=$('#con_'+i), r=$('#con_r'+i); if(n&&n!==e.target) n.value=v; if(r&&r!==e.target) r.value=v;
+  else if(a==='convdel'){ CONV=conReadVariants(); CONV.splice(+el.dataset.i,1); $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); } });
+document.addEventListener('input',e=>{ const i=e.target.dataset&&e.target.dataset.con; if(i==null) return; const v=e.target.value; const el=$('#con_'+i), r=$('#con_r'+i); if(el&&el!==e.target) el.value=v; if(r&&r!==e.target) r.value=v;
   const input=GGMConstruct.normalize(conReadInput(),CON()), info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(input); CBUILD().input=input; });

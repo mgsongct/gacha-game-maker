@@ -2,10 +2,10 @@ async function handleEconomyAction(a,t,id,p,e){
   switch(a){
 case 'daily': if(p.daily!==today()){p.daily=today(); const dr=rateR({gems:120,gold:5000,exp:10,gift:2}); giveReward(dr);render();sfx('확인');toast(`일일 보급: ${rewardText(dr)}`);} break;
 case 'shkdraw': { const m=G.meta.shop, o=shkSelf(); o.naiPrompt=stripMinor(stripAge($('#sk_prompt').value.trim())); naiBlocksSave(o,'naiPrompt','sk_prompt');o.name=$('#sk_name').value.trim()||m.name; if(!o.naiPrompt){ toast('외형 프롬프트를 먼저 적어 주세요'); break; } if(!imgReady()){ toast(imgNeed()); break; }
-      const lab=t.textContent; t.disabled=true; t.textContent='그리는 중…'; try{ const b=await naiDrawItem({k:'char',o,c:o}); await storeImage(o,b,''); m.charId='__self'; mark('meta'); SHOP_LINE=''; const pv=document.querySelector('.sk-prev'); if(pv) pv.innerHTML=`<img src="${esc(imgSrc(o))}" alt="">`; $('#sk_char').value='__self'; render(); toast('상점 주인 그림을 그렸어요'); }catch(e){ toast(naiErr(e)); } finally{ if(t.isConnected){ t.disabled=false; t.textContent='다시 그리기'; } } break; }
+      const lab=t.textContent; t.disabled=true; t.textContent='그리는 중…'; try{ const bn=await naiDrawItem({k:'char',o,c:o}); await storeImage(o,bn,''); m.charId='__self'; mark('meta'); SHOP_LINE=''; const pv=document.querySelector('.sk-prev'); if(pv) pv.innerHTML=`<img src="${esc(imgSrc(o))}" alt="">`; $('#sk_char').value='__self'; render(); toast('상점 주인 그림을 그렸어요'); }catch(e){ toast(naiErr(e)); } finally{ if(t.isConnected){ t.disabled=false; t.textContent='다시 그리기'; } } break; }
 case 'sparkopen': openSpark(id); break;
-case 'sparkgo': { const b=G.banners.find(x=>x.id===t.dataset.b), c=charById(id); if(!b||!c) break; p.spark=p.spark||{}; if((p.spark[b.id]||0)<SPARK){toast('포인트가 모자라요');break;}
-      if(!(await appConfirm(`${c.name}을(를) ${SPARK}포인트로 데려올까요?`))) break; p.spark[b.id]-=SPARK; let isNew=false;
+case 'sparkgo': { const bn=G.banners.find(x=>x.id===t.dataset.b), c=charById(id); if(!bn||!c||!castOk(c)) break; p.spark=p.spark||{}; if((p.spark[bn.id]||0)<SPARK){toast('포인트가 모자라요');break;}
+      if(!(await appConfirm(`${c.name}을(를) ${SPARK}포인트로 데려올까요?`))) break; p.spark[bn.id]-=SPARK; let isNew=false;
       if(p.owned[c.id]){ const o=p.owned[c.id]; if(o.dup<5){o.dup++; if(o.dup>=5)o.cgNew=true;} else { p.mat.core+=10; } } else { p.owned[c.id]={levelCapVersion:1,transc:0,growthCostVersion:1,lv:1,exp:0,dup:0,aff:0,seen:[],wlv:0,skin:''}; isNew=true; if(p.squad.length<4)p.squad.push(c.id); }
       mark('prog'); closeModal(); render(); playGacha([{c,isNew,refund:0}]); break; }
 case 'pull': pull(+t.dataset.n); break;
@@ -32,10 +32,7 @@ case 'shopswap': { const x=SHOP_SWAP().find(q=>q.id===id); if(!x) break; const n
 case 'shkedit': openShk(); break;
 case 'shksave': { const m=G.meta.shop; m.name=$('#sk_name').value.trim()||'상점 주인'; m.charId=$('#sk_char').value; if($('#sk_prompt'))naiBlocksSave(shkSelf(),'naiPrompt','sk_prompt'); ['hello','buy','poor'].forEach(k=>{const v=lines($('#sk_'+k).value); if(v.length) m[k]=v;}); mark('meta'); SHOP_LINE=''; closeModal(); render(); toast('상점 주인을 저장했어요'); break; }
 case 'shkai': { const c=$('#sk_char').value?charById($('#sk_char').value):null, nm=$('#sk_name').value.trim()||'상점 주인';
-      const r=await aiJSON(`${RULES}
-세계관: ${G.world.summary}
-상점 주인 "${nm}"의 대사를 써라.${c?` 이 인물은 ${c.name}이고 프로필은 다음과 같다: ${c.profile}`:''} 플레이어(${T('player')})에게 재료를 파는 가게 주인이다. 짧고 개성 있게, 세계관 용어를 섞는다.
-JSON만 출력: {"hello":["인사 5개"],"buy":["구매 감사 5개"],"poor":["돈이 모자랄 때 3개"]}`,t);
+      const r=await aiJSON(`${pf('SHOP_LINES',{RULES,summary:G.world.summary,nm,name:c?` 이 인물은 ${c.name}이고 프로필은 다음과 같다: ${c.profile}`:'',player:T('player')})}JSON만 출력: {"hello":["인사 5개"],"buy":["구매 감사 5개"],"poor":["돈이 모자랄 때 3개"]}`,t);
       if(r){ ['hello','buy','poor'].forEach(k=>{ if(Array.isArray(r[k])&&r[k].length) $('#sk_'+k).value=r[k].map(String).join('\n'); }); toast('대사를 채웠어요. 저장을 눌러 주세요'); } break; }
 case 'cashbuy': { const k=CASH_PACKS.find(x=>x.id===id); if(!k) break; const first=!p.cash.first[k.id], n=k.gems+(first?k.gems:k.bonus); p.cash.first[k.id]=true; p.cash.total+=n; giveReward({gems:n}); mark('prog'); render(); buyFx('+'+nf(n),`◆ ${T('currency')}${first?' · 첫 구매 2배':''}`); break; }
 case 'cashmonth': { const mo=p.cash.month, base=Math.max(Date.now(),mo.until||0); mo.until=base+30*864e5; giveReward({gems:300}); mark('prog'); render(); buyFx('+300','월간 보급 카드 · 30일'); cashTick(); render(); break; }

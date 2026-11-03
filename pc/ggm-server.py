@@ -6,11 +6,12 @@
 # 필요: Python 3.8 이상. 창을 닫으면 주소가 사라져요(다음 실행 때 새 주소 + 새 QR).
 import base64, hashlib, http.server, json, os, platform, re, secrets, shutil, socket, socketserver, stat, subprocess, sys, tarfile, threading, time, urllib.error, urllib.parse, urllib.request, webbrowser
 
-SERVER_VER = '2026.11.03.2'
+SERVER_VER = '2026.11.03.3'
 PORT = int(os.environ.get('GGM_PORT', '8790'))
 # 켤 때 www/를 받아 오는 곳. 이 포크의 빌드를 써요(원본으로 두면 원본 index.html로 덮어써져요). GGM_BRANCH로 브랜치도 고를 수 있어요
 REPO = os.environ.get('GGM_REPO', 'mgsongct/gacha-game-maker')
 BRANCH = os.environ.get('GGM_BRANCH', 'main')
+RAW = os.environ.get('GGM_RAW', 'https://raw.githubusercontent.com').rstrip('/')  # 앱 받는 주소(배포본 시험에서 로컬 주소로 바꿈)
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, 'ggm-data')
 WWW = os.path.join(HERE, 'www')
@@ -137,7 +138,7 @@ FILES = ['index.html', 'manifest.webmanifest', 'sw.js', 'icons/icon-192.png', 'i
 def update_www():
     ok = 0
     for f in FILES:
-        url = f'https://raw.githubusercontent.com/{REPO}/{BRANCH}/www/{f}?t={int(time.time())}'
+        url = f'{RAW}/{REPO}/{BRANCH}/www/{f}?t={int(time.time())}'
         try:
             data = urllib.request.urlopen(url, timeout=30).read()
             open(os.path.join(WWW, f), 'wb').write(data); ok += 1

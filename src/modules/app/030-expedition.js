@@ -58,6 +58,11 @@ function bizPerformance(assign,chars,conds,c){const cfg=config(c),B=cfg.business
 // h시간 영업: 수익/시간 = base × (0.2 + 실적) × (1 + 평판/repMax), 평판은 실적이 목표보다 높으면 오르고 낮으면 내려요
 function bizSettle(perf,rep,hours,c){const B=config(c).business,h=Math.min(B.cap,Math.max(0,hours));
  const gold=Math.round(B.base*(0.2+perf)*(1+clamp(rep,0,B.repMax)/B.repMax)*h),nrep=clamp((+rep||0)+(perf-B.target)*25*h,0,B.repMax);return {gold,rep:nrep,hours:h};}
-const api={DEFAULTS,MODES,config,tierOf,condNow,condFactor,idolOffers,idolResult,streamResult,libIncome,bizPerformance,bizSettle,rngInt};
+// 새 게임 세계관 단계의 원정 방식과 이름(expedition, expeditionNames{fame, jobs[]}) → G.meta.expedition. 수치는 기본값 그대로, 이름만 바꿈
+const NAME_SLOT={idol:['places','fameName'],streamer:['platforms','fameName'],business:['parts','repName']}; // 방식 → [이름을 바꿀 목록, 인기 수치 이름 키]
+function namesApply(mode,n){const k=NAME_SLOT[mode];if(!k||!n||typeof n!=='object')return null;const D=DEFAULTS[mode],J=(Array.isArray(n.jobs)?n.jobs:[]).map(x=>String(x||'').trim().slice(0,16)),fame=String(n.fame||'').trim().slice(0,10);
+ if(!fame&&!J.some(Boolean))return null;return {[k[1]]:fame||D[k[1]],[k[0]]:D[k[0]].map((x,i)=>Object.assign({},x,J[i]?{name:J[i]}:{}))};}
+function fromWorld(a){if(!a||!MODES.includes(a.expedition))return null;const ex={mode:a.expedition},ov=namesApply(a.expedition,a.expeditionNames);if(ov)ex[a.expedition]=ov;return ex;}
+const api={DEFAULTS,MODES,config,namesApply,fromWorld,tierOf,condNow,condFactor,idolOffers,idolResult,streamResult,libIncome,bizPerformance,bizSettle,rngInt};
 root.GGMExpedition=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

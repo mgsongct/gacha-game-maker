@@ -1,0 +1,446 @@
+[
+ {
+  "id": "lhffrmjq6",
+  "kind": "bg",
+  "name": "병원 복도",
+  "prompt": "no humans, scenery, indoors, hospital, corridor, fluorescent light, bench, linoleum floor, night, empty, dim lighting, quiet",
+  "img": null
+ },
+ {
+  "id": "lom6tiddq",
+  "kind": "bg",
+  "name": "새벽별 연습실",
+  "prompt": "no humans, scenery, indoors, dance studio, practice room, wall mirror, cracked mirror, wooden floor, fluorescent light, speakers, water bottle, small window, night, cramped",
+  "img": null
+ },
+ {
+  "id": "lamsy0hqn",
+  "kind": "bg",
+  "name": "실장님 사무실",
+  "prompt": "no humans, scenery, indoors, small office, desk, laptop, stacked papers, coffee cup, whiteboard, posters, window, night, messy",
+  "img": null
+ },
+ {
+  "id": "lt7lzjucv",
+  "kind": "bg",
+  "name": "망원동 상가 옥상",
+  "prompt": "no humans, scenery, outdoors, rooftop, city, night, apartment buildings, string lights, plastic chair, water tank, city lights, sky",
+  "img": null
+ },
+ {
+  "id": "l844iavdn",
+  "kind": "bg",
+  "name": "홍대 버스킹 거리",
+  "prompt": "no humans, scenery, outdoors, street, city, night, neon lights, shop signs, speakers, microphone stand, wet pavement, bokeh",
+  "img": null
+ },
+ {
+  "id": "l0o8lvdxv",
+  "kind": "bg",
+  "name": "막차 플랫폼",
+  "prompt": "no humans, scenery, indoors, subway station, platform, train tracks, tiled wall, bench, fluorescent light, night, empty, quiet",
+  "img": null
+ },
+ {
+  "id": "l92dz144u",
+  "kind": "bg",
+  "name": "오로라TV 스튜디오",
+  "prompt": "no humans, scenery, indoors, tv studio, stage, pyramid seating, led screen, stage lights, spotlight, purple lighting, smoke, cameras",
+  "img": null
+ },
+ {
+  "id": "lj22w7ol1",
+  "kind": "bg",
+  "name": "스타라인 메인 무대",
+  "prompt": "no humans, scenery, concert stage, stage lights, spotlight, laser, led screen, audience seats, glowstick, confetti, neon, dark",
+  "img": null
+ },
+ {
+  "id": "ll1unb6js",
+  "kind": "bg",
+  "name": "대기실",
+  "prompt": "no humans, scenery, indoors, dressing room, vanity mirror, light bulbs, clothes rack, stage costume, makeup table, sofa, warm lighting",
+  "img": null
+ },
+ {
+  "id": "lb11hpyf4",
+  "kind": "bg",
+  "name": "편의점 앞",
+  "prompt": "no humans, scenery, outdoors, convenience store, night, plastic table, plastic chair, street lamp, vending machine, city",
+  "img": null
+ },
+ {
+  "id": "l5sjvc0jn",
+  "kind": "bg",
+  "name": "한강 둔치",
+  "prompt": "no humans, scenery, outdoors, river, bridge, riverside, park, bench, night, city lights, reflection, skyline",
+  "img": null
+ },
+ {
+  "id": "ll9djl6rh",
+  "kind": "prop",
+  "name": "대표의 노트북",
+  "prompt": "no humans, object focus, laptop, closed laptop, silver laptop, star sticker, sticky note, simple background, white background",
+  "img": null
+ },
+ {
+  "id": "lzpl5kzix",
+  "kind": "prop",
+  "name": "대표의 메모",
+  "prompt": "no humans, object focus, note, handwritten note, folded paper, coffee stain, simple background, white background",
+  "img": null
+ },
+ {
+  "id": "laxqmfc16",
+  "kind": "prop",
+  "name": "스타라인 참가 신청서",
+  "prompt": "no humans, object focus, paper, document, application form, red stamp, clipboard, simple background, white background",
+  "img": null
+ },
+ {
+  "id": "lar98k6ty",
+  "kind": "prop",
+  "name": "사원증",
+  "prompt": "no humans, object focus, id card, lanyard, card holder, plastic, simple background, white background",
+  "img": null
+ },
+ {
+  "id": "lpvqm2pw4",
+  "kind": "prop",
+  "name": "응원봉",
+  "prompt": "no humans, object focus, light stick, star shape, glowing, pink light, simple background, white background",
+  "img": null
+ },
+ {
+  "id": "lvfkswj1s",
+  "kind": "bgm",
+  "name": "타이틀",
+  "prompt": "bright synth-pop, k-pop idol anthem, uplifting, sparkling synths, driving beat, hopeful, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "ls72rufys",
+  "kind": "bgm",
+  "name": "로비",
+  "prompt": "light city pop, mellow groove, electric piano, slap bass, relaxed, warm, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "l4p8buk76",
+  "kind": "bgm",
+  "name": "일상",
+  "prompt": "cheerful acoustic pop, ukulele, hand claps, playful, light, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "l71vgqkvj",
+  "kind": "bgm",
+  "name": "긴장",
+  "prompt": "tense electronic ambient, ticking pulse, low synth drone, suspense, minimal, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "lwl7ugw9t",
+  "kind": "bgm",
+  "name": "전투",
+  "prompt": "energetic k-pop dance track, edm, four-on-the-floor, punchy bass, stage performance, competitive, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "lxe7il7an",
+  "kind": "bgm",
+  "name": "보스전",
+  "prompt": "dramatic electro-pop, orchestral hits, heavy beat, epic build-up, final stage showdown, intense, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "lodd0p0me",
+  "kind": "bgm",
+  "name": "뽑기 연출",
+  "prompt": "glittering fanfare, rising synth arpeggio, sparkle chimes, anticipation, celebratory, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "logrf97x6",
+  "kind": "bgm",
+  "name": "감성",
+  "prompt": "emotional piano ballad, soft strings, melancholic, hopeful, gentle, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "l7jwbshv7",
+  "kind": "bgm",
+  "name": "설렘",
+  "prompt": "sweet pop, bell synth, light percussion, fluttering, romantic, bright, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "sfx_btn",
+  "kind": "sfx",
+  "name": "버튼",
+  "prompt": "Short crisp futuristic UI click, clean digital tick",
+  "dur": 0.5,
+  "img": null
+ },
+ {
+  "id": "sfx_ok",
+  "kind": "sfx",
+  "name": "확인",
+  "prompt": "Positive UI confirm chime, two-tone digital blip",
+  "dur": 0.7,
+  "img": null
+ },
+ {
+  "id": "sfx_seal",
+  "kind": "sfx",
+  "name": "계약진",
+  "prompt": "Magical summoning circle activating, rising shimmering hum with crystalline resonance",
+  "dur": 2.5,
+  "img": null
+ },
+ {
+  "id": "sfx_fall",
+  "kind": "sfx",
+  "name": "낙하",
+  "prompt": "Shooting star whoosh falling from the sky with sparkling tail",
+  "dur": 1.5,
+  "img": null
+ },
+ {
+  "id": "sfx_flash",
+  "kind": "sfx",
+  "name": "섬광",
+  "prompt": "Bright magical flash impact with shimmering burst",
+  "dur": 1.2,
+  "img": null
+ },
+ {
+  "id": "sfx_ssr",
+  "kind": "sfx",
+  "name": "SSR",
+  "prompt": "Triumphant golden reveal sting, sparkling chimes and orchestral hit",
+  "dur": 3,
+  "img": null
+ },
+ {
+  "id": "sfx_card",
+  "kind": "sfx",
+  "name": "카드",
+  "prompt": "Quick card flip swish",
+  "dur": 0.5,
+  "img": null
+ },
+ {
+  "id": "sfx_hit",
+  "kind": "sfx",
+  "name": "타격",
+  "prompt": "Short punchy gunshot impact, anime battle hit",
+  "dur": 0.5,
+  "img": null
+ },
+ {
+  "id": "sfx_skill",
+  "kind": "sfx",
+  "name": "스킬",
+  "prompt": "Powerful energy skill release, charged blast with whoosh",
+  "dur": 1.5,
+  "img": null
+ },
+ {
+  "id": "sfx_win",
+  "kind": "sfx",
+  "name": "승리",
+  "prompt": "Short victory fanfare jingle, brass and strings, anime game",
+  "dur": 3.5,
+  "img": null
+ },
+ {
+  "id": "sfx_lose",
+  "kind": "sfx",
+  "name": "패배",
+  "prompt": "Short defeat jingle, low descending synth tones",
+  "dur": 2.5,
+  "img": null
+ },
+ {
+  "id": "sfx_up",
+  "kind": "sfx",
+  "name": "강화",
+  "prompt": "Power-up level up sound, rising sparkly arpeggio",
+  "dur": 1.5,
+  "img": null
+ },
+ {
+  "id": "sfx_noti",
+  "kind": "sfx",
+  "name": "알림",
+  "prompt": "Smartphone message notification ping, soft two-note chime",
+  "dur": 0.8,
+  "img": null
+ },
+ {
+  "id": "nlutif8n7",
+  "kind": "enemy",
+  "name": "훈련 표적",
+  "prompt": "",
+  "img": null
+ },
+ {
+  "id": "nmwvjjhmi",
+  "kind": "enemy",
+  "name": "강화 표적",
+  "prompt": "",
+  "img": null
+ },
+ {
+  "id": "njtdid3gs",
+  "kind": "enemy",
+  "name": "훈련 교관",
+  "prompt": "",
+  "img": null
+ },
+ {
+  "id": "nt1poyypb",
+  "kind": "enemy",
+  "name": "크라운 연습생 댄스조",
+  "prompt": "1girl, solo, short hair, black hair, undercut, black track jacket, gold trim, crown emblem, black crop top, black jogger pants, white sneakers, silver earrings",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "1girl, solo, short hair, black hair",
+    "outfit": "black track jacket, black jogger pants, silver earrings",
+    "other": "undercut, gold trim, crown emblem, black crop top, white sneakers",
+    "style": "",
+    "combined": "1girl, solo, short hair, black hair, undercut, black track jacket, gold trim, crown emblem, black crop top, black jogger pants, white sneakers, silver earrings",
+    "original": "1girl, solo, short hair, black hair, undercut, black track jacket, gold trim, crown emblem, black crop top, black jogger pants, white sneakers, silver earrings",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  },
+  "desc": "크라운 엔터테인먼트가 6년 이상 길러 낸 칼군무 전문 연습생 유닛.",
+  "nature": "한 치 오차 없는 대형으로 무대를 빠르게 장악하고, 첫 8카운트에 승부를 건다.",
+  "weak": "짜인 안무를 벗어난 즉흥 무대와 청량한 분위기에 리듬이 흔들린다.",
+  "faction": "크라운 엔터테인먼트"
+ },
+ {
+  "id": "n8poeisrg",
+  "kind": "enemy",
+  "name": "크라운 연습생 보컬조",
+  "prompt": "1girl, solo, long hair, brown hair, half updo, black blazer, gold buttons, crown emblem, white blouse, black pleated skirt, headset microphone",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "1girl, solo, long hair, brown hair",
+    "outfit": "white blouse, black pleated skirt, headset microphone",
+    "other": "half updo, black blazer, gold buttons, crown emblem",
+    "style": "",
+    "combined": "1girl, solo, long hair, brown hair, half updo, black blazer, gold buttons, crown emblem, white blouse, black pleated skirt, headset microphone",
+    "original": "1girl, solo, long hair, brown hair, half updo, black blazer, gold buttons, crown emblem, white blouse, black pleated skirt, headset microphone",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  },
+  "desc": "고급 보컬 트레이닝으로 다듬어진 크라운의 안정형 보컬 유닛.",
+  "nature": "흔들림 없는 라이브로 팀의 실수를 덮고 끝까지 점수를 지킨다.",
+  "weak": "정해진 편곡에서 벗어나는 몽환적인 화음 앞에서는 표현이 단조로워진다.",
+  "faction": "크라운 엔터테인먼트"
+ },
+ {
+  "id": "ncu7ck3p3",
+  "kind": "enemy",
+  "name": "크라운 연습생 랩조",
+  "prompt": "1girl, solo, braid, dark blue hair, black cap, oversized black hoodie, gold chain necklace, crown emblem, cargo pants, chunky sneakers",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "1girl, solo, braid, dark blue hair",
+    "outfit": "black cap, oversized black hoodie, gold chain necklace, cargo pants",
+    "other": "crown emblem, chunky sneakers",
+    "style": "",
+    "combined": "1girl, solo, braid, dark blue hair, black cap, oversized black hoodie, gold chain necklace, crown emblem, cargo pants, chunky sneakers",
+    "original": "1girl, solo, braid, dark blue hair, black cap, oversized black hoodie, gold chain necklace, crown emblem, cargo pants, chunky sneakers",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  },
+  "desc": "킬링 파트 한 소절로 판을 뒤집도록 설계된 크라운의 래퍼 유닛.",
+  "nature": "상대의 약한 파트를 노려 짧고 날카로운 벌스를 꽂는다.",
+  "weak": "체력과 호흡이 짧아 무대가 길어지면 급격히 무너진다.",
+  "faction": "크라운 엔터테인먼트"
+ },
+ {
+  "id": "nvwauoyo1",
+  "kind": "enemy",
+  "name": "도하은",
+  "prompt": "1girl, solo, long hair, straight hair, black hair, hime cut, yellow eyes, sharp eyes, tall, slender, black tailored jacket, gold buttons, crown brooch, white shirt, black slacks, gold earrings, white gloves",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "1girl, solo, long hair, straight hair, black hair, yellow eyes, sharp eyes, tall, slender",
+    "outfit": "black tailored jacket, crown brooch, white shirt, gold earrings, white gloves",
+    "other": "hime cut, gold buttons, black slacks",
+    "style": "",
+    "combined": "1girl, solo, long hair, straight hair, black hair, hime cut, yellow eyes, sharp eyes, tall, slender, black tailored jacket, gold buttons, crown brooch, white shirt, black slacks, gold earrings, white gloves",
+    "original": "1girl, solo, long hair, straight hair, black hair, hime cut, yellow eyes, sharp eyes, tall, slender, black tailored jacket, gold buttons, crown brooch, white shirt, black slacks, gold earrings, white gloves",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "ic_gems",
+  "kind": "icon",
+  "key": "gems",
+  "name": "프리즘 아이콘",
+  "prompt": "blue crystal gem, faceted crystal, glowing, sparkle",
+  "img": null
+ },
+ {
+  "id": "ic_gold",
+  "kind": "icon",
+  "key": "gold",
+  "name": "활동비 아이콘",
+  "prompt": "gold coin, embossed star emblem, shiny metal",
+  "img": null
+ },
+ {
+  "id": "ic_exp",
+  "kind": "icon",
+  "key": "exp",
+  "name": "연습 일지 아이콘",
+  "prompt": "glowing data chip, holographic record, blue light",
+  "img": null
+ },
+ {
+  "id": "ic_wmat",
+  "kind": "icon",
+  "key": "wmat",
+  "name": "스킬 교본 아이콘",
+  "prompt": "mechanical parts, gears and bolts, metal",
+  "img": null
+ },
+ {
+  "id": "ic_core",
+  "kind": "icon",
+  "key": "core",
+  "name": "스포트 배지 아이콘",
+  "prompt": "hexagonal energy core, pink glow, crystal inside",
+  "img": null
+ },
+ {
+  "id": "ic_gearMat",
+  "kind": "icon",
+  "key": "gearMat",
+  "name": "튜닝 큐브 아이콘",
+  "prompt": "polished alloy ingot, metallic shine, gear emblem",
+  "img": null
+ },
+ {
+  "id": "ic_transcMat",
+  "kind": "icon",
+  "key": "transcMat",
+  "name": "골든 앙코르 아이콘",
+  "prompt": "radiant transcendence crystal, violet and gold glow",
+  "img": null
+ }
+]

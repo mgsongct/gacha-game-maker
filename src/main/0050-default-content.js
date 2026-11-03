@@ -470,6 +470,6 @@ const DEFAULT_OPENING = {
 
 const DEFAULT_PROG = {gems:3600,pity:0,total:0,owned:{},cleared:{},squad:[],sec:null,daily:'',
   settings:{ssr:4,sr:18,pity:150,rv:2,expRate:100,goldRate:100,gemRate:100,stamina:true},firstTen:true,adult:true,show19:true,history:[],savedAt:0,
-  gold:20000,mat:{exp:40,wmat:20,core:10,gearMat:0,transcMat:0},pities:{},tokens:{},disp:{},dm:{date:'',cnt:{},got:{}},pass:{xp:0,got:[]},farmClear:{},shopBuy:{},curBanner:'',curEvent:'',live:{on:{talk:true,event:true,rerun:true,rotate:true,pass:true,chapter:false,season:true,skin:true},last:{},notices:[],seen:0,recentPU:[],seasons:{story:true,event:true,char:true,rerun:true,train:true},skillGeneration:1,season:null},
+  gold:20000,mat:{exp:40,wmat:20,core:10,gearMat:0,transcMat:0},pities:{},tokens:{},disp:{},dm:{date:'',cnt:{},got:{}},pass:{xp:0,got:[]},farmClear:{},shopBuy:{},curBanner:'',curEvent:'',live:{on:{talk:true,event:true,rerun:true,rotate:true,pass:true,chapter:false,season:true,skin:true,fill:true},last:{},notices:[],seen:0,recentPU:[],seasons:{story:true,event:true,char:true,rerun:true,train:true},skillGeneration:1,season:null},
   player:'',gender:'',inbox:{},seenOpening:false,lobbyBg:'',titleBg:'',titleChar:'',gachaBg:''};
 

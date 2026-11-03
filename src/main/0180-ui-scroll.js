@@ -47,7 +47,7 @@ function render(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewS
   if(viewState)uiScrollRestore($('#view'),viewState);else $('#view').scrollTop=0;UI_PAGE_SCROLL_ROUTE=scrollKey;UI_PAGE_SCROLL_GAME=G;
 }
 const pageHead=(ko,en,back)=>`<div class="phead">${back?`<button class="back" data-act="go" data-to="${back}" aria-label="뒤로">‹</button>`:''}<div><i>${en}</i><h2>${esc(ko)}</h2></div></div>`;
-function nextStage(){ const main=G.chapters.filter(c=>c.kind==='main'); for(const [ci,ch] of main.entries()) for(const [si,s] of ch.stages.entries()) if(!P().cleared[s.id]) return {ch,s,code:(ci+1)+'-'+(si+1)}; return null; }
+function nextStage(){ const main=G.chapters.filter(ch=>ch.kind==='main'); for(const [ci,ch] of main.entries()) for(const [si,s] of ch.stages.entries()) if(!P().cleared[s.id]) return {ch,s,code:(ci+1)+'-'+(si+1)}; return null; }
 const ICO={
   raid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14.5 3 21 9.5 11 19.5 4.5 13z"/><path d="M4.5 13 3 21l8-1.5M16 8l-6 6"/></svg>',
   book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-5a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h6z"/></svg>',
@@ -69,7 +69,7 @@ function lobbyCharacterArt(c,cls='lobby-art',face=''){
  return src?`<img class="art upimg ${cls}" src="${esc(src)}" alt="${esc(c.name)}" draggable="false">`:art(c,cls,{upper:true,face});
 }
 function lobbyHTML(){
-  const p=P(), c=charById(p.sec), has=c&&own(c.id), nx=nextStage(), evs=G.events.filter(e=>e.active!==false&&gateOpen(e));
+  const p=P(), c=charById(p.sec), has=c&&own(c.id), nx=nextStage(), evs=G.events.filter(ev=>ev.active!==false&&gateOpen(ev));
   // 자동 로비는 레이어 유지: 포즈 → 상반신 → 스탠딩. 일러스트는 별도 표시 모드에서 사용합니다.
   const oo=has?own(c.id):null, lm=p.lobbyMode||'auto', poseSrc=has&&!(skinOf(c)&&imgSrc(skinOf(c)))&&c.pose&&imgSrc(c.pose), layer=lm==='layer'||(lm==='auto'&&!!has), ill=has&&lm!=='stand'&&!layer&&((oo.useCg&&oo.dup>=5&&lbcgSrc(c))||charIllust(c)), pose=layer&&poseSrc;
   const bn=curBanner(), bup=bn&&((bn.pickup||[]).map(charById).filter(Boolean)[0]||bannerPool(bn).filter(x=>x.rarity===3)[0]);
@@ -118,24 +118,24 @@ let OPS_CH=null;
 function chLogline(ch){ if(ch.logline) return ch.logline; const L=parseScript((ch.stages[0]||{}).pre||'').find(l=>l.type==='nar'&&l.text&&l.text.length>8); return L?sub(L.text).slice(0,70)+(L.text.length>70?'…':''):''; }
 function chCover(ch){ const ml=chMapLib(ch), ms=ml&&imgSrc(ml); if(ms) return `background-image:url('${esc(ms)}');background-size:cover;background-position:center`;
   const pl=parseScript((ch.stages[0]||{}).pre||'').find(l=>l.type==='place'); return bgStyle(pl?pl.text:ch.title); }
-function opsListHTML(){ const main=G.chapters.filter(c=>c.kind==='main'); let prevDone=true, curIdx=-1;
+function opsListHTML(){ const main=G.chapters.filter(ch=>ch.kind==='main'); let prevDone=true, curIdx=-1;
   const cards=main.map((ch,ci)=>{ const n=ch.stages.length, done=ch.stages.filter(s=>P().cleared[s.id]).length, open=prevDone, full=n&&done===n; prevDone=full; if(open&&!full&&curIdx<0) curIdx=ci;
     return `<button class="chc ${open?'':'lock'} ${full?'clear':''} ${open&&!full?'cur':''}" data-act="${open?'opsch':'locked'}" data-ch="${ch.id}"><div class="chc-art" style="${chCover(ch)}"></div><div class="chc-no"><i>CHAPTER</i><b>${String(ci+1).padStart(2,'0')}</b></div>${full?'<em class="chc-st">CLEAR</em>':open?'<em class="chc-st now">진행 중</em>':'<em class="chc-st">🔒 잠김</em>'}
       <div class="chc-t"><b>${esc(ch.title)}</b><p>${open?esc(chLogline(ch)||'이야기가 기다리고 있어요.'):'앞 장을 모두 끝내면 열려요.'}</p><div class="chc-bar"><i style="width:${n?done/n*100:0}%"></i></div><span>${done} / ${n}</span></div></button>`; }).join('');
   const nxt=`<button class="chc next" data-act="${SAMPLE?'aichapter-open':'nextneedai'}"><div class="chc-art"></div><div class="chc-no"><i>CHAPTER</i><b>${String(main.length+1).padStart(2,'0')}</b></div><em class="chc-st">다음 이야기</em><div class="chc-t"><b>＋ 다음 장 만들기</b><p>${SAMPLE?'AI가 지금까지의 이야기와 보유한 '+esc(T('crew'))+'을(를) 반영해 다음 장을 써요.':'글 AI를 등록하면 다음 장을 만들 수 있어요.'}</p></div></button>`;
   if(curIdx>=0) setTimeout(()=>{ const el=document.querySelectorAll('.chc')[curIdx]; if(el&&el.parentNode) el.parentNode.scrollLeft=Math.max(0,el.offsetLeft-24); },30);
   return `${pageHead(T('ops'),'MAIN STORY')}<div class="chc-row">${cards}${nxt}</div><p class="muted" style="margin:6px 2px;font-size:.75rem">← 옆으로 넘겨서 장을 고르세요 →</p><button class="linkb" data-act="rebal" style="margin-top:6px">적 스탯 자동조정 · 새 스킬 기준</button>`; }
-function opsHTML(){ if(!OPS_CH||!G.chapters.some(c=>c.id===OPS_CH)) return opsListHTML();
+function opsHTML(){ if(!OPS_CH||!G.chapters.some(ch=>ch.id===OPS_CH)) return opsListHTML();
   let prev=true,out=`<div class="phead"><button class="back" data-act="opsback" aria-label="장 목록">‹</button><div><i>MAIN STORY</i><h2>${esc(T('ops'))}</h2></div></div>`;
   const XS=[28,68,38,74,26,60,44,72];
-  G.chapters.filter(c=>c.kind==='main').forEach((ch,ci)=>{ if(ch.id!==OPS_CH){ prev=ch.stages.every(s=>P().cleared[s.id]); return; }
+  G.chapters.filter(ch=>ch.kind==='main').forEach((ch,ci)=>{ if(ch.id!==OPS_CH){ prev=ch.stages.every(s=>P().cleared[s.id]); return; }
     const ml=chMapLib(ch), ms=ml&&imgSrc(ml), n=ch.stages.length, RH=104, Hh=n*RH+40;
     const pts=ch.stages.map((s,i)=>({x:XS[i%XS.length],y:56+i*RH}));
     let d=''; pts.forEach((p,i)=>{ if(!i){d+=`M${p.x} ${p.y}`;return;} const q=pts[i-1]; d+=` C${q.x} ${q.y+RH/2} ${p.x} ${p.y-RH/2} ${p.x} ${p.y}`; });
     const done=ch.stages.filter(s=>P().cleared[s.id]).length;
     let firstOpen=true;
     const nodes=ch.stages.map((s,si)=>{const cl=!!P().cleared[s.id],open=prev; prev=cl; const cur=open&&!cl&&firstOpen; if(cur) firstOpen=false;
-      const boss=!s.story&&(s.enemies.some(e=>e.boss)||si===n-1), p=pts[si];
+      const boss=!s.story&&(s.enemies.some(en=>en.boss)||si===n-1), p=pts[si];
       return `<button class="onode ${cl?'clear':''} ${open?'':'lock'} ${cur?'cur':''} ${boss?'boss':''} ${s.story?'story':''} ${s.mode?'m-'+s.mode:''}" style="left:${p.x}%;top:${p.y}px" data-act="${open?'stage':'locked'}" data-ch="${ch.id}" data-st="${s.id}"><span class="dia"><span>${cl?'✓':open?(modeIcon(s)||(boss?'★':s.story?'📖':'')):'🔒'}</span></span><span class="ont"><i>${ci+1}-${si+1}</i><b>${esc(s.title)}</b>${P().stars&&P().stars[s.id]?`<small class="ost">${'★'.repeat(P().stars[s.id])}${'☆'.repeat(3-P().stars[s.id])}</small>`:''}<em>${s.enemies.slice(0,4).map(e=>`<u style="--ec:${ECOL[e.elem]}"></u>`).join('')}</em></span></button>`;}).join('');
     out+=`<section class="omap">
       <div class="omap-h"><div><i>CHAPTER ${ci+1}</i><h3>${esc(ch.title)}</h3></div><span>${done}/${n}</span><button class="btn sm ghost" data-act="mapedit" data-ch="${ch.id}">지도</button><button class="btn sm ghost" data-act="chedit" data-ch="${ch.id}">편집</button></div>
@@ -149,42 +149,42 @@ function opsHTML(){ if(!OPS_CH||!G.chapters.some(c=>c.id===OPS_CH)) return opsLi
 }
 const contractHTML=noSkin(contractHTML0);
 function contractHTML0(){
-  const s=P().settings, bs=G.banners.filter(bnOpen), b=curBanner();
-  if(!b) return pageHead(T('gacha'),'RECRUIT')+`<div class="panel"><p>열린 배너가 없어요.</p><button class="btn" data-act="bnew">배너 만들기</button></div>`;
-  const pity=b.id==='std'?P().pity:(P().pities[b.id]||0), left=s.pity-pity, pool=bannerPool(b);
-  const ups=(b.pickup||[]).map(charById).filter(Boolean), show=(ups.length?ups:pool.filter(c=>c.rarity===3)).slice(0,4);
+  const s=P().settings, bs=G.banners.filter(bnOpen), bn=curBanner();
+  if(!bn) return pageHead(T('gacha'),'RECRUIT')+`<div class="panel"><p>열린 배너가 없어요.</p><button class="btn" data-act="bnew">배너 만들기</button></div>`;
+  const pity=pityGet(bn), left=s.pity-pity, pool=bannerPool(bn);
+  const ups=(bn.pickup||[]).map(charById).filter(Boolean), show=(ups.length?ups:pool.filter(c=>c.rarity===3)).slice(0,4);
   const hero=show[0], hill=hero&&P().lobbyMode!=='stand'&&charIllust(hero);
   const rOf=r=>r===3?s.ssr:r===2?s.sr:Math.max(0,100-s.ssr-s.sr);
   const BIG={std:'STAN<br>DARD',pickup:'PICK<span>✦</span>UP',pool:'SQUAD<br>UP',event:'EVENT<br>LIMITED'};
   const KR={std:'상시 모집',pickup:'신규 '+T('crew')+' 등장!',pool:'소속 모집',event:'기간 한정!'};
   const rows=[3,2,1].map(r=>{const n=pool.filter(c=>c.rarity===r).length;return `<tr><td><span class="badge r${r}c">${RL[r]}</span> ${n}명</td><td style="text-align:right">${rOf(r)}%</td></tr>`;}).join('');
-  return `<div class="bsel" style="margin-top:6px">${bs.map(x=>`<button class="${x.id===b.id?'on':''}" data-act="bsel" data-id="${x.id}">${esc(x.name)}${x.until&&x.until>Date.now()?` <small class="b-dd">D-${Math.max(0,Math.ceil((x.until-Date.now())/864e5))}</small>`:''}</button>`).join('')}<button data-act="newpu" title="신규 픽업 만들기">✦ 신규</button><button data-act="puexist" title="기존 ${esc(T('crew'))} 픽업">★ 픽업</button><button data-act="bnew" title="배너 직접 만들기">＋</button></div>
-  ${(b.storyFail||(b.type==='pickup'&&(b.newAt||b.pin)))&&!b.eventId&&!PUBUSY.has(b.id)&&(b.pickup||[])[0]&&SAMPLE?`<div class="panel" style="margin:6px 0;display:flex;gap:8px;align-items:center;justify-content:space-between"><span class="muted" style="font-size:.85rem">${b.storyFail?'이 배너의 픽업 스토리를 만들다 멈췄어요.':'이 배너에는 아직 픽업 스토리가 없어요.'}</span><button class="btn sm" data-act="pustoryretry" data-id="${esc(b.pickup[0])}" data-b="${esc(b.id)}">${b.storyFail?'이어서 만들기':'픽업 스토리 만들기'}</button></div>`:''}
-  <section class="pk-hero ${esc(b.type||'')} ${window.__BSLIDE||''}" data-swipe="banner">${bs.length>1?`<button class="pk-nav l" data-act="bswipe" data-d="-1" aria-label="이전 배너">‹</button><button class="pk-nav r" data-act="bswipe" data-d="1" aria-label="다음 배너">›</button><div class="pk-dots">${bs.map(x=>`<i class="${x.id===b.id?'on':''}"></i>`).join('')}</div>`:''}
-    <div class="pk-bg" style="${b.bg?bgStyle(b.bg):bgStyle(P().gachaBg||'낙성 분화구')}"></div>
+  return `<div class="bsel" style="margin-top:6px">${bs.map(x=>`<button class="${x.id===bn.id?'on':''}" data-act="bsel" data-id="${x.id}">${esc(x.name)}${x.until&&x.until>Date.now()?` <small class="b-dd">D-${Math.max(0,Math.ceil((x.until-Date.now())/864e5))}</small>`:''}</button>`).join('')}<button data-act="newpu" title="신규 픽업 만들기">✦ 신규</button><button data-act="puexist" title="기존 ${esc(T('crew'))} 픽업">★ 픽업</button><button data-act="bnew" title="배너 직접 만들기">＋</button></div>
+  ${(bn.storyFail||(bn.type==='pickup'&&(bn.newAt||bn.pin)))&&!bn.eventId&&!PUBUSY.has(bn.id)&&(bn.pickup||[])[0]&&SAMPLE?`<div class="panel" style="margin:6px 0;display:flex;gap:8px;align-items:center;justify-content:space-between"><span class="muted" style="font-size:.85rem">${bn.storyFail?'이 배너의 픽업 스토리를 만들다 멈췄어요.':'이 배너에는 아직 픽업 스토리가 없어요.'}</span><button class="btn sm" data-act="pustoryretry" data-id="${esc(bn.pickup[0])}" data-b="${esc(bn.id)}">${bn.storyFail?'이어서 만들기':'픽업 스토리 만들기'}</button></div>`:''}
+  <section class="pk-hero ${esc(bn.type||'')} ${window.__BSLIDE||''}" data-swipe="banner">${bs.length>1?`<button class="pk-nav l" data-act="bswipe" data-d="-1" aria-label="이전 배너">‹</button><button class="pk-nav r" data-act="bswipe" data-d="1" aria-label="다음 배너">›</button><div class="pk-dots">${bs.map(x=>`<i class="${x.id===bn.id?'on':''}"></i>`).join('')}</div>`:''}
+    <div class="pk-bg" style="${bn.bg?bgStyle(bn.bg):bgStyle(P().gachaBg||'낙성 분화구')}"></div>
     ${hero&&(hill||imgSrc(hero))?`<div class="pk-ghost">${hill?`<img src="${esc(hill)}" alt="">`:art(hero)}</div>`:''}
     <div class="pk-diag"></div>
     <div class="pk-art ${hill?'ill':''}">${hill?`<img src="${esc(hill)}" alt="${esc(hero.name)}" draggable="false">`:hero?art(hero):''}</div>
     ${show.length>1?`<div class="pk-subs">${show.slice(1).map(c=>`<button class="s" data-act="char" data-id="${c.id}" aria-label="${esc(c.name)}">${art(c)}</button>`).join('')}</div>`:''}
     <div class="pk-title">
       <div class="pk-logo">${esc(G.meta.title)}<small>${esc(G.meta.sub)}</small></div>
-      <h1 class="pk-big">${BIG[b.type]||'PICK<span>✦</span>UP'}</h1>
+      <h1 class="pk-big">${BIG[bn.type]||'PICK<span>✦</span>UP'}</h1>
       <div class="pk-rec">RECRUITMENT</div>
-      <div class="pk-kr">${esc(b.name||KR[b.type]||'')}</div>
-      ${b.desc?`<p>${esc(b.desc)}</p>`:''}
+      <div class="pk-kr">${esc(bn.name||KR[bn.type]||'')}</div>
+      ${bn.desc?`<p>${esc(bn.desc)}</p>`:''}
     </div>
     ${hero?`<button class="pk-name" data-act="char" data-id="${hero.id}"><span class="cs-rar r${hero.rarity}">${RL[hero.rarity]}</span><b>${esc(hero.name)}</b><i>${esc((hero.faction||ROLE_EN[hero.role]||'').toUpperCase())}</i></button>`:''}
   </section>
   <div class="panel pk-pity"><div style="display:flex;justify-content:space-between"><span>SSR 확정까지</span><b>${left}회</b></div><div class="bar" style="margin-top:6px"><i style="width:${pity/s.pity*100}%"></i></div>
     ${pity>=Math.floor(s.pity*0.75)?`<p class="soft">🔥 확률 상승 중 · 지금 SSR ${softRate(s,pity+1).toFixed(1)}%</p>`:`<p class="muted" style="margin:6px 0 0;font-size:.75rem">${Math.floor(s.pity*0.75)}회부터 SSR 확률이 점점 올라가요</p>`}
-    ${ups.length&&(P().guar||{})[b.id]?`<p class="soft gold">★ 다음 SSR은 확률 업 ${esc(T('crew'))} 확정</p>`:''}
-    <div class="sparkrow"><span>모집 포인트</span><div class="bar"><i style="width:${Math.min(100,((P().spark||{})[b.id]||0)/SPARK*100)}%"></i></div><b>${(P().spark||{})[b.id]||0}/${SPARK}</b><button class="btn sm ${((P().spark||{})[b.id]||0)>=SPARK?'':'ghost'}" data-act="sparkopen" data-id="${b.id}">교환</button></div>${P().firstTen?'<p class="muted" style="margin:8px 0 0">첫 10회는 SSR 1명 확정</p>':''}${ups.length?`<p class="muted" style="margin:8px 0 0">확률 업: ${ups.map(c=>esc(c.name)).join(', ')} · 같은 등급이 나오면 ${b.rate}% 확률</p>`:''}</div>
+    ${ups.length&&guarGet(bn)?`<p class="soft gold">★ 다음 SSR은 확률 업 ${esc(T('crew'))} 확정</p>`:''}${pityKey(bn)==='pickup'?`<p class="muted" style="margin:4px 0 0;font-size:.72rem">천장·확정은 다음 픽업 배너로 이어져요</p>`:''}
+    <div class="sparkrow"><span>모집 포인트</span><div class="bar"><i style="width:${Math.min(100,((P().spark||{})[bn.id]||0)/SPARK*100)}%"></i></div><b>${(P().spark||{})[bn.id]||0}/${SPARK}</b><button class="btn sm ${((P().spark||{})[bn.id]||0)>=SPARK?'':'ghost'}" data-act="sparkopen" data-id="${bn.id}">교환</button></div>${P().firstTen?'<p class="muted" style="margin:8px 0 0">첫 10회는 SSR 1명 확정</p>':''}${ups.length?`<p class="muted" style="margin:8px 0 0">확률 업: ${ups.map(c=>esc(c.name)).join(', ')} · 같은 등급이 나오면 ${bn.rate}% 확률</p>`:''}</div>
   <div class="pullrow"><button class="btn ghost" data-act="pull" data-n="1">1회<small>◆ ${COST}</small></button><button class="btn" data-act="pull" data-n="10">10회<small>◆ ${nf(COST*10)}${pool.some(c=>c.rarity>=2)?' · SR 이상 1명 보장':''}</small></button></div>
   <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="go" data-to="cash">◆ ${esc(T('currency'))} 충전</button></div>
 
   <div class="panel"><h3>확률 정보</h3><table style="width:100%;font-size:.9rem">${rows}</table>
     <p class="muted" style="margin:8px 0 0;font-size:.78rem">· ${Math.floor(s.pity*0.75)}회부터 SSR 확률이 조금씩 올라가고 ${s.pity}회째에 확정이에요.${ups.length?`<br>· SSR이 확률 업 ${esc(T('crew'))}이(가) 아니었으면 다음 SSR은 확률 업 확정이에요.`:''}<br>· 1회마다 모집 포인트 1, ${SPARK}포인트로 원하는 ${esc(T('crew'))} 교환.</p>
-    <div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="bedit" data-id="${b.id}">배너 편집</button><button class="btn sm ghost" data-act="ghist">${esc(T('gacha'))} 기록</button></div></div>`;
+    <div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="bedit" data-id="${bn.id}">배너 편집</button><button class="btn sm ghost" data-act="ghist">${esc(T('gacha'))} 기록</button></div></div>`;
 }
 function crewHTML(){
   const busy=busyIds(), list=[...G.chars].sort((a,b)=>(own(b.id)?1:0)-(own(a.id)?1:0)||b.rarity-a.rarity||(a.ord||0)-(b.ord||0));
@@ -200,7 +200,7 @@ function eventsHTML(){
 }
 function eventDetailHTML(){
   const ev=G.events.find(e=>e.id===P().curEvent); if(!ev){tab='event';return eventsHTML();}
-  const ch=G.chapters.find(c=>c.id===ev.chapterId), tok=P().tokens[ev.id]||0, buy=P().shopBuy[ev.id]||{}, b=G.banners.find(x=>x.id===ev.bannerId);
+  const ch=G.chapters.find(c=>c.id===ev.chapterId), tok=P().tokens[ev.id]||0, buy=P().shopBuy[ev.id]||{}, bn=G.banners.find(x=>x.id===ev.bannerId);
   let prev=true, st='';
   if(ch) ch.stages.forEach((s,si)=>{const cl=!!P().cleared[s.id],open=prev;st+=`<button class="stage ${cl?'clear':''} ${open?'':'lock'}" data-act="${open?'stage':'locked'}" data-ch="${ch.id}" data-st="${s.id}"><span class="code">EV${si+1}</span><span class="t"><b>${s.story?'📖 ':''}${esc(s.title)}</b><span class="st">${s.story?'이야기 · ':''}${esc(ev.token)} +${s.story?s.reward*2:s.reward}${cl?(s.story?' · 다시 보기':' · 반복 가능'):''}</span></span></button>`;prev=cl;});
   const item=it=>{const left=it.limit-(buy[it.id]||0), c=it.type==='char'?charById(it.ref):null;
@@ -209,13 +209,13 @@ function eventDetailHTML(){
   return `${pageHead(ev.title,'EVENT','event')}
   <section class="banner" style="min-height:180px"><div class="bgl" style="${bgStyle(ev.bg||'회색구 골목')}"></div><div class="bn-t"><i>${ev.active===false?'CLOSED':'EVENT'}${loreOf(ev)?' · '+esc(loreLabel(loreOf(ev))):''}</i><h1>${esc(ev.title)}</h1><p>${esc(ev.desc||'')}</p><p class="ups">${esc(ev.token)} <b>${nf(tok)}</b></p></div></section>
   <h3 class="sec">이벤트 스토리</h3>${st||'<p class="muted">스테이지가 없어요.</p>'}
-  ${b?`<button class="btn block" style="margin:10px 0" data-act="bsel" data-id="${b.id}" data-go="1">이벤트 ${T('gacha')}: ${esc(b.name)}</button>`:''}
+  ${bn?`<button class="btn block" style="margin:10px 0" data-act="bsel" data-id="${bn.id}" data-go="1">이벤트 ${T('gacha')}: ${esc(bn.name)}</button>`:''}
   ${(()=>{ const host=evHost(ev); return `<button class="evs-door" data-act="go" data-to="evshop"><div class="evs-bg" style="${bgStyle(ev.bg||'회색구 골목')}"></div><div class="evs-av">${host?art(host):''}</div><div class="evs-t"><i>EXCHANGE</i><b>이벤트 교환소</b><span>${host?esc(host.name)+'이(가) 기다리고 있어요 · ':''}${esc(ev.token)} ${nf(tok)} · 상품 ${(ev.shop||[]).length}개</span></div><em>입장 ›</em></button>`; })()}
   <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="evedit" data-id="${ev.id}">이벤트 편집</button>${ch?`<button class="btn sm ghost" data-act="chedit" data-ch="${ch.id}">스토리 편집</button>`:''}${ch&&SAMPLE?`<button class="btn sm ghost" data-act="evreroll" data-id="${ev.id}">🎲 스토리 다시 쓰기</button>`:''}</div>`;
 }
 // 이벤트 교환소: 픽업 캐릭터가 맞이하는 상점
 let EVS_LINE='', EVS_FOR='';
-function evHost(ev){ const b=G.banners.find(x=>x.id===ev.bannerId); const ids=[...((b&&b.pickup)||[]),...(ev.shop||[]).filter(i=>i.type==='char').map(i=>i.ref)]; return ids.map(charById).find(Boolean)||null; }
+function evHost(ev){ const bn=G.banners.find(x=>x.id===ev.bannerId); const ids=[...((bn&&bn.pickup)||[]),...(ev.shop||[]).filter(i=>i.type==='char').map(i=>i.ref)]; return ids.map(charById).find(Boolean)||null; }
 function evShopHTML(){
   const ev=G.events.find(e=>e.id===P().curEvent); if(!ev){ tab='event'; return eventsHTML(); }
   const tok=P().tokens[ev.id]||0, buy=P().shopBuy[ev.id]||{}, host=evHost(ev);
@@ -305,7 +305,7 @@ function openAp(){
     <div class="row" style="margin-top:14px"><button class="btn" data-act="apsave">저장</button><button class="btn ghost" data-act="aptest">연결 테스트</button>${d.id?`<button class="btn ghost" data-act="apdel">삭제</button>`:''}</div>`);
 }
 function readAp(){
-  const v=id=>{const e=$('#'+id);return e?e.value.trim():undefined;};
+  const v=id=>{const el=$('#'+id);return el?el.value.trim():undefined;};
   const d=APD;
   [['name','ap_name'],['key','ap_key'],['base','ap_base'],['pub','ap_pub'],['sa','ap_sa'],['region','ap_region'],['project','ap_project'],['vkey','ap_vkey'],['model','ap_model'],['quick','ap_quick']].forEach(([k,id])=>{const x=v(id);if(x!==undefined)d[k]=x;});
   if(d.base) d.base=normBase(d.base);
@@ -459,7 +459,7 @@ async function openNaiGen(kind,id,custom){
   const c=naiCfg(), k=kind==='char'?'char':kind==='weapon'?'prop':o.kind, job={kind,id,custom,originalSrc:imgSrcRaw(o)||''}; NAIJOB=job;
   openModal(`${head('그리는 중',`<span class="muted">${esc(o.name)}</span>`)}<div class="naiprev ${k}"><div class="spin"></div></div><p class="muted" id="nai_stat" style="text-align:center">보통 10~30초 걸려요. 창을 닫으면 결과를 버려요.</p>`);
   try{
-    const op={originalSrc:job.originalSrc,promptParts:custom.promptParts,candidateEligible:custom.candidateEligible===true||imageCandidateEligible(kind==='lib'?o.kind:kind,o,charById(id)),neg:custom.neg,seed:custom.seed,model:custom.model,size:custom.size,chars:custom.chars,onRetry:(a,n,why)=>{const e=$('#nai_stat');if(e&&NAIJOB===job)e.textContent=`${why} · 다시 시도 ${a}/${n-1}…`;}};
+    const op={originalSrc:job.originalSrc,promptParts:custom.promptParts,candidateEligible:custom.candidateEligible===true||imageCandidateEligible(kind==='lib'?o.kind:kind,o,charById(id)),neg:custom.neg,seed:custom.seed,model:custom.model,size:custom.size,chars:custom.chars,onRetry:(a,n,why)=>{const el=$('#nai_stat');if(el&&NAIJOB===job)el.textContent=`${why} · 다시 시도 ${a}/${n-1}…`;}};
     if(custom.ref){
       const rf={type:custom.ref.type,strength:custom.ref.strength,fidelity:custom.ref.fidelity};
       if(k==='char'&&imgSrc(o)) op.refs=[Object.assign({image:await refImage(imgSrc(o))},rf)];
@@ -494,7 +494,7 @@ async function naiBatch(kind){
   const job={stop:false}; NAIBATCH=job; let done=0;
   openModal(`${head('일괄 생성')}<p id="nbStat">0 / ${items.length}</p><p class="muted">한 장씩 그려서 자동으로 등록해요. 창을 닫아도 계속 진행돼요.</p><div class="row"><button class="btn ghost" data-act="naistop">중지</button></div>`);
   for(const l of items){
-    if(job.stop) break; const st=$('#nbStat'); if(st) st.textContent=`${done} / ${items.length} · ${l.name} 그리는 중`;
+    if(job.stop) break; const el=$('#nbStat'); if(el) el.textContent=`${done} / ${items.length} · ${l.name} 그리는 중`;
     try{ const b=await naiDrawItem({k:kind,o:l}); await storeImage(l,b,'l:'); done++; await wait(600); }catch(e){ toast(naiErr(e)); break; }
   }
   NAIBATCH=null; render(); if($('#nbStat')) openLib(kind); toast(`${done}개를 그려서 등록했어요`);
@@ -528,7 +528,7 @@ function openSound(){
     <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">저장된 음성</h3>
     <p class="muted" id="vstat" style="margin:4px 0 8px">세는 중…</p>
     <div class="row"><button class="btn sm ghost" data-act="vprebuild">전체 대사 미리 만들기</button><button class="btn sm ghost" data-act="vclearall">음성 저장소 비우기</button></div>`);
-  voiceStats().then(v=>{const e=$('#vstat'); if(e) e.textContent=`${v.n}개 · ${v.mb}MB. 같은 목소리·모델·대사는 다시 요청하지 않고 이 파일을 재생해요.`;});
+  voiceStats().then(v=>{const el=$('#vstat'); if(el) el.textContent=`${v.n}개 · ${v.mb}MB. 같은 목소리·모델·대사는 다시 요청하지 않고 이 파일을 재생해요.`;});
 }
 let VS={cid:null,results:[],picks:{},lang:'ko',q:''};
 function voiceRow(m){
@@ -607,7 +607,7 @@ function studioHTML(){
     <div class="row" style="margin-top:10px"><button class="btn sm" data-act="apnew">AI 추가</button><button class="btn sm ghost" data-act="apfb">실패하면 다음 AI로 ${AIP().fallback?'켜짐':'꺼짐'}</button><button class="btn sm ghost" data-act="ailog">🔍 AI 기록</button><button class="btn sm ghost" data-act="llmopen">생성 지침${(()=>{ const L=llmEff(); return L.top||L.mid||L.bot?' ✓':''; })()}</button></div></div>`,
   img:`<div class="panel"><h3>그림 AI</h3><p class="muted" style="margin:0 0 8px">${imgProvider()==='comfy'?'ComfyUI '+(imgReady()?'연결 설정됨':'설정 미완료'):'NovelAI '+(naiCfg().key?'토큰 등록됨':'미등록')}</p><div class="row"><button class="btn sm ghost" data-act="naiopen">그림 AI 설정</button><button class="btn sm ghost" data-act="packopen">그림체 프리셋</button><button class="btn sm ghost" data-act="dsopen">🎨 캐릭터 디자인 통일${G.meta.design&&(G.meta.design.all||Object.values(G.meta.design.fac||{}).some(Boolean))?' ✓':''}</button><button class="btn sm" data-act="prepopen">그림 준비실 (${drawTodo().length})</button><button class="btn sm ghost" data-act="setupopen">처음 설정 다시</button></div></div>`,
   live:`${v2SeasonGenerationHTML()}<div class="panel"><h3>시즌 운영</h3><p class="muted" style="margin:0 0 10px">앱을 켤 때 날짜를 보고 새 콘텐츠를 자동으로 만들어요. 켠 항목만큼 글 AI 요금이 들어요.</p>
-    <div class="chips">${(P().live.on.season?[['season',cycLabel('season')+' 시즌 로테이션'],['talk',cycLabel('talk')+(cycDays('talk')>1?'마다':'')+' 새 '+T('talk')],['pass','매달 '+T('pass')+' 초기화'],['skin','시즌마다 새 '+T('skin')+' 상점']]:[['season',cycLabel('season')+' 시즌 로테이션'],['talk',cycLabel('talk')+(cycDays('talk')>1?'마다':'')+' 새 '+T('talk')],['event',cycLabel('event')+'마다 새 이벤트'],['rerun','이벤트 복각'],['rotate',cycLabel('rotate')+'마다 확률 업 교체'],['pass','매달 '+T('pass')+' 초기화'],['chapter',cycLabel('chapter')+'마다 메인 다음 장'],['skin',cycLabel('rotate')+'마다 새 '+T('skin')+' 상점']]).map(([k,l])=>`<button class="chip ${P().live.on[k]?'on':''}" data-act="livetog" data-k="${k}">${esc(l)}</button>`).join('')}</div>
+    <div class="chips">${(P().live.on.season?[['season',cycLabel('season')+' 시즌 로테이션'],['talk',cycLabel('talk')+(cycDays('talk')>1?'마다':'')+' 새 '+T('talk')],['pass','매달 '+T('pass')+' 초기화'],['skin','시즌마다 새 '+T('skin')+' 상점'],['fill','빈 콘텐츠 자동 채움']]:[['season',cycLabel('season')+' 시즌 로테이션'],['talk',cycLabel('talk')+(cycDays('talk')>1?'마다':'')+' 새 '+T('talk')],['event',cycLabel('event')+'마다 새 이벤트'],['rerun','이벤트 복각'],['rotate',cycLabel('rotate')+'마다 확률 업 교체'],['pass','매달 '+T('pass')+' 초기화'],['chapter',cycLabel('chapter')+'마다 메인 다음 장'],['skin',cycLabel('rotate')+'마다 새 '+T('skin')+' 상점'],['fill','빈 콘텐츠 자동 채움']]).map(([k,l])=>`<button class="chip ${P().live.on[k]?'on':''}" data-act="livetog" data-k="${k}">${esc(l)}</button>`).join('')}</div>
     <h4 class="sec" style="margin-top:12px">운영 주기</h4>
     <div class="g2">${(P().live.on.season?['season','talk']:['talk','event','chapter','rotate']).map(k=>`<div><label class="f" for="cyc_${k}">${({season:'시즌 길이',event:'새 이벤트',chapter:'메인 다음 장',talk:'새 '+esc(T('talk')),rotate:'확률 업 교체 · 새 '+esc(T('skin'))})[k]}</label><select class="in" id="cyc_${k}" data-cyc="${k}">${opt(LIVE_CYC[k][1].map(([d,l])=>[d,d===1?l:l+'마다']),cycDays(k))}</select></div>`).join('')}</div>
     <p class="muted" style="margin:4px 0 0;font-size:.78rem">주기를 바꾸면 그때부터 새로 세요. 짧을수록 글 AI 사용량이 늘어요.</p>

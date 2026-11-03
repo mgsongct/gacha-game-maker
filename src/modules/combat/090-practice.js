@@ -37,18 +37,18 @@ function v2PracticeSnapshot(){return {time:B.engine.time,rows:B.allies.map(u=>({
 function v2PracticeTable(snapshot){return `<table><thead><tr><th>캐릭터</th><th>피해 / DPS</th><th>실제 회복</th><th>액티브 / 궁극기</th></tr></thead><tbody>${snapshot.rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${nf(r.damage)} / ${nf(r.damage/Math.max(GGMCombat.DT,snapshot.time))}</td><td>${nf(r.healing)}</td><td>${r.active} / ${r.ultimate}</td></tr>`).join('')}</tbody></table>`;}
 function v2MountPractice(){
  const bt=document.querySelector('#ov > .bt');bt.classList.add('v2-practice');B.paused=false;
- B.enemies.forEach((u,i)=>{const el=document.getElementById('u_e'+i);const shape=el.querySelector('.shape,.en-img');if(shape){const art=document.createElement('div');art.className='v2-dummy-art';art.textContent=u.role==='def'?'🛡':u.role==='sup'?'✚':'⚔';shape.replaceWith(art);}const label=document.createElement('small');label.className='v2-dummy-label';label.textContent='HP ∞ · 기준 '+nf(u.maxhp);el.append(label);});
+ B.enemies.forEach((en,i)=>{const el=document.getElementById('u_e'+i);const shape=el.querySelector('.shape,.en-img');if(shape){const art=document.createElement('div');art.className='v2-dummy-art';art.textContent=en.role==='def'?'🛡':en.role==='sup'?'✚':'⚔';shape.replaceWith(art);}const label=document.createElement('small');label.className='v2-dummy-label';label.textContent='HP ∞ · 기준 '+nf(en.maxhp);el.append(label);});
  const log=document.getElementById('bLog'),middle=document.createElement('div');middle.className='v2-practice-middle';log.replaceWith(middle);const hud=document.createElement('div');hud.className='v2-practice-hud';hud.innerHTML='<b id="v2-practice-time"></b><div id="v2-practice-metrics"></div><div class="row"><button class="btn sm ghost" data-act="v2practice-pause">일시정지</button><button class="btn sm ghost" data-act="v2practice-reset">처음부터</button><button class="btn sm ghost" data-act="v2practice-config">편성·허수아비 변경</button></div>';middle.append(hud,log);v2UpdatePractice();
 }
 function v2UpdatePractice(){
  if(B?.ctx.kind!=='practice')return;const s=v2PracticeSnapshot();const time=document.getElementById('v2-practice-time'),metrics=document.getElementById('v2-practice-metrics');if(time)time.textContent=`${B.paused?'일시정지 · ':''}연습 ${s.time.toFixed(1)}초 · 누적 피해 ${nf(s.rows.reduce((n,r)=>n+r.damage,0))}`;if(metrics)metrics.innerHTML=v2PracticeTable(s);
 }
 function v2StopPractice(){if(B?.ctx.kind!=='practice')return;V2PRACTICE.last=v2PracticeSnapshot();clearInterval(B.timer);B.over=true;B=null;closeOv();render();v2OpenPractice(true);}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;switch(b.dataset.act){
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;switch(el.dataset.act){
  case 'v2practice':v2OpenPractice();break;
  case 'v2practice-start':v2StartPractice();break;
  case 'v2practice-config':v2StopPractice();break;
  case 'v2practice-reset':v2StartPractice(false);break;
- case 'v2practice-pause':if(B?.ctx.kind==='practice'){B.paused=!B.paused;b.textContent=B.paused?'계속하기':'일시정지';v2UpdatePractice();}break;
+ case 'v2practice-pause':if(B?.ctx.kind==='practice'){B.paused=!B.paused;el.textContent=B.paused?'계속하기':'일시정지';v2UpdatePractice();}break;
 }});
 

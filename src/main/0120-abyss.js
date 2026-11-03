@@ -137,7 +137,7 @@ async function drawCardArts(deck,btn){ if(!imgReady()){ toast(imgNeed()); return
 
 /* --- 카드 전투 엔진 --- */
 let CB=null;
-function cbAtkVal(u,m,e){ if(!e&&CB){ const es=CB.enemies.filter(x=>x.hp>0); e=CB.enemies[CB.tgt]&&CB.enemies[CB.tgt].hp>0?CB.enemies[CB.tgt]:es[0]; } let v=u.atk*(CB?CB.str:1)*m; if(e){ v*=BEATS[u.elem]===e.elem?1.5:BEATS[e.elem]===u.elem?0.75:1; if(e.vul>0) v*=1.5; } return Math.max(1,Math.round(v)); }
+function cbAtkVal(u,m,e){ if(!e&&CB){ const es=CB.enemies.filter(en=>en.hp>0); e=CB.enemies[CB.tgt]&&CB.enemies[CB.tgt].hp>0?CB.enemies[CB.tgt]:es[0]; } let v=u.atk*(CB?CB.str:1)*m; if(e){ v*=BEATS[u.elem]===e.elem?1.5:BEATS[e.elem]===u.elem?0.75:1; if(e.vul>0) v*=1.5; } return Math.max(1,Math.round(v)); }
 function cbBlk(u,m){ return Math.round(u.maxhp*0.09*m); }
 function cbSkillVal(u,sk,pw){ const k=sk.kind; if(k==='dmg') return cbAtkVal(u,pw*1.3); if(k==='aoe') return cbAtkVal(u,pw*0.9); if(k==='heal') return Math.round(u.maxhp*0.14*pw); if(k==='shield') return Math.round(u.maxhp*0.12*pw); return Math.min(0.6,0.2*pw); }
 function cbEnemyDmg(e,m,a){ let v=e.dmg*e.str*m; if(e.weak>0) v*=0.7; v*=BEATS[e.elem]===a.elem?1.5:BEATS[a.elem]===e.elem?0.75:1; const dr=Math.min(1.35,Math.max(0.65,Math.pow((CB?CB.defA:a.def)/Math.max(1,a.def),0.35))); return Math.max(1,Math.round(v*dr)); }
@@ -167,18 +167,18 @@ function cbStart(kind){ const run=RG().run; const en=rgEnemies({k:run.k,floor:rg
     <div class="cb-detail" id="cbDet" hidden></div>
     <div class="cb-hand fan" id="cbHand"></div></div>`;
   $('#ov').hidden=false; sceneBgm(); cbIntents(); cbTurn(true); }
-function cbAliveE(){ return CB.enemies.filter(e=>e.hp>0); }
-function cbLog(t){ CB.log.push(t); CB.log=CB.log.slice(-3); const l=$('#cbLog'); if(l) l.innerHTML=CB.log.map(x=>`<p>${esc(x)}</p>`).join(''); }
+function cbAliveE(){ return CB.enemies.filter(en=>en.hp>0); }
+function cbLog(t){ CB.log.push(t); CB.log=CB.log.slice(-3); const el=$('#cbLog'); if(el) el.innerHTML=CB.log.map(x=>`<p>${esc(x)}</p>`).join(''); }
 function cbDraw(n){ for(let k=0;k<n;k++){ if(CB.hand.length>=10) break; if(!CB.draw.length){ if(!CB.disc.length) break; CB.draw=cbShuffle(CB.disc); CB.disc=[]; } CB.hand.push(CB.draw.pop()); } }
 function cbTurn(first){ if(!CB||CB.over) return; const L=cbLead(); CB.turn++; CB.block=CB.retain?Math.floor(CB.block*0.5):0; CB.retain=false; CB.counter=0; CB.taunt=-1; CB.played=0; CB.disc1=false; CB.chainOK=false; CB.firstFree=rgCount('firstfree')>0; CB.last=null; CB.sel=-1;
   CB.energy=3+(first&&rgCount('burst')?1:0);
   if(L.role==='def'){ const b=Math.round(L.maxhp*0.06); CB.block+=b; }
   cbDraw(5+(L.role==='sup'?1:0)+(first?rgCount('spd'):0)); CB.busy=false; cbRender(); }
-function cbIntents(){ CB.enemies.forEach(e=>{ if(e.hp<=0) return; const r=Math.random(); let it;
-    if(e.boss){ it=r<0.25?{k:'aoe',m:0.75}:r<0.42?{k:'heavy',m:2.0}:r<0.75?{k:'atk',m:1.15}:r<0.88?{k:'multi',m:0.6,n:2}:{k:'def'}; if(CB.turn===0&&it.k==='heavy') it={k:'atk',m:1.15}; }
+function cbIntents(){ CB.enemies.forEach(en=>{ if(en.hp<=0) return; const r=Math.random(); let it;
+    if(en.boss){ it=r<0.25?{k:'aoe',m:0.75}:r<0.42?{k:'heavy',m:2.0}:r<0.75?{k:'atk',m:1.15}:r<0.88?{k:'multi',m:0.6,n:2}:{k:'def'}; if(CB.turn===0&&it.k==='heavy') it={k:'atk',m:1.15}; }
     else it=r<0.58?{k:'atk',m:1.0}:r<0.73?{k:'multi',m:0.55,n:2}:r<0.88?{k:'def'}:{k:'buff'};
     if(it.k==='aoe') it={k:'atk',m:1.3};
-    e.intent=it; }); }
+    en.intent=it; }); }
 function cbIntentHTML(e){ const it=e.intent; if(!it) return ''; const L=cbLead(), dm=cbEnemyDmg(e,it.m||1,L);
   if(it.k==='atk'||it.k==='heavy') return `<span class="it it-atk ${it.k==='heavy'?'heavy':''}">⚔ ${nf(dm)}</span>`;
   if(it.k==='multi') return `<span class="it it-atk">⚔ ${nf(dm)}×${it.n}</span>`;
@@ -189,7 +189,7 @@ function cbFanStyle(i,n,sel,si){ const o=i-(n-1)/2, sp=Math.min(54,250/Math.max(
   const half=(Math.min(innerWidth,620)/2)-62; let tx=o*sp; if(si!=null&&si>=0&&!sel) tx+=i<si?-16:16; if(sel) tx=Math.max(-half,Math.min(half,tx));
   return sel?`--tx:${tx}px;--ty:-58px;--r:0deg;z-index:30`:`--tx:${tx}px;--ty:${y}px;--r:${r}deg;z-index:${10+i}`; }
 function cbRender(){ if(!CB) return; const es=cbAliveE(); if(!es.includes(CB.enemies[CB.tgt])) CB.tgt=(es[0]||{i:0}).i; const L=cbLead();
-  $('#cbEn').innerHTML=CB.enemies.map(e=>`<button class="ce ${e.hp<=0?'dead':''} ${e.boss?'boss':''} ${CB.tgt===e.i&&e.hp>0?'tg':''}" id="ce${e.i}" data-act="cbtgt" data-i="${e.i}" style="--ec:${ECOL[e.elem]}">${e.hp>0?cbIntentHTML(e):''}<div class="ce-art">${enemyArt(e)}</div><b>${esc(e.name)}</b><span class="hpb"><i style="width:${Math.max(0,e.hp/e.maxhp*100)}%"></i></span><span class="ce-n">${nf(Math.max(0,e.hp))}${e.blk?` <em class="eb">🛡${nf(e.blk)}</em>`:''}${e.mark?` <em class="em">낙인 ${e.mark}</em>`:''}${e.bleed?` <em class="ebl">출혈 ${e.bleed}</em>`:''}${e.weak?` <em class="ew">약화 ${e.weak}</em>`:''}${e.vul?` <em class="ev">취약 ${e.vul}</em>`:''}${e.str>1?` <em class="es">공↑</em>`:''}</span></button>`).join('');
+  $('#cbEn').innerHTML=CB.enemies.map(en=>`<button class="ce ${en.hp<=0?'dead':''} ${en.boss?'boss':''} ${CB.tgt===en.i&&en.hp>0?'tg':''}" id="ce${en.i}" data-act="cbtgt" data-i="${en.i}" style="--ec:${ECOL[en.elem]}">${en.hp>0?cbIntentHTML(en):''}<div class="ce-art">${enemyArt(en)}</div><b>${esc(en.name)}</b><span class="hpb"><i style="width:${Math.max(0,en.hp/en.maxhp*100)}%"></i></span><span class="ce-n">${nf(Math.max(0,en.hp))}${en.blk?` <em class="eb">🛡${nf(en.blk)}</em>`:''}${en.mark?` <em class="em">낙인 ${en.mark}</em>`:''}${en.bleed?` <em class="ebl">출혈 ${en.bleed}</em>`:''}${en.weak?` <em class="ew">약화 ${en.weak}</em>`:''}${en.vul?` <em class="ev">취약 ${en.vul}</em>`:''}${en.str>1?` <em class="es">공↑</em>`:''}</span></button>`).join('');
   $('#clHp').style.width=Math.max(0,L.hp/L.maxhp*100)+'%'; $('#clN').textContent=`${nf(Math.max(0,L.hp))} / ${nf(L.maxhp)}`; $('#cbLead').classList.toggle('down',L.hp<=0);
   $('#clSt').innerHTML=[CB.charge?`충전 ${CB.charge}`:'',CB.rage?'투지':'',CB.str>1?`공격 +${Math.round((CB.str-1)*100)}%`:'',CB.retain?'보존':'',CB.counter?'반격':'',CB.disc1?'다음 카드 -1':'',L.role==='atk'?`맹공 ${CB.atkN%3}/3`:''].filter(Boolean).map(x=>`<em>${x}</em>`).join('');
   const ub=$('#cbUlt'); ub.disabled=CB.busy||CB.ult<ULT_MAX; ub.classList.toggle('ready',CB.ult>=ULT_MAX); $('#cbUltG').style.height=(CB.ult/ULT_MAX*100)+'%';
@@ -263,8 +263,8 @@ function cbUlt(){ if(!CB||CB.busy||CB.over||CB.ult<ULT_MAX) return; const L=cbLe
   const r=$('.cb'); if(r){ r.classList.remove('shake'); void r.offsetWidth; r.classList.add('shake'); }
   cbRender(); pops.forEach(p=>cbFx(...p)); if(!cbAliveE().length) setTimeout(()=>cbEnd(true),500); }
 function cbEndTurn(){ if(!CB||CB.busy||CB.over) return; CB.busy=true; CB.sel=-1; CB.disc.push(...CB.hand); CB.hand=[]; cbRender();
-  const acts=CB.enemies.filter(e=>e.hp>0); let k=0; const L=cbLead();
-  const step=()=>{ if(!CB||CB.over) return; if(k>=acts.length){ CB.enemies.forEach(e=>{ if(e.vul>0) e.vul--; if(e.weak>0) e.weak--; }); if(L.hp<=0){ cbEnd(false); return; } cbIntents(); cbTurn(false); return; }
+  const acts=CB.enemies.filter(en=>en.hp>0); let k=0; const L=cbLead();
+  const step=()=>{ if(!CB||CB.over) return; if(k>=acts.length){ CB.enemies.forEach(en=>{ if(en.vul>0) en.vul--; if(en.weak>0) en.weak--; }); if(L.hp<=0){ cbEnd(false); return; } cbIntents(); cbTurn(false); return; }
     const e=acts[k++]; if(e.hp<=0){ step(); return; } const pops=[];
     if(e.bleed>0){ const d=Math.max(1,Math.round(L.atk*0.12*e.bleed*(1+0.5*rgCount('deepcut')))); e.hp=Math.max(0,e.hp-d); pops.push(['ce'+e.i,nf(d)+' 출혈','weak']); e.bleed--; if(e.hp<=0){ cbLog(`${e.name}이(가) 출혈로 쓰러졌어요`); cbRender(); pops.forEach(p=>cbFx(...p)); if(!cbAliveE().length){ setTimeout(()=>cbEnd(true),500); return; } setTimeout(step,420); return; } }
     e.blk=0; const it=e.intent||{k:'atk',m:1};

@@ -44,11 +44,11 @@ function drLibHTML(){ const a=drLib(); return `<div class="dr-lib" id="drLib"><d
 function drLoadFrom(d,label){ try{ appStorage.setItem(DR2KEY,JSON.stringify(drClean(d))); }catch(e){} DRTAB='theme'; openDraft(); toast(`「${label||drName(d)}」 초안을 불러왔어요. 고친 뒤 만들기를 누르면 새 게임으로 만들어져요`); }
 function drSave(){ try{ appStorage.setItem(DR2KEY,JSON.stringify(DR2)); }catch(e){} }
 function drLen(d){ d=d||DR2; return [d.auto,d.kw,d.tone,d.story,d.world,d.setting,d.hero.name,d.hero.gender,d.hero.look,d.hero.bio,...d.chars.flatMap(c=>[c.name,c.role,c.profile,c.look,c.speech])].reduce((n,s)=>n+String(s||'').length,0); }
-function drRead(){ if(!DR2||!$('#drPage')) return; const v=id=>{const e=$('#'+id);return e?(e.type==='checkbox'?e.checked:e.value):undefined;}, set=(k,id,f)=>{const x=v(id); if(x!==undefined) DR2[k]=f?f(x):x;};
-  set('auto','dr_auto'); set('gtitle','dr_gtitle'); set('crewTerm','dr_crew',x=>String(x||'').trim().slice(0,8)); set('castSex','dr_cast'); set('kw','ng_kw'); set('tone','ng_tone'); set('theme','ng_theme'); set('n','ng_n',Number); set('style','ng_style'); set('fan','ng_fan'); set('src','ng_src'); set('story','ng_story'); set('stages','ng_stages',Number); set('len','ng_len'); set('depth','ng_depth'); set('newc','ng_newc',Number); set('talkOnly','ng_talkonly',Number); set('world','dr_world'); set('setting','dr_setting');
+function drRead(){ if(!DR2||!$('#drPage')) return; const v=id=>{const el=$('#'+id);return el?(el.type==='checkbox'?el.checked:el.value):undefined;}, set=(k,id,f)=>{const x=v(id); if(x!==undefined) DR2[k]=f?f(x):x;};
+  set('auto','dr_auto'); set('gtitle','dr_gtitle'); set('crewTerm','dr_crew',x=>String(x||'').trim().slice(0,8)); set('castSex','dr_cast'); set('kw','ng_kw'); set('tone','ng_tone'); set('theme','ng_theme'); set('n','ng_n',Number); set('style','ng_style'); set('fan','ng_fan'); set('src','ng_src'); set('story','ng_story'); set('stages','ng_stages',Number); set('len','ng_len'); set('depth','ng_depth'); set('newc','ng_newc',Number); set('talkOnly','ng_talkonly',Number); set('con','ng_con'); set('world','dr_world'); set('setting','dr_setting');
   document.querySelectorAll('#drPage [data-dc]').forEach(e=>{ const c=DR2.chars[+e.dataset.i]; if(c){c[e.dataset.dc]=e.value;if(e.dataset.dc==='tags')naiBlocksSave(c,'tags',e);} });
   ['name','call','gender','look','bio'].forEach(k=>{ const x=v('dr_h_'+k); if(x!==undefined) DR2.hero[k]=x; }); const hd=v('dr_h_hide'); if(hd!==undefined) DR2.hero.hide=hd;
-  drSave(); const c=$('#drCount'); if(c) c.textContent=nf(drLen()); }
+  drSave(); const el=$('#drCount'); if(el) el.textContent=nf(drLen()); }
 function drText(d){ d=d||DR2; const L=[];
   if(d.world.trim()) L.push('[세계관]\n'+d.world.trim());
   if(d.setting.trim()) L.push('[설정: 세력·용어·규칙·비밀]\n'+d.setting.trim());
@@ -70,6 +70,7 @@ function drTabHTML(k){ const d=DR2, sec=(id,h)=>`<section data-dr="${id}" ${DRTA
     <div id="ng_srcw" ${d.fan?'':'hidden'}><label class="f" for="ng_src">원작 이름</label><input class="in" id="ng_src" value="${esc(d.src)}" placeholder="예: 작품 이름"><p class="muted" style="margin:4px 0 0;font-size:.78rem">원작에서 미성년자·학생인 캐릭터는 넣지 않고 성인 캐릭터만 써요. 개인 감상용으로만 써 주세요.</p></div>
     ${drPresetHTML()}
     <label class="f" for="ng_style">이 게임 그림체 태그 (선택 · 프리셋보다 우선)</label><input class="in" id="ng_style" value="${esc(d.style)}" placeholder="예: dark fantasy, muted colors">
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng_con" ${d.con?'checked':''}><span><b>건조/영입 사용</b> <span class="muted" style="font-size:.8rem">(자원 4종을 넣어 영입 · 기본 ${esc(d.crewTerm||'동료')}은(는) 뽑기, 특별 의상 바리에이션은 건조로 · 나중에 설정에서 켜고 끌 수 있어요)</span></span></label>
     ${storyFormHTML({plot:d.story,stages:d.stages,len:d.len,depth:d.depth,newc:d.newc,talkOnly:d.talkOnly})}
     <button class="btn sm ghost" data-act="drpolish" data-k="story">✦ 스토리 개요 AI로 다듬기</button>`);
   if(k==='world') return sec('world',`<div class="dr-h"><h3 class="sec">세계관</h3><span class="muted">${nf(d.world.length)}자 / 권장 8,000</span></div><p class="muted dr-help">역사, 사회 구조, 기술이나 마법의 규칙, 지금 벌어지는 갈등, 사람들이 일상에서 겪는 불편까지. 고유명사와 구체적인 디테일이 많을수록 AI가 지어낼 틈이 줄어요. 플레이어에게 숨길 반전은 여기 말고 <b>설정</b> 탭에 '비밀'로 따로 적어 두세요.</p>
@@ -109,12 +110,13 @@ function drAutoHTML(){ const d=DR2; return `<div class="dr-intro"><p><b>자율�
     <label class="f" for="dr_crew">아군 호칭 <span class="muted" style="font-size:.75rem">(유닛 이름 · 비우면 AI가 새로 지어요)</span></label><input class="in" id="dr_crew" maxlength="8" value="${esc(d.crewTerm||'')}" placeholder="예: 대원, 요원, 사도">
     <label class="f" for="dr_cast">등장인물 성별</label><select class="in" id="dr_cast">${opt([['','AI가 정하기 (키워드에 맞게)'],['f','여성만'],['m','남성만'],['mix','여성 + 남성 혼성']],d.castSex||'')}</select>
     <label class="f" for="ng_n">${esc(d.crewTerm||'동료')} 수</label><select class="in" id="ng_n">${opt([[6,'6명'],[8,'8명'],[10,'10명'],[12,'12명']],d.n)}</select>
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng_con" ${d.con?'checked':''}><span><b>건조/영입 사용</b> <span class="muted" style="font-size:.8rem">(자원 4종을 넣어 영입 · 특별 의상 바리에이션은 건조로)</span></span></label>
     ${drPresetHTML()}
     <details class="optbox" style="margin-top:10px" ${d.hero.name||d.hero.gender||d.hero.look?'open':''}><summary><b>주인공</b> <span class="muted" style="font-size:.8rem">(선택 · 비우면 AI가 정해요)</span></summary>${drHeroHTML()}</details>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="drmake" ${SAMPLE?'':'disabled'}>이 내용으로 새 게임 만들기</button></div>
     ${SAMPLE?'':'<p class="muted" style="font-size:.8rem;margin:6px 0 0">글 AI를 등록하면 만들 수 있어요.</p>'}<p class="muted" id="ng_stat" style="margin:6px 0 0"></p><button class="linkb" data-act="ailog" style="margin-top:4px;font-size:.8rem">🔍 AI 기록 보기 (안 만들어질 때 원인 확인)</button>`; }
 function openDraft(tab){ DR2=drLoad(); if(tab) DRTAB=tab;
-  if(DR2.hero.av&&!DRAVU){ idbGet('draft_avatar').then(b=>{ if(b){ DRAVU=URL.createObjectURL(b); const x=$('#drAvBox'); if(x) x.innerHTML=`<img src="${esc(DRAVU)}" alt="프로필">`; } }).catch(()=>{}); }
+  if(DR2.hero.av&&!DRAVU){ idbGet('draft_avatar').then(b=>{ if(b){ DRAVU=URL.createObjectURL(b); const el=$('#drAvBox'); if(el) el.innerHTML=`<img src="${esc(DRAVU)}" alt="프로필">`; } }).catch(()=>{}); }
   const top=`<div class="dr-top"><button class="x" data-act="close" aria-label="닫기">‹</button><div><i>NEW GAME</i><h2>새 게임 초안</h2></div><button class="btn sm ghost" data-act="drlib" style="margin-left:auto">📂 초안 보관함</button>${DR2.mode?`<button class="btn sm ghost" data-act="drmode" data-v="">${DR2.mode==='auto'?'1. 자율주행':'2. 디테일'} · 바꾸기</button>`:''}</div>${DR2.reuse?`<div class="optbox dr-reuse" style="margin:0 0 8px;font-size:.82rem">🎲 <b>그림 유지 리롤</b> · 「${esc(DR2.reuse.title||'')}」의 ${esc(T('crew'))}·NPC·배경 그림을 <b>이름이 같은 인물·배경</b>에 그대로 써요. 이름을 바꾸거나 새 인물을 넣으면 그 인물만 새로 그려요. 원래 게임은 그대로 남아요. <button class="linkb" type="button" data-act="drreuseoff">그림 새로 그리기로 바꾸기</button></div>`:''}`;
   if(!DR2.mode){ openModal(`<div id="drPage" class="dr-page">${top}<p class="muted" style="margin:0 0 10px">어떻게 만들까요? 지금 게임은 그대로 남아요.</p>${drModeHTML()}</div>`,false,'cs-sheet dr-sheet'); return; }
   if(DR2.mode==='auto'){ openModal(`<div id="drPage" class="dr-page">${top}${drAutoHTML()}</div>`,false,'cs-sheet dr-sheet'); return; }
@@ -126,14 +128,14 @@ function openDraft(tab){ DR2=drLoad(); if(tab) DRTAB=tab;
     <div class="chips dr-tabs">${DR_TABS.map(([k,l])=>`<button class="chip ${DRTAB===k?'on':''}" data-act="drtab" data-k="${k}">${l}</button>`).join('')}</div>
     ${DR_TABS.map(([k])=>drTabHTML(k)).join('')}</div>`,false,'cs-sheet dr-sheet'); }
 // 다시 그리기 전에 부르는 쪽에서 drRead()를 먼저 해요(여기서 읽으면 방금 바꾼 값이 옛 입력칸 값으로 덮여요)
-function drRerender(){ const sc=$('#modal .sheet'), y=sc?sc.scrollTop:0; openDraft(); const s2=$('#modal .sheet'); if(s2) s2.scrollTop=y; }
+function drRerender(){ const sc=$('#modal .sheet'), y=sc?sc.scrollTop:0; openDraft(); const el=$('#modal .sheet'); if(el) el.scrollTop=y; }
 document.addEventListener('input',e=>{ if(e.target.closest&&e.target.closest('#drPage')){ clearTimeout(drRead._t); drRead._t=setTimeout(drRead,400); } });
 document.addEventListener('change',e=>{ const cy=e.target&&e.target.dataset&&e.target.dataset.cyc; if(cy){ const L=P().live; L.cyc=Object.assign({},L.cyc||{},{[cy]:+e.target.value}); mark('prog'); render(); toast(`${cycLabel(cy)} 주기로 바꿨어요`); return; } });
 document.addEventListener('change',e=>{ if(e.target.closest&&e.target.closest('#drPage')){ drRead(); if(e.target.dataset&&e.target.dataset.dc==='kind') drRerender(); } });
 // 장르·키워드와 분위기에 같은 글이 들어 있으면(한쪽이 다른 쪽을 품으면) 분위기는 한 번만 써요
 const dupTxt=(a,b)=>{ const n=x=>String(x||'').replace(/[\s"'“”‘’.,!?~·…]/g,''); a=n(a); b=n(b); return !!(a&&b&&(a.includes(b)||b.includes(a))); };
 function drTheme(d){ return [d.gtitle&&'게임 이름: '+d.gtitle,d.kw&&'장르·키워드: '+d.kw,d.tone&&!dupTxt(d.kw,d.tone)&&'분위기: '+d.tone,d.fan&&d.src&&'2차 창작 원작: '+d.src].filter(Boolean); }
-const DR_NODUP='모든 항목(세계관·설정·스토리 개요·인물·주인공)에서 같은 문장·소개 문구·설명을 두 번 쓰지 않는다. 항목마다 자기 역할의 내용만 쓰고, 다른 항목에 이미 있는 문장·소개 문구를 그대로 되풀이하지 않는다(세계관은 무대와 역사, 설정은 세력·용어·규칙, 스토리 개요는 사건의 흐름, 인물은 그 사람 이야기).';
+const DR_NODUP=pf('DR_NODUP');
 /* 중복 문장 정리(시스템, AI 없이): 앞 칸에 이미 나온 문장과 같거나 그 문장 안에 통째로 들어 있는 문장은 뒤 칸에서 지워요.
    같은 칸 안에서 되풀이된 문장도 지워요. 더 긴 문장이 짧은 문장을 품으면 긴 문장은 남겨요(내용이 줄지 않게) */
 const sentKey=x=>String(x||'').replace(/[\s"'“”‘’「」『』()\[\].,!?~·…:;\-–—]/g,'').toLowerCase();
@@ -145,7 +147,7 @@ function drDedup(d){ d=d||DR2; const seen=[]; let n=0; const run=(o,k)=>{ if(!o|
   return n; }
 // 초안의 다른 칸을 함께 보여 줘서 서로 맞춰 다듬어요(skip: 'world'|'setting'|'story'|'c:번호')
 function drCtx(skip){ const d=DR2, L=[];
-  const th=drTheme(d).map(x=>x.startsWith('2차 창작')?x+' (원작 설정을 따르고, 원작의 미성년자·학생 캐릭터는 쓰지 않는다)':x);
+  const th=drTheme(d).map(x=>x.startsWith('2차 창작')?x+pf('DR_SOURCE'):x);
   if(th.length) L.push('[테마]\n'+th.join('\n'));
   if(skip!=='world'&&d.world.trim()) L.push('[세계관]\n'+d.world.trim().slice(0,6000));
   if(skip!=='setting'&&d.setting.trim()) L.push('[설정: 세력·용어·규칙·비밀]\n'+d.setting.trim().slice(0,4000));
@@ -153,33 +155,20 @@ function drCtx(skip){ const d=DR2, L=[];
   const cs=d.chars.map((c,i)=>[c,i]).filter(([c,i])=>skip!=='c:'+i&&(String(c.name||'').trim()||String(c.profile||'').trim()));
   if(cs.length) L.push('[다른 인물]\n'+cs.map(([c])=>`- ${c.name||'(이름 미정)'}${c.role?' — '+c.role:''}: ${String(c.profile||'').slice(0,300)}${c.speech?' / 말투: '+c.speech:''}${c.look?' / 외모: '+c.look:''}`).join('\n'));
   const hr=d.hero; if(skip!=='hero'&&(hr.name||hr.call||hr.gender||hr.look||hr.bio)) L.push(`[주인공(플레이어)]\n호칭: ${hr.call||'(미정)'} / 이름: ${hr.name||'(미정)'} / 성별: ${hr.gender||'정하지 않음'}${hr.look?' / 외모: '+hr.look:''}${hr.bio?'\n설정: '+hr.bio:''}`);
-  return L.length?'\n초안의 다른 항목(이것들과 어긋나지 않게 맞추고, 여기 나온 고유명사·세력·인물 관계를 적극적으로 엮는다. 다른 항목은 고치지 않는다):\n'+L.join('\n\n')+'\n':''; }
+  return L.length?pf('DR_OTHER')+L.join('\n\n')+'\n':''; }
 function drSnap(label){ const d=DR2; d.undo={label,kw:d.kw,tone:d.tone,world:d.world,setting:d.setting,story:d.story,chars:JSON.parse(JSON.stringify(d.chars)),hero:JSON.parse(JSON.stringify(Object.assign({},d.hero,{av:undefined})))}; }
 async function drPolish(k,btn){ drRead(); if(k==='hero') return drPolishHero(btn); const cur=String(DR2[k]||'').trim(); if(!cur){ toast('먼저 내용을 조금 적어 주세요'); return; }
   const what=k==='world'?'게임 세계관':k==='story'?'스토리 개요':'게임 설정(세력·용어·규칙·비밀)';
-  const r=await aiJSON(`다음은 작가가 직접 쓴 ${what}이다. 적힌 내용, 고유명사, 설정은 그대로 살린다. 모순을 고치고, 빈약한 부분을 구체적인 디테일로 채우고, 읽기 좋게 정리한다. 같은 문장·소개 문구가 되풀이되면 한 번만 남기고, 다른 항목에 이미 있는 문장을 그대로 옮겨 쓰지 않는다. 작가가 정하지 않은 큰 설정을 새로 바꾸지는 않는다. 등장인물은 모두 성인이다. 한국어로 쓴다.
-${k==='setting'?"'비밀:'로 시작하는 줄은 그 표시를 유지한다.\n":''}${drCtx(k)}원문(다듬을 글):
-${cur}
-JSON만 출력: {"text":"다듬은 전체 글"}`,btn,'default');
+  const r=await aiJSON(`${pf('DR_POLISH',{what,pf:k==='setting'?pf('DR_POLISH_SECRET'):'',drCtx:drCtx(k),cur})}JSON만 출력: {"text":"다듬은 전체 글"}`,btn,'default');
   if(r&&r.text){ drRead(); drSnap(what); DR2[k]=String(r.text); const dn=drDedup(); drSave(); drRerender(); toast('다른 항목에 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); } }
 async function drPolishHero(btn){ const h=DR2.hero;
-  const r=await aiJSON(`새 게임의 주인공(플레이어)을 다듬어라. 호칭·이름·성별·외모·설정이 서로 맞물리고, 세계관 안에서 주인공의 자리(직책, 소속, 사연)와 인물들과의 관계가 드러나게 한다. 적힌 내용과 이름은 살리고, 어색한 곳을 고치고, 빈 칸은 다른 항목에 맞춰 채운다. 성별을 비워 두었으면 비워 둔다. 성인이다. 한국어로 쓴다.
-${drCtx('hero')}지금 주인공: ${JSON.stringify({call:h.call||'',name:h.name||'',gender:h.gender||'',look:h.look||'',bio:h.bio||''})}
-JSON만 출력: {"call":"호칭(2~4자)","name":"이름(비어 있었으면 빈 문자열)","look":"외모","bio":"설정 3~5문장"}`,btn,'default');
+  const r=await aiJSON(`${pf('DR_POLISH_HERO',{drCtx:drCtx('hero'),call:JSON.stringify({call:h.call||'',name:h.name||'',gender:h.gender||'',look:h.look||'',bio:h.bio||''})})}JSON만 출력: {"call":"호칭(2~4자)","name":"이름(비어 있었으면 빈 문자열)","look":"외모","bio":"설정 3~5문장"}`,btn,'default');
   if(!r||typeof r!=='object') return; drRead(); drSnap('주인공'); const S=v=>typeof v==='string'?v.trim():''; const H=DR2.hero;
   if(S(r.call)) H.call=S(r.call).slice(0,12); if(S(r.name)&&!String(H.name||'').trim()) H.name=S(r.name).slice(0,12); if(S(r.look)) H.look=S(r.look).slice(0,400); if(S(r.bio)) H.bio=S(r.bio).slice(0,1500);
   drDedup(); drSave(); drRerender(); toast('주인공을 다듬었어요. 마음에 안 들면 「되돌리기」'); }
 /* 전체 맞추기: 세계관·설정·스토리·인물·주인공 설정을 한꺼번에 보고, 서로 어긋난 곳을 고치고 관계를 엮어요. 적힌 내용은 살리고, 한 번 되돌릴 수 있어요 */
 async function drHarmony(btn){ drRead(); const d=DR2; if(!drText(d).trim()){ toast('먼저 세계관이나 인물을 조금 적어 주세요'); return; }
-  const r=await aiJSON(`다음은 작가가 쓴 새 게임 초안이다. 세계관·설정·스토리 개요·인물·주인공이 서로를 참고해 하나의 이야기로 맞물리도록 다듬어라.
-규칙: 작가가 적은 내용·고유명사·이름은 그대로 살린다. 항목끼리 어긋나는 곳(세력 이름, 지명, 연표, 관계)은 맞춘다. 인물은 세계관의 세력·사건에 자리를 잡게 하고, 인물끼리·주인공과의 관계를 서로 맞게(한쪽에 적힌 관계는 상대 쪽에도) 넣는다. 비어 있는 칸은 다른 항목에 맞춰 채운다. 비어 있던 항목(세계관·설정·스토리)은 빈 문자열로 둔다. 큰 설정을 새로 바꾸지 않는다. 설정의 '비밀:' 줄은 유지한다. 등장인물은 모두 성인이다. 한국어로 쓴다.
-${DR_NODUP}
-테마도 정리한다: kw(장르와 키워드)는 장르와 핵심 키워드만 짧게(예: "학원 판타지 활극. 기숙사 대항전, 검술, 우정"), tone(분위기)은 글의 톤과 감정선만 한 줄로(예: "밝고 떠들썩하게, 때때로 뭉클하게") 쓴다. 두 칸에 같은 문장을 넣지 않고, 홍보 문구 같은 긴 소개 문장은 세계관 쪽으로 옮긴다. 작가가 적은 핵심 단어는 살린다.
-장르와 키워드(지금): ${d.kw||'(비어 있음)'}
-분위기(지금): ${!d.tone?'(비어 있음)':dupTxt(d.kw,d.tone)?'(장르와 키워드와 같은 글이 들어 있음 — 분위기만 새로 뽑아 쓴다)':d.tone}
-${drTheme(d).filter(x=>!/^장르|^분위기/.test(x)).join('\n')}
-${drText(d).slice(0,20000)}
-JSON만 출력: {"kw":"장르와 키워드","tone":"분위기","world":"세계관 전체 글","setting":"설정 전체 글","story":"스토리 개요 전체 글","chars":[{"name":"","role":"","profile":"","speech":"","look":""}],"heroBio":"주인공 설정"} — chars는 위 인물 순서 그대로, 같은 수로.`,btn,'complex');
+  const r=await aiJSON(`${pf('DR_HARMONY',{DR_NODUP,kw:d.kw||'(비어 있음)',tone:!d.tone?'(비어 있음)':dupTxt(d.kw,d.tone)?pf('DR_HARMONY_TONE'):d.tone,drTheme:drTheme(d).filter(x=>!/^장르|^분위기/.test(x)).join('\n'),drText:drText(d).slice(0,20000)})}JSON만 출력: {"kw":"장르와 키워드","tone":"분위기","world":"세계관 전체 글","setting":"설정 전체 글","story":"스토리 개요 전체 글","chars":[{"name":"","role":"","profile":"","speech":"","look":""}],"heroBio":"주인공 설정"} — chars는 위 인물 순서 그대로, 같은 수로.`,btn,'complex');
   if(!r||typeof r!=='object'){ return; } drRead();
   drSnap('전체 맞추기');
   const S=v=>typeof v==='string'?v.trim():'';
@@ -189,9 +178,7 @@ JSON만 출력: {"kw":"장르와 키워드","tone":"분위기","world":"세계�
   if(String(d.hero.bio||'').trim()&&S(r.heroBio)) d.hero.bio=S(r.heroBio);
   const dn=drDedup(d); drSave(); drRerender(); toast('서로 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); }
 async function drFillChar(i,btn){ drRead(); const c=DR2.chars[i]; if(!c) return;
-  const r=await aiJSON(`게임에 들어갈 인물 한 명을 다듬어라. 이름·역할·성격·과거·관계·말투·외모가 서로 맞물려 한 사람으로 읽히게 한다(예: 과거가 성격과 말투를 만들고, 역할과 외모가 그 과거를 드러낸다). 세계관의 세력·사건 안에 자리를 잡게 하고, 다른 인물·주인공과의 관계를 구체적으로 넣는다(다른 인물 쪽에 이 인물과의 관계가 적혀 있으면 그것과 맞춘다). 다른 인물과 역할·말투·외모가 겹치지 않게 하고, 세계관·설정이나 다른 인물 칸에 이미 있는 문장을 그대로 옮겨 쓰지 않는다. 작가가 적은 이름과 핵심 설정은 그대로 살리고, 어색한 곳을 고치고, 빈 칸은 채운다. 등장인물은 모두 성인이다. 한국어로 쓴다.
-${drCtx('c:'+i)}지금 인물: ${JSON.stringify({name:c.name||'',role:c.role||'',profile:c.profile||'',speech:c.speech||'',look:c.look||''})}
-JSON만 출력: {"name":"","role":"한 줄 소개","profile":"성격·과거·관계 3~5문장","speech":"말투 설명과 예시 한 마디","look":"외모"}`,btn,'default');
+  const r=await aiJSON(`${pf('DR_FILL_CHAR',{drCtx:drCtx('c:'+i),name:JSON.stringify({name:c.name||'',role:c.role||'',profile:c.profile||'',speech:c.speech||'',look:c.look||''})})}JSON만 출력: {"name":"","role":"한 줄 소개","profile":"성격·과거·관계 3~5문장","speech":"말투 설명과 예시 한 마디","look":"외모"}`,btn,'default');
   if(!r) return; let o=Array.isArray(r)?r[0]:r; if(o&&!o.profile&&!o.role){ const v=Object.values(o).find(x=>x&&typeof x==='object'&&!Array.isArray(x)); if(v) o=v; } if(!o||typeof o!=='object'){ toast('AI 응답을 읽지 못했어요. 다시 눌러 주세요'); return; }
   drRead(); const c2=DR2.chars[i]||c; drSnap((c2.name||'인물')+' 다듬기'); const S=v=>Array.isArray(v)?v.join(' ').trim():typeof v==='string'?v.trim():'';
   const RK=/\s*[\[(【]\s*(SSR|SR|R)\s*[\])】]\s*/gi; let rk=''; ['role','profile','speech','look'].forEach(k=>{ let v=S(o[k]); if(!v) return; v=v.replace(RK,(m,g)=>{ rk=rk||g.toUpperCase(); return ' '; }).replace(/\s{2,}/g,' ').trim(); if(v) c2[k]=v; }); if(rk&&!c2.rank&&c2.kind!=='npc') c2.rank=({SSR:3,SR:2,R:1})[rk]; if(!String(c2.name||'').trim()&&S(o.name)) c2.name=S(o.name).replace(RK,' ').trim();
@@ -220,8 +207,8 @@ async function openMaskPainter(src,prev,cb,po){ po=po||{}; const im=await loadIm
   cv.addEventListener('pointermove',e=>{ if(!down) return; const p=pt(e); stroke(last,p); last=p; draw(); });
   cv.addEventListener('pointerup',()=>{ down=false; }); cv.addEventListener('pointercancel',()=>{ down=false; });
   d.querySelector('input[type=range]').addEventListener('input',e=>{ size=+e.target.value; });
-  d.querySelector('.mp-bar').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const m=b.dataset.m;
-    if(m==='brush'||m==='erase'){ mode=m; d.querySelectorAll('[data-m=brush],[data-m=erase]').forEach(q=>q.classList.toggle('on',q===b)); }
+  d.querySelector('.mp-bar').addEventListener('click',e=>{ const el=e.target.closest('button'); if(!el) return; const m=el.dataset.m;
+    if(m==='brush'||m==='erase'){ mode=m; d.querySelectorAll('[data-m=brush],[data-m=erase]').forEach(q=>q.classList.toggle('on',q===el)); }
     else if(m==='clear'){ mx.fillStyle='#000'; mx.fillRect(0,0,W,H); draw(); }
     else if(m==='auto'){ const tall=H/W>1.25; mx.fillStyle='#fff'; mx.beginPath(); mx.ellipse(W*0.5,H*(tall?0.12:0.24),W*(tall?0.1:0.16),H*(tall?0.055:0.11),0,0,Math.PI*2); mx.fill(); draw(); toast('얼굴 위치를 대충 칠했어요. 맞지 않으면 고쳐 주세요'); }
     else if(m==='cancel'){ d.remove(); if(po.onCancel) po.onCancel(); }

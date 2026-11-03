@@ -1,0 +1,99 @@
+{
+ "materialTermNamesVersion": 1,
+ "title": "낙성계약",
+ "sub": "STARFALL CONTRACT",
+ "theme": "tactical",
+ "accent": "#ffb400",
+ "terms": {
+  "player": "관리관",
+  "currency": "성석",
+  "gold": "크레딧",
+  "expMat": "전투 기록",
+  "wMat": "스킬 교본",
+  "core": "승급(Lv1~70) 재료",
+  "gearMat": "장비 강화 재료",
+  "transcMat": "초월승급(Lv71~120) 재료",
+  "gacha": "계약",
+  "ops": "작전",
+  "crew": "대원",
+  "talk": "등대톡",
+  "dispatch": "파견",
+  "farm": "훈련",
+  "pass": "시즌 패스",
+  "event": "이벤트",
+  "weapon": "전용 무기",
+  "files": "기밀 파일",
+  "skin": "스킨",
+  "enhance": "강화",
+  "limit": "돌파",
+  "abyss": "미지 탐사",
+  "construct": "영입",
+  "res1": "연료",
+  "res2": "탄약",
+  "res3": "합금",
+  "res4": "부품"
+ },
+ "elems": [
+  {
+   "n": "홍",
+   "c": "#ff5a5a",
+   "d": ""
+  },
+  {
+   "n": "녹",
+   "c": "#4fd18b",
+   "d": ""
+  },
+  {
+   "n": "청",
+   "c": "#4fa3ff",
+   "d": ""
+  }
+ ],
+ "roles": {
+  "atk": "공격",
+  "def": "방어",
+  "sup": "지원"
+ },
+ "farms": [
+  {
+   "key": "exp",
+   "name": "전투 기록 회수"
+  },
+  {
+   "key": "gold",
+   "name": "크레딧 수급"
+  },
+  {
+   "key": "wmat",
+   "name": "스킬 교본 회수"
+  },
+  {
+   "key": "core",
+   "name": "성핵 코어 정제"
+  }
+ ],
+ "shop": {
+  "name": "보급관",
+  "charId": "",
+  "hello": [
+   "어서 와요, {관리관}. 오늘은 뭐가 필요해요?",
+   "재고 넉넉해요. 천천히 골라요.",
+   "오늘 들어온 물건, 꽤 괜찮아요."
+  ],
+  "buy": [
+   "좋은 선택이에요!",
+   "고마워요. 다음에 또 와요.",
+   "포장해 둘게요. 잘 쓰세요."
+  ],
+  "poor": [
+   "음… 그건 조금 모자라요.",
+   "작전 한 번 다녀오면 살 수 있을 거예요."
+  ]
+ },
+ "skillTrainingMaterialsVersion": 1,
+ "ageTags": 1,
+ "curve": 3,
+ "combatVersion": 2,
+ "rules": {}
+}

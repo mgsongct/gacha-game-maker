@@ -15,13 +15,13 @@ function openPickExisting(pre){ if(pre||!PUX) PUX={ids:pre&&charById(pre)?[pre]:
 function puxGo(){ puxRead(); const cs=PUX.ids.map(charById).filter(Boolean); if(!cs.length) return null; const c=cs[0], sn=seasonNow(), now=Date.now();
   const until=PUX.days==='season'&&sn?sn.until:+PUX.days>0?now+(+PUX.days)*864e5:0;
   const same=x=>x.type==='pickup'&&!x.eventId&&(x.pickup||[]).length===cs.length&&(x.pickup||[])[0]===c.id&&cs.every(y=>x.pickup.includes(y.id));
-  let b=G.banners.find(x=>same(x)&&bnOpen(x)), rerun=false;
-  if(!b){ b=G.banners.find(x=>same(x)&&!bnOpen(x)); rerun=!!b; }
-  if(!b){ b={id:'b'+uid(),type:'pickup',pool:{mode:'all',factions:[],ids:[]},pickup:cs.map(x=>x.id),bg:''}; G.banners.push(b); }
-  Object.assign(b,{name:String(PUX.name||'').trim()||(rerun?'복각: ':'')+puxNames(),desc:`${cs.map(x=>`${RL[x.rarity]} ${x.name}`).join(' · ')} 확률 업`,rate:+PUX.rate||50,active:true,pin:true,until,seasonal:PUX.days==='season'&&!!sn});
-  delete b.newAt; delete b.storyFail; delete b.gate;
-  if(!b.bg){ const bgs=G.lib.filter(l=>l.kind==='bg'); if(bgs.length) b.bg=rand(bgs).name; }
-  P().curBanner=b.id; mark('prog'); return {b,c,rerun,story:!!(PUX.story&&SAMPLE&&!b.eventId)}; }
+  let bn=G.banners.find(x=>same(x)&&bnOpen(x)), rerun=false;
+  if(!bn){ bn=G.banners.find(x=>same(x)&&!bnOpen(x)); rerun=!!bn; }
+  if(!bn){ bn={id:'b'+uid(),type:'pickup',pool:{mode:'all',factions:[],ids:[]},pickup:cs.map(x=>x.id),bg:''}; G.banners.push(bn); }
+  Object.assign(bn,{name:String(PUX.name||'').trim()||(rerun?'복각: ':'')+puxNames(),desc:`${cs.map(x=>`${RL[x.rarity]} ${x.name}`).join(' · ')} 확률 업`,rate:+PUX.rate||50,active:true,pin:true,until,seasonal:PUX.days==='season'&&!!sn});
+  delete bn.newAt; delete bn.storyFail; delete bn.gate;
+  if(!bn.bg){ const bgs=G.lib.filter(l=>l.kind==='bg'); if(bgs.length) bn.bg=rand(bgs).name; }
+  P().curBanner=bn.id; mark('prog'); return {b: bn,c,rerun,story:!!(PUX.story&&SAMPLE&&!bn.eventId)}; }
 const PUBUSY=new Set();
 async function puStoryBg(c,lim,bn){ // 배너는 이미 열렸고, 스토리는 뒤에서 써요
   const b=bn||G.banners.find(x=>x.type==='pickup'&&(x.pickup||[])[0]===c.id&&!x.eventId), ex=!!(b&&b.pin), mates=ex?(b.pickup||[]).slice(1).map(charById).filter(Boolean):[]; if(b&&PUBUSY.has(b.id)) return; if(b){ PUBUSY.add(b.id); b.storyFail=false; } liveBar(`${c.name}의 픽업 스토리를 쓰는 중… 몇 분 걸려요. 그동안 플레이해도 돼요.`);

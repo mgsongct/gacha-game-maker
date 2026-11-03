@@ -8,6 +8,14 @@
      같은 사람을 연달아 쓰면 분위기가 깨지고, 취향을 맞추거나 다른 사람으로 이어 가면 분위기가 오름. 1위면 통과.
    - 생성 연계: 조각 STAGE_MODES(프롬프트 스튜디오)를 장·이벤트·새 게임 1장 프롬프트에 넣고, stageSchema의 mode·debate·contest를
      buildStages가 검증(modeClean). 잘못되면 전투로. 설정에서 양식별로 끔. 문서: docs/research/stage-modes.md */
+// 장의 마지막(클라이맥스) 스테이지 형식 — 세계관 단계가 장르에 맞게 고름(G.meta.story.finale). 지시문은 프롬프트 스튜디오의 FINALE_RULE, 값은 여기서
+const FINALE_SCHEMA='"finale":"battle|contest|debate"'; // 새 게임 세계관 단계 스키마
+const FINALE_END={battle:'보스전과',contest:'결승 무대와',debate:'결정적인 회담과'};
+const finaleOf=f=>['contest','debate'].includes(f)?f:'battle';
+const finaleRule=()=>`이 게임의 finale: ${storyCfg().finale}. ${FINALE_RULE}`, finaleEnd=()=>FINALE_END[storyCfg().finale];
+// 스테이지 집필(writeStages)의 스테이지 종류 표시 — 회담·콘테스트면 프롬프트 스튜디오의 STAGE_WRITE_RULE(대본은 그 전·후만)을 붙임
+const STAGE_KIND={debate:'회담 스테이지',contest:'콘테스트 스테이지'};
+function stageWhat(s){ return s.story?' — 전투 없는 이야기 스테이지':STAGE_KIND[s.mode]?` — ${STAGE_KIND[s.mode]}. ${STAGE_WRITE_RULE}`:' — 전투 전(pre)과 전투 후(post)'; }
 const CHARM={cool:'멋',cute:'귀여움',beauty:'아름다움',smart:'지성',tough:'강인함'};
 const CHARM_KW={cool:/쿨|냉정|과묵|카리스마|멋|차분|무뚝뚝/,cute:/귀여|밝|천진|장난|애교|활발|명랑/,beauty:/우아|아름|기품|섬세|예술|고상|신비/,smart:/똑똑|지적|분석|침착|박식|천재|논리|책/,tough:/강인|용감|열혈|근성|힘|투지|단단|호쾌/};
 function modesCfg(){ const m=(G.meta.story||{}).modes||{}; return {debate:m.debate!==false,contest:m.contest!==false}; }
@@ -23,7 +31,6 @@ function modeClean(s){ const mode=String(s&&s.mode||'').trim(), cfg=modesCfg();
   if(mode==='contest'&&cfg.contest&&s.contest){ const c=s.contest, judges=(Array.isArray(c.judges)?c.judges:[]).slice(0,3).map(j=>({name:S_(j.name,20)||'심사위원',likes:CHARM[j.likes]?j.likes:Object.keys(CHARM).find(k=>CHARM[k]===j.likes)||'cool'}));
     if(judges.length) return {mode:'contest',contest:{title:S_(c.title,40)||'콘테스트',judges,rounds:Math.max(2,Math.min(5,+c.rounds||3)),rivals:(Array.isArray(c.rivals)?c.rivals:[]).slice(0,3).map(r=>({name:S_(r.name,20)||'경쟁자',power:Math.max(.6,Math.min(1.6,+r.power||1))})).filter(r=>r.name)}}; }
   return null; }
-pfDef('STAGE_MODES','스테이지 양식(전투·이야기·회담·콘테스트) 고르기',()=>{ const m=modesCfg(); if(!m.debate&&!m.contest) return '스테이지는 battle(전투) 또는 이야기 스테이지만 쓴다.'; return `스테이지 양식(mode): 대부분은 battle(전투). 이야기에 맞으면 한 장에 0~2개를 다른 양식으로${m.debate?'':'(debate는 쓰지 않는다)'}${m.contest?'':'(contest는 쓰지 않는다)'}: debate(회담 — 협상·재판·심문·설득·거짓말 들추기 장면. 상대의 주장 줄 3~5개 중 모순이 있는 줄에 weak=그 모순을 밝히는 증거 id, 또는 persuade={who:설득할 수 있는 ${T('crew')} 이름,text}. 증거는 앞선 이야기에서 얻은 물건·증언·기록으로 3~5개. 라운드 1~3개), contest(콘테스트 — 축제·오디션·무대·대회·사교 파티. 심사위원 1~3명과 각자 좋아하는 매력 likes(${Object.keys(CHARM).join('|')}), 경쟁자 1~3명 power 0.8~1.3). battle:false인 이야기 스테이지도 섞을 수 있다. 회담·콘테스트 스테이지는 enemies를 빈 배열로 둔다.`; });
 const MODE_SCHEMA=`"mode":"battle|debate|contest","debate":{"opponent":"상대 이름","goal":"이 회담의 목표","evidence":[{"id":"e1","name":"","desc":""}],"rounds":[{"claim":"상대 주장 요약","lines":[{"text":"상대의 말","press":"추궁하면 나오는 대답","weak":"모순을 밝히는 증거 id 또는 빈칸","persuade":{"who":"","text":""}}]}],"win":"","lose":""},"contest":{"title":"","judges":[{"name":"","likes":"${Object.keys(CHARM).join('|')}"}],"rounds":3,"rivals":[{"name":"","power":1}]}`;
 function modeIcon(s){ return s&&s.mode==='debate'?'⚖':s&&s.mode==='contest'?'✦':''; }
 
@@ -70,14 +77,14 @@ function contestAppeal(cid,k){ const e=MD.ent.find(x=>x.id===cid); if(!e) return
   const best=Math.max(0,...MD.rivals.map(r=>r.score)), mine=MD.score, win=mine>best, {ch,s}=MD, margin=best?mine/best:2; MD=null;
   if(!win){ closeModal(); toast(`콘테스트 결과: 우리 ${nf(mine)} · 1위 ${nf(best)} — 출전자와 어필을 바꿔 다시 도전해 보세요`); return; }
   modeClear(ch,s,margin>=1.3?3:margin>=1.1?2:1); }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
-  if(a==='mdgo'){ const ch=G.chapters.find(x=>x.id===b.dataset.ch), s=ch&&ch.stages.find(x=>x.id===b.dataset.st); if(!s) return; const sel=[...document.querySelectorAll('#modal [data-mdsel]')].filter(x=>x.checked).map(x=>x.dataset.mdsel); if(sel.length){ P().squad=sel.slice(0,s.mode==='contest'?3:4); mark('prog'); } closeModal(); const go=()=>s.mode==='debate'?debateStart(ch,s):contestStart(ch,s); if(!P().cleared[s.id]&&s.pre) playStory(s.title,s.pre,go); else go(); }
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
+  if(a==='mdgo'){ const ch=G.chapters.find(x=>x.id===el.dataset.ch), s=ch&&ch.stages.find(x=>x.id===el.dataset.st); if(!s) return; const sel=[...document.querySelectorAll('#modal [data-mdsel]')].filter(x=>x.checked).map(x=>x.dataset.mdsel); if(sel.length){ P().squad=sel.slice(0,s.mode==='contest'?3:4); mark('prog'); } closeModal(); const go=()=>s.mode==='debate'?debateStart(ch,s):contestStart(ch,s); if(!P().cleared[s.id]&&s.pre) playStory(s.title,s.pre,go); else go(); }
   else if(!MD) return;
-  else if(a==='dbnav'){ const R=MD.s.debate.rounds[MD.r]; MD.i=Math.max(0,Math.min(R.lines.length-1,MD.i+(+b.dataset.v))); debateDraw(); }
+  else if(a==='dbnav'){ const R=MD.s.debate.rounds[MD.r]; MD.i=Math.max(0,Math.min(R.lines.length-1,MD.i+(+el.dataset.v))); debateDraw(); }
   else if(a==='dbpress'){ const L=MD.s.debate.rounds[MD.r].lines[MD.i]; MD.pressed[MD.i]=1; debateDraw(L.press?`${MD.s.debate.opponent}: ${L.press}`:'더 이상 나오는 말이 없어요'); }
-  else if(a==='dbshow'){ const L=MD.s.debate.rounds[MD.r].lines[MD.i], ev=MD.s.debate.evidence.find(x=>x.id===b.dataset.v); if(L.weak&&L.weak===b.dataset.v) debateHit(`「${ev.name}」을(를) 제시 — "${L.text}"의 모순을 밝혀냈다!`); else debateMiss(`「${ev?ev.name:''}」은(는) 이 말과 맞지 않아요. 신뢰도 −1`); }
-  else if(a==='dbpers'){ const L=MD.s.debate.rounds[MD.r].lines[MD.i], c=charById(b.dataset.v); if(L.persuade&&c&&(c.name===L.persuade.who||ROLE[c.role]===L.persuade.who||c.faction===L.persuade.who)) debateHit(`${c.name}: ${L.persuade.text||'제 말을 들어 주세요.'}`); else debateMiss(`${c?c.name:''}의 말은 이 대목에서 통하지 않았어요. 신뢰도 −1`); }
-  else if(a==='ctap') contestAppeal(b.dataset.c,b.dataset.k);
+  else if(a==='dbshow'){ const L=MD.s.debate.rounds[MD.r].lines[MD.i], ev=MD.s.debate.evidence.find(x=>x.id===el.dataset.v); if(L.weak&&L.weak===el.dataset.v) debateHit(`「${ev.name}」을(를) 제시 — "${L.text}"의 모순을 밝혀냈다!`); else debateMiss(`「${ev?ev.name:''}」은(는) 이 말과 맞지 않아요. 신뢰도 −1`); }
+  else if(a==='dbpers'){ const L=MD.s.debate.rounds[MD.r].lines[MD.i], c=charById(el.dataset.v); if(L.persuade&&c&&(c.name===L.persuade.who||ROLE[c.role]===L.persuade.who||c.faction===L.persuade.who)) debateHit(`${c.name}: ${L.persuade.text||'제 말을 들어 주세요.'}`); else debateMiss(`${c?c.name:''}의 말은 이 대목에서 통하지 않았어요. 신뢰도 −1`); }
+  else if(a==='ctap') contestAppeal(el.dataset.c,el.dataset.k);
   else if(a==='dbquit'){ MD=null; closeModal(); } });
 
 document.addEventListener('change',e=>{ const id=e.target.dataset&&e.target.dataset.mdsel; if(id) e.target.closest('label').classList.toggle('on',e.target.checked); });

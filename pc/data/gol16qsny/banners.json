@@ -1,0 +1,51 @@
+[
+ {
+  "id": "std",
+  "name": "상시 캐스팅: 새벽별 오디션",
+  "type": "std",
+  "desc": "",
+  "pool": {
+   "mode": "all",
+   "factions": [],
+   "ids": []
+  },
+  "pickup": [],
+  "rate": 50,
+  "active": true,
+  "bg": ""
+ },
+ {
+  "id": "b_pu",
+  "name": "센터의 증명",
+  "type": "pickup",
+  "desc": "SSR 차하린 확률 상승",
+  "pool": {
+   "mode": "all",
+   "factions": [],
+   "ids": []
+  },
+  "pickup": [
+   "0ri2udsj"
+  ],
+  "rate": 50,
+  "active": true,
+  "bg": ""
+ },
+ {
+  "id": "b_fac",
+  "name": "새벽별 패밀리 캐스팅",
+  "type": "pool",
+  "desc": "새벽별 엔터테인먼트 소속만 등장",
+  "pool": {
+   "mode": "faction",
+   "factions": [
+    "새벽별 엔터테인먼트"
+   ],
+   "ids": []
+  },
+  "pickup": [],
+  "rate": 50,
+  "active": true,
+  "bg": ""
+ }
+]

@@ -1,0 +1,42 @@
+[
+ {
+  "phase": "new",
+  "ref": "HEAD",
+  "sha": "c0e228214f53e4cc30f8d26a4e85cc23530b2923",
+  "at": "2026-11-03T13:19:48.901Z",
+  "pending": [],
+  "commitAtCall": 4,
+  "log": [
+   {
+    "kind": "world",
+    "len": 5046,
+    "max_tokens": 32000,
+    "at": 1793711984463,
+    "outLen": 7320
+   },
+   {
+    "kind": "chars",
+    "len": 18035,
+    "max_tokens": 32000,
+    "at": 1793711984502,
+    "outLen": 39714
+   },
+   {
+    "kind": "opening",
+    "len": 8384,
+    "max_tokens": 32000,
+    "at": 1793711984566,
+    "outLen": 5690
+   },
+   {
+    "kind": "chapter1",
+    "len": 11255,
+    "max_tokens": 32000,
+    "at": 1793711984603,
+    "outLen": 11256
+   }
+  ],
+  "toasts": [],
+  "pageErrors": []
+ }
+]

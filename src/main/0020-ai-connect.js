@@ -59,8 +59,8 @@ function parsePcLink(s){ try{ const u=new URL(String(s).trim()); const k=u.searc
 function pcOrigin(){ const pc=PCS(); return !!(pc&&pc.base===location.origin); }
 // PC 서버 주소인데 연결 키가 없어요(키 없이 다시 열었거나, 홈 화면 앱처럼 저장 공간이 따로인 경우) → 빈 게임으로 시작하지 않고 다시 연결하게 해요
 function pcLostKey(){ if(IS_NATIVE||PCS()) return false; return /\.trycloudflare\.com$/i.test(location.hostname)||location.port==='8790'; }
-(function(){ try{ const pc=PCS(); if(!pc||pc.base!==location.origin||!window.fetch||!URL.createObjectURL) return; const l=document.querySelector('link[rel=manifest]'); if(!l) return;
-  fetch(l.href).then(r=>r.json()).then(m=>{ m.start_url=location.origin+'/?pc='+encodeURIComponent(pc.key); m.scope=location.origin+'/'; m.icons=(m.icons||[]).map(i=>Object.assign({},i,{src:new URL(i.src,l.href).href})); l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'})); }).catch(()=>{}); }catch(e){ quietErr(e,'0020-ai-connect.js:63'); } })();
+(function(){ try{ const pc=PCS(); if(!pc||pc.base!==location.origin||!window.fetch||!URL.createObjectURL) return; const el=document.querySelector('link[rel=manifest]'); if(!el) return;
+  fetch(el.href).then(r=>r.json()).then(m=>{ m.start_url=location.origin+'/?pc='+encodeURIComponent(pc.key); m.scope=location.origin+'/'; m.icons=(m.icons||[]).map(i=>Object.assign({},i,{src:new URL(i.src,el.href).href})); el.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'})); }).catch(()=>{}); }catch(e){ quietErr(e,'0020-ai-connect.js:63'); } })();
 const isLocalHost=h=>/^(localhost|127\.0\.0\.1|\[::1\]|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(h);
 function webProxy(){ if(IS_NATIVE) return ''; try{ return String(appStorage.getItem('ggm-proxy')||'').trim(); }catch(e){ return ''; } }
 function b64ToBytes(b){const s=atob(b);const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
@@ -163,8 +163,6 @@ function jsonRepair(t){ let out='', inS=false, esc=false; const st=[];
   while(st.length){ out=out.replace(/[\s,]+$/,''); out+=st.pop(); }
   return out; }
 const TMO={quick:60000,default:300000,complex:600000};
-const JSON_STRICT_BASE='\n\n[중요] 응답 전체가 올바른 JSON 하나여야 한다. 문자열 안의 줄바꿈은 \\n으로, 큰따옴표는 \\"로 쓴다. 마지막 항목 뒤에 쉼표를 두지 않는다. JSON 앞뒤에 설명을 붙이지 않는다.';
-pfDef('JSON_STRICT','JSON 출력 강조(모든 JSON 요청 끝)',()=>JSON_STRICT_BASE);
 
 /* Vertex 서비스 계정 토큰 */
 const TOKC={};
@@ -348,7 +346,7 @@ function openPresetCode(kind,code){
 const TAG_REQ=/NovelAI|naiPrompt|Danbooru|영어 태그|장면 태그/;
 function llmWrap(pr){ const L=llmEff(); let s=String(pr);
   { const isTag=TAG_REQ.test(s), pl=plInject(isTag); if(pl){ let i=s.lastIndexOf('JSON만 출력'); if(i<0) i=s.length; s=s.slice(0,i)+pl+s.slice(i); } } // 프롬프트 스튜디오(0025) 교훈·그림 가이드
-  if(L.tag&&TAG_REQ.test(s)){ let i=s.lastIndexOf('JSON만 출력'); if(i<0) i=s.length; s=s.slice(0,i)+'[그림 태그 지침] NovelAI 영어 태그(naiPrompt, prompt, CG·배경·소품·의상 태그 등)를 쓸 때 반드시 따른다:\n'+L.tag.trim()+'\n'+s.slice(i); }
+  if(L.tag&&TAG_REQ.test(s)){ let i=s.lastIndexOf('JSON만 출력'); if(i<0) i=s.length; s=s.slice(0,i)+pf('USER_TAG_GUIDE_HEAD')+'\n'+L.tag.trim()+'\n'+s.slice(i); }
   if(!L.top&&!L.mid&&!L.bot) return s;
   if(L.mid){ let i=s.lastIndexOf('JSON만 출력'); if(i<0){ const j=s.lastIndexOf('\n'); i=j>0?j+1:s.length; } s=s.slice(0,i)+'[제작자 지침]\n'+L.mid.trim()+'\n'+s.slice(i); }
   return (L.top?'[제작자 지침]\n'+L.top.trim()+'\n\n':'')+s+(L.bot?'\n\n[제작자 지침]\n'+L.bot.trim():''); }
@@ -377,7 +375,7 @@ function llmHTML(){ const L=llmSlots(); return `${head('글 AI 지침','<span cl
 // 초안에서 고른 프리셋을 그림 AI 설정에 바로 적용해요(그림체 태그·네거티브·품질 태그·스텝·가이던스·샘플러)
 function presetToCfg(id){ const s=allPresets().find(x=>x.id===id); if(!s) return false; const c=naiCfg(),q=presetQualityParts(s); c.styles=[{id:'my_style',name:'내 그림체',tags:q.tags,neg:s.neg}]; c.styleId='my_style'; c.qtags=''; c.quality=false; c.legacyQualityTags=''; c.steps=s.steps; c.scale=s.scale; c.cfgRescale=s.cfgRescale; c.sampler=s.sampler; try{ appStorage.setItem(NKEY,JSON.stringify(c)); }catch(e){ return false; } return true; }
 function drPresetHTML(){ const cur=DR2.preset||''; return `<label class="f">그림체 프리셋</label><div class="dr-pres">${[{id:'',name:'지금 설정 그대로',desc:'설정 → 그림 AI의 그림체를 써요'},...allPresets()].map(s=>`<button type="button" class="dr-pre ${cur===s.id?'on':''}" data-act="drpreset" data-v="${s.id}">${s.id?pthumbHTML(s.id,'big'):''}<b>${esc(s.name)}</b><span>${esc(s.desc)}${s.by?` · 프리셋 제공: ${esc(s.by)}`:''}</span></button>`).join('')}</div><p class="muted" style="margin:4px 0 0;font-size:.76rem">고르면 그림 AI 설정(그림체·품질 태그·스텝·가이던스·샘플러)에 바로 적용되고, 이 게임의 그림체로 저장돼요.</p>`; }
-function applyStylePreset(id){ const s=allPresets().find(x=>x.id===id); if(!s) return; const set=(k,v)=>{ const e=$('#'+k); if(e) e.value=v; };
+function applyStylePreset(id){ const s=allPresets().find(x=>x.id===id); if(!s) return; const set=(k,v)=>{ const el=$('#'+k); if(el) el.value=v; };
   const q=presetQualityParts(s); set('nai_stags',q.tags); if($('#nai_stags'))$('#nai_stags').dataset.presetApplied='true'; set('nai_sneg',s.neg); set('nai_steps',s.steps); set('nai_scale',s.scale); set('nai_cfgr',s.cfgRescale); set('nai_sampler',s.sampler);
   toast(`「${s.name}」 프리셋을 채웠어요. 아래 '저장'을 눌러야 적용돼요`);  }
 const NAI_QUALITY={'nai-diffusion-5-full':'very aesthetic, masterpiece, best quality','nai-diffusion-5-curated':'very aesthetic, masterpiece, best quality','nai-diffusion-4-5-full':'very aesthetic, masterpiece, no text','nai-diffusion-4-5-curated':'location, masterpiece, no text','nai-diffusion-4-full':'no text, best quality, very aesthetic, absurdres'};

@@ -7,6 +7,7 @@
 const PERSONA_FIELDS=[['traits','핵심 성격 (3개)','list'],['self','1인칭','text'],['call','플레이어를 부르는 말','text'],['ending','말끝·어미 (예: ~거든, ~해요)','text'],['quirk','말버릇','text'],['catch','대표 대사','text'],
   ['gap','반전 매력','text'],['flaw','결점·약점','text'],['want','원하는 것','text'],['fear','두려워하는 것','text'],['likes','좋아하는 것','list'],['dislikes','싫어하는 것','list'],['hobby','취미','text'],['motif','상징 (모티프)','text']];
 const PROFILE_TPLS={basic:['생일','신장','출신','특기'],org:['소속','직책','생일','신장','출신','특기'],operator:['코드네임','출신','생일','신장','전투 경력','특기','임상 소견'],fantasy:['종족','출신','생일','신장','계약','특기'],idol:['소속사','데뷔','생일','신장','담당','팬덤 이름'],streamer:['활동명','플랫폼','데뷔','구독자 애칭','방송 장르','생일']};
+const PROFILE_TPL_SCHEMA='"profileTemplate":"'+Object.keys(PROFILE_TPLS).join('|')+'"'; // 새 게임 세계관 단계 스키마
 const PERSONA_GENERIC=/^(친절|상냥|착함|착한|밝음|밝은|명랑|쿨|쿨함|차가움|차가운|귀여움|귀여운|활발|활발함|성실|성실함|다정|다정함|조용|조용함|무뚝뚝|츤데레|냉정|냉정함|따뜻함|강함|용감|용감함|똑똑함|진지함)$/;
 function PERSONA_CFG(){ const d={tpl:PROFILE_TPLS.basic,affLv:[2,4,6,8],memoLv:8}; return Object.assign(d,G.meta.persona||{}); }
 const pStrs=v=>(Array.isArray(v)?v:String(v||'').split(/[,，·/]/)).map(x=>String(x||'').trim()).filter(Boolean).slice(0,8);
@@ -36,7 +37,7 @@ function personaReview(c){ const p=c.persona||{}, issues=[], add=(w,k,msg)=>issu
 /* AI: 개성 채우기·다듬기(mode fill|improve), 대사도 말투에 맞게 다시 쓰기(lines) */
 async function personaAI(c,mode='fill',opt={}){
   const cfg=PERSONA_CFG(), others=G.chars.filter(x=>x!==c&&!x.alt&&x.persona).slice(0,12).map(x=>`${x.name}: ${personaBrief(x)}`).join(' / ');
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」(${RL[c.rarity]}, ${c.faction||'무소속'}, ${c.elem}, ${(posOf(c)||{}).name||ROLE[c.role]})의 개성 시트를 ${mode==='improve'?'더 매력적으로 다듬어라. 흔한 키워드는 구체적인 습관·반전으로 바꾸고, 결점과 반전 매력이 서로 이어지게 한다':'채워라. 이미 있는 값은 살린다'}.
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」(${RL[c.rarity]}, ${c.faction||'무소속'}, ${c.elem}, ${(posOf(c)||{}).name||ROLE[c.role]})의 개성 시트를 ${mode==='improve'?pf('PERSONA_IMPROVE'):pf('PERSONA_FILL')}.
 프로필: ${String(c.profile||'').slice(0,500)}
 지금 개성: ${JSON.stringify(c.persona||{})}
 지금 대사: ${(c.lines||[]).slice(0,6).join(' / ')}
@@ -49,26 +50,16 @@ JSON만 출력: {"persona":{"traits":["","",""],"self":"","call":"","ending":"",
   c.pfields=Object.assign({},pfieldsClean(r.pfields),mode==='fill'?pfieldsClean(c.pfields):{});
   if(opt.lines){ const L=strs(r.lines); if(L.length>=3) c.lines=L.slice(0,12); if(r.affLines&&typeof r.affLines==='object'){ const a={...(c.affLines||{})}; Object.entries(r.affLines).forEach(([k,v])=>{ const n=parseInt(k,10); if(n>=1&&n<=10&&strs(v).length) a[n]=strs(v).slice(0,4); }); c.affLines=a; } }
   mark('c:'+c.id); return true; }
-async function personaAIReview(c,btn){ const r=await aiJSON(`${RULES}\n${ctx()}\n\n서브컬처 수집형 게임 기획자로서 ${T('crew')} 「${c.name}」의 매력을 냉정하게 평가하라. 기준: 첫인상 훅, 말투의 개성, 반전 매력, 다른 캐릭터와의 차별성, 팬이 생길 포인트, 관계가 깊어질 여지.
-프로필: ${String(c.profile||'').slice(0,500)}
-개성: ${JSON.stringify(c.persona||{})}
-대사: ${(c.lines||[]).slice(0,8).join(' / ')}
-JSON만 출력: {"score":0~100,"strengths":["2~3개"],"weaknesses":["2~3개"],"suggestions":["바로 고칠 수 있는 구체적인 제안 3개"]}`,btn,'quick'); if(!r) return null; c.personaAIReview={at:Date.now(),score:Math.max(0,Math.min(100,+r.score||0)),strengths:strs(r.strengths).slice(0,4),weaknesses:strs(r.weaknesses).slice(0,4),suggestions:strs(r.suggestions).slice(0,5)}; mark('c:'+c.id); return c.personaAIReview; }
+async function personaAIReview(c,btn){ const r=await aiJSON(`${pf('PERSONA_REVIEW',{RULES,ctx:ctx(),crew:T('crew'),name:c.name,profile:String(c.profile||'').slice(0,500),persona:JSON.stringify(c.persona||{}),lines:(c.lines||[]).slice(0,8).join(' / ')})}JSON만 출력: {"score":0~100,"strengths":["2~3개"],"weaknesses":["2~3개"],"suggestions":["바로 고칠 수 있는 구체적인 제안 3개"]}`,btn,'quick'); if(!r) return null; c.personaAIReview={at:Date.now(),score:Math.max(0,Math.min(100,+r.score||0)),strengths:strs(r.strengths).slice(0,4),weaknesses:strs(r.weaknesses).slice(0,4),suggestions:strs(r.suggestions).slice(0,5)}; mark('c:'+c.id); return c.personaAIReview; }
 
 /* 인연 톡: 호감도 단계마다 메신저 대화(모모톡처럼 관계가 깊어지는 흐름) */
 async function talkAffGen(c,btn){ const cfg=PERSONA_CFG(), have=new Set(affThreads(c).map(t=>+t.trigger.value)), levels=cfg.affLv.filter(l=>!have.has(+l)); if(!levels.length){ toast('이미 모든 단계의 인연 톡이 있어요'); return 0; }
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」이(가) ${T('talk')}으로 플레이어에게 보내는 인연 톡을 호감도 ${levels.join(', ')} 단계마다 하나씩 써라. 단계가 오를수록 관계가 깊어진다(가벼운 안부 → 개인적인 이야기 → 약점·고민을 털어놓음 → 특별한 약속). 개성: ${personaBrief(c)}. 프로필: ${String(c.profile||'').slice(0,300)}.
-${THREAD_FMT}
-각 톡은 8~16줄, 선택지 1~2번. 이 캐릭터의 1인칭·어미·말버릇을 지킨다.
-JSON만 출력: {"threads":[{"lv":${levels[0]},"title":"알림에 뜰 짧은 제목","script":"대화"}]}`,btn,'default');
+  const r=await aiJSON(`${pf('AFF_TALK',{RULES,ctx:ctx(),crew:T('crew'),name:c.name,talk:T('talk'),levels:levels.join(', '),personaBrief:personaBrief(c),profile:String(c.profile||'').slice(0,300),THREAD_FMT})}JSON만 출력: {"threads":[{"lv":${levels[0]},"title":"알림에 뜰 짧은 제목","script":"대화"}]}`,btn,'default');
   const L=(r&&Array.isArray(r.threads)?r.threads:[]).filter(x=>x&&x.script&&levels.includes(+x.lv)); let n=0;
   for(const x of L){ const th={id:uid(),charId:c.id,title:String(x.title||'메시지').slice(0,30),trigger:{type:'aff',value:+x.lv},needOwn:true,script:String(x.script)}; G.threads.push(th); mark('t:'+th.id); n++; }
   if(n) checkTriggers(true); return n; }
 /* 메모리얼: 호감도 memoLv에서 열리는 특별 장면 + 메모리얼 로비 대사 */
-async function memorialGen(c,btn){ const cfg=PERSONA_CFG(); const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」의 메모리얼(호감도 ${cfg.memoLv}에서 열리는 특별한 장면)을 써라. 둘만의 조용한 순간, 이 캐릭터의 반전 매력과 속마음이 드러난다. 개성: ${personaBrief(c)}. 프로필: ${String(c.profile||'').slice(0,300)}.
-${SCRIPT_FMT}
-대본은 15~30줄. lines는 메모리얼 로비에서 터치하면 나오는 대사 4개(그 장면의 여운).
-JSON만 출력: {"title":"메모리얼 제목","script":"대본","lines":["4개"]}`,btn,'default'); if(!r||!r.script) return false;
+async function memorialGen(c,btn){ const cfg=PERSONA_CFG(); const r=await aiJSON(`${pf('MEMORIAL',{RULES,ctx:ctx(),crew:T('crew'),name:c.name,memoLv:cfg.memoLv,personaBrief:personaBrief(c),profile:String(c.profile||'').slice(0,300),SCRIPT_FMT})}JSON만 출력: {"title":"메모리얼 제목","script":"대본","lines":["4개"]}`,btn,'default'); if(!r||!r.script) return false;
   c.memorial={lv:+cfg.memoLv||8,title:String(r.title||'메모리얼').slice(0,30),script:String(r.script),lines:strs(r.lines).slice(0,6)}; mark('c:'+c.id); return true; }
 function memoOpen(c){ const o=own(c.id); return !!(c.memorial&&c.memorial.script&&o&&affLv(o)>=(+c.memorial.lv||8)); }
 function memoOn(c){ return !!((P().memoOn||{})[c.id]&&memoOpen(c)); }
@@ -116,17 +107,17 @@ async function personaBatch(kind){ if(!SAMPLE){ toast('설정의 글 AI에서 AI
 function personaCfgSave(){ const m=G.meta, k=$('#ps_tpl').value, f=k==='custom'||$('#ps_tplf').value.trim()!==(PROFILE_TPLS[k]||[]).join(', ')?pStrs($('#ps_tplf').value):PROFILE_TPLS[k]; m.persona=Object.assign(m.persona||{},{tpl:f.length?f:PROFILE_TPLS.basic,affLv:[...new Set(String($('#ps_aff').value).split(/[,\s]+/).map(Number).filter(n=>n>=1&&n<=10))].sort((a,b)=>a-b),memoLv:Math.max(1,Math.min(10,+$('#ps_memo').value||8))}); mark('meta'); }
 const psReopen=c=>{ if(!$('#modal').hidden&&typeof openChar==='function'){ closeModal(); openChar(c.id); } else render(); };
 document.addEventListener('change',e=>{ if(e.target.id==='ps_tpl'&&PROFILE_TPLS[e.target.value]) $('#ps_tplf').value=PROFILE_TPLS[e.target.value].join(', '); });
-document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act, c=b.dataset.id&&charById(b.dataset.id);
+document.addEventListener('click',async e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act, c=el.dataset.id&&charById(el.dataset.id);
   if(a==='psedit'&&c) openPersona(c.id);
   else if(a==='pssave'&&c){ personaSave(c); closeModal(); toast('개성을 저장했어요'); if(typeof openChar==='function') openChar(c.id); }
-  else if(a==='psai'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } auditSnap([c],'개성 '+(b.dataset.k==='improve'?'다듬기':'채우기')); if(await personaAI(c,b.dataset.k,{lines:b.dataset.k==='improve',btn:b})){ toast('개성을 반영했어요 (점검 화면에서 되돌리기 가능)'); psReopen(c); } }
-  else if(a==='psreview'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await personaAIReview(c,b)) psReopen(c); }
-  else if(a==='pstalk'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } const n=await talkAffGen(c,b); if(n){ toast(`인연 톡 ${n}개를 만들었어요`); psReopen(c); } }
-  else if(a==='psmemo'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await memorialGen(c,b)){ toast('메모리얼을 만들었어요'); psReopen(c); } }
+  else if(a==='psai'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } auditSnap([c],'개성 '+(el.dataset.k==='improve'?'다듬기':'채우기')); if(await personaAI(c,el.dataset.k,{lines:el.dataset.k==='improve',btn:el})){ toast('개성을 반영했어요 (점검 화면에서 되돌리기 가능)'); psReopen(c); } }
+  else if(a==='psreview'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await personaAIReview(c,el)) psReopen(c); }
+  else if(a==='pstalk'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } const n=await talkAffGen(c,el); if(n){ toast(`인연 톡 ${n}개를 만들었어요`); psReopen(c); } }
+  else if(a==='psmemo'&&c){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } if(await memorialGen(c,el)){ toast('메모리얼을 만들었어요'); psReopen(c); } }
   else if(a==='psmemoplay'&&c&&c.memorial){ closeModal(); playStory(c.memorial.title,c.memorial.script); }
   else if(a==='psmemolobby'&&c){ const p=P(); p.memoOn=p.memoOn||{}; p.memoOn[c.id]=!p.memoOn[c.id]; mark('prog'); toast(p.memoOn[c.id]?'메모리얼 로비를 켰어요. 로비에서 메모리얼 대사가 나와요':'메모리얼 로비를 껐어요'); psReopen(c); }
   else if(a==='psopen') openPersonaAll();
   else if(a==='pscfg'){ personaCfgSave(); toast('개성 설정을 저장했어요'); openPersonaAll(); }
-  else if(a==='psbatch') personaBatch(b.dataset.k);
+  else if(a==='psbatch') personaBatch(el.dataset.k);
   else if(a==='psstop'){ if(PS_JOB) PS_JOB.stop=true; }
   else if(a==='psundo'){ auditUndo(); openPersonaAll(); } });

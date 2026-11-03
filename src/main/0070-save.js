@@ -53,7 +53,7 @@ function fix(g){
     c.skill=c.skill||{name:'공격',kind:'dmg',power:1.5,cd:3,desc:''}; c.age=Math.max(20,c.age|0);
   });
   g.chapters=Array.isArray(g.chapters)?g.chapters:d.chapters;
-  if(old){ const c1=g.chapters.find(c=>c.id==='c1'); if(c1){ const dc=d.chapters[0]; c1.stages.forEach(s=>{const ds=dc.stages.find(x=>x.id===s.id); if(ds){s.pre=ds.pre;s.post=ds.post;}}); } }
+  if(old){ const c1=g.chapters.find(ch=>ch.id==='c1'); if(c1){ const dc=d.chapters[0]; c1.stages.forEach(s=>{const ds=dc.stages.find(x=>x.id===s.id); if(ds){s.pre=ds.pre;s.post=ds.post;}}); } }
   g.lib=Array.isArray(g.lib)?g.lib:d.lib;
   if(!g.lib.some(l=>l.kind==='bgm')) g.lib.push(...clone(DEFAULT_BGM));
   g.threads=Array.isArray(g.threads)?g.threads:d.threads;
@@ -88,7 +88,7 @@ function fix(g){
   g.chapters.forEach(ch=>{ch.kind=ch.kind||'main';});
   if(!Array.isArray(g.banners)) g.banners=isDefaultGame?clone(DEFAULT_BANNERS):[{id:'std',name:'상시 '+(g.meta.terms.gacha||'뽑기'),type:'std',desc:'',pool:{mode:'all',factions:[],ids:[]},pickup:[],rate:50,active:true,bg:''}];
   g.banners.forEach(b=>{b.pool=Object.assign({mode:'all',factions:[],ids:[]},b.pool||{});b.pickup=b.pickup||[];if(b.rate==null)b.rate=50;});
-  if(!Array.isArray(g.events)){ g.events=[]; if(isDefaultGame){ g.events=clone(DEFAULT_EVENTS); if(!g.chapters.some(c=>c.id==='evc1')) g.chapters.push(clone(DEFAULT_EVENT_CHAPTER)); } }
+  if(!Array.isArray(g.events)){ g.events=[]; if(isDefaultGame){ g.events=clone(DEFAULT_EVENTS); if(!g.chapters.some(ch=>ch.id==='evc1')) g.chapters.push(clone(DEFAULT_EVENT_CHAPTER)); } }
   g.events.forEach(ev=>{ if(!ev.shop||!ev.shop.length) ev.shop=defaultShop(ev,g); });
   if(!Array.isArray(g.dispatches)) g.dispatches=clone(DEFAULT_DISP);
   if(!g.lib.some(l=>l.kind==='sfx')) g.lib.push(...clone(DEFAULT_SFX));
@@ -100,12 +100,12 @@ function fix(g){
   g.prog.shop=Object.assign({day:'',buy:{}},g.prog.shop||{}); g.prog.cash=Object.assign({first:{},month:{until:0,last:''},total:0},g.prog.cash||{}); g.prog.cash.first=g.prog.cash.first||{}; g.prog.cash.month=Object.assign({until:0,last:''},g.prog.cash.month||{});
   g.meta.shop=Object.assign(clone(DEFAULT_META.shop),g.meta.shop||{});
   if(g.prog.gold==null) g.prog.gold=20000;
-  let legacyExtra=0;g.chapters.filter(ch=>ch.kind==='main').forEach((ch,i)=>{if(ch.stages.some(st=>g.prog.cleared?.[st.id]))legacyExtra=Math.max(legacyExtra,5*Math.max(0,i-9));});
+  let legacyExtra=0;g.chapters.filter(ch=>ch.kind==='main').forEach((ch,i)=>{if(ch.stages.some(s=>g.prog.cleared?.[s.id]))legacyExtra=Math.max(legacyExtra,5*Math.max(0,i-9));});
   Object.values(g.prog.owned).forEach(o=>{if(o.levelCapVersion!==1){o.legacyLevelCap=Math.min(120,Math.max(Number(o.lv)||1,Math.min(70,20+10*(o.dup||0))+legacyExtra));o.transc=Math.min(5,Math.max(0,Math.floor(Number(o.transc)||0)));o.levelCapVersion=1;g.__curveNew=true;}if(o.lv>120){o.lv=120;o.exp=0;g.__curveNew=true;}if(GGMCombat.migrateGrowthProgress(o))g.__curveNew=true;o.wlv=o.wlv||0;o.skillTraining=GGMCombat.trainingState(o.skillTraining);o.skin=o.skin||'';if(o.dup==null)o.dup=0;});
-  g.chars.forEach(c=>{ c.rarity=[1,2,3].includes(+c.rarity)?+c.rarity:1; if(!['atk','def','sup'].includes(c.role)) c.role='atk'; c.elem=String(c.elem||'').replace(/[<>"'&`]/g,''); });
+  g.chars.forEach(c=>{ if(!c.skillPending&&/응답 대기|내부 검사하는 중|설계하는 중|새 게임을 연 뒤/.test(String(c.skillGenerationWarning||''))) c.skillPending=true; /* 생성 중 끊긴 스킬 설계 → 이어서(skillResume) */ c.rarity=[1,2,3].includes(+c.rarity)?+c.rarity:1; if(!['atk','def','sup'].includes(c.role)) c.role='atk'; c.elem=String(c.elem||'').replace(/[<>"'&`]/g,''); });
   if(Array.isArray(g.world.codex)) g.world.codex=g.world.codex.filter(x=>x&&typeof x==='object').map(x=>Object.assign(x,{cat:['world','faction','person','place','item','term','history'].includes(x.cat)?x.cat:'term',title:String(x.title||''),body:String(x.body||'')}));
   if(!(g.meta.ageTags>=1)){ g.chars.forEach(c=>{ if(c.naiPrompt) c.naiPrompt=stripAge(c.naiPrompt); }); g.meta.ageTags=1; g.__curveNew=true; }
-  if(!(g.meta.curve>=3)){ g.chapters.filter(c=>c.kind==='main').forEach((ch,k)=>rebalanceChapter(ch,k)); g.meta.curve=3; g.__curveNew=true; }
+  if(!(g.meta.curve>=3)){ g.chapters.filter(ch=>ch.kind==='main').forEach((ch,k)=>rebalanceChapter(ch,k)); g.meta.curve=3; g.__curveNew=true; }
   for(const c of g.chars)if(GGMCombat.migrateBaseStats(c))g.__curveNew=true;
   if(g.chars.some(c=>c.roleSpeedVersion!==1))g.__curveNew=true;g.chars.forEach(c=>v2Ensure(c)); g.meta.combatVersion=2;
   g.ver=VER;
@@ -121,13 +121,13 @@ const dirty=new Set(); let flushT=null,saveRevision=0,saveTail=Promise.resolve()
 function mark(...k){if(NEW_GAME_SOURCE&&G!==NEW_GAME_SOURCE)return;naiBlocksGame(G);for(const x of k)if(typeof x==='string'&&x.startsWith('c:'))inheritOnMark(x.slice(2));k.forEach(x=>dirty.add(x));saveRevision++;clearTimeout(flushT);flushT=setTimeout(()=>flush().catch(()=>{}),100);}
 function flushNow(){if(dirty.size){clearTimeout(flushT);flush().catch(()=>{});}}
 addEventListener('pagehide',flushNow);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushNow();},true);
-function markAll(){mark('meta','world','prog','opening',...G.chars.map(c=>'c:'+c.id),...G.chapters.map(c=>'ch:'+c.id),...G.lib.map(l=>'l:'+l.id),...G.threads.map(t=>'t:'+t.id));}
+function markAll(){mark('meta','world','prog','opening',...G.chars.map(c=>'c:'+c.id),...G.chapters.map(ch=>'ch:'+ch.id),...G.lib.map(l=>'l:'+l.id),...G.threads.map(t=>'t:'+t.id));}
 function flush(){
  if(window.__NOFLUSH)return appStorage.drain();
  const run=async()=>{if(!dirty.size)return appStorage.drain();const game=NEW_GAME_SOURCE||G,revision=saveRevision,keys=[...dirty],oldAt=game.prog.savedAt;const at=Date.now();
  try{const bases=new Set((game.chars||[]).filter(x=>!x.alt).map(x=>x.id)),snapshot=JSON.stringify({...game,chars:(game.chars||[]).map(c=>inheritStore(c,bases)),prog:{...game.prog,savedAt:at}});appStorage.setItem(LKEY,snapshot);await appStorage.drain();game.prog.savedAt=at;
  if(DB)for(const k of keys)await writeKey(k,game);
- if(revision===saveRevision)dirty.clear();const b=document.getElementById('save-warning');if(b)b.remove();
+ if(revision===saveRevision)dirty.clear();const el=document.getElementById('save-warning');if(el)el.remove();
  }catch(e){game.prog.savedAt=oldAt;storageWarning(e.message||'기기에 저장하지 못했습니다');throw e;}};
  saveTail=saveTail.catch(()=>{}).then(run);return saveTail;
 }

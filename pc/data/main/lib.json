@@ -1,0 +1,592 @@
+[
+ {
+  "id": "bg_office",
+  "kind": "bg",
+  "name": "새벽등대 사무소",
+  "prompt": "no humans, scenery, small detective office interior, night, rain on window, neon light from outside, cluttered desk, old leather sofa, coffee machine, warm desk lamp, cyberpunk harbor city, anime background, highly detailed",
+  "img": null
+ },
+ {
+  "id": "bg_alley",
+  "kind": "bg",
+  "name": "회색구 골목",
+  "prompt": "no humans, scenery, narrow back alley, night, heavy rain, puddles reflecting neon signs, korean signboards, ruined buildings, anime background, cinematic lighting",
+  "img": null
+ },
+ {
+  "id": "bg_roof",
+  "kind": "bg",
+  "name": "사무소 옥상",
+  "prompt": "no humans, scenery, rooftop at dawn, wet floor after rain, railing, water tank, distant skyline with red crater glow, anime background",
+  "img": null
+ },
+ {
+  "id": "bg_rail",
+  "kind": "bg",
+  "name": "폐선로",
+  "prompt": "no humans, scenery, abandoned railway, rusted train cars, overgrown tracks, eerie floating light particles, dusk, anime background",
+  "img": null
+ },
+ {
+  "id": "bg_helix",
+  "kind": "bg",
+  "name": "헬릭스 물류창고",
+  "prompt": "no humans, scenery, high-tech corporate warehouse interior, stacked containers with helix logo, cold blue lights, red alarm lights, anime background",
+  "img": null
+ },
+ {
+  "id": "bg_crater",
+  "kind": "bg",
+  "name": "낙성 분화구",
+  "prompt": "no humans, scenery, giant crater in ruined city, glowing red star fragment in center, night sky, pillars of light, apocalyptic, epic, anime background",
+  "img": null
+ },
+ {
+  "id": "bg_med",
+  "kind": "bg",
+  "name": "의무실",
+  "prompt": "no humans, scenery, small infirmary, white curtain, medical bed, shelves of medicine, wine bottle on desk, soft lamp, night, anime background",
+  "img": null
+ },
+ {
+  "id": "bg_port",
+  "kind": "bg",
+  "name": "옛 항구",
+  "prompt": "no humans, scenery, old harbor pier, rusted cranes, calm sea, sunset, seagulls, anime background",
+  "img": null
+ },
+ {
+  "id": "bg_casino",
+  "kind": "bg",
+  "name": "카지노 뒷골목",
+  "prompt": "no humans, scenery, back alley behind casino, red neon, playing card posters, cigarette smoke, night, anime background",
+  "img": null
+ },
+ {
+  "id": "bg_garage",
+  "kind": "bg",
+  "name": "정비실",
+  "prompt": "no humans, scenery, cluttered mechanic workshop, drones on workbench, tools on wall, warm work light, anime background",
+  "img": null
+ },
+ {
+  "id": "bg_stall",
+  "kind": "bg",
+  "name": "포장마차",
+  "prompt": "no humans, scenery, korean street food tent at night, orange tarp, steaming noodles, plastic stools, rain outside, anime background",
+  "img": null
+ },
+ {
+  "id": "bg_odelle",
+  "kind": "bg",
+  "name": "오델의 집",
+  "prompt": "no humans, scenery, tidy small apartment entrance, cat bowl, neatly arranged shoes, warm light, anime background",
+  "img": null
+ },
+ {
+  "id": "bg_room",
+  "kind": "bg",
+  "name": "관리관 숙소",
+  "prompt": "no humans, scenery, small bedroom at night, phone glowing on bed, city lights through window, anime background",
+  "img": null
+ },
+ {
+  "id": "pr_ace",
+  "kind": "prop",
+  "name": "하트 에이스",
+  "prompt": "no humans, still life, ace of hearts playing card, slightly worn, object focus, simple background, white background",
+  "img": null
+ },
+ {
+  "id": "pr_box",
+  "kind": "prop",
+  "name": "헬릭스 상자",
+  "prompt": "no humans, object focus, metal cargo case with glowing blue helix logo, sci-fi, simple background, white background",
+  "img": null
+ },
+ {
+  "id": "pr_tracker",
+  "kind": "prop",
+  "name": "성핵 추적 장치",
+  "prompt": "no humans, object focus, small sci-fi tracking device with red glowing core, simple background, white background",
+  "img": null
+ },
+ {
+  "id": "pr_mungchi",
+  "kind": "prop",
+  "name": "뭉치",
+  "prompt": "no humans, object focus, small cute round repair drone with one camera eye, patched paint, simple background, white background",
+  "img": null
+ },
+ {
+  "id": "pr_letter",
+  "kind": "prop",
+  "name": "임명장",
+  "prompt": "no humans, object focus, old paper appointment certificate with red wax seal, simple background, white background",
+  "img": null
+ },
+ {
+  "id": "bgm_title",
+  "kind": "bgm",
+  "name": "타이틀",
+  "prompt": "Epic orchestral anime game title theme, melancholic solo piano intro building to soaring strings and soft choir, starry night, mysterious and grand, 90 bpm, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "bgm_lobby",
+  "kind": "bgm",
+  "name": "로비",
+  "prompt": "Relaxed lo-fi jazz hip hop for a small detective office at night, gentle rain ambience, warm electric piano, brushed drums, upright bass, cozy anime game lobby, 80 bpm, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "bgm_daily",
+  "kind": "bgm",
+  "name": "일상",
+  "prompt": "Lighthearted slice-of-life anime BGM, playful pizzicato strings, glockenspiel, ukulele, bouncy and comedic, 110 bpm, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "bgm_tense",
+  "kind": "bgm",
+  "name": "긴장",
+  "prompt": "Tense suspense underscore for an investigation in a rainy cyberpunk city, low synth drones, ticking percussion, distant metallic hits, 90 bpm, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "bgm_battle",
+  "kind": "bgm",
+  "name": "전투",
+  "prompt": "High-energy anime game battle music, driving electric guitar riffs, synth bass, orchestral hits, fast drums, heroic and urgent, 160 bpm, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "bgm_boss",
+  "kind": "bgm",
+  "name": "보스전",
+  "prompt": "Epic boss battle theme, dark latin choir, heavy orchestral percussion, distorted guitars, apocalyptic red star rising, intense and desperate, 150 bpm, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "bgm_gacha",
+  "kind": "bgm",
+  "name": "계약",
+  "prompt": "Magical summoning fanfare, shimmering harp glissandos, celesta, rising strings, anticipation and wonder, bright and sparkling, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "bgm_sad",
+  "kind": "bgm",
+  "name": "감성",
+  "prompt": "Emotional anime piano ballad, gentle strings, bittersweet and intimate, late night confession, 70 bpm, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "bgm_flirt",
+  "kind": "bgm",
+  "name": "설렘",
+  "prompt": "Romantic sultry lounge jazz, slow tenor saxophone, soft piano, muted trumpet, late night bar, flirty and teasing mood, 75 bpm, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "sfx_btn",
+  "kind": "sfx",
+  "name": "버튼",
+  "prompt": "Short crisp futuristic UI click, clean digital tick",
+  "dur": 0.5,
+  "img": null
+ },
+ {
+  "id": "sfx_ok",
+  "kind": "sfx",
+  "name": "확인",
+  "prompt": "Positive UI confirm chime, two-tone digital blip",
+  "dur": 0.7,
+  "img": null
+ },
+ {
+  "id": "sfx_seal",
+  "kind": "sfx",
+  "name": "계약진",
+  "prompt": "Magical summoning circle activating, rising shimmering hum with crystalline resonance",
+  "dur": 2.5,
+  "img": null
+ },
+ {
+  "id": "sfx_fall",
+  "kind": "sfx",
+  "name": "낙하",
+  "prompt": "Shooting star whoosh falling from the sky with sparkling tail",
+  "dur": 1.5,
+  "img": null
+ },
+ {
+  "id": "sfx_flash",
+  "kind": "sfx",
+  "name": "섬광",
+  "prompt": "Bright magical flash impact with shimmering burst",
+  "dur": 1.2,
+  "img": null
+ },
+ {
+  "id": "sfx_ssr",
+  "kind": "sfx",
+  "name": "SSR",
+  "prompt": "Triumphant golden reveal sting, sparkling chimes and orchestral hit",
+  "dur": 3,
+  "img": null
+ },
+ {
+  "id": "sfx_card",
+  "kind": "sfx",
+  "name": "카드",
+  "prompt": "Quick card flip swish",
+  "dur": 0.5,
+  "img": null
+ },
+ {
+  "id": "sfx_hit",
+  "kind": "sfx",
+  "name": "타격",
+  "prompt": "Short punchy gunshot impact, anime battle hit",
+  "dur": 0.5,
+  "img": null
+ },
+ {
+  "id": "sfx_skill",
+  "kind": "sfx",
+  "name": "스킬",
+  "prompt": "Powerful energy skill release, charged blast with whoosh",
+  "dur": 1.5,
+  "img": null
+ },
+ {
+  "id": "sfx_win",
+  "kind": "sfx",
+  "name": "승리",
+  "prompt": "Short victory fanfare jingle, brass and strings, anime game",
+  "dur": 3.5,
+  "img": null
+ },
+ {
+  "id": "sfx_lose",
+  "kind": "sfx",
+  "name": "패배",
+  "prompt": "Short defeat jingle, low descending synth tones",
+  "dur": 2.5,
+  "img": null
+ },
+ {
+  "id": "sfx_up",
+  "kind": "sfx",
+  "name": "강화",
+  "prompt": "Power-up level up sound, rising sparkly arpeggio",
+  "dur": 1.5,
+  "img": null
+ },
+ {
+  "id": "sfx_noti",
+  "kind": "sfx",
+  "name": "알림",
+  "prompt": "Smartphone message notification ping, soft two-note chime",
+  "dur": 0.8,
+  "img": null
+ },
+ {
+  "id": "n3nc0ik8b",
+  "kind": "enemy",
+  "name": "훈련 표적",
+  "prompt": "no humans, training target dummy, mechanical, holographic target rings, sci-fi",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans",
+    "outfit": "",
+    "other": "training target dummy, mechanical, holographic target rings, sci-fi",
+    "style": "",
+    "combined": "no humans, training target dummy, mechanical, holographic target rings, sci-fi",
+    "original": "no humans, training target dummy, mechanical, holographic target rings, sci-fi",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "ncehl5u0y",
+  "kind": "enemy",
+  "name": "강화 표적",
+  "prompt": "no humans, armored training robot, holographic shield, sci-fi",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans, armored training robot",
+    "outfit": "",
+    "other": "holographic shield, sci-fi",
+    "style": "",
+    "combined": "no humans, armored training robot, holographic shield, sci-fi",
+    "original": "no humans, armored training robot, holographic shield, sci-fi",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "n0g6clmqa",
+  "kind": "enemy",
+  "name": "훈련 교관",
+  "prompt": "no humans, large combat training mech, holographic weapons, sci-fi, boss",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans",
+    "outfit": "",
+    "other": "large combat training mech, holographic weapons, sci-fi, boss",
+    "style": "",
+    "combined": "no humans, large combat training mech, holographic weapons, sci-fi, boss",
+    "original": "no humans, large combat training mech, holographic weapons, sci-fi, boss",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "nzigdrlv7",
+  "kind": "enemy",
+  "name": "잔광 하운드",
+  "prompt": "no humans, monster, wolf made of glowing green light, translucent crystalline body, sharp light shards on back, snarling, glowing eyes, creature focus",
+  "img": null,
+  "faction": "잔광",
+  "desc": "성핵 파편에 잠식된 들개 무리가 빛의 짐승이 된 것",
+  "nature": "소리를 쫓아 무리로 사냥한다",
+  "weak": "코어를 노린 집중 공격, 홍 속성",
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans, glowing eyes",
+    "outfit": "",
+    "other": "monster, wolf made of glowing green light, translucent crystalline body, sharp light shards on back, snarling, creature focus",
+    "style": "",
+    "combined": "no humans, monster, wolf made of glowing green light, translucent crystalline body, sharp light shards on back, snarling, glowing eyes, creature focus",
+    "original": "no humans, monster, wolf made of glowing green light, translucent crystalline body, sharp light shards on back, snarling, glowing eyes, creature focus",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "n6sbfu173",
+  "kind": "enemy",
+  "name": "잔광 파수꾼",
+  "prompt": "no humans, monster, tall humanoid golem of red light and rubble, glowing core in chest, cracked stone armor, menacing, creature focus",
+  "img": null,
+  "faction": "잔광",
+  "desc": "무너진 건물 잔해가 성핵에 엉겨 붙어 생긴 거인",
+  "nature": "한 구역을 떠나지 않고 다가오는 것을 부순다",
+  "weak": "가슴의 코어, 느린 움직임",
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans, tall humanoid golem of red light and rubble",
+    "outfit": "cracked stone armor",
+    "other": "monster, glowing core in chest, menacing, creature focus",
+    "style": "",
+    "combined": "no humans, monster, tall humanoid golem of red light and rubble, glowing core in chest, cracked stone armor, menacing, creature focus",
+    "original": "no humans, monster, tall humanoid golem of red light and rubble, glowing core in chest, cracked stone armor, menacing, creature focus",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "n999c7zd6",
+  "kind": "enemy",
+  "name": "헬릭스 경비병",
+  "prompt": "1other, faceless, armored corporate soldier, full-face helmet with blue visor, black tactical armor with helix emblem, holding rifle, menacing",
+  "img": null,
+  "faction": "헬릭스 컨소시엄",
+  "desc": "헬릭스가 고용한 무장 경비 인력(사람)",
+  "nature": "명령대로만 움직이고 퇴각이 빠르다",
+  "weak": "지휘관을 먼저 쓰러뜨리면 흩어진다",
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "1other, faceless",
+    "outfit": "full-face helmet with blue visor, black tactical armor with helix emblem",
+    "other": "armored corporate soldier, holding rifle, menacing",
+    "style": "",
+    "combined": "1other, faceless, armored corporate soldier, full-face helmet with blue visor, black tactical armor with helix emblem, holding rifle, menacing",
+    "original": "1other, faceless, armored corporate soldier, full-face helmet with blue visor, black tactical armor with helix emblem, holding rifle, menacing",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "niydgq4fc",
+  "kind": "enemy",
+  "name": "헬릭스 감시드론",
+  "prompt": "no humans, flying surveillance drone, mechanical, single red camera eye, rotors, sleek black and blue chassis, sci-fi",
+  "img": null,
+  "faction": "헬릭스 컨소시엄",
+  "desc": "헬릭스의 무인 감시 기체",
+  "nature": "발견한 대상을 표시해 경비병을 부른다",
+  "weak": "로터, 청 속성 전류",
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans, single red camera eye",
+    "outfit": "",
+    "other": "flying surveillance drone, mechanical, rotors, sleek black and blue chassis, sci-fi",
+    "style": "",
+    "combined": "no humans, flying surveillance drone, mechanical, single red camera eye, rotors, sleek black and blue chassis, sci-fi",
+    "original": "no humans, flying surveillance drone, mechanical, single red camera eye, rotors, sleek black and blue chassis, sci-fi",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "nphpl35k7",
+  "kind": "enemy",
+  "name": "적색 잔광체",
+  "prompt": "no humans, giant monster, colossal creature made of burning red light, many glowing eyes, star fragment in chest, crystalline spikes, apocalyptic, boss",
+  "img": null,
+  "faction": "잔광",
+  "desc": "낙성 분화구 깊은 곳에서 깨어난 거대 잔광",
+  "nature": "주변의 잔광을 끌어당겨 몸을 키운다",
+  "weak": "흩어진 코어를 하나씩 부숴야 한다",
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans, many glowing eyes",
+    "outfit": "",
+    "other": "giant monster, colossal creature made of burning red light, star fragment in chest, crystalline spikes, apocalyptic, boss",
+    "style": "",
+    "combined": "no humans, giant monster, colossal creature made of burning red light, many glowing eyes, star fragment in chest, crystalline spikes, apocalyptic, boss",
+    "original": "no humans, giant monster, colossal creature made of burning red light, many glowing eyes, star fragment in chest, crystalline spikes, apocalyptic, boss",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "npzxmvq1b",
+  "kind": "enemy",
+  "name": "떠도는 등불",
+  "prompt": "no humans, floating paper lantern monster, glowing face on lantern, wisps of colored light, eerie, cute but creepy",
+  "img": null,
+  "faction": "잔광",
+  "desc": "축제 등불에 스며든 작은 잔광",
+  "nature": "사람의 그리움에 이끌려 떠돈다",
+  "weak": "빛을 가리면 약해진다",
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans",
+    "outfit": "",
+    "other": "floating paper lantern monster, glowing face on lantern, wisps of colored light, eerie, cute but creepy",
+    "style": "",
+    "combined": "no humans, floating paper lantern monster, glowing face on lantern, wisps of colored light, eerie, cute but creepy",
+    "original": "no humans, floating paper lantern monster, glowing face on lantern, wisps of colored light, eerie, cute but creepy",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "n8ekwpzop",
+  "kind": "enemy",
+  "name": "등불 잔광",
+  "prompt": "no humans, monster, lantern spirit, swirling colored light, ghostly flames, floating",
+  "img": null,
+  "faction": "잔광",
+  "desc": "등불 잔광이 모여 불꽃 형체가 된 것",
+  "nature": "무리 지어 맴돌며 불씨를 퍼뜨린다",
+  "weak": "녹 속성 바람",
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans",
+    "outfit": "",
+    "other": "monster, lantern spirit, swirling colored light, ghostly flames, floating",
+    "style": "",
+    "combined": "no humans, monster, lantern spirit, swirling colored light, ghostly flames, floating",
+    "original": "no humans, monster, lantern spirit, swirling colored light, ghostly flames, floating",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "nikqrpu2w",
+  "kind": "enemy",
+  "name": "거대 등불 잔광",
+  "prompt": "no humans, giant lantern monster, huge glowing paper lantern with fanged mouth, flames and light tendrils, festival, boss",
+  "img": null,
+  "faction": "잔광",
+  "desc": "축제의 밤에 모인 등불 잔광이 하나로 뭉친 괴물",
+  "nature": "축제의 소원 등불을 삼켜 커진다",
+  "weak": "입 안의 코어",
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans",
+    "outfit": "",
+    "other": "giant lantern monster, huge glowing paper lantern with fanged mouth, flames and light tendrils, festival, boss",
+    "style": "",
+    "combined": "no humans, giant lantern monster, huge glowing paper lantern with fanged mouth, flames and light tendrils, festival, boss",
+    "original": "no humans, giant lantern monster, huge glowing paper lantern with fanged mouth, flames and light tendrils, festival, boss",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "ic_gems",
+  "kind": "icon",
+  "key": "gems",
+  "name": "성석 아이콘",
+  "prompt": "blue crystal gem, faceted crystal, glowing, sparkle",
+  "img": null
+ },
+ {
+  "id": "ic_gold",
+  "kind": "icon",
+  "key": "gold",
+  "name": "크레딧 아이콘",
+  "prompt": "gold coin, embossed star emblem, shiny metal",
+  "img": null
+ },
+ {
+  "id": "ic_exp",
+  "kind": "icon",
+  "key": "exp",
+  "name": "전투 기록 아이콘",
+  "prompt": "glowing data chip, holographic record, blue light",
+  "img": null
+ },
+ {
+  "id": "ic_wmat",
+  "kind": "icon",
+  "key": "wmat",
+  "name": "스킬 교본 아이콘",
+  "prompt": "mechanical parts, gears and bolts, metal",
+  "img": null
+ },
+ {
+  "id": "ic_core",
+  "kind": "icon",
+  "key": "core",
+  "name": "승급(Lv1~70) 재료 아이콘",
+  "prompt": "hexagonal energy core, pink glow, crystal inside",
+  "img": null
+ },
+ {
+  "id": "ic_gearMat",
+  "kind": "icon",
+  "key": "gearMat",
+  "name": "장비 강화 재료 아이콘",
+  "prompt": "polished alloy ingot, metallic shine, gear emblem",
+  "img": null
+ },
+ {
+  "id": "ic_transcMat",
+  "kind": "icon",
+  "key": "transcMat",
+  "name": "초월승급(Lv71~120) 재료 아이콘",
+  "prompt": "radiant transcendence crystal, violet and gold glow",
+  "img": null
+ }
+]

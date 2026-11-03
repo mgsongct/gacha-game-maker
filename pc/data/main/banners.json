@@ -1,0 +1,70 @@
+[
+ {
+  "id": "std",
+  "name": "상시 계약",
+  "type": "std",
+  "desc": "모든 대원과 언제든 계약할 수 있어요.",
+  "pool": {
+   "mode": "all",
+   "factions": [],
+   "ids": []
+  },
+  "pickup": [],
+  "rate": 50,
+  "active": true,
+  "bg": ""
+ },
+ {
+  "id": "b_sera",
+  "name": "적색 일섬",
+  "type": "pickup",
+  "desc": "SSR 세라 확률 상승.",
+  "pool": {
+   "mode": "all",
+   "factions": [],
+   "ids": []
+  },
+  "pickup": [
+   "sera"
+  ],
+  "rate": 50,
+  "active": true,
+  "bg": "낙성 분화구"
+ },
+ {
+  "id": "b_dawn",
+  "name": "새벽등대 정기 모집",
+  "type": "pool",
+  "desc": "새벽등대 소속 대원만 등장해요.",
+  "pool": {
+   "mode": "faction",
+   "factions": [
+    "새벽등대"
+   ],
+   "ids": []
+  },
+  "pickup": [],
+  "rate": 50,
+  "active": true,
+  "bg": "새벽등대 사무소"
+ },
+ {
+  "id": "b_ev1",
+  "name": "잔광 축제의 밤",
+  "type": "event",
+  "desc": "이벤트 한정 계약. 미호, 루나 확률 상승.",
+  "pool": {
+   "mode": "all",
+   "factions": [],
+   "ids": []
+  },
+  "pickup": [
+   "miho",
+   "luna"
+  ],
+  "rate": 60,
+  "active": true,
+  "bg": "카지노 뒷골목",
+  "eventId": "ev1"
+ }
+]

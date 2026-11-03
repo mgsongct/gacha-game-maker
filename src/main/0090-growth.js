@@ -23,7 +23,7 @@ function stam(){ const p=P();
   if(!p.stam||typeof p.stam!=='object') p.stam={v:STAM_MAX,at:Date.now()}; const s=p.stam, now=Date.now();
   if(s.v>=STAM_MAX) s.at=now; else { const n=Math.floor((now-s.at)/STAM_MS); if(n>0){ s.v=Math.min(STAM_MAX,s.v+n); s.at=s.v>=STAM_MAX?now:s.at+n*STAM_MS; } } return s; }
 function stamCost(kind){ return kind==='main'||kind==='event'?10:kind==='farm'?8:0; }
-function updStam(){ const b=document.getElementById('stamBox'); if(!b) return; b.hidden=!stamOn(); if(!stamOn()) return; const s=stam(); const v=document.getElementById('stamV'); if(v) v.textContent=s.v+'/'+STAM_MAX; }
+function updStam(){ const el=document.getElementById('stamBox'); if(!el) return; el.hidden=!stamOn(); if(!stamOn()) return; const s=stam(); const v=document.getElementById('stamV'); if(v) v.textContent=s.v+'/'+STAM_MAX; }
 function stamUse(n){ if(!stamOn()||!n) return true; const s=stam(); if(s.v<n){ openStam(n); return false; } s.v-=n; mark('prog'); updStam(); return true; }
 function openStam(need){ const s=stam(), left=s.v>=STAM_MAX?0:Math.ceil((STAM_MS-(Date.now()-s.at))/60000), full=s.v>=STAM_MAX?0:Math.ceil(((STAM_MAX-s.v-1)*STAM_MS+(STAM_MS-(Date.now()-s.at)))/60000);
   openModal(`${head('⚡ 행동력',`<span class="muted">${s.v} / ${STAM_MAX}</span>`)}${need?`<p style="margin:0 0 8px">행동력이 모자라요. 필요 <b>${need}</b> · 지금 <b>${s.v}</b></p>`:''}
@@ -38,7 +38,7 @@ const PASS_MAX=30, PASS_PER=500;
 const passLv=()=>Math.min(PASS_MAX,Math.floor(P().pass.xp/PASS_PER));
 function passReward(l){return l%10===0?{gems:1000}:l%5===0?{core:10}:l%3===0?{wmat:15}:l%2===0?{exp:30}:{gold:8000};}
 function passClaimable(){const n=passLv();let k=0;for(let l=1;l<=n;l++)if(!P().pass.got.includes(l))k++;return k+MISSIONS.filter(m=>(dm().cnt[m.k]||0)>=m.goal&&!dm().got[m.k]).length;}
-const dispDone=()=>Object.values(P().disp).filter(d=>Date.now()>=d.start+d.hours*3600e3).length;
+const dispDone=()=>[...Object.values(P().disp),...Object.values((P().exped||{}).jobs||{})].filter(d=>Date.now()>=d.start+d.hours*3600e3).length; // 로비 배지: 전투형 파견 + 다른 원정 방식의 끝난 일정
 const busyIds=()=>new Set([...Object.values(P().disp).flatMap(d=>d.chars),...exBusyIds()]); // 원정 모드(방송·스트리머·경영)에서 일하는·쉬는·배치된 캐릭터 포함
 function linePop(c,text,face){
   if(!c||!text) return; document.querySelectorAll('.linepop').forEach(x=>x.remove());
@@ -90,7 +90,7 @@ function openUpConfirm(c,k){ const u=upPlan(c,k); if(!u) return;
 /* 스포일러 막기: 아직 만나지 않은 인물(보유하지 않았고, 본 스토리에도 안 나온)의 이름이 든 대사는 로비·터치에서 빼요 */
 let SEEN_K='', SEEN_T='';
 function seenText(){ const p=P(), k=Object.keys(p.cleared||{}).length+'|'+Object.keys(p.owned||{}).length+'|'+(p.seenOpening?1:0); if(k===SEEN_K) return SEEN_T;
-  const L=[p.seenOpening&&G.opening?String(G.opening.prologue||''):'']; G.chapters.forEach(ch=>ch.stages.forEach(st=>{ if(p.cleared[st.id]) L.push(st.pre||'',st.post||''); }));
+  const L=[p.seenOpening&&G.opening?String(G.opening.prologue||''):'']; G.chapters.forEach(ch=>ch.stages.forEach(s=>{ if(p.cleared[s.id]) L.push(s.pre||'',s.post||''); }));
   G.chars.forEach(c=>{ if(p.owned[c.id]) L.push(c.name); }); SEEN_K=k; SEEN_T=L.join('\n'); return SEEN_T; }
 function spoilFree(c,arr){ arr=arr||[]; if(!arr.length) return arr; const seen=seenText(), self=c&&c.name;
   const unseen=[...G.chars,...(G.npcs||[])].map(x=>x.name).filter(n=>n&&n.length>=2&&n!==self&&!seen.includes(n)); if(!unseen.length) return arr;

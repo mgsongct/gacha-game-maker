@@ -38,6 +38,6 @@ function fieldTime(s){ const r=s&&s.field; return r&&r.k==='timed'?Math.max(20,M
 function rulesHTML(s){ const f=fieldText(s.field); return `<div class="panel" style="padding:8px;margin:6px 0;font-size:.82rem">${f?`<div><b>전장 규칙</b> ${esc(f)}</div>`:''}<div><b>별 조건</b> 승리 · 전원 생존 · ${esc(goalText(s.goal))}</div></div>`; }
 // 집중 지시
 function bFocus(i){ if(!B||B.over||!B.engine) return; const u=B.enemies[i], t=B.engine.time; if(!u||u.hp<=0) return; if(t<(B.focusReady||0)){ toast(`집중 지시는 ${Math.ceil(B.focusReady-t)}초 뒤에 다시 쓸 수 있어요`); return; }
-  B.enemies.forEach(e=>{ e.status=e.status.filter(s=>s.id!=='order'); }); u.status.push({id:'order',type:'focus',value:1,until:t+8,next:Infinity,source:null,slot:'order',remaining:1,hpRemain:1});
+  B.enemies.forEach(en=>{ en.status=en.status.filter(s=>s.id!=='order'); }); u.status.push({id:'order',type:'focus',value:1,until:t+8,next:Infinity,source:null,slot:'order',remaining:1,hpRemain:1});
   B.focusReady=t+12; blog(`집중 공격 지시: ${u.name}`); bUpdate(); }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="bfocus"]'); if(!b) return; e.stopPropagation(); bFocus(+b.dataset.i); });
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act="bfocus"]'); if(!el) return; e.stopPropagation(); bFocus(+el.dataset.i); });

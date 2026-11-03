@@ -1,0 +1,697 @@
+[
+ {
+  "id": "l12csyksq",
+  "kind": "bg",
+  "name": "리벳항 부두",
+  "prompt": "no humans, scenery, floating island, harbor, pier, airship dock, steampunk, scrap metal, crane, pipes, smokestack, sea of clouds, overcast, dusk",
+  "img": null
+ },
+ {
+  "id": "l2x6ea5pq",
+  "kind": "bg",
+  "name": "브람의 대장간",
+  "prompt": "no humans, scenery, indoors, workshop, forge, anvil, steampunk, scrap metal, tools on wall, gears, hanging chains, warm lighting, embers",
+  "img": null
+ },
+ {
+  "id": "lkho1nks3",
+  "kind": "bg",
+  "name": "크레스트홀드 폐요새",
+  "prompt": "no humans, scenery, fortress, castle ruins, on floating island, torn banner, overgrown, stone wall, brass pipes, steampunk, cloudy sky, sea of clouds",
+  "img": null
+ },
+ {
+  "id": "l6y7heyft",
+  "kind": "bg",
+  "name": "요새 집무실",
+  "prompt": "no humans, scenery, indoors, office, wooden desk, map on wall, brass lamp, bookshelf, dusty, window, sky, steampunk, sunlight",
+  "img": null
+ },
+ {
+  "id": "l8c7lpttd",
+  "kind": "bg",
+  "name": "요새 격납고",
+  "prompt": "no humans, scenery, indoors, hangar, airship, scaffolding, steampunk, pipes, steam, catwalk, tools, dim lighting",
+  "img": null
+ },
+ {
+  "id": "l5zqweatz",
+  "kind": "bg",
+  "name": "비행선 갑판",
+  "prompt": "no humans, scenery, airship, deck, wooden floor, railing, sails, propeller, rigging, steampunk, blue sky, sea of clouds, horizon",
+  "img": null
+ },
+ {
+  "id": "ldwh3h0y0",
+  "kind": "bg",
+  "name": "폭풍권 하늘",
+  "prompt": "no humans, scenery, storm, dark clouds, lightning, vortex, sea of clouds, floating island, debris, rain, dramatic sky",
+  "img": null
+ },
+ {
+  "id": "ltqrmfe8l",
+  "kind": "bg",
+  "name": "자유항 코그웰",
+  "prompt": "no humans, scenery, city, port town, steampunk, airships, chimneys, brass, market, street, lanterns, floating island, daytime",
+  "img": null
+ },
+ {
+  "id": "l0f5s223g",
+  "kind": "bg",
+  "name": "등대섬 라우트",
+  "prompt": "no humans, scenery, lighthouse, small floating island, cliff, grass, night, starry sky, sea of clouds, light beam",
+  "img": null
+ },
+ {
+  "id": "lxbcdfhfd",
+  "kind": "bg",
+  "name": "폭풍이 지난 섬",
+  "prompt": "no humans, scenery, ruins, destroyed town, floating island, broken house, debris, scattered gears, overcast, wind, dust",
+  "img": null
+ },
+ {
+  "id": "lef2rsadp",
+  "kind": "bg",
+  "name": "리벳항 골목",
+  "prompt": "no humans, scenery, alley, steampunk, pipes, steam, lantern, puddle, brick wall, night, rain",
+  "img": null
+ },
+ {
+  "id": "l6bssel63",
+  "kind": "prop",
+  "name": "질풍문장",
+  "prompt": "no humans, object focus, emblem, brass, badge, wind motif, engraved, old, scratches, compass needle, glowing, simple background",
+  "img": null
+ },
+ {
+  "id": "lgm078qyv",
+  "kind": "prop",
+  "name": "부유석",
+  "prompt": "no humans, object focus, crystal, floating, glowing, blue light, rough stone, sparkle, simple background",
+  "img": null
+ },
+ {
+  "id": "l60c7ec03",
+  "kind": "prop",
+  "name": "의회 징발 명령서",
+  "prompt": "no humans, object focus, paper, document, wax seal, ribbon, official document, gold border, simple background",
+  "img": null
+ },
+ {
+  "id": "l99gq5xmr",
+  "kind": "prop",
+  "name": "기압계",
+  "prompt": "no humans, object focus, barometer, brass, glass dial, needle, steampunk, simple background",
+  "img": null
+ },
+ {
+  "id": "lqyq4vdo0",
+  "kind": "prop",
+  "name": "레오폴트의 항해 일지",
+  "prompt": "no humans, object focus, book, old book, leather cover, brass clasp, burnt edges, simple background",
+  "img": null
+ },
+ {
+  "id": "le3wagcaa",
+  "kind": "bgm",
+  "name": "타이틀",
+  "prompt": "epic orchestral steampunk fantasy, soaring strings, brass fanfare, wind, adventurous, majestic, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "l9csn41cn",
+  "kind": "bgm",
+  "name": "로비",
+  "prompt": "warm steampunk fantasy, accordion, acoustic guitar, light strings, ticking clock percussion, calm, cozy, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "l655j8y97",
+  "kind": "bgm",
+  "name": "일상",
+  "prompt": "cheerful steampunk town, pizzicato strings, whistle, accordion, light percussion, playful, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "ly8jdr8es",
+  "kind": "bgm",
+  "name": "긴장",
+  "prompt": "tense ambient, low strings, ticking percussion, distant thunder, suspense, steampunk, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "lvlg0qlah",
+  "kind": "bgm",
+  "name": "전투",
+  "prompt": "fast orchestral battle, driving drums, brass, strings ostinato, industrial percussion, heroic, steampunk fantasy, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "lbvnh7ikt",
+  "kind": "bgm",
+  "name": "보스전",
+  "prompt": "intense epic boss battle, full orchestra, choir, heavy drums, storm sounds, dark brass, dramatic, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "lz18bxcgv",
+  "kind": "bgm",
+  "name": "서임",
+  "prompt": "ceremonial knighting fanfare, rising strings, bells, brass, anticipation, grand reveal, fantasy, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "l3klxskrp",
+  "kind": "bgm",
+  "name": "감성",
+  "prompt": "emotional piano, solo cello, soft strings, melancholic, gentle wind, nostalgic, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "sfx_btn",
+  "kind": "sfx",
+  "name": "버튼",
+  "prompt": "Short crisp futuristic UI click, clean digital tick",
+  "dur": 0.5,
+  "img": null
+ },
+ {
+  "id": "sfx_ok",
+  "kind": "sfx",
+  "name": "확인",
+  "prompt": "Positive UI confirm chime, two-tone digital blip",
+  "dur": 0.7,
+  "img": null
+ },
+ {
+  "id": "sfx_seal",
+  "kind": "sfx",
+  "name": "계약진",
+  "prompt": "Magical summoning circle activating, rising shimmering hum with crystalline resonance",
+  "dur": 2.5,
+  "img": null
+ },
+ {
+  "id": "sfx_fall",
+  "kind": "sfx",
+  "name": "낙하",
+  "prompt": "Shooting star whoosh falling from the sky with sparkling tail",
+  "dur": 1.5,
+  "img": null
+ },
+ {
+  "id": "sfx_flash",
+  "kind": "sfx",
+  "name": "섬광",
+  "prompt": "Bright magical flash impact with shimmering burst",
+  "dur": 1.2,
+  "img": null
+ },
+ {
+  "id": "sfx_ssr",
+  "kind": "sfx",
+  "name": "SSR",
+  "prompt": "Triumphant golden reveal sting, sparkling chimes and orchestral hit",
+  "dur": 3,
+  "img": null
+ },
+ {
+  "id": "sfx_card",
+  "kind": "sfx",
+  "name": "카드",
+  "prompt": "Quick card flip swish",
+  "dur": 0.5,
+  "img": null
+ },
+ {
+  "id": "sfx_hit",
+  "kind": "sfx",
+  "name": "타격",
+  "prompt": "Short punchy gunshot impact, anime battle hit",
+  "dur": 0.5,
+  "img": null
+ },
+ {
+  "id": "sfx_skill",
+  "kind": "sfx",
+  "name": "스킬",
+  "prompt": "Powerful energy skill release, charged blast with whoosh",
+  "dur": 1.5,
+  "img": null
+ },
+ {
+  "id": "sfx_win",
+  "kind": "sfx",
+  "name": "승리",
+  "prompt": "Short victory fanfare jingle, brass and strings, anime game",
+  "dur": 3.5,
+  "img": null
+ },
+ {
+  "id": "sfx_lose",
+  "kind": "sfx",
+  "name": "패배",
+  "prompt": "Short defeat jingle, low descending synth tones",
+  "dur": 2.5,
+  "img": null
+ },
+ {
+  "id": "sfx_up",
+  "kind": "sfx",
+  "name": "강화",
+  "prompt": "Power-up level up sound, rising sparkly arpeggio",
+  "dur": 1.5,
+  "img": null
+ },
+ {
+  "id": "sfx_noti",
+  "kind": "sfx",
+  "name": "알림",
+  "prompt": "Smartphone message notification ping, soft two-note chime",
+  "dur": 0.8,
+  "img": null
+ },
+ {
+  "id": "nbi6xxcnk",
+  "kind": "enemy",
+  "name": "훈련 표적",
+  "prompt": "",
+  "img": null
+ },
+ {
+  "id": "n86kuxsnt",
+  "kind": "enemy",
+  "name": "강화 표적",
+  "prompt": "",
+  "img": null
+ },
+ {
+  "id": "nh5geun9s",
+  "kind": "enemy",
+  "name": "훈련 교관",
+  "prompt": "",
+  "img": null
+ },
+ {
+  "id": "ngajjzm9n",
+  "kind": "enemy",
+  "name": "잔해 까마귀",
+  "prompt": "no humans, monster, bird, crow, made of scrap metal, gears, debris, metal wings, glowing eyes, wind",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans, metal wings, glowing eyes",
+    "outfit": "",
+    "other": "monster, bird, crow, made of scrap metal, gears, debris, wind",
+    "style": "",
+    "combined": "no humans, monster, bird, crow, made of scrap metal, gears, debris, metal wings, glowing eyes, wind",
+    "original": "no humans, monster, bird, crow, made of scrap metal, gears, debris, metal wings, glowing eyes, wind",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  },
+  "desc": "폭풍에 부서진 쇳조각과 톱니가 기류에 엮여 까마귀 모양을 이룬 작은 와류수다.",
+  "nature": "떼를 지어 높은 곳에 둥지를 틀고, 부유석 엔진의 열기를 맴돌며 반짝이는 금속을 물어 간다.",
+  "weak": "몸을 엮은 기류가 약해 한 번만 크게 흔들어도 흩어진다. 강한 맞바람 속에서는 제대로 날지 못한다.",
+  "faction": "와류수"
+ },
+ {
+  "id": "nhfdkzavy",
+  "kind": "enemy",
+  "name": "녹슨 껍데기",
+  "prompt": "no humans, monster, crab, made of rusted metal plates, rivets, pipes, steam, claws, glowing core",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans",
+    "outfit": "",
+    "other": "monster, crab, made of rusted metal plates, rivets, pipes, steam, claws, glowing core",
+    "style": "",
+    "combined": "no humans, monster, crab, made of rusted metal plates, rivets, pipes, steam, claws, glowing core",
+    "original": "no humans, monster, crab, made of rusted metal plates, rivets, pipes, steam, claws, glowing core",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  },
+  "desc": "버려진 장갑판과 배관을 등딱지처럼 뒤집어쓴 게 모양의 와류수다.",
+  "nature": "느리지만 단단하며, 부유석 근처에 자리를 잡으면 좀처럼 움직이지 않는다.",
+  "weak": "철판 이음새 사이로 드러난 기류의 핵. 뜨거운 증기에 철판이 달궈지면 껍데기가 벌어진다.",
+  "faction": "와류수"
+ },
+ {
+  "id": "nx1io44so",
+  "kind": "enemy",
+  "name": "기류 늑대",
+  "prompt": "no humans, monster, wolf, made of storm clouds, lightning, metal shards, debris, glowing eyes, electricity",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans, glowing eyes",
+    "outfit": "",
+    "other": "monster, wolf, made of storm clouds, lightning, metal shards, debris, electricity",
+    "style": "",
+    "combined": "no humans, monster, wolf, made of storm clouds, lightning, metal shards, debris, glowing eyes, electricity",
+    "original": "no humans, monster, wolf, made of storm clouds, lightning, metal shards, debris, glowing eyes, electricity",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  },
+  "desc": "폭풍 구름과 번개가 늑대의 형체로 뭉친 와류수다.",
+  "nature": "무리 지어 사냥하며, 번개를 튀기며 빠르게 달려들어 약한 상대부터 노린다.",
+  "weak": "피뢰 강철에 번개를 빼앗기면 급격히 둔해진다. 강한 빛에 눈이 멀어 잠시 멈춰 선다.",
+  "faction": "와류수"
+ },
+ {
+  "id": "n21sulm5q",
+  "kind": "enemy",
+  "name": "증기 망령",
+  "prompt": "no humans, monster, jellyfish, floating, made of steam, translucent, tentacles, glowing core, vapor",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans, tentacles",
+    "outfit": "",
+    "other": "monster, jellyfish, floating, made of steam, translucent, glowing core, vapor",
+    "style": "",
+    "combined": "no humans, monster, jellyfish, floating, made of steam, translucent, tentacles, glowing core, vapor",
+    "original": "no humans, monster, jellyfish, floating, made of steam, translucent, tentacles, glowing core, vapor",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  },
+  "desc": "폭풍에 휘말린 보일러의 증기가 기류와 섞여 해파리처럼 떠도는 와류수다.",
+  "nature": "소리 없이 떠다니다 뜨거운 증기 촉수로 감싸 상대를 익힌다. 증기기관의 열을 가장 좋아한다.",
+  "weak": "차가운 강풍에 증기가 흩어지면 형체를 잃는다.",
+  "faction": "와류수"
+ },
+ {
+  "id": "ndv9q04dp",
+  "kind": "enemy",
+  "name": "잔해 고래",
+  "prompt": "no humans, monster, giant, whale, made of debris, scrap metal, broken airship hull, rocks, storm clouds, lightning, glowing eyes, flying",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans, glowing eyes",
+    "outfit": "",
+    "other": "monster, giant, whale, made of debris, scrap metal, broken airship hull, rocks, storm clouds, lightning, flying",
+    "style": "",
+    "combined": "no humans, monster, giant, whale, made of debris, scrap metal, broken airship hull, rocks, storm clouds, lightning, glowing eyes, flying",
+    "original": "no humans, monster, giant, whale, made of debris, scrap metal, broken airship hull, rocks, storm clouds, lightning, glowing eyes, flying",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  },
+  "desc": "폭풍의 중심에서 부서진 비행선과 섬의 잔해가 거대한 고래 모양으로 뭉친 와류수다.",
+  "nature": "폭풍과 함께 섬을 감싸 부유석을 통째로 삼키며, 낮고 긴 울음소리를 낸다. 그 울음에 다른 와류수들이 모여든다.",
+  "weak": "몸 한가운데에 삼킨 부유석이 빛나는 핵. 주변 기류를 끊으면 거대한 몸이 무너져 내린다.",
+  "faction": "와류수"
+ },
+ {
+  "id": "ic_gems",
+  "kind": "icon",
+  "key": "gems",
+  "name": "하늘결정 아이콘",
+  "prompt": "blue crystal gem, faceted crystal, glowing, sparkle",
+  "img": null
+ },
+ {
+  "id": "ic_gold",
+  "kind": "icon",
+  "key": "gold",
+  "name": "황동화 아이콘",
+  "prompt": "gold coin, embossed star emblem, shiny metal",
+  "img": null
+ },
+ {
+  "id": "ic_exp",
+  "kind": "icon",
+  "key": "exp",
+  "name": "기사 교범 아이콘",
+  "prompt": "glowing data chip, holographic record, blue light",
+  "img": null
+ },
+ {
+  "id": "ic_wmat",
+  "kind": "icon",
+  "key": "wmat",
+  "name": "스킬 교본 아이콘",
+  "prompt": "mechanical parts, gears and bolts, metal",
+  "img": null
+ },
+ {
+  "id": "ic_core",
+  "kind": "icon",
+  "key": "core",
+  "name": "부유심 아이콘",
+  "prompt": "hexagonal energy core, pink glow, crystal inside",
+  "img": null
+ },
+ {
+  "id": "ic_gearMat",
+  "kind": "icon",
+  "key": "gearMat",
+  "name": "운철 톱니 아이콘",
+  "prompt": "polished alloy ingot, metallic shine, gear emblem",
+  "img": null
+ },
+ {
+  "id": "ic_transcMat",
+  "kind": "icon",
+  "key": "transcMat",
+  "name": "폭안석 아이콘",
+  "prompt": "radiant transcendence crystal, violet and gold glow",
+  "img": null
+ },
+ {
+  "id": "mmtap0yji",
+  "kind": "map",
+  "ch": "c1",
+  "name": "녹슨 깃발 지도",
+  "prompt": "ruined city at night, glowing roads, rivers of light, crater, scattered buildings",
+  "img": null
+ },
+ {
+  "id": "lkwgx61m0",
+  "kind": "bg",
+  "name": "코그웰 대조선소",
+  "prompt": "no humans, scenery, indoors, shipyard, giant airship hull, scaffolding, cranes, steampunk, brass pipes, furnace, sparks, warm lighting",
+  "img": null
+ },
+ {
+  "id": "ljx3g1xn3",
+  "kind": "bg",
+  "name": "상회 대회의장",
+  "prompt": "no humans, scenery, indoors, grand hall, steampunk, chandelier, brass ornaments, long table, tiered seats, large windows, sky, dramatic lighting",
+  "img": null
+ },
+ {
+  "id": "lsc19488z",
+  "kind": "bg",
+  "name": "운해 저공 항로",
+  "prompt": "no humans, scenery, sea of clouds, low altitude, clouds surface, mist, airship silhouette, overcast, wind, steampunk",
+  "img": null
+ },
+ {
+  "id": "lg12eyz2a",
+  "kind": "bg",
+  "name": "백익호 화물칸",
+  "prompt": "no humans, scenery, indoors, cargo hold, airship interior, wooden crates, chains, sealed boxes, glowing crystals, dim lighting, steampunk",
+  "img": null
+ },
+ {
+  "id": "l65wstf1c",
+  "kind": "bgm",
+  "name": "회담",
+  "prompt": "tense debate, pizzicato strings, ticking clock, staccato piano, low brass, building tension, steampunk, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "ly2oh9986",
+  "kind": "bgm",
+  "name": "검은 돛",
+  "prompt": "dark pirate theme, accordion, fiddle, low brass, war drums, wind, menacing, adventurous, steampunk fantasy, instrumental, seamless loop",
+  "img": null
+ },
+ {
+  "id": "lfgmtm11a",
+  "kind": "prop",
+  "name": "철익 근위대 휘장",
+  "prompt": "no humans, object focus, badge, insignia, silver, wing emblem, military, pin, scratches, simple background",
+  "img": null
+ },
+ {
+  "id": "lejavyxrp",
+  "kind": "prop",
+  "name": "백익호 적재 목록",
+  "prompt": "no humans, object focus, paper, document, list, wax seal, stamp, official document, simple background",
+  "img": null
+ },
+ {
+  "id": "l3bw5epgp",
+  "kind": "cg",
+  "name": "구름 위의 곡예비행",
+  "prompt": "sky, sea of clouds, flying vehicle, steampunk, airships, black sails, dynamic angle, speed lines, barrel roll, cannon fire, smoke trails, dramatic",
+  "cast": [
+   {
+    "id": "vsu3k6pz",
+    "pos": "left",
+    "act": ""
+   },
+   {
+    "id": "q9okz0du",
+    "pos": "right",
+    "act": ""
+   }
+  ],
+  "img": null
+ },
+ {
+  "id": "lejkvexf1",
+  "kind": "cg",
+  "name": "대회의장의 대치",
+  "prompt": "indoors, grand hall, steampunk, crowd, confrontation, standing, facing each other, dramatic lighting, papers, chandelier, tension",
+  "cast": [
+   {
+    "id": "__player",
+    "pos": "left",
+    "act": ""
+   },
+   {
+    "id": "ar0dnvh5",
+    "pos": "right",
+    "act": ""
+   }
+  ],
+  "img": null
+ },
+ {
+  "id": "l39o3f55o",
+  "kind": "cg",
+  "name": "떼어 낸 휘장",
+  "prompt": "night, shipyard, scaffolding, airship hull, furnace glow, sparks, throwing, badge, falling, determined, dramatic lighting",
+  "cast": [
+   {
+    "id": "sv7dw295",
+    "pos": "left",
+    "act": ""
+   },
+   {
+    "id": "__player",
+    "pos": "right",
+    "act": ""
+   }
+  ],
+  "img": null
+ },
+ {
+  "id": "l9qwe49rx",
+  "kind": "cg",
+  "name": "검은 돛의 검",
+  "prompt": "airship deck, storm, lightning, black sails, sword clash, sparks, wind, dynamic angle, sea of clouds, dramatic",
+  "cast": [
+   {
+    "id": "q9okz0du",
+    "pos": "center",
+    "act": ""
+   }
+  ],
+  "img": null
+ },
+ {
+  "id": "niy529yza",
+  "kind": "enemy",
+  "name": "검은 돛 약탈자",
+  "prompt": "1boy, solo, faceless, pirate, black bandana, goggles, leather coat, black sash, cutlass, steampunk, pistol",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "1boy, solo, faceless",
+    "outfit": "goggles, leather coat",
+    "other": "pirate, black bandana, black sash, cutlass, steampunk, pistol",
+    "style": "",
+    "combined": "1boy, solo, faceless, pirate, black bandana, goggles, leather coat, black sash, cutlass, steampunk, pistol",
+    "original": "1boy, solo, faceless, pirate, black bandana, goggles, leather coat, black sash, cutlass, steampunk, pistol",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "n9h9pe33y",
+  "kind": "enemy",
+  "name": "검은 돛 포격수",
+  "prompt": "",
+  "img": null,
+  "alias": "niy529yza"
+ },
+ {
+  "id": "ngtqdqu0g",
+  "kind": "enemy",
+  "name": "철익 근위병",
+  "prompt": "1boy, solo, faceless, soldier, silver armor, white uniform, winged helmet, blue cape, rifle, bayonet, steampunk",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "1boy, solo, faceless",
+    "outfit": "silver armor, white uniform, winged helmet, blue cape",
+    "other": "soldier, rifle, bayonet, steampunk",
+    "style": "",
+    "combined": "1boy, solo, faceless, soldier, silver armor, white uniform, winged helmet, blue cape, rifle, bayonet, steampunk",
+    "original": "1boy, solo, faceless, soldier, silver armor, white uniform, winged helmet, blue cape, rifle, bayonet, steampunk",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ },
+ {
+  "id": "nek37q662",
+  "kind": "enemy",
+  "name": "철익 저격병",
+  "prompt": "",
+  "img": null,
+  "alias": "ngtqdqu0g"
+ },
+ {
+  "id": "n1qv3frkj",
+  "kind": "enemy",
+  "name": "운해 장어",
+  "prompt": "no humans, monster, eel, serpent, made of clouds, lightning, metal pipes, glowing eyes, long body, electricity",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "no humans, glowing eyes",
+    "outfit": "",
+    "other": "monster, eel, serpent, made of clouds, lightning, metal pipes, long body, electricity",
+    "style": "",
+    "combined": "no humans, monster, eel, serpent, made of clouds, lightning, metal pipes, glowing eyes, long body, electricity",
+    "original": "no humans, monster, eel, serpent, made of clouds, lightning, metal pipes, glowing eyes, long body, electricity",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  },
+  "desc": "운해 표면의 안개와 번개, 가라앉은 배관 잔해가 길게 뭉쳐 뱀장어 모양을 이룬 와류수다.",
+  "nature": "운해 바로 위를 미끄러지듯 헤엄치며, 부유석의 울림을 따라 떼로 몰려든다. 배의 바닥을 감아 번개를 흘려 넣는다.",
+  "weak": "운해에서 높이 끌어올리면 몸을 이루는 안개가 흩어진다. 피뢰 강철에 번개를 빼앗기면 축 늘어진다.",
+  "faction": "와류수"
+ },
+ {
+  "id": "nw1rq0cgj",
+  "kind": "enemy",
+  "name": "로웬",
+  "prompt": "1boy, solo, mature male, long hair, black hair, streaked hair, low ponytail, stubble, scar across eye, half mask, black mask, black coat, long coat, torn cape, leather armor, belt, holding sword, cutlass",
+  "img": null,
+  "naiBlocks": {
+   "prompt": {
+    "appearance": "1boy, solo, long hair, black hair, streaked hair, low ponytail, scar across eye",
+    "outfit": "black coat, long coat, torn cape, leather armor, belt",
+    "other": "mature male, stubble, half mask, black mask, holding sword, cutlass",
+    "style": "",
+    "combined": "1boy, solo, mature male, long hair, black hair, streaked hair, low ponytail, stubble, scar across eye, half mask, black mask, black coat, long coat, torn cape, leather armor, belt, holding sword, cutlass",
+    "original": "1boy, solo, mature male, long hair, black hair, streaked hair, low ponytail, stubble, scar across eye, half mask, black mask, black coat, long coat, torn cape, leather armor, belt, holding sword, cutlass",
+    "method": "rules",
+    "ruleVersion": 3
+   }
+  }
+ }
+]

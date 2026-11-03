@@ -35,11 +35,11 @@ const AUDIT_RULES=[
  {id:'g_codex',scope:'game',kind:'upgrade',since:3,label:'도감에 게임 규칙(상성·역할)이 기록되지 않았어요',test:()=>rulesNotInCodex(),fix:{mode:'auto',run:()=>{ rulesCodex(); }}},
  {id:'w_faction',scope:'game',kind:'upgrade',since:8,label:'세력·몬스터 설정이 얕아요(종류·목적·관계·정체가 비어 있음)',test:()=>factionReview().score<70,fix:{mode:'ai-run',run:()=>factionAI()}},
  {id:'c_monster',scope:'char',kind:'missing',since:1,label:'몬스터로 보이는 캐릭터예요(톡·일정·인연 대상이 되면 안 돼요 → 적으로 전환)',test:c=>!c.monster&&!c.alt&&isMonsterLike(c),fix:{mode:'auto',run:c=>charToMonster(c)}},
- {id:'c_debut',scope:'char',kind:'upgrade',since:8,label:'스토리 중간에 처음 나오는데 처음부터 뽑을 수 있는 캐릭터예요(첫 등장 스테이지 전엔 잠그기)',test:c=>!c.debut&&!own(c.id)&&!c.alt&&!c.monster&&!!firstSpeak(c)&&firstSpeak(c).k>0,fix:{mode:'auto',run:c=>{ const f=firstSpeak(c); if(f) c.debut=f.s.id; }}},
+ {id:'c_debut',scope:'char',kind:'upgrade',since:8,label:'스토리 중간에 처음 나오는데 처음부터 뽑을 수 있는 캐릭터예요(첫 등장 스테이지 전엔 잠그기)',test:c=>!c.debut&&!own(c.id)&&!c.alt&&!c.monster&&!!firstSpeak(c)&&firstSpeak(c).k>0,fix:{mode:'auto',run:c=>{ const f=firstSpeak(c); if(f){ c.debut=f.s.id; delete c.debutLater; } }}},
  {id:'c_range',scope:'char',kind:'upgrade',since:7,label:'사거리(근접·원거리·지원)가 정해지지 않았어요(무기·포지션으로 추정해 정해요)',test:c=>!c.npc&&!RANGE[c.range],fix:{mode:'auto',run:c=>{ c.range=charRange(c); }}},
  {id:'s_direct',scope:'stage',kind:'upgrade',since:6,label:'대본에 연출(감정 아이콘·동작·화면 효과)이 없어요(AI로 대사는 그대로 두고 연출만 더해요)',test:s=>!s.dirV&&String((s.pre||'')+(s.post||'')).split('\n').length>=6&&dirCount((s.pre||'')+'\n'+(s.post||''))===0,fix:{mode:'ai-run',run:s=>directStage(s)}},
  {id:'s_rules',scope:'stage',kind:'upgrade',since:5,label:'전장 규칙·별 조건이 없는 스테이지예요(예전 생성물)',test:s=>!s.story&&!s.farm&&(s.enemies||[]).length>0&&!s.rulesV,fix:{mode:'auto',run:s=>{ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)), L=ch?ch.stages:[s]; stageAutoRules(s,L.indexOf(s),L.length); }}},
- {id:'g_spots',scope:'game',kind:'upgrade',since:5,label:'일정(장소 방문) 장소가 없어요',test:()=>!spots().length,fix:{mode:'auto',run:()=>{ spotsAuto(); }}},
+ {id:'g_spots',scope:'game',kind:'upgrade',since:5,label:'일정(장소 방문) 장소가 없어요',test:()=>!spots().length,fix:{mode:'auto',ai:()=>spotsAI(),run:()=>{ spotsAuto(); }}},
  {id:'c_spot',scope:'char',kind:'upgrade',since:5,label:'일정 장소에서 만날 때의 장면이 없어요(기본 장면으로 나와요)',test:c=>!c.alt&&!c.npc&&spots().length>0&&spots().some(s=>!(c.spotTalk||{})[s.id]),fix:{mode:'ai-run',run:c=>spotTalkAI(c)}},
  {id:'l_imgperson',scope:'lib',kind:'missing',since:1,label:'배경·소품 그림 프롬프트에 사람 태그가 섞여 있어요(사람 그림이 돼요)',test:l=>!!IMG_NOHUMAN[l.kind]&&!!l.prompt&&imgGuard(l.kind,l.prompt).removed.length>0,fix:{mode:'auto',run:l=>{ plHit('img-person-'+l.kind,l.prompt); l.prompt=imgGuard(l.kind,l.prompt).out; }}},
  {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
@@ -56,7 +56,7 @@ function auditMarkObj(o){ if(o===G.meta){ mark('meta','world'); return; } if(G.c
 
 async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(instruction 없음) 또는 지정 변환(instruction 있음)
   const schema='{'+fields.map(f=>AUDIT_FIELDS[f][1]).join(',')+'}', cur=fields.map(f=>`${AUDIT_FIELDS[f][0]}: ${JSON.stringify(c[f]??'')}`).join('\n');
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」(${ROLE[c.role]||''}, ${c.faction||'무소속'}). 프로필: ${String(c.profile||'').slice(0,400)}\n지금 값:\n${cur}\n\n${instruction?`다음 지시대로 위 항목을 고쳐 써라: "${instruction}". 지시와 관계없는 설정·말투는 유지한다.`:'비었거나 부족한 항목을 이 캐릭터의 성격·말투·설정에 맞게 채워라. 이미 있는 내용은 살리고 어긋나지 않게 한다.'}${fields.includes('naiPrompt')?' '+NAI_CHAR:''}\nJSON만 출력: ${schema}`,null,'default');
+  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」(${ROLE[c.role]||''}, ${c.faction||'무소속'}). 프로필: ${String(c.profile||'').slice(0,400)}\n지금 값:\n${cur}\n\n${instruction?pf('AUDIT_CONVERT',{instruction}):pf('AUDIT_FILL')}${fields.includes('naiPrompt')?' '+NAI_CHAR:''}\nJSON만 출력: ${schema}`,null,'default');
   if(!r) return false;
   for(const f of fields){ const v=r[f]; if(v==null) continue;
     if(f==='touch'&&typeof v==='object') c.touch={head:auditStrs(v.head).slice(0,8),body:auditStrs(v.body).slice(0,8),pet:auditStrs(v.pet).slice(0,8)};
@@ -65,8 +65,24 @@ async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(ins
     else if(f==='naiPrompt') c.naiPrompt=stripAge(tagList(String(v)).filter(t=>!MINOR_TAGS.test(tagKey(t))).join(', '));
     else c[f]=String(v).trim(); }
   mark('c:'+c.id); return true; }
-async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(`${RULES}\n${ctx()}\n\n${SCRIPT_FMT}\n「${ch?ch.title:''}」의 스테이지 「${s.title||''}」 전투 직전 장면 대본을 써라. 앞뒤 스테이지 흐름과 이어지게, 12~25줄.\nJSON만 출력: {"pre":"대본"}`,null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
+async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(`${pf('AUDIT_STAGE',{RULES,ctx:ctx(),SCRIPT_FMT,title:ch?ch.title:'',title2:s.title||''})}\nJSON만 출력: {"pre":"대본"}`,null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
 
+// 한 항목 고치기 — 점검 화면의 일괄 고치기(auditFix)와 실행 중 자동 채움(liveFill, 0537)이 같이 씀. 고쳤으면 true
+// 규칙 고치기 중 글 AI로 더 잘 채울 수 있는 것(fix.ai — 일정 장소는 AI가 좋아하는 것 태그까지 붙여 "좋아하는 장소 ♥"가 맞음)은 AI가 있으면 AI로, 없거나 실패하면 규칙으로
+async function auditAutoRun(rule,o){ if(SAMPLE&&rule.fix.ai){ try{ if(await rule.fix.ai(o)) return; }catch(e){ quietErr(e,'auditAutoRun'); } } rule.fix.run(o); }
+async function auditFixOne(rule,o){ const m=rule.fix.mode;
+  if(m==='auto'){ await auditAutoRun(rule,o); auditMarkObj(o); return true; }
+  if(m==='ai') return !!(await auditAIFill(o,rule.fix.fields));
+  if(m==='ai-stage') return !!(await auditAIStage(o));
+  if(m==='ai-rules') return !!(await rulesAIFill());
+  if(m==='ai-persona') return !!(await personaAI(o,rule.fix.k,{lines:rule.fix.k==='improve'}));
+  if(m==='ai-afftalk') return !!(await talkAffGen(o));
+  if(m==='ai-memo') return !!(await memorialGen(o));
+  if(m==='ai-run') return !!(await rule.fix.run(o));
+  if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); return true; }
+  if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); return true; }
+  if(m==='skills-remaster'&&balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); return true; }
+  return false; }
 async function auditFix(rule,items){
   if(AUDIT_JOB){ toast('점검 작업이 진행 중이에요'); return; } const m=rule.fix.mode;
   if(m==='open'){ const c=items[0]; if(rule.fix.stamp) items.forEach(x=>{ x.genVer=auditGenVer(); auditMarkObj(x); }); closeModal(); if(c&&typeof openRegen==='function') openRegen(c.id); if(items.length>1) toast(`${items.length}명을 지금 버전으로 표시했어요. 다시 만들 부분은 캐릭터마다 「다시 만들기」에서 골라요`); return; }
@@ -74,17 +90,7 @@ async function auditFix(rule,items){
   if((m==='ai'||m==='ai-stage'||m==='weapon'||m==='ai-rules'||m==='ai-persona'||m==='ai-afftalk'||m==='ai-memo'||m==='ai-run')&&!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; }
   auditSnap(items,rule.label); const job=AUDIT_JOB={stop:false,done:0,total:items.length}; let ok=0;
   try{ for(const o of items){ if(job.stop) break; syBar(`점검: ${rule.label} ${job.done+1}/${job.total}`);
-      try{ if(m==='auto'){ rule.fix.run(o); auditMarkObj(o); ok++; }
-        else if(m==='ai'){ if(await auditAIFill(o,rule.fix.fields)) ok++; }
-        else if(m==='ai-stage'){ if(await auditAIStage(o)) ok++; }
-        else if(m==='ai-rules'){ if(await rulesAIFill()) ok++; }
-        else if(m==='ai-persona'){ if(await personaAI(o,rule.fix.k,{lines:rule.fix.k==='improve'})) ok++; }
-        else if(m==='ai-afftalk'){ if(await talkAffGen(o)) ok++; }
-        else if(m==='ai-memo'){ if(await memorialGen(o)) ok++; }
-        else if(m==='ai-run'){ if(await rule.fix.run(o)) ok++; }
-        else if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); ok++; }
-        else if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); ok++; }
-        else if(m==='skills-remaster'){ if(balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); ok++; } } }catch(e){ console.warn('audit',rule.id,e); }
+      try{ if(await auditFixOne(rule,o)) ok++; }catch(e){ console.warn('audit',rule.id,e); }
       job.done++; } }
   finally{ AUDIT_JOB=null; syBar(''); }
   mark('prog'); toast(`${rule.label}: ${ok}/${items.length}개 고쳤어요${AUDIT_UNDO?' (되돌리기 가능)':''}`); if(!$('#modal').hidden) openAudit(AUDIT_FOCUS); else render(); }
@@ -116,10 +122,10 @@ function auditPanel(){ const n=auditScan().reduce((a,x)=>a+x.items.length,0), fr
 function auditNotice(){ try{ if((+G.meta.auditSeen||0)>=auditVer()||!P().seenOpening) return; const n=auditScan().reduce((a,x)=>a+x.items.length,0); if(n) toast(`생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 ${n}개를 업그레이드할 수 있어요`); }catch(e){} }
 setTimeout(auditNotice,6000);
 
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
-  if(a==='audopen') openAudit(b.dataset.id||null);
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
+  if(a==='audopen') openAudit(el.dataset.id||null);
   else if(a==='audundo'){ auditUndo(); openAudit(AUDIT_FOCUS); }
   else if(a==='audstop'){ if(AUDIT_JOB) AUDIT_JOB.stop=true; }
-  else if(a==='audfix'){ const r=AUDIT_RULES.find(x=>x.id===b.dataset.rule), g=r&&auditScan(AUDIT_FOCUS?(o=>o.id===AUDIT_FOCUS):null).find(x=>x.rule===r); if(!g) return;
+  else if(a==='audfix'){ const r=AUDIT_RULES.find(x=>x.id===el.dataset.rule), g=r&&auditScan(AUDIT_FOCUS?(o=>o.id===AUDIT_FOCUS):null).find(x=>x.rule===r); if(!g) return;
     const pick=[...document.querySelectorAll(`[data-aud="${r.id}"]`)].filter(x=>x.checked).map(x=>g.items[+x.dataset.i]).filter(Boolean); if(!pick.length){ toast('고칠 항목을 골라 주세요'); return; } auditFix(r,pick); }
   else if(a==='audconv'){ const cs=[...document.querySelectorAll('[data-audc]:checked')].map(x=>charById(x.dataset.audc)).filter(Boolean), fs=[...document.querySelectorAll('[data-audf]:checked')].map(x=>x.dataset.audf); auditConvert(cs,fs,($('#aud_ins')||{}).value||''); } });

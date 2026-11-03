@@ -5,7 +5,7 @@ let CXCAT='all';
 function cxStore(){ if(!Array.isArray(G.world.codex)) G.world.codex=[]; return G.world.codex; }
 function cxNotes(){ if(!G.world.codexNotes||typeof G.world.codexNotes!=='object') G.world.codexNotes={}; return G.world.codexNotes; }
 function libSrc(kind,name){ const l=G.lib.find(x=>x.kind===kind&&x.name===name); return l?imgSrc(l):null; }
-function mainStages(){ const a=[]; G.chapters.filter(c=>c.kind==='main').forEach((ch,ci)=>ch.stages.forEach((s,si)=>a.push({id:s.id,code:(ci+1)+'-'+(si+1),title:s.title,ch}))); return a; }
+function mainStages(){ const a=[]; G.chapters.filter(ch=>ch.kind==='main').forEach((ch,ci)=>ch.stages.forEach((s,si)=>a.push({id:s.id,code:(ci+1)+'-'+(si+1),title:s.title,ch}))); return a; }
 function escRe(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
 function cxMention(seen,name){ name=String(name||'').trim(); if(!name) return false; if(new RegExp('\\[(배경|소품)\\s*[:：]\\s*'+escRe(name)+'\\s*\\]').test(seen)) return true; if(name===P().lobbyBg||name===P().titleBg) return true; return name.length>=3&&seen.includes(name); }
 function cxSeenText(){ const p=P(); let t=(G.opening&&G.opening.lines||[]).join('\n')+'\n'+(p.lobbyBg||'')+'\n'+(p.titleBg||'');
@@ -20,9 +20,9 @@ function cxEntries(){
     out.push({key:'c:'+c.id,cat:'person',title:c.name,sub:[c.faction,RL[c.rarity],ROLE[c.role]].filter(Boolean).join(' · '),body:[c.profile,...files.map(x=>'【'+T('files')+' '+(x.dup||'')+'】 '+(x.text||''))].filter(Boolean).join('\n\n')+((c.files||[]).length>files.length?`\n\n(${T('limit')}하면 ${T('files')}가 더 공개돼요)`:''),unlock:{type:'own',value:c.id},char:c}); });
   G.lib.filter(l=>l.kind==='bg').forEach(l=>out.push({key:'p:'+l.name,cat:'place',title:l.name,sub:'장소',body:'',unlock:{type:'seen',ok:cxMention(seen,l.name)},img:imgSrc(l)}));
   G.lib.filter(l=>l.kind==='prop').forEach(l=>out.push({key:'i:'+l.name,cat:'item',title:l.name,sub:'물건',body:'',unlock:{type:'seen',ok:cxMention(seen,l.name)},img:imgSrc(l),contain:true}));
-  const ens={}; G.chapters.filter(c=>c.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ const x=ens[e.name]||(ens[e.name]={e,codes:[],first:s.id,clear:false}); x.codes.push(stageCode(s.id)); if(P().cleared[s.id]) x.clear=true; })));
+  const ens={}; G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ const x=ens[e.name]||(ens[e.name]={e,codes:[],first:s.id,clear:false}); x.codes.push(stageCode(s.id)); if(P().cleared[s.id]) x.clear=true; })));
   Object.values(ens).forEach(x=>{ const e=x.e; out.push({key:'e:'+e.name,cat:'enemy',title:e.name,sub:`${e.elem} 속성${e.boss?' · 보스':''}`,body:`출현: ${[...new Set(x.codes)].join(', ')}`,unlock:x.clear?{type:'start'}:{type:'clear',value:x.first},img:(enemyLib(e.name)&&imgSrc(enemyLib(e.name)))||null,contain:true}); });
-  G.chapters.filter(c=>c.kind==='main').forEach((ch,ci)=>{ const done=ch.stages.filter(s=>P().cleared[s.id]);
+  G.chapters.filter(ch=>ch.kind==='main').forEach((ch,ci)=>{ const done=ch.stages.filter(s=>P().cleared[s.id]);
     out.push({key:'h:'+ch.id,cat:'history',title:ch.title,sub:`CHAPTER ${ci+1} · ${done.length}/${ch.stages.length}`,body:ch.stages.map((s,si)=>(P().cleared[s.id]?'✓ ':'· ')+`${ci+1}-${si+1} `+(P().cleared[s.id]?s.title:'???')).join('\n'),unlock:ch.stages[0]?{type:'clear',value:ch.stages[0].id}:{type:'start'}}); });
   cxStore().forEach(x=>out.push({key:'x:'+x.id,cat:CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term',title:x.title,sub:(CX_LABEL[x.cat]||'기록')+(x.src==='ai'?' · AI 기록':''),body:x.body,unlock:x.unlock||{type:'start'},stored:x,img:libSrc('bg',x.title)||libSrc('prop',x.title)}));
   const N=cxNotes(); out.forEach(e=>{ e.notes=(N[e.key]||[]); e.open=cxUnlocked(e.unlock); });
@@ -74,12 +74,7 @@ function codeToStage(code){ code=String(code||'').trim(); if(!code||/^start|처�
 function cxProgressText(){ const st=mainStages(), done=st.filter(s=>P().cleared[s.id]); return done.length?`플레이어가 지금까지 깬 스테이지: ${done.map(s=>s.code+' '+s.title).join(', ')}`:'플레이어는 아직 스토리를 시작하지 않았다'; }
 async function cxDiscover(t){
   const st=mainStages(), have=cxEntries().map(e=>e.title);
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n이 게임의 도감(로어북)에 실을 새 기록 6개를 써라. 세계관을 더 깊게 만드는 내용으로: 장소, 용어(기술·제도·현상), 역사적 사건, 아직 등장하지 않은 주요 인물(NPC), 세력의 이면, 물건 등을 고루 섞는다.
-이미 있는 항목과 제목이 겹치지 않게: ${have.join(', ')}
-스테이지 목록: ${st.map(s=>s.code+' '+s.title).join(', ')||'없음'}
-${cxProgressText()}
-규칙: 메인 플롯의 비밀이나 반전에 닿는 기록은 "after"에 그 비밀이 드러나는 스테이지 코드를 넣는다. "start" 기록에는 비밀을 쓰지 않는다. 기록은 게임 속 문서처럼 3인칭 백과사전 말투로 4~6문장. 대원 이름은 기존 이름을 그대로 쓴다.
-JSON만 출력: {"entries":[{"cat":"place|term|history|person|faction|item","title":"짧은 제목","body":"내용","after":"start 또는 1-3 같은 스테이지 코드"}]}`,t);
+  const r=await aiJSON(`${pf('CODEX_DISCOVER',{RULES,ctx:ctx(),have:have.join(', '),code:st.map(s=>s.code+' '+s.title).join(', ')||'없음',cxProgressText:cxProgressText()})}JSON만 출력: {"entries":[{"cat":"place|term|history|person|faction|item","title":"짧은 제목","body":"내용","after":"start 또는 1-3 같은 스테이지 코드"}]}`,t);
   if(!r||!Array.isArray(r.entries)) return 0;
   let n=0; r.entries.slice(0,8).forEach(x=>{ if(!x||!x.title||!x.body) return; const cat=CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term'; const sid=codeToStage(x.after);
     cxStore().push({id:'cx'+uid(),cat,title:String(x.title).slice(0,40),body:String(x.body),unlock:sid?{type:'clear',value:sid}:{type:'start'},src:'ai',at:Date.now()}); n++; });
@@ -87,12 +82,7 @@ JSON만 출력: {"entries":[{"cat":"place|term|history|person|faction|item","tit
 }
 async function cxDeepen(key,t){
   const e=cxEntries().find(x=>x.key===key); if(!e) return false;
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n도감 항목 「${e.title}」(${CX_LABEL[e.cat]||''})에 새 기록을 한 단락 덧붙여라.
-지금 기록: ${String(e.body||'').slice(0,800)}
-이미 덧붙인 기록: ${e.notes.map(n=>n.text).join(' / ').slice(0,800)||'없음'}
-${cxProgressText()}
-규칙: 플레이어가 아직 깨지 않은 스테이지에서 밝혀질 비밀이나 반전은 쓰지 않는다. 대신 아직 풀리지 않은 의문을 암시하는 건 좋다. 앞의 기록과 겹치지 않는 새 사실, 일화, 소문, 문서 인용 중 하나로 4~6문장. 게임 속 문서 말투.
-JSON만 출력: {"text":"덧붙일 내용"}`,t);
+  const r=await aiJSON(`${pf('CODEX_DEEPEN',{RULES,ctx:ctx(),title:e.title,cat:CX_LABEL[e.cat]||'',body:String(e.body||'').slice(0,800),notes:e.notes.map(n=>n.text).join(' / ').slice(0,800)||'없음',cxProgressText:cxProgressText()})}JSON만 출력: {"text":"덧붙일 내용"}`,t);
   if(!r||!r.text) return false;
   const N=cxNotes(); (N[key]=N[key]||[]).push({text:String(r.text),at:mainStages().filter(s=>P().cleared[s.id]).map(s=>s.code).pop()||'시작 전'}); mark('world'); return true;
 }

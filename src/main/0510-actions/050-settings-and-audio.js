@@ -56,14 +56,14 @@ case 'vsearch': { VS.q=$('#vs_q').value.trim(); VS.lang=$('#vs_lang').value; t.d
       try{ VS.results=await fishSearch(VS.q,VS.lang,30); VS.picks={}; renderVoice(VS.results.length?'':'검색 결과가 없어요. 다른 단어나 언어 전체로 다시 찾아보세요.'); }catch(e){ toast(AIERR[e&&e.code]||('검색 실패. '+((e&&e.message)||''))); if(t.isConnected) t.disabled=false; } break; }
 case 'vsai': { const c=charById(VS.cid); VS.lang=$('#vs_lang').value;
       if(!SND().fishKey){toast('설정의 소리에서 Fish Audio 키를 먼저 넣어 주세요');break;}
-      const q=await aiJSON(`캐릭터에 맞는 목소리를 Fish Audio 음성 라이브러리 제목 검색으로 찾으려 한다.\n캐릭터: ${c.name}. 프로필: ${c.profile}\n외모 태그: ${c.naiPrompt||''} (성별은 프로필과 외모 태그로 판단한다)\n말투: ${c.lines.slice(0,3).join(' / ')}\n음성 제목 검색에 쓸 짧은 검색어 6개를 만들어라. 목소리 톤, 나이대 느낌, 성격을 나타내는 1~2단어로, 한국어 2개, 일본어 2개, 영어 2개. 예: "차분한 여성", "누나", "お姉さん", "クール", "calm female", "seductive".\nJSON만 출력: {"queries":["..."]}`,t,'quick');
+      const q=await aiJSON(`${pf('VOICE_SEARCH',{name:c.name,profile:c.profile,naiPrompt:c.naiPrompt||'',lines:c.lines.slice(0,3).join(' / ')})}\nJSON만 출력: {"queries":["..."]}`,t,'quick');
       if(!q) break; renderVoice('목소리를 찾는 중이에요…');
       const seen=new Map();
       try{ for(const w of strs(q.queries).slice(0,6)){ for(const m of await fishSearch(w,VS.lang,10)) if(!seen.has(m._id)) seen.set(m._id,m); } }catch(e){ toast(AIERR[e&&e.code]||('검색 실패. '+((e&&e.message)||''))); }
       const list=[...seen.values()];
       if(!list.length){ VS.results=[]; renderVoice('검색 결과가 없어요. 언어를 전체로 바꾸거나 직접 검색해 보세요.'); break; }
       const cands=list.slice(0,30).map(m=>({id:m._id,title:m.title,desc:String(m.description||'').slice(0,100),tags:(m.tags||[]).slice(0,6),lang:m.languages}));
-      const rk=await aiJSON(`캐릭터: ${c.name}. ${c.profile}\n외모 태그: ${c.naiPrompt||''} (성별은 프로필과 외모 태그로 판단한다)\n말투: ${c.lines.slice(0,3).join(' / ')}\n아래 음성 후보 중 이 캐릭터에 어울리는 것을 최대 6개 골라 잘 어울리는 순서로 나열하라. 남성 음성, 아동 음성, 내레이터용 음성은 제외한다.\n후보: ${JSON.stringify(cands)}\nJSON만 출력: {"picks":[{"id":"후보 id","reason":"한 줄 이유"}]}`,null,'quick');
+      const rk=await aiJSON(`${pf('VOICE_PICK',{name:c.name,profile:c.profile,naiPrompt:c.naiPrompt||'',lines:c.lines.slice(0,3).join(' / '),cands:JSON.stringify(cands)})}\nJSON만 출력: {"picks":[{"id":"후보 id","reason":"한 줄 이유"}]}`,null,'quick');
       VS.picks={}; const order=[]; if(rk) for(const p of (rk.picks||[])){ const m=seen.get(p.id); if(m&&VS.picks[p.id]===undefined){VS.picks[p.id]=String(p.reason||'');order.push(m);} }
       VS.results=[...order,...list.filter(m=>VS.picks[m._id]===undefined)];
       renderVoice(order.length?'AI가 고른 후보가 위에 있어요. ▶로 샘플을, 대사로 이 캐릭터 대사를 들어 보세요.':''); break; }

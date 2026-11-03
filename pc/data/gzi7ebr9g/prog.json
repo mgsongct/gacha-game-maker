@@ -1,0 +1,106 @@
+{
+ "gems": 3600,
+ "pity": 0,
+ "total": 0,
+ "owned": {},
+ "cleared": {},
+ "squad": [],
+ "sec": null,
+ "daily": "",
+ "settings": {
+  "ssr": 4,
+  "sr": 18,
+  "pity": 150,
+  "rv": 2,
+  "expRate": 100,
+  "goldRate": 100,
+  "gemRate": 100,
+  "stamina": true
+ },
+ "firstTen": true,
+ "adult": true,
+ "show19": true,
+ "history": [],
+ "savedAt": 1793692902729,
+ "gold": 20000,
+ "mat": {
+  "exp": 40,
+  "wmat": 20,
+  "core": 10,
+  "gearMat": 0,
+  "transcMat": 0
+ },
+ "pities": {},
+ "tokens": {},
+ "disp": {},
+ "dm": {
+  "date": "",
+  "cnt": {},
+  "got": {}
+ },
+ "pass": {
+  "xp": 0,
+  "got": []
+ },
+ "farmClear": {},
+ "shopBuy": {},
+ "curBanner": "",
+ "curEvent": "",
+ "live": {
+  "on": {
+   "talk": true,
+   "event": true,
+   "rerun": true,
+   "rotate": true,
+   "pass": true,
+   "chapter": false,
+   "season": true,
+   "skin": true
+  },
+  "last": {},
+  "notices": [],
+  "seen": 0,
+  "recentPU": [],
+  "seasons": {
+   "story": true,
+   "event": true,
+   "char": true,
+   "rerun": true,
+   "train": true
+  },
+  "skillGeneration": 1,
+  "season": null
+ },
+ "player": "",
+ "gender": "",
+ "inbox": {},
+ "seenOpening": false,
+ "lobbyBg": "리벳항 부두",
+ "titleBg": "리벳항 골목",
+ "titleChar": "",
+ "gachaBg": "",
+ "genderTxt": "",
+ "look": "바람에 해진 기사단 외투를 걸치고 가슴에 낡은 황동 문장을 단, 흐트러진 머리의 성인",
+ "bio": "",
+ "hideEyes": false,
+ "nameAsked": true,
+ "scene": {
+  "title": "타이틀",
+  "lobby": "로비",
+  "battle": "전투",
+  "boss": "보스전",
+  "gacha": "서임"
+ },
+ "shop": {
+  "day": "",
+  "buy": {}
+ },
+ "cash": {
+  "first": {},
+  "month": {
+   "until": 0,
+   "last": ""
+  },
+  "total": 0
+ }
+}

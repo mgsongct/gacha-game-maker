@@ -105,7 +105,7 @@ async function v2GearAction(action,button){
  finally{clearInterval(ticker);state.busy=false;if(state.job===job)state.job=null;if(V2GEAR===state&&field.isConnected)v2DrawGearEditor();}
 }
 document.addEventListener('click',e=>{
- const b=e.target.closest('[data-act],[data-gear-act]');if(b?.dataset.act==='v2gearedit')v2OpenGearEditor(b.dataset.id);else if(b?.dataset.act==='v2gearalert')v2GearAlert(b);else if(b?.dataset.gearAct)v2GearAction(b.dataset.gearAct,b);
+ const el=e.target.closest('[data-act],[data-gear-act]');if(el?.dataset.act==='v2gearedit')v2OpenGearEditor(el.dataset.id);else if(el?.dataset.act==='v2gearalert')v2GearAlert(el);else if(el?.dataset.gearAct)v2GearAction(el.dataset.gearAct,el);
  if(!e.target.closest('.v2-equipment-alert,.v2-equipment-bubble')){document.querySelectorAll('.v2-equipment-bubble').forEach(x=>x.remove());document.querySelectorAll('.v2-equipment-alert').forEach(x=>x.setAttribute('aria-expanded','false'));}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.v2-equipment-bubble').forEach(x=>x.remove());});

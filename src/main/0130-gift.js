@@ -13,7 +13,7 @@ function openGift(cid){
     ${items.length?`<div class="gf-grid">${items.map(g=>`<button class="gf-it" data-act="giftgive" data-id="${esc(cid)}" data-v="${g[0]}" ${full?'disabled':''}><em>${g[2]}</em><b>${esc(g[1])}</b><span>×${inv[g[0]]} · +${g[3]}${seen[g[0]]===2?' <i class="gf-like">♥ 좋아해요</i>':seen[g[0]]===1?' <i class="gf-meh">무난</i>':''}</span></button>`).join('')}</div>`
       :`<p class="muted">가진 선물이 없어요. 상점의 '선물 꾸러미', 일일 보급, 파견, 도전 보상에서 얻을 수 있어요.</p><div class="row"><button class="btn sm" data-act="go" data-to="shop">상점 가기</button></div>`}`);
 }
-function bannerStep(d){ const bs=G.banners.filter(bnOpen); if(bs.length<2) return; const cur=curBanner(), i=Math.max(0,bs.findIndex(x=>cur&&x.id===cur.id));
+function bannerStep(d){ const bs=G.banners.filter(bnOpen); if(bs.length<2) return; const bn=curBanner(), i=Math.max(0,bs.findIndex(x=>bn&&x.id===bn.id));
   P().curBanner=bs[(i+d+bs.length)%bs.length].id; mark('prog'); window.__BSLIDE=d>0?'sl-r':'sl-l'; render(); window.__BSLIDE=''; sfx('버튼'); }
 (()=>{ let sx=0,sy=0,st=0,el=null;
   const down=(x,y,t)=>{ el=t&&t.closest&&t.closest('[data-swipe]'); sx=x; sy=y; st=Date.now(); };
@@ -24,7 +24,7 @@ function bannerStep(d){ const bs=G.banners.filter(bnOpen); if(bs.length<2) retur
   document.addEventListener('mouseup',e=>{ up(e.clientX,e.clientY); });
 })();
 
-(()=>{ let tx=0,ty=0,cx=0,cy=0,raf=0; const step=()=>{ cx+=(tx-cx)*0.08; cy+=(ty-cy)*0.08; const l=document.querySelector('.lobby.layer'); if(l){ l.style.setProperty('--px',cx.toFixed(3)); l.style.setProperty('--py',cy.toFixed(3)); } raf=(Math.abs(tx-cx)+Math.abs(ty-cy)>0.002)?requestAnimationFrame(step):0; };
+(()=>{ let tx=0,ty=0,cx=0,cy=0,raf=0; const step=()=>{ cx+=(tx-cx)*0.08; cy+=(ty-cy)*0.08; const el=document.querySelector('.lobby.layer'); if(el){ el.style.setProperty('--px',cx.toFixed(3)); el.style.setProperty('--py',cy.toFixed(3)); } raf=(Math.abs(tx-cx)+Math.abs(ty-cy)>0.002)?requestAnimationFrame(step):0; };
   const set=(x,y)=>{ tx=Math.max(-1,Math.min(1,x)); ty=Math.max(-1,Math.min(1,y)); if(!raf) raf=requestAnimationFrame(step); };
   document.addEventListener('pointermove',e=>{ if(e.pointerType==='mouse'&&document.querySelector('.lobby.layer')) set(e.clientX/innerWidth*2-1,e.clientY/innerHeight*2-1); },{passive:true});
   addEventListener('deviceorientation',e=>{ if(e.gamma==null||!document.querySelector('.lobby.layer')) return; set(e.gamma/30,(e.beta-45)/30); },{passive:true});
@@ -40,6 +40,6 @@ function hsUpd(w){ const el=w.firstElementChild; if(!el) return; const max=el.sc
   document.addEventListener('wheel',e=>{ const el=e.target.closest&&e.target.closest('.bsel,.cx-cats'); if(!el||Math.abs(e.deltaY)<=Math.abs(e.deltaX)) return; if(el.scrollWidth<=el.clientWidth) return; el.scrollLeft+=e.deltaY; e.preventDefault(); },{passive:false});
   document.addEventListener('click',e=>{ const a=e.target.closest&&e.target.closest('[data-hs]'); if(!a) return; e.stopPropagation(); const el=a.parentElement.firstElementChild; el.scrollBy({left:(+a.dataset.hs)*el.clientWidth*0.7,behavior:'smooth'}); },true);
 })();
-function fitLobby(){ try{ hsDecorate(); }catch(e){} const l=document.querySelector('.lobby'); if(!l) return; const tb=document.querySelector('.tabs'); const top=l.getBoundingClientRect().top+(document.scrollingElement?document.scrollingElement.scrollTop:0);
-  const tabsH=tb?tb.getBoundingClientRect().height:0; const h=Math.max(document.body.classList.contains('wide')?200:360,Math.floor(innerHeight-top-tabsH)); l.style.height=h+'px'; l.classList.toggle('short',h<600); l.classList.toggle('narrow',l.clientWidth<370); }
+function fitLobby(){ try{ hsDecorate(); }catch(e){} const el=document.querySelector('.lobby'); if(!el) return; const tb=document.querySelector('.tabs'); const top=el.getBoundingClientRect().top+(document.scrollingElement?document.scrollingElement.scrollTop:0);
+  const tabsH=tb?tb.getBoundingClientRect().height:0; const h=Math.max(document.body.classList.contains('wide')?200:360,Math.floor(innerHeight-top-tabsH)); el.style.height=h+'px'; el.classList.toggle('short',h<600); el.classList.toggle('narrow',el.clientWidth<370); }
 addEventListener('resize',()=>{ clearTimeout(window.__fitT); window.__fitT=setTimeout(fitLobby,120); });

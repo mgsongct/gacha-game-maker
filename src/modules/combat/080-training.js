@@ -21,5 +21,5 @@ function v2ConfirmTraining(){
  const plan=GGMCombat.trainingPlan(t,pending.slot);if(!plan.allowed||!v2TrainingHasGain(c,t,plan)||P().mat.wmat<plan.materials||P().gold<plan.gold){toast('강화 조건이나 재료를 다시 확인해 주세요.');openChar(c.id);return;}
  P().mat.wmat-=plan.materials;P().gold-=plan.gold;o.skillTraining=v2TrainingNext(t,plan);mark('prog');sfx('강화');openChar(c.id);toast(plan.slot?GGMCombat.SLOTS[plan.slot]+' 전문화 '+o.skillTraining.mastery[plan.slot]+'단계':'스킬 공통 Lv.'+o.skillTraining.rank);
 }
-document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;if(b.dataset.act==='v2train')v2OpenTraining(b.dataset.id,b.dataset.slot);else if(b.dataset.act==='v2train-confirm')v2ConfirmTraining();});
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||el.disabled)return;if(el.dataset.act==='v2train')v2OpenTraining(el.dataset.id,el.dataset.slot);else if(el.dataset.act==='v2train-confirm')v2ConfirmTraining();});
 

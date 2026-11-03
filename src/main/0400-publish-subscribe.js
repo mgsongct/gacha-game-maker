@@ -17,7 +17,7 @@ async function subGet(base,path,binary){ const r=await http(base+path+(binary?''
 // 게시할 콘텐츠: 공유 팩과 같은 기준(진행·키·음성·소리 파일 없음). 픽업·이벤트는 메인 진행에 맞춰 열려요
 function pubContent(){ const game=JSON.parse(JSON.stringify(G)); delete game.prog; delete game.rels; (game.chars||[]).forEach(c=>{ delete c.voiceId; delete c.voiceName; }); (game.lib||[]).forEach(l=>{ if(l.audio) l.audio=null; });
   game.rels=JSON.parse(JSON.stringify(RELS()));
-  const S=game.chapters.filter(c=>c.kind==='main').reduce((n,ch)=>n+ch.stages.length,0), spread=arr=>arr.forEach((x,k)=>{ x.gate=Math.min(S,x.gate>0?x.gate:Math.max(1,Math.round((k+1)*S/(arr.length+1)))); });
+  const S=game.chapters.filter(ch=>ch.kind==='main').reduce((n,ch)=>n+ch.stages.length,0), spread=arr=>arr.forEach((x,k)=>{ x.gate=Math.min(S,x.gate>0?x.gate:Math.max(1,Math.round((k+1)*S/(arr.length+1)))); });
   spread(game.events||[]); spread((game.banners||[]).filter(b=>b.id!=='std'&&!b.eventId)); game.meta.gated=S>0;
   (game.banners||[]).forEach(b=>{ delete b.until; if(b.id!=='std'){ b.active=true; delete b.newAt; } }); (game.events||[]).forEach(e=>{ delete e.until; e.active=true; });
   if(!String(game.meta.artTags||'').trim()){ try{ const c=naiCfg(), b=c.styles.find(x=>x.id===c.styleId)||c.styles[0]; if(b&&String(b.tags||'').trim()){ game.meta.artTags=b.tags; game.meta.artNeg=b.neg||''; } }catch(e){} }
@@ -36,7 +36,7 @@ async function pubUpload(notes,btn){ const P0=PUB(); if(!P0.token||!/^[\w.-]+\/[
     const need=Object.keys(byHash).filter(h=>!have.has(dir+'/b/'+h)), entries=[]; let done=0, nextAt=0, qi=0;
     const pace=async()=>{ const now=Date.now(), t=Math.max(now,nextAt); nextAt=t+850; if(t>now) await wait(t-now); };
     await ghUploadPool(need,async h=>{await pace();const r=await ghCreateBlob(o,byHash[h],`그림 ${done+1}/${need.length}`);entries.push({path:dir+'/b/'+h,mode:'100644',type:'blob',sha:r.sha});done++;st(`그림 올리는 중 ${done}/${need.length}`);});
-    const ver=M.ver+1, man={app:'gacha-game-maker',kind:'pub',v:1,title:G.meta.title,sub:G.meta.sub||'',ver,at:Date.now(),build:APP_BUILD,notes:String(notes||'').slice(0,2000),images:Object.keys(imap).length,chapters:game.chapters.filter(c=>c.kind==='main').length,events:(game.events||[]).length,chars:(game.chars||[]).length};
+    const ver=M.ver+1, man={app:'gacha-game-maker',kind:'pub',v:1,title:G.meta.title,sub:G.meta.sub||'',ver,at:Date.now(),build:APP_BUILD,notes:String(notes||'').slice(0,2000),images:Object.keys(imap).length,chapters:game.chapters.filter(ch=>ch.kind==='main').length,events:(game.events||[]).length,chars:(game.chars||[]).length};
     game.meta.pub={slug:M.slug,ver}; st('게임 올리는 중…');
     const gb=await ghCreateBlob(o,new Blob([JSON.stringify(game)]),'게임 정보');
     const mb=await ghCreateBlob(o,new Blob([JSON.stringify(man,null,1)]),'게시 정보');
@@ -102,7 +102,7 @@ async function subApply(btn){const S=G.meta.subscr;if(!S)return;const prefix='su
   game.prog=clone(source.prog);game.meta=game.meta||{};game.meta.subscr=Object.assign({},S,{ver:man.ver,at:Date.now(),imgs:imap,notes:man.notes||'',skip:0});delete game.meta.pub;
   const mine=RELS().filter(r=>!(game.rels||[]).some(x=>(x.a===r.a&&x.b===r.b)||(x.a===r.b&&x.b===r.a)));game.rels=[...(game.rels||[]),...clone(mine)];const next=fix(game),pj=PJ(),row=pj.list.find(x=>x.id===pj.active);if(row){row.title=next.meta.title||row.title;row.sub=S.base;}
   await appStorage.commitImport(prefix,LKEY,JSON.stringify(next),IMGNS,{[PJKEY]:JSON.stringify(pj)});
-  const oldKeys=[...source.chars.map(c=>'c:'+c.id),...source.chapters.map(c=>'ch:'+c.id),...source.lib.map(l=>'l:'+l.id),...source.threads.map(x=>'t:'+x.id)];G=next;dirty.clear();clearTimeout(flushT);for(const id of Object.keys(imgCache)){try{URL.revokeObjectURL(imgCache[id]);}catch(e){}delete imgCache[id];}mark(...oldKeys);markAll();await flush();applyMeta();await loadIdbImages();closeModal();sendMail({from:next.meta.title||'만든 사람',title:`v${man.ver} 업데이트를 받았어요`,body:man.notes||'새 버전으로 바뀌었어요.',days:14});toast(`v${man.ver}(으)로 업데이트했어요`);render();checkTriggers&&checkTriggers();
+  const oldKeys=[...source.chars.map(c=>'c:'+c.id),...source.chapters.map(ch=>'ch:'+ch.id),...source.lib.map(l=>'l:'+l.id),...source.threads.map(x=>'t:'+x.id)];G=next;dirty.clear();clearTimeout(flushT);for(const id of Object.keys(imgCache)){try{URL.revokeObjectURL(imgCache[id]);}catch(e){}delete imgCache[id];}mark(...oldKeys);markAll();await flush();applyMeta();await loadIdbImages();closeModal();sendMail({from:next.meta.title||'만든 사람',title:`v${man.ver} 업데이트를 받았어요`,body:man.notes||'새 버전으로 바뀌었어요.',days:14});toast(`v${man.ver}(으)로 업데이트했어요`);render();checkTriggers&&checkTriggers();
  }catch(e){toast('업데이트 실패. '+(e.message||e)+' 다시 시도해 주세요');}
  finally{await appStorage.discard(prefix).catch(()=>{});syBar('');if(btn?.isConnected){btn.disabled=false;btn.textContent=lbl;}}
 }
