@@ -67,6 +67,20 @@ async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(ins
   mark('c:'+c.id); return true; }
 async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(`${RULES}\n${ctx()}\n\n${SCRIPT_FMT}\n「${ch?ch.title:''}」의 스테이지 「${s.title||''}」 전투 직전 장면 대본을 써라. 앞뒤 스테이지 흐름과 이어지게, 12~25줄.\nJSON만 출력: {"pre":"대본"}`,null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
 
+// 한 항목 고치기 — 점검 화면의 일괄 고치기(auditFix)와 실행 중 자동 채움(liveFill, 0537)이 같이 씀. 고쳤으면 true
+async function auditFixOne(rule,o){ const m=rule.fix.mode;
+  if(m==='auto'){ rule.fix.run(o); auditMarkObj(o); return true; }
+  if(m==='ai') return !!(await auditAIFill(o,rule.fix.fields));
+  if(m==='ai-stage') return !!(await auditAIStage(o));
+  if(m==='ai-rules') return !!(await rulesAIFill());
+  if(m==='ai-persona') return !!(await personaAI(o,rule.fix.k,{lines:rule.fix.k==='improve'}));
+  if(m==='ai-afftalk') return !!(await talkAffGen(o));
+  if(m==='ai-memo') return !!(await memorialGen(o));
+  if(m==='ai-run') return !!(await rule.fix.run(o));
+  if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); return true; }
+  if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); return true; }
+  if(m==='skills-remaster'&&balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); return true; }
+  return false; }
 async function auditFix(rule,items){
   if(AUDIT_JOB){ toast('점검 작업이 진행 중이에요'); return; } const m=rule.fix.mode;
   if(m==='open'){ const c=items[0]; if(rule.fix.stamp) items.forEach(x=>{ x.genVer=auditGenVer(); auditMarkObj(x); }); closeModal(); if(c&&typeof openRegen==='function') openRegen(c.id); if(items.length>1) toast(`${items.length}명을 지금 버전으로 표시했어요. 다시 만들 부분은 캐릭터마다 「다시 만들기」에서 골라요`); return; }
@@ -74,17 +88,7 @@ async function auditFix(rule,items){
   if((m==='ai'||m==='ai-stage'||m==='weapon'||m==='ai-rules'||m==='ai-persona'||m==='ai-afftalk'||m==='ai-memo'||m==='ai-run')&&!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; }
   auditSnap(items,rule.label); const job=AUDIT_JOB={stop:false,done:0,total:items.length}; let ok=0;
   try{ for(const o of items){ if(job.stop) break; syBar(`점검: ${rule.label} ${job.done+1}/${job.total}`);
-      try{ if(m==='auto'){ rule.fix.run(o); auditMarkObj(o); ok++; }
-        else if(m==='ai'){ if(await auditAIFill(o,rule.fix.fields)) ok++; }
-        else if(m==='ai-stage'){ if(await auditAIStage(o)) ok++; }
-        else if(m==='ai-rules'){ if(await rulesAIFill()) ok++; }
-        else if(m==='ai-persona'){ if(await personaAI(o,rule.fix.k,{lines:rule.fix.k==='improve'})) ok++; }
-        else if(m==='ai-afftalk'){ if(await talkAffGen(o)) ok++; }
-        else if(m==='ai-memo'){ if(await memorialGen(o)) ok++; }
-        else if(m==='ai-run'){ if(await rule.fix.run(o)) ok++; }
-        else if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); ok++; }
-        else if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); ok++; }
-        else if(m==='skills-remaster'){ if(balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); ok++; } } }catch(e){ console.warn('audit',rule.id,e); }
+      try{ if(await auditFixOne(rule,o)) ok++; }catch(e){ console.warn('audit',rule.id,e); }
       job.done++; } }
   finally{ AUDIT_JOB=null; syBar(''); }
   mark('prog'); toast(`${rule.label}: ${ok}/${items.length}개 고쳤어요${AUDIT_UNDO?' (되돌리기 가능)':''}`); if(!$('#modal').hidden) openAudit(AUDIT_FOCUS); else render(); }

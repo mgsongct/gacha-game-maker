@@ -44,6 +44,8 @@ node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(
 게임 데이터 키(G.meta.*·G.world.*·G.*·P().*)마다 **누가 언제 쓰는지**를 원안(포크 전, 기본 `49cec7a` — 원본 index.html을 src/로 나눈 커밋)과 지금 트리에서 뽑아 비교해요(`lib/lifecycle.mjs`, 결과 `out/lifecycle.md`).
 - 단계: **생성**(newGame·buildNewGameDraft … 새 게임 초안, 만드는 중인 `ng.*` 포함) · **실행 중 AI**(`liveTick` — 게임이 구동되는 동안 시즌·장·이벤트·픽업·의상·톡을 AI가 만드는 원안의 경로) · **사용자**(`handle*Action` 처리기와 최상위 이벤트 리스너가 부르는 함수) · **불러오기**(fix·defaults·applyMeta)
 - 포크가 더한 키(원안에 없던 키)가 원안의 생성·실행 경계 어디에 붙었는지: 아무 단계도 안 씀 · 사용자 조작으로만 씀 · 생성·실행 중 AI 밖
+- `--why <키>`: 단계 시작점에서 그 키를 쓰는 함수까지 가장 짧은 호출 경로(예: `실행 중 AI: liveTick → liveFill → auditFixOne → AUDIT_RULES.run → spotsAuto`) — 결과를 설명하고 오탐을 가릴 때
+- 함수를 담은 최상위 표(`AUDIT_RULES`의 `fix.run`·`test` 등)는 속성별 의사 함수(`AUDIT_RULES.run`)로 그래프에 들어가요(`lib/graph.mjs`). 그 속성을 멤버로 호출하는 함수만 이어지고, 표를 참조만 하는 곳은 잇지 않아요
 - 한계: 동적 키 쓰기(`P()[k]=v`)는 못 따라가요(아무도 안 씀으로 나옴 — 도구 문제인지 코드 문제인지 따로 가림)
 
 ## 포크 기능 배선 점검 (`node tools/wiring.mjs [--strict] [--update-baseline]`)

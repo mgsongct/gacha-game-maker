@@ -17,6 +17,12 @@ const ri = process.argv.indexOf('--ref'), ref = ri > 0 ? process.argv[ri + 1] : 
 const sha = execSync(`git rev-parse --verify ${JSON.stringify(ref + '^{commit}')}`, { cwd: ROOT, encoding: 'utf8' }).trim(), refDir = join(OUT, 'ref-src', sha);
 if (!existsSync(join(refDir, 'src'))) { mkdirSync(refDir, { recursive: true }); execSync(`git archive ${sha} src | tar -x -C ${JSON.stringify(refDir)}`, { cwd: ROOT }); }
 async function run(root) { const units = await loadUnits(root), { fns } = buildGraph(units); return lifecycle(units, fns, stateFlow(units, fns)); }
+// --why <키>: 지금 트리에서 그 키를 쓰는 함수까지 단계 시작점에서 가는 가장 짧은 호출 경로(결과를 설명하고 도구 오탐을 가릴 때)
+const wi = process.argv.indexOf('--why'); if (wi > 0) { const key = process.argv[wi + 1], units = await loadUnits(ROOT), { fns } = buildGraph(units), sf = stateFlow(units, fns), { stageRoots } = await import('./lib/lifecycle.mjs'), x = sf.list.find(k => k.key === key);
+  if (!x) { console.log('그 키를 쓰는 곳을 찾지 못했어요: ' + key); process.exit(1); }
+  for (const [st, roots] of Object.entries(stageRoots(units, fns))) { const prev = new Map(roots.map(r => [r, null])), q = [...roots]; while (q.length) { const k = q.shift(); for (const c of fns.get(k)?.calls.keys() || []) if (!prev.has(c)) { prev.set(c, k); q.push(c); } }
+    const hit = [...x.w].find(w => prev.has(w)); if (!hit) { console.log(`${st}: 닿지 않음`); continue; } const path = []; for (let k = hit; k; k = prev.get(k)) path.unshift(k); console.log(`${st}: ${path.join(' → ')}`); }
+  process.exit(0); }
 const O = await run(refDir), N = await run(ROOT), origKeys = new Set(O.rows.map(r => r.key)), ST = ['생성', '실행 중 AI', '사용자', '불러오기'];
 const cell = (r, s) => r.stages[s] ? r.stages[s].slice(0, 2).join(', ') + (r.stages[s].length > 2 ? ` 외 ${r.stages[s].length - 2}` : '') : '';
 const t = (h, rs) => [`| ${h.join(' | ')} |`, `|${h.map(() => '---').join('|')}|`, ...rs.map(r => `| ${r.map(x => String(x ?? '').replace(/\|/g, '/')).join(' | ')} |`)].join('\n');

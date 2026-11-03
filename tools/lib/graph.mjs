@@ -47,6 +47,18 @@ export function buildGraph(units) {
   for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression') return; const f = n.childForFieldName('function'); if (f?.type !== 'identifier') return;
     const to = resolve(u, n, f.text); if (!to) return; const o = owner(u, n); if (!o || o.f === to) return; const from = o.f;
     from.calls.set(to.key, (from.calls.get(to.key) || 0) + 1); to.callers.add(from.key); if (!o.as) from.async.add(to.key); }); /* async 집합 = 동기로 부르는 대상 */
+  // 함수를 담은 최상위 표(const X=[{…, fix:{run:o=>f(o)}, test:c=>…}]): 표 안의 함수는 속성 이름별 의사 함수 "X.run"·"X.test"로 두고, 그 안에서 부르는 함수를 호출로 잡음.
+  // 어떤 함수가 그 속성을 멤버로 호출하면(rule.fix.run(o) · r.test(x)) 그 의사 함수를 부르는 것으로 봄 — 표를 참조만 하는 곳(AUDIT_RULES.map(r=>r.since))은 연결하지 않음.
+  // 비동기 간선으로 둬서 동기 콜스택·순환에는 넣지 않음
+  const mainT = units.find(u => u.name === 'main'), BUILTIN = /^(map|filter|forEach|find|some|every|push|join|sort|reduce|includes|slice|concat|then|catch|call|apply|bind|get|set|has|add|delete|keys|values|entries)$/;
+  if (mainT) { const byProp = new Map();
+    for (let i = 0; i < mainT.tree.rootNode.childCount; i++) { const st = mainT.tree.rootNode.child(i); if (st.type !== 'lexical_declaration' && st.type !== 'variable_declaration') continue;
+      for (const d of st.namedChildren) { if (d.type !== 'variable_declarator') continue; const v = d.childForFieldName('value'), nm = d.childForFieldName('name')?.text; if (!nm || !v || (v.type !== 'array' && v.type !== 'object') || fns.has(nm)) continue;
+        walk(v, pr => { if (pr.type !== 'pair') return; const k = pr.childForFieldName('key')?.text.replace(/^['"]|['"]$/g, ''), fv = pr.childForFieldName('value'); if (!k || BUILTIN.test(k) || !fv || !FN.has(fv.type)) return;
+          const key = `${nm}.${k}`; let rec = fns.get(key); if (!rec) { rec = { key, name: key, unit: 'main', loc: mainT.loc(d), lines: 1, cc: 1, depth: 0, cases: null, node: d, calls: new Map(), async: new Set(), callers: new Set(), top: true, table: true }; fns.set(key, rec); if (!byProp.has(k)) byProp.set(k, []); byProp.get(k).push(rec); }
+          walk(fv, x => { if (x.type !== 'call_expression') return; const f = x.childForFieldName('function'); if (f?.type !== 'identifier') return; const to = resolve(mainT, x, f.text); if (!to) return; rec.calls.set(to.key, (rec.calls.get(to.key) || 0) + 1); to.callers.add(rec.key); }); }); } }
+    if (byProp.size) walk(mainT.tree.rootNode, n => { if (n.type !== 'call_expression') return; const f = n.childForFieldName('function'); if (f?.type !== 'member_expression') return; const k = f.childForFieldName('property')?.text; if (!byProp.has(k)) return;
+      const o = owner(mainT, n); if (!o || o.f.table) return; for (const t of byProp.get(k)) { o.f.calls.set(t.key, (o.f.calls.get(t.key) || 0) + 1); t.callers.add(o.f.key); } }); }
   // main 최상위 이름 충돌(let/const 중복은 실행 시 SyntaxError)
   const mainU = units.find(u => u.name === 'main'), seen = new Map(); // main 한 스크립트가 없는 묶음(도구 코드 메타 점검)은 이름 충돌 검사 없음
   for (let i = 0; mainU && i < mainU.tree.rootNode.childCount; i++) { const n = mainU.tree.rootNode.child(i), names = [];
@@ -58,7 +70,7 @@ export function buildGraph(units) {
 // 안 쓰는 최상위 변수·상수(함수 아닌 것)
 export function unusedVars(tops, fns, allText) { const out = []; for (const [nm, v] of tops) { if (v.kind === 'function' || fns.has(nm)) continue; const n = (allText.match(new RegExp(`(?<![\\w$])${nm.replace(/\$/g, '\\$')}(?![\\w$])`, 'g')) || []).length; if (n <= 1) out.push({ name: nm, loc: v.loc }); } return out; }
 // 안 쓰는 함수: 이름이 선언 말고는 어디에도(코드·문자열·HTML 템플릿) 안 나옴
-export function unused(fns, allText, unitOk = u => u === 'main') { const out = []; for (const f of fns.values()) { if (!f.top || !unitOk(f.unit)) continue; const re = new RegExp(`(?<![\\w$])${f.name.replace(/\$/g, '\\$')}(?![\\w$])`, 'g'); const n = (allText.match(re) || []).length; if (n <= 1) out.push(f); } return out; }
+export function unused(fns, allText, unitOk = u => u === 'main') { const out = []; for (const f of fns.values()) { if (!f.top || f.table || !unitOk(f.unit)) continue; /* 표 의사 함수(X.run)는 이름이 글자로 안 나옴 */ const re = new RegExp(`(?<![\\w$])${f.name.replace(/\$/g, '\\$')}(?![\\w$])`, 'g'); const n = (allText.match(re) || []).length; if (n <= 1) out.push(f); } return out; }
 // 이름 없는 콜백(인자로 넘긴 함수: page.evaluate(async () => {…}), addEventListener('click', e => {…}), arr.map(x => {…}))은 함수 그래프에 안 들어가
 // 복잡도를 따로 잼 — 큰 익명 콜백이 측정에서 빠지던 구멍. 이름: 둘러싼 함수→부른 함수(예: runQA→page.evaluate), 같은 이름이 또 있으면 #2…
 export function complexAnon(units, cc = 40, lines = 120) { const out = [];

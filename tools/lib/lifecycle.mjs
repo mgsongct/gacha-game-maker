@@ -15,10 +15,8 @@ export function listenerCallees(units, fns) { const out = new Set();
       const cb = n.childForFieldName('arguments')?.namedChildren.find(a => a.type === 'arrow_function' || a.type === 'function_expression'); if (!cb) return;
       walk(cb, m => { if (m.type === 'call_expression') { const f = m.childForFieldName('function'); if (f?.type === 'identifier' && fns.has(f.text) && fns.get(f.text).top) out.add(f.text); } }); }); }
   return [...out]; }
-export function stageClosures(units, fns) { const S = {};
-  for (const [k, roots] of Object.entries(STAGES)) S[k] = closure(fns, roots, k === '불러오기' ? 2 : 5);
-  S.사용자 = closure(fns, [...[...fns.values()].filter(f => f.top && /^handle\w+Action$/.test(f.name)).map(f => f.key), ...listenerCallees(units, fns)], 4);
-  return S; }
+export function stageRoots(units, fns) { return { ...STAGES, 사용자: [...[...fns.values()].filter(f => f.top && /^handle\w+Action$/.test(f.name)).map(f => f.key), ...listenerCallees(units, fns)] }; }
+export function stageClosures(units, fns) { return Object.fromEntries(Object.entries(stageRoots(units, fns)).map(([k, roots]) => [k, closure(fns, roots, k === '불러오기' ? 2 : k === '사용자' ? 4 : 5)])); }
 // 키마다 단계별 쓰는 함수(몇 개만) — 생성은 ng.* 쓰기까지 포함
 export function lifecycle(units, fns, sf) { const S = stageClosures(units, fns), gv = generatorVocab(fns, S.생성.keys(), new Set()), rows = new Map(), row = k => { if (!rows.has(k)) rows.set(k, { key: k, readers: 0, stages: {} }); return rows.get(k); };
   for (const x of sf.list) { if (!/^(G\.meta\.|G\.world\.|P\(\)\.|G\.)\w+$/.test(x.key) || /^G\.(meta|world|prog)$/.test(x.key)) continue; const r = row(x.key); r.readers = x.r.size;

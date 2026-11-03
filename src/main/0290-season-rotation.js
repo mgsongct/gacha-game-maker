@@ -71,11 +71,11 @@ async function liveTick(force){
   if(LIVE_RUN||!P().seenOpening) return;
   const L=P().live, on=subLocked()?{pass:L.on.pass}:L.on, now=new Date(); // 구독 게임: 시즌·확률 업·새 이벤트·의상·장·톡을 스스로 만들지 않아요(패스 월 초기화만)
   const keys={day:cycKey('talk'),week:cycKey('event'),rot:cycKey('rotate'),chap:cycKey('chapter'),month:now.getFullYear()+'-'+(now.getMonth()+1)};
-  if(!force&&!L.last.day){ L.last=Object.assign({},keys); mark('prog'); return; }
+  if(!force&&!L.last.day){ L.last=Object.assign({},keys); mark('prog'); await liveFillRun(on); return; } // 첫 실행: 주기는 지금부터 세고, 빈 콘텐츠 채우기만(0537)
   // 주기를 바꾸거나 새로 생긴 항목은 바로 만들지 않고 지금부터 세요
   Object.keys(keys).forEach(k=>{ if(L.last[k]==null||(k!=='month'&&String(L.last[k]).split(':').slice(0,2).join(':')!==String(keys[k]).split(':').slice(0,2).join(':')&&String(keys[k]).includes(':'))) L.last[k]=keys[k]; });
   if(L.last.skin!=null&&!/^(season|rotate):/.test(String(L.last.skin))) L.last.skin=skinPeriodKey(); // 예전 형식이면 지금부터 세요
-  const due=k=>force||L.last[k]!==keys[k], notes=[];
+  const due=k=>force||L.last[k]!==keys[k], notes=[], fillNotes=[];
   LIVE_RUN=true; liveBar('업데이트 확인 중…');
   try{
     if(on.season&&(force==='season'||!L.season||Date.now()>=(L.season.until||0))){ const nx=seasonNext(); if(nx){ await seasonStart(nx,notes); L.last.rot=keys.rot; L.last.week=keys.week; } }
@@ -100,10 +100,10 @@ async function liveTick(force){
     }
     if(due('chap')) L.last.chap=keys.chap;
     if(due('month')) L.last.month=keys.month;
-    if(due('day')){ if(on.talk&&SAMPLE){ liveBar('새 메시지를 쓰는 중…'); const n=await dailyTalks(); if(n) notes.push(`${T('talk')} 새 대화 ${n}개`); } L.last.day=keys.day; }
+    if(due('day')){ if(on.talk&&SAMPLE){ liveBar('새 메시지를 쓰는 중…'); const n=await dailyTalks(); if(n) notes.push(`${T('talk')} 새 대화 ${n}개`); } L.last.day=keys.day; } await liveFillStep(on,fillNotes); /* 빈 포크 기능 내용 자동 채움(0537) */
   }catch(e){ console.log(e); }
   finally{ LIVE_RUN=false; liveBar(null); }
-  mark('prog');
+  mark('prog'); liveFillNotes(notes,fillNotes);
   const todo=drawTodo().length;
   if(notes.length){ if(todo) notes.push(`NAI로 그릴 이미지가 ${todo}개 쌓였어요. 공지 화면에서 한 번에 그릴 수 있어요`);
     L.notices.unshift({at:Date.now(),title:`${dayKey()} 업데이트`,lines:notes}); sendMail({from:'운영팀',title:`${dayKey()} 업데이트 기념 보급`,body:'새 소식\n· '+notes.join('\n· '),reward:{gems:200,gold:5000},days:14}); L.notices=L.notices.slice(0,30); render(); openNotice(0); checkTriggers(); }

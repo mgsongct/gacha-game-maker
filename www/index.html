@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function(){
-  var BUILT='2026.11.03.21'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
+  var BUILT='2026.11.03.22'; var REQUIRED_APK='2026.10.21.6'; window.__REQUIRED_APK__=REQUIRED_APK; window.APP_BUILD=BUILT; window.__SHELL__=window.__SHELL__||BUILT;
   function vc(a,b){a=String(a||'').split(/\D+/).map(Number);b=String(b||'').split(/\D+/).map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x<y?-1:1;}return 0;}
   if(window.__LIVE__) return;
   if(window.indexedDB){window.__STORAGE_SHELL__=BUILT;return;}
@@ -6511,7 +6511,7 @@ const DEFAULT_OPENING = {
 
 const DEFAULT_PROG = {gems:3600,pity:0,total:0,owned:{},cleared:{},squad:[],sec:null,daily:'',
   settings:{ssr:4,sr:18,pity:150,rv:2,expRate:100,goldRate:100,gemRate:100,stamina:true},firstTen:true,adult:true,show19:true,history:[],savedAt:0,
-  gold:20000,mat:{exp:40,wmat:20,core:10,gearMat:0,transcMat:0},pities:{},tokens:{},disp:{},dm:{date:'',cnt:{},got:{}},pass:{xp:0,got:[]},farmClear:{},shopBuy:{},curBanner:'',curEvent:'',live:{on:{talk:true,event:true,rerun:true,rotate:true,pass:true,chapter:false,season:true,skin:true},last:{},notices:[],seen:0,recentPU:[],seasons:{story:true,event:true,char:true,rerun:true,train:true},skillGeneration:1,season:null},
+  gold:20000,mat:{exp:40,wmat:20,core:10,gearMat:0,transcMat:0},pities:{},tokens:{},disp:{},dm:{date:'',cnt:{},got:{}},pass:{xp:0,got:[]},farmClear:{},shopBuy:{},curBanner:'',curEvent:'',live:{on:{talk:true,event:true,rerun:true,rotate:true,pass:true,chapter:false,season:true,skin:true,fill:true},last:{},notices:[],seen:0,recentPU:[],seasons:{story:true,event:true,char:true,rerun:true,train:true},skillGeneration:1,season:null},
   player:'',gender:'',inbox:{},seenOpening:false,lobbyBg:'',titleBg:'',titleChar:'',gachaBg:''};
 
 /* =========================================================
@@ -8554,7 +8554,7 @@ function studioHTML(){
     <div class="row" style="margin-top:10px"><button class="btn sm" data-act="apnew">AI 추가</button><button class="btn sm ghost" data-act="apfb">실패하면 다음 AI로 ${AIP().fallback?'켜짐':'꺼짐'}</button><button class="btn sm ghost" data-act="ailog">🔍 AI 기록</button><button class="btn sm ghost" data-act="llmopen">생성 지침${(()=>{ const L=llmEff(); return L.top||L.mid||L.bot?' ✓':''; })()}</button></div></div>`,
   img:`<div class="panel"><h3>그림 AI</h3><p class="muted" style="margin:0 0 8px">${imgProvider()==='comfy'?'ComfyUI '+(imgReady()?'연결 설정됨':'설정 미완료'):'NovelAI '+(naiCfg().key?'토큰 등록됨':'미등록')}</p><div class="row"><button class="btn sm ghost" data-act="naiopen">그림 AI 설정</button><button class="btn sm ghost" data-act="packopen">그림체 프리셋</button><button class="btn sm ghost" data-act="dsopen">🎨 캐릭터 디자인 통일${G.meta.design&&(G.meta.design.all||Object.values(G.meta.design.fac||{}).some(Boolean))?' ✓':''}</button><button class="btn sm" data-act="prepopen">그림 준비실 (${drawTodo().length})</button><button class="btn sm ghost" data-act="setupopen">처음 설정 다시</button></div></div>`,
   live:`${v2SeasonGenerationHTML()}<div class="panel"><h3>시즌 운영</h3><p class="muted" style="margin:0 0 10px">앱을 켤 때 날짜를 보고 새 콘텐츠를 자동으로 만들어요. 켠 항목만큼 글 AI 요금이 들어요.</p>
-    <div class="chips">${(P().live.on.season?[['season',cycLabel('season')+' 시즌 로테이션'],['talk',cycLabel('talk')+(cycDays('talk')>1?'마다':'')+' 새 '+T('talk')],['pass','매달 '+T('pass')+' 초기화'],['skin','시즌마다 새 '+T('skin')+' 상점']]:[['season',cycLabel('season')+' 시즌 로테이션'],['talk',cycLabel('talk')+(cycDays('talk')>1?'마다':'')+' 새 '+T('talk')],['event',cycLabel('event')+'마다 새 이벤트'],['rerun','이벤트 복각'],['rotate',cycLabel('rotate')+'마다 확률 업 교체'],['pass','매달 '+T('pass')+' 초기화'],['chapter',cycLabel('chapter')+'마다 메인 다음 장'],['skin',cycLabel('rotate')+'마다 새 '+T('skin')+' 상점']]).map(([k,l])=>`<button class="chip ${P().live.on[k]?'on':''}" data-act="livetog" data-k="${k}">${esc(l)}</button>`).join('')}</div>
+    <div class="chips">${(P().live.on.season?[['season',cycLabel('season')+' 시즌 로테이션'],['talk',cycLabel('talk')+(cycDays('talk')>1?'마다':'')+' 새 '+T('talk')],['pass','매달 '+T('pass')+' 초기화'],['skin','시즌마다 새 '+T('skin')+' 상점'],['fill','빈 콘텐츠 자동 채움']]:[['season',cycLabel('season')+' 시즌 로테이션'],['talk',cycLabel('talk')+(cycDays('talk')>1?'마다':'')+' 새 '+T('talk')],['event',cycLabel('event')+'마다 새 이벤트'],['rerun','이벤트 복각'],['rotate',cycLabel('rotate')+'마다 확률 업 교체'],['pass','매달 '+T('pass')+' 초기화'],['chapter',cycLabel('chapter')+'마다 메인 다음 장'],['skin',cycLabel('rotate')+'마다 새 '+T('skin')+' 상점'],['fill','빈 콘텐츠 자동 채움']]).map(([k,l])=>`<button class="chip ${P().live.on[k]?'on':''}" data-act="livetog" data-k="${k}">${esc(l)}</button>`).join('')}</div>
     <h4 class="sec" style="margin-top:12px">운영 주기</h4>
     <div class="g2">${(P().live.on.season?['season','talk']:['talk','event','chapter','rotate']).map(k=>`<div><label class="f" for="cyc_${k}">${({season:'시즌 길이',event:'새 이벤트',chapter:'메인 다음 장',talk:'새 '+esc(T('talk')),rotate:'확률 업 교체 · 새 '+esc(T('skin'))})[k]}</label><select class="in" id="cyc_${k}" data-cyc="${k}">${opt(LIVE_CYC[k][1].map(([d,l])=>[d,d===1?l:l+'마다']),cycDays(k))}</select></div>`).join('')}</div>
     <p class="muted" style="margin:4px 0 0;font-size:.78rem">주기를 바꾸면 그때부터 새로 세요. 짧을수록 글 AI 사용량이 늘어요.</p>
@@ -10471,11 +10471,11 @@ async function liveTick(force){
   if(LIVE_RUN||!P().seenOpening) return;
   const L=P().live, on=subLocked()?{pass:L.on.pass}:L.on, now=new Date(); // 구독 게임: 시즌·확률 업·새 이벤트·의상·장·톡을 스스로 만들지 않아요(패스 월 초기화만)
   const keys={day:cycKey('talk'),week:cycKey('event'),rot:cycKey('rotate'),chap:cycKey('chapter'),month:now.getFullYear()+'-'+(now.getMonth()+1)};
-  if(!force&&!L.last.day){ L.last=Object.assign({},keys); mark('prog'); return; }
+  if(!force&&!L.last.day){ L.last=Object.assign({},keys); mark('prog'); await liveFillRun(on); return; } // 첫 실행: 주기는 지금부터 세고, 빈 콘텐츠 채우기만(0537)
   // 주기를 바꾸거나 새로 생긴 항목은 바로 만들지 않고 지금부터 세요
   Object.keys(keys).forEach(k=>{ if(L.last[k]==null||(k!=='month'&&String(L.last[k]).split(':').slice(0,2).join(':')!==String(keys[k]).split(':').slice(0,2).join(':')&&String(keys[k]).includes(':'))) L.last[k]=keys[k]; });
   if(L.last.skin!=null&&!/^(season|rotate):/.test(String(L.last.skin))) L.last.skin=skinPeriodKey(); // 예전 형식이면 지금부터 세요
-  const due=k=>force||L.last[k]!==keys[k], notes=[];
+  const due=k=>force||L.last[k]!==keys[k], notes=[], fillNotes=[];
   LIVE_RUN=true; liveBar('업데이트 확인 중…');
   try{
     if(on.season&&(force==='season'||!L.season||Date.now()>=(L.season.until||0))){ const nx=seasonNext(); if(nx){ await seasonStart(nx,notes); L.last.rot=keys.rot; L.last.week=keys.week; } }
@@ -10500,10 +10500,10 @@ async function liveTick(force){
     }
     if(due('chap')) L.last.chap=keys.chap;
     if(due('month')) L.last.month=keys.month;
-    if(due('day')){ if(on.talk&&SAMPLE){ liveBar('새 메시지를 쓰는 중…'); const n=await dailyTalks(); if(n) notes.push(`${T('talk')} 새 대화 ${n}개`); } L.last.day=keys.day; }
+    if(due('day')){ if(on.talk&&SAMPLE){ liveBar('새 메시지를 쓰는 중…'); const n=await dailyTalks(); if(n) notes.push(`${T('talk')} 새 대화 ${n}개`); } L.last.day=keys.day; } await liveFillStep(on,fillNotes); /* 빈 포크 기능 내용 자동 채움(0537) */
   }catch(e){ console.log(e); }
   finally{ LIVE_RUN=false; liveBar(null); }
-  mark('prog');
+  mark('prog'); liveFillNotes(notes,fillNotes);
   const todo=drawTodo().length;
   if(notes.length){ if(todo) notes.push(`NAI로 그릴 이미지가 ${todo}개 쌓였어요. 공지 화면에서 한 번에 그릴 수 있어요`);
     L.notices.unshift({at:Date.now(),title:`${dayKey()} 업데이트`,lines:notes}); sendMail({from:'운영팀',title:`${dayKey()} 업데이트 기념 보급`,body:'새 소식\n· '+notes.join('\n· '),reward:{gems:200,gold:5000},days:14}); L.notices=L.notices.slice(0,30); render(); openNotice(0); checkTriggers(); }
@@ -14120,6 +14120,20 @@ async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(ins
   mark('c:'+c.id); return true; }
 async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(`${RULES}\n${ctx()}\n\n${SCRIPT_FMT}\n「${ch?ch.title:''}」의 스테이지 「${s.title||''}」 전투 직전 장면 대본을 써라. 앞뒤 스테이지 흐름과 이어지게, 12~25줄.\nJSON만 출력: {"pre":"대본"}`,null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
 
+// 한 항목 고치기 — 점검 화면의 일괄 고치기(auditFix)와 실행 중 자동 채움(liveFill, 0537)이 같이 씀. 고쳤으면 true
+async function auditFixOne(rule,o){ const m=rule.fix.mode;
+  if(m==='auto'){ rule.fix.run(o); auditMarkObj(o); return true; }
+  if(m==='ai') return !!(await auditAIFill(o,rule.fix.fields));
+  if(m==='ai-stage') return !!(await auditAIStage(o));
+  if(m==='ai-rules') return !!(await rulesAIFill());
+  if(m==='ai-persona') return !!(await personaAI(o,rule.fix.k,{lines:rule.fix.k==='improve'}));
+  if(m==='ai-afftalk') return !!(await talkAffGen(o));
+  if(m==='ai-memo') return !!(await memorialGen(o));
+  if(m==='ai-run') return !!(await rule.fix.run(o));
+  if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); return true; }
+  if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); return true; }
+  if(m==='skills-remaster'&&balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); return true; }
+  return false; }
 async function auditFix(rule,items){
   if(AUDIT_JOB){ toast('점검 작업이 진행 중이에요'); return; } const m=rule.fix.mode;
   if(m==='open'){ const c=items[0]; if(rule.fix.stamp) items.forEach(x=>{ x.genVer=auditGenVer(); auditMarkObj(x); }); closeModal(); if(c&&typeof openRegen==='function') openRegen(c.id); if(items.length>1) toast(`${items.length}명을 지금 버전으로 표시했어요. 다시 만들 부분은 캐릭터마다 「다시 만들기」에서 골라요`); return; }
@@ -14127,17 +14141,7 @@ async function auditFix(rule,items){
   if((m==='ai'||m==='ai-stage'||m==='weapon'||m==='ai-rules'||m==='ai-persona'||m==='ai-afftalk'||m==='ai-memo'||m==='ai-run')&&!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; }
   auditSnap(items,rule.label); const job=AUDIT_JOB={stop:false,done:0,total:items.length}; let ok=0;
   try{ for(const o of items){ if(job.stop) break; syBar(`점검: ${rule.label} ${job.done+1}/${job.total}`);
-      try{ if(m==='auto'){ rule.fix.run(o); auditMarkObj(o); ok++; }
-        else if(m==='ai'){ if(await auditAIFill(o,rule.fix.fields)) ok++; }
-        else if(m==='ai-stage'){ if(await auditAIStage(o)) ok++; }
-        else if(m==='ai-rules'){ if(await rulesAIFill()) ok++; }
-        else if(m==='ai-persona'){ if(await personaAI(o,rule.fix.k,{lines:rule.fix.k==='improve'})) ok++; }
-        else if(m==='ai-afftalk'){ if(await talkAffGen(o)) ok++; }
-        else if(m==='ai-memo'){ if(await memorialGen(o)) ok++; }
-        else if(m==='ai-run'){ if(await rule.fix.run(o)) ok++; }
-        else if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); ok++; }
-        else if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); ok++; }
-        else if(m==='skills-remaster'){ if(balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); ok++; } } }catch(e){ console.warn('audit',rule.id,e); }
+      try{ if(await auditFixOne(rule,o)) ok++; }catch(e){ console.warn('audit',rule.id,e); }
       job.done++; } }
   finally{ AUDIT_JOB=null; syBar(''); }
   mark('prog'); toast(`${rule.label}: ${ok}/${items.length}개 고쳤어요${AUDIT_UNDO?' (되돌리기 가능)':''}`); if(!$('#modal').hidden) openAudit(AUDIT_FOCUS); else render(); }
@@ -14176,6 +14180,26 @@ document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); 
   else if(a==='audfix'){ const r=AUDIT_RULES.find(x=>x.id===el.dataset.rule), g=r&&auditScan(AUDIT_FOCUS?(o=>o.id===AUDIT_FOCUS):null).find(x=>x.rule===r); if(!g) return;
     const pick=[...document.querySelectorAll(`[data-aud="${r.id}"]`)].filter(x=>x.checked).map(x=>g.items[+x.dataset.i]).filter(Boolean); if(!pick.length){ toast('고칠 항목을 골라 주세요'); return; } auditFix(r,pick); }
   else if(a==='audconv'){ const cs=[...document.querySelectorAll('[data-audc]:checked')].map(x=>charById(x.dataset.audc)).filter(Boolean), fs=[...document.querySelectorAll('[data-audf]:checked')].map(x=>x.dataset.audf); auditConvert(cs,fs,($('#aud_ins')||{}).value||''); } });
+/* ===== 포크 기능 내용 자동 채움(실행 중 AI) =====
+   원안의 liveTick이 게임이 구동되는 동안 장·이벤트·톡을 AI로 만들듯, 포크 기능의 내용이 비어 있으면 구동 중에 자동으로 채워요.
+   채우는 방법은 콘텐츠 점검(0535) 규칙의 고치기를 그대로 써요(auditFixOne). 자동이 기본이고, 사용자는 콘텐츠 점검·각 화면에서
+   직접 고치거나 AI에 추가 지시할 수 있어요. 설정 → 라이브 운영의 "빈 콘텐츠 자동 채움"으로 끌 수 있어요(live.on.fill) */
+const LIVE_FILL_AUTO=['g_spots','g_codex','c_symbol','c_pos','c_range','s_rules']; // 규칙으로 채움(AI 없음) — 빈 것은 매번
+const LIVE_FILL_AI=['c_persona','c_afftalk','c_memorial','c_spot','s_direct'];    // AI로 채움 — 한 번에 LIVE_FILL_MAX개까지
+const LIVE_FILL_OWNED=new Set(['c_afftalk','c_memorial','c_spot']);              // 만날 수 있는(보유한) 대원부터
+const LIVE_FILL_NAME={g_spots:'일정 장소',g_codex:'도감 규칙',c_symbol:'상징 컬러·아이템',c_pos:'포지션',c_range:'사거리',s_rules:'전장 규칙',c_persona:'개성 시트',c_afftalk:'인연 톡',c_memorial:'메모리얼',c_spot:'일정 장면',s_direct:'대본 연출'};
+const LIVE_FILL_MAX=4;
+async function liveFill(notes){ if(subLocked()) return 0; const done={}, add=id=>{ done[id]=(done[id]||0)+1; }, group=id=>auditScan().find(g=>g.rule.id===id);
+  for(const id of LIVE_FILL_AUTO){ const g=group(id); if(!g) continue; for(const o of g.items) if(await auditFixOne(g.rule,o)) add(id); }
+  let n=0; if(SAMPLE) for(const id of LIVE_FILL_AI){ if(n>=LIVE_FILL_MAX) break; const g=group(id); if(!g) continue;
+    for(const o of LIVE_FILL_OWNED.has(id)?g.items.filter(c=>own(c.id)):g.items){ if(n>=LIVE_FILL_MAX) break; liveBar(`${LIVE_FILL_NAME[id]}을(를) 채우는 중…`); n++; if(await auditFixOne(g.rule,o)) add(id); } }
+  const ids=Object.keys(done); if(ids.length){ mark('prog'); notes.push('비어 있던 콘텐츠를 채웠어요: '+ids.map(id=>`${LIVE_FILL_NAME[id]} ${done[id]}`).join(', ')+' (콘텐츠 점검·각 화면에서 고칠 수 있어요)'); }
+  return ids.length; }
+// liveTick에서 부르는 세 곳: 정기 실행의 채우기 단계, 첫 실행(주기 기준만 잡고 돌아갈 때 — 채우기는 주기와 상관없어서 이때도), 알림 합치기
+async function liveFillStep(on,notes){ if(!on.fill) return; liveBar('비어 있는 콘텐츠를 채우는 중…'); await liveFill(notes); }
+async function liveFillRun(on){ if(!on.fill||LIVE_RUN) return; LIVE_RUN=true; liveBar('비어 있는 콘텐츠를 채우는 중…'); const notes=[];
+  try{ await liveFill(notes); }catch(e){ quietErr(e,'liveFillRun'); } finally{ LIVE_RUN=false; liveBar(null); } if(notes.length) toast(notes[0]); }
+function liveFillNotes(notes,fill){ if(notes.length) notes.push(...fill); else if(fill.length) toast(fill[0]); } // 채운 것만으로는 업데이트 보급 우편을 보내지 않음
 /* =========================================================
    시작
    ========================================================= */

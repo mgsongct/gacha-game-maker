@@ -272,15 +272,6 @@
    "text": "renderSetup (src/main/0210-setup.js:24) 복잡도 43 · 47줄 · 중첩 1"
   },
   {
-   "key": "복잡한 함수|auditFix",
-   "num": {
-    "복잡도": 43,
-    "줄": 21,
-    "중첩": 13
-   },
-   "text": "auditFix (src/main/0535-content-audit.js:70) 복잡도 43 · 21줄 · 중첩 13"
-  },
-  {
    "key": "복잡한 함수|step",
    "num": {
     "복잡도": 43,

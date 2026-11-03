@@ -663,7 +663,22 @@ try {
     return o; });
   assert.ok(Object.values(r27).every(v => v === true), JSON.stringify(r27)); assert.deepEqual(err27, [], '페이지 오류');
   console.log('ok 27 자기점검 보강 결과: 용어(T)에 넣은 태그가 화면에서 실행되지 않음(가져온 게임·AI 용어), 대화 배지가 로비 아이콘에 바로 반영');
-  await browser.close(); server.close();
+
+  // 28) 포크 기능 내용 자동 채움(실행 중 AI): 원안 liveTick의 첫 실행·다음 실행에서 빈 일정 장소·도감 규칙·상징 컬러가 채워지고, 끄면 채우지 않음
+  const p28 = await browser.newPage(), err28 = []; p28.on('pageerror', e => err28.push(String(e)));
+  await p28.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p28.goto(`http://127.0.0.1:${server.address().port}/?t=28`);
+  await p28.waitForFunction(() => typeof liveFill === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  const r28 = await p28.evaluate(async () => { const o = {}; SAMPLE = null; P().seenOpening = true; closeModal(); closeOv();
+    const empty = () => { G.meta.spots = []; G.world.codex = (G.world.codex || []).filter(x => !String(x.title).startsWith('[규칙]')); G.chars.forEach(c => { delete c.symColor; delete c.symItem; }); };
+    const filled = () => spots().length > 0 && !rulesNotInCodex() && !auditScan().some(g => g.rule.id === 'g_spots' || g.rule.id === 'g_codex');
+    empty(); P().live.on.fill = true; P().live.last = {}; await liveTick(); o.first = filled(); // 첫 실행: 주기 기준만 잡고 채우기만
+    empty(); await liveTick(); o.next = filled();
+    empty(); P().live.on.fill = false; await liveTick(); o.off = !spots().length;
+    o.chip = (tab = 'studio', STTAB = 'live', render(), !!document.querySelector('[data-act="livetog"][data-k="fill"]'));
+    o.one = typeof auditFixOne === 'function' && await auditFixOne(AUDIT_RULES.find(r => r.id === 'g_spots'), G) === true && spots().length > 0;
+    return o; });
+  assert.ok(Object.values(r28).every(v => v === true), JSON.stringify(r28)); assert.deepEqual(err28, [], '페이지 오류');
+  console.log('ok 28 포크 기능 내용 자동 채움: liveTick 첫 실행·다음 실행에서 빈 일정 장소·도감 규칙을 점검 규칙의 고치기로 채움, 설정으로 끔, 한 항목 고치기 공유');  await browser.close(); server.close();
   assert.equal(after.n, r5.n + 1); assert.notEqual(after.active, 'main'); assert.equal(after.title, r5.title);
   assert.deepEqual(after.img, { idb: true }); assert.equal(after.blob, 7);
   assert.deepEqual(err2, [], '페이지 오류');
