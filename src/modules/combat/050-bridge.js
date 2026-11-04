@@ -2,9 +2,9 @@
 let V2EDIT=null;
 const V2PENDING=new WeakMap();
 // The season setting controls future releases; a character keeps its release generation.
-function v2CurrentGeneration(){if(typeof balanceGeneration==='function'){const g=balanceGeneration();if(g)return GGMCombat.generation({generation:g});}return GGMCombat.generation({generation:typeof G!=='undefined'&&G?.prog?.live?.skillGeneration});} // 밸런스 설정(세대 고정·자동 상승)이 있으면 그걸 따라요
+function v2CurrentGeneration(){if((typeof Rules==='undefined'?'undefined':typeof Rules.balanceGeneration)==='function'){const g=Rules.balanceGeneration();if(g)return GGMCombat.generation({generation:g});}return GGMCombat.generation({generation:typeof G!=='undefined'&&G?.prog?.live?.skillGeneration});} // 밸런스 설정(세대 고정·자동 상승)이 있으면 그걸 따라요
 function v2SeasonGenerationHTML(){const g=v2CurrentGeneration();return `<div class="panel" id="v2-season-generation-panel"><h3>캐릭터 출시 세대</h3><label class="f" for="v2-season-generation">새 캐릭터에게 적용할 세대<select class="in" id="v2-season-generation">${[1,2,3,4,5].map(n=>`<option value="${n}" ${g===n?'selected':''}>${n}세대</option>`).join('')}</select></label><p class="muted">선택하면 바로 저장됩니다. 이후 새로 추가되는 캐릭터(신규 픽업·이벤트·직접 추가 포함)는 이 세대로 만들어집니다. 세대가 높을수록 AI가 사용할 수 있는 스킬 전력 예산이 늘어납니다. 세대는 직접 바꾸며 시즌이 넘어가도 자동으로 올라가지 않습니다.</p><p class="muted">기존 캐릭터의 세대와 스킬은 그대로 유지됩니다. 기존 캐릭터의 스킬을 다시 생성할 때도 그 캐릭터의 출시 세대를 사용합니다. 복각 픽업도 기존 세대를 유지합니다.</p></div>`;}
-function v2Options(){return {elems:[...ELEMS],beats:{...BEATS},...(typeof rulesOptions==='function'?rulesOptions():{})};} // 게임 규칙의 상성 배율·시너지·관계
+function v2Options(){return {elems:[...ELEMS],beats:{...BEATS},...((typeof Rules==='undefined'?'undefined':typeof Rules.rulesOptions)==='function'?Rules.rulesOptions():{})};} // 게임 규칙의 상성 배율·시너지·관계
 let V2JOBS=Promise.resolve();
 function v2Job(type,args,options={}){
  const snapshot=GGMCombat.clone(args);
@@ -51,7 +51,7 @@ function v2QueueCharacter(c){
  const fingerprint=v2Fingerprint(c);
  const promise=(async()=>{
   const r=await v2Job(c.skillTuning==='manual'?'inspectSkill':'balanceSkill',[v2CharacterInput(c),v2Options()]);
-  if(v2Fingerprint(c)===fingerprint){const prevNames=Object.fromEntries(Object.keys(GGMCombat.SLOTS).map(s=>[s,c.skills?.[s]?.name]));c.skills=r.kit;if(r.report.fallbackReason){c.skillGenerationNotice=r.report.fallbackReason+' 스킬 이름과 설계 의도는 유지했어요.';for(const slot of Object.keys(GGMCombat.SLOTS))c.skills[slot].name=prevNames[slot]||v2ConceptName(c,slot);(c.skillDesignLog||=[]).push({kind:'fallback',text:r.report.fallbackReason});}c.skillBalance={...r.report,fingerprint:v2Fingerprint(c)};if(G.chars.includes(c))mark('c:'+c.id);}
+  if(v2Fingerprint(c)===fingerprint){const prevNames=Object.fromEntries(Object.keys(GGMCombat.SLOTS).map(s=>[s,c.skills?.[s]?.name]));c.skills=r.kit;if(r.report.fallbackReason){c.skillGenerationNotice=r.report.fallbackReason+' 스킬 이름과 설계 의도는 유지했어요.';for(const slot of Object.keys(GGMCombat.SLOTS))c.skills[slot].name=prevNames[slot]||v2ConceptName(c,slot);(c.skillDesignLog||=[]).push({kind:'fallback',text:r.report.fallbackReason});}c.skillBalance={...r.report,fingerprint:v2Fingerprint(c)};if(G.chars.includes(c))Core.mark('c:'+c.id);}
   return r;
  })().finally(()=>V2PENDING.delete(c));
  V2PENDING.set(c,promise);return promise;
@@ -61,7 +61,7 @@ async function v2ReadyChars(chars){for(const c of chars){v2Ensure(c);if(!c.skill
 function v2KeepPlan(state,slot,plan){(state.plans||={})[slot]=plan;}
 function v2SavePlan(c,state,slot){if(!state.plans?.[slot])return;c.skillPlan={...(c.skillPlan||{}),[slot]:v2SkillPlanText(state.plans[slot])};delete state.plans[slot];}
 function v2PlanHTML(c){const p=c.skillPlan||{},rows=[['kit','세트'],...Object.entries(GGMCombat.SLOTS)].filter(([k])=>p[k]);return rows.length?'<details><summary>스킬 설계 의도</summary>'+rows.map(([k,l])=>'<p class="muted" style="margin:2px 0"><b>'+esc(l)+'</b> '+esc(p[k])+'</p>').join('')+'</details>':'';}
-function v2SkillSummary(c){const kit=GGMCombat.trainedKit(v2Kit(c),v2OwnedTraining(c));return `${v2TrainingSummary(c)}${v2PlanHTML(c)}${c.skillGenerationNotice?'<p class="muted">'+esc(c.skillGenerationNotice)+'</p>':''}${c.skillDesignLog?.length?'<details><summary>최근 스킬 생성 기록</summary><ol>'+c.skillDesignLog.slice(-20).map(x=>'<li>'+esc((x.attempt?x.attempt+'차 · ':'')+x.text)+'</li>').join('')+'</ol></details>':''}${c.skillGenerationWarning?'<p class="muted">'+esc(c.skillGenerationWarning)+'</p>':''}${Object.entries(GGMCombat.SLOTS).map(([key,label])=>`<div class="cs-card" data-skill-card="${key}"><div class="wthumb">${imgSrc(c.skillIcons?.[key])?`<img src="${esc(imgSrc(c.skillIcons[key]))}" alt="${label} 아이콘">`:'<span>✦</span>'}</div><div class="t"><b>${label} · ${esc(kit[key].name)} <span class="badge">${esc(v2TrainingLabel(v2OwnedTraining(c),key))}</span></b><p class="muted">${esc(v2SkillText(kit[key],key))}${key==='ultimate'?' · 전투 시작 SP '+Math.round(GGMCombat.trainingInitialSP(v2OwnedTraining(c))*100)/100:''}</p><button class="btn sm ghost" data-act="v2edit" data-id="${esc(c.id)}" data-slot="${key}">${label} 편집 · AI 생성</button> ${v2MasteryButton(c,key)}</div></div>`).join('')}`;}
+function v2SkillSummary(c){const kit=GGMCombat.trainedKit(v2Kit(c),v2OwnedTraining(c));return `${v2TrainingSummary(c)}${v2PlanHTML(c)}${c.skillGenerationNotice?'<p class="muted">'+esc(c.skillGenerationNotice)+'</p>':''}${c.skillDesignLog?.length?'<details><summary>최근 스킬 생성 기록</summary><ol>'+c.skillDesignLog.slice(-20).map(x=>'<li>'+esc((x.attempt?x.attempt+'차 · ':'')+x.text)+'</li>').join('')+'</ol></details>':''}${c.skillGenerationWarning?'<p class="muted">'+esc(c.skillGenerationWarning)+'</p>':''}${Object.entries(GGMCombat.SLOTS).map(([key,label])=>`<div class="cs-card" data-skill-card="${key}"><div class="wthumb">${Characters.imgSrc(c.skillIcons?.[key])?`<img src="${esc(Characters.imgSrc(c.skillIcons[key]))}" alt="${label} 아이콘">`:'<span>✦</span>'}</div><div class="t"><b>${label} · ${esc(kit[key].name)} <span class="badge">${esc(v2TrainingLabel(v2OwnedTraining(c),key))}</span></b><p class="muted">${esc(v2SkillText(kit[key],key))}${key==='ultimate'?' · 전투 시작 SP '+Math.round(GGMCombat.trainingInitialSP(v2OwnedTraining(c))*100)/100:''}</p><button class="btn sm ghost" data-act="v2edit" data-id="${esc(c.id)}" data-slot="${key}">${label} 편집 · AI 생성</button> ${v2MasteryButton(c,key)}</div></div>`).join('')}`;}
 function v2TriggerSettings(s){
  const help={always:'전투 중 조건을 계속 확인합니다. 재사용 대기와 발동 제한을 함께 설정하세요.',battle_start:'전투 시작 시 한 번 발동합니다. 첫 사용 대기를 설정하면 그 시간이 지난 뒤 한 번 발동합니다.',interval:'설정한 간격과 재사용 대기를 모두 충족하면 자동 발동합니다.',after_basic:'일반 공격을 지정한 횟수만큼 사용할 때마다 발동합니다.',attack_hit:'공격이 적중한 횟수를 셉니다. 여러 타격은 각각 계산합니다.',hp_below:'자신의 HP가 기준 비율 이하인 동안 재사용 대기마다 발동할 수 있습니다.',mark_threshold:'자신 또는 마지막 대상에게 지정 표식이 쌓일 때 기준 중첩을 확인합니다. 표식은 자동 소모되지 않습니다.'};
  let fields='';
@@ -101,7 +101,7 @@ function v2EffectSettings(e){
 function v2Select(name,map,value){return `<select class="in" data-v2-field="${name}">${Object.entries(map).map(([k,v])=>`<option value="${k}" ${k===value?'selected':''}>${esc(Array.isArray(v)?v[0]:v)}</option>`).join('')}</select>`;}
 function v2Number(name,value,min,max,label,step='.1',scale=1){return `<label class="f">${label}<input class="in" type="number" data-v2-field="${name}" value="${Math.round(value*scale*100)/100}" data-v2-scale="${scale}" data-v2-raw="${value}" data-v2-shown="${Math.round(value*scale*100)/100}" min="${min}" max="${max}" step="${+step>=1?step:'.01'}"></label>`;}
 function v2Report(r){if(!r)return '저장 전에 검사해 주세요';return `${r.generation||1}세대 · ${r.trials}개 비교 시나리오 · 기준 대비 ${r.ratio}배 · ${r.status==='within'?'목표 범위':r.status==='strong'?'강한 편 — 검토 권장':'약한 편 — 검토 권장'} (추정치)`;}
-function v2OpenEditor(id,slot="passive"){if(playMode())return;if(typeof v2CloseGearEditor==='function')v2CloseGearEditor();const c=charById(id);if(!c)return;v2CancelEditorGeneration();V2EDIT={id,slot:GGMCombat.SLOTS[slot]?slot:'passive',kit:GGMCombat.clone(v2Kit(c)),report:null,reports:{},histories:{},fallbacks:{},generation:GGMCombat.generation(c),concept:'',busy:false,status:'',job:null};v2DrawEditor();}
+function v2OpenEditor(id,slot="passive"){if(System.playMode())return;if(typeof v2CloseGearEditor==='function')v2CloseGearEditor();const c=charById(id);if(!c)return;v2CancelEditorGeneration();V2EDIT={id,slot:GGMCombat.SLOTS[slot]?slot:'passive',kit:GGMCombat.clone(v2Kit(c)),report:null,reports:{},histories:{},fallbacks:{},generation:GGMCombat.generation(c),concept:'',busy:false,status:'',job:null};v2DrawEditor();}
 function v2EffectBlock(e,i,slot,count){return `<div data-v2-effect="${i}" style="padding:10px 0;border-top:1px solid var(--line)"><b>효과 ${i+1}</b><div class="g2"><label class="f">효과 종류${v2EffectTypeSelect(e.type)}</label><label class="f">적용 대상${v2Select('target',GGMCombat.TARGETS,e.target)}</label></div>
  ${v2NeedsPriority(e)?`<label class="f">대상 선택 우선순위${v2ArraySelect('priority',GGMStudio.PRIORITY,e.priority)}</label>`:''}
  ${e.target.includes('random_')?v2Number('targetCount',e.targetCount||e.count,1,e.target==='random_enemies'?5:4,'대상 수',1):e.target==='role_allies'?`<label class="f">역할${v2ArraySelect('role',['공격형','방어형','지원형'],e.role)}</label>`:e.target==='slot_ally'?v2Number('slot',e.slot,1,4,'편성 슬롯 번호',1):''}
@@ -109,7 +109,7 @@ function v2EffectBlock(e,i,slot,count){return `<div data-v2-effect="${i}" style=
  ${v2EffectRules(e)}
  <div class="row"><button class="btn sm ghost" data-act="v2up" data-slot="${slot}" data-index="${i}" ${i===0?'disabled':''}>↑</button><button class="btn sm ghost" data-act="v2down" data-slot="${slot}" data-index="${i}" ${i===count-1?'disabled':''}>↓</button><button class="btn sm ghost" data-act="v2remove" data-slot="${slot}" data-index="${i}" ${count<=1?'disabled':''}>효과 삭제</button></div></div>`;}
 function v2DrawEditor(preserve=false){const previous=preserve?document.querySelector('#modal>.sheet'):null,scroll=previous?.scrollTop||0,aiOpen=!!previous?.querySelector('#v2-ai-panel')?.open,historyOpen=!!previous?.querySelector('#v2-generation-history')?.open;const state=V2EDIT;if(!state)return;const c=charById(state.id);if(!c)return;
- openModal(`${head(esc(c.name)+' · 일반 전투 스킬','<span class="muted">패시브 / 액티브 / 수동·자동 필살기</span>')}
+ CoreView.openModal(`${head(esc(c.name)+' · 일반 전투 스킬','<span class="muted">패시브 / 액티브 / 수동·자동 필살기</span>')}
 
  <p class="muted">이 화면은 기본 스킬 설계를 편집합니다. SP 회복·피해 감소·적 공격속도 감소·치명타 확률 증가의 효과량은 Lv.10 기준이며, 나머지는 Lv.1 기준입니다. 앞의 세 효과는 Lv.1에서 입력값의 50%, 치명타 확률 증가는 ⅔로 시작해 Lv.10에서 입력값에 도달합니다. 공통 레벨·전문화 보너스는 상세 화면과 전투에 별도로 적용되며 재생성해도 강화 레벨은 유지됩니다. 무적은 Lv.1에서 입력 지속의 절반·최대 2초/최소 재사용 18초이며, 최대 전문화에서 지속 +50%·최대 3초/최소 17초까지 조금씩 성장합니다.</p>
  <fieldset id="v2-fields" style="border:0;padding:0;min-width:0">
@@ -177,14 +177,14 @@ async function v2EditorAction(action,button){
   v2CheckCancelled(controller.signal);if(V2EDIT!==state||charById(state.id)!==c)return;state.report=r.report;state.reports[slot]=r.report;
   if(action==='v2save'){
    c.generation=state.generation;c.skillConcept=state.concept.trim()||c.skillConcept||'';c.skills=candidate;c.skillTuning='manual';v2SavePlan(c,state,slot);v2EquipmentSkillSaved(c,slot,base[slot],candidate[slot],!!state.generatedSlots?.[slot]);if(state.generatedSlots)delete state.generatedSlots[slot];if(state.histories[slot]?.length){c.skillDesignLog=GGMCombat.clone(state.histories[slot]);delete c.skillGenerationNotice;}if(state.fallbacks[slot])c.skillGenerationWarning='AI 응답 문제로 복구한 '+GGMCombat.SLOTS[slot]+' 초안을 사용 중입니다.';else delete c.skillGenerationWarning;
-   c.skillBalance={...r.report,fingerprint:v2Fingerprint(c)};mark('c:'+c.id);setStatus(GGMCombat.SLOTS[slot]+'만 저장했어요. '+v2Report(r.report));toast('선택한 스킬을 저장했어요');
+   c.skillBalance={...r.report,fingerprint:v2Fingerprint(c)};Core.mark('c:'+c.id);setStatus(GGMCombat.SLOTS[slot]+'만 저장했어요. '+v2Report(r.report));CoreView.toast('선택한 스킬을 저장했어요');
   }else setStatus(v2Report(r.report));
  }catch(e){if(V2EDIT===state)setStatus(e.name==='AbortError'?e.message:v2FailureText(e));}
  finally{clearInterval(ticker);state.busy=false;if(state.job===job)state.job=null;if(field?.isConnected)field.disabled=false;if(V2EDIT===state)v2RenderGeneration(state);}
 }
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;const action=el.dataset.act;if(action==='v2edit'){v2OpenEditor(el.dataset.id,el.dataset.slot);}else if(['v2color','v2fxpreview','v2cancel','v2tab','v2save','v2generate','v2inspect','v2add','v2remove','v2up','v2down'].includes(action))v2EditorAction(action,el);});
 document.addEventListener('change',e=>{
- const input=e.target;if(input.id==='v2-season-generation'){if(playMode())return;const value=Number(input.value);if(!Number.isInteger(value)||value<1||value>5)return;P().live.skillGeneration=value;mark('prog');if(document.getElementById('v2-season-generation-panel'))document.getElementById('v2-season-generation-panel').outerHTML=v2SeasonGenerationHTML();toast('새 캐릭터의 출시 세대를 '+value+'세대로 저장했어요');return;}if(!input.matches('[data-v2-field]'))return;if(input.dataset.v2Field==='color'){const mode=input.closest('[data-v2-slot]')?.querySelector('[data-v2-field=colorMode]');if(mode)mode.value='custom';}v2ReadEditor();if(!V2EDIT)return;
+ const input=e.target;if(input.id==='v2-season-generation'){if(System.playMode())return;const value=Number(input.value);if(!Number.isInteger(value)||value<1||value>5)return;P().live.skillGeneration=value;Core.mark('prog');if(document.getElementById('v2-season-generation-panel'))document.getElementById('v2-season-generation-panel').outerHTML=v2SeasonGenerationHTML();CoreView.toast('새 캐릭터의 출시 세대를 '+value+'세대로 저장했어요');return;}if(!input.matches('[data-v2-field]'))return;if(input.dataset.v2Field==='color'){const mode=input.closest('[data-v2-slot]')?.querySelector('[data-v2-field=colorMode]');if(mode)mode.value='custom';}v2ReadEditor();if(!V2EDIT)return;
  if(input.dataset.v2Field==='trigger'){
   const s=V2EDIT.kit[input.closest('[data-v2-slot]').dataset.v2Slot];
   if(s.trigger==='hp_below')s.threshold=40;if(s.trigger==='mark_threshold')s.threshold=3;
@@ -216,8 +216,8 @@ async function v2BalanceChapter(ch,k){
 }
 async function v2RebalanceAll(button){
  if(window.__v2Rebalancing)return;window.__v2Rebalancing=true;const label=button.textContent;button.disabled=true;
- try{let k=0,outside=0;for(const ch of G.chapters.filter(ch=>ch.kind==='main'||ch.kind==='event')){button.textContent=`${ch.title} 검사 중…`;const updates=await v2BalanceChapter(ch,ch.kind==='main'?k++:Math.max(0,k-1));outside+=updates.filter(x=>!x.r.report.targetReached).length;mark('ch:'+ch.id);}G.meta.combatVersion=2;mark('meta');render();toast('적 능력치 조정 완료. 직접 수정한 적은 유지했어요.'+(outside?' 목표 난이도 범위 밖 '+outside+'개 스테이지는 추가 검토가 필요해요.':''));}
- catch(e){toast(e.message);}finally{window.__v2Rebalancing=false;button.disabled=false;button.textContent=label;}
+ try{let k=0,outside=0;for(const ch of G.chapters.filter(ch=>ch.kind==='main'||ch.kind==='event')){button.textContent=`${ch.title} 검사 중…`;const updates=await v2BalanceChapter(ch,ch.kind==='main'?k++:Math.max(0,k-1));outside+=updates.filter(x=>!x.r.report.targetReached).length;Core.mark('ch:'+ch.id);}G.meta.combatVersion=2;Core.mark('meta');Challenge.render();CoreView.toast('적 능력치 조정 완료. 직접 수정한 적은 유지했어요.'+(outside?' 목표 난이도 범위 밖 '+outside+'개 스테이지는 추가 검토가 필요해요.':''));}
+ catch(e){CoreView.toast(e.message);}finally{window.__v2Rebalancing=false;button.disabled=false;button.textContent=label;}
 }
 function v2BattleEvents(events){
  const battle=B;if(!battle)return;
@@ -232,21 +232,21 @@ function v2DrainBattleEvents(battle){
    blog(`${ev.source.name}: ${ev.name} (${GGMCombat.SLOTS[ev.slot]})`);
    if(ev.slot==='ultimate'&&ev.source.c){
     battle.presentationBusy=true;
-    const shown=skillCut(ev.source.c,ev.name,false,null,()=>{
-     if(B!==battle)return;battle.presentationBusy=false;v2CastFx(ev);v2DrainBattleEvents(battle);if(B===battle){bUpdate();bCheck();if(B?.ctx.kind==='practice')v2UpdatePractice();}
+    const shown=SystemView.skillCut(ev.source.c,ev.name,false,null,()=>{
+     if(B!==battle)return;battle.presentationBusy=false;v2CastFx(ev);v2DrainBattleEvents(battle);if(B===battle){SystemView.bUpdate();Core.bCheck();if(B?.ctx.kind==='practice')v2UpdatePractice();}
     });
-    sfx('스킬');if(shown)return;battle.presentationBusy=false;
+    Art.sfx('스킬');if(shown)return;battle.presentationBusy=false;
    }
    v2CastFx(ev);
   }else if(ev.type==='attackIntent'){
    GGMVFX.intent(ev,()=>{
     if(B!==battle||battle.over||battle.ending)return;
     const landed=GGMCombat.landImpact(battle.engine,ev.id);v2BattleEvents(landed);
-    if(B===battle){bUpdate();bCheck();if(B?.ctx.kind==='practice')v2UpdatePractice();}
+    if(B===battle){SystemView.bUpdate();Core.bCheck();if(B?.ctx.kind==='practice')v2UpdatePractice();}
    });
   }else if(ev.type==='effect')GGMVFX.effect(ev);
   else if(ev.type==='damage'){
-   const delay=ev.impact?GGMVFX.damage(ev):ev.basic?attackFx(ev.source,ev.target):GGMVFX.damage(ev);
+   const delay=ev.impact?GGMVFX.damage(ev):ev.basic?System.attackFx(ev.source,ev.target):GGMVFX.damage(ev);
    battle.impactUntil=Math.max(battle.impactUntil||0,Date.now()+delay+180);
    setTimeout(()=>{if(B!==battle)return;pop(ev.target,ev.value?nf(ev.value):'막음',ev.crit?'crit':'');if(ev.basic&&!ev.impact)GGMVFX.impactUnit(ev.target,GGMCombat.physicalStyle(ev.source.c||ev.source),ev.source.kit?.active?.color||'#edf6ff');if(ev.blocked)GGMVFX.proc({source:ev.target,target:ev.target,visual:{kind:ev.guard||(ev.target.status.some(s=>s.type==='invincible')?'invincible':'block'),phase:'proc'}});},delay||0);
   }else if(ev.type==='heal'){
@@ -265,10 +265,10 @@ async function v2PrepareStage(stage,ctx){
  if(V2STAGES.has(stage))return V2STAGES.get(stage);
  const fingerprint=JSON.stringify(stage.enemies);
  const task=(async()=>{const k=ctx.ch?Math.max(0,G.chapters.filter(ch=>ch.kind==='main').indexOf(ctx.ch)):0;
- const level=ctx.kind==='farm'?farmRec(stage.farm.lv):v2ChapterLevel(k,ctx.ch?ctx.ch.stages.indexOf(stage):0);
+ const level=ctx.kind==='farm'?Characters.farmRec(stage.farm.lv):v2ChapterLevel(k,ctx.ch?ctx.ch.stages.indexOf(stage):0);
  const r=await v2Job('balanceEncounter',[stage.enemies,level,v2Options()]);
  if(JSON.stringify(stage.enemies)!==fingerprint)throw new Error('전투 준비 중 적 데이터가 변경됐어요. 다시 출격해 주세요.');
- stage.enemies=r.enemies;stage.combatBalance=r.report;if(ctx.ch)mark('ch:'+ctx.ch.id);
+ stage.enemies=r.enemies;stage.combatBalance=r.report;if(ctx.ch)Core.mark('ch:'+ctx.ch.id);
  })().finally(()=>V2STAGES.delete(stage));V2STAGES.set(stage,task);return task;
 }
 
@@ -291,9 +291,9 @@ async function v2GenerateSkills(c,concept='',onProgress=()=>{},opt={}){ /* opt.r
  try{
  for(let attempt=1;attempt<=6;attempt++){
   v2CheckCancelled(controller.signal);message=`${C.generation(c)}세대 캐릭터 역할과 세 스킬 설계 응답 대기 · ${attempt}/6`;tick();onProgress(message);
-  const prompt=v2GenerateSkillsPromptText({menus,designC,concept,base,feedback,remaster:opt.remaster});
+  const prompt=Characters.v2GenerateSkillsPromptText({menus,designC,concept,base,feedback,remaster:opt.remaster});
   try{
-   let response=await v2SkillRequest(SAMPLE,prompt,controller.signal);if(typeof response==='string')response=parseLoose(response);response=response?.data||response?.result||response;
+   let response=await v2SkillRequest(SAMPLE,prompt,controller.signal);if(typeof response==='string')response=Characters.parseLoose(response);response=response?.data||response?.result||response;
    message='응답 해석 · 역할·효과 개수·수치·발동 조건 검사';tick();onProgress(message);
    const kit=v2PrepareGenerated(response?.skills,designC);c.skillPlan={kit:v2SkillPlanText(response?.designPlan)||c.skillPlan?.kit||''};/* 설계 의도 저장 — 리마스터·재설계 때 이름·컨셉을 지키는 근거 */c.skillDesignLog.push({kind:'success',attempt,text:`${C.generation(c)}세대 역할·효과 개수·전력 예산 검사 완료`});onProgress('스킬 설계 완료 · 기준 편성 모의 전투 검사 준비');return kit;
   }catch(e){
@@ -316,7 +316,7 @@ function v2ReleaseIconDraft(d){if(!d)return;for(const x of Object.values(d.items
 function v2OpenIcons(id){const c=charById(id);if(!c)return;if(V2ICONS)v2ReleaseIconDraft(V2ICONS);V2ICONS={id,items:{},preview:null,busy:false};v2DrawIcons();}
 function v2DrawIcons(){const d=V2ICONS,c=d&&charById(d.id);if(!c)return;const el=v2IconLayer(),p=d.preview,previous=el._draft===d?el.querySelector('.sheet'):null,page=p?p.slot:'list';el._draft=d;d.scrolls=d.scrolls||{};if(previous)d.scrolls[previous.dataset.iconPage]=previous.scrollTop;
  const close=p?`<button class="btn ghost" style="margin-left:auto;flex:0 0 32px;width:32px;height:32px;min-width:32px;min-height:32px;padding:0;font-size:22px;line-height:1" data-icon-act="${p?'back':'close'}" aria-label="${p?'이번 이미지 폐기하고 돌아가기':'아이콘 창 닫기'}">×</button>`:'';
- el.innerHTML=`<div class="sheet" data-icon-page="${page}" role="dialog" aria-modal="true" aria-label="스킬 이미지 생성"><div class="row"><h2>${p?'스킬 아이콘 미리보기':'스킬 이미지 생성'}</h2>${close}</div>${p?`<h3>${GGMCombat.SLOTS[p.slot]}</h3><label class="f">NAI 프롬프트 (영어 태그)<textarea class="in" id="v2-icon-prompt" maxlength="2000">${esc(p.prompt)}</textarea></label><button class="btn sm ghost" data-icon-act="concept" ${d.busy?'disabled':''}>캐릭터·스킬 컨셉으로 프롬프트 구성</button><p class="muted">정사각형 스킬 아이콘입니다. 사용 중인 그림 AI 설정을 사용하며, 생성 시 서비스 이용량이 소모될 수 있어요.</p><div class="ill-box">${p.url?`<img src="${esc(p.url)}" alt="생성된 스킬 아이콘" data-original-src="${esc(p.originalSrc||'')}">`:'<span>프롬프트를 입력하고 생성해 주세요</span>'}</div><p id="v2-icon-status" role="status" aria-live="polite"></p><div class="row"><button class="btn" data-icon-act="generate" ${d.busy?'disabled':''}>${p.url?'다시 생성':'이미지 생성'}</button><button class="btn" data-icon-act="accept" ${!p.url||d.busy?'disabled':''}>확인 · 목록에 적용</button></div><p class="muted">확인은 이 창의 임시 목록에 반영합니다. ×를 누르면 이번 미리보기 결과를 폐기해요.</p>`:`<p class="muted">세 아이콘을 각각 만든 뒤 완료를 누르면 캐릭터에 저장합니다. 닫으면 아직 저장하지 않은 결과는 폐기해요.</p>${Object.entries(GGMCombat.SLOTS).map(([slot,label])=>{const src=d.items[slot]?.url||imgSrc(c.skillIcons?.[slot]);return `<div class="v2-icon-row"><div class="v2-icon-caption">${src?`<img src="${esc(src)}" alt="${label} 아이콘">`:'<span class="v2-icon-empty">✦</span>'}<b>${label}</b></div><div class="t">${esc(v2Kit(c)[slot].name)}${d.items[slot]?'<p class="muted">저장 대기</p>':''}</div><button class="btn sm" data-icon-act="edit" data-slot="${slot}">이미지 생성</button></div>`;}).join('')}<p id="v2-icon-status" role="status" aria-live="polite"></p><div class="row" style="margin-top:16px"><button class="btn" data-icon-act="done">완료</button><button class="btn ghost" data-icon-act="close">닫기</button></div>`}</div>`;
+ el.innerHTML=`<div class="sheet" data-icon-page="${page}" role="dialog" aria-modal="true" aria-label="스킬 이미지 생성"><div class="row"><h2>${p?'스킬 아이콘 미리보기':'스킬 이미지 생성'}</h2>${close}</div>${p?`<h3>${GGMCombat.SLOTS[p.slot]}</h3><label class="f">NAI 프롬프트 (영어 태그)<textarea class="in" id="v2-icon-prompt" maxlength="2000">${esc(p.prompt)}</textarea></label><button class="btn sm ghost" data-icon-act="concept" ${d.busy?'disabled':''}>캐릭터·스킬 컨셉으로 프롬프트 구성</button><p class="muted">정사각형 스킬 아이콘입니다. 사용 중인 그림 AI 설정을 사용하며, 생성 시 서비스 이용량이 소모될 수 있어요.</p><div class="ill-box">${p.url?`<img src="${esc(p.url)}" alt="생성된 스킬 아이콘" data-original-src="${esc(p.originalSrc||'')}">`:'<span>프롬프트를 입력하고 생성해 주세요</span>'}</div><p id="v2-icon-status" role="status" aria-live="polite"></p><div class="row"><button class="btn" data-icon-act="generate" ${d.busy?'disabled':''}>${p.url?'다시 생성':'이미지 생성'}</button><button class="btn" data-icon-act="accept" ${!p.url||d.busy?'disabled':''}>확인 · 목록에 적용</button></div><p class="muted">확인은 이 창의 임시 목록에 반영합니다. ×를 누르면 이번 미리보기 결과를 폐기해요.</p>`:`<p class="muted">세 아이콘을 각각 만든 뒤 완료를 누르면 캐릭터에 저장합니다. 닫으면 아직 저장하지 않은 결과는 폐기해요.</p>${Object.entries(GGMCombat.SLOTS).map(([slot,label])=>{const src=d.items[slot]?.url||Characters.imgSrc(c.skillIcons?.[slot]);return `<div class="v2-icon-row"><div class="v2-icon-caption">${src?`<img src="${esc(src)}" alt="${label} 아이콘">`:'<span class="v2-icon-empty">✦</span>'}<b>${label}</b></div><div class="t">${esc(v2Kit(c)[slot].name)}${d.items[slot]?'<p class="muted">저장 대기</p>':''}</div><button class="btn sm" data-icon-act="edit" data-slot="${slot}">이미지 생성</button></div>`;}).join('')}<p id="v2-icon-status" role="status" aria-live="polite"></p><div class="row" style="margin-top:16px"><button class="btn" data-icon-act="done">완료</button><button class="btn ghost" data-icon-act="close">닫기</button></div>`}</div>`;
  const sheet=el.querySelector('.sheet');sheet.style.overflowAnchor='none';sheet.scrollTop=d.scrolls[page]||0;
 }
 async function v2IconClick(event){
@@ -329,26 +329,26 @@ async function v2IconClick(event){
  if(act==='accept'&&d.preview?.blob){const p=d.preview;if(d.items[p.slot]?.url)URL.revokeObjectURL(d.items[p.slot].url);d.items[p.slot]={blob:p.blob,url:p.url,prompt:p.prompt,promptParts:p.promptParts};d.preview=null;v2DrawIcons();return;}
  if(act==='concept'){await v2ConceptPrompt(d,c);return;}
  if(act==='generate'){
-  if(!imgReady()){toast(imgNeed());return;}const p=d.preview;p.promptParts=naiBlocksFieldParts('v2-icon-prompt');p.prompt=document.getElementById('v2-icon-prompt').value.trim();if(!p.prompt){toast('NAI 프롬프트를 입력해 주세요.');return;}
+  if(!Core.imgReady()){CoreView.toast(Core.imgNeed());return;}const p=d.preview;p.promptParts=CharactersView.naiBlocksFieldParts('v2-icon-prompt');p.prompt=document.getElementById('v2-icon-prompt').value.trim();if(!p.prompt){CoreView.toast('NAI 프롬프트를 입력해 주세요.');return;}
   d.busy=true;v2DrawIcons();let n=0;const tick=()=>{const el=document.getElementById('v2-icon-status');if(el)el.textContent='이미지 생성중'+'.'.repeat(n++%3+1);};tick();const timer=setInterval(tick,400);
-  try{const blob=await naiDraw('icon',p.prompt,{candidateEligible:true,originalSrc:imgSrcRaw(c.skillIcons?.[p.slot])||'',size:[832,832],noCut:true});if(V2ICONS!==d||d.preview!==p)return;const cfg=blob.__candidateConfig;if(cfg?.promptParts&&cfg.promptParts.combined===cfg.prompt){p.prompt=cfg.prompt;p.promptParts=cfg.promptParts;}if(p.url)URL.revokeObjectURL(p.url);p.blob=blob;p.originalSrc=imgSrcRaw(c.skillIcons?.[p.slot])||'';p.url=URL.createObjectURL(blob);if(blob.__candidateRegistered){if(d.items[p.slot]?.url)URL.revokeObjectURL(d.items[p.slot].url);d.items[p.slot]={blob,url:p.url,prompt:p.prompt,promptParts:p.promptParts};d.preview=null;d.busy=false;v2DrawIcons();}}
-  catch(e){if(V2ICONS===d&&d.preview===p)toast(naiErr(e));}finally{clearInterval(timer);if(V2ICONS===d&&d.preview===p){d.busy=false;v2DrawIcons();}}return;
+  try{const blob=await NewGame.naiDraw('icon',p.prompt,{candidateEligible:true,originalSrc:Art.imgSrcRaw(c.skillIcons?.[p.slot])||'',size:[832,832],noCut:true});if(V2ICONS!==d||d.preview!==p)return;const cfg=blob.__candidateConfig;if(cfg?.promptParts&&cfg.promptParts.combined===cfg.prompt){p.prompt=cfg.prompt;p.promptParts=cfg.promptParts;}if(p.url)URL.revokeObjectURL(p.url);p.blob=blob;p.originalSrc=Art.imgSrcRaw(c.skillIcons?.[p.slot])||'';p.url=URL.createObjectURL(blob);if(blob.__candidateRegistered){if(d.items[p.slot]?.url)URL.revokeObjectURL(d.items[p.slot].url);d.items[p.slot]={blob,url:p.url,prompt:p.prompt,promptParts:p.promptParts};d.preview=null;d.busy=false;v2DrawIcons();}}
+  catch(e){if(V2ICONS===d&&d.preview===p)CoreView.toast(Core.naiErr(e));}finally{clearInterval(timer);if(V2ICONS===d&&d.preview===p){d.busy=false;v2DrawIcons();}}return;
  }
  if(act==='done'){
   if(!(await appConfirm('현재 목록의 스킬 이미지를 캐릭터에 저장할까요?')))return;
   d.busy=true;const staged={};const previous={...(c.skillIcons||{})};
   try{
    // Fresh IDs keep old icons intact if saving one of the new images fails.
-   for(const [slot,item] of Object.entries(d.items)){const o={id:'si_'+uid(),kind:'icon',name:c.name+' '+GGMCombat.SLOTS[slot],prompt:item.prompt,img:null};if(item.promptParts?.combined===item.prompt)o.naiBlocks={prompt:item.promptParts};await storeImage(o,item.blob,'');staged[slot]=o;}
-   if(V2ICONS!==d||charById(d.id)!==c)return;c.skillIcons={...previous,...staged};mark('c:'+c.id);remove();openChar(c.id);toast('스킬 이미지를 저장했어요.');
-  }catch(e){toast('이미지를 저장하지 못했어요. 다시 완료를 눌러 주세요.');}finally{d.busy=false;}
+   for(const [slot,item] of Object.entries(d.items)){const o={id:'si_'+uid(),kind:'icon',name:c.name+' '+GGMCombat.SLOTS[slot],prompt:item.prompt,img:null};if(item.promptParts?.combined===item.prompt)o.naiBlocks={prompt:item.promptParts};await Art.storeImage(o,item.blob,'');staged[slot]=o;}
+   if(V2ICONS!==d||charById(d.id)!==c)return;c.skillIcons={...previous,...staged};Core.mark('c:'+c.id);remove();CharactersCtl.openChar(c.id);CoreView.toast('스킬 이미지를 저장했어요.');
+  }catch(e){CoreView.toast('이미지를 저장하지 못했어요. 다시 완료를 눌러 주세요.');}finally{d.busy=false;}
  }
 }
-document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;if(el.dataset.act==='v2icons')v2OpenIcons(el.dataset.id);if(el.dataset.act==='v2standing'){const c=charById(el.dataset.id);if(!c||playMode())return;c.useStanding=c.useStanding===false;el.setAttribute('aria-checked',String(c.useStanding));mark('c:'+c.id);setTimeout(()=>{if(document.querySelector('.cs-sheet')?.dataset.cid===c.id)openChar(c.id);},180);}});
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;if(el.dataset.act==='v2icons')v2OpenIcons(el.dataset.id);if(el.dataset.act==='v2standing'){const c=charById(el.dataset.id);if(!c||System.playMode())return;c.useStanding=c.useStanding===false;el.setAttribute('aria-checked',String(c.useStanding));Core.mark('c:'+c.id);setTimeout(()=>{if(document.querySelector('.cs-sheet')?.dataset.cid===c.id)CharactersCtl.openChar(c.id);},180);}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&V2ICONS&&!document.getElementById('generated-image-preview')&&!(typeof IMAGE_CANDIDATES!=='undefined'&&IMAGE_CANDIDATES)){e.preventDefault();e.stopImmediatePropagation();v2IconClick({target:document.querySelector('[data-icon-act="back"],[data-icon-act="close"]')});}},true);
 
 const V2STANDING_HELP='켜면 스탠딩 그림을 사용합니다. 끄면 전투·편성·스토리 등 모든 스탠딩 표시를 상반신 그림으로 대체합니다. 스킨은 스킨 상반신, 없으면 기본 상반신을 사용해요. 상반신이 없으면 미등록으로 표시해요. 기존 스탠딩은 보관되며 다시 켜서 사용할 수 있어요. 상세정보 상단의 전신 전환과 외형 탭에서는 이 설정과 관계없이 등록된 원본을 확인할 수 있어요.';
-function v2StandingHeader(c){return `<div class="v2-standing-header"><h3 class="sec">스탠딩 (전투·편성·${esc(T('crew'))} 화면)</h3><div class="v2-standing-controls"><button class="v2-help" data-act="v2standhelp" aria-label="스탠딩 사용 도움말" aria-expanded="false">?</button><span>스탠딩 사용</span><button class="v2-switch" role="switch" aria-checked="${c.useStanding!==false}" aria-label="스탠딩 이미지 사용" data-act="v2standing" data-id="${c.id}"><span></span></button></div></div>`;}
+function v2StandingHeader(c){return `<div class="v2-standing-header"><h3 class="sec">스탠딩 (전투·편성·${esc(System.T('crew'))} 화면)</h3><div class="v2-standing-controls"><button class="v2-help" data-act="v2standhelp" aria-label="스탠딩 사용 도움말" aria-expanded="false">?</button><span>스탠딩 사용</span><button class="v2-switch" role="switch" aria-checked="${c.useStanding!==false}" aria-label="스탠딩 이미지 사용" data-act="v2standing" data-id="${c.id}"><span></span></button></div></div>`;}
 function v2CloseStandingHelp(){document.getElementById('v2-standing-help')?.remove();document.querySelectorAll('[data-act="v2standhelp"]').forEach(b=>b.setAttribute('aria-expanded','false'));}
 function v2StandingHelp(button){const open=button.getAttribute('aria-expanded')==='true';v2CloseStandingHelp();if(open)return;button.setAttribute('aria-expanded','true');const bubble=document.createElement('div');bubble.id='v2-standing-help';bubble.className='v2-help-bubble';bubble.setAttribute('role','note');bubble.textContent=V2STANDING_HELP;button.closest('.v2-standing-header').append(bubble);}
 document.addEventListener('click',e=>{const button=e.target.closest('[data-act="v2standhelp"]');if(button)v2StandingHelp(button);else if(!e.target.closest('#v2-standing-help'))v2CloseStandingHelp();});
@@ -366,11 +366,11 @@ async function v2ConceptPrompt(d,c){
  d.busy=true;const fallback=v2IconPrompt(c,p.slot);let status=document.getElementById('v2-icon-status'),dots=0;const tick=()=>{if(status?.isConnected)status.textContent='컨셉에 맞는 프롬프트 구성중'+'.'.repeat(dots++%3+1);};tick();const timer=setInterval(tick,400);
  try{
   let prompt=fallback;
-  if(SAMPLE){const s=v2Kit(c)[p.slot];const r=await SAMPLE.json(v2ConceptPromptPrompt({c,p,s,fallback}),{modelTier:'quick',cache:false});if(typeof r?.prompt==='string'&&r.prompt.trim())prompt=r.prompt.trim().slice(0,1800)+', no text, no letters, no watermark';}
+  if(SAMPLE){const s=v2Kit(c)[p.slot];const r=await SAMPLE.json(Characters.v2ConceptPromptPrompt({c,p,s,fallback}),{modelTier:'quick',cache:false});if(typeof r?.prompt==='string'&&r.prompt.trim())prompt=r.prompt.trim().slice(0,1800)+', no text, no letters, no watermark';}
   if(V2ICONS===d&&d.preview===p){p.prompt=prompt;v2DrawIcons();}
- }catch(e){if(V2ICONS===d&&d.preview===p){p.prompt=fallback;v2DrawIcons();toast('캐릭터·스킬 정보를 바탕으로 기본 프롬프트를 구성했어요.');}}
+ }catch(e){if(V2ICONS===d&&d.preview===p){p.prompt=fallback;v2DrawIcons();CoreView.toast('캐릭터·스킬 정보를 바탕으로 기본 프롬프트를 구성했어요.');}}
  finally{clearInterval(timer);if(V2ICONS===d&&d.preview===p){d.busy=false;v2DrawIcons();}}
 }
 /* 전투 화면 표시: 떠오르는 숫자(pop)·전투 기록(blog) — 아래 이벤트 연출이 주로 씀 */
-function pop(u,t,cls=''){const e=uel(u);if(!e)return;const d=document.createElement('span');d.className='dmg '+cls;d.textContent=t;e.appendChild(d);setTimeout(()=>d.remove(),700);}
+function pop(u,t,cls=''){const e=SystemView.uel(u);if(!e)return;const d=document.createElement('span');d.className='dmg '+cls;d.textContent=t;e.appendChild(d);setTimeout(()=>d.remove(),700);}
 function blog(t){B.log.push(t);if(B.log.length>6)B.log.shift();const el=$('#bLog');if(el)el.innerHTML=B.log.map(x=>`<div>${esc(x)}</div>`).join('');}

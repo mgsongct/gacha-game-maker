@@ -41,22 +41,24 @@ export async function withPage(fn, { tag = 'play', viewport, pcHome, gid, www = 
       if (!f.startsWith(www) || !existsSync(f)) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'content-type': TYPES[extname(f)] || 'application/octet-stream' }); r.end(readFileSync(f)); }).listen(0);
     url = `http://127.0.0.1:${srv.address().port}/?t=${tag}`; }
   const b = await chromium.launch(), page = await b.newPage(), errors = [];
-  await page.addInitScript(names => { for (const c of names) if (!(c in window)) window[c] = window; }, appClassNames()); /* 옛 빌드 호환(--ref): 시험 도구가 쓰는 Class.이름 — 새 빌드는 class 선언이 가리고, class가 없는 옛 빌드는 전역 함수(window)로 */
+  await page.addInitScript(names => { for (const c of names) if (!(c in window)) window[c] = window;
+    /* 이름(글)으로 앱 함수 찾기: 전역(모듈 블록 함수·옛 빌드) → 앱 class의 static 메서드(맨 위 class는 window에 없어 전역 eval로) */
+    window.__ggmFn = nm => { if (typeof window[nm] === 'function') return window[nm]; for (const c of names) { let C; try { C = (0, eval)(c); } catch { continue; } if (C && C !== window && typeof C[nm] === 'function') return C[nm]; } return undefined; }; }, appClassNames()); /* 옛 빌드 호환(--ref): 시험 도구가 쓰는 Class.이름 — 새 빌드는 class 선언이 가리고, class가 없는 옛 빌드는 전역 함수(window)로 */
   if (viewport) await page.setViewportSize(viewport);
   page.on('pageerror', e => errors.push(String(e.stack || e).split('\n').slice(0, 4).join(' ← '))); await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
   try {
     await page.goto(url);
-    await page.waitForFunction(() => typeof buildNewGameDraft === 'function' && typeof G === 'object', null, { timeout: 20000 });
+    await page.waitForFunction(() => (typeof Story==='undefined'?'undefined':typeof Story.buildNewGameDraft) === 'function' && typeof G === 'object', null, { timeout: 20000 });
     if (pc) { // 빈 브라우저: 서버 data에 게임이 있으면 앱이 받아 와서 다시 시작함 — 받은 게임이 활성이 될 때까지 기다림
       const has = await fetch(`http://127.0.0.1:${pc.port}/api/store/state`, { headers: { 'X-GGM-Key': pc.key } }).then(r => r.ok).catch(() => false);
-      if (has) await until(() => page.evaluate(() => typeof PJ === 'function' && PJ().active !== 'main' && typeof G === 'object' && !!G && Array.isArray(G.chars)), 60000, 'PC 서버 data에서 게임 받기');
-      await page.waitForFunction(() => typeof buildNewGameDraft === 'function' && typeof G === 'object' && !!PCS(), null, { timeout: 20000 });
-      if (gid && await page.evaluate(id => PJ().active !== id, gid)) { // 그 게임으로 전환(앱의 switchProject — 다시 시작함)
-        await page.evaluate(id => { switchProject(id); }, gid).catch(() => {});
-        await until(() => page.evaluate(id => typeof PJ === 'function' && PJ().active === id && typeof G === 'object' && !!G && Array.isArray(G.chars) && typeof buildNewGameDraft === 'function', gid), 60000, '게임 전환 ' + gid); } }
+      if (has) await until(() => page.evaluate(() => (typeof Core==='undefined'?'undefined':typeof Core.PJ) === 'function' && Core.PJ().active !== 'main' && typeof G === 'object' && !!G && Array.isArray(G.chars)), 60000, 'PC 서버 data에서 게임 받기');
+      await page.waitForFunction(() => (typeof Story==='undefined'?'undefined':typeof Story.buildNewGameDraft) === 'function' && typeof G === 'object' && !!System.PCS(), null, { timeout: 20000 });
+      if (gid && await page.evaluate(id => Core.PJ().active !== id, gid)) { // 그 게임으로 전환(앱의 switchProject — 다시 시작함)
+        await page.evaluate(id => { System.switchProject(id); }, gid).catch(() => {});
+        await until(() => page.evaluate(id => (typeof Core==='undefined'?'undefined':typeof Core.PJ) === 'function' && Core.PJ().active === id && typeof G === 'object' && !!G && Array.isArray(G.chars) && (typeof Story==='undefined'?'undefined':typeof Story.buildNewGameDraft) === 'function', gid), 60000, '게임 전환 ' + gid); } }
     return { out: await fn(page), errors, pc: pc && { port: pc.port } };
   } finally { await b.close(); if (srv) srv.close(); if (pc) pc.proc.kill(); }
 }
 
 // 앱의 PC 저장(pcPush)으로 지금 브라우저 캐시를 서버 data 폴더에 씀 — 활성 게임 id를 돌려줌
-export async function pcSave(page) { return page.evaluate(async () => { await flush(); await appStorage.drain(); const ok = await pcPush(true, true); return { ok: !!ok, gid: PJ().active }; }); }
+export async function pcSave(page) { return page.evaluate(async () => { await Core.flush(); await appStorage.drain(); const ok = await SystemView.pcPush(true, true); return { ok: !!ok, gid: Core.PJ().active }; }); }

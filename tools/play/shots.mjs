@@ -13,23 +13,23 @@ const gid = process.argv[2] && gidOf(dir); if (!gid || !hasGame(PC_DIR, gid)) { 
 const game = JSON.stringify(readGame(PC_DIR, gid).game), outDir = join(dir, 'shots'); mkdirSync(outDir, { recursive: true });
 const { out, errors } = await withPage(async page => {
   const log = {}, shot = name => page.screenshot({ path: join(outDir, name + '.png') }), text = sel => page.evaluate(s => (document.querySelector(s)?.innerText || '').replace(/\s+/g, ' ').slice(0, 400), sel);
-  await page.evaluate(game => { closeModal(); closeOv(); G = fix(JSON.parse(game)); applyMeta(); P().owned = {}; P().squad = []; P().firstTen = true; P().seenOpening = true; P().gems = Math.max(P().gems, 3000); SystemView.reloadGame = () => {}; tab = 'lobby'; render(); }, game);
+  await page.evaluate(game => { CoreView.closeModal(); CoreView.closeOv(); G = Characters.fix(JSON.parse(game)); SystemView.applyMeta(); P().owned = {}; P().squad = []; P().firstTen = true; P().seenOpening = true; P().gems = Math.max(P().gems, 3000); SystemView.reloadGame = () => {}; tab = 'lobby'; Challenge.render(); }, game);
   await page.waitForTimeout(500); await shot('01-lobby'); log.lobby = await text('#view');
-  await page.evaluate(() => { tab = 'contract'; render(); }); await page.waitForTimeout(400); await shot('02-contract'); log.contract = await text('#view');
-  await page.evaluate(() => pull(10)); await page.waitForTimeout(1500);
+  await page.evaluate(() => { tab = 'contract'; Challenge.render(); }); await page.waitForTimeout(400); await shot('02-contract'); log.contract = await text('#view');
+  await page.evaluate(() => Acquire.pull(10)); await page.waitForTimeout(1500);
   for (let i = 0; i < 30; i++) { if (!(await page.evaluate(() => !document.getElementById('ov').hidden))) break; if (i === 4) await shot('03-gacha'); await page.mouse.click(206, 700); await page.waitForTimeout(350); }
   await shot('04-after-gacha'); log.owned = await page.evaluate(() => Object.keys(P().owned).map(id => charById(id)?.name));
-  await page.evaluate(() => { closeOv(); tab = 'crew'; render(); }); await page.waitForTimeout(400); await shot('05-crew');
-  await page.evaluate(() => openChar(P().squad[0] || G.chars[0].id)); await page.waitForTimeout(500); await shot('06-char'); log.char = await text('#modal');
-  await page.evaluate(() => { closeModal(); tab = 'ops'; render(); }); await page.waitForTimeout(400); await shot('07-ops'); log.ops = await text('#view');
-  await page.evaluate(() => { const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages[0]; playStory(s.title, s.pre || '', () => {}); });
+  await page.evaluate(() => { CoreView.closeOv(); tab = 'crew'; Challenge.render(); }); await page.waitForTimeout(400); await shot('05-crew');
+  await page.evaluate(() => CharactersCtl.openChar(P().squad[0] || G.chars[0].id)); await page.waitForTimeout(500); await shot('06-char'); log.char = await text('#modal');
+  await page.evaluate(() => { CoreView.closeModal(); tab = 'ops'; Challenge.render(); }); await page.waitForTimeout(400); await shot('07-ops'); log.ops = await text('#view');
+  await page.evaluate(() => { const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages[0]; SystemView.playStory(s.title, s.pre || '', () => {}); });
   await page.waitForTimeout(800); await shot('08-story');
   for (let i = 0; i < 5; i++) { await page.mouse.click(206, 650); await page.waitForTimeout(450); } await shot('09-story-later'); log.story = await text('#ov');
-  await page.evaluate(() => { if (S) vnEnd(); closeOv(); const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages.find(x => (x.enemies || []).length && !x.mode) || ch.stages[0]; P().settings.bspeed = 3; startBattle(ch.id, s.id); });
+  await page.evaluate(() => { if (S) CharactersView.vnEnd(); CoreView.closeOv(); const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages.find(x => (x.enemies || []).length && !x.mode) || ch.stages[0]; P().settings.bspeed = 3; StoryCtl.startBattle(ch.id, s.id); });
   await page.waitForTimeout(3500); await shot('10-battle'); await page.waitForTimeout(15000); await shot('11-battle-later'); log.battle = await text('#ov');
-  await page.evaluate(() => { closeOv(); openPhone(); }); await page.waitForTimeout(600); await shot('12-phone');
+  await page.evaluate(() => { CoreView.closeOv(); MessengerView.openPhone(); }); await page.waitForTimeout(600); await shot('12-phone');
   // 특수 스테이지(콘테스트·회담)가 있으면 열어서 첫 화면과 선택 몇 번 뒤를 캡처
-  const mode = await page.evaluate(() => { closePhone(); closeOv(); closeModal(); for (const ch of G.chapters) for (const s of ch.stages || []) if (s.mode === 'contest' || s.mode === 'debate') { startBattle(ch.id, s.id); return s.mode + ':' + s.title; } return ''; });
+  const mode = await page.evaluate(() => { CoreView.closePhone(); CoreView.closeOv(); CoreView.closeModal(); for (const ch of G.chapters) for (const s of ch.stages || []) if (s.mode === 'contest' || s.mode === 'debate') { StoryCtl.startBattle(ch.id, s.id); return s.mode + ':' + s.title; } return ''; });
   if (mode) { await page.waitForTimeout(1200); await shot('13-mode'); log.mode = mode + ' | ' + await text('#ov') + ' | ' + await text('#modal');
     for (let i = 0; i < 4; i++) { const b = await page.$('#ov button:not([disabled]), #modal button:not([disabled])'); if (!b) break; await b.click().catch(() => {}); await page.waitForTimeout(700); } await shot('14-mode-later'); log.modeLater = await text('#ov') + ' | ' + await text('#modal'); }
   return log;

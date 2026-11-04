@@ -5,11 +5,11 @@ function v2RefreshBattleEquipment(c){
 }
 function v2SyncEquipment(c){
  const p=c.weapon?.passiveOption;if(!p)return false;
- if(GGMCombat.equipmentState(c,1).needsReroll){const changed=!p.invalidated;p.invalidated=true;p.enabled=false;v2RefreshBattleEquipment(c);if(changed&&typeof G!=='undefined'&&G.chars?.includes(c))mark('c:'+c.id);return changed;}return false;
+ if(GGMCombat.equipmentState(c,1).needsReroll){const changed=!p.invalidated;p.invalidated=true;p.enabled=false;v2RefreshBattleEquipment(c);if(changed&&typeof G!=='undefined'&&G.chars?.includes(c))Core.mark('c:'+c.id);return changed;}return false;
 }
 function v2EnsureEquipment(c){
  v2Ensure(c);c.weapon=c.weapon||{};
- if(!c.weapon.passiveOption){const draft=GGMCombat.equipmentDraft(c);if(draft){c.weapon.passiveOption=draft;if(G.chars.includes(c))mark('c:'+c.id);}}
+ if(!c.weapon.passiveOption){const draft=GGMCombat.equipmentDraft(c);if(draft){c.weapon.passiveOption=draft;if(G.chars.includes(c))Core.mark('c:'+c.id);}}
  v2SyncEquipment(c);return c.weapon.passiveOption;
 }
 function v2EquipmentOf(c){return c.weapon?.passiveOption||GGMCombat.equipmentDraft(c);} // 읽기 — 고칠 때는 v2EnsureEquipment
@@ -23,11 +23,11 @@ function v2EquipmentSkillSaved(c,slot,before,after,rerolled=false){
 function v2EquipmentCard(c,o){
  const p=v2EquipmentOf(c),state=GGMCombat.equipmentState(c.weapon?.passiveOption?c:{...c,weapon:{...(c.weapon||{}),passiveOption:p}},o?.wlv||0),warning=state.needsReroll;
  return `<div class="cs-card v2-equipment-card ${warning?'needs-reroll':''}" data-equipment-card data-cid="${esc(c.id)}">
- <div class="v2-equipment-head"><div class="wthumb">${imgSrc(c.weapon)?`<img src="${esc(imgSrc(c.weapon))}" alt="">`:'<span>⚔</span>'}</div><div class="t"><b>${esc(c.weapon.name||T('weapon')+' 미설정')} ${o?`<span class="muted">${o.wlv?o.wlv+'단계':'잠김'}</span>`:''}</b><div class="muted">${esc(c.weapon.desc||'')}</div></div></div>
- <div class="v2-equipment-upgrade"><button class="btn" data-act="wup" data-id="${esc(c.id)}" ${!o||o.wlv>=5?'disabled':''}>${!o?'장비 해금 — 캐릭터 획득 필요':o.wlv>=5?'장비 최대 강화':o.wlv?'장비 강화':'장비 해금'}</button><p class="muted">${!o?'캐릭터를 획득하면 장비를 해금할 수 있어요.':o.wlv>=5?'최대 5단계입니다.':`${esc(T('wMat'))} ${GGMCombat.equipmentUpgradeCost(o.wlv).materials}개 · ${esc(T('gold'))} ${nf(GGMCombat.equipmentUpgradeCost(o.wlv).gold)}개 필요`}</p></div>
+ <div class="v2-equipment-head"><div class="wthumb">${Characters.imgSrc(c.weapon)?`<img src="${esc(Characters.imgSrc(c.weapon))}" alt="">`:'<span>⚔</span>'}</div><div class="t"><b>${esc(c.weapon.name||System.T('weapon')+' 미설정')} ${o?`<span class="muted">${o.wlv?o.wlv+'단계':'잠김'}</span>`:''}</b><div class="muted">${esc(c.weapon.desc||'')}</div></div></div>
+ <div class="v2-equipment-upgrade"><button class="btn" data-act="wup" data-id="${esc(c.id)}" ${!o||o.wlv>=5?'disabled':''}>${!o?'장비 해금 — 캐릭터 획득 필요':o.wlv>=5?'장비 최대 강화':o.wlv?'장비 강화':'장비 해금'}</button><p class="muted">${!o?'캐릭터를 획득하면 장비를 해금할 수 있어요.':o.wlv>=5?'최대 5단계입니다.':`${esc(System.T('wMat'))} ${GGMCombat.equipmentUpgradeCost(o.wlv).materials}개 · ${esc(System.T('gold'))} ${nf(GGMCombat.equipmentUpgradeCost(o.wlv).gold)}개 필요`}</p></div>
  <p class="muted v2-equipment-stats">HP +${(o?.wlv||0)*3}%, 공격 +${(o?.wlv||0)*6}%, 스킬 위력 +${(o?.wlv||0)*5}%</p>
  <div class="v2-equipment-passive"><b>고유 효과 · ${esc(p?.name||'미구성')}</b><span class="badge">${warning?'재생성 필요':state.active?'적용 중':state.reason==='locked'?'해금 후 적용':'미구성'}</span><p>${esc(GGMCombat.equipmentDescription(c,p))}</p>${warning?'<p class="v2-equipment-warning">연계 스킬이 변경되어 고유 효과가 중지됐어요.</p>':''}</div>
- ${playMode()?'':`<button class="btn sm ghost" data-act="v2gearedit" data-id="${esc(c.id)}">고유 효과 편집 · AI 생성</button>`}
+ ${System.playMode()?'':`<button class="btn sm ghost" data-act="v2gearedit" data-id="${esc(c.id)}">고유 효과 편집 · AI 생성</button>`}
  ${warning?`<button class="v2-equipment-alert" data-act="v2gearalert" data-id="${esc(c.id)}" aria-label="연계 스킬 변경: 장비 고유 효과 재생성 필요" aria-expanded="false">!</button>`:''}</div>`;
 }
 function v2GearAlert(button){
@@ -37,7 +37,7 @@ function v2GearAlert(button){
 function v2CancelGearEditor(){V2GEAR?.job?.controller.abort();}
 function v2CloseGearEditor(){v2CancelGearEditor();V2GEAR=null;}
 function v2OpenGearEditor(id){
- if(playMode())return;const c=charById(id);if(!c)return;v2CancelEditorGeneration();v2CancelGearEditor();
+ if(System.playMode())return;const c=charById(id);if(!c)return;v2CancelEditorGeneration();v2CancelGearEditor();
  const old=v2EnsureEquipment(c),choices=GGMCombat.equipmentChoices(c),choice=choices.find(x=>x.sourceSlot===old?.sourceSlot&&x.effectIndex===old?.effectIndex&&x.modifier===old?.modifier)||choices[0];
  V2GEAR={id,draft:choice?{...(old||{}),...choice,name:old?.name||GGMCombat.equipmentDraft(c,choice).name,value:old&&choice.modifier===old.modifier?old.value:choice.value}:null,concept:'',busy:false,status:'',history:[],report:null,job:null};v2DrawGearEditor();
 }
@@ -52,7 +52,7 @@ function v2GearStatus(){
 function v2GearReport(r){return `${r.trials}개 비교 · 고유 효과 없는 동일 파티 대비 ${r.ratio}배 · ${r.status==='strong'?'강한 편 — 검토 권장':'목표 범위'} (추정치)`;}
 function v2DrawGearEditor(){
  const s=V2GEAR,c=s&&charById(s.id);if(!c)return;const choices=GGMCombat.equipmentChoices(c),kit=v2Ensure(c),p=s.draft,spec=p&&GGMCombat.EQUIPMENT_MODS[p.modifier];
- openModal(`${head(esc(c.name)+' · 전용장비 고유 효과','<span class="muted">패시브 또는 액티브를 강화하는 고유 효과 1개</span>')}
+ CoreView.openModal(`${head(esc(c.name)+' · 전용장비 고유 효과','<span class="muted">패시브 또는 액티브를 강화하는 고유 효과 1개</span>')}
  <fieldset id="v2-gear-fields" style="border:0;padding:0;min-width:0" ${s.busy?'disabled':''}>
  <p class="muted">현재 스킬을 분석해 패시브 또는 액티브 중 하나만 자동으로 선정합니다. 기존 장비 강화의 스탯 상승은 유지되며, 고유 효과는 해금 후 항상 적용됩니다. 연계 스킬 변경 시에는 재생성이 필요합니다.</p>
  ${p?`<section class="v2-slot" style="border:1px solid var(--line);padding:12px;margin:12px 0;border-radius:12px"><h3>장비 패시브</h3><label class="f">이름<input class="in" id="v2-gear-name" maxlength="60" value="${esc(p.name||'')}"></label>
@@ -71,8 +71,8 @@ async function v2GearGenerate(c,state,signal,phase){
  for(let attempt=1;attempt<=5;attempt++){
   try{
    phase(`캐릭터 컨셉과 현재 스킬 분석 · AI 응답 대기 ${attempt}/5`);
-   let raw=await v2SkillRequest(SAMPLE,v2GearGeneratePrompt({c,state,choices,feedback}),signal);
-   v2CheckCancelled(signal);if(typeof raw==='string')raw=parseLoose(raw);raw=raw?.data||raw?.result||raw;
+   let raw=await v2SkillRequest(SAMPLE,Characters.v2GearGeneratePrompt({c,state,choices,feedback}),signal);
+   v2CheckCancelled(signal);if(typeof raw==='string')raw=Characters.parseLoose(raw);raw=raw?.data||raw?.result||raw;
    const choice=choices.find(x=>v2GearChoiceKey(x)===raw?.choiceId);if(!choice)throw new Error('현재 스킬에 없는 강화 방식이나 연계 대상을 반환했어요.');
    const draft={...choice,name:String(raw.name||'').trim(),value:Number(raw.value),enabled:true};if(!draft.name)throw new Error('고유 효과 이름이 비어 있어요.');const errors=GGMCombat.equipmentValidate(c,draft);if(errors.length)throw new Error(errors.join(' '));
    if(baseSig!==v2GearSkillSnapshot(c))throw new Error('연계 스킬이 생성 도중 바뀌었어요. 창을 다시 열어 주세요.');
@@ -88,7 +88,7 @@ async function v2GearGenerate(c,state,signal,phase){
 }
 async function v2GearAction(action,button){
  const state=V2GEAR;if(!state)return;if(action==='cancel'){v2CancelGearEditor();return;}if(state.busy)return;v2GearRead();const c=charById(state.id);if(!c)return;
- if(action==='back'){v2CancelGearEditor();V2GEAR=null;openChar(c.id);return;}
+ if(action==='back'){v2CancelGearEditor();V2GEAR=null;CharactersCtl.openChar(c.id);return;}
  if(action==='tab')return;
  if(action==='local'){
   state.draft=GGMCombat.equipmentDraft(c);state.report=null;state.status='현재 스킬의 특징으로 초안을 구성했어요. 검사·저장을 누르면 적용됩니다.';v2DrawGearEditor();return;
@@ -100,7 +100,7 @@ async function v2GearAction(action,button){
   const result=action==='generate'?await v2GearGenerate(c,state,controller.signal,phase):await v2Job('inspectEquipment',[{...v2CharacterInput(c),skillTraining:v2OwnedTraining(c)},state.draft,v2Options()],{signal:controller.signal,onProgress:p=>phase('장비 고유 효과 유무 비교 · '+Math.round(p.progress*27)+'/27')});v2CheckCancelled(controller.signal);
   if(V2GEAR!==state||!field.isConnected||charById(state.id)!==c)return;if(snapshot!==v2GearSkillSnapshot(c))throw new Error('연계 스킬이 작업 도중 바뀌었어요. 창을 다시 열고 구성해 주세요.');
   state.report=result.report;state.draft=result.option;
-  if(action==='save'){c.weapon.passiveOption=GGMCombat.equipmentBind(c,state.draft);c.weapon.passiveOption.balance=GGMCombat.clone(result.report);v2RefreshBattleEquipment(c);mark('c:'+c.id);state.status='장비 고유 효과를 저장했어요. '+v2GearReport(result.report);toast('장비 고유 효과를 저장했어요');}
+  if(action==='save'){c.weapon.passiveOption=GGMCombat.equipmentBind(c,state.draft);c.weapon.passiveOption.balance=GGMCombat.clone(result.report);v2RefreshBattleEquipment(c);Core.mark('c:'+c.id);state.status='장비 고유 효과를 저장했어요. '+v2GearReport(result.report);CoreView.toast('장비 고유 효과를 저장했어요');}
   else state.status=(action==='generate'?'고유 효과 초안을 생성했어요. 저장 전에는 장비가 바뀌지 않습니다. ':'')+v2GearReport(result.report);
  }catch(e){if(V2GEAR===state)state.status=e.name==='AbortError'?'작업을 중단했어요. 기존 장비는 유지됩니다.':v2FailureText(e);}
  finally{clearInterval(ticker);state.busy=false;if(state.job===job)state.job=null;if(V2GEAR===state&&field.isConnected)v2DrawGearEditor();}

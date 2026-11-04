@@ -46,7 +46,7 @@ console.log(`모듈 판정(SOLID/DRY/KISS/YAGNI): ${['폐기', '통합', '해체
 writeFileSync(join(OUT, 'judge.json'), JSON.stringify({ def: JUDGE_DEF, modules: JM }, null, 1));
 const F = findings(RS);
 if (arg('--rebase')) { const sha = execSync(`git rev-parse --verify ${JSON.stringify(arg('--rebase') + '^{commit}')}`, { cwd: ROOT, encoding: 'utf8' }).trim(), dir = join(ROOT, 'tools/out/ref-tree', sha);
-  if (!existsSync(join(dir, 'src'))) { mkdirSync(dir, { recursive: true }); execSync(`git archive ${sha} src www/index.html | tar -x -C ${JSON.stringify(dir)}`, { cwd: ROOT }); }
+  if (!existsSync(join(dir, 'tools/play'))) { mkdirSync(dir, { recursive: true }); execSync(`git archive ${sha} src www/index.html build/test.mjs tools/play | tar -x -C ${JSON.stringify(dir)}`, { cwd: ROOT }); /* 시험 도구도(규칙 A1 — 페이지 안 코드) */ }
   const F0 = findings(await inspect(dir)), D = compare(F0, F); writeBaseline(ROOT, F0, 'rules');
   console.log(`규칙 기준선을 ${sha.slice(0, 7)}의 코드(지금 규칙으로 잼)로: ${F0.length}개 · 지금 코드는 그 대비 새로 생김 ${D.added.length} · 나빠짐 ${D.worse.length} · 해결 ${D.fixed.length} · 좋아짐 ${D.better.length} · 옮김 ${(D.moved || []).length}`); [...D.added, ...D.worse].forEach(f => console.log('  + ' + f.text)); }
 else if (argv.includes('--strict') || argv.includes('--update-baseline')) { const B = readBaseline(ROOT, 'rules'), D = B ? compare(B, F) : null, errs = RS.filter(r => r.block.startsWith('오류') && r.n);

@@ -3013,11 +3013,18 @@
    "text": "A1 옛 이름 다리로 부름 main/10-liveops.js 3"
   },
   {
+   "key": "규칙 A1|src/main/90-load.js",
+   "num": {
+    "건": 3
+   },
+   "text": "A1 옛 이름 다리로 부름 main/90-load.js 3"
+  },
+  {
    "key": "규칙 A1|src/modules/app/010-confirm.js",
    "num": {
-    "건": 2
+    "건": 4
    },
-   "text": "A1 옛 이름 다리로 부름 modules/app/010-confirm.js 2"
+   "text": "A1 옛 이름 다리로 부름 modules/app/010-confirm.js 4"
   },
   {
    "key": "규칙 A1|src/modules/combat/040-effects.js",
@@ -3029,9 +3036,9 @@
   {
    "key": "규칙 A1|src/modules/combat/050-bridge.js",
    "num": {
-    "건": 51
+    "건": 53
    },
-   "text": "A1 옛 이름 다리로 부름 modules/combat/050-bridge.js 51"
+   "text": "A1 옛 이름 다리로 부름 modules/combat/050-bridge.js 53"
   },
   {
    "key": "규칙 A1|src/modules/combat/060-generation.js",
@@ -3060,6 +3067,69 @@
     "건": 9
    },
    "text": "A1 옛 이름 다리로 부름 modules/combat/090-practice.js 9"
+  },
+  {
+   "key": "규칙 A1|build/test.mjs",
+   "num": {
+    "건": 605
+   },
+   "text": "A1 옛 이름 다리로 부름 build/test.mjs 605"
+  },
+  {
+   "key": "규칙 A1|tools/play/combos.mjs",
+   "num": {
+    "건": 67
+   },
+   "text": "A1 옛 이름 다리로 부름 tools/play/combos.mjs 67"
+  },
+  {
+   "key": "규칙 A1|tools/play/lib/generate.mjs",
+   "num": {
+    "건": 12
+   },
+   "text": "A1 옛 이름 다리로 부름 tools/play/lib/generate.mjs 12"
+  },
+  {
+   "key": "규칙 A1|tools/play/lib/page.mjs",
+   "num": {
+    "건": 14
+   },
+   "text": "A1 옛 이름 다리로 부름 tools/play/lib/page.mjs 14"
+  },
+  {
+   "key": "규칙 A1|tools/play/lib/qa.mjs",
+   "num": {
+    "건": 35
+   },
+   "text": "A1 옛 이름 다리로 부름 tools/play/lib/qa.mjs 35"
+  },
+  {
+   "key": "규칙 A1|tools/play/link.mjs",
+   "num": {
+    "건": 72
+   },
+   "text": "A1 옛 이름 다리로 부름 tools/play/link.mjs 72"
+  },
+  {
+   "key": "규칙 A1|tools/play/prompts.mjs",
+   "num": {
+    "건": 4
+   },
+   "text": "A1 옛 이름 다리로 부름 tools/play/prompts.mjs 4"
+  },
+  {
+   "key": "규칙 A1|tools/play/shots.mjs",
+   "num": {
+    "건": 22
+   },
+   "text": "A1 옛 이름 다리로 부름 tools/play/shots.mjs 22"
+  },
+  {
+   "key": "규칙 A1|tools/play/upgrade.mjs",
+   "num": {
+    "건": 9
+   },
+   "text": "A1 옛 이름 다리로 부름 tools/play/upgrade.mjs 9"
   }
  ]
 }

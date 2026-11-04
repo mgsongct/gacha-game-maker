@@ -286,10 +286,13 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   /* 규칙 C1(역할 무리가 상위 class 밖)·A1(옛 이름 다리로 부름) · 선언 목록은 길어도 복잡 아님 */
   { const { roleFamilies, aliasUses } = await import('./lib/rules.mjs'), { classTable } = await import('./lib/graph.mjs'), { complexFns } = await import('./lib/quality.mjs');
     writeFileSync(join(r10, 'src/main/010-a.js'), "class Core {\n  static aiJSON(p){ return p; }\n  static toast(m){ return m; }\n}\nclass Generator {\n  static run(){ return Core.aiJSON('p'); }\n}\nclass Story {\n  static old(){ return Core.aiJSON('q'); }\n  static regs(){\n" + Array.from({ length: 130 }, (_, i) => `    reg('k${i}', ${i});`).join('\n') + "\n  }\n}\nfunction toast(...a) { return Core.toast(...a); }\nfunction reg(){}\ntoast('x');\n");
-    const U13 = await loadUnits(r10), g13 = buildGraph(U13), RF = roleFamilies(g13.fns, classTable(U13))['AI 생성 흐름'], AU = aliasUses(U13, '<b onclick="toast(1)">', [{ path: 't.mjs', text: "window.toast = () => {};\nconst toast = 1;" }]);
+    const U13 = await loadUnits(r10), g13 = buildGraph(U13), RF = roleFamilies(g13.fns, classTable(U13))['AI 생성 흐름'], AU = aliasUses(U13, '<b onclick="toast(1)">', [{ path: 't.mjs', text: "await page.evaluate(() => { window.toast = () => {}; toast(1); });\nconst toast = 1; toast2 = toast;" }]);
     assert.deepEqual(RF.map(x => [x.name, x.under]).sort(), [['old', false], ['run', true]], 'C1 역할 무리: ' + JSON.stringify(RF));
-    assert.deepEqual(AU.map(x => [x.at.replace(/^.*\//, '').replace(/:\d+$/, ''), x.name, !!x.driver]), [['010-a.js', 'toast', false], ['index.html', 'toast', false], ['t.mjs', 'toast', true]], 'A1 다리: ' + JSON.stringify(AU));
-    assert.ok(!complexFns(g13.fns).some(f => f.name === 'regs'), '선언 목록은 복잡 아님'); }
+    assert.deepEqual(AU.map(x => [x.at.replace(/^.*\//, '').replace(/:\d+$/, ''), x.name, !!x.driver]), [['010-a.js', 'toast', false], ['index.html', 'toast', false], ['t.mjs', 'toast', true], ['t.mjs', 'toast', true]], 'A1 다리: ' + JSON.stringify(AU));
+    assert.ok(!complexFns(g13.fns).some(f => f.name === 'regs'), '선언 목록은 복잡 아님');
+    /* 코드 글(eval로 도는 흐름 표 값)·typeof 이름(주인 class가 없을 때도 'undefined') */
+    const AU2 = aliasUses(U13, '', [{ path: 'u.mjs', text: "const F = { a: 'toast(2)' };\nawait page.waitForFunction(() => typeof toast === 'function');" }]).filter(x => x.driver), E2 = AU2.map(x => x.edit);
+    assert.ok(AU2.length === 2 && E2.some(e => e.line === 1 && e.col === 16 && e.to === 'Core.toast') && E2.some(e => e.line === 2 && /^\(typeof Core==='undefined'\?'undefined':typeof Core\.toast\)$/.test(e.to)), 'A1 코드 글·typeof: ' + JSON.stringify(AU2)); }
   assert.ok(g12.fns.get('boot')?.cls === 'Box' && g12.fns.get('boot').calls.has('read') && !g12.issues.some(i => i.kind === '중복 정의') && T3.includes('K2') && !un12(U12, {}).some(x => x.name === 'RULE') && R12.has('read') && !R12.has('dead'), 'class 인식: ' + JSON.stringify({ T3, iss: g12.issues, R: [...R12] }));
   rmSync(r10, { recursive: true, force: true }); }
 // 프롬프트 조립 함수(조각을 고르고 잇는 함수)가 스튜디오 밖이면 잡음 · 조각을 데이터와 바로 보내는 요청 지점은 안 잡음 · 불러올 때 조각 읽기 잡음

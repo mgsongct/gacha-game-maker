@@ -1,6 +1,6 @@
 # 연관 맵 — 모듈 → 빌드 → index.html(생성기·실행기·편집기) → data 게임 파일
 
-생성: `node tools/map.mjs` · 2026-11-04T14:49 · git ef1621f · 입력: src 57파일 · www/index.html cccb7118a6d7 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
+생성: `node tools/map.mjs` · 2026-11-04T22:37 · git 883b36b · 입력: src 56파일 · www/index.html 84079ca6c143 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
 
 ## 읽는 법 — 거꾸로 따라가기
 
@@ -105,7 +105,7 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | [].naiPrompt |  | fix<sub>10-characters</sub> | regenApply<sub>10-characters</sub> | conMakeVariant<sub>10-characters</sub> | c_age c_look c_minor |  | 2/2 |
 | [].naiStyle |  | apply<sub>10-characters</sub> | apply<sub>10-characters</sub> | conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
 | [].name |  | apply<sub>10-characters</sub> apply<sub>10-characters</sub> | apply<sub>10-characters</sub> apply<sub>10-characters</sub> regenApply<sub>10-characters</sub> | edit<sub>10-newgame</sub> conMakeVariant<sub>10-characters</sub> |  |  | 2/2 |
-| [].over |  | inheritAll<sub>10-characters</sub> | inheritOnMark<sub>10-characters</sub> |  |  |  | 0/2 |
+| [].over |  | inheritAll<sub>10-characters</sub> |  | inheritOnMark<sub>10-characters</sub> |  |  | 0/2 |
 | [].persona |  |  |  | personaSave<sub>10-characters</sub> | c_persona c_persona_weak c_pfields |  | 2/2 |
 | [].pfields |  |  |  | personaSave<sub>10-characters</sub> | c_pfields |  | 2/2 |
 | [].pos | posSpread<sub>10-characters</sub> | posSpread<sub>10-characters</sub> |  | rulesSave<sub>10-rules</sub> | c_pos |  | 2/2 |
@@ -116,7 +116,7 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | [].roleSpeedRole | v2ApplyRoleSpeed<sub>combat/050-bridge</sub> | v2ApplyRoleSpeed<sub>combat/050-bridge</sub> |  |  |  |  | 2/2 |
 | [].roleSpeedVersion | v2ApplyRoleSpeed<sub>combat/050-bridge</sub> | v2ApplyRoleSpeed<sub>combat/050-bridge</sub> |  |  |  |  | 2/2 |
 | [].skill |  | fix<sub>10-characters</sub> |  |  |  |  | 2/2 |
-| [].skillBalance | v2ApplyRoleSpeed<sub>combat/050-bridge</sub> v2Ensure<sub>combat/050-bridge</sub> v2QueueCharacter<sub>combat/050-bridge</sub> | balRemasterAI<sub>10-characters</sub> inheritApply<sub>10-characters</sub> v2ApplyRoleSpeed<sub>combat/050-bridge</sub> v2Ensure<sub>combat/050-bridge</sub> …외 1 | inheritApply<sub>10-characters</sub> v2EditorAction<sub>combat/050-bridge</sub> regenApply<sub>10-characters</sub> | balFix<sub>10-characters</sub> | c_skills |  | 1/2 |
+| [].skillBalance | v2ApplyRoleSpeed<sub>combat/050-bridge</sub> v2Ensure<sub>combat/050-bridge</sub> v2QueueCharacter<sub>combat/050-bridge</sub> | balRemasterAI<sub>10-characters</sub> inheritApply<sub>10-characters</sub> v2ApplyRoleSpeed<sub>combat/050-bridge</sub> v2Ensure<sub>combat/050-bridge</sub> …외 1 | v2EditorAction<sub>combat/050-bridge</sub> regenApply<sub>10-characters</sub> | balFix<sub>10-characters</sub> | c_skills |  | 1/2 |
 | [].skillConcept |  |  | v2EditorAction<sub>combat/050-bridge</sub> regenApply<sub>10-characters</sub> |  |  |  | 0/2 |
 | [].skillDesignLog | v2GenerateSkills<sub>combat/050-bridge</sub> v2QueueCharacter<sub>combat/050-bridge</sub> | balRemasterAI<sub>10-characters</sub> v2GenerateSkills<sub>combat/050-bridge</sub> v2QueueCharacter<sub>combat/050-bridge</sub> | v2EditorAction<sub>combat/050-bridge</sub> regenApply<sub>10-characters</sub> |  |  |  | 1/2 |
 | [].skillGenerationNotice | v2GenerateSkills<sub>combat/050-bridge</sub> v2QueueCharacter<sub>combat/050-bridge</sub> | v2GenerateSkills<sub>combat/050-bridge</sub> v2QueueCharacter<sub>combat/050-bridge</sub> | v2EditorAction<sub>combat/050-bridge</sub> regenApply<sub>10-characters</sub> |  |  |  | 0/2 |
@@ -442,13 +442,13 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 |---|---|---|---|---|---|
 | src/boot/durable-storage | 4571~4618 | 3 |  |  |  |
 | src/boot/head | 6~23 | 1 |  |  |  |
-| src/boot/storage-boot | 18841~18875 | 4 |  |  |  |
+| src/boot/storage-boot | 17225~17259 | 4 |  |  |  |
 | 00-core | 4621~5941 | 224 |  |  | 90-load 174, 10-characters 96, 10-system 65, 10-art 61, 10-newgame 33 |
 | 10-acquire | 5942~6578 | 70 | 실행기 23 · 편집기 30 · 생성기 3 | banners.json › [].active, banners.json › [].alt, banners.json › [].bg, banners.json › [].collab, banners.json › [].desc, banners.json › [].gate …외 19 | 00-core 122, 90-load 99, 10-characters 41, 10-system 38, 10-story 14 |
 | 10-art | 6579~7212 | 96 | 편집기 15 · 실행기 3 | lib.json › [].affLines, lib.json › [].alias, lib.json › [].faction, lib.json › [].files, lib.json › [].intro, lib.json › [].lines …외 8 | 00-core 128, 90-load 80, 10-system 24, 10-characters 19, 10-newgame 8 |
 | 10-battle | 7213~7346 | 29 |  |  | 90-load 28, 00-core 24, 10-characters 15, 10-system 7, 10-economy 4 |
 | 10-challenge | 7347~7882 | 90 |  |  | 00-core 85, 90-load 57, 10-system 22, 10-characters 18, 10-art 8 |
-| 10-characters | 7883~10034 | 315 | 실행기 64 · 기타 28 · 편집기 46 · 생성기 16 | banners.json › [].pickup, banners.json › [].pool, banners.json › [].rate, chapters.json › [].kind, chapters.json › [].stages[].post, chapters.json › [].stages[].pre …외 74 | 00-core 368, 90-load 266, 10-system 77, 10-art 46, 10-world 26 |
+| 10-characters | 7883~10034 | 315 | 실행기 64 · 기타 29 · 편집기 44 · 생성기 16 | banners.json › [].pickup, banners.json › [].pool, banners.json › [].rate, chapters.json › [].kind, chapters.json › [].stages[].post, chapters.json › [].stages[].pre …외 74 | 00-core 368, 90-load 266, 10-system 77, 10-art 46, 10-world 26 |
 | 10-economy | 10035~10323 | 50 |  |  | 90-load 85, 00-core 75, 10-characters 20, 10-system 19, 10-art 8 |
 | 10-expedition | 10324~10480 | 37 | 생성기 6 | dispatches.json, meta.json › expedition, meta.json › farms, meta.json › persona, meta.json › shop, meta.json › variants | 00-core 45, 90-load 34, 10-economy 5, 10-challenge 5, 10-system 5 |
 | 10-liveops | 10481~10869 | 88 | 생성기 2 · 실행기 1 | meta.json › auditSeen, meta.json › spots | 00-core 95, 90-load 66, 10-system 19, 10-characters 7, 10-economy 5 |
@@ -478,6 +478,9 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 
 ## 7. 최근 변화(증분 갱신 기록)
 
+- 2026-11-04T22:37 · git 883b36b · src 10: −src/main/99-aliases, 10-liveops, 90-load, app/010-confirm, combat/040-effects, combat/050-bridge, combat/060-generation, combat/070-equipment … · index.html 다시 빌드
+  - chars.json › [].over: +기타:inheritOnMark −편집기:inheritOnMark
+  - chars.json › [].skillBalance:  −편집기:inheritApply
 - 2026-11-04T14:49 · git ef1621f · src 4: 00-core, 10-newgame, 10-world, 99-aliases · index.html 다시 빌드
 - 2026-11-04T14:45 · git ef1621f · src 18: 00-core, 10-acquire, 10-art, 10-battle, 10-challenge, 10-characters, 10-economy, 10-expedition … · index.html 다시 빌드
 - 2026-11-04T14:13 · git ef1621f · src 1: 90-load · index.html 다시 빌드
@@ -528,5 +531,3 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
   - banners.json › [].id:  −실행기:addPickupFor −편집기:handleNavigationAndToolsAction
   - banners.json › [].name:  −실행기:addPickupFor −실행기:rotatePickups −편집기:handleNavigationAndToolsAction −편집기:readBanner −편집기:renameEverywhere
 - 2026-11-04T09:06 · git 1251f3a
-- 2026-11-04T09:06 · git 1251f3a · src 128: +src/main/0010-base/0010-rules, +src/main/0010-base/0060-util, +src/main/0015-prompt-studio/0440-ai-context, +src/main/0020-ai, +src/main/0030-image/0310-art-after-ai, +src/main/0030-image/0330-casting, +src/main/0030-image/0565-asset-library, +src/main/0070-store/0070-save … · index.html 다시 빌드
-  - 함수: 추가 0 · 삭제 1 (showCut0) · 옮김 574 (elemLine: src/main/0010-rules.js → src/main/0010-base/0010-rules.js; T: src/main/0010-rules.js → src/main/0010-base/0010-rules.js; applyMeta: src/main/0010-rules.js → src/main/0010-base/0010-rules.js; charById: src/main/0060-util.js → src/main/0010-base/0060-util.js)

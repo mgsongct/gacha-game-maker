@@ -7,7 +7,7 @@ function v2Abortable(promise,signal){
 }
 function v2Has(map,key){return typeof key==='string'&&Object.prototype.hasOwnProperty.call(map,key);}
 function v2DecodeSkillResponse(response,slot){
- let r=response;if(typeof r==='string')r=parseLoose(r);
+ let r=response;if(typeof r==='string')r=Characters.parseLoose(r);
  for(let i=0;i<3;i++){
   if(r?.skill||r?.skills||Array.isArray(r?.effects)||r?.recipe)break;
   if(r?.data||r?.result)r=r.data||r.result;else break;
@@ -117,9 +117,9 @@ async function v2ResolvePalette(c,slot,raw,compiled,{provider,signal,onEvent,att
  onPhase?.('외모 태그·스킬 컨셉의 색 의미와 원문 근거를 LLM에 보완 요청');
  onEvent({kind:'request',attempt,purpose:'palette',text:'팔레트 해석 보완 요청 (최대 1회)'});
  try{
-  const context={character:v2DesignContext(c,c.skillConcept||'',compiled.kit).character,skill:{name:raw.name,description:raw.description,visualTheme:raw.visualTheme,effects:compiled.skill.effects.map(e=>({type:e.type,status:['dot','stun'].includes(e.type)?e.status:undefined}))},sourceTexts:GGMCombat.paletteSources(c,raw)};
-  let response=await v2SkillRequest(provider,v2ResolvePalettePrompt({context,compiled}),signal);
-  if(typeof response==='string')response=parseLoose(response);response=response?.data||response?.result||response;
+  const context={character:Characters.v2DesignContext(c,c.skillConcept||'',compiled.kit).character,skill:{name:raw.name,description:raw.description,visualTheme:raw.visualTheme,effects:compiled.skill.effects.map(e=>({type:e.type,status:['dot','stun'].includes(e.type)?e.status:undefined}))},sourceTexts:GGMCombat.paletteSources(c,raw)};
+  let response=await v2SkillRequest(provider,Core.v2ResolvePalettePrompt({context,compiled}),signal);
+  if(typeof response==='string')response=Characters.parseLoose(response);response=response?.data||response?.result||response;
   const repairedRaw={...raw,paletteDesign:response?.paletteDesign||response?.skill?.paletteDesign},decision=GGMCombat.skillPaletteDecision(c,slot,{...repairedRaw,type:compiled.skill.effects[0]?.type,effects:compiled.skill.effects,fx:compiled.skill.fx});
   if(decision.valid){Object.assign(compiled.skill,GGMCombat.skillVisual(c,slot,{type:compiled.skill.effects[0]?.type},{...repairedRaw,effects:compiled.skill.effects}));compiled.paletteDecision=decision;return compiled;}
   compiled.paletteDecision.details.push('색상만 보완한 응답도 근거 검사에 실패했습니다: '+decision.issues.join(' '));
@@ -128,7 +128,7 @@ async function v2ResolvePalette(c,slot,raw,compiled,{provider,signal,onEvent,att
  return compiled;
 }
 function v2ElemNames(){ try{ return (typeof ELEMS!=='undefined'&&ELEMS.length?ELEMS:['홍','녹','청']).join('·'); }catch(e){ return '속성'; } } // 프롬프트의 속성 이름은 이 게임의 것으로(원본 「홍·녹·청」 고정 문구였음)
-function v2FailureText(e){const code=e?.code||e?.name||'오류';const known={invalid_json:'AI 응답의 JSON 형식이 올바르지 않습니다.',invalid_skill:'스킬 응답 구조가 맞지 않습니다.',timeout:'AI 응답 대기 시간이 90초를 초과했습니다.',bad_key:'글 AI 인증 키를 확인해 주세요.',no_ai:'설정의 글 AI를 먼저 등록해 주세요.',rate_limited:'AI 서비스가 요청을 제한하고 있습니다.',network:'AI 서비스 연결에 실패했습니다.'};return (known[code]||'')+(e?.message?' '+String(e.message).slice(0,500):!known[code]?aiErrText(e):'');}
+function v2FailureText(e){const code=e?.code||e?.name||'오류';const known={invalid_json:'AI 응답의 JSON 형식이 올바르지 않습니다.',invalid_skill:'스킬 응답 구조가 맞지 않습니다.',timeout:'AI 응답 대기 시간이 90초를 초과했습니다.',bad_key:'글 AI 인증 키를 확인해 주세요.',no_ai:'설정의 글 AI를 먼저 등록해 주세요.',rate_limited:'AI 서비스가 요청을 제한하고 있습니다.',network:'AI 서비스 연결에 실패했습니다.'};return (known[code]||'')+(e?.message?' '+String(e.message).slice(0,500):!known[code]?Art.aiErrText(e):'');}
 async function v2SkillRequest(provider,prompt,signal){
  const controller=new AbortController(),abort=()=>controller.abort();signal?.addEventListener('abort',abort,{once:true});if(signal?.aborted)controller.abort();let timedOut=false;
  const timer=setTimeout(()=>{timedOut=true;controller.abort();},90000);
@@ -158,7 +158,7 @@ async function v2GenerateSelected(c,slot,concept,base,{signal,onEvent=()=>{}}={}
   let response,paletteLogged=false;
   try{
    onEvent({kind:'request',attempt,purpose:'skill',text:`${attempt}차 스킬 설계 요청`});
-   response=await v2SkillRequest(provider,v2SlotPrompt(c,slot,concept,base,feedback),signal);
+   response=await v2SkillRequest(provider,Characters.v2SlotPrompt(c,slot,concept,base,feedback),signal);
    phase(3,'AI 응답의 JSON과 선택 스킬 목록 해석',{attempt});
    const decoded=v2DecodeSkillResponse(response,slot);plan=decoded.plan||plan;
    phase(4,'효과·대상·발동 조건을 지원 규칙에 연결',{attempt});
@@ -181,11 +181,11 @@ async function v2GenerateSelected(c,slot,concept,base,{signal,onEvent=()=>{}}={}
 
  if(r.report?.nerfPasses)onEvent({kind:'repair',attempt:requestsUsed,text:`${GGMCombat.generation(c)}세대 기준 ${r.report.beforeRatio}배에서 ${r.report.ratio}배로 약화·재검사했습니다 (${r.report.nerfPasses}회).`});
  while(r.report?.status==='strong'&&requestsUsed<6){
-  const reason=v2GenerateSelectedReasonText({c,r});
+  const reason=Art.v2GenerateSelectedReasonText({c,r});
   onEvent({kind:'failure',attempt:requestsUsed,text:'밸런스 초과: '+reason});
   phase(2,`같은 세대 기준을 넘은 스킬을 약화해 재설계 · 시도 ${requestsUsed+1}/6`);
   let paletteLogged=false;try{
-   requestsUsed++;onEvent({kind:'request',attempt:requestsUsed,purpose:'skill',text:`${requestsUsed}차 약화 스킬 설계 요청`});const response=await v2SkillRequest(provider,v2SlotPrompt(c,slot,concept,base,reason),signal),decoded=v2DecodeSkillResponse(response,slot);
+   requestsUsed++;onEvent({kind:'request',attempt:requestsUsed,purpose:'skill',text:`${requestsUsed}차 약화 스킬 설계 요청`});const response=await v2SkillRequest(provider,Characters.v2SlotPrompt(c,slot,concept,base,reason),signal),decoded=v2DecodeSkillResponse(response,slot);
    compiled=v2CompileGenerated({...decoded.raw,power:Math.min(Number(decoded.raw.power)||100,75)},slot,base,c);
    compiled=await v2ResolvePalette(c,slot,decoded.raw,compiled,{provider,signal,onEvent,attempt:requestsUsed,onPhase:text=>phase(4,text,{attempt:requestsUsed})});
    onEvent(v2PaletteLog(c,slot,decoded.raw,compiled,requestsUsed));paletteLogged=true;if(compiled.repairs.length)onEvent({kind:'repair',attempt:requestsUsed,text:compiled.repairs.join(' ')});

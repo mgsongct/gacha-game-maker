@@ -43,30 +43,30 @@ const NEWGAME = [
 ];
 // 흐름: 요청 지점을 부르는 진입(앱이 부르는 방식대로). 도우미 이름은 앱 전역(B·C 등)과 겹치지 않게 __로. __C()=대원 · __ALT()=이격 · __CH()=메인 장 · __ST()=대본 있는 스테이지 · __B()=버튼. 분배기 case(화면 동작)는 아래 자동 운전
 const FLOWS = {
-  naiBlocksSeparate: 'naiBlocksSeparate(__C().naiPrompt||"1girl, solo, long hair, red eyes, armor", __B())',
-  designAI: 'designAI(__B())', weaponPromptAI: 'weaponPromptAI(G.chars.slice(0,2).map(c=>({c,name:(c.weapon||{}).name||"검",desc:(c.weapon||{}).desc||"",cur:(c.weapon||{}).prompt||""})),null,G.world)',
-  jaBatch: 'jaBatch(["다시 만나서 반가워요","오늘도 잘 부탁해요"])', toJa: 'toJa("오늘은 같이 걸을까요")',
-  spotsAI: 'spotsAI(__B())', spotTalkAI: '(async()=>{ if(!spots().length) await spotsAI(null); return spotTalkAI(__C(),__B()); })()',
-  heroTags: 'heroTags({gender:"여성",look:"은발 단발, 군복",hide:false})', fcSend: 'fcSend()', fcSummarize: 'fcSummarize(__C().id)',
-  rulesAIData: 'rulesAIData(__B())', rulesPosAI: 'rulesPosAI(__B())', skinAuto: 'skinAuto("")',
-  ensureLibPrompts: '(()=>{ G.lib.filter(l=>l.kind==="bg").slice(0,2).forEach(l=>{ l.prompt=""; }); return ensureLibPrompts(); })()',
-  aiChapterGen0: 'aiChapterGen("메인 플롯을 따라 자연스럽게 이어서",4,[],null)', writeStages: 'aiChapterGen("메인 플롯을 따라 자연스럽게 이어서",4,[],null)',
-  aiEventGen0: 'aiEventGen("여름 축제에서 생긴 일",3,true,[],null)',
-  drPolish: '(()=>{ openDraft(); return drPolish("world",__B()); })()', drPolishHero: '(()=>{ openDraft(); return drPolishHero(__B()); })()', drHarmony: '(()=>{ openDraft(); return drHarmony(__B()); })()', drFillChar: '(()=>{ openDraft(); return drFillChar(0,__B()); })()',
-  skinLinesAI: 'skinLinesAI(__C(),(__C().skins||[])[0]||{name:"여름 휴가",idea:"수영복"},null)', dailyTalks: 'dailyTalks()',
-  aiNewPickupChar: 'aiNewPickupChar("","ai",null)', aiAltChar: 'aiAltChar(__C(),"","ai",null)', cxDiscover: 'cxDiscover(__B())', cxDeepen: '(async()=>{ const k=(cxEntries()[0]||{}).key; return k?cxDeepen(k,__B()):null; })()',
-  autoNpcs: 'autoNpcs([__CH()])', factionAI: 'factionAI()', relSeedAI: 'relSeedAI(__B())',
-  personaAI: 'personaAI(__C(),"fill")', personaAIReview: 'personaAIReview(__C(),__B())', talkAffGen: 'talkAffGen(__C(),__B())', memorialGen: 'memorialGen(__C(),__B())',
-  directScript: 'directScript((__ST()||{}).pre||"세라: 안녕하세요\\n나레이션: 바람이 분다.")', planAI: 'planAI("new",null)',
-  smExtract: 'smExtract(__CH())', storyWrapUp: 'storyWrapUp(__CH(),"1~2")', auditAIFill: 'auditAIFill(__C(),["profile","speech"])', auditAIStage: 'auditAIStage(__ST())',
+  naiBlocksSeparate: 'LiveOps.naiBlocksSeparate(__C().naiPrompt||"1girl, solo, long hair, red eyes, armor", __B())',
+  designAI: 'Core.designAI(__B())', weaponPromptAI: 'Characters.weaponPromptAI(G.chars.slice(0,2).map(c=>({c,name:(c.weapon||{}).name||"검",desc:(c.weapon||{}).desc||"",cur:(c.weapon||{}).prompt||""})),null,G.world)',
+  jaBatch: 'System.jaBatch(["다시 만나서 반가워요","오늘도 잘 부탁해요"])', toJa: 'System.toJa("오늘은 같이 걸을까요")',
+  spotsAI: 'LiveOps.spotsAI(__B())', spotTalkAI: '(async()=>{ if(!LiveOps.spots().length) await LiveOps.spotsAI(null); return LiveOps.spotTalkAI(__C(),__B()); })()',
+  heroTags: 'NewGame.heroTags({gender:"여성",look:"은발 단발, 군복",hide:false})', fcSend: 'Core.fcSend()', fcSummarize: 'Core.fcSummarize(__C().id)',
+  rulesAIData: 'Rules.rulesAIData(__B())', rulesPosAI: 'Rules.rulesPosAI(__B())', skinAuto: 'LiveOps.skinAuto("")',
+  ensureLibPrompts: '(()=>{ G.lib.filter(l=>l.kind==="bg").slice(0,2).forEach(l=>{ l.prompt=""; }); return Art.ensureLibPrompts(); })()',
+  aiChapterGen0: 'StoryCtl.aiChapterGen("메인 플롯을 따라 자연스럽게 이어서",4,[],null)', writeStages: 'StoryCtl.aiChapterGen("메인 플롯을 따라 자연스럽게 이어서",4,[],null)',
+  aiEventGen0: 'CoreCtl.aiEventGen("여름 축제에서 생긴 일",3,true,[],null)',
+  drPolish: '(()=>{ StoryView.openDraft(); return Core.drPolish("world",__B()); })()', drPolishHero: '(()=>{ StoryView.openDraft(); return Characters.drPolishHero(__B()); })()', drHarmony: '(()=>{ StoryView.openDraft(); return Characters.drHarmony(__B()); })()', drFillChar: '(()=>{ StoryView.openDraft(); return Core.drFillChar(0,__B()); })()',
+  skinLinesAI: 'Misc.skinLinesAI(__C(),(__C().skins||[])[0]||{name:"여름 휴가",idea:"수영복"},null)', dailyTalks: 'Messenger.dailyTalks()',
+  aiNewPickupChar: 'Characters.aiNewPickupChar("","ai",null)', aiAltChar: 'Characters.aiAltChar(__C(),"","ai",null)', cxDiscover: 'World.cxDiscover(__B())', cxDeepen: '(async()=>{ const k=(World.cxEntries()[0]||{}).key; return k?World.cxDeepen(k,__B()):null; })()',
+  autoNpcs: 'Characters.autoNpcs([__CH()])', factionAI: 'World.factionAI()', relSeedAI: 'Core.relSeedAI(__B())',
+  personaAI: 'Characters.personaAI(__C(),"fill")', personaAIReview: 'Misc.personaAIReview(__C(),__B())', talkAffGen: 'Characters.talkAffGen(__C(),__B())', memorialGen: 'Characters.memorialGen(__C(),__B())',
+  directScript: 'System.directScript((__ST()||{}).pre||"세라: 안녕하세요\\n나레이션: 바람이 분다.")', planAI: 'Story.planAI("new",null)',
+  smExtract: 'Story.smExtract(__CH())', storyWrapUp: 'StoryCtl.storyWrapUp(__CH(),"1~2")', auditAIFill: 'LiveOps.auditAIFill(__C(),["profile","speech"])', auditAIStage: 'Story.auditAIStage(__ST())',
   v2ConceptPrompt: '(async()=>{ const c=__C(); return v2ConceptPrompt({items:{},slot:"ult",preview:null},c); })()',
   // 그림(가짜 NovelAI 키 — 그림 요청의 프롬프트·제외 태그를 받아 적고 오류로 답함)
-  '그림: 캐릭터': 'naiDraw("char",__C().naiPrompt||"1girl, solo")', '그림: 상반신': 'naiDrawItem({k:"upper",o:{prompt:""},c:__C()})',
-  '그림: 배경': '(()=>{ const l=G.lib.find(x=>x.kind==="bg")||{prompt:"castle, sky"}; return naiDraw("bg",l.prompt||"castle"); })()', '그림: 소품': '(()=>{ const l=G.lib.find(x=>x.kind==="prop")||{prompt:"sword"}; return naiDraw("prop",l.prompt||"sword"); })()',
-  '그림: 적': 'naiDraw("enemy","monster, claws")', '그림: CG': '(()=>{ const it=G.lib.find(x=>x.kind==="cg")||{name:"테스트 CG",prompt:"sunset, two people",chars:[__C().id]}; return naiDraw("cg",null,{item:it}); })()',
+  '그림: 캐릭터': 'NewGame.naiDraw("char",__C().naiPrompt||"1girl, solo")', '그림: 상반신': 'Core.naiDrawItem({k:"upper",o:{prompt:""},c:__C()})',
+  '그림: 배경': '(()=>{ const l=G.lib.find(x=>x.kind==="bg")||{prompt:"castle, sky"}; return NewGame.naiDraw("bg",l.prompt||"castle"); })()', '그림: 소품': '(()=>{ const l=G.lib.find(x=>x.kind==="prop")||{prompt:"sword"}; return NewGame.naiDraw("prop",l.prompt||"sword"); })()',
+  '그림: 적': 'NewGame.naiDraw("enemy","monster, claws")', '그림: CG': '(()=>{ const it=G.lib.find(x=>x.kind==="cg")||{name:"테스트 CG",prompt:"sunset, two people",chars:[__C().id]}; return NewGame.naiDraw("cg",null,{item:it}); })()',
   '(최상위 문장)': '(()=>{ const b=document.createElement("button"); b.dataset.act="pstai"; b.dataset.id=Object.keys(window.__PF)[0]; document.body.appendChild(b); b.click(); return new Promise(r=>setTimeout(r,1500)); })()',
 };
-const LAYER = new Set(['setupAI', 'aiJSON', 'aiJSONRetry', 'naiGenerate', 'naiGenerate0']); // 모든 요청이 지나는 층(감싸기·연결) — 요청 지점으로 세지 않음
+const LAYER = new Set(['setupAI', 'aiJSON', 'aiJSONRetry', 'naiGenerate', 'naiGenerate0', 'run']); // 모든 요청이 지나는 층(감싸기·연결 · Generator.run — AI 생성 흐름의 상위 템플릿 메서드) — 요청 지점으로 세지 않음
 
 if (!hasBrowser()) { console.log('skip tools/play/combos: playwright 없음(브라우저 도구 — tools/play/test.mjs와 같이 건너뜀)'); process.exit(0); }
 const units = await loadUnits(ROOT), S1 = promptSitesStatic(units), S2 = promptSitesStatic(units, { sinks: IMAGE_SINKS, tables: true }), sites = [...S1.sites, ...S2.sites.map(x => ({ ...x, key: '그림 ' + x.key, image: true }))], wrappers = [...S1.wrappers, ...S2.wrappers], layerTexts = S1.layerTexts, skip = new Set([...LAYER, ...wrappers, ...sites.filter(s => s.layer).map(s => s.owner)]);
@@ -99,13 +99,13 @@ async function runSide(www, tag) {
         return page.evaluate(async ({ step, game, owners, skip, flows, acts, responses, kindSrc, libSrc }) => {
           let seed = 12345; Math.random = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648); Error.stackTraceLimit = 80;
           const recs = [], kindOfP = new Function('return ' + kindSrc)(), seenSkill = {}; let cur = '';
-          P().seenOpening = true; closeModal(); closeOv(); appStorage.removeItem('ggm-ng-draft');
-          appStorage.setItem(PKEY, JSON.stringify({ active: 'gen', fallback: false, list: [{ id: 'gen', type: 'anthropic', name: 'tools/play', key: 'replay', model: 'replay', quick: 'replay-quick' }] })); setupAI();
+          P().seenOpening = true; CoreView.closeModal(); CoreView.closeOv(); appStorage.removeItem('ggm-ng-draft');
+          appStorage.setItem(PKEY, JSON.stringify({ active: 'gen', fallback: false, list: [{ id: 'gen', type: 'anthropic', name: 'tools/play', key: 'replay', model: 'replay', quick: 'replay-quick' }] })); System.setupAI();
           // 형식 견본을 그대로 답(견본 속 범위·설명은 앞 값으로) — 흐름이 응답을 받아 다음 단계로 가게
           const [schemaOf, lenientJSON, fakeAnswer] = ['schemaOf', 'lenientJSON', 'fakeAnswer'].map(k => new Function('return ' + libSrc[k])());
           const fakeSt = { n: 0 }; // 형식 견본을 그럴듯한 답으로(tools/lib/combos.mjs fakeAnswer — 번호를 붙여 서로 다르게: 대원마다 같은 글이면 같은 줄 되풀이가 가짜로 생김)
           const echo = p => { const sc = schemaOf(p), v = sc && sc.body ? lenientJSON(sc.body) : null; return v ? JSON.stringify(fakeAnswer(v, fakeSt)) : '{}'; };
-          const realHttp = http;
+          const realHttp = System.http;
           appStorage.setItem(NKEY, JSON.stringify({ key: 'combos-fake', retries: 0 })); // 그림 AI가 켜진 것으로(요청은 아래에서 가로챔)
           System.http = async (url, opts) => { if (/image\.novelai\.net/.test(url)) { const b = typeof opts.body === 'string' ? JSON.parse(opts.body) : (opts.body || {}), pr = b.parameters || {}; const frames = String(new Error().stack).split('\n').map(l => (/at (?:async )?([\w$.]+) \(/.exec(l) || [])[1]).filter(Boolean).map(f => f.replace(/^[A-Z][\w$]*\./, '')) /* Class.이름 → 이름(요청 지점 이름) */;
               recs.push({ flow: cur, owner: frames.find(f => owners.includes(f) && !skip.includes(f)) || '', image: true, prompt: [b.input || '', '[제외] ' + (pr.negative_prompt || ''), pr.v4_prompt ? '[v4] ' + JSON.stringify(pr.v4_prompt) : '', pr.v4_negative_prompt ? '[v4 제외] ' + JSON.stringify(pr.v4_negative_prompt) : ''].filter(Boolean).join('\n'), frames: frames.slice(0, 12).join('<') }); return { status: 500, text: 'combos: image request recorded' }; }
@@ -120,20 +120,20 @@ async function runSide(www, tag) {
             for (const k of Object.keys(r)) { let v = r[k]; Object.defineProperty(r, k, { enumerable: true, configurable: true, get() { const st = String(new Error().stack); if (!/JSON\.stringify|structuredClone|\.put \(|clone/.test(st) && !rec.used.includes(k)) rec.used.push(k); return v; }, set(x) { v = x; } }); } return r; };
           const oj = Core.aiJSON; Core.aiJSON = async (...a) => watch(a[0], await oj(...a)); const sj = SAMPLE.json; SAMPLE.json = async (...a) => watch(a[0], await sj(...a));
           CoreView.toast = () => {}; appConfirm = async () => true; SystemView.reloadGame = () => {};
-          const errs = [], S0 = game || JSON.stringify(G), load = () => { G = fix(JSON.parse(S0)); applyMeta(); if (step.code) { (0, eval)(step.code); applyMeta(); } };
-          window.__C = () => G.chars.find(c => !c.alt) || G.chars[0]; window.__ALT = () => G.chars.find(c => c.alt); window.__CH = () => G.chapters.find(c => c.kind === 'main' && (c.stages || []).some(s => s.pre)) || G.chapters[0]; window.__ST = () => (__CH().stages || []).find(s => s.pre) || (__CH().stages || [])[0]; window.__B = () => uiProg(document.createElement('button')); /* 처리기가 단추로 만든 진행 알림(uiProg)을 넘기는 것처럼 */
+          const errs = [], S0 = game || JSON.stringify(G), load = () => { G = Characters.fix(JSON.parse(S0)); SystemView.applyMeta(); if (step.code) { (0, eval)(step.code); SystemView.applyMeta(); } };
+          window.__C = () => G.chars.find(c => !c.alt) || G.chars[0]; window.__ALT = () => G.chars.find(c => c.alt); window.__CH = () => G.chapters.find(c => c.kind === 'main' && (c.stages || []).some(s => s.pre)) || G.chapters[0]; window.__ST = () => (__CH().stages || []).find(s => s.pre) || (__CH().stages || [])[0]; window.__B = () => CoreView.uiProg(document.createElement('button')); /* 처리기가 단추로 만든 진행 알림(uiProg)을 넘기는 것처럼 */
           const run = async (name, code) => { cur = name; load(); const n0 = recs.length; try { await Promise.race([(0, eval)(code), new Promise((_, rj) => setTimeout(() => rj(Error('시간 초과 20초')), 20000))]); } catch (e) { errs.push({ flow: name, err: String(e && (e.message || e.code) || e).slice(0, 200) }); recs.slice(n0).forEach(x => { x.failed = true; }); } await new Promise(r => setTimeout(r, 300)); };
-          if (step.kind === 'new') { load(); cur = '새 게임'; const btn = document.createElement('button'); document.body.appendChild(btn); try { await Promise.race([newGame(uiProg(btn, '#ng_stat'), step.input.mode === 'auto' ? step.input : (() => { appStorage.setItem(DR2KEY, JSON.stringify(step.input)); return drLoad(); })()), new Promise((_, rj) => setTimeout(() => rj(Error('시간 초과 120초')), 120000))]); } catch (e) { errs.push({ flow: '새 게임', err: String(e && (e.message || e) || e).slice(0, 200) }); } await new Promise(r => setTimeout(r, 1500)); }
+          if (step.kind === 'new') { load(); cur = '새 게임'; const btn = document.createElement('button'); document.body.appendChild(btn); try { await Promise.race([NewGame.newGame(CoreView.uiProg(btn, '#ng_stat'), step.input.mode === 'auto' ? step.input : (() => { appStorage.setItem(DR2KEY, JSON.stringify(step.input)); return Core.drLoad(); })()), new Promise((_, rj) => setTimeout(() => rj(Error('시간 초과 120초')), 120000))]); } catch (e) { errs.push({ flow: '새 게임', err: String(e && (e.message || e) || e).slice(0, 200) }); } await new Promise(r => setTimeout(r, 1500)); }
           else {
             for (const [name, code] of Object.entries(flows)) await run(name, code);
             for (const a of acts) { cur = a.owner + ':' + a.act; try { load(); const box = document.createElement('div'); box.style.display = 'none'; document.body.appendChild(box);
               for (const id of a.ids) { if (document.getElementById(id)) continue; const el = a.sel.includes(id) ? Object.assign(document.createElement('select'), { innerHTML: '<option value="1">1</option>' }) : a.chk.includes(id) ? Object.assign(document.createElement('input'), { type: 'checkbox' }) : document.createElement('textarea'); el.id = id; if (!a.sel.includes(id) && !a.chk.includes(id)) el.value = a.num.includes(id) ? '1' : (id === 'f_name' ? __C().name : '여름 축제'); box.appendChild(el); }
               const t = document.createElement('button'); t.dataset.act = a.act; for (const k of a.ds) t.dataset[k] = /^(i|j)$/.test(k) ? '0' : k === 's' ? ((__C().skins || [])[0] || {}).id || '' : k === 'k' ? 'bg' : ''; box.appendChild(t);
               const id = a.npc ? ((G.npcs || [])[0] || {}).id : __C().id;
-              try { await Promise.race([window[a.owner](a.act, t, id, P(), { target: t }), new Promise((_, rj) => setTimeout(() => rj(Error('시간 초과 20초')), 20000))]); } catch (e) { errs.push({ flow: cur, err: String(e && (e.message || e.code) || e).slice(0, 200) }); }
-              await new Promise(r => setTimeout(r, 300)); box.remove(); closeModal(); } catch (e) { errs.push({ flow: cur, err: '운전 준비: ' + String(e && e.message || e).slice(0, 200) }); } }
+              try { await Promise.race([__ggmFn(a.owner)(a.act, t, id, P(), { target: t }), new Promise((_, rj) => setTimeout(() => rj(Error('시간 초과 20초')), 20000))]); } catch (e) { errs.push({ flow: cur, err: String(e && (e.message || e.code) || e).slice(0, 200) }); }
+              await new Promise(r => setTimeout(r, 300)); box.remove(); CoreView.closeModal(); } catch (e) { errs.push({ flow: cur, err: '운전 준비: ' + String(e && e.message || e).slice(0, 200) }); } }
           }
-          load(); const frags = Object.fromEntries(Object.values(window.__PF || {}).map(f => [f.id, promptFrag(f.id)]));
+          load(); const frags = Object.fromEntries(Object.values(window.__PF || {}).map(f => [f.id, System.promptFrag(f.id)]));
           return { recs, errs, frags };
         }, { step, game: gm.game, owners, skip: [...skip], flows: step.kind === 'new' ? {} : FLOWS, acts: step.kind === 'new' ? [] : uniqActs, responses: gm.responses, kindSrc: kindOf.toString(), libSrc: { schemaOf: schemaOf.toString(), lenientJSON: lenientJSON.toString(), fakeAnswer: fakeAnswer.toString() } });
       }, { tag: `combos-${tag}`, www });

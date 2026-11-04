@@ -13,11 +13,11 @@ export async function runGenerate({ phase, responses = {}, input = null, game = 
     await page.exposeFunction('__onPrompt', (kind, text, pending) => { if (onPrompt) onPrompt(kind, text, pending); });
     const res = await page.evaluate(async ({ phase, responses, input, game, stages, direction, settleMs, kindSrc }) => {
       const log = [], pending = new Set(), toasts = [], seenSkill = {};
-      P().seenOpening = true; closeModal(); closeOv(); appStorage.removeItem('ggm-ng-draft');
+      P().seenOpening = true; CoreView.closeModal(); CoreView.closeOv(); appStorage.removeItem('ggm-ng-draft');
       const tt = CoreView.toast; CoreView.toast = m => { toasts.push(String(m)); return tt(m); };
-      appStorage.setItem(PKEY, JSON.stringify({ active: 'gen', fallback: false, list: [{ id: 'gen', type: 'anthropic', name: 'tools/play', key: 'replay', model: 'replay', quick: 'replay-quick' }] })); setupAI();
+      appStorage.setItem(PKEY, JSON.stringify({ active: 'gen', fallback: false, list: [{ id: 'gen', type: 'anthropic', name: 'tools/play', key: 'replay', model: 'replay', quick: 'replay-quick' }] })); System.setupAI();
       const kindOf = p => (new Function('return ' + kindSrc)())(p, phase, seenSkill);
-      const realHttp = http;
+      const realHttp = System.http;
       System.http = async (url, opts) => {
         if (!/api\.anthropic\.com\/v1\/messages/.test(url)) return realHttp(url, opts);
         const body = opts.body, msgs = body.messages, first = msgs[0].content, prompt = typeof first === 'string' ? first : first.map(b => b.text || '').join('');
@@ -34,21 +34,21 @@ export async function runGenerate({ phase, responses = {}, input = null, game = 
         let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [, v] of Object.entries(recs)) if (/"chapters"/.test(v)) { saved = JSON.parse(v); result.commitAtCall = log.length; } return orig(recs); };
         SystemView.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
         const stat = []; const mo = new MutationObserver(() => { const s = document.getElementById('ng_stat'); if (s && s.textContent && stat.at(-1) !== s.textContent) stat.push(s.textContent); }); mo.observe(document.body, { subtree: true, childList: true, characterData: true });
-        const t0 = performance.now(); try { await newGame(uiProg(btn, '#ng_stat'), input); } /* 실제 진입점(NEW_GAME_SOURCE를 켜고 끝나면 원래 게임으로) */ catch (e) { result.thrown = String(e && (e.message || e.code) || e); }
+        const t0 = performance.now(); try { await NewGame.newGame(CoreView.uiProg(btn, '#ng_stat'), input); } /* 실제 진입점(NEW_GAME_SOURCE를 켜고 끝나면 원래 게임으로) */ catch (e) { result.thrown = String(e && (e.message || e.code) || e); }
         result.ms = Math.round(performance.now() - t0); await settle(settleMs); mo.disconnect(); result.stat = stat; result.game = saved;
         result.draftKept = !!appStorage.getItem('ggm-ng-draft');
       } else if (phase === 'import') { // 앱의 데이터 폴더 zip 내보내기·가져오기 경로 그대로(확인 창은 "예")
-        SystemView.reloadGame = () => {}; const g = JSON.parse(game), blob = await dataExportZip(g, 'import'); appConfirm = async () => true;
-        await dataImport(new File([blob], 'import.zip', { type: 'application/zip' })); window.__NOFLUSH = 0; result.game = g;
+        SystemView.reloadGame = () => {}; const g = JSON.parse(game), blob = await SystemView.dataExportZip(g, 'import'); appConfirm = async () => true;
+        await SystemCtl.dataImport(new File([blob], 'import.zip', { type: 'application/zip' })); window.__NOFLUSH = 0; result.game = g;
       } else {
-        if (game) { G = fix(JSON.parse(game)); applyMeta(); } SystemView.reloadGame = () => {}; // pcHome이면 G는 이미 서버 data에서 받은 게임
+        if (game) { G = Characters.fix(JSON.parse(game)); SystemView.applyMeta(); } SystemView.reloadGame = () => {}; // pcHome이면 G는 이미 서버 data에서 받은 게임
         if (phase === 'skills') {
           const defNames = c => JSON.stringify(Object.values(GGMCombat.generationDefaults(c) || {}).filter(x => x && x.name).map(x => x.name)), kitNames = c => JSON.stringify(Object.values(c.skills || {}).filter(x => x && x.name).map(x => x.name));
           const todo = G.chars.filter(c => !c.alt && (c.skillGenerationWarning || kitNames(c) === defNames(c))); // 임시 상태이거나 기본 스킬 그대로인 대원만(인라인 스킬이 검증을 통과했으면 건드리지 않음)
           result.todo = todo.map(c => c.name + ' | ' + (c.skillGenerationWarning || '설계 기록 없음'));
-          for (const c of todo) { try { const kit = await v2GenerateSkills(c, '', () => {}); c.skills = kit; delete c.skillGenerationWarning; delete c.skillPending; } catch (e) { c.skillGenerationWarning = String(e.message || e.code || e); } mark('c:' + c.id); }
+          for (const c of todo) { try { const kit = await v2GenerateSkills(c, '', () => {}); c.skills = kit; delete c.skillGenerationWarning; delete c.skillPending; } catch (e) { c.skillGenerationWarning = String(e.message || e.code || e); } Core.mark('c:' + c.id); }
         } else {
-          const t0 = performance.now(); let res = null; try { res = await aiChapterGen(direction, stages, [], null); } catch (e) { result.thrown = String(e && (e.message || e.code) || e); }
+          const t0 = performance.now(); let res = null; try { res = await StoryCtl.aiChapterGen(direction, stages, [], null); } catch (e) { result.thrown = String(e && (e.message || e.code) || e); }
           result.ms = Math.round(performance.now() - t0); await settle(settleMs); result.chapter = res ? { title: res.ch.title, nb: res.nb, nt: res.nt, nc: (res.nc || []).map(c => c.name) } : null;
         }
         result.game = JSON.parse(JSON.stringify(G));

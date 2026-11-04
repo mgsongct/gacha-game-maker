@@ -34,76 +34,76 @@ for (const dir of dirs) {
   const { out, errors } = await withPage(page => page.evaluate(async game => {
     const R = [], ok = (area, link, pass, why) => R.push({ area, link, res: pass === null ? '건너뜀' : pass ? '통과' : '실패', why: String(why || '').slice(0, 300) });
     const step = async (area, fn) => { try { await fn(); } catch (e) { R.push({ area, link: '(실행)', res: '실패', why: String(e && (e.stack || e.message) || e).split('\n').slice(0, 3).join(' ← ').slice(0, 300) }); } };
-    const g = JSON.parse(game); delete g.prog; G = fix(g); applyMeta(); const p = P(); p.seenOpening = true; SAMPLE = null; const toasts = []; CoreView.toast = m => { toasts.push(String(m)); }; appConfirm = async () => true; closeModal(); closeOv(); // 연출(playGacha는 const)은 그대로 — 결과 화면은 닫음
+    const g = JSON.parse(game); delete g.prog; G = Characters.fix(g); SystemView.applyMeta(); const p = P(); p.seenOpening = true; SAMPLE = null; const toasts = []; CoreView.toast = m => { toasts.push(String(m)); }; appConfirm = async () => true; CoreView.closeModal(); CoreView.closeOv(); // 연출(playGacha는 const)은 그대로 — 결과 화면은 닫음
     const names = ids => ids.map(id => (charById(id) || {}).name || id).join(', ');
     // ① 가챠
     await step('가챠', async () => { p.gems = 999999; const bn = (G.banners || []).find(b => b.active && b.type === 'std') || (G.banners || [])[0]; if (!bn) return ok('가챠', '배너', null, '배너 없음'); p.curBanner = bn.id;
-      const before = new Set(Object.keys(p.owned)), locked = G.chars.filter(c => !castOk(c)).map(c => c.id); await pull(10); { const sk = document.querySelector('.gc .skipb'); if (sk) await handleNavigationAndToolsAction('gcskip', sk, '', p, { target: sk }); } closeOv(); closeModal(); /* 앱의 건너뛰기로 연출 타이머를 끝냄 */ const got = Object.keys(p.owned).filter(id => !before.has(id)), pool = new Set(bannerPool(bn).map(c => c.id));
+      const before = new Set(Object.keys(p.owned)), locked = G.chars.filter(c => !Acquire.castOk(c)).map(c => c.id); await Acquire.pull(10); { const sk = document.querySelector('.gc .skipb'); if (sk) await Acquire.handleNavigationAndToolsAction('gcskip', sk, '', p, { target: sk }); } CoreView.closeOv(); CoreView.closeModal(); /* 앱의 건너뛰기로 연출 타이머를 끝냄 */ const got = Object.keys(p.owned).filter(id => !before.has(id)), pool = new Set(Characters.bannerPool(bn).map(c => c.id));
       ok('가챠', '10연 → 보유 대원', got.length > 0, `새 보유 ${got.length}명: ${names(got)}`);
       ok('가챠', '뽑힌 대원은 배너 후보 안', got.every(id => pool.has(id)), got.filter(id => !pool.has(id)).length ? '후보 밖: ' + names(got.filter(id => !pool.has(id))) : `후보 ${pool.size}명`);
       ok('가챠 ↔ 등장 계획', '첫 등장 전 대원은 안 나옴', locked.length ? !got.some(id => locked.includes(id)) : null, locked.length ? `잠긴 대원 ${locked.length}명(${names(locked).slice(0, 80)})` : '잠긴 대원 없음');
-      const fb = (G.banners || []).find(b => b.pool && b.pool.mode === 'faction'); if (fb) { const fp = bannerPool(fb); const own2 = fp.filter(c => (fb.pool.factions || []).includes(c.faction)), have = new Set(own2.map(c => c.rarity)), off = fp.filter(c => !(fb.pool.factions || []).includes(c.faction) && !(fb.pickup || []).includes(c.id)), bad = off.filter(c => have.has(c.rarity)); /* bannerPool: 그 세력에 없는 등급은 상시 대원으로 채움(설계) */
+      const fb = (G.banners || []).find(b => b.pool && b.pool.mode === 'faction'); if (fb) { const fp = Characters.bannerPool(fb); const own2 = fp.filter(c => (fb.pool.factions || []).includes(c.faction)), have = new Set(own2.map(c => c.rarity)), off = fp.filter(c => !(fb.pool.factions || []).includes(c.faction) && !(fb.pickup || []).includes(c.id)), bad = off.filter(c => have.has(c.rarity)); /* bannerPool: 그 세력에 없는 등급은 상시 대원으로 채움(설계) */
       ok('가챠 ↔ 세력', '세력 배너 후보는 그 세력만(픽업·없는 등급 채움 제외)', !bad.length, `${(fb.pool.factions || []).join(',')}: 후보 ${fp.length}명${off.length ? ' · 다른 소속 ' + off.map(c => `${c.name}(${c.faction || '무소속'}·${['', 'R', 'SR', 'SSR'][c.rarity]}${have.has(c.rarity) ? '' : ' — 세력에 이 등급 없어 채움'})`).join(', ') : ''}`); } else ok('가챠 ↔ 세력', '세력 배너', null, '세력 배너 없음'); });
     // ② 장 진행
     const main = G.chapters.filter(ch => (ch.kind || 'main') === 'main'), stanceLog = [];
     await step('장 진행', async () => { const realPlay = SystemView.playStory; SystemView.playStory = (t, sc, done) => { if (done) done(); };
       for (const ch of main.slice(0, 2)) { for (const s of ch.stages || []) {
         const debutOf = G.chars.filter(c => c.debut === s.id).map(c => c.id), inbox0 = (p.inbox || []).length, owned0 = Object.keys(p.owned).length, last = ch.stages.at(-1) === s;
-        if (s.mode === 'debate' || s.mode === 'contest') modeClear(ch, s, 3);
-        else if (s.story || !(s.enemies || []).length) playStoryStage(ch, s);
-        else { if (!p.squad.filter(id => own(id)).length) Object.keys(p.owned).slice(0, 4).forEach(id => { if (!p.squad.includes(id)) p.squad.push(id); });
-          await startStage(s, { kind: 'main', ch }); for (let i = 0; i < 50 && !(B && B.engine); i++) await new Promise(r => setTimeout(r, 50));
+        if (s.mode === 'debate' || s.mode === 'contest') Battle.modeClear(ch, s, 3);
+        else if (s.story || !(s.enemies || []).length) StoryCtl.playStoryStage(ch, s);
+        else { if (!p.squad.filter(id => Characters.own(id)).length) Object.keys(p.owned).slice(0, 4).forEach(id => { if (!p.squad.includes(id)) p.squad.push(id); });
+          await SystemView.startStage(s, { kind: 'main', ch }); for (let i = 0; i < 50 && !(B && B.engine); i++) await new Promise(r => setTimeout(r, 50));
           if (!B) { ok('장 진행', `${ch.title} · ${s.title}: 전투 시작`, false, '전투가 시작되지 않음(편성할 대원 없음?)'); continue; }
-          B.enemies.forEach(en => { en.hp = 0; }); B.presentationBusy = false; B.ending = false; bCheck(); for (let i = 0; i < 40 && !B.over; i++) await new Promise(r => setTimeout(r, 50)); closeOv(); }
-        checkTriggers(true);
+          B.enemies.forEach(en => { en.hp = 0; }); B.presentationBusy = false; B.ending = false; Core.bCheck(); for (let i = 0; i < 40 && !B.over; i++) await new Promise(r => setTimeout(r, 50)); CoreView.closeOv(); }
+        MessengerCtl.checkTriggers(true);
         ok('장 진행', `${ch.title} · ${s.title}: 클리어 기록`, !!p.cleared[s.id], s.mode || (s.story ? '대화만' : '전투'));
-        if (debutOf.length) ok('장 진행 ↔ 등장 계획', `${s.title}: 첫 등장 대원이 등장 가능`, debutOf.every(id => castOk(charById(id))), names(debutOf));
-        if (last && (ch.recruits || []).length) ok('장 진행 ↔ 영입', `${ch.title} 끝: 영입 대원 합류`, ch.recruits.every(id => own(id)), names(ch.recruits));
+        if (debutOf.length) ok('장 진행 ↔ 등장 계획', `${s.title}: 첫 등장 대원이 등장 가능`, debutOf.every(id => Acquire.castOk(charById(id))), names(debutOf));
+        if (last && (ch.recruits || []).length) ok('장 진행 ↔ 영입', `${ch.title} 끝: 영입 대원 합류`, ch.recruits.every(id => Characters.own(id)), names(ch.recruits));
         const trig = (G.threads || []).filter(t => t.trigger && t.trigger.type === 'stage' && t.trigger.value === s.id).map(t => t.id); if (trig.length) ok('장 진행 ↔ 메신저', `${s.title}: 클리어 톡 배달`, trig.every(id => (p.inbox || []).some(x => (x.tid || x.id || x) === id) || (p.inbox || []).length > inbox0), `톡 ${trig.length}개 · 받은 편지함 ${inbox0}→${(p.inbox || []).length}`);
         void owned0; }
-        stanceLog.push({ ch: main.indexOf(ch) + 1, now: mainNow() }); }
+        stanceLog.push({ ch: main.indexOf(ch) + 1, now: World.mainNow() }); }
       SystemView.playStory = realPlay;
-      ok('장 진행', '진행 장(mainNow)이 깬 장 다음으로', main.length >= 2 ? mainNow() >= Math.min(3, main.length + 1) || mainNow() === main.findIndex(ch => ch.stages.some(s => !p.cleared[s.id])) + 1 : null, JSON.stringify(stanceLog)); });
+      ok('장 진행', '진행 장(mainNow)이 깬 장 다음으로', main.length >= 2 ? World.mainNow() >= Math.min(3, main.length + 1) || World.mainNow() === main.findIndex(ch => ch.stages.some(s => !p.cleared[s.id])) + 1 : null, JSON.stringify(stanceLog)); });
     // ③ 세력 태도·관계 ↔ AI 컨텍스트
-    await step('세력·관계', async () => { const F = factions(), n = mainNow(), changing = F.filter(f => (f.stance || []).length);
+    await step('세력·관계', async () => { const F = World.factions(), n = World.mainNow(), changing = F.filter(f => (f.stance || []).length);
       ok('세력', '장마다 바뀌는 태도', changing.length ? true : null, changing.length ? changing.map(f => `${f.name}: ${(f.stance || []).map(x => x.ch + '장 ' + FSTANCE[x.s]).join('→')}`).join(' / ').slice(0, 200) : '장별 태도 변화 없음(생성 게임에 stance 없음)');
-      const C = ctx(); for (const f of changing.slice(0, 4)) { const s = stanceAt(f, n); ok('세력 ↔ AI 컨텍스트', `${f.name}: 지금 장(${n})의 태도 「${FSTANCE[s]}」가 컨텍스트에`, C.includes(f.name) && C.includes(FSTANCE[s]), C.includes(f.name) ? '' : '컨텍스트에 세력 이름 없음'); }
-      const rs = RELS().filter(r => charById(r.a) && charById(r.b)); if (!rs.length) return ok('관계 ↔ AI 컨텍스트', '인물 관계', null, '대원 사이 관계 없음'); const r0 = rs[0], txt = `${charById(r0.a).name} ${charById(r0.b).name}`, RC = relCtx(txt);
+      const C = World.ctx(); for (const f of changing.slice(0, 4)) { const s = World.stanceAt(f, n); ok('세력 ↔ AI 컨텍스트', `${f.name}: 지금 장(${n})의 태도 「${FSTANCE[s]}」가 컨텍스트에`, C.includes(f.name) && C.includes(FSTANCE[s]), C.includes(f.name) ? '' : '컨텍스트에 세력 이름 없음'); }
+      const rs = World.RELS().filter(r => charById(r.a) && charById(r.b)); if (!rs.length) return ok('관계 ↔ AI 컨텍스트', '인물 관계', null, '대원 사이 관계 없음'); const r0 = rs[0], txt = `${charById(r0.a).name} ${charById(r0.b).name}`, RC = Core.relCtx(txt);
       ok('관계 ↔ AI 컨텍스트', '장면에 나오는 두 인물의 관계가 관계 컨텍스트(relCtx)에', RC.includes(r0.kind), `${txt}: ${r0.kind} · 관계 ${rs.length}개`); });
     // ④ 파견
-    await step('파견', async () => { if (typeof dispList !== 'function' || !dispList().length) return ok('파견', '파견 목록', null, '파견 없음');
-      const d = dispList().find(x => !p.disp[x.id]), busy0 = busyIds(), free = Object.keys(p.owned).filter(id => !busy0.has(id)); if (!d || free.length < (d.need || 1)) return ok('파견', '보낼 대원', null, `대원 ${free.length}명 · 필요 ${d && d.need}`);
-      DSEL = { id: d.id, ids: free.slice(0, d.need || 1) }; await handleEconomyAction('dispgo', document.createElement('button'), d.id, p, {}); const sent = (p.disp[d.id] || {}).chars || [];
+    await step('파견', async () => { if ((typeof Expedition==='undefined'?'undefined':typeof Expedition.dispList) !== 'function' || !Expedition.dispList().length) return ok('파견', '파견 목록', null, '파견 없음');
+      const d = Expedition.dispList().find(x => !p.disp[x.id]), busy0 = busyIds(), free = Object.keys(p.owned).filter(id => !busy0.has(id)); if (!d || free.length < (d.need || 1)) return ok('파견', '보낼 대원', null, `대원 ${free.length}명 · 필요 ${d && d.need}`);
+      DSEL = { id: d.id, ids: free.slice(0, d.need || 1) }; await Economy.handleEconomyAction('dispgo', document.createElement('button'), d.id, p, {}); const sent = (p.disp[d.id] || {}).chars || [];
       ok('파견', '보낸 대원 기록', sent.length === (d.need || 1), `${d.name}: ${names(sent)}`);
       ok('파견 ↔ 전투 편성', '파견 중인 대원은 편성에서 빠짐', sent.every(id => busyIds().has(id)), `busyIds ${busyIds().size}명`);
-      const cres0 = conOn() ? JSON.stringify(progSlot('cres')) : '', gold0 = p.gold; p.disp[d.id].start -= (p.disp[d.id].hours || d.hours) * 3600e3 + 1000; // 시간이 지난 것으로
-      await handleEconomyAction('dispget', document.createElement('button'), d.id, p, {});
-      ok('파견', '완료 보상', !p.disp[d.id] && (p.gold !== gold0 || JSON.stringify(CRES ? progSlot('cres') : {}) !== cres0), `골드 ${gold0}→${p.gold}`);
-      ok('파견 ↔ 건조', '건조가 켜져 있으면 파견 보상에 건조 자원', conOn() ? JSON.stringify(progSlot('cres')) !== cres0 : null, conOn() ? `${cres0} → ${JSON.stringify(progSlot('cres'))}` : '건조 꺼짐');
+      const cres0 = Acquire.conOn() ? JSON.stringify(Core.progSlot('cres')) : '', gold0 = p.gold; p.disp[d.id].start -= (p.disp[d.id].hours || d.hours) * 3600e3 + 1000; // 시간이 지난 것으로
+      await Economy.handleEconomyAction('dispget', document.createElement('button'), d.id, p, {});
+      ok('파견', '완료 보상', !p.disp[d.id] && (p.gold !== gold0 || JSON.stringify(CRES ? Core.progSlot('cres') : {}) !== cres0), `골드 ${gold0}→${p.gold}`);
+      ok('파견 ↔ 건조', '건조가 켜져 있으면 파견 보상에 건조 자원', Acquire.conOn() ? JSON.stringify(Core.progSlot('cres')) !== cres0 : null, Acquire.conOn() ? `${cres0} → ${JSON.stringify(Core.progSlot('cres'))}` : '건조 꺼짐');
       ok('파견', '끝나면 다시 편성 가능', sent.every(id => !busyIds().has(id)), ''); });
     // ⑤ 원정(전투가 아닌 방식)
-    await step('원정', async () => { const forced = exMode() === 'combat'; if (forced) G.meta.expedition = { mode: 'idol' }; const mode = exMode(), tag = forced ? ' (상황: 원정 아이돌로 켬)' : '';
+    await step('원정', async () => { const forced = Expedition.exMode() === 'combat'; if (forced) G.meta.expedition = { mode: 'idol' }; const mode = Expedition.exMode(), tag = forced ? ' (상황: 원정 아이돌로 켬)' : '';
       const id = Object.keys(p.owned).find(x => !busyIds().has(x)); if (!id) return ok('원정', '대원', null, '쉬는 대원 없음');
       if (mode !== 'idol') return ok('원정', `방식 ${mode}`, null, '아이돌 방식만 자동 확인(나머지는 화면 흐름이 달라 미구현)');
-      const o = exOffers(id), job = (Object.values(o).find(Array.isArray) || [])[0]; if (!job) return ok('원정', '의뢰', null, '오늘 의뢰 없음');
-      exStart(id, job); const jid = exJobOf(id); ok('원정', '일 시작' + tag, !!jid, `${(charById(id) || {}).name} · ${job.name || job.id}`);
+      const o = Expedition.exOffers(id), job = (Object.values(o).find(Array.isArray) || [])[0]; if (!job) return ok('원정', '의뢰', null, '오늘 의뢰 없음');
+      Expedition.exStart(id, job); const jid = Expedition.exJobOf(id); ok('원정', '일 시작' + tag, !!jid, `${(charById(id) || {}).name} · ${job.name || job.id}`);
       ok('원정 ↔ 전투 편성', '일하는 대원은 편성에서 빠짐' + tag, busyIds().has(id), '');
-      if (jid) { progSlot('exped').jobs[jid].start -= job.hours * 3600e3 + 1000; const fame0 = progSlot('exped').fame[id] || 0, r = exClaim(jid); ok('원정', '끝나면 결과·인기' + tag, !!r && (progSlot('exped').fame[id] || 0) >= fame0, `인기 ${fame0}→${progSlot('exped').fame[id] || 0}`); } if (forced) G.meta.expedition = { mode: 'combat' }; });
+      if (jid) { Core.progSlot('exped').jobs[jid].start -= job.hours * 3600e3 + 1000; const fame0 = Core.progSlot('exped').fame[id] || 0, r = Expedition.exClaim(jid); ok('원정', '끝나면 결과·인기' + tag, !!r && (Core.progSlot('exped').fame[id] || 0) >= fame0, `인기 ${fame0}→${Core.progSlot('exped').fame[id] || 0}`); } if (forced) G.meta.expedition = { mode: 'combat' }; });
     // ⑥ 건조
-    await step('건조', async () => { const forced = !conOn(); if (forced) G.meta.construct = Object.assign(conMeta(), { on: true }); /* conMeta()는 읽기(없으면 새 값) — 켤 때는 conSave처럼 G.meta.construct에 씀 */ const tag = forced ? ' (상황: 건조 켬)' : '';
-      CON_RES.forEach(k => { progSlot('cres')[k] = 99999; }); const cfg = CON(), pool = conPool(), inp = GGMConstruct.normalize(conReadInput(), cfg), info = GGMConstruct.roll(inp, cfg, pool, conVariantChoices(inp)).info || {}, mem = gr => pool.filter(c => Object.entries(gr.match || {}).every(([k, v]) => c[k] === v)).length;
+    await step('건조', async () => { const forced = !Acquire.conOn(); if (forced) G.meta.construct = Object.assign(Acquire.conMeta(), { on: true }); /* conMeta()는 읽기(없으면 새 값) — 켤 때는 conSave처럼 G.meta.construct에 씀 */ const tag = forced ? ' (상황: 건조 켬)' : '';
+      CON_RES.forEach(k => { Core.progSlot('cres')[k] = 99999; }); const cfg = Acquire.CON(), pool = Acquire.conPool(), inp = GGMConstruct.normalize(AcquireView.conReadInput(), cfg), info = GGMConstruct.roll(inp, cfg, pool, AcquireView.conVariantChoices(inp)).info || {}, mem = gr => pool.filter(c => Object.entries(gr.match || {}).every(([k, v]) => c[k] === v)).length;
       ok('건조 ↔ 생성된 대원', '분류마다 나올 대원이 있음' + tag, cfg.groups.every(gr => mem(gr) > 0), cfg.groups.map(gr => `${gr.name} ${mem(gr)}명`).join(' · '));
       const tb = GGMConstruct.table(inp, cfg, pool), rar = Object.entries(info.rarity || {}).filter(([, v]) => v > 0).map(([k]) => ['', 'R', 'SR', 'SSR'][k]).join('·');
       ok('건조 ↔ 생성된 대원', '기본 투입으로 나올 대원이 있음(열린 분류·허용 희귀도 안 — 첫 건조가 빈손이 아님)' + tag, tb.rows.length > 0, `투입 ${inp.join('/')} → 열림 ${(info.groups || []).filter(gr => gr.open).map(gr => `${gr.name} ${pool.filter(c => Object.entries(gr.match || {}).every(([k, v]) => c[k] === v)).map(c => ['', 'R', 'SR', 'SSR'][c.rarity]).join('') || '없음'}`).join(', ')} · 허용 희귀도 ${rar} · 나올 대원 ${tb.rows.length}명`);
-      CON_RES.forEach(k => { progSlot('cres')[k] = 0; }); /* 자원이 모자라도 멈추지 않음: 캐시 상점 ₩0 보충으로 건조(PL1) */
-      const h0 = (p.hist2 || []).length, owned0 = new Set(Object.keys(p.owned)), chars0 = G.chars.length, r0 = JSON.stringify(progSlot('cres')), t0 = toasts.length; await conBuild(); for (let i = 0; i < 40 && CONJOB; i++) await new Promise(r => setTimeout(r, 50));
+      CON_RES.forEach(k => { Core.progSlot('cres')[k] = 0; }); /* 자원이 모자라도 멈추지 않음: 캐시 상점 ₩0 보충으로 건조(PL1) */
+      const h0 = (p.hist2 || []).length, owned0 = new Set(Object.keys(p.owned)), chars0 = G.chars.length, r0 = JSON.stringify(Core.progSlot('cres')), t0 = toasts.length; await AcquireView.conBuild(); for (let i = 0; i < 40 && CONJOB; i++) await new Promise(r => setTimeout(r, 50));
       const gotOwn = Object.keys(p.owned).filter(id => !owned0.has(id)), made = G.chars.slice(chars0);
       ok('건조', '자원이 0이어도 캐시 상점 ₩0 보충으로 대원을 얻음' + tag, (p.hist2 || []).length > h0, `얻음 ${(p.hist2 || []).length > h0 ? names([p.hist2[0].id]) + (p.hist2[0].n ? '(새 대원)' : '(중복)') : '없음'} · 새 캐릭터 ${made.length}${toasts.length > t0 ? ' · 알림: ' + toasts.slice(t0).join(' / ') : ''}`);
-      { const B = progSlot('cbuild'), mn = [cfg.min, cfg.min, cfg.min, cfg.min], empty = !GGMConstruct.table(mn, cfg, pool).rows.length; B.input = mn; CON_RES.forEach(k => { progSlot('cres')[k] = 0; }); const h1 = (p.hist2 || []).length; await conBuild(); for (let i = 0; i < 40 && CONJOB; i++) await new Promise(r => setTimeout(r, 50));
+      { const B = Core.progSlot('cbuild'), mn = [cfg.min, cfg.min, cfg.min, cfg.min], empty = !GGMConstruct.table(mn, cfg, pool).rows.length; B.input = mn; CON_RES.forEach(k => { Core.progSlot('cres')[k] = 0; }); const h1 = (p.hist2 || []).length; await AcquireView.conBuild(); for (let i = 0; i < 40 && CONJOB; i++) await new Promise(r => setTimeout(r, 50));
         ok('건조', `최소 투입(${mn.join('/')}${empty ? ' — 나올 대원 없음' : ''})이어도 빈손으로 끝나지 않음(나올 수 있게 맞춘 투입으로)` + tag, (p.hist2 || []).length > h1, `${empty ? '맞춘 투입 ' + (B.input || []).join('/') : '최소 투입으로 나옴'} · 얻음 ${(p.hist2 || []).length > h1 ? names([p.hist2[0].id]) : '없음'}`); }
-      { const r1 = JSON.stringify(progSlot('cres')), k = CASH_RES().find(x => x.id === 'cr_con'); if (k) await handleEconomyAction('cashpkg', { dataset: {} }, k.id, P(), {}); /* 앱의 캐시 상점 구매 액션 그대로 */ ok('캐시 상점 ↔ 건조', '자원 보급(₩0)에 건조 자원 꾸러미' + tag, !!k && JSON.stringify(progSlot('cres')) !== r1 && /자원 보급/.test(cashHTML()), k ? rewardText(k.give) : '없음'); }
+      { const r1 = JSON.stringify(Core.progSlot('cres')), k = CASH_RES().find(x => x.id === 'cr_con'); if (k) await Economy.handleEconomyAction('cashpkg', { dataset: {} }, k.id, P(), {}); /* 앱의 캐시 상점 구매 액션 그대로 */ ok('캐시 상점 ↔ 건조', '자원 보급(₩0)에 건조 자원 꾸러미' + tag, !!k && JSON.stringify(Core.progSlot('cres')) !== r1 && /자원 보급/.test(EconomyView.cashHTML()), k ? Core.rewardText(k.give) : '없음'); }
       const v = G.chars.find(c => c.alt && c.base && charById(c.base)); if (!v) return ok('건조 ↔ 바리에이션', '이격 상속' + tag, null, '이격 없음(건조 결과에 이격이 안 나옴)');
-      const base = charById(v.base), k = ['speech', 'profile'].find(x => !(v.inh && v.inh.own && v.inh.own.includes(x))) || 'speech', mark0 = '연계검증_' + Date.now(); base[k] = mark0; mark('c:' + base.id); inheritAll && inheritAll();
+      const base = charById(v.base), k = ['speech', 'profile'].find(x => !(v.inh && v.inh.own && v.inh.own.includes(x))) || 'speech', mark0 = '연계검증_' + Date.now(); base[k] = mark0; Core.mark('c:' + base.id); Characters.inheritAll && Characters.inheritAll();
       ok('건조 ↔ 바리에이션', `기본 대원을 고치면 이격에 반영(${k})` + tag, charById(v.id)[k] === mark0, `${base.name} → ${v.name}`); });
     return R; }, JSON.stringify(g.game)), { tag: 'link-' + basename(dir) });
   if (gen) out.unshift({ area: '생성', link: '지금 빌드로 새 게임 생성·저장', res: '통과', why: `요청 ${gen.calls} · 대기(답 없음) ${gen.pending.length}${gen.errors.length ? ' · 페이지 오류 ' + gen.errors.length : ''}` });

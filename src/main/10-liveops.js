@@ -299,7 +299,7 @@ static auditHTML(focus,old,res,kinds,how,chars){ return `${head(focus?`${charByI
     CoreView.openModal(LiveOpsView.updateReadyHTML(build));
   }
 
-  static updateAPKRequired(man,html,repo=updRepo(LV()),branch=LV().branch||'main'){
+  static updateAPKRequired(man,html,repo=Core.updRepo(Core.LV()),branch=Core.LV().branch||'main'){
    let minimum;try{minimum=LiveOps.updateMinimum(man,html);}catch(e){UPD=null;CoreView.toast(e.message);return true;}const installed=window.__SHELL__||APP_BUILD;
    if(!minimum||Core.verCmp(installed,minimum)>=0)return false;
    UPD=null;LiveOps.updateCheckRecord(man,repo,branch,'새 APK 설치 필요',html);

@@ -7,7 +7,7 @@ import { moduleOf } from './scope.mjs';
 import { reachable } from './history.mjs';
 import { classTable, aliasOf } from './graph.mjs';
 import { unboundRefs } from './scope.mjs';
-import { walk } from './source.mjs';
+import { walk, parseJS } from './source.mjs';
 export { LAYER_DEF };
 
 // 함수 키 → 단위(main · modules · boot)
@@ -32,17 +32,34 @@ export function roleFamilies(fns, classes = new Map()) { const under = (c, base)
   const row = (f, role) => ({ name: f.name, key: f.key, cls: f.cls || null, mod: f.loc.split(':')[0], loc: f.loc, under: under(f.cls, ROLE_BASE[role]) }), out = {};
   for (const [role, re] of Object.entries(ROLES)) out[role] = [...fns.values()].filter(f => f.top && !f.table && !re.test(f.name) && [...f.calls.keys()].some(k => re.test(fns.get(k)?.name || ''))).map(f => row(f, role));
   out['화면 그리기(HTML)'] = [...fns.values()].filter(f => f.top && !f.table && /HTML\d*$/.test(f.name)).map(f => row(f, '화면 그리기(HTML)')); return out; }
-/* 옛 이름 다리(src/main/99-aliases.js — function n(...a){ return Class.n(...a); })로 부르는 곳: 코드의 풀리지 않는 참조(전역으로 감) · HTML·글 속 처리기(onclick="n(…)") */
+/* 옛 이름 다리(src/main/99-aliases.js — function n(...a){ return Class.n(...a); })를 거쳐 가는 곳 — 다리를 지우면 깨지는 자리마다 고칠 자리(edit: 파일·줄·칸·길이·바꿀 글)도 냄:
+   앱 코드 — 맨 위로만 풀리는 이름(부름·값·{이름} 줄임) · typeof 이름(있나 보기) · window.이름 · 동적 전역 접근 window[…](확인 필요 — 이름을 글로 가리킴) · HTML·글 속 처리기(onclick="이름(…)")
+   페이지를 모는 시험 도구(build/test.mjs · tools/play) — 페이지 안에서 도는 콜백(evaluate·waitForFunction·addInitScript …)의 풀리지 않는 다리 이름(부름·덮어쓰기 — 덮어쓰면 코드가 Class.이름을 불러 가로채지지 않음) */
+const PAGE_FN = /^(evaluate|evaluateHandle|waitForFunction|addInitScript|\$eval|\$\$eval)$/, GLOBAL_OBJ = /^(window|globalThis|self)$/;
 export function aliasUses(units, html = '', drivers = []) { const main = units.find(u => u.name === 'main'), alias = new Map(); if (!main) return [];
-  for (let i = 0; i < main.tree.rootNode.childCount; i++) { const c = main.tree.rootNode.child(i), to = aliasOf(c); if (to) alias.set(c.childForFieldName('name').text, to); } if (!alias.size) return [];
-  const out = [], RE = new RegExp(`(^|[^\\w$.])(${[...alias.keys()].join('|')})\\s*\\(`, 'g');
-  for (const u of units) { for (const n of unboundRefs(u.tree.rootNode, { topFree: true }).refs) if (alias.has(n.text) && !aliasOf(n.parent)) out.push({ at: u.loc(n), name: n.text, to: alias.get(n.text) });
-    walk(u.tree.rootNode, n => { if (n.type !== 'string_fragment') return; for (const m of n.text.matchAll(RE)) out.push({ at: u.loc(n), name: m[2], to: alias.get(m[2]), inText: true }); }); }
-  String(html).split('\n').forEach((l, i) => { for (const m of l.matchAll(RE)) out.push({ at: `src/index.html:${i + 1}`, name: m[2], to: alias.get(m[2]), inText: true }); });
-  /* 페이지를 모는 시험 도구(build/test.mjs · tools/play): 다리 이름을 덮어써 가로채면(window.aiJSON = 가짜) 코드는 Class.이름을 부르므로 가로채지지 않음 */
-  const SET = new RegExp(`(?:window\\.|globalThis\\.|[^\\w$.]|^)(${[...alias.keys()].join('|')})\\s*=(?![="'])`, 'g'); /* HTML 속성(data-pf="…")은 아님 */
-  const DECL = /(\b(const|let|var)\s+[\w$,\s{}\[\]:]*|[{,(]\s*)$/; /* 선언·매개변수 기본값·구조 분해·객체 칸(Node 쪽 이름)은 덮어쓰기가 아님 */
-  for (const d of drivers) String(d.text).split('\n').forEach((l, i) => { for (const m of l.matchAll(SET)) { const pre = l.slice(0, m.index + m[0].indexOf(m[1])); if ((!/(window|globalThis)\.$/.test(pre) && DECL.test(pre)) || /\/\/(?!.*['"`])/.test(pre)) continue; /* 주석 속 글은 아님 */ out.push({ at: `${d.path}:${i + 1}`, name: m[1], to: alias.get(m[1]), driver: true, text: l.trim().slice(0, 90) }); } });
+  for (let i = 0; i < main.tree.rootNode.childCount; i++) { const c = main.tree.rootNode.child(i), to = aliasOf(c); if (to) alias.set(c.childForFieldName('name').text, to); }
+  /* 다리가 없어도(다 지운 뒤) 동적 전역 접근은 셈 — 함수를 class로 옮기면 window[이름]으로는 못 찾음. 시험 도구 쪽 이름 표는 다리가 없으면 앱 class의 static 메서드 색인(이름이 하나뿐인 것) */
+  const mIdx = new Map(), dup = new Set(); for (let i = 0; i < main.tree.rootNode.childCount; i++) { const c = main.tree.rootNode.child(i); if (c.type !== 'class_declaration') continue; for (const m of c.childForFieldName('body').namedChildren) if (m.type === 'method_definition' && m.child(0)?.text === 'static') { const nm = m.childForFieldName('name')?.text; if (mIdx.has(nm)) dup.add(nm); else mIdx.set(nm, c.childForFieldName('name').text); } }
+  dup.forEach(n => mIdx.delete(n)); const pageNames = alias.size ? alias : mIdx;
+  const out = [], RE = new RegExp(alias.size ? `(^|[^\\w$.])(${[...alias.keys()].join('|')})\\s*\\(` : '(?!)', 'g');
+  /* n(이름 노드)·글자리(file·line·col) → 건: 줄임 {이름}은 이름: Class.이름, window.이름은 통째로 Class.이름 */
+  const item = (n, where, kind, extra = {}) => { const nm = extra.name || n.text, to = (extra.names || alias).get(nm), whole = extra.whole || n; return { at: `${where.file}:${where.line}`, name: nm, to, kind, ...extra, whole: undefined,
+    edit: { file: where.file, line: where.line, col: where.col, len: whole.endIndex - whole.startIndex, to: extra.typeOf ? (extra.inStr ? `(()=>{try{return typeof ${to}.${nm}}catch{return typeof undefined}})()` : `(typeof ${to}==='undefined'?'undefined':typeof ${to}.${nm})`) /* 주인 class가 아직 없을 때도 'undefined'(옛 typeof 이름과 같은 뜻 — 코드 글 안은 따옴표 없이) */ : n.type === 'shorthand_property_identifier' ? `${nm}: ${to}.${nm}` : `${to}.${nm}` } }; };
+  const scan = (root, whereOf, kinds, inScope = () => true, names = alias, ex = {}) => { const R = []; for (const n of unboundRefs(root, { topFree: kinds.top }).refs) if (names.has(n.text) && !aliasOf(n.parent) && inScope(n)) R.push(item(n, whereOf(n), n.parent?.type === 'assignment_expression' && n.parent.childForFieldName('left')?.id === n.id ? kinds.set : kinds.use, { names, ...ex }));
+    walk(root, n => { if (!inScope(n)) return; if (n.type === 'unary_expression' && n.child(0)?.type === 'typeof' && n.childForFieldName('argument')?.type === 'identifier' && names.has(n.childForFieldName('argument').text)) { const a = n.childForFieldName('argument'); R.push(item(a, whereOf(n), kinds.use + '(typeof)', { whole: n, typeOf: true, names, ...ex })); }
+      if (n.type === 'member_expression' && GLOBAL_OBJ.test(n.childForFieldName('object')?.text || '') && names.has(n.childForFieldName('property')?.text)) { const p = n.childForFieldName('property'); R.push(item(p, whereOf(n), (n.parent?.type === 'assignment_expression' && n.parent.childForFieldName('left')?.id === n.id ? kinds.set : kinds.use) + '(window.이름)', { name: p.text, whole: n, names, ...ex })); }
+      if (n.type === 'subscript_expression' && GLOBAL_OBJ.test(n.childForFieldName('object')?.text || '') && kinds.dyn) R.push({ at: `${whereOf(n).file}:${whereOf(n).line}`, name: n.text.slice(0, 40), to: '?', kind: kinds.dyn }); }); return R; };
+  for (const u of units) { const whereOf = n => { const p = u.at(n.startPosition.row); return { file: p.file, line: p.line, col: n.startPosition.column }; };
+    out.push(...scan(u.tree.rootNode, whereOf, { top: true, use: '코드', set: '코드(덮어씀)', dyn: '동적 전역 접근(확인 필요)' }));
+    walk(u.tree.rootNode, n => { if (n.type !== 'string_fragment') return; for (const m of n.text.matchAll(RE)) out.push({ at: u.loc(n), name: m[2], to: alias.get(m[2]), kind: '글 속 처리기', inText: true }); }); }
+  String(html).split('\n').forEach((l, i) => { for (const m of l.matchAll(RE)) out.push({ at: `src/index.html:${i + 1}`, name: m[2], to: alias.get(m[2]), kind: 'HTML 처리기', inText: true }); });
+  for (const d of drivers) { let root; try { root = parseJS(d.text).rootNode; } catch { continue; /* 파서 준비 전(시험) */ } const whereOf = n => ({ file: d.path, line: n.startPosition.row + 1, col: n.startPosition.column });
+    walk(root, n => { if (n.type !== 'call_expression' || !PAGE_FN.test(n.childForFieldName('function')?.childForFieldName?.('property')?.text || '')) return; const fn = n.childForFieldName('arguments')?.namedChildren[0]; if (!/^(arrow_function|function_expression)$/.test(fn?.type || '')) return;
+      out.push(...scan(fn, whereOf, { top: false, use: '시험 도구가 부름', set: '시험 도구가 덮어씀(가로채기 안 됨)', dyn: '시험 도구의 동적 전역 접근(확인 필요)' }, undefined, pageNames).map(x => ({ ...x, driver: true }))); return false; });
+    /* 페이지에서 eval로 도는 코드 글(흐름 표 'designAI(__B())' 같은 글자 값): JS 식으로 읽히고 앱 이름을 부르면 페이지 코드 — 고칠 자리는 글 안 위치(따옴표 없이) */
+    const lines = String(d.text).split('\n'), lineStart = []; { let o = 0; for (const l of lines) { lineStart.push(o); o += l.length + 1; } } const pos = off => { let lo = 0, hi = lineStart.length - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (lineStart[m] <= off) lo = m; else hi = m - 1; } return { file: d.path, line: lo + 1, col: off - lineStart[lo] }; };
+    walk(root, n => { if (n.type !== 'string' || !/\(/.test(n.text)) return; const body = n.text.slice(1, -1); if (/\\/.test(body.replace(/\\[nt"'\\]/g, ''))) return; let t; try { t = parseJS(body).rootNode; } catch { return; } if (t.hasError || !t.namedChildren.length) return;
+      out.push(...scan(t, x => pos(n.startIndex + 1 + x.startIndex), { top: false, use: '시험 도구의 코드 글', set: '시험 도구의 코드 글(덮어씀)' }, undefined, pageNames, { inStr: true }).map(x => ({ ...x, driver: true }))); }); }
   return out; }
 
 // 규칙표: id · 무리 · 원칙 · 판정 · 고치는 법 · 막는 정도 · 건(ctx → [{at, what, scope}])
@@ -98,7 +115,7 @@ export const RULES = [
     find: c => Object.entries(c.RF).flatMap(([role, xs]) => xs.filter(x => !x.under).map(x => ({ at: x.loc, what: `${role} → ${ROLE_BASE[role]}: ${x.cls ? x.cls + '.' : ''}${x.name}`, kind: `${role} → ${ROLE_BASE[role]}`, scope: scopeOfLoc(x.loc) }))) },
   { id: 'A1', group: '재설계', name: '옛 이름 다리로 부름', why: '함수는 class에 — 옛 전역 이름 다리(src/main/99-aliases.js)는 옮기는 동안만 두는 임시 길(docs/restructure.md R6)',
     judge: '코드의 풀리지 않는 참조·HTML과 글 속 처리기(onclick="이름(…)")가 다리 이름을 부름 · 페이지를 모는 시험 도구(build/test.mjs·tools/play)가 다리 이름을 덮어써 가로챔(aliasUses)', fix: 'Class.이름으로 바꿈 — 다 바꾸면 다리를 지움', block: '래칫(rules.mjs --strict)',
-    find: c => c.AU.map(x => ({ at: x.at, what: `${x.name} → ${x.to}.${x.name}${x.inText ? ' (글 속)' : ''}${x.text ? ` — ${x.text}` : ''}`, kind: x.driver ? '시험 도구가 덮어씀(가로채기 안 됨)' : x.at.startsWith('src/index.html') ? 'HTML 처리기' : x.inText ? '글 속 처리기' : '코드', scope: x.driver ? 'tools' : scopeOfLoc(x.at) })) },
+    find: c => c.AU.map(x => ({ at: x.at, what: `${x.name} → ${x.to}.${x.name}${x.inText ? ' (글 속)' : ''}${x.text ? ` — ${x.text}` : ''}`, kind: x.kind, scope: x.driver ? 'tools' : scopeOfLoc(x.at) })) },
   { id: 'X1', group: '보안', name: 'HTML에 이스케이프 없이 넣음', why: 'innerHTML로 가는 값은 esc(), AI 출력은 신뢰하지 않는 입력(OWASP XSS·LLM Top 10)',
     judge: 'HTML 템플릿의 ${…}에 esc() 없이 이름·제목·설명·용어 같은 글(또는 HTML 안전하지 않은 함수의 결과)이 들어감(lib/extra.mjs htmlInject)', fix: 'esc(값)', block: '경고(check.mjs)',
     find: c => c.R.inj.out.map(x => ({ at: x.loc, what: x.what, scope: scopeOfLoc(x.loc) })) },

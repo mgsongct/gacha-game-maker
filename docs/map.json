@@ -3019,7 +3019,7 @@
     "실행기": [
      "inheritAll"
     ],
-    "편집기": [
+    "기타": [
      "inheritOnMark"
     ]
    },
@@ -3607,7 +3607,6 @@
    "path": "[].skillBalance",
    "writers": {
     "편집기": [
-     "inheritApply",
      "module:modules/combat/050-bridge.js#v2EditorAction",
      "regenApply"
     ],
@@ -11734,8 +11733,8 @@
     {
      "file": "src/boot/storage-boot.js",
      "www": [
-      18841,
-      18875
+      17225,
+      17259
      ]
     }
    ],
@@ -12051,8 +12050,8 @@
    "fns": 315,
    "roles": {
     "실행기": 64,
-    "기타": 28,
-    "편집기": 46,
+    "기타": 29,
+    "편집기": 44,
     "생성기": 16
    },
    "writes": [
@@ -12954,22 +12953,6 @@
     }
    ],
    "fns": 1,
-   "roles": {},
-   "writes": [],
-   "reads": 0,
-   "neighbors": []
-  },
-  "src/main/99-aliases.js": {
-   "files": [
-    {
-     "file": "src/main/99-aliases.js",
-     "www": [
-      17223,
-      18838
-     ]
-    }
-   ],
-   "fns": 0,
    "roles": {},
    "writes": [],
    "reads": 0,
@@ -18323,8 +18306,8 @@
   }
  },
  "gamesN": 2,
- "at": "2026-11-04T14:49",
- "head": "ef1621f",
+ "at": "2026-11-04T22:37",
+ "head": "883b36b",
  "inputs": {
   "src": {
    "src/boot/durable-storage.js": "9e1fdc434852",
@@ -18339,7 +18322,7 @@
    "src/main/10-characters.js": "353601b5e2c1",
    "src/main/10-economy.js": "c5ab88617184",
    "src/main/10-expedition.js": "1122044517ce",
-   "src/main/10-liveops.js": "e5fa196c3bed",
+   "src/main/10-liveops.js": "6c0fb2e306db",
    "src/main/10-messenger.js": "6cf318eb6aa0",
    "src/main/10-newgame.js": "2ebb51956255",
    "src/main/10-player.js": "0d0027fc271b",
@@ -18349,21 +18332,20 @@
    "src/main/10-system.js": "1ca630cae7ee",
    "src/main/10-world.js": "585f4abe97d1",
    "src/main/80-misc.js": "ccde4bcffc2a",
-   "src/main/90-load.js": "dcf7f2fdda0e",
+   "src/main/90-load.js": "bab0c96bae32",
    "src/main/95-start.js": "add9fe9e8181",
-   "src/main/99-aliases.js": "da9ae0c00f3c",
-   "src/modules/app/010-confirm.js": "c1808ba912d6",
+   "src/modules/app/010-confirm.js": "994f1976d32f",
    "src/modules/app/020-construct.js": "55945e1504c5",
    "src/modules/app/030-expedition.js": "5861db6b5430",
    "src/modules/combat/010-catalog.js": "8f670fc55eae",
    "src/modules/combat/020-visual-catalog.js": "c2b30776303c",
    "src/modules/combat/030-core.js": "53eae01812fc",
-   "src/modules/combat/040-effects.js": "994c543903e9",
-   "src/modules/combat/050-bridge.js": "5ee1f842430a",
-   "src/modules/combat/060-generation.js": "ab4e9bbb87f4",
-   "src/modules/combat/070-equipment.js": "bdb1ef2f152a",
-   "src/modules/combat/080-training.js": "4a1643187217",
-   "src/modules/combat/090-practice.js": "17753086750f",
+   "src/modules/combat/040-effects.js": "dea6161ef159",
+   "src/modules/combat/050-bridge.js": "766abde27b0b",
+   "src/modules/combat/060-generation.js": "d3e45d09bac2",
+   "src/modules/combat/070-equipment.js": "0c433e0d2f9d",
+   "src/modules/combat/080-training.js": "6bbe6d07bcc9",
+   "src/modules/combat/090-practice.js": "62021a88a108",
    "src/style/0010-base.css": "2f03ee413b69",
    "src/style/0020-v3-theme-tactical-default-skins.css": "5d53909abba7",
    "src/style/0030-lobby-nav-char-screen-pickup-shops.css": "bf5e6c5f1378",
@@ -18385,14 +18367,67 @@
    "src/style/0190-formation-sortie.css": "7673b215d35f",
    "src/style/0200-stage-modes.css": "4b0337d1ad04"
   },
-  "www": "cccb7118a6d7",
+  "www": "84079ca6c143",
   "games": {
    "idol-audition": "a443d928bb99",
    "sky-knights": "c782aafba942"
   },
-  "tool": "e9027b12f522"
+  "tool": "2c794f496ca1"
  },
  "changes": [
+  {
+   "at": "2026-11-04T22:37",
+   "head": "883b36b",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [
+      "src/main/99-aliases.js"
+     ],
+     "changed": [
+      "src/main/10-liveops.js",
+      "src/main/90-load.js",
+      "src/modules/app/010-confirm.js",
+      "src/modules/combat/040-effects.js",
+      "src/modules/combat/050-bridge.js",
+      "src/modules/combat/060-generation.js",
+      "src/modules/combat/070-equipment.js",
+      "src/modules/combat/080-training.js",
+      "src/modules/combat/090-practice.js"
+     ]
+    },
+    "www": true,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": [
+    {
+     "path": "chars.json › [].over",
+     "added": [
+      "기타:inheritOnMark"
+     ],
+     "removed": [
+      "편집기:inheritOnMark"
+     ]
+    },
+    {
+     "path": "chars.json › [].skillBalance",
+     "added": [],
+     "removed": [
+      "편집기:inheritApply"
+     ]
+    }
+   ]
+  },
   {
    "at": "2026-11-04T14:49",
    "head": "ef1621f",
@@ -26059,30 +26094,6 @@
      "changed": []
     },
     "tool": false
-   },
-   "fns": {
-    "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": []
-  },
-  {
-   "at": "2026-11-04T03:39",
-   "head": "5b06d05",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "www": false,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": true
    },
    "fns": {
     "added": [],

@@ -4,7 +4,7 @@ import { withPage } from './page.mjs';
 export async function runQA(game, input) { const { out, errors } = await withPage(page => page.evaluate(async ({ game, input }) => {
   const R = { findings: [] }, F = (sev, area, msg) => R.findings.push({ sev, area, msg });
   let seed = 12345; const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-  closeModal(); closeOv(); G = fix(JSON.parse(game)); applyMeta(); SystemView.reloadGame = () => {};
+  CoreView.closeModal(); CoreView.closeOv(); G = Characters.fix(JSON.parse(game)); SystemView.applyMeta(); SystemView.reloadGame = () => {};
   const main = G.chapters.filter(c => c.kind === 'main'), chars = G.chars.filter(c => !c.alt), npcs = G.npcs || [], elems = new Set((G.meta.elems || []).map(e => e.n));
   const cnt = (a, f) => a.reduce((m, x) => { const k = f(x); m[k] = (m[k] || 0) + 1; return m; }, {}), L = r => Array.isArray(r) ? r : (r && r.issues) || [];
   // ① 구성
@@ -35,13 +35,13 @@ export async function runQA(game, input) { const { out, errors } = await withPag
   const defNames = Object.values(GGMCombat.generationDefaults({ role: 'atk' }) || {}).filter(x => x && x.name).map(x => x.name);
   chars.forEach(c => { const sk = Object.values(c.skills || {}).filter(x => x && x.name).map(x => x.name); if (c.skillPending) F('하', '스킬', `${c.name}: 인라인 스킬이 검증에 걸려 게임을 연 뒤 스킬을 설계함(skillPending)`); else if (c.skillGenerationWarning) F('상', '스킬', `${c.name}: 스킬이 임시 상태로 저장됨 — "${c.skillGenerationWarning.slice(0, 40)}"`); else if (sk.length && sk.every(n => defNames.includes(n) || /^(스킬|수호|응급 지원|전술 공격|전투 태세)$/.test(n))) F('중', '스킬', `${c.name}: 기본 스킬(${sk.join('/')})`); });
   G.chapters.forEach(ch => (ch.stages || []).forEach((s, i) => (s.enemies || []).forEach(e => { if (e.elem && !elems.has(e.elem)) F('중', '적', `${ch.title} ${i + 1}: 적 「${e.name}」 속성 「${e.elem}」이 이 게임 속성 목록에 없음`); })));
-  G.banners.filter(b => b.type === 'pickup' && b.active).forEach(b => (b.pickup || []).forEach(id => { const c = charById(id); if (!c) F('중', '배너', `「${b.name}」 픽업 대상이 없는 대원`); else if (typeof castOk === 'function' && !castOk(c)) F('중', '배너', `「${b.name}」 픽업 대상 ${c.name}이(가) 아직 만나지 않은 대원(뽑을 수 없음)`); }));
+  G.banners.filter(b => b.type === 'pickup' && b.active).forEach(b => (b.pickup || []).forEach(id => { const c = charById(id); if (!c) F('중', '배너', `「${b.name}」 픽업 대상이 없는 대원`); else if ((typeof Acquire==='undefined'?'undefined':typeof Acquire.castOk) === 'function' && !Acquire.castOk(c)) F('중', '배너', `「${b.name}」 픽업 대상 ${c.name}이(가) 아직 만나지 않은 대원(뽑을 수 없음)`); }));
   [3, 2, 1].forEach(r => { const n = chars.filter(c => c.rarity === r && !c.debutLater).length; if (n === 1) F('중', '뽑기', `${RL[r]} 대원이 1명뿐 — 그 등급 확률(${({ 3: 'SSR', 2: 'SR', 1: 'R' })[r]})이 모두 한 사람에게 몰려 중복이 쏟아짐`); });
   // ③ 앱 자체 점검
-  const a = auditScan(); R.audit = { total: a.reduce((s, x) => s + x.items.length, 0), rules: a.map(x => `${x.rule.id}(${x.rule.kind}) ${x.rule.label}: ${x.items.length}`) };
-  const pr = chars.map(c => { const r = personaReview(c); return { n: c.name, score: r.score, issues: L(r).map(i => i.msg) }; }); R.persona = { avg: Math.round(pr.reduce((s, x) => s + (x.score || 0), 0) / Math.max(1, pr.length)), detail: pr };
-  R.plan = L(planCheck()).map(x => x.msg || x); const fr = factionReview(); R.faction = { score: fr.score, issues: L(fr).map(x => x.msg) };
-  R.balance = balReport().map(b => ({ n: b.c.name, dev: b.dev })); R.imgPerson = imgAuditScan().map(x => `${x.kind}:${x.name} -${x.removed.join(',')}`);
+  const a = LiveOps.auditScan(); R.audit = { total: a.reduce((s, x) => s + x.items.length, 0), rules: a.map(x => `${x.rule.id}(${x.rule.kind}) ${x.rule.label}: ${x.items.length}`) };
+  const pr = chars.map(c => { const r = Characters.personaReview(c); return { n: c.name, score: r.score, issues: L(r).map(i => i.msg) }; }); R.persona = { avg: Math.round(pr.reduce((s, x) => s + (x.score || 0), 0) / Math.max(1, pr.length)), detail: pr };
+  R.plan = L(Story.planCheck()).map(x => x.msg || x); const fr = World.factionReview(); R.faction = { score: fr.score, issues: L(fr).map(x => x.msg) };
+  R.balance = Rules.balReport().map(b => ({ n: b.c.name, dev: b.dev })); R.imgPerson = PromptStudio.imgAuditScan().map(x => `${x.kind}:${x.name} -${x.removed.join(',')}`);
   if (R.imgPerson.length) F('하', '그림 프롬프트', `배경·소품 프롬프트에 인물 태그 ${R.imgPerson.length}건(그릴 때 가드가 제거)`);
   // ④ 대본 QA
   const known = new Set([...names, ...npcs.map(n => n.name)]), bgs = new Set(G.lib.filter(l => l.kind === 'bg').map(l => l.name)), bgms = new Set(G.lib.filter(l => l.kind === 'bgm').map(l => l.name));
@@ -49,7 +49,7 @@ export async function runQA(game, input) { const { out, errors } = await withPag
   G.chapters.forEach(ch => (ch.stages || []).forEach((s, si) => { scripts.push([`${ch.title} ${si + 1} 전`, s.pre, s]); scripts.push([`${ch.title} ${si + 1} 후`, s.post, s]); }));
   G.threads.forEach(t => scripts.push([`톡 「${t.title}」`, t.script, null]));
   const qa = { sayLines: 0, choices: 0, branches: 0, unknownSpeakers: {}, missingBg: {}, missingBgm: {}, faces: {}, commands: {}, longLines: 0, english: [], parseErrors: [], debutViolations: [] };
-  for (const [where, text, st] of scripts) { if (!text) continue; let ls; try { ls = parseScript(text); } catch (e) { qa.parseErrors.push(where + ': ' + e.message); continue; }
+  for (const [where, text, st] of scripts) { if (!text) continue; let ls; try { ls = System.parseScript(text); } catch (e) { qa.parseErrors.push(where + ': ' + e.message); continue; }
     for (const l of ls) {
       if (l.type === 'say') { qa.sayLines++; const who = l.who; if (who && !known.has(who) && !isMe(who) && !/^(나레이션|내레이션|해설|\?\?\?|모두|일동|목소리|방송|아나운서|사회자|관객|모두들)$/.test(who)) qa.unknownSpeakers[who] = (qa.unknownSpeakers[who] || 0) + 1;
         if (l.face) qa.faces[l.face] = (qa.faces[l.face] || 0) + 1; const tx = String(l.text || ''); if (tx.length > 140) qa.longLines++; if (/[A-Za-z]{6,}/.test(tx) && qa.english.length < 10) qa.english.push(`${where}: ${tx.slice(0, 60)}`);
@@ -64,7 +64,7 @@ export async function runQA(game, input) { const { out, errors } = await withPag
   Object.entries(qa.missingBg).forEach(([w, n]) => F('중', '대본', `배경 목록에 없는 장소·배경 「${w}」 ${n}회(그림이 연결되지 않음)`)); Object.entries(qa.missingBgm).forEach(([w, n]) => F('하', '대본', `없는 음악 「${w}」 ${n}회`));
   if (qa.english.length) F('하', '대본', `대사에 영어 단어 ${qa.english.length}건`);
   const ch1 = main[0]; if (ch1) (ch1.stages || []).forEach((s, i) => { const pre = String(s.pre || '').split('\n').filter(l => l.trim()).length, post = String(s.post || '').split('\n').filter(l => l.trim()).length; if (pre < 15 || pre > 25 || post < 8 || post > 15) F('하', '분량', `1장 ${i + 1}: 전 ${pre}줄·후 ${post}줄(지시: 전 15~25·후 8~15)`); });
-  { const texts = []; for (const t of ['lobby', 'ops', 'contract', 'crew']) { tab = t; render(); texts.push(document.getElementById('view').innerText); } const ui = texts.join('\n'), bad = new Set();
+  { const texts = []; for (const t of ['lobby', 'ops', 'contract', 'crew']) { tab = t; Challenge.render(); texts.push(document.getElementById('view').innerText); } const ui = texts.join('\n'), bad = new Set();
     const jong = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00; return c >= 0 && c <= 11171 ? c % 28 : -1; };
     Object.values(G.meta.terms || {}).filter(v => typeof v === 'string' && v.trim()).forEach(v => { const j = jong(v); if (j > 0 && j !== 8 && new RegExp(v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '로(?![가-힣])').test(ui)) bad.add(`${v}로`); if (j === 0 && new RegExp(v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '으로').test(ui)) bad.add(`${v}으로`); });
     const both = (ui.match(/[가-힣]+(을\(를\)|이\(가\)|은\(는\)|과\(와\))/g) || []).slice(0, 4); R.uiText = ui.replace(/\s+/g, ' ').slice(0, 600);
@@ -73,52 +73,52 @@ export async function runQA(game, input) { const { out, errors } = await withPag
   { const C = { on: !!(G.meta.construct && G.meta.construct.on), configured: !!G.meta.construct, expedition: (G.meta.expedition && G.meta.expedition.mode) || '(기본 combat)', resTerms: ['res1', 'res2', 'res3', 'res4'].map(k => G.meta.terms[k]) };
     if (!C.configured) F('중', '건조·원정', `생성기가 건조(자원 투입식 영입)를 설정하지 않음 — 꺼진 채 시작, 자원 이름 ${C.resTerms.join('/')}(기본값)${/아이돌|방송|기획사|스트리머|가게|카페/.test(JSON.stringify(G.world).slice(0, 4000)) && C.expedition.includes('combat') ? `, 원정은 전투형(${C.expedition}) — 세계관과 맞는 원정 방식(방송·스트리머·경영)이 있는데 고르지 않음` : ''}`);
     C.dispatches = (G.dispatches || []).map(d => d.name); // 파견 목록은 이름·설명 견본(원안 설계) — 의뢰는 게시판(dispOffer)이 매일 뽑음
-    const keep = G.meta.construct; G.meta.construct = Object.assign({ on: true }, keep || {}); try { conMeta(); const cfg = CON(), pool = conPool(), inputs = { '최소 30×4': [30, 30, 30, 30], '균등 300×4': [300, 300, 300, 300], '공격 쏠림 100/600/100/100': [100, 600, 100, 100], '균등 500×4': [500, 500, 500, 500], '최대 999×4': [999, 999, 999, 999] };
+    const keep = G.meta.construct; G.meta.construct = Object.assign({ on: true }, keep || {}); try { Acquire.conMeta(); const cfg = Acquire.CON(), pool = Acquire.conPool(), inputs = { '최소 30×4': [30, 30, 30, 30], '균등 300×4': [300, 300, 300, 300], '공격 쏠림 100/600/100/100': [100, 600, 100, 100], '균등 500×4': [500, 500, 500, 500], '최대 999×4': [999, 999, 999, 999] };
       C.groups = (cfg.groups || []).map(g => `${g.name}(${JSON.stringify(g.match)})`); C.start = cfg.start; C.buy = cfg.buy; const seen = new Set();
       C.tables = Object.entries(inputs).map(([k, t]) => { const r = GGMConstruct.rates(t, cfg), tb = GGMConstruct.table(t, cfg, pool); tb.rows.filter(x => x.p > 0).forEach(x => seen.add(x.id));
         return { input: k, open: r.groups.filter(g => g.open).map(g => `${g.name} ${g.p.toFixed(0)}%`).join(' · '), rarity: `R ${(r.rarity[1] || 0).toFixed(0)} / SR ${(r.rarity[2] || 0).toFixed(0)} / SSR ${(r.rarity[3] || 0).toFixed(1)}`, rows: tb.rows.filter(x => x.p > 0).sort((a, b) => b.p - a.p).slice(0, 6).map(x => `${(charById(x.id) || {}).name} ${x.p.toFixed(1)}%`).join(', ') }; });
       C.poolSize = pool.length; C.never = pool.filter(c => !seen.has(c.id)).map(c => (charById(c.id) || {}).name);
       if (C.never.length) F('중', '건조·원정', `어떤 투입으로도 건조되지 않는 대원: ${C.never.join(', ')}`);
       const byRole = cnt(pool, c => c.role); Object.entries(byRole).filter(([, n]) => n === 1).forEach(([r]) => F('하', '건조·원정', `건조 분류 「${(ROLE && ROLE[r]) || r}」 후보가 1명 — 그 분류를 열면 같은 대원만 나옴`));
-      const offers = Array.from({ length: 30 }, () => dispOffer([])), inc = offers.map(o => Object.fromEntries(Object.entries(o.reward).filter(([k]) => /^res/.test(k)))), perH = offers.map((o, i) => Object.values(inc[i]).reduce((a, v) => a + v, 0) / o.hours); // 게시판이 실제로 뽑는 의뢰 30개(건조가 켜져 있을 때 자원 보상)
+      const offers = Array.from({ length: 30 }, () => Expedition.dispOffer([])), inc = offers.map(o => Object.fromEntries(Object.entries(o.reward).filter(([k]) => /^res/.test(k)))), perH = offers.map((o, i) => Object.values(inc[i]).reduce((a, v) => a + v, 0) / o.hours); // 게시판이 실제로 뽑는 의뢰 30개(건조가 켜져 있을 때 자원 보상)
       C.expIncome = [`게시판 의뢰 30개의 건조 자원: 평균 ${Math.round(inc.reduce((a, r) => a + Object.values(r).reduce((x, v) => x + v, 0), 0) / offers.length)} · 시간당 평균 ${Math.round(perH.reduce((a, v) => a + v, 0) / offers.length)} · 자원 보상 없는 의뢰 ${inc.filter(r => !Object.keys(r).length).length}`];
     } catch (e) { C.err = e.message; } finally { G.meta.construct = keep; }
     R.construct = C; }
   // ⑤ 플레이
   const realRandom = Math.random; Math.random = rnd;
   P().owned = {}; P().squad = []; P().gems = Math.max(P().gems, 3000); P().firstTen = true; P().pity = 0; P().cleared = {};
-  const b0 = curBanner(); let pulled = [];
-  try { await pull(10); await new Promise(r => setTimeout(r, 300)); ((GC && GC.timers) || []).forEach(clearTimeout); /* 건너뛰기와 같이 연출 타이머를 지우고 닫음 */ closeOv(); pulled = (P().history || []).slice(0, 10).map(id => { const c = charById(id); return c ? `${RL[c.rarity]} ${c.name}` : id; }); } catch (e) { pulled = ['오류: ' + e.message]; }
+  const b0 = Acquire.curBanner(); let pulled = [];
+  try { await Acquire.pull(10); await new Promise(r => setTimeout(r, 300)); ((GC && GC.timers) || []).forEach(clearTimeout); /* 건너뛰기와 같이 연출 타이머를 지우고 닫음 */ CoreView.closeOv(); pulled = (P().history || []).slice(0, 10).map(id => { const c = charById(id); return c ? `${RL[c.rarity]} ${c.name}` : id; }); } catch (e) { pulled = ['오류: ' + e.message]; }
   R.firstPull = { banner: b0 && b0.name, results: pulled, owned: Object.keys(P().owned).map(id => charById(id)?.name), squad: P().squad.map(id => charById(id)?.name) };
   if (R.firstPull.owned.length < 4) F('중', '플레이', `첫 10연 뒤 서로 다른 대원 ${R.firstPull.owned.length}명 — 편성 ${Math.min(4, R.firstPull.owned.length)}명으로 시작`);
   const squad = P().squad.map(charById).filter(Boolean); squad.forEach(c => { try { v2Ensure(c); } catch (e) { F('상', '플레이', `${c.name}: 전투 스킬 준비(v2Ensure) 오류 — ${e.message}`); } });
-  const sim = (s, lv, seeds) => { const res = []; for (const sd of seeds) { squad.forEach(c => { own(c.id).lv = lv; }); const fb = factionBonus(squad.map(c => c.id));
-      const allies = squad.map((c, i) => { const st = stats(c), o = own(c.id) || { wlv: 0 }; try { v2EnsureEquipment(c); } catch (e) { F('상', '플레이', `${c.name}: 장비 준비(v2EnsureEquipment) 오류 — ${e.message}`); } return { side: 'a', slot: i, c, name: c.name, range: charRange(c), elem: c.elem, role: c.role, maxhp: st.hp, hp: st.hp, atk: Math.round(st.atk * (1 + (fb[c.faction] || 0) / 100)), def: st.def, spd: st.spd, g: rnd() * 600, sh: 0, mul: 1, skillTraining: GGMCombat.trainingState(o.skillTraining), wlv: o.wlv || 0 }; });
+  const sim = (s, lv, seeds) => { const res = []; for (const sd of seeds) { squad.forEach(c => { Characters.own(c.id).lv = lv; }); const fb = Core.factionBonus(squad.map(c => c.id));
+      const allies = squad.map((c, i) => { const st = Core.stats(c), o = Characters.own(c.id) || { wlv: 0 }; try { v2EnsureEquipment(c); } catch (e) { F('상', '플레이', `${c.name}: 장비 준비(v2EnsureEquipment) 오류 — ${e.message}`); } return { side: 'a', slot: i, c, name: c.name, range: Core.charRange(c), elem: c.elem, role: c.role, maxhp: st.hp, hp: st.hp, atk: Math.round(st.atk * (1 + (fb[c.faction] || 0) / 100)), def: st.def, spd: st.spd, g: rnd() * 600, sh: 0, mul: 1, skillTraining: GGMCombat.trainingState(o.skillTraining), wlv: o.wlv || 0 }; });
       const enemies = (s.enemies || []).map(e => ({ side: 'e', name: e.name, elem: e.elem, role: e.role, boss: e.boss, maxhp: e.hp, hp: e.hp, baseHp: e.hp, atk: e.atk, def: e.def, spd: e.spd, g: rnd() * 400, turns: 0, sh: 0, mul: 1, pattern: e.pattern, skills: e.skills }));
-      try { fieldApply(s, allies, enemies); res.push(GGMCombat.run(allies, enemies, { ...v2Options(), seed: sd, maxTime: fieldTime(s) || 119 })); } catch (e) { res.push({ err: e.message }); } }
+      try { System.fieldApply(s, allies, enemies); res.push(GGMCombat.run(allies, enemies, { ...v2Options(), seed: sd, maxTime: System.fieldTime(s) || 119 })); } catch (e) { res.push({ err: e.message }); } }
     const ok = res.filter(r => !r.err); return { win: ok.length ? Math.round(100 * ok.filter(r => r.win).length / ok.length) : null, time: ok.length ? Math.round(ok.reduce((x, r) => x + r.time, 0) / ok.length) : null, err: res.find(r => r.err)?.err }; };
   const seeds = Array.from({ length: 20 }, (_, i) => 1000 + i);
   R.battles = squad.length ? main.map(ch => ({ chapter: ch.title, stages: (ch.stages || []).map((s, i) => { const mode = s.mode || (s.story || !(s.enemies || []).length ? 'story' : 'battle'); if (mode !== 'battle') return { n: i + 1, title: s.title, mode };
     return { n: i + 1, title: s.title, mode, boss: (s.enemies || []).some(e => e.boss), lv1: sim(s, 1, seeds), lv10: sim(s, 10, seeds), lv20: sim(s, 20, seeds) }; }) })) : [];
-  Math.random = realRandom; squad.forEach(c => { own(c.id).lv = 1; });
+  Math.random = realRandom; squad.forEach(c => { Characters.own(c.id).lv = 1; });
   // ⑦ 바리에이션(이격): 템플릿·조건·레시피, 건조로 이격 만들기, 상속(기본 캐릭터 수정이 이격에 반영되는지) — 첫 10연 보유 대원 기준
   { const V = { templates: [], made: [] }; const keep = G.meta.construct; G.meta.construct = Object.assign({ on: true }, keep || {}); const keepSample = SAMPLE; SAMPLE = null;
-    try { const tpls = VARIANTS(), cfg = CON(), start = cfg.start, owned = Object.keys(P().owned).map(charById).filter(c => c && !c.alt);
-      V.templates = tpls.map(t => { const bases = conTargets(t), need = (t.recipe && t.recipe.min) || []; return { name: t.name, prompt: t.prompt, chance: t.chance, recipe: need.join('/'), cond: JSON.stringify(t.cond || {}), eligible: bases.map(b => b.name), affordable: need.length ? Math.floor(Math.min(...need.map(x => (+start || 0) / Math.max(1, x)))) : 0 }; });
+    try { const tpls = Characters.VARIANTS(), cfg = Acquire.CON(), start = cfg.start, owned = Object.keys(P().owned).map(charById).filter(c => c && !c.alt);
+      V.templates = tpls.map(t => { const bases = Characters.conTargets(t), need = (t.recipe && t.recipe.min) || []; return { name: t.name, prompt: t.prompt, chance: t.chance, recipe: need.join('/'), cond: JSON.stringify(t.cond || {}), eligible: bases.map(b => b.name), affordable: need.length ? Math.floor(Math.min(...need.map(x => (+start || 0) / Math.max(1, x)))) : 0 }; });
       const generic = tpls.filter(t => /^v_(swim|school|armor|stage[123])$/.test(t.id) && !t.cond || JSON.stringify(t.cond || {}) === '{}').length;
       if (tpls.length && tpls.every(t => /^v_(swim|school|armor|stage[123])$/.test(t.id))) F('중', '바리에이션', `바리에이션 템플릿이 모든 게임 공통 기본값 ${tpls.length}종(${tpls.map(t => t.name).join('·')}) — 생성기가 세계관에 맞게 만들지 않음`);
       if (generic === tpls.length && tpls.length) F('하', '바리에이션', '모든 템플릿의 조건이 비어 있어 보유 대원 누구나 대상(속성·포지션·능력치·업적 조건 없음)');
       const b = owned[0], t0 = tpls[0];
-      if (b && t0) { const v = await conMakeVariant(b, t0), base0 = String(v.profile || '');
+      if (b && t0) { const v = await Characters.conMakeVariant(b, t0), base0 = String(v.profile || '');
         const tagOk = String(v.naiPrompt || '').includes(String(t0.prompt || '').split(',')[0].trim());
-        b.profile = String(b.profile || '') + ' [QA 상속 확인]'; mark('c:' + b.id); await new Promise(r => setTimeout(r, 200));
+        b.profile = String(b.profile || '') + ' [QA 상속 확인]'; Core.mark('c:' + b.id); await new Promise(r => setTimeout(r, 200));
         const v2 = G.chars.find(x => x.id === v.id), inherited = String(v2.profile).includes('[QA 상속 확인]') && !('profile' in (v2.over || {})); // 기본 캐릭터를 고친 것이 이격에 반영되고, 이격이 프로필을 따로 갖지 않음
         V.made.push({ base: b.name, tpl: t0.name, name: v.name, rarity: RL[v.rarity], tagOk, look: String(v.naiPrompt || '').slice(0, 160), inherited });
         if (!tagOk) F('중', '바리에이션', `이격 「${v.name}」 외형 태그에 템플릿 의상(${t0.prompt})이 들어가지 않음`);
         if (!inherited) F('중', '바리에이션', `기본 캐릭터 ${b.name}의 프로필 수정이 이격 「${v.name}」에 반영되지 않음(상속)`); }
     } catch (e) { V.err = e.message; } finally { G.meta.construct = keep; SAMPLE = keepSample; }
     R.variants = V; }
-  R.squadStats = squad.map(c => { const st = stats(c); return `${c.name}(${RL[c.rarity]} ${ROLE[c.role] || c.role}) 체력${st.hp} 공격${st.atk} 방어${st.def}`; });
+  R.squadStats = squad.map(c => { const st = Core.stats(c); return `${c.name}(${RL[c.rarity]} ${ROLE[c.role] || c.role}) 체력${st.hp} 공격${st.atk} 방어${st.def}`; });
   R.battles.forEach(ch => ch.stages.filter(s => s.lv1).forEach(s => { if (s.lv1.err) F('상', '전투', `${ch.chapter} ${s.n}: 전투 시뮬레이션 오류 ${s.lv1.err}`); else if (s.n === 1 && s.lv1.win < 50) F('상', '난이도', `${ch.chapter} 1: 첫 편성(레벨 1) 승률 ${s.lv1.win}% — 첫 전투에서 막힘`); else if (s.lv20.win === 0) F('중', '난이도', `${ch.chapter} ${s.n}: 레벨 20에서도 승률 0%`); else if (s.lv1.win === 100 && (s.boss || s.lv1.time < 15)) F('하', '난이도', `${ch.chapter} ${s.n}${s.boss ? '(보스)' : ''}: 첫 편성·레벨 1로 ${s.lv1.time}초 만에 승률 100% — 성장 없이 깸`); }));
   return R;
 }, { game, input }), { tag: 'qa' }); out.pageErrors = errors; if (errors.length) out.findings.push({ sev: '상', area: '페이지 오류', msg: errors.slice(0, 3).join(' | ') }); return out; }

@@ -9,6 +9,8 @@ import { parse as sgParse, Lang } from '@ast-grep/napi';
 const req = createRequire(import.meta.url);
 const tree = d => readdirSync(d).filter(f => !f.startsWith('.')).sort().flatMap(f => statSync(join(d, f)).isDirectory() ? tree(join(d, f)) : [join(d, f)]);
 let parser = null, JS = null;
+/* 이미 준비된 파서로 글 하나를 바로 읽음(tsInit 뒤 — 시험 도구 파일 같은 분석 단위 밖 글) */
+export const parseJS = text => { if (!parser) throw Error('tsInit 먼저'); return parser.parse(text); };
 export async function tsInit() { if (parser) return { parser, JS }; await Parser.init(); JS = await Language.load(req.resolve('tree-sitter-javascript/tree-sitter-javascript.wasm')); parser = new Parser(); parser.setLanguage(JS); return { parser, JS }; }
 
 /* 앱 class(불러온 코드의 맨 위 class 선언 — tools/reshape.mjs로 함수를 옮긴 자리)와 부른 이름: Class.이름(…)은 옛 함수 이름(이름)으로 풂, 내장(Object.assign·JSON.parse …)과 값의 메서드(SAMPLE.json)는 글 그대로.

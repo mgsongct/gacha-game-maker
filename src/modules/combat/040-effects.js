@@ -58,7 +58,7 @@ function standingPosition(host,u,el){
  if(!entry||entry.battle!==battle||entry.host!==host||entry.w!==h.width||entry.h!==h.height){entry={...position(host,el),battle,host,w:h.width,h:h.height};anchors.set(u,entry);}
  return {x:entry.x,y:entry.y,width:entry.width,height:entry.height};
 }
-function primePositions(host){if(typeof B==='undefined'||!B)return;for(const u of [...B.allies,...B.enemies]){const el=uel(u);if(el)standingPosition(host,u,el);}}
+function primePositions(host){if(typeof B==='undefined'||!B)return;for(const u of [...B.allies,...B.enemies]){const el=SystemView.uel(u);if(el)standingPosition(host,u,el);}}
 // Five torso points, like the five pips on a die. Never spread outside the art box.
 function aimPoint(z,index=Math.floor(Math.random()*5)){
  const offsets=[[0,0],[-1,-1],[1,-1],[-1,1],[1,1]],p=offsets[Math.max(0,Math.min(4,index))],x=Math.min(14,(z.width||60)*.16),y=Math.min(18,(z.height||90)*.13);
@@ -122,10 +122,10 @@ function remember(source,target,delay,slot){let map=arrivals.get(source);if(!map
 function remaining(source,target){return Math.max(0,(arrivals.get(source)?.get(target)?.at||0)-Date.now());}
 function hasArrival(source,target,slot){const a=arrivals.get(source)?.get(target);return !!a&&a.slot===slot&&a.stamp===source.lastCast?.[slot];}
 
-function impactUnit(u,fx,color){if(typeof B==='undefined'||!B||document.hidden)return;const host=document.querySelector('#ov > .bt'),el=uel(u);if(host&&el)attackImpact(host,position(host,el),{style:fx,color,kind:'damage',family:'attack'},{});}
+function impactUnit(u,fx,color){if(typeof B==='undefined'||!B||document.hidden)return;const host=document.querySelector('#ov > .bt'),el=SystemView.uel(u);if(host&&el)attackImpact(host,position(host,el),{style:fx,color,kind:'damage',family:'attack'},{});}
 function cast(ev){
  if(typeof B==='undefined'||!B||document.hidden)return;
- const host=document.querySelector('#ov > .bt'),el=uel(ev.source);if(!host||!el)return;
+ const host=document.querySelector('#ov > .bt'),el=SystemView.uel(ev.source);if(!host||!el)return;
  const z=position(host,el),d=node(host,'v2-fx-cast v5-caster-ring',ev.color,z.x,z.y);
  castReady.set(ev.source,Date.now()+(reduced()?0:TIMING.prepare*tempo()));
  animate(d,[{transform:'translate(-50%,-50%) scale(.65)',opacity:1},{transform:'translate(-50%,-50%) scale(1.2)',opacity:1,offset:.3},{transform:'translate(-50%,-50%) scale(1.3)',opacity:0}],1100*tempo());
@@ -151,13 +151,13 @@ function liveTimeline(duration,frame,done){
 }
 function intent(ev,onLand){
  const ctx=context(ev);if(!ctx){onLand();return;}
- const p=ev.plan,host=ctx.host,a=ev.source,t=ev.target,source=ev.visual?.flightOrigin||a,startEl=uel(source)||ctx.a.el;
- const base=standingPosition(host,source,startEl),target=standingPosition(host,t,uel(t)||ctx.z.el),destination=p.mode==='projectile'&&a.side!==t.side?aimPoint(target,p.aimIndex):target,color=chosenColor(a.kit?.[ev.slot]||{},undefined,ev.visual||{},p.style)||GGMVisuals.resolve(ev.visual||{},p.style).color||'#edf6ff';
+ const p=ev.plan,host=ctx.host,a=ev.source,t=ev.target,source=ev.visual?.flightOrigin||a,startEl=SystemView.uel(source)||ctx.a.el;
+ const base=standingPosition(host,source,startEl),target=standingPosition(host,t,SystemView.uel(t)||ctx.z.el),destination=p.mode==='projectile'&&a.side!==t.side?aimPoint(target,p.aimIndex):target,color=chosenColor(a.kit?.[ev.slot]||{},undefined,ev.visual||{},p.style)||GGMVisuals.resolve(ev.visual||{},p.style).color||'#edf6ff';
  ev.visual=ev.visual||{};ev.visual.impactPoint={x:destination.x,y:destination.y};
  if(p.mode==='melee'&&!reduced()){
   const startMelee=()=>{
    if(a.hp<=0)return;const old=meleeGroups.get(a);if(old?.group===p.group)return;old?.cancel();
-   const el=uel(a);if(!el)return;const transform=el.style.transform,zIndex=el.style.zIndex,windup=p.windup-p.startDelay,contact=p.duration-p.startDelay,hold=GGMCombat.IMPACT.gap*Math.max(0,p.total-1),recovery=160/GGMCombat.IMPACT.wallPerSecond;
+   const el=SystemView.uel(a);if(!el)return;const transform=el.style.transform,zIndex=el.style.zIndex,windup=p.windup-p.startDelay,contact=p.duration-p.startDelay,hold=GGMCombat.IMPACT.gap*Math.max(0,p.total-1),recovery=160/GGMCombat.IMPACT.wallPerSecond;
    const dx=target.x-base.x,dy=target.y-base.y,length=Math.max(1,Math.hypot(dx,dy)),reach=Math.min(10,Math.max(4,base.width*.1));el.style.zIndex='30';let stop;
    const cleanup=()=>{el.style.transform=transform;el.style.zIndex=zIndex;delete el.dataset.contactProgress;meleeGroups.delete(a);};const cancel=()=>{stop?.();cleanup();};meleeGroups.set(a,{group:p.group,cancel});
    stop=liveTimeline(contact+hold+recovery,(_,time)=>{
@@ -183,7 +183,7 @@ function intent(ev,onLand){
 }
 function basic(a,t){
  if(typeof B==='undefined'||!B||document.hidden||!a||!t||a.side===t.side)return 0;
- const host=document.querySelector('#ov > .bt'),ae=uel(a),te=uel(t);if(!host||!ae||!te)return 0;
+ const host=document.querySelector('#ov > .bt'),ae=SystemView.uel(a),te=SystemView.uel(t);if(!host||!ae||!te)return 0;
  const start=position(host,ae),end=position(host,te),color=chosenColor(a.kit?.active)||'#edf6ff';
  if(ranged(a)){
   const text=[a.c?.weapon?.name,a.c?.weapon?.desc,a.c?.skillConcept,a.c?.concept,a.c?.profile].filter(v=>typeof v==='string').join(' ');
@@ -357,13 +357,13 @@ function route(host,a,z,p,e={},offset=0,token){
 }
 function context(ev){
  if(typeof B==='undefined'||!B||document.hidden)return null;
- const host=document.querySelector('#ov > .bt'),source=ev.origin||ev.visual?.origin||ev.source,a=source&&uel(source),t=ev.target&&uel(ev.target);if(!host||!a||!t)return null;
+ const host=document.querySelector('#ov > .bt'),source=ev.origin||ev.visual?.origin||ev.source,a=source&&SystemView.uel(source),t=ev.target&&SystemView.uel(ev.target);if(!host||!a||!t)return null;
  primePositions(host);const landed=ev.visual?.impactPoint;return {host,a:{...standingPosition(host,source,a),el:a},z:{...standingPosition(host,ev.target,t),...(landed||{}),el:t}};
 }
 function area(ev,ctx,p){
  if(!['enemies','allies','other_allies','same_element','same_faction','role_allies'].includes(ev.visual?.targetRule||ev.targetRule))return;
  let seen=areaSeen.get(B);if(!seen){seen=new Set();areaSeen.set(B,seen);}const key=[ev.source.side,ev.source.slot,ev.slot,ev.source.lastCast?.[ev.slot],p.kind].join(':');if(seen.has(key))return;if(seen.size>=512)seen.clear();seen.add(key);
- const units=ev.target.side==='a'?B.allies:B.enemies,points=units.filter(u=>u.hp>0).map(uel).filter(Boolean).map(el=>position(ctx.host,el));if(!points.length)return;
+ const units=ev.target.side==='a'?B.allies:B.enemies,points=units.filter(u=>u.hp>0).map(SystemView.uel).filter(Boolean).map(el=>position(ctx.host,el));if(!points.length)return;
  const x=points.reduce((n,v)=>n+v.x,0)/points.length,y=points.reduce((n,v)=>n+v.y,0)/points.length,n=node(ctx.host,'v3-area-field',p.color,x,y);
  if(n)n.style.width=Math.min(500,Math.max(...points.map(v=>v.x))-Math.min(...points.map(v=>v.x))+100)+'px';
  animate(n,[{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-50%) scale(1)',opacity:.4,offset:.4},{transform:'translate(-50%,-50%) scale(1.2)',opacity:0}],700*tempo());
@@ -383,7 +383,7 @@ function semanticEffect(ev){
  const z=e.kind==='sp'&&ev.target.side==='a'?spPosition(ctx.host,ev.target,ctx.z):ctx.z;
  const delay=route(ctx.host,ctx.a,z,p,{...e,sameSide:ev.source.side!=null&&ev.source.side===ev.target.side},preparation(ev));remember(ev.source,ev.target,delay,ev.slot);return delay;
 }
-function spPosition(host,u,fallback){const el=uel(u)?.querySelector('.skill');return el?position(host,el):fallback;}
+function spPosition(host,u,fallback){const el=SystemView.uel(u)?.querySelector('.skill');return el?position(host,el):fallback;}
 function semanticDamage(ev){
  const ctx=context(ev);if(!ctx)return 0;
  const e=ev.visual||{kind:ev.periodic?'dot':ev.delayed?'delayed':'damage',phase:ev.periodic?'tick':'hit'},s=ev.source.kit?.[ev.slot]||{},p=semanticProfile(e,e.intentStyle||s.fx,chosenColor(s,undefined,e,e.intentStyle||s.fx));
@@ -418,7 +418,7 @@ function statusModel(u,sim){
 function sync(){
  if(typeof B==='undefined'||!B||B.presentationBusy)return;
  for(const u of [...B.allies,...B.enemies]){
-  const el=uel(u);if(!el)continue;const items=u.hp>0?statusModel(u,B.engine):[];
+  const el=SystemView.uel(u);if(!el)continue;const items=u.hp>0?statusModel(u,B.engine):[];
   let strip=el.querySelector('.v3-status-strip');if(!strip){strip=document.createElement('div');strip.className='v3-status-strip';strip.setAttribute('aria-label','현재 적용 중인 상태');el.append(strip);}
   const signature=JSON.stringify(items);if(strip.dataset.signature===signature)continue;strip.dataset.signature=signature;strip.replaceChildren();
   for(const [index,item]of items.slice(0,5).entries()){
