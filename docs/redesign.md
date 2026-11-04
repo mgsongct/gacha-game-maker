@@ -20,7 +20,82 @@
 
 원안도 class가 없고 같은 역할을 기능마다 함수로 되풀이하는 구조였고, 포크가 그 위에 같은 꼴로 기능을 더해(함수 +629) 되풀이가 늘었음.
 
-## 2. 설계 — class와 상속 계층
+## 2. 추상 매핑 — 제품이 가진 data → 기능(주인 하나)
+
+사용자 지시(U22): 「추상적으로 매핑부터 먼저 하고 설계부터 하고 진행」. 기능 = 그 data의 CRUD 일괄 단위(U9)이므로, 먼저 제품(index.html)이 가진 data를 기능에 하나씩 나눠 줌. 함수는 이 표를 따라 「무엇을 만들고·고치고·지우나」로 기능이 정해짐(`node tools/redesign.mjs --map`). data 목록은 연관 맵(`docs/map.json`)의 data 파일·첫 칸.
+
+| 기능 | data 파일 | meta.json 칸 | prog.json 칸 | world.json 칸 |
+|---|---|---|---|---|
+| Characters | `chars.json` `npcs.json` | `variants` `persona` `design` `castSex` | `owned` `mat` `tokens` `gifts` `giftSeen` `skinOwn` | |
+| Acquire | `banners.json` | `construct` `gated` | `pity` `pities` `guar` `spark` `firstTen` `curBanner` `cres` `cbuild` `history` `hist2` | |
+| Battle | | `story` | `squad` `sortie` `stars` | |
+| Challenge | | `farms` | `raid` `rogue` `run` `tower` `farmClear` | |
+| Story | `chapters.json` `events.json` `opening.json` | `storyMemory` `tone` | `cleared` `curEvent` `seenOpening` `castDone` `scene` `after` | `plan` `plot` |
+| World | `rels.json` | `bestiary` `bible` `cast` `relProf` | `cxSeen` `cxBadge` | `factions` `codex` `codexNotes` `lore` `name` `summary` `source` |
+| Messenger | `threads.json` | | `inbox` `fchat` `fcPhoto` `fcAff` | |
+| Player | | | `player` `avatar` `gender` `genderTxt` `bio` `look` `nameAsked` `hideEyes` `title` | |
+| Economy | | `shop` | `gold` `gems` `cash` `shop` `shopBuy` `mail` `mailBuild` `mailInit` `pass` `stam` `daily` `dm` | |
+| LiveOps | | `spots` `auditSeen` | `live` `sched` `prepAsked` `prepNever` `bootPrep` `flags` `gateSeen` | |
+| Expedition | `dispatches.json` | `expedition` | `exped` `disp` `dboard` | |
+| Rules | | `rules` `balance` `elems` `roles` `positions` | | |
+| NewGame | | `draft` | | |
+| PromptStudio | | `prompts` | | |
+| Image | `lib.json` | `artTags` `artNeg` | | |
+| System | `game.json` | `title` `sub` `theme` `accent` `terms` `logoStyle` `manual` `pub` `subscr` | `settings` `presets` `lobbyBg` `lobbyMode` `lbSize` `titleBg` `titleChar` `gachaBg` `dgBg` `csFull` `useCg` `skillCut` `battleMotion` `vnDirect` `vnStage` `memoOn` `savedAt` | |
+| 미정(도구로 확인) | | | `back` `ids` `prompt` `sec` `seen` `total` | |
+
+### 2-2. 화면 → 기능 (data를 쓰지 않는 화면·창 함수의 자리)
+
+화면 단위는 연관 맵이 index.html에서 뽑은 것(탭 화면 31 · 설정 패널 28 · 배경 처리 4 — 창 77은 그 창을 여는 화면의 기능). `node tools/redesign.mjs --map`이 data로 기능이 안 정해진 함수를 이 표로 놓음(이름이 화면 이름에 들어 있으면 그 줄).
+
+| 기능 | 화면·패널·배경 처리 |
+|---|---|
+| Characters | `대원` `로비` `훈련` `캐릭터 개성·매력` |
+| Acquire | `계약` `영입` `conSettingsPanel` |
+| Battle | `연습장` `전투 체계` |
+| Challenge | `도전` `abyss` |
+| Story | `작전` `이벤트` `evd` `시나리오 설계` `스토리 기억 관리` `연출` |
+| World | `도감` `세력·몬스터·등장 관리` `세계관:` |
+| Economy | `상점` `캐시 상점` `evshop` `시즌 패스` |
+| LiveOps | `공지` `일정` `시즌 운영` `콘텐츠 점검·업그레이드` `실행 중 AI` |
+| Expedition | `disp` `exSettingsPanel` |
+| Rules | `게임 규칙 (속성·포지션·능력치)` `밸런스 관리` |
+| Player | `관리관` |
+| NewGame | `새 게임 생성` `AI 창작실` |
+| PromptStudio | `프롬프트 스튜디오` |
+| Image | `그림 AI` `에셋 관리` `자료실` |
+| System | `설정` `화면·연출` `소리` `글 AI` `연동` `데이터` `앱 정보` `플레이 모드` `게시·구독` `아이폰·웹 연결` `PC 서버` `PC·폰 연동` `backupBlocks` `앱 업데이트` `불러오기` `앱 시작` |
+
+### 2-3. 매핑 결과 — 함수 → 기능 · class 종류 (`node tools/redesign.mjs --map` → `tools/out/redesign-map-www.md`·`.json`, 함수마다 기능·까닭·종류)
+
+| 기능 | 합 | Repository | Generator | Service | Controller | Screen | Dialog | Helper |
+|---|---|---|---|---|---|---|---|---|
+| Acquire | 72 | 20 | 1 | 1 | 1 | 19 | 9 | 21 |
+| Battle | 29 | 6 | 0 | 0 | 4 | 5 | 3 | 11 |
+| Challenge | 91 | 11 | 0 | 0 | 8 | 24 | 3 | 45 |
+| Characters | 376 | 46 | 12 | 1 | 13 | 91 | 27 | 186 |
+| Economy | 58 | 10 | 1 | 1 | 2 | 18 | 5 | 21 |
+| Expedition | 40 | 11 | 0 | 0 | 1 | 7 | 2 | 19 |
+| Image | 245 | 9 | 1 | 6 | 8 | 39 | 6 | 176 |
+| LiveOps | 79 | 6 | 5 | 2 | 6 | 11 | 7 | 42 |
+| Messenger | 40 | 3 | 2 | 0 | 2 | 18 | 1 | 14 |
+| NewGame | 70 | 0 | 1 | 2 | 4 | 2 | 0 | 61 |
+| Player | 16 | 2 | 0 | 0 | 0 | 5 | 1 | 8 |
+| PromptStudio | 15 | 1 | 1 | 1 | 0 | 1 | 1 | 10 |
+| Rules | 47 | 5 | 3 | 0 | 3 | 7 | 2 | 27 |
+| Shared | 244 | 0 | 6 | 11 | 16 | 66 | 11 | 134 |
+| Story | 142 | 13 | 8 | 2 | 5 | 32 | 16 | 66 |
+| System | 296 | 2 | 3 | 19 | 15 | 82 | 21 | 154 |
+| World | 83 | 11 | 4 | 0 | 0 | 5 | 4 | 59 |
+| 미정 | 123 | 0 | 2 | 1 | 0 | 30 | 2 | 88 |
+
+기능이 정해진 까닭: 쓰는 data 181 · 화면 507 · 읽는 상태 212 · 부르는·불리는 함수 799 · 공용(많이 불림) 25 · 공용(여러 기능) 219 · — 123
+
+- **Shared**(공용 244): 25곳↑에서 불리거나 여러 기능이 같이 쓰는 함수 — 설계에서 상위 class(View·Dialog·Service·Generator)와 공용 도구로 감.
+- **미정**(123): 매핑 표에 없는 data만 다루거나 이어진 함수가 없음 — 표를 채우거나 YAGNI로 지울 대상.
+- 기능 크기: Characters 376 · System 296 · Image 245 가 큼 — 설계에서 하위 class로 더 나눔(예: Characters = 보유·성장 / 캐릭터 data·시트 / 이격·바리에이션).
+
+## 3. 설계 — class와 상속 계층
 
 되풀이되는 역할 꼴은 상위 class(템플릿 메서드), data마다 창구 class 하나.
 
@@ -73,7 +148,7 @@ Feature                     기능 하나 = 가진 Repository(창구) + Generato
 | NewGame | 새 게임 초안 | 새 게임(위 Generator들을 차례로) | 초안 편집 | 11 새 게임 |
 | System | Store 설정 · Sync · Updater | — | 설정·동기화·업데이트 | 3 AI 연결 · 12 동기화 · 13 업데이트 |
 
-## 3. 옮기는 길(도구로)
+## 4. 옮기는 길(도구로)
 
 1. **틀 만들기**: 위 class의 뼈대 파일(상위 class 구현 + 빈 하위)을 새 src에 둠 — 지금 src는 버림(git 이력).
 2. **함수 → class 메서드 대응표**: 두 index.html의 함수마다 역할 꼴(AI 생성·창·화면·data 쓰기)·쓰는 data로 어느 class의 무엇이 되는지 도구가 표로 냄(`tools/redesign.mjs`에 대응표) — 같은 역할의 되풀이는 상위 class 하나로 합쳐지고 하위는 다른 점(프롬프트·스키마·반영)만 가짐.
