@@ -71,62 +71,12 @@ function scgNew(c){ return {id:'sc_'+c.id,kind:'scg',name:c.name+' 기술 컷인
 function scgSlot(c){ if(!c) return null; if(!c.scg||typeof c.scg!=='object') c.scg=scgNew(c); c.scg.id=c.scg.id||'sc_'+c.id; c.scg.kind='scg'; return c.scg; }
 function scgFixAll(g){ (g.chars||[]).forEach(c=>{ if(c.scg) scgSlot(c); }); } // 불러오기(fix): 있는 칸의 id·종류만 맞춤
 function scgOf(c){ if(!c) return null; return c.scg&&typeof c.scg==='object'?c.scg:scgNew(c); } // 읽기 — 고칠 때는 scgSlot
-function charIllust(c){ if(!c) return null; const k=skinOf(c); if(k&&imgSrc(k)) return skinPartSrc(c,'illust'); return c.illust?imgSrc(c.illust):null; } // 스킨을 입으면 기본 옷 일러스트로 돌아가지 않아요
-function lobbyCharacterArt(c,cls='lobby-art',face=''){
- const sk=skinOf(c),faces=sk?.upper&&imgSrc(sk.upper)?sk.faces:c.faces,f=(faces||[]).find(x=>x.name===face),src=f?.up&&imgSrc(f.up)||sk?.upper&&imgSrc(sk.upper)||c.upper&&imgSrc(c.upper);
- if(sk&&c.useStanding!==false&&!imgSrcRaw(sk.upper)&&skinPreviewSrc(c,sk))return art(c,cls,{upper:true,face});
- return src?`<img class="art upimg ${cls}" src="${esc(src)}" alt="${esc(c.name)}" draggable="false">`:art(c,cls,{upper:true,face});
-}
-function lobbyHTML(){
-  const p=P(), c=charById(p.sec), has=c&&own(c.id), nx=nextStage(), evs=G.events.filter(ev=>ev.active!==false&&gateOpen(ev));
-  // 자동 로비는 레이어 유지: 포즈 → 상반신 → 스탠딩. 일러스트는 별도 표시 모드에서 사용합니다.
-  const oo=has?own(c.id):null, lm=p.lobbyMode||'auto', poseSrc=has&&!(skinOf(c)&&imgSrc(skinOf(c)))&&c.pose&&imgSrc(c.pose), layer=lm==='layer'||(lm==='auto'&&!!has), ill=has&&lm!=='stand'&&!layer&&((oo.useCg&&oo.dup>=5&&lbcgSrc(c))||charIllust(c)), pose=layer&&poseSrc;
-  const bn=curBanner(), bup=bn&&((bn.pickup||[]).map(charById).filter(Boolean)[0]||bannerPool(bn).filter(x=>x.rarity===3)[0]);
-  const TYPE={std:'STANDARD',pickup:'PICK UP',pool:'FACTION',event:'EVENT LIMITED'};
-  const ico=(act,to,ic,label,badge,hot)=>`<button class="lb-ico ${hot?'hot':''}" data-act="${act}" ${to?`data-to="${to}"`:''}><span class="ic">${ICO[ic]}</span><b>${esc(label)}</b>${badge?`<em>${badge}</em>`:''}</button>`;
-  const newN=p.live.notices.filter(n=>n.at>p.live.seen).length;
-  return `<div class="lobby ${ill?'ill':''} ${layer?'layer':''} lbsz-${esc(p.lbSize||'fit')}">${layer?`<div class="lb-far" style="${has&&c.lbbg&&imgSrc(c.lbbg)?`background-image:url('${esc(imgSrc(c.lbbg))}')`:bgStyle(p.lobbyBg||'새벽등대 사무소')}"></div>`:''}
-    <div class="lb-stage" ${has?'data-act="poke" role="button" tabindex="0"':'data-act="lbshow"'} style="${ill?'background:#000':layer?'background:transparent':bgStyle(p.lobbyBg||'새벽등대 사무소')}">
-      ${ill?`<img class="lobby-ill" src="${esc(ill)}" alt="${esc(c.name)}" draggable="false">`:pose?`<img class="art lobby-art lobby-pose" src="${esc(pose)}" alt="${esc(c.name)}" draggable="false">`:has?(layer?lobbyCharacterArt(c):art(c,'lobby-art')):''}<div class="lb-shade"></div>
-    </div>
-    <div class="lb-ui">
-      ${bn?`<button class="lb-banner" data-act="go" data-to="contract" data-swipe="banner"><span class="bgl" style="${bn.bg?bgStyle(bn.bg):bgStyle(p.gachaBg||'낙성 분화구')}"></span><span class="bt"><i>${TYPE[bn.type]||'RECRUIT'}</i><b>${esc(bn.name)}</b><span>${bup?esc(bup.name)+' 확률 업':esc(T('gacha'))}</span></span><span class="bf">${bup?noSkin(()=>art(bup))():''}</span></button>`:''}
-      <div class="lb-tr"><button class="lb-pass" data-act="go" data-to="pass"><i>SEASON PASS</i><b>Lv.${passLv()}</b>${passClaimable()?'<em></em>':''}</button>${seasonChip()}</div>
-      <div class="lb-left">
-        ${ico('phone','','talk',T('talk'),unread()||'')}
-        ${evs.length?ico('go','event','event',T('event'),evs.length):''}
-        ${ico('go','notice','notice','공지',newN||'')}
-        ${ico('go','codex','book','도감',cxNewFast()||'')}
-        ${p.daily!==today()?ico('daily','','gift','일일 보급','!',true):''}
-      </div>
-      <div class="lb-right">
-        ${ico('mailopen','','mail','우편함',mailCount()||'',mailCount()>0)}
-        ${ico('go','disp','disp',T('dispatch'),dispDone()||'')}
-        ${ico('go','sched','talk','일정',G.chars.some(c=>own(c.id))&&progRead('sched').left?progRead('sched').left:'')}
-        ${ico('go','farm','farm',T('farm'),'')}
-        ${ico('go','challenge','raid','도전',progRead('rogue').run?'!':(raidTriesLeft()&&!progRead('raid').killed?raidTriesLeft():''))}
-        ${ill||has?ico('lbhide','','eye','숨기기',''):''}
-      </div>
-      <div class="lb-foot">
-      ${has?`<div class="bubble" id="bubble">${esc(sub(rand(affLinePool(c))||'…'))}</div>`:''}
-      <div class="lb-id">${has?`<i>${esc(G.meta.sub)}</i><b>${esc(c.name)}</b><span>${esc(c.faction||ROLE[c.role])} · 호감도 Lv.${affLv(own(c.id))}</span>`:`<i>${esc(G.meta.sub)}</i><b>${esc(G.meta.title)}</b><span>첫 ${T('gacha')}로 ${T('crew')}을(를) 만나세요</span>`}</div>
-      <div class="lb-bottom">
-        <div class="lb-shops">
-          <button class="lb-shop cash" data-act="go" data-to="cash">${ICO.gem}<span><i>CASH SHOP</i><b>캐시 상점</b></span></button>
-          <button class="lb-shop" data-act="go" data-to="shop">${ICO.shop}<span><i>SUPPLY SHOP</i><b>상점</b></span></button>
-        </div>
-        <button class="lb-sortie" data-act="go" data-to="ops"><i>COMBAT</i><b>${esc(T('ops'))} 출격</b><span>${nx?esc(nx.code+' '+nx.s.title):'모든 '+esc(T('ops'))+' 완료'}</span></button>
-      </div></div>
-    </div>
-  </div>`;
-}
 function chMapLib(ch){return G.lib.find(l=>l.kind==='map'&&l.ch===ch.id);}
 /* 장 작전 지도(자료실 map): 새 값(장마다 id 하나 — 목록에서 미리 보여 줄 때도 같은 열쇠) · 쓰기(없으면 넣고 돌려줌 — 지도 편집·그림 등록) */
 function chMapNew(ch){return {id:'m_'+ch.id,kind:'map',ch:ch.id,name:ch.title+' 지도',prompt:'ruined city at night, glowing roads, rivers of light, crater, scattered buildings',img:null};}
 function ensureChMap(ch){let l=chMapLib(ch); if(!l){ l=chMapNew(ch); G.lib.push(l); mark('l:'+l.id); } return l;}
 // 작전: 장 카드를 가로로 넘겨 고르고, 누르면 그 장의 지도로 들어가요
 let OPS_CH=null;
-function chLogline(ch){ if(ch.logline) return ch.logline; const L=parseScript((ch.stages[0]||{}).pre||'').find(l=>l.type==='nar'&&l.text&&l.text.length>8); return L?sub(L.text).slice(0,70)+(L.text.length>70?'…':''):''; }
 function chCover(ch){ const ml=chMapLib(ch), ms=ml&&imgSrc(ml); if(ms) return `background-image:url('${esc(ms)}');background-size:cover;background-position:center`;
   const pl=parseScript((ch.stages[0]||{}).pre||'').find(l=>l.type==='place'); return bgStyle(pl?pl.text:ch.title); }
 function opsListHTML(){ const main=G.chapters.filter(ch=>ch.kind==='main'); let prevDone=true, curIdx=-1;
@@ -159,70 +109,10 @@ function opsHTML(){ if(!OPS_CH||!G.chapters.some(ch=>ch.id===OPS_CH)) return ops
   return out+`<div class="row" style="margin:10px 0"><button class="btn ghost block" data-act="opsback">‹ 장 목록으로</button></div><div class="panel" hidden><h3>다음 이야기</h3><p class="muted" style="margin:0 0 10px">AI가 메인 플롯과 지금까지의 진행, 보유한 ${T('crew')}을(를) 반영해서 다음 장을 써요. 필요한 배경, 음악, ${T('talk')}도 함께 만들어요.</p><button class="btn block" data-act="aichapter-open">AI로 다음 장 만들기</button><button class="linkb" data-act="rebal" style="margin-top:10px">적 스탯 자동조정 · 새 스킬 기준</button></div>`;
 }
 const contractHTML=noSkin(contractHTML0);
-function contractHTML0(){
-  const s=P().settings, bs=G.banners.filter(bnOpen), bn=curBanner();
-  if(!bn) return pageHead(T('gacha'),'RECRUIT')+`<div class="panel"><p>열린 배너가 없어요.</p><button class="btn" data-act="bnew">배너 만들기</button></div>`;
-  const pity=pityGet(bn), left=s.pity-pity, pool=bannerPool(bn);
-  const ups=(bn.pickup||[]).map(charById).filter(Boolean), show=(ups.length?ups:pool.filter(c=>c.rarity===3)).slice(0,4);
-  const hero=show[0], hill=hero&&P().lobbyMode!=='stand'&&charIllust(hero);
-  const rOf=r=>r===3?s.ssr:r===2?s.sr:Math.max(0,100-s.ssr-s.sr);
-  const BIG={std:'STAN<br>DARD',pickup:'PICK<span>✦</span>UP',pool:'SQUAD<br>UP',event:'EVENT<br>LIMITED'};
-  const KR={std:'상시 모집',pickup:'신규 '+T('crew')+' 등장!',pool:'소속 모집',event:'기간 한정!'};
-  const rows=[3,2,1].map(r=>{const n=pool.filter(c=>c.rarity===r).length;return `<tr><td><span class="badge r${r}c">${RL[r]}</span> ${n}명</td><td style="text-align:right">${rOf(r)}%</td></tr>`;}).join('');
-  return `<div class="bsel" style="margin-top:6px">${bs.map(x=>`<button class="${x.id===bn.id?'on':''}" data-act="bsel" data-id="${x.id}">${esc(x.name)}${x.until&&x.until>Date.now()?` <small class="b-dd">D-${Math.max(0,Math.ceil((x.until-Date.now())/864e5))}</small>`:''}</button>`).join('')}<button data-act="newpu" title="신규 픽업 만들기">✦ 신규</button><button data-act="puexist" title="기존 ${esc(T('crew'))} 픽업">★ 픽업</button><button data-act="bnew" title="배너 직접 만들기">＋</button></div>
-  ${(bn.storyFail||(bn.type==='pickup'&&(bn.newAt||bn.pin)))&&!bn.eventId&&!PUBUSY.has(bn.id)&&(bn.pickup||[])[0]&&SAMPLE?`<div class="panel" style="margin:6px 0;display:flex;gap:8px;align-items:center;justify-content:space-between"><span class="muted" style="font-size:.85rem">${bn.storyFail?'이 배너의 픽업 스토리를 만들다 멈췄어요.':'이 배너에는 아직 픽업 스토리가 없어요.'}</span><button class="btn sm" data-act="pustoryretry" data-id="${esc(bn.pickup[0])}" data-b="${esc(bn.id)}">${bn.storyFail?'이어서 만들기':'픽업 스토리 만들기'}</button></div>`:''}
-  <section class="pk-hero ${esc(bn.type||'')} ${window.__BSLIDE||''}" data-swipe="banner">${bs.length>1?`<button class="pk-nav l" data-act="bswipe" data-d="-1" aria-label="이전 배너">‹</button><button class="pk-nav r" data-act="bswipe" data-d="1" aria-label="다음 배너">›</button><div class="pk-dots">${bs.map(x=>`<i class="${x.id===bn.id?'on':''}"></i>`).join('')}</div>`:''}
-    <div class="pk-bg" style="${bn.bg?bgStyle(bn.bg):bgStyle(P().gachaBg||'낙성 분화구')}"></div>
-    ${hero&&(hill||imgSrc(hero))?`<div class="pk-ghost">${hill?`<img src="${esc(hill)}" alt="">`:art(hero)}</div>`:''}
-    <div class="pk-diag"></div>
-    <div class="pk-art ${hill?'ill':''}">${hill?`<img src="${esc(hill)}" alt="${esc(hero.name)}" draggable="false">`:hero?art(hero):''}</div>
-    ${show.length>1?`<div class="pk-subs">${show.slice(1).map(c=>`<button class="s" data-act="char" data-id="${c.id}" aria-label="${esc(c.name)}">${art(c)}</button>`).join('')}</div>`:''}
-    <div class="pk-title">
-      <div class="pk-logo">${esc(G.meta.title)}<small>${esc(G.meta.sub)}</small></div>
-      <h1 class="pk-big">${BIG[bn.type]||'PICK<span>✦</span>UP'}</h1>
-      <div class="pk-rec">RECRUITMENT</div>
-      <div class="pk-kr">${esc(bn.name||KR[bn.type]||'')}</div>
-      ${bn.desc?`<p>${esc(bn.desc)}</p>`:''}
-    </div>
-    ${hero?`<button class="pk-name" data-act="char" data-id="${hero.id}"><span class="cs-rar r${hero.rarity}">${RL[hero.rarity]}</span><b>${esc(hero.name)}</b><i>${esc((hero.faction||ROLE_EN[hero.role]||'').toUpperCase())}</i></button>`:''}
-  </section>
-  <div class="panel pk-pity"><div style="display:flex;justify-content:space-between"><span>SSR 확정까지</span><b>${left}회</b></div><div class="bar" style="margin-top:6px"><i style="width:${pity/s.pity*100}%"></i></div>
-    ${pity>=Math.floor(s.pity*0.75)?`<p class="soft">🔥 확률 상승 중 · 지금 SSR ${softRate(s,pity+1).toFixed(1)}%</p>`:`<p class="muted" style="margin:6px 0 0;font-size:.75rem">${Math.floor(s.pity*0.75)}회부터 SSR 확률이 점점 올라가요</p>`}
-    ${ups.length&&guarGet(bn)?`<p class="soft gold">★ 다음 SSR은 확률 업 ${esc(T('crew'))} 확정</p>`:''}${pityKey(bn)==='pickup'?`<p class="muted" style="margin:4px 0 0;font-size:.72rem">천장·확정은 다음 픽업 배너로 이어져요</p>`:''}
-    <div class="sparkrow"><span>모집 포인트</span><div class="bar"><i style="width:${Math.min(100,((P().spark||{})[bn.id]||0)/SPARK*100)}%"></i></div><b>${(P().spark||{})[bn.id]||0}/${SPARK}</b><button class="btn sm ${((P().spark||{})[bn.id]||0)>=SPARK?'':'ghost'}" data-act="sparkopen" data-id="${bn.id}">교환</button></div>${P().firstTen?'<p class="muted" style="margin:8px 0 0">첫 10회는 SSR 1명 확정</p>':''}${ups.length?`<p class="muted" style="margin:8px 0 0">확률 업: ${ups.map(c=>esc(c.name)).join(', ')} · 같은 등급이 나오면 ${bn.rate}% 확률</p>`:''}</div>
-  <div class="pullrow"><button class="btn ghost" data-act="pull" data-n="1">1회<small>◆ ${COST}</small></button><button class="btn" data-act="pull" data-n="10">10회<small>◆ ${nf(COST*10)}${pool.some(c=>c.rarity>=2)?' · SR 이상 1명 보장':''}</small></button></div>
-  <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="go" data-to="cash">◆ ${esc(T('currency'))} 충전</button></div>
-
-  <div class="panel"><h3>확률 정보</h3><table style="width:100%;font-size:.9rem">${rows}</table>
-    <p class="muted" style="margin:8px 0 0;font-size:.78rem">· ${Math.floor(s.pity*0.75)}회부터 SSR 확률이 조금씩 올라가고 ${s.pity}회째에 확정이에요.${ups.length?`<br>· SSR이 확률 업 ${esc(T('crew'))}이(가) 아니었으면 다음 SSR은 확률 업 확정이에요.`:''}<br>· 1회마다 모집 포인트 1, ${SPARK}포인트로 원하는 ${esc(T('crew'))} 교환.</p>
-    <div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="bedit" data-id="${bn.id}">배너 편집</button><button class="btn sm ghost" data-act="ghist">${esc(T('gacha'))} 기록</button></div></div>`;
-}
 function crewHTML(){
   const busy=busyIds(), list=[...G.chars].sort((a,b)=>(own(b.id)?1:0)-(own(a.id)?1:0)||b.rarity-a.rarity||(a.ord||0)-(b.ord||0));
   return `${pageHead(T('crew'),'UNITS')}<div class="chap"><span class="muted">${G.chars.filter(c=>own(c.id)).length} / ${G.chars.length}</span><div class="row"><button class="btn sm ghost" data-act="addchar-open">＋ ${esc(T('crew'))} 추가</button><button class="btn sm" data-act="newpu">✦ 신규 픽업 만들기</button><button class="btn sm ghost" data-act="castfaces">😊 표정 한꺼번에 만들기</button></div></div>
   <div class="grid">${list.map(c=>{const o=own(c.id);return `<button class="cc r${c.rarity} ${o?'':'off'}" data-act="char" data-id="${c.id}">${art(c)}<span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${o&&o.dup?`<span class="dup">${'★'.repeat(o.dup)}</span>`:''}${busy.has(c.id)?'<span class="busy">파견 중</span>':''}<span class="lbl"><i>${RL[c.rarity]} · ${ROLE_EN[c.role]}</i><b>${esc(c.name)}</b>${o?`Lv.${o.lv}`:'미보유'}</span></button>`;}).join('')}</div>`;
-}
-function eventsHTML(){
-  const evs=G.events.filter(gateOpen), locked=G.events.length-evs.length;
-  return `${pageHead(T('event'),'EVENT','lobby')}
-  ${evs.length?evs.map(ev=>`<button class="evcard ${ev.active===false?'off':''}" data-act="evopen" data-id="${ev.id}"><div class="bgl" style="${bgStyle(ev.bg||'회색구 골목')}"></div><div class="ev-t"><i>${ev.active===false?'CLOSED':'NOW OPEN'}${loreOf(ev)?' · '+esc(loreLabel(loreOf(ev))):''}</i><b>${esc(ev.title)}</b><span>${esc(ev.desc||'')}</span><em>${esc(ev.token)} ${nf(P().tokens[ev.id]||0)}</em></div></button>`).join(''):'<div class="panel"><p class="muted">아직 이벤트가 없어요.</p></div>'}
-  ${locked?`<p class="muted" style="text-align:center;margin:8px 0">🔒 아직 열리지 않은 ${esc(T('event'))} ${locked}개 · 메인 스토리를 진행하면 차례로 열려요</p>`:''}
-  <div class="panel pm-hide"><h3>새 이벤트</h3><p class="muted" style="margin:0 0 10px">AI가 이벤트 스토리, 이벤트 한정 배너, 교환소, 필요하면 한정 ${T('crew')}까지 한 번에 만들어요.</p><button class="btn block" data-act="aievent-open">AI로 이벤트 만들기</button></div>`;
-}
-function eventDetailHTML(){
-  const ev=G.events.find(e=>e.id===P().curEvent); if(!ev){tab='event';return eventsHTML();}
-  const ch=G.chapters.find(c=>c.id===ev.chapterId), tok=P().tokens[ev.id]||0, buy=P().shopBuy[ev.id]||{}, bn=G.banners.find(x=>x.id===ev.bannerId);
-  let prev=true, st='';
-  if(ch) ch.stages.forEach((s,si)=>{const cl=!!P().cleared[s.id],open=prev;st+=`<button class="stage ${cl?'clear':''} ${open?'':'lock'}" data-act="${open?'stage':'locked'}" data-ch="${ch.id}" data-st="${s.id}"><span class="code">EV${si+1}</span><span class="t"><b>${s.story?'📖 ':''}${esc(s.title)}</b><span class="st">${s.story?'이야기 · ':''}${esc(ev.token)} +${s.story?s.reward*2:s.reward}${cl?(s.story?' · 다시 보기':' · 반복 가능'):''}</span></span></button>`;prev=cl;});
-  const item=it=>{const left=it.limit-(buy[it.id]||0), c=it.type==='char'?charById(it.ref):null;
-    const name=c?`${c.name} (${own(c.id)?T('limit')+' +1':'획득'})`:rewardText({[it.type]:it.amt});
-    return `<div class="ep"><span class="t"><b>${esc(name)}</b><span class="muted">${esc(ev.token)} ${it.price} · 남은 횟수 ${left}</span></span><button class="btn sm" data-act="evbuy" data-id="${it.id}" ${left<=0||tok<it.price?'disabled':''}>교환</button></div>`;};
-  return `${pageHead(ev.title,'EVENT','event')}
-  <section class="banner" style="min-height:180px"><div class="bgl" style="${bgStyle(ev.bg||'회색구 골목')}"></div><div class="bn-t"><i>${ev.active===false?'CLOSED':'EVENT'}${loreOf(ev)?' · '+esc(loreLabel(loreOf(ev))):''}</i><h1>${esc(ev.title)}</h1><p>${esc(ev.desc||'')}</p><p class="ups">${esc(ev.token)} <b>${nf(tok)}</b></p></div></section>
-  <h3 class="sec">이벤트 스토리</h3>${st||'<p class="muted">스테이지가 없어요.</p>'}
-  ${bn?`<button class="btn block" style="margin:10px 0" data-act="bsel" data-id="${bn.id}" data-go="1">이벤트 ${T('gacha')}: ${esc(bn.name)}</button>`:''}
-  ${(()=>{ const host=evHost(ev); return `<button class="evs-door" data-act="go" data-to="evshop"><div class="evs-bg" style="${bgStyle(ev.bg||'회색구 골목')}"></div><div class="evs-av">${host?art(host):''}</div><div class="evs-t"><i>EXCHANGE</i><b>이벤트 교환소</b><span>${host?esc(host.name)+'이(가) 기다리고 있어요 · ':''}${esc(ev.token)} ${nf(tok)} · 상품 ${(ev.shop||[]).length}개</span></div><em>입장 ›</em></button>`; })()}
-  <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="evedit" data-id="${ev.id}">이벤트 편집</button>${ch?`<button class="btn sm ghost" data-act="chedit" data-ch="${ch.id}">스토리 편집</button>`:''}${ch&&SAMPLE?`<button class="btn sm ghost" data-act="evreroll" data-id="${ev.id}">🎲 스토리 다시 쓰기</button>`:''}</div>`;
 }
 // 이벤트 교환소: 픽업 캐릭터가 맞이하는 상점
 let EVS_LINE='', EVS_FOR='';
@@ -240,29 +130,7 @@ function evShopHTML(){
     const name=c?`${c.name} ${own(c.id)?T('limit')+' +1':'획득'}`:rewardText({[it.type]:it.amt});
     return `<div class="si ${out?'soldout':''} ${c?'char':''}">${c?'<span class="tag">한정</span>':''}<span class="ri">${c?`<i class="evs-c">${art(c)}</i>`:rIcon({[it.type]:1})}</span><b>${esc(name)}</b><small>${esc(ev.token)} ${nf(it.price)} · 남은 ${Math.max(0,left)}/${it.limit}</small><button class="btn ${c?'':'ghost'}" data-act="evbuy" data-id="${it.id}" ${out||poor?'disabled':''}>${out?'매진':poor?'부족':'교환'}</button></div>`; }).join('')||'<p class="muted">상품이 없어요.</p>'}</div></div></div>`;
 }
-function farmHTML(){
-  const p=P(), top4=G.chars.filter(c=>own(c.id)).map(c=>own(c.id).lv||1).sort((a,b)=>b-a).slice(0,4), topLv=top4.length?Math.round(top4.reduce((a,b)=>a+b,0)/top4.length):1;
-  return `${pageHead(T('farm'),'TRAINING','lobby')}<p class="muted">반복해서 재료를 모으는 곳이에요. 단계마다 권장 레벨이 있고, 높은 단계일수록 보상이 커요. 한 번 깬 단계는 소탕으로 바로 보상을 받을 수 있어요. 보유: ${rewardText({exp:p.mat.exp,wmat:p.mat.wmat,core:p.mat.core,gold:p.gold})}</p>
-  ${G.meta.farms.map(f=>`<h3 class="sec">${esc(f.name)}</h3>${Array.from({length:FARM_N},(_,k)=>k+1).map(lv=>{const id=`farm_${f.key}_${lv}`, rec=farmRec(lv), low=topLv<rec,cl=!!p.farmClear[id],open=lv===1||!!p.farmClear[`farm_${f.key}_${lv-1}`];
-    return `<div class="stage ${cl?'clear':''} ${open?'':'lock'}"><span class="code">${lv}</span><span class="t"><b>${lv}단계 <small class="${low?'farm-low':'muted'}">권장 Lv.${rec}</small></b><span class="st">${rewardText(farmReward(f.key,lv))}</span></span>${open?`<button class="btn sm ghost" data-act="farmgo" data-k="${f.key}" data-lv="${lv}">출격</button>`:''}${cl?`<button class="btn sm" data-act="sweep" data-k="${f.key}" data-lv="${lv}">소탕</button><button class="btn sm ghost" data-act="sweep" data-k="${f.key}" data-lv="${lv}" data-n="5">×5</button>`:''}</div>`;}).join('')}`).join('')}`;
-}
-function passHTML(){
-  const p=P(), d=progRead('dm'), lv=passLv(), xp=p.pass.xp;
-  return `${pageHead(T('pass'),'SEASON PASS','lobby')}
-  <div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Lv.${lv} / ${PASS_MAX}</h3><span class="muted">${nf(xp%PASS_PER)} / ${PASS_PER} XP</span></div><div class="bar"><i style="width:${lv>=PASS_MAX?100:(xp%PASS_PER)/PASS_PER*100}%"></i></div></div>
-  <div class="row" style="margin:8px 0"><button class="btn sm" data-act="pgetall">모두 받기 <small>(임무·패스 보상)</small></button></div>
-  <h3 class="sec">오늘의 임무</h3>
-  ${MISSIONS.map(m=>{const c=Math.min(m.goal,d.cnt[m.k]||0),ok=c>=m.goal,got=d.got[m.k];return `<div class="ep"><span class="t"><b>${m.name}</b><span class="muted">${c}/${m.goal} · ${m.xp} XP</span></span><button class="btn sm ${got?'ghost':''}" data-act="mget" data-k="${m.k}" ${ok&&!got?'':'disabled'}>${got?'완료':'받기'}</button></div>`;}).join('')}
-  <h3 class="sec">패스 보상</h3>
-  <div class="passgrid">${Array.from({length:PASS_MAX},(_,i)=>i+1).map(l=>{const got=p.pass.got.includes(l),ok=l<=lv;return `<button class="pv ${got?'got':ok?'ok':''}" data-act="pget" data-lv="${l}" ${ok&&!got?'':'disabled'}><i>${l}</i><span>${rewardText(passReward(l))}</span></button>`;}).join('')}</div>
-  <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="passreset">새 시즌 시작</button></div>`;
-}
 function bgOptions(cur,label='자동'){return `<option value="">${label}</option>`+G.lib.filter(l=>l.kind==='bg').map(l=>`<option ${l.name===cur?'selected':''}>${esc(l.name)}</option>`).join('');}
-function aiProfilesHTML(){
-  const A=AIP(); if(!A.list.length) return '<p class="muted">아직 등록된 AI가 없어요.</p>';
-  return A.list.map(p=>{const on=p.id===A.active||(!A.list.some(x=>x.id===A.active)&&p===A.list[0]);const dm=DEFM[defKey(p)]||[''];
-    return `<div class="ep"><span class="t"><b>${esc(p.name||AITYPE[p.type])} ${on?'<span class="badge r3c">사용 중</span>':''}</b><span class="muted">${AITYPE[p.type]}${p.type==='vertex'?(p.pub==='anthropic'?' · Claude':' · Gemini'):''} · ${esc(p.model||dm[0]||'모델 미지정')}${apValid(p)?'':' · 설정 미완료'}</span></span>${on?'':`<button class="btn sm" data-act="apuse" data-id="${p.id}">사용</button>`}<button class="btn sm ghost" data-act="apedit" data-id="${p.id}">편집</button></div>`;}).join('');
-}
 const OAI_PRESETS=[
  ['GitHub Copilot','https://api.githubcopilot.com','gpt-4.1','키 칸에 GitHub Copilot 토큰을 넣어요. 모델은 gpt-4.1, gpt-4o, claude-sonnet-4 등 Copilot에 있는 이름을 써요. 비공식 방식이라 막힐 수 있어요. 웹 버전에서 안 되면 중계 서버를 최신 코드로 바꿔 주세요.'],
  ['LLM Gateway','https://api.llmgateway.io/v1','','llmgateway.io에서 API 키를 만들어요. 모델 이름은 llmgateway.io 모델 목록의 ID를 그대로 써요. 웹 버전에서 안 되면 중계 서버를 최신 코드로 바꿔 주세요(허용 목록에 들어 있어요).'],
@@ -272,77 +140,8 @@ const OAI_PRESETS=[
  ['LM Studio','http://192.168.0.10:1234/v1','','LM Studio → Developer → Start Server, "Serve on Local Network"를 켜고 PC의 IP로 주소를 바꿔요. 키는 아무 글자나 넣으면 돼요.'],
  ['DeepSeek','https://api.deepseek.com/v1','deepseek-chat','platform.deepseek.com → API keys에서 만들어요.']];
 const MODEL_SUGG={copilot:['gpt-4.1','gpt-4o','claude-sonnet-4','claude-3.7-sonnet','gemini-2.5-pro','o4-mini'],anthropic:['claude-opus-5-5','claude-sonnet-5-5','claude-haiku-4-5-20251001'],gemini:['gemini-2.5-pro','gemini-2.5-flash','gemini-2.5-flash-lite'],vertex_google:['gemini-2.5-pro','gemini-2.5-flash','gemini-2.5-flash-lite'],vertex_anthropic:[],openai:[]};
-function apForm(d){
-  const dm=DEFM[defKey(d)]||['',''], sg=MODEL_SUGG[defKey(d)]||[];
-  const f=(id,label,val,ph,type='text',list)=>`<label class="f" for="${id}">${label}</label><input class="in" id="${id}" type="${type}" autocomplete="off" value="${esc(val||'')}" placeholder="${esc(ph||'')}" ${list?`list="${list}"`:''}>`;
-  let fields='',help='';
-  if(d.type==='anthropic'){ fields=f('ap_key','API 키',d.key,'sk-ant-...','password'); help='console.anthropic.com → API Keys에서 만들어요.'; }
-  if(d.type==='gemini'){ fields=f('ap_key','API 키',d.key,'AIza...','password'); help='aistudio.google.com → Get API key에서 만들어요. 무료 사용량이 있어요.'; }
-  if(d.type==='openai'){ fields=`<div class="chips ap-pre">${OAI_PRESETS.map((x,i)=>`<button class="chip" data-act="appre" data-i="${i}">${esc(x[0])}</button>`).join('')}</div>`+f('ap_base','API 주소',d.base,'https://openrouter.ai/api/v1')+f('ap_key','API 키',d.key,'','password'); help=(OAI_PRESETS.find(x=>normBase(x[1])===normBase(d.base))||[])[3]||'OpenRouter, DeepSeek, Ollama, LM Studio 등 OpenAI 방식 API예요. 위 버튼으로 주소를 채울 수 있어요. 주소는 /chat/completions 앞부분까지, 모델 이름은 그 서비스에 나온 이름을 그대로 써요.'; }
-  if(d.type==='copilot'){ fields=`<div class="optbox" style="margin-top:8px"><div class="row"><b style="flex:1">GitHub 계정 · <span id="cpState">${d.gh?'로그인됨':'로그인 안 됨'}</span></b><button class="btn sm" data-act="cplogin">${d.gh?'다시 로그인':'GitHub로 로그인'}</button></div><div id="cpBox"></div></div>`; help='GitHub Copilot 구독(무료 플랜 포함)이 있는 계정으로 로그인하면 Copilot에 들어 있는 모델(GPT·Claude·Gemini)을 써요. 공식 API가 아닌 비공식 연결 방식이라 GitHub 정책에 따라 막히거나 계정에 제한이 생길 수 있어요. 무료 플랜은 사용량이 적어요. 웹 버전에서는 중계 서버가 필요해요.'; }
-  if(d.type==='vertex'){
-    fields=`<label class="f" for="ap_pub">모델 종류</label><select class="in" id="ap_pub">${opt([['google','Gemini'],['anthropic','Claude (Model Garden)']],d.pub||'google')}</select>
-      <label class="f" for="ap_sa">서비스 계정 키 (JSON 파일 내용 전체)</label><textarea class="in" id="ap_sa" placeholder='{"type": "service_account", "project_id": ...}'>${esc(d.sa||'')}</textarea>
-      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="saload">JSON 파일 불러오기</button></div>
-      <div class="g2"><div>${f('ap_region','리전',d.region,'global')}</div><div>${f('ap_project','프로젝트 ID (비우면 JSON에서)',d.project,'')}</div></div>
-      ${(d.pub||'google')==='google'?f('ap_vkey','또는 익스프레스 API 키 (Gemini 전용, 서비스 계정 대신)',d.vkey,'','password'):''}`;
-    help=(d.pub==='anthropic')?'Google Cloud 콘솔 → IAM 및 관리자 → 서비스 계정 → 키 추가 → JSON. 계정에 Vertex AI 사용자 역할이 필요해요. Model Garden에서 Claude 모델을 먼저 사용 설정하고, 모델 이름은 Model Garden에 나온 ID를 그대로 써요.'
-      :'Google Cloud 콘솔 → IAM 및 관리자 → 서비스 계정 → 키 추가 → JSON. 계정에 Vertex AI 사용자 역할이 필요해요. 익스프레스 모드 API 키가 있으면 서비스 계정 없이 그것만 넣어도 돼요.';
-  }
-  return `<label class="f" for="ap_type">종류</label><select class="in" id="ap_type">${opt(Object.entries(AITYPE),d.type)}</select>
-    ${f('ap_name','이름 (구분용)',d.name,'예: 버텍스 제미니')}
-    ${fields}
-    <datalist id="ap_ml">${sg.map(m=>`<option value="${esc(m)}">`).join('')}</datalist>
-    <div class="g2"><div>${f('ap_model','기본 모델 (직접 입력 가능)',d.model,dm[0]||'모델 ID','text','ap_ml')}</div><div>${f('ap_quick','빠른 모델 (짧은 작업용)',d.quick,dm[1]||'비우면 기본 모델','text','ap_ml')}</div></div>
-    <p class="muted" style="margin-top:8px">${help} 모델 칸을 누르면 추천 목록이 나오고, 다른 모델 ID도 직접 쓸 수 있어요. 비우면 흐린 글씨의 기본값을 써요.</p>`;
-}
-function openAp(){
-  const d=APD;
-  openModal(`${head(d.id?'AI 편집':'AI 추가')}
-    ${apForm(d)}
-    <div class="row" style="margin-top:14px"><button class="btn" data-act="apsave">저장</button><button class="btn ghost" data-act="aptest">연결 테스트</button>${d.id?`<button class="btn ghost" data-act="apdel">삭제</button>`:''}</div>`);
-}
-function readAp(){
-  const v=id=>{const el=$('#'+id);return el?el.value.trim():undefined;};
-  const d=APD;
-  [['name','ap_name'],['key','ap_key'],['base','ap_base'],['pub','ap_pub'],['sa','ap_sa'],['region','ap_region'],['project','ap_project'],['vkey','ap_vkey'],['model','ap_model'],['quick','ap_quick']].forEach(([k,id])=>{const x=v(id);if(x!==undefined)d[k]=x;});
-  if(d.base) d.base=normBase(d.base);
-  if(!d.name) d.name=AITYPE[d.type];
-  return d;
-}
 
  const NLASTSEED={};
-function openSound(){
-  const s=SND(); s.scene=sceneOf(); const bg=['',...G.lib.filter(l=>l.kind==='bgm').map(l=>l.name)];
-  const sel=(id,cur)=>`<select class="in" id="${id}">${bg.map(n=>`<option value="${esc(n)}" ${n===cur?'selected':''}>${n?esc(n):'없음'}</option>`).join('')}</select>`;
-  const onoff=(id,v)=>`<select class="in" id="${id}">${opt([['1','켜기'],['0','끄기']],v?'1':'0')}</select>`;
-  openModal(`${head('소리')}
-    <div class="slider"><label for="sd_bv"><span>배경음 볼륨</span></label><input id="sd_bv" type="range" min="0" max="100" value="${Math.round(s.bgmVol*100)}"></div>
-    <div class="slider"><label for="sd_xv"><span>효과음 볼륨</span></label><input id="sd_xv" type="range" min="0" max="100" value="${Math.round(s.sfxVol*100)}"></div>
-    <div class="slider"><label for="sd_vv"><span>음성 볼륨</span></label><input id="sd_vv" type="range" min="0" max="100" value="${Math.round(s.voiceVol*100)}"></div>
-    <div class="g2"><div><label class="f">배경음</label>${onoff('sd_bon',s.bgmOn)}</div><div><label class="f">스토리 음성</label>${onoff('sd_vs',s.voiceStory)}</div></div>
-    <div class="g2"><div><label class="f">로비 터치 음성</label>${onoff('sd_vl',s.voiceLobby)}</div><div><label class="f" for="sd_lang">목소리 언어</label><select class="in" id="sd_lang">${opt([['ko','한국어 (자막 그대로)'],['ja','일본어 (자막은 한국어)']],s.voiceLang||'ko')}</select></div></div>
-    <p class="muted" style="margin:4px 0 0;font-size:.78rem">일본어로 하면 대사를 글 AI가 일본어로 옮겨서 읽어요(한 번 옮긴 대사는 저장해서 다시 쓰고, 처음 한 번은 글 AI 요금이 조금 들어요). 일본어를 잘하는 목소리를 고르면 더 자연스러워요.</p>
-    <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">장면별 배경음</h3>
-    <div class="g2"><div><label class="f">타이틀</label>${sel('sd_title',s.scene.title)}</div><div><label class="f">로비</label>${sel('sd_lobby',s.scene.lobby)}</div></div>
-    <div class="g2"><div><label class="f">전투</label>${sel('sd_battle',s.scene.battle)}</div><div><label class="f">보스전</label>${sel('sd_boss',s.scene.boss)}</div></div>
-    <div class="g2"><div><label class="f">계약</label>${sel('sd_gacha',s.scene.gacha)}</div><div></div></div>
-    <p class="muted" style="margin:6px 0 0">스토리에서는 대본의 [음악: 이름]으로 바뀌어요.</p>
-    <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">음성 AI (Fish Audio)</h3>
-    <label class="f" for="sd_fk">API 키</label><input class="in" id="sd_fk" type="password" autocomplete="off" value="${esc(s.fishKey)}">
-    <label class="f" for="sd_fm">음성 모델</label><select class="in" id="sd_fm">${opt([['s2.1-pro','S2.1 Pro (기본)'],['s2-pro','S2 Pro'],['s1','S1'],['s2.1-pro-free','S2.1 Pro Free (무료 개발자 등급)'],['drama-3-preview','Drama 3 Preview']],s.fishModel)}</select>
-    <p class="muted" style="margin:4px 0 0">fish.audio 로그인 → API Keys에서 만들어요. 한 번 만든 대사 음성은 기기에 저장돼서 다시 들을 때 돈이 들지 않아요.</p>
-    <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">음악 AI (ElevenLabs Music)</h3>
-    <label class="f" for="sd_ek">API 키</label><input class="in" id="sd_ek" type="password" autocomplete="off" value="${esc(s.elKey)}">
-    <label class="f" for="sd_eb">API 주소 (비우면 공식 주소 ${EL_DEF})</label><input class="in" id="sd_eb" inputmode="url" autocomplete="off" placeholder="${EL_DEF}" value="${esc(s.elBase||'')}">
-    <div class="g2"><div><label class="f" for="sd_em">모델</label><select class="in" id="sd_em">${opt([['music_v1','Music v1'],['music_v2','Music v2']],s.elModel)}</select></div><div><label class="f" for="sd_el">곡 길이(초)</label><input class="in" id="sd_el" type="number" value="${s.elLen}"></div></div>
-    <p class="muted" style="margin:4px 0 0">elevenlabs.io → Developers → API Keys에서 만들어요. 음악 생성은 유료 요금제에서 쓸 수 있어요.</p>
-    <div class="row" style="margin-top:14px"><button class="btn" data-act="sndsave">저장</button><button class="btn ghost" data-act="fishtest">Fish 연결 확인</button></div>
-    <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">저장된 음성</h3>
-    <p class="muted" id="vstat" style="margin:4px 0 8px">세는 중…</p>
-    <div class="row"><button class="btn sm ghost" data-act="vprebuild">전체 대사 미리 만들기</button><button class="btn sm ghost" data-act="vclearall">음성 저장소 비우기</button></div>`);
-  voiceStats().then(v=>{const el=$('#vstat'); if(el) el.textContent=`${v.n}개 · ${v.mb}MB. 같은 목소리·모델·대사는 다시 요청하지 않고 이 파일을 재생해요.`;});
-}
 let VS={cid:null,results:[],picks:{},lang:'ko',q:''};
 function voiceRow(m){
   const pk=VS.picks[m._id], smp=(m.samples||[]).find(x=>/^https?:/.test(x.audio||''));
@@ -450,10 +249,3 @@ function viewTop(){ $('#view').scrollTop=0; }
 function lobbyMenuHidden(){ return document.body.classList.contains('lb-hidden'); }
 function lobbyMenu(show){ document.body.classList.toggle('lb-hidden',!show); }
 function lobbyBubbleText(){ const el=$('#bubble'); return el?el.textContent:undefined; }
-/* 로비 캐릭터를 눌렀을 때 반응(View): 말풍선 · 감정 연출 · 표정 그림 잠깐 바꾸기 · 물결·하트 · 몸짓 — 호감도·미션 반영은 처리기(Controller)가 먼저 */
-function lobbyPokeShow(t,e,c,l,zone,face){
-  const el=$('#bubble'); if(el){ el.textContent=sub(l); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } lobbyEmote(t,l,zone);
-  const st=t.querySelector('.lb-stage')||t; const old=st.querySelector('.lobby-art:not(.lobby-pose)'); if(old){ /* 레이어 그림(포즈)은 표정 그림이 없어서 그대로 둬요. 바꾸면 스탠딩으로 고정돼 버렸어요 */ const tmp=document.createElement('div'); tmp.innerHTML=P().lobbyMode==='stand'?art(c,'lobby-art react',{face}):lobbyCharacterArt(c,'lobby-art react',face); old.replaceWith(tmp.firstElementChild); clearTimeout(window._faceT); window._faceT=setTimeout(()=>{const cur=document.querySelector('.lobby-art'); if(cur&&tab==='lobby'){const t2=document.createElement('div');t2.innerHTML=P().lobbyMode==='stand'?art(c,'lobby-art'):lobbyCharacterArt(c);cur.replaceWith(t2.firstElementChild);}},3500); }
-  const x=e.clientX||innerWidth/2, y=e.clientY||innerHeight/2, lv=affLv(own(c.id)); ripple(x,y,lv>=7); if(lv>=5&&zone!=='body') hearts(x,y,Math.min(5,lv-3)); setTimeout(()=>charReact(document.querySelector('.lobby .lobby-art,.lobby .lobby-ill'),lv,zone),10); }
-/* 이벤트 화면 진행자를 눌렀을 때 반응(View): 물결 · 몸짓 · 표정 · 대사 칸 */
-function evsPokeShow(t,c,l,zone,lv,x,y){ ripple(x,y,lv>=7); charReact(t.querySelector('.art'),lv,zone); faceSwap(c,t.querySelector('.art'),touchFace(c,zone,lv)); const pe=$('#evsLine'); if(pe){ pe.textContent=sub(l); pe.classList.remove('pop'); void pe.offsetWidth; pe.classList.add('pop'); } }
