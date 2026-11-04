@@ -24,6 +24,12 @@ export async function loadUnits(root) {
   if (existsSync(join(src, 'boot'))) tree(join(src, 'boot')).filter(f => f.endsWith('.js')).forEach(f => units.push(unit(root, 'boot:' + relative(src, f), [read(f)])));
   return units;
 }
+// 빌드된(또는 원안) index.html 한 파일을 바로 읽음(사용자 지시 U21 — 재설계의 입력은 index.html): 스크립트 블록마다 단위 —
+//   ggm-main(text/ggm-main) → main · ggm-module 블록 → module:<id> · 그 밖의 인라인 스크립트 → boot:<id 또는 순번>. 위치는 index.html#<id>:줄
+export async function loadHtmlUnits(html, label = 'index.html') { await tsInit(); const units = [], re = /<script([^>]*)>([\s\S]*?)<\/script>/g; let m, i = 0;
+  while ((m = re.exec(html))) { const attrs = m[1], code = m[2], type = (attrs.match(/type="([^"]+)"/) || [])[1] || '', id = (attrs.match(/id="([^"]+)"/) || [])[1] || `script${++i}`; if (/\bsrc=/.test(attrs) || !code.trim() || (type && !/^(text\/javascript|text\/ggm-module|text\/ggm-main|module)$/.test(type))) continue;
+    const name = type === 'text/ggm-main' || id === 'ggm-main' ? 'main' : type === 'text/ggm-module' ? 'module:' + id : 'boot:' + id; units.push(unit('/', name, [{ path: `/${label}#${id}`, text: code.endsWith('\n') ? code : code + '\n' }])); }
+  return units; }
 // 메타 점검 대상: 도구 자신(tools/**, build/*.mjs)도 앱과 같은 품질 규칙(빈 catch·복잡도·다중화·되풀이 문자열·안 쓰는 함수)으로 봄 — 파일마다 따로
 export async function loadToolUnits(root) {
   await tsInit(); const read = p => ({ path: p, text: readFileSync(p, 'utf8') }), skip = /(^|[\\/])(node_modules|out|fixtures|games|reports)[\\/]/;
