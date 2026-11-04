@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { loadUnits } from '../lib/source.mjs';
 import { IMAGE_SINKS } from '../lib/prompts.mjs';
 import { promptSitesStatic, checkPrompt, composition, schemaOf, lenientJSON, fakeAnswer } from '../lib/combos.mjs';
-import { withPage, ROOT, PC_DIR } from './lib/page.mjs';
+import { withPage, ROOT, PC_DIR, hasBrowser } from './lib/page.mjs';
 import { readGame, gidOf, hasGame } from './lib/data.mjs';
 import { kindOf } from './lib/kind.mjs';
 
@@ -68,6 +68,7 @@ const FLOWS = {
 };
 const LAYER = new Set(['setupAI', 'aiJSON', 'aiJSONRetry', 'naiGenerate', 'naiGenerate0']); // 모든 요청이 지나는 층(감싸기·연결) — 요청 지점으로 세지 않음
 
+if (!hasBrowser()) { console.log('skip tools/play/combos: playwright 없음(브라우저 도구 — tools/play/test.mjs와 같이 건너뜀)'); process.exit(0); }
 const units = await loadUnits(ROOT), S1 = promptSitesStatic(units), S2 = promptSitesStatic(units, { sinks: IMAGE_SINKS, tables: true }), sites = [...S1.sites, ...S2.sites.map(x => ({ ...x, key: '그림 ' + x.key, image: true }))], wrappers = [...S1.wrappers, ...S2.wrappers], layerTexts = S1.layerTexts, skip = new Set([...LAYER, ...wrappers, ...sites.filter(s => s.layer).map(s => s.owner)]);
 // 분배기 case(화면 동작) 운전 재료: case 값·그 본문이 읽는 입력 칸($('#x'))·버튼 dataset 키
 const acts = [];
