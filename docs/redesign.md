@@ -130,23 +130,37 @@ View                        html(상태) → 글 · 동작 묶기
 Feature                     기능 하나 = 가진 Repository(창구) + Generator + View + 동작(Controller) — App에 등록
 ```
 
-### 기능(Feature) — 원안 기능 구성(`docs/modules.md` §1–13)에 포크 기능을 가진 data로 흡수
+### 기능(Feature) — 2절 매핑대로(원안 기능 구성 `docs/modules.md` §1–13에 포크 기능을 가진 data로 흡수)
 
-| Feature | 가진 data(창구) | Generator(예) | View(예) | 원안 절 · 흡수한 포크 기능 |
+| Feature | 가진 data(Repository 창구) | 매핑 함수 | 하위 class(나눔) | 원안 절 · 흡수한 포크 기능 |
 |---|---|---|---|---|
-| Characters | Characters · Progress(보유·성장·호감) | 캐릭터·개성·스킨·바리에이션 | 대원·캐릭터 시트·스킨 | 9 성장 · 바리에이션·상속형 이격·개성 |
-| Acquire | Banners · Progress(천장·건조 자원) | 픽업·건조 디자인 | 계약·건조 | 8 가챠 · 건조/영입 |
-| Battle | Progress(편성·스테이지) · Meta(전장 규칙) | 보스 패턴 | 전투·편성·출격 | 6 전투 v2 · 대열·출격·전장 규칙 |
-| Challenge | Progress(레이드·심연·탑) | 이벤트 전투 | 도전 | 9 콘텐츠 · 탑·스테이지 양식 |
-| Story | Chapters · Events · Threads(장 톡) | 장·스테이지·외전·시나리오 설계·기억 | 스토리·대본 재생·연출·오프닝 | 7 대본 엔진 · 11 스토리 공장 · 시나리오 설계·연출 |
-| World | World · Relations · Library(적·배경) | 세력·도감·관계·적 | 세계관·도감·관계도 | 세력·적 도감·등장 계획 |
-| Messenger | Threads · Progress(받은 톡·갠톡) | 톡·갠톡 | 메신저 | 10 메신저 |
-| Economy | Progress(재화·상점·우편) | — | 상점·우편 | 9 경제 |
-| LiveOps | Progress(시즌·일정) · Meta | liveTick·픽업·의상 | 운영·알림 | 9 라이브 · 일정·콘텐츠 점검 |
-| Expedition | Progress(원정·파견) | — | 원정·파견 | 원정 · 파견 |
-| Rules | Meta(규칙·밸런스) | 규칙 설명·포지션 | 게임 규칙·밸런스 | 게임 규칙·속성·포지션·밸런스 |
-| NewGame | 새 게임 초안 | 새 게임(위 Generator들을 차례로) | 초안 편집 | 11 새 게임 |
-| System | Store 설정 · Sync · Updater | — | 설정·동기화·업데이트 | 3 AI 연결 · 12 동기화 · 13 업데이트 |
+| Characters | `chars.json` `npcs.json` · prog 보유·성장·호감·스킨 · meta 이격·개성 | 376 | Roster(보유·성장·호감) · CharacterSheet(캐릭터 data·시트 View) · Variants(이격 상속·바리에이션·스킨) · Persona(개성) | 9 성장 · 바리에이션·상속형 이격·개성 |
+| Acquire | `banners.json` · prog 천장·건조 자원 · meta 건조 | 72 | Gacha(뽑기·픽업) · Construct(건조 — 순수 엔진 GGMConstruct를 부름) | 8 가챠 · 건조/영입 |
+| Battle | prog 편성·출격·별 · meta 전장 규칙 | 29 | BattleSession(전투 v2 연결) · Formation(편성·출격) | 6 전투 v2 · 대열·출격·전장 규칙 |
+| Challenge | prog 레이드·심연·탑·재료 던전 · meta 던전 | 91 | Raid · Abyss · Tower · StageModes | 9 콘텐츠 · 탑·스테이지 양식 |
+| Story | `chapters.json` `events.json` `opening.json` · prog 진행 · meta 기억 · world 설계 | 142 | StoryFactory(장·스테이지·외전 Generator) · ScriptPlayer(대본 재생·연출) · ScenarioPlan · StoryMemory | 7 대본 엔진 · 11 스토리 공장 · 시나리오 설계·연출 |
+| World | `rels.json` · world 세계·도감·세력 · meta 도감·세계 성경 | 83 | Codex · Factions · Relations | 세력·적 도감·등장 계획 |
+| Image | `lib.json`(자료실) · meta 그림 태그 | 245 | Library(배경·소품·CG·적·지도·아이콘 창구) · ImageJobs(생성·후보·일괄) · Assets(에셋 관리) | 4 그림 · 에셋 관리 |
+| Messenger | `threads.json` · prog 받은 톡·갠톡 | 40 | Threads · FreeChat | 10 메신저 |
+| Player | prog 플레이어 프로필·외형 | 16 | Profile | 10(프로필) |
+| Economy | prog 재화·상점·우편·패스·행동력 · meta 상점 | 58 | Wallet · Shop · Mail · Pass | 9 경제 |
+| LiveOps | prog 시즌·일정·알림 · meta 일정 장소·점검 | 79 | LiveTick · Season · Schedule · ContentAudit | 9 라이브 · 일정·콘텐츠 점검 |
+| Expedition | `dispatches.json` · prog 원정·파견 · meta 원정 | 40 | Expedition(순수 엔진 GGMExpedition) · Dispatch | 원정 · 파견 |
+| Rules | meta 규칙·밸런스·속성·역할·포지션 | 47 | GameRules · Balance | 게임 규칙·속성·포지션·밸런스 |
+| NewGame | meta 초안 | 70 | Draft(초안 편집) · GameBuilder(새 게임 — 위 Generator들을 차례로) | 11 새 게임 |
+| PromptStudio | meta 프롬프트 | 15(+조각) | PromptStudio | 프롬프트 스튜디오 |
+| System | `game.json` · meta 제목·테마·용어 · prog 설정·표시 | 296 | Settings · SyncPanel · UpdatePanel · Boot | 3 AI 연결 · 12 동기화 · 13 업데이트 |
+| (Shared → 상위 class) | — | 244 | 화면 66 → View·Screen 공용 부품 · 창 11 → Dialog · 입출력 11 → Service·Store · 생성 6 → Generator · 처리 16 → App · 도구 134 → 공용 도구 | — |
+| (미정) | — | 123 | 매핑 표를 채우거나 YAGNI로 지움 | — |
+
+### 파일 배치(모듈 하나 = 파일 하나 — 사용자 지시 U19·U20: 계층마다 파일을 나누지 않고 class로 묶음)
+
+- `src/main/00-core.js` — 상위 class: App · Store · Repository · Slot · Service · Generator · View · Screen · Dialog · Feature + 공용 도구
+- `src/main/01-services.js` — TextAI · ImageAI · Sound · Updater · SyncAdapter들(PC 서버·GitHub·한 기기·게시)
+- `src/main/02-prompt-studio.js` — PromptStudio(조각·조립)
+- `src/main/10-<기능>.js` — 기능마다 하나: 그 기능의 Repository 하위 · Generator 하위 · Screen·Dialog 하위 · Feature(동작 등록)
+- `src/main/90-default-content.js` — 기본 콘텐츠(샘플 data)
+- 규칙 엔진(`src/modules` — 순수, Worker)은 그대로. `src/style` 20개 파일은 한 파일로(이슈).
 
 ## 4. 옮기는 길(도구로)
 
