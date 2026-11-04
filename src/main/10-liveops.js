@@ -46,10 +46,7 @@ static planCtx(n){ if(!Story.planHas()) return ''; const p=Story.PLAN(), act=Cor
    return Core.naiBlocksUpgrade(r);
   }
 
-  static async naiBlocksSeparate(text,rep){
-   const r=await Core.aiJSON(LiveOps.naiBlocksSeparatePrompt({text}),rep||null,'quick');
-   return LiveOps.naiBlocksValidateSplit(text,r);
-  }
+  static naiBlocksSeparate(text,rep){ return NaiBlocksGen.run({text,rep}); }
 
   static regenSlot(slot){return Object.prototype.hasOwnProperty.call(GGMCombat.SLOTS,slot)?slot:'active';}
 
@@ -97,13 +94,9 @@ static planCtx(n){ if(!Story.planHas()) return ''; const p=Story.PLAN(), act=Cor
     return [`[배경: ${s.bg||s.name}]`,`${s.name}에서 ${n}을(를) 만났다.`,`${n}: ${p.catch||r(0)}`,'선택: 같이 둘러볼래? | 여기서 뭐 하고 있었어?',
       `1) ${n}: ${(p.likes||[])[0]?`좋아. ${p.likes[0]} 얘기라도 하면서 걸을까.`:r(1)}`,`2) ${n}: ${p.hobby?`${p.hobby}… 그런 거. 비밀이야.`:r(2)}`,`${n}: ${r(3)}`].join('\n'); }
 
-  static async spotsAI(rep){ const r=await Core.aiJSON(LiveOps.spotsAIPrompt(),rep,'complex');
-    const L=(r&&Array.isArray(r.spots)?r.spots:[]).slice(0,8).map(x=>({id:uid(),name:String(x.name||'').trim().slice(0,20),desc:String(x.desc||'').slice(0,120),bg:String(x.bg||'').trim(),tags:(Array.isArray(x.tags)?x.tags:[]).map(String).slice(0,4)})).filter(x=>x.name);
-    if(!L.length) return false; const old=LiveOps.spots(); L.forEach(s=>{ const o=old.find(x=>x.name===s.name); if(o) s.id=o.id; }); G.meta.spots=L; Core.mark('meta'); return true; }
+  static spotsAI(rep){ return SpotsGen.run({rep}); }
 
-  static async spotTalkAI(c,rep){ const S=LiveOps.spots(); if(!S.length) return false;
-    const r=await Core.aiJSON(LiveOps.spotTalkAIPrompt({c,S}),rep,'complex');
-    let n=0; (r&&Array.isArray(r.scenes)?r.scenes:[]).forEach(x=>{ const s=S.find(y=>y.name===String(x.spot||'').trim()), t=nl(x.script); if(s&&t){ c.spotTalk=c.spotTalk||{}; c.spotTalk[s.id]=t; n++; } }); if(n) Core.mark('c:'+c.id); return n>0; }
+  static spotTalkAI(c,rep){ return SpotTalkGen.run({c,rep}); }
 
   static dayKey(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 
@@ -369,4 +362,28 @@ static async liveFillStep(on,notes){ if(!on.fill) return; LiveOpsView.liveBar('�
 
   static async liveFillRun(on){ if(!on.fill||LIVE_RUN) return; LIVE_RUN=true; LiveOpsView.liveBar('비어 있는 콘텐츠를 채우는 중…'); const notes=[];
     try{ await LiveOpsCtl.liveFill(notes); }catch(e){ Core.quietErr(e,'liveFillRun'); } finally{ LIVE_RUN=false; LiveOpsView.liveBar(null); } if(notes.length) CoreView.toast(notes[0]); }
+}
+
+/* ===== LiveOps의 AI 생성 흐름(Generator 하위 — docs/redesign.md 3절) ===== */
+/* 그림 태그 덩어리 나누기(답이 없어도 원문으로 검사) */
+class NaiBlocksGen extends Generator {
+  static tier = 'quick';
+  static prompt({text}){ return LiveOps.naiBlocksSeparatePrompt({text}); }
+  static apply(r,{text}){ return LiveOps.naiBlocksValidateSplit(text,r); }
+  static none({text}){ return LiveOps.naiBlocksValidateSplit(text,null); }
+}
+/* 일정 장소 */
+class SpotsGen extends Generator {
+  static tier = 'complex';
+  static prompt(){ return LiveOps.spotsAIPrompt(); }
+  static parse(r){ const L=(r&&Array.isArray(r.spots)?r.spots:[]).slice(0,8).map(x=>({id:uid(),name:String(x.name||'').trim().slice(0,20),desc:String(x.desc||'').slice(0,120),bg:String(x.bg||'').trim(),tags:(Array.isArray(x.tags)?x.tags:[]).map(String).slice(0,4)})).filter(x=>x.name); return L.length?L:null; }
+  static apply(L){ const old=LiveOps.spots(); L.forEach(s=>{ const o=old.find(x=>x.name===s.name); if(o) s.id=o.id; }); G.meta.spots=L; Core.mark('meta'); return true; }
+}
+/* 캐릭터의 장소별 장면 */
+class SpotTalkGen extends Generator {
+  static tier = 'complex';
+  static context(o){ return {...o,S:LiveOps.spots()}; }
+  static ready({S}){ return S.length>0; }
+  static prompt({c,S}){ return LiveOps.spotTalkAIPrompt({c,S}); }
+  static apply(r,{c,S}){ let n=0; (r&&Array.isArray(r.scenes)?r.scenes:[]).forEach(x=>{ const s=S.find(y=>y.name===String(x.spot||'').trim()), t=nl(x.script); if(s&&t){ c.spotTalk=c.spotTalk||{}; c.spotTalk[s.id]=t; n++; } }); if(n) Core.mark('c:'+c.id); return n>0; }
 }

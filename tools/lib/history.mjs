@@ -3,6 +3,7 @@
 //                 안 닿는 함수는 만들어 놓고 연결하지 않은 것(시행 안 됨) 후보
 //   주장(claims) — 커밋 설명·조사 노트에 적힌 코드 이름(`이름`, 낙타 표기 함수 이름, 대문자 상수, G.meta.x·P().x 키, src 파일 이름)
 import { walk } from './source.mjs';
+import { classTable, memberFn } from './graph.mjs';
 
 // 진입점에서 닿는 최상위 함수: 최상위 문장(함수 선언 본문 제외)과 html이 가리키는 이름에서 출발해, 함수 본문에 나오는 최상위 함수 이름을 따라감
 // (호출만이 아니라 값으로 넘기는 것 — 표·콜백·setTimeout 등 — 도 닿음으로 봄). 모듈 이름공간(GGM…)의 함수는 프로퍼티 이름으로 이음
@@ -10,19 +11,23 @@ import { walk } from './source.mjs';
 //   글로 안 보이는(동적으로 만드는) 액션은 deadActs(보내는 쪽이 아예 없음)가 아니면 살아 있다고 봄
 const ACT_RE = /data-act=\\?["']([\w-]+)\\?["']|dataset\.act\s*=\s*['"]([\w-]+)['"]/g;
 export function reachable(units, fns, html = '', deadActs = new Set()) {
-  const top = new Map([...fns.values()].filter(f => f.top && !f.table).map(f => [f.name, f])), seen = new Set(), queue = [], cases = new Map(), live = new Set(), literal = new Set();
-  const classes = new Set([...fns.values()].map(f => f.cls).filter(Boolean)); // class로 옮긴 함수(Class.이름 — 부름·값으로 넘김)
+  const top = new Map([...fns.values()].filter(f => f.top && !f.table).map(f => [f.key, f])), seen = new Set(), queue = [], cases = new Map(), live = new Set(), literal = new Set();
+  /* class로 옮긴 함수(Class.이름 — 부름·값으로 넘김): 물려받은 메서드는 상위에서 찾고(this.이름도), 쓰인 class가 상위 class 메서드를 덮어쓴 것(템플릿 메서드의 훅 — 상위가 this로 부름)은 닿음 */
+  const classes = classTable(units), members = new Map(), byName = new Map(); for (const f of top.values()) { if (f.cls) { if (!members.has(f.cls)) members.set(f.cls, []); members.get(f.cls).push(f.key); } if (f.key !== f.name && !f.cls) { if (!byName.has(f.name)) byName.set(f.name, []); byName.get(f.name).push(f.key); } }
+  const usedCls = new Set(), useClass = c => { if (usedCls.has(c)) return; usedCls.add(c); const anc = new Set(); for (let k = classes.get(c), i = 0; k && i < 20; k = classes.get(k), i++) (members.get(k) || []).forEach(x => anc.add(top.get(x).name)); anc.forEach(nm => { const t = memberFn(top, classes, c, nm); if (t) mark(t.key); }); }; /* 상위 메서드 이름마다 이 class에서 보이는 구현(덮어쓴 것·중간 상위의 것) */
+  const clsAt = n => { for (let q = n; q; q = q.parent) if (q.type === 'method_definition') return q.parent?.type === 'class_body' ? q.parent.parent?.childForFieldName('name')?.text : null; return null; };
   for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'switch_case') { const v = String(n.childForFieldName('value')?.text || '').replace(/^['"`]|['"`]$/g, ''); if (v) { if (!cases.has(v)) cases.set(v, []); cases.get(v).push(n); } } });
   for (const u of units) for (const m of u.text.matchAll(ACT_RE)) literal.add(m[1] || m[2]);
-  const hit = name => { if (top.has(name) && !seen.has(name)) { seen.add(name); queue.push(top.get(name)); } };
+  const mark = key => { if (top.has(key) && !seen.has(key)) { seen.add(key); queue.push(top.get(key)); } }, hit = name => { mark(name); (byName.get(name) || []).forEach(mark); }; /* 이름 → 맨 위 함수·모듈 블록 함수(unit#이름) */
   const acts = text => { for (const m of String(text).matchAll(ACT_RE)) { const a = m[1] || m[2]; if (!live.has(a)) { live.add(a); (cases.get(a) || []).forEach(c => queue.push({ node: c, isCase: true })); } } };
   const idsIn = node => { acts(node.text); walk(node, n => { if (n.type === 'switch_case' && cases.has(String(n.childForFieldName('value')?.text || '').replace(/^['"`]|['"`]$/g, ''))) { const v = String(n.childForFieldName('value').text).replace(/^['"`]|['"`]$/g, ''); if (!live.has(v) && (literal.has(v) || deadActs.has(v))) return false; }
-    if (n.type === 'identifier' || n.type === 'shorthand_property_identifier') hit(n.text); else if (n.type === 'property_identifier') { const o = n.parent?.childForFieldName('object')?.text || ''; if (/^GGM\w+$/.test(o) || (classes.has(o) && top.get(n.text)?.cls === o)) hit(n.text); } }); }; // 다른 프로퍼티 이름(obj.name)은 함수가 아님
+    if (n.type === 'identifier' || n.type === 'shorthand_property_identifier') hit(n.text); else if (n.type === 'property_identifier') { const o = n.parent?.childForFieldName('object')?.text || ''; const c = o === 'this' ? clsAt(n) : o; if (/^GGM\w+$/.test(o)) hit(n.text); else if (classes.has(c)) { const t = memberFn(top, classes, c, n.text); if (t) mark(t.key); useClass(c); } } }); }; // 다른 프로퍼티 이름(obj.name)은 함수가 아님
   for (const u of units) { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type === 'function_declaration' || c.type === 'class_declaration') continue; /* 선언 본문은 불러올 때 돌지 않음 */
     if (c.type === 'lexical_declaration' || c.type === 'variable_declaration') { for (const d of c.namedChildren.filter(x => x.type === 'variable_declarator')) { const v = d.childForFieldName('value'); if (v && !/^(arrow_function|function_expression)$/.test(v.type)) idsIn(v); } continue; }
     idsIn(c); } }
   acts(html); for (const m of html.matchAll(/[A-Za-z_$][\w$]*/g)) hit(m[0]);
   while (queue.length) { const f = queue.shift(); if (f.node) idsIn(f.node); }
+  for (const k of [...seen]) seen.add(top.get(k).name); /* 열쇠(Class.이름·unit#이름)와 이름 둘 다로 물을 수 있게 */
   return seen;
 }
 // 글에서 코드 이름 뽑기: `…` 안 이름, 낙타 표기(소문자로 시작·대문자 섞임), 대문자 상수(_ 포함 4자 이상), 상태 키, src 파일 이름(0465-story-plan)

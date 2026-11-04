@@ -96,7 +96,7 @@ export function judgeModules(c, RS, { units = [], html = '', cov = null } = {}) 
   const dupN = m => c.R.dup.filter(g => g.fns.some(x => fileMod(locOfDup(x)) === m)).length, wOnly = m => (c.R.sf?.writeOnly || []).filter(x => [...x.w].some(w => modOf(w) === m)).length;
   const shared = m => Object.values(c.M.data).filter(d => { const ms = new Set(Object.values(d.writers).flat().map(w => c.M.fns[w]?.module).filter(Boolean)); return ms.size > 1 && ms.has(m); }).length;
   const disp = new Map(); for (const f of c.fns.values()) if (f.top && /^handle\w+Action$/.test(f.name)) for (const k of f.calls.keys()) { const m = modOf(k); if (m && m !== modOf(f.key)) disp.set(m, (disp.get(m) || 0) + 1); }
-  return [...byMod].map(([m, fs]) => { const v = V.get(m), n = fs.length, dead = fs.filter(f => unusedK.has(f.key) || (reach && !reach.has(f.name))), notRan = ran ? fs.filter(f => !ran.has(f.name)).length : null;
+  return [...byMod].map(([m, fs]) => { const v = V.get(m), n = fs.length, dead = fs.filter(f => unusedK.has(f.key) || (reach && !reach.has(f.key))), notRan = ran ? fs.filter(f => !ran.has(f.name)).length : null;
     const S = (v && ['슈퍼', '흩어짐'].includes(v.kind) ? 1 : 0) + (nat.has(m) ? 1 : 0), O = disp.get(m) || 0, D = cnt('L3', m) + cnt('L4', m), DRY = dupN(m) + shared(m), KISS = fs.filter(f => complexK.has(f.key)).length + cnt('L1', m), YAGNI = dead.length + wOnly(m);
     const verdict = n && dead.length * 2 >= n ? '폐기' : v?.kind === '조각' ? '통합' : S ? '해체' : (O || D || DRY || KISS) ? '재구축' : '유지';
     const to = verdict === '통합' ? [v.to] : verdict === '해체' ? [...new Set((v?.split || v?.spread || []).map(x => x.to).filter(Boolean))] : [];

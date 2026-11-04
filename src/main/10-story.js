@@ -96,7 +96,7 @@ static evPastHint(skip){ const L=(G.events||[]).filter(e=>e&&e.id!==skip).slice(
 
   static modeIcon(s){ return s&&s.mode==='debate'?'⚖':s&&s.mode==='contest'?'✦':''; }
 
-  static async auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await Core.aiJSON(Story.auditAIStagePrompt({ch,s}),null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); LiveOps.auditMarkObj(s); return true; }
+  static auditAIStage(s){ return StageAuditGen.run({s}); }
 
   static async liveTick(force){
     if(typeof BACKUP_BUSY!=='undefined'&&BACKUP_BUSY)return;
@@ -238,12 +238,7 @@ static planCheck(){ const p=Story.PLAN(), main=G.chapters.filter(ch=>ch.kind==='
     const last=p.acts.length?+p.acts.at(-1).upto:0; if(last&&n>last) out.push(`지금 ${n}장으로 설계한 막(~${last}장)을 넘었어요 — 다음 막을 설계해 주세요`);
     return out; }
 
-  static async planAI(mode,rep,instruction){ const p=Story.PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').length;
-    const r=await Core.aiJSON(Story.planAIPrompt({mode,p,n,instruction}),rep,'complex');
-    if(!r) return false; const old=Core.gameSlot('world.plan'), clean=Story.planClean(r);
-    if(mode==='extend'){ old.acts.push(...clean.acts.filter(a=>+a.upto>(+(old.acts.at(-1)||{}).upto||0))); old.twists.push(...clean.twists.filter(t=>!old.twists.some(x=>x.id===t.id))); old.branches.push(...clean.branches.filter(b=>!old.branches.some(x=>x.id===b.id))); clean.arcs.forEach(a=>{ if(!old.arcs.some(x=>x.name===a.name)) old.arcs.push(a); }); }
-    else G.world.plan=Object.assign(old,clean,{notes:old.notes||''});
-    Core.mark('world'); return true; }
+  static planAI(mode,rep,instruction){ return PlanGen.run({mode,rep,instruction}); }
 
   static planClean(r){ const S=(v,n)=>String(v||'').trim().slice(0,n||200), N=v=>Math.max(1,Math.min(99,Math.round(+v||1)));
     return {logline:S(r.logline,160),theme:S(r.theme,80),ending:S(r.ending,200),acts:(r.acts||[]).slice(0,8).map(a=>({name:S(a.name,30),upto:N(a.upto),goal:S(a.goal)})).filter(a=>a.name),
@@ -990,5 +985,25 @@ class StoryCtl {
     if(s.mode==='debate'||s.mode==='contest') return CharactersView.openModeStage(ch,s); // 회담·콘테스트(0488)
     if(Battle.sortieOn()&&!s.story&&(s.enemies||[]).length&&['main','event'].includes(ch.kind||'main')) return Battle.sortieBegin(ch,s); // 출격 경로(0487)
     SystemView.startStage(s,{kind:ch.kind||'main',ch});
+  }
+}
+
+/* ===== Story의 AI 생성 흐름(Generator 하위 — docs/redesign.md 3절) ===== */
+/* 빈 대본 스테이지 채우기(콘텐츠 점검) */
+class StageAuditGen extends Generator {
+  static context(o){ return {...o,ch:G.chapters.find(c=>(c.stages||[]).includes(o.s))}; }
+  static prompt({ch,s}){ return Story.auditAIStagePrompt({ch,s}); }
+  static parse(r){ return r.pre?r:null; }
+  static apply(r,{s}){ s.pre=String(r.pre); LiveOps.auditMarkObj(s); return true; }
+}
+/* 시나리오 설계(새로·잇기) */
+class PlanGen extends Generator {
+  static tier = 'complex';
+  static context(o){ return {...o,p:Story.PLAN(),n:G.chapters.filter(ch=>ch.kind==='main').length}; }
+  static prompt({mode,p,n,instruction}){ return Story.planAIPrompt({mode,p,n,instruction}); }
+  static apply(r,{mode}){ const old=Core.gameSlot('world.plan'), clean=Story.planClean(r);
+    if(mode==='extend'){ old.acts.push(...clean.acts.filter(a=>+a.upto>(+(old.acts.at(-1)||{}).upto||0))); old.twists.push(...clean.twists.filter(t=>!old.twists.some(x=>x.id===t.id))); old.branches.push(...clean.branches.filter(b=>!old.branches.some(x=>x.id===b.id))); clean.arcs.forEach(a=>{ if(!old.arcs.some(x=>x.name===a.name)) old.arcs.push(a); }); }
+    else G.world.plan=Object.assign(old,clean,{notes:old.notes||''});
+    Core.mark('world'); return true;
   }
 }

@@ -123,10 +123,9 @@ static async *legacyBackupEntries(file){
     /* 행동력 회복 규칙: 마지막 회복 뒤 STAM_MS마다 1씩 cap까지, 가득 차 있으면 시각만 지금으로 — 진행 칸 stam의 정의(0070 PROG_SLOTS)가 부름 */
 static stamRegen(s,cap){ const now=Date.now(); if(s.v>=cap){ s.at=now; return s; } const n=Math.floor((now-s.at)/STAM_MS); if(n>0){ s.v=Math.min(cap,s.v+n); s.at=s.v>=cap?now:s.at+n*STAM_MS; } return s; }
 
-  static async skinLinesAI(c,k,rep){ const r=await Core.aiJSON(Misc.skinLinesAIPrompt({c,k}),rep,'quick');
-    if(r&&Array.isArray(r.lines)){ k.lines=r.lines.map(x=>String(x||'').trim()).filter(Boolean).slice(0,8); if(r.intro) k.intro=String(r.intro).slice(0,120); Core.mark('c:'+c.id); return k.lines.length; } return 0; }
+  static skinLinesAI(c,k,rep){ return SkinLinesGen.run({c,k,rep}); }
 
-  static async personaAIReview(c,rep){ const r=await Core.aiJSON(Misc.personaAIReviewPrompt({c}),rep,'quick'); if(!r) return null; c.personaAIReview={at:Date.now(),score:Math.max(0,Math.min(100,+r.score||0)),strengths:strs(r.strengths).slice(0,4),weaknesses:strs(r.weaknesses).slice(0,4),suggestions:strs(r.suggestions).slice(0,5)}; Core.mark('c:'+c.id); return c.personaAIReview; }
+  static personaAIReview(c,rep){ return PersonaReviewGen.run({c,rep}); }
 
     /* 스레드 기록(Model): 말 하나 더하기 · 끝냄(인연 +10) */
 static thrLogAdd(s,entry){ entry.at=Date.now(); s.log.push(entry); s.at=entry.at; Core.mark('prog'); }

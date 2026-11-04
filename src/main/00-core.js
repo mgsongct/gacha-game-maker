@@ -1,4 +1,21 @@
 /* ===== core — 상위 class와 공용(Shared — 여러 기능이 같이 쓰는 함수). 재설계 docs/redesign.md 3절의 상위 class(Repository·Generator·View·Dialog·Service)로 옮겨 갈 자리 ===== */
+/* AI 생성 흐름 하나(템플릿 메서드 — docs/redesign.md 3절 Generator): context(입력·지금 data를 모음) → ready(할 수 있나) → prompt(프롬프트 스튜디오 조립)
+   → 글 AI(Core.aiJSON, 등급 tier) → parse(AI 출력은 믿지 않는 입력 — 검사·정리, 못 쓰면 null) → apply(data 창구로 반영하고 결과를 돌려줌).
+   하위 class는 다른 점(프롬프트·검사·반영)만 가짐. 못 했을 때: 할 수 없으면 fail, AI 답이 없거나 못 쓰면 none(ctx)(기본 fail) */
+class Generator {
+  static tier = 'default';
+  static fail = false;
+  static context(opt) { return opt; }
+  static ready(ctx) { return true; }
+  static prompt(ctx) { throw Error(`${this.name}.prompt가 없음`); }
+  static parse(r, ctx) { return r; }
+  static apply(v, ctx) { return v; }
+  static none(ctx) { return this.fail; }
+  static async run(opt = {}) { const ctx = this.context(opt); if (!this.ready(ctx)) return this.fail;
+    const r = await Core.aiJSON(this.prompt(ctx), ctx.rep || null, this.tier), v = r ? this.parse(r, ctx) : null;
+    return v == null ? this.none(ctx) : this.apply(v, ctx); }
+}
+
 class Core {
   static quietErr(e,where){ QUIET.unshift({at:Date.now(),where:String(where||''),msg:String(e&&e.message||e||'오류').slice(0,200)}); if(QUIET.length>60) QUIET.length=60; try{ console.debug('[quiet]',where,e); }catch(_){ /* 콘솔이 없어도 괜찮음 */ } }
 
@@ -457,10 +474,7 @@ static skinPreviewSrc(c,k){if(!k)return null;const stand=Art.imgSrcRaw(k),upper=
 
   static memoOpen(c){ const o=Characters.own(c.id); return !!(c.memorial&&c.memorial.script&&o&&Core.affLv(o)>=(+c.memorial.lv||8)); }
 
-  static async fcSummarize(cid){
-    const c=charById(cid), f=Messenger.fcOf(cid); const end=f.log.length-24, part=f.log.slice(f.sumTo||0,end); if(part.length<20) return;
-    try{ const r=await Core.aiJSON(Player.fcSummarizePrompt({c,f,part}),null,'quick'); if(r&&r.summary){ f.sum=String(r.summary).slice(0,1200); f.sumTo=end; Core.mark('prog'); } }catch(e){ Core.quietErr(e,'0100-messenger.js:151'); }
-  }
+  static fcSummarize(cid){ return ChatSummaryGen.run({cid}).catch(e=>Core.quietErr(e,'0100-messenger.js:151')); }
 
   static async fcSend(opt){
     opt=opt||{}; if(FCBUSY||!PH||!PH.fc) return; const cid=PH.fc, c=charById(cid), inp=$('#fcIn'); if(!c||!inp) return; if(!opt.img&&PH.pendImg) opt.img=PH.pendImg; const text=inp.value.trim(); if(!text&&!opt.img) return; if(!opt.img&&PH.lastSend&&PH.lastSend.t===text&&Date.now()-PH.lastSend.at<2500){ inp.value=''; return; } PH.lastSend={t:text,at:Date.now()}; if(opt.img){ PH.pendImg=null; CoreView.phPendRender(); NewGameView.fcInputPhotoHint(false); }
@@ -562,17 +576,9 @@ static prepTarget(it){ return it.k==='scg'?Characters.scgSlot(it.c):it.k==='map'
 
   static drSnap(label){ const d=DR2; d.undo={label,kw:d.kw,tone:d.tone,world:d.world,setting:d.setting,story:d.story,chars:JSON.parse(JSON.stringify(d.chars)),hero:JSON.parse(JSON.stringify(Object.assign({},d.hero,{av:undefined})))}; }
 
-  static async drPolish(k,rep){ CoreView.drRead(); if(k==='hero') return Characters.drPolishHero(rep); const cur=String(DR2[k]||'').trim(); if(!cur){ CoreView.toast('먼저 내용을 조금 적어 주세요'); return; }
-    const what=Misc.drPolishWhatText({k});
-    const r=await Core.aiJSON(Characters.drPolishPrompt({what,k,cur}),rep,'default');
-    if(r&&r.text){ CoreView.drRead(); Core.drSnap(what); DR2[k]=String(r.text); const dn=Characters.drDedup(); Core.drSave(); CoreView.drRerender(); CoreView.toast('다른 항목에 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); } }
+  static drPolish(k,rep){ CoreView.drRead(); if(k==='hero') return Characters.drPolishHero(rep); return DraftPolishGen.run({k,rep}); }
 
-  static async drFillChar(i,rep){ CoreView.drRead(); const c=DR2.chars[i]; if(!c) return;
-    const r=await Core.aiJSON(Characters.drFillCharPrompt({i,c}),rep,'default');
-    if(!r) return; let o=Array.isArray(r)?r[0]:r; if(o&&!o.profile&&!o.role){ const v=Object.values(o).find(x=>x&&typeof x==='object'&&!Array.isArray(x)); if(v) o=v; } if(!o||typeof o!=='object'){ CoreView.toast('AI 응답을 읽지 못했어요. 다시 눌러 주세요'); return; }
-    CoreView.drRead(); const c2=DR2.chars[i]||c; Core.drSnap((c2.name||'인물')+' 다듬기'); const S=v=>Array.isArray(v)?v.join(' ').trim():typeof v==='string'?v.trim():'';
-    const RK=/\s*[\[(【]\s*(SSR|SR|R)\s*[\])】]\s*/gi; let rk=''; ['role','profile','speech','look'].forEach(k=>{ let v=S(o[k]); if(!v) return; v=v.replace(RK,(m,g)=>{ rk=rk||g.toUpperCase(); return ' '; }).replace(/\s{2,}/g,' ').trim(); if(v) c2[k]=v; }); if(rk&&!c2.rank&&c2.kind!=='npc') c2.rank=({SSR:3,SR:2,R:1})[rk]; if(!String(c2.name||'').trim()&&S(o.name)) c2.name=S(o.name).replace(RK,' ').trim();
-    Characters.drDedup(); Core.drSave(); CoreView.drRerender(); CoreView.toast(`${c2.name||'인물'}을(를) 다듬었어요. 마음에 안 들면 「되돌리기」`); }
+  static drFillChar(i,rep){ CoreView.drRead(); return DraftCharGen.run({i,rep}); }
 
   static cxFromChapter(r,ch){ if(!r||!Array.isArray(r.codex)) return; const last=ch.stages[ch.stages.length-1];
     r.codex.slice(0,3).forEach(x=>{ if(!x||!x.title||!x.body) return; World.cxPut({id:'cx'+uid(),cat:CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term',title:String(x.title).slice(0,40),body:String(x.body),unlock:last?{type:'clear',value:last.id}:{type:'start'},src:'ai',at:Date.now()}); }); Core.mark('world'); }
@@ -596,9 +602,7 @@ static stageCast(s,withMe){ const set=new Set(); System.parseScript((s.pre||'')+
     // 관계에 두 사람 이름도 적어 둬요: 나중에 id가 바뀌어도(리롤·가져오기) 이름으로 다시 이어 붙일 수 있게
 static relNames(r){ [['a','an'],['b','bn']].forEach(([k,n])=>{ const o=Characters.relObj(r[k]); if(o) r[n]=o.name; }); return r; }
 
-  static async relSeedAI(rep){ if(!SAMPLE){ CoreView.toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return 0; }
-    const r=await Core.aiJSON(Core.relSeedAIPrompt(),rep,'default');
-    const n=r?NewGame.relApply(r.relations,'정리'):0; return n; }
+  static relSeedAI(rep){ return RelSeedGen.run({rep}); }
 
     // 그림 받기: 내용 해시가 같은 그림은 다시 받지 않아요
 static async subPullImages(base,game,ns,had,st,prefix){

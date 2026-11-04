@@ -59,7 +59,7 @@ static rulesRename(map){ const r=Core.gameSlot('meta.rules'), f=n=>map[n]||n; if
   static rulesMissingDesc(){ return G.meta.elems.some(e=>!e.d)||Object.keys(ROLE).some(k=>!((G.meta.rules||{}).roleDesc||{})[k]); }
 
     /* 포지션 자동 설계(점검 g_pos·실행 중 자동 채움): 포지션 없이 기본 3개로 돌던 예전 게임에 세계관에 맞춘 포지션을 만들어 저장하고 캐릭터를 고루 배정 */
-static async posAI(){ const r=await Core.aiJSON(Rules.rulesPosAIPrompt(),null,'default'), L=NewGame.posClean(r&&r.positions); if(!NewGame.posValid(L)) return false; G.meta.positions=L; Characters.posSpread(L); Core.mark('meta'); return true; }
+  static posAI(){ return PositionsGen.run(); }
 
     /* 문제: ① 새 캐릭터는 지금 "출시 세대"로 만들어져 세대가 오를수록 스킬 예산이 커져요(1세대 ×1 → 5세대 ×2.1) → 오래된 캐릭터가 구식이 됨
            ② AI가 쓴 능력치는 범위만 맞춰서(체력 600~2000 등) 같은 희귀도끼리도 들쭉날쭉
@@ -203,4 +203,12 @@ static stageResultHTML(R){ if(!R.win) return `<h2 class="disp" style="color:#ff5
         ${mvp?`<div class="rs-mvp"><div class="rs-art">${CoreView.art(mvp.c)}</div><div class="rs-mt"><i>MVP</i><b>${esc(mvp.name)}</b>${ml?`<span>“${esc(sub(ml))}”</span>`:''}</div></div>
         <div class="rs-dmg">${B.allies.map(u=>`<div><b>${esc(u.name)}</b><span class="bar"><i style="width:${Math.round((u.dmg||0)/tot*100)}%"></i></span><em>${nf(u.dmg||0)}</em></div>`).join('')}</div>`:''}
         <p style="margin:4px 0">${Core.rewardText(r)}${first?' (첫 클리어 보상)':(kind==='farm'?'':`<br><small class="muted">${esc(System.T('currency'))}은(는) 첫 클리어 때만 받아요</small>`)}${bonus}<br>참가 ${System.T('crew')} 경험치 +${exp}</p><button class="btn" data-act="bdone" data-win="1" data-first="${first?1:0}">계속</button>`; }
+}
+
+/* ===== Rules의 AI 생성 흐름(Generator 하위 — docs/redesign.md 3절) ===== */
+/* 포지션 설계(검사를 통과해야 반영) */
+class PositionsGen extends Generator {
+  static prompt(){ return Rules.rulesPosAIPrompt(); }
+  static parse(r){ const L=NewGame.posClean(r.positions); return NewGame.posValid(L)?L:null; }
+  static apply(L){ G.meta.positions=L; Characters.posSpread(L); Core.mark('meta'); return true; }
 }

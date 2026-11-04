@@ -732,9 +732,7 @@ static dirStrip(t){ return System.parseScript(t).filter(L=>L.type==='say'||L.typ
 
   static dirCount(t){ return System.parseScript(t).filter(L=>(L.type==='say'&&L.dir&&(L.dir.emo||L.dir.motion))||(L.type==='cmd'&&(L.cmd==='연출'||(L.cmd==='효과'&&!/흔들림|플래시|암전/.test(L.arg))))).length; }
 
-  static async directScript(text,rep){ const src=String(text||''); if(!src.trim()) return null;
-    const r=await Core.aiJSON(System.directScriptPrompt({src}),rep,'complex');
-    const out=r&&nl(r.script); if(!out) return null; if(System.dirStrip(out)!==System.dirStrip(src)) return null; return out; }
+  static directScript(text,rep){ return DirectScriptGen.run({text,rep}); }
 
   static bRun(){clearInterval(B.timer);B.timer=setInterval(SystemCtl.bTick,230/(B.speed||1));}
 
@@ -1565,4 +1563,15 @@ static async saveImgBlob(b,base){
     if(!B.over&&B.engine.winner==='timeout')CoreCtl.bEnd(B.ctx.kind==='raid');
     SystemView.bUpdate();if(B?.ctx.kind==='practice')v2UpdatePractice();
   }
+}
+
+/* ===== System의 AI 생성 흐름(Generator 하위 — docs/redesign.md 3절) ===== */
+/* 대본에 연출 입히기(대사는 그대로여야 받음) */
+class DirectScriptGen extends Generator {
+  static tier = 'complex';
+  static fail = null;
+  static context(o){ return {...o,src:String(o.text||'')}; }
+  static ready({src}){ return !!src.trim(); }
+  static prompt({src}){ return System.directScriptPrompt({src}); }
+  static parse(r,{src}){ const out=nl(r.script); return out&&System.dirStrip(out)===System.dirStrip(src)?out:null; }
 }

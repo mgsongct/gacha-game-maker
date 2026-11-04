@@ -279,9 +279,7 @@ static charImgItems(c){if(!c)return [];const L=[],add=(k,label,o,group='기본')
     // 무기 프롬프트 검사: 사람 태그가 섞였거나 '물건 사진'으로 시작하지 않으면 정리가 필요해요 (PR #3 LTXY12님 아이디어)
 static wpBad(p){ const s=String(p||'').trim(); if(!s) return false; return /\b(1girl|1boy|1other|2girls|2boys|solo|holding)\b/i.test(s)||!/^(no humans|object focus)/i.test(s); }
 
-  static async weaponPromptAI(list,rep,world){ const w=world||G.world; const v=Characters.weaponPromptAIVText({list});
-    const r=await Core.aiJSON(Characters.weaponPromptAIPrompt({w,v}),rep||null,'quick');
-    const out=list.map(()=>''); (r&&Array.isArray(r.weapons)?r.weapons:[]).forEach(x=>{ const i=list.findIndex(y=>y.c.name===String(x&&x.name||'').trim()), p=String((x&&x.prompt)||'').trim(); const k=i>=0?i:(list.length===1?0:-1); if(k>=0&&p&&!Characters.wpBad(p)) out[k]=p; }); return out; }
+  static weaponPromptAI(list,rep,world){ return WeaponPromptGen.run({list,rep,world}); }
 
   static async fixWeaponPrompts(chars,world){ try{ const bad=(chars||[]).filter(c=>c&&c.weapon&&Characters.wpBad(c.weapon.prompt)); if(!bad.length) return 0; const out=await Characters.weaponPromptAI(bad.map(c=>({c,name:c.weapon.name,desc:c.weapon.desc,cur:c.weapon.prompt})),null,world); let n=0; bad.forEach((c,i)=>{ if(out[i]){ c.weapon.prompt=out[i]; try{ Core.mark('c:'+c.id); }catch(e){} n++; } }); return n; }catch(e){ return 0; } }
 
@@ -375,12 +373,7 @@ static imageCandidateEligible(kind,target,owner,mode='manual'){
   static npcNew(name){ const id='npc_'+uid(); return {id,npc:true,name,role:'',profile:'',speech:'',look:'',naiPrompt:'',img:null,faces:[],skins:[],lines:[],touch:{head:[],body:[]},affLines:{},upper:{id:'up_'+id,kind:'upper',name:name+' 상반신',prompt:'',img:null}}; }
 
     /* 중요한 NPC 자동 추가: 대본에 대사가 3줄 이상인데 ${'캐릭터'}·NPC가 아닌 인물을 NPC로 만들고 그림 프롬프트를 써요(그림 목록에 들어가요) */
-static async autoNpcs(chs,rep){ if(!SAMPLE) return 0; const cnt={}; const skip=n=>!n||isMe(n)||Characters.findSpeaker(n)||Characters.npcBy(n)||Art.enemyLib(n)||/^(나레이션|내레이션|해설|모두|일동|\?\?\?|목소리|소리|방송|안내)$/.test(n);
-    (chs||[]).forEach(ch=>(ch.stages||[]).forEach(st=>[st.pre,st.post].forEach(t=>System.parseScript(t||'').forEach(L=>{ if(L.type==='say'&&!skip(L.who)) cnt[L.who]=(cnt[L.who]||0)+1; }))));
-    const names=Object.entries(cnt).filter(([,n])=>n>=3).sort((a,b)=>b[1]-a[1]).map(x=>x[0]).slice(0,6); if(!names.length) return 0;
-    const lines=n=>{ const out=[]; (chs||[]).forEach(ch=>(ch.stages||[]).forEach(st=>[st.pre,st.post].forEach(t=>System.parseScript(t||'').forEach(L=>{ if(L.type==='say'&&L.who===n&&out.length<4) out.push(L.text); })))); return out.join(' / '); };
-    const r=await Core.aiJSON(World.autoNpcsPrompt({names,lines}),rep||null,'quick');
-    let n=0; (r&&Array.isArray(r.npcs)?r.npcs:[]).forEach(x=>{ const nm=String((x&&x.name)||'').trim(); if(!names.includes(nm)||Characters.npcBy(nm)) return; const o=Characters.npcNew(nm); Object.assign(o,{role:String(x.role||''),look:String(x.look||''),naiPrompt:stripMinor(Core.stripAge(String(x.naiPrompt||'')))}); G.npcs=G.npcs||[]; G.npcs.push(o); n++; }); if(n) Core.mark('meta'); return n; }
+  static autoNpcs(chs,rep){ return NpcAutoGen.run({chs,rep}); }
 
   static castChars(){ return [...G.chars.filter(c=>c.naiPrompt&&!(c.alt)),...(G.npcs||[]).filter(n=>n.naiPrompt)]; }
 
@@ -816,25 +809,13 @@ static personaReview(c){ const p=c.persona||{}, issues=[], add=(w,k,msg)=>issues
     return {score,issues,grade:score>=85?'S':score>=70?'A':score>=55?'B':score>=40?'C':'D'}; }
 
     /* AI: 개성 채우기·다듬기(mode fill|improve), 대사도 말투에 맞게 다시 쓰기(lines) */
-static async personaAI(c,mode='fill',opt={}){
-    const cfg=Characters.PERSONA_CFG(), others=G.chars.filter(x=>x!==c&&!x.alt&&x.persona).slice(0,12).map(x=>`${x.name}: ${Characters.personaBrief(x)}`).join(' / ');
-    const r=await Core.aiJSON(Characters.personaAIPrompt({c,mode,others,opt,cfg}),CoreView.uiProg(opt.btn),'default');
-    if(!r||!r.persona) return false;
-    c.persona=Object.assign({},mode==='fill'?Characters.personaClean(r.persona):{},mode==='fill'?Characters.personaClean(c.persona):{},mode==='improve'?Characters.personaClean(r.persona):{});
-    c.pfields=Object.assign({},Characters.pfieldsClean(r.pfields),mode==='fill'?Characters.pfieldsClean(c.pfields):{});
-    if(opt.lines){ const L=strs(r.lines); if(L.length>=3) c.lines=L.slice(0,12); if(r.affLines&&typeof r.affLines==='object'){ const a={...(c.affLines||{})}; Object.entries(r.affLines).forEach(([k,v])=>{ const n=parseInt(k,10); if(n>=1&&n<=10&&strs(v).length) a[n]=strs(v).slice(0,4); }); c.affLines=a; } }
-    Core.mark('c:'+c.id); return true; }
+  static personaAI(c,mode='fill',opt={}){ return PersonaGen.run({c,mode,opt,rep:CoreView.uiProg(opt.btn)}); }
 
     /* 메모리얼: 호감도 memoLv에서 열리는 특별 장면 + 메모리얼 로비 대사 */
-static async memorialGen(c,rep){ const cfg=Characters.PERSONA_CFG(); const r=await Core.aiJSON(Characters.memorialGenPrompt({c,cfg}),rep,'default'); if(!r||!r.script) return false;
-    c.memorial={lv:+cfg.memoLv||8,title:String(r.title||'메모리얼').slice(0,30),script:String(r.script),lines:strs(r.lines).slice(0,6)}; Core.mark('c:'+c.id); return true; }
+  static memorialGen(c,rep){ return MemorialGen.run({c,rep}); }
 
     /* 인연 톡: 호감도 단계마다 메신저 대화(모모톡처럼 관계가 깊어지는 흐름) */
-static async talkAffGen(c,rep){ const cfg=Characters.PERSONA_CFG(), have=new Set(affThreads(c).map(t=>+t.trigger.value)), levels=cfg.affLv.filter(l=>!have.has(+l)); if(!levels.length){ CoreView.toast('이미 모든 단계의 인연 톡이 있어요'); return 0; }
-    const r=await Core.aiJSON(Characters.talkAffGenPrompt({c,levels}),rep,'default');
-    const L=(r&&Array.isArray(r.threads)?r.threads:[]).filter(x=>x&&x.script&&levels.includes(+x.lv)); let n=0;
-    for(const x of L){ const th={id:uid(),charId:c.id,title:String(x.title||'메시지').slice(0,30),trigger:{type:'aff',value:+x.lv},needOwn:true,script:String(x.script)}; G.threads.push(th); Core.mark('t:'+th.id); n++; }
-    if(n) MessengerCtl.checkTriggers(true); return n; }
+  static talkAffGen(c,rep){ return TalkAffGen.run({c,rep}); }
 
   static personaSave(c){ const p={}; document.querySelectorAll('#modal [data-ps]').forEach(el=>{ p[el.dataset.ps]=el.value; }); c.persona=Characters.personaClean(p); const f={}; document.querySelectorAll('#modal [data-pf]').forEach(el=>{ f[el.dataset.pf]=el.value; });
     String(($('#ps_extra')||{}).value||'').split('\n').forEach(l=>{ const i=l.indexOf('='); if(i>0) f[l.slice(0,i).trim()]=l.slice(i+1).trim(); }); c.pfields=Characters.pfieldsClean(f); Core.mark('c:'+c.id); }
@@ -902,18 +883,9 @@ static async drawCardArts(deck,rep){ if(!Core.imgReady()){ CoreView.toast(Core.i
       catch(e){ CoreView.toast(Core.naiErr(e)); break; } }
     if(rep) rep.end(); if(n) CoreView.toast(`카드 일러스트 ${n}장을 그렸어요`); const run=Core.progSlot('rogue').run; if($('#modal .cd-row')&&run) ChallengeView.rgDeckModal(run.deck); if(CB) ChallengeView.cbRender(); }
 
-  static async aiNewPickupChar(con,rr,rep,col,alt){
-    if(alt) return Characters.aiAltChar(alt,con,rr,rep);
-    const COL=Characters.aiNewPickupCharCOLText({col});
-    const r=await Core.aiJSON(Core.aiNewPickupCharPrompt({COL,con,rr}),rep);
-    if(!r) return null; const c=Characters.cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr; if(!c.name) c.name='이름 없음'; if(col&&col.src){ c.collab=col.src; if(!c.faction) c.faction='콜라보'; } G.chars.push(c); Core.mark('c:'+c.id); return c; }
+  static aiNewPickupChar(con,rr,rep,col,alt){ if(alt) return Characters.aiAltChar(alt,con,rr,rep); return PickupCharGen.run({con,rr,rep,col}); }
 
-  static async aiAltChar(b,con,rr,rep){ const canon=!!b.__canon; b=charById(b.id)||b;
-    const r=await Core.aiJSON(Core.aiAltCharPrompt({b,canon,con,rr}),rep);
-    if(!r) return null; const c=Characters.cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr;
-    if(!c.name||c.name.indexOf(b.name)!==0) c.name=`${b.name}(${String(con||'이격').replace(/[()]/g,'').slice(0,6)})`;
-    c.alt=b.id; c.altCanon=canon; c.faction=b.faction||c.faction; if(b.voiceId) c.voiceId=b.voiceId; if(b.naiStyle) c.naiStyle=b.naiStyle; if(b.age&&!c.age) c.age=b.age; if(!c.lines||!c.lines.length) c.lines=(b.lines||[]).slice(0,3);
-    G.chars.push(c); Core.mark('c:'+c.id); return c; }
+  static aiAltChar(b,con,rr,rep){ return AltCharGen.run({b,con,rr,rep}); }
 
   static bannerPool(b){
     // 건조 전용 바리에이션(c.cvar)은 건조/영입이 켜져 있으면 뽑기에 안 나와요(픽업으로 직접 넣은 건 예외)
@@ -1157,23 +1129,10 @@ static addNewChars(arr,max,stages,opt){ opt=opt||{}; const out=[]; let list=Arra
     NewGame.remapIds(ng,idMap); // 관계·톡·배너가 바뀐 id를 가리키게(안 그러면 관계가 '없는 인물'로 보여 지워져요)
     return {ids:[...ids],ns:src.ns,nc,nn,nl}; }
 
-  static async drPolishHero(rep){ const h=DR2.hero;
-    const r=await Core.aiJSON(Characters.drPolishHeroPrompt({h}),rep,'default');
-    if(!r||typeof r!=='object') return; CoreView.drRead(); Core.drSnap('주인공'); const S=v=>typeof v==='string'?v.trim():''; const H=DR2.hero;
-    if(S(r.call)) H.call=S(r.call).slice(0,12); if(S(r.name)&&!String(H.name||'').trim()) H.name=S(r.name).slice(0,12); if(S(r.look)) H.look=S(r.look).slice(0,400); if(S(r.bio)) H.bio=S(r.bio).slice(0,1500);
-    Characters.drDedup(); Core.drSave(); CoreView.drRerender(); CoreView.toast('주인공을 다듬었어요. 마음에 안 들면 「되돌리기」'); }
+  static drPolishHero(rep){ return DraftHeroGen.run({rep}); }
 
     /* 전체 맞추기: 세계관·설정·스토리·인물·주인공 설정을 한꺼번에 보고, 서로 어긋난 곳을 고치고 관계를 엮어요. 적힌 내용은 살리고, 한 번 되돌릴 수 있어요 */
-static async drHarmony(rep){ CoreView.drRead(); const d=DR2; if(!Core.drText(d).trim()){ CoreView.toast('먼저 세계관이나 인물을 조금 적어 주세요'); return; }
-    const r=await Core.aiJSON(Characters.drHarmonyPrompt({d}),rep,'complex');
-    if(!r||typeof r!=='object'){ return; } CoreView.drRead();
-    Core.drSnap('전체 맞추기');
-    const S=v=>typeof v==='string'?v.trim():'';
-    ['world','setting','story'].forEach(k=>{ if(String(d[k]||'').trim()&&S(r[k])) d[k]=S(r[k]); });
-    if(String(d.kw||'').trim()&&S(r.kw)) d.kw=S(r.kw).slice(0,400); if(String(d.tone||'').trim()&&S(r.tone)) d.tone=S(r.tone).slice(0,200);
-    const rc=Array.isArray(r.chars)?r.chars:[]; d.chars.forEach((c,i)=>{ const o=rc[i]||rc.find(x=>x&&x.name&&x.name===c.name); if(!o) return; ['role','profile','speech','look'].forEach(k=>{ if(S(o[k])) c[k]=S(o[k]); }); if(!String(c.name||'').trim()&&S(o.name)) c.name=S(o.name); });
-    if(String(d.hero.bio||'').trim()&&S(r.heroBio)) d.hero.bio=S(r.heroBio);
-    const dn=Characters.drDedup(d); Core.drSave(); CoreView.drRerender(); CoreView.toast('서로 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); }
+  static drHarmony(rep){ return DraftHarmonyGen.run({rep}); }
 
     /* 원정 칸 형식 맞춤(빠진 하위 칸: 인지도·컨디션·일정·제안·연속·기록·경영, 기록 시작 시각) + 방송 출연 모드면 오늘의 출연 제안(보유 캐릭터마다 하루 한 번, 무작위라 만들어 저장) — 진행 칸 exped의 정의(0070 PROG_SLOTS)가 그리기 전에 부름 */
 static expedFill(s){ for(const [k,v] of [['fame',{}],['cond',{}],['jobs',{}],['offers',{}],['streak',{}],['lib',[]]]) if(!s[k]||typeof s[k]!=='object') s[k]=v; if(!s.biz||typeof s.biz!=='object') s.biz={assign:{},at:0,rep:0}; if(!s.libAt) s.libAt=Date.now();
@@ -2103,4 +2062,91 @@ static openChar(id){ const c=charById(id); if(!c) return; MessengerView.charShee
 
   static newBonds(s){ const cs=G.chars.filter(c=>c.debut===s.id); if(!cs.length) return; cs.forEach(c=>{ if(!Core.relPair(REL_ME,c.id)) NewGame.relApply([{a:System.T('player'),b:c.name,kind:'첫 만남',note:`「${s.title}」에서 처음 만났다.`}],''); });
     setTimeout(()=>CoreView.toast(`새 인연: ${cs.map(c=>`${c.name}(${RL[c.rarity]})`).join(', ')} · 이제 상시 ${System.T('gacha')}에서 만날 수 있어요`),600); }
+}
+
+/* ===== Characters의 AI 생성 흐름(Generator 하위 — docs/redesign.md 3절) ===== */
+/* 무기 그림 태그(답이 없으면 빈 글) */
+class WeaponPromptGen extends Generator {
+  static tier = 'quick';
+  static context(o){ const w=o.world||G.world; const v=Characters.weaponPromptAIVText({list:o.list}); return {...o,w,v}; }
+  static prompt({w,v}){ return Characters.weaponPromptAIPrompt({w,v}); }
+  static apply(r,{list}){ const out=list.map(()=>''); (r&&Array.isArray(r.weapons)?r.weapons:[]).forEach(x=>{ const i=list.findIndex(y=>y.c.name===String(x&&x.name||'').trim()), p=String((x&&x.prompt)||'').trim(); const k=i>=0?i:(list.length===1?0:-1); if(k>=0&&p&&!Characters.wpBad(p)) out[k]=p; }); return out; }
+  static none({list}){ return list.map(()=>''); }
+}
+/* 대본에 3번 이상 나오는 이름 없는 화자를 NPC로 */
+class NpcAutoGen extends Generator {
+  static tier = 'quick';
+  static fail = 0;
+  static context(o){ const chs=o.chs; const cnt={}; const skip=n=>!n||isMe(n)||Characters.findSpeaker(n)||Characters.npcBy(n)||Art.enemyLib(n)||/^(나레이션|내레이션|해설|모두|일동|\?\?\?|목소리|소리|방송|안내)$/.test(n);
+    (chs||[]).forEach(ch=>(ch.stages||[]).forEach(st=>[st.pre,st.post].forEach(t=>System.parseScript(t||'').forEach(L=>{ if(L.type==='say'&&!skip(L.who)) cnt[L.who]=(cnt[L.who]||0)+1; }))));
+    const names=Object.entries(cnt).filter(([,n])=>n>=3).sort((a,b)=>b[1]-a[1]).map(x=>x[0]).slice(0,6);
+    const lines=n=>{ const out=[]; (chs||[]).forEach(ch=>(ch.stages||[]).forEach(st=>[st.pre,st.post].forEach(t=>System.parseScript(t||'').forEach(L=>{ if(L.type==='say'&&L.who===n&&out.length<4) out.push(L.text); })))); return out.join(' / '); };
+    return {...o,names,lines}; }
+  static ready({names}){ return !!SAMPLE&&names.length>0; }
+  static prompt({names,lines}){ return World.autoNpcsPrompt({names,lines}); }
+  static apply(r,{names}){ let n=0; (r&&Array.isArray(r.npcs)?r.npcs:[]).forEach(x=>{ const nm=String((x&&x.name)||'').trim(); if(!names.includes(nm)||Characters.npcBy(nm)) return; const o=Characters.npcNew(nm); Object.assign(o,{role:String(x.role||''),look:String(x.look||''),naiPrompt:stripMinor(Core.stripAge(String(x.naiPrompt||'')))}); G.npcs=G.npcs||[]; G.npcs.push(o); n++; }); if(n) Core.mark('meta'); return n; }
+}
+/* 개성 시트 채우기·다듬기(mode fill·improve, opt.lines면 대사도) */
+class PersonaGen extends Generator {
+  static context(o){ const c=o.c; const cfg=Characters.PERSONA_CFG(), others=G.chars.filter(x=>x!==c&&!x.alt&&x.persona).slice(0,12).map(x=>`${x.name}: ${Characters.personaBrief(x)}`).join(' / '); return {...o,cfg,others}; }
+  static prompt({c,mode,others,opt,cfg}){ return Characters.personaAIPrompt({c,mode,others,opt,cfg}); }
+  static parse(r){ return r.persona?r:null; }
+  static apply(r,{c,mode,opt}){
+    c.persona=Object.assign({},mode==='fill'?Characters.personaClean(r.persona):{},mode==='fill'?Characters.personaClean(c.persona):{},mode==='improve'?Characters.personaClean(r.persona):{});
+    c.pfields=Object.assign({},Characters.pfieldsClean(r.pfields),mode==='fill'?Characters.pfieldsClean(c.pfields):{});
+    if(opt.lines){ const L=strs(r.lines); if(L.length>=3) c.lines=L.slice(0,12); if(r.affLines&&typeof r.affLines==='object'){ const a={...(c.affLines||{})}; Object.entries(r.affLines).forEach(([k,v])=>{ const n=parseInt(k,10); if(n>=1&&n<=10&&strs(v).length) a[n]=strs(v).slice(0,4); }); c.affLines=a; } }
+    Core.mark('c:'+c.id); return true;
+  }
+}
+/* 개성 AI 검수 */
+class PersonaReviewGen extends Generator {
+  static tier = 'quick';
+  static fail = null;
+  static prompt({c}){ return Misc.personaAIReviewPrompt({c}); }
+  static apply(r,{c}){ c.personaAIReview={at:Date.now(),score:Math.max(0,Math.min(100,+r.score||0)),strengths:strs(r.strengths).slice(0,4),weaknesses:strs(r.weaknesses).slice(0,4),suggestions:strs(r.suggestions).slice(0,5)}; Core.mark('c:'+c.id); return c.personaAIReview; }
+}
+/* 스킨 대사 */
+class SkinLinesGen extends Generator {
+  static tier = 'quick';
+  static fail = 0;
+  static prompt({c,k}){ return Misc.skinLinesAIPrompt({c,k}); }
+  static parse(r){ return Array.isArray(r.lines)?r:null; }
+  static apply(r,{c,k}){ k.lines=r.lines.map(x=>String(x||'').trim()).filter(Boolean).slice(0,8); if(r.intro) k.intro=String(r.intro).slice(0,120); Core.mark('c:'+c.id); return k.lines.length; }
+}
+/* 메모리얼(호감도 memoLv에서 열리는 장면 + 로비 대사) */
+class MemorialGen extends Generator {
+  static context(o){ return {...o,cfg:Characters.PERSONA_CFG()}; }
+  static prompt({c,cfg}){ return Characters.memorialGenPrompt({c,cfg}); }
+  static parse(r){ return r.script?r:null; }
+  static apply(r,{c,cfg}){ c.memorial={lv:+cfg.memoLv||8,title:String(r.title||'메모리얼').slice(0,30),script:String(r.script),lines:strs(r.lines).slice(0,6)}; Core.mark('c:'+c.id); return true; }
+}
+/* 인연 톡(호감도 단계마다 메신저 대화) */
+class TalkAffGen extends Generator {
+  static fail = 0;
+  static context(o){ const c=o.c, cfg=Characters.PERSONA_CFG(), have=new Set(affThreads(c).map(t=>+t.trigger.value)), levels=cfg.affLv.filter(l=>!have.has(+l)); return {...o,levels}; }
+  static ready({levels}){ if(levels.length) return true; CoreView.toast('이미 모든 단계의 인연 톡이 있어요'); return false; }
+  static prompt({c,levels}){ return Characters.talkAffGenPrompt({c,levels}); }
+  static apply(r,{c,levels}){
+    const L=(r&&Array.isArray(r.threads)?r.threads:[]).filter(x=>x&&x.script&&levels.includes(+x.lv)); let n=0;
+    for(const x of L){ const th={id:uid(),charId:c.id,title:String(x.title||'메시지').slice(0,30),trigger:{type:'aff',value:+x.lv},needOwn:true,script:String(x.script)}; G.threads.push(th); Core.mark('t:'+th.id); n++; }
+    if(n) MessengerCtl.checkTriggers(true); return n;
+  }
+}
+/* 새 픽업 캐릭터 */
+class PickupCharGen extends Generator {
+  static fail = null;
+  static context(o){ return {...o,COL:Characters.aiNewPickupCharCOLText({col:o.col})}; }
+  static prompt({COL,con,rr}){ return Core.aiNewPickupCharPrompt({COL,con,rr}); }
+  static apply(r,{rr,col}){ const c=Characters.cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr; if(!c.name) c.name='이름 없음'; if(col&&col.src){ c.collab=col.src; if(!c.faction) c.faction='콜라보'; } G.chars.push(c); Core.mark('c:'+c.id); return c; }
+}
+/* 이격(What IF) 캐릭터 — 원본을 상속 */
+class AltCharGen extends Generator {
+  static fail = null;
+  static context(o){ const canon=!!o.b.__canon, b=charById(o.b.id)||o.b; return {...o,canon,b}; }
+  static prompt({b,canon,con,rr}){ return Core.aiAltCharPrompt({b,canon,con,rr}); }
+  static apply(r,{b,canon,con,rr}){ const c=Characters.cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr;
+    if(!c.name||c.name.indexOf(b.name)!==0) c.name=`${b.name}(${String(con||'이격').replace(/[()]/g,'').slice(0,6)})`;
+    c.alt=b.id; c.altCanon=canon; c.faction=b.faction||c.faction; if(b.voiceId) c.voiceId=b.voiceId; if(b.naiStyle) c.naiStyle=b.naiStyle; if(b.age&&!c.age) c.age=b.age; if(!c.lines||!c.lines.length) c.lines=(b.lines||[]).slice(0,3);
+    G.chars.push(c); Core.mark('c:'+c.id); return c;
+  }
 }

@@ -1,6 +1,6 @@
 # 연관 맵 — 모듈 → 빌드 → index.html(생성기·실행기·편집기) → data 게임 파일
 
-생성: `node tools/map.mjs` · 2026-11-04T10:04 · git f41663d · 입력: src 57파일 · www/index.html 7c2993fbd53b · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
+생성: `node tools/map.mjs` · 2026-11-04T10:26 · git fdc3c3b · 입력: src 57파일 · www/index.html 282761f377b5 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
 
 ## 읽는 법 — 거꾸로 따라가기
 
@@ -72,13 +72,13 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 |---|---|---|---|---|---|---|---|
 | (파일 전체) | buildManualGameDraft<sub>10-system</sub> buildNewGameDraft<sub>10-story</sub> |  |  |  |  |  | 2/2 |
 | [].__deb | buildNewGameDraft<sub>10-story</sub> |  |  |  |  |  | 0/2 |
-| [].affLines |  | fix<sub>10-characters</sub> personaAI<sub>10-characters</sub> |  |  | c_aff |  | 2/2 |
-| [].age |  | aiAltChar<sub>10-characters</sub> fix<sub>10-characters</sub> | aiAltChar<sub>10-characters</sub> | conMakeVariant<sub>10-characters</sub> |  |  | 2/2 |
-| [].alt |  | aiAltChar<sub>10-characters</sub> | aiAltChar<sub>10-characters</sub> | conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
-| [].altCanon |  | aiAltChar<sub>10-characters</sub> | aiAltChar<sub>10-characters</sub> | conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
+| [].affLines |  | fix<sub>10-characters</sub> |  |  | c_aff |  | 2/2 |
+| [].age |  | fix<sub>10-characters</sub> |  | apply<sub>10-characters</sub> conMakeVariant<sub>10-characters</sub> |  |  | 2/2 |
+| [].alt |  |  |  | apply<sub>10-characters</sub> conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
+| [].altCanon |  |  |  | apply<sub>10-characters</sub> conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
 | [].atk |  |  |  | rulesRecalc<sub>10-characters</sub> |  |  | 2/2 |
 | [].cards |  |  | drawCardArts<sub>10-characters</sub> |  |  |  | 0/2 |
-| [].collab |  | aiNewPickupChar<sub>10-characters</sub> | aiNewPickupChar<sub>10-characters</sub> |  |  |  | 0/2 |
+| [].collab |  |  |  | apply<sub>10-characters</sub> |  |  | 0/2 |
 | [].cvar |  |  |  | conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
 | [].debut | buildNewGameDraft<sub>10-story</sub> | debutResolve<sub>10-characters</sub> | debutResolve<sub>10-characters</sub> | fwRead<sub>10-characters</sub> | c_debut |  | 2/2 |
 | [].debutLater | buildNewGameDraft<sub>10-story</sub> | debutResolve<sub>10-characters</sub> | debutResolve<sub>10-characters</sub> |  | c_debut |  | 0/2 |
@@ -88,7 +88,7 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | [].episodes |  | fix<sub>10-characters</sub> | handleStoryAndAuthoringAction<sub>10-story</sub> |  |  |  | 0/2 |
 | [].faceMask | artReuse<sub>10-characters</sub> |  | handleImagesAndAssetsAction<sub>10-characters</sub> regenApply<sub>10-characters</sub> |  |  |  | 0/2 |
 | [].faces | artReuse<sub>10-characters</sub> | fix<sub>10-characters</sub> | handleImagesAndAssetsAction<sub>10-characters</sub> |  |  |  | 0/2 |
-| [].faction |  | aiAltChar<sub>10-characters</sub> aiNewPickupChar<sub>10-characters</sub> fix<sub>10-characters</sub> | aiAltChar<sub>10-characters</sub> aiNewPickupChar<sub>10-characters</sub> regenApply<sub>10-characters</sub> | conMakeVariant<sub>10-characters</sub> fwRead<sub>10-characters</sub> |  |  | 2/2 |
+| [].faction |  | fix<sub>10-characters</sub> | regenApply<sub>10-characters</sub> | apply<sub>10-characters</sub> apply<sub>10-characters</sub> conMakeVariant<sub>10-characters</sub> fwRead<sub>10-characters</sub> |  |  | 2/2 |
 | [].files |  | fix<sub>10-characters</sub> |  |  |  |  | 2/2 |
 | [].generation |  |  | v2EditorAction<sub>combat/050-bridge</sub> |  |  |  | 2/2 |
 | [].hp |  |  |  | rulesRecalc<sub>10-characters</sub> |  |  | 2/2 |
@@ -98,19 +98,19 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | [].lbbg |  | fix<sub>10-characters</sub> | handleImagesAndAssetsAction<sub>10-characters</sub> |  |  |  | 2/2 |
 | [].lbcg |  | fix<sub>10-characters</sub> |  |  |  |  | 2/2 |
 | [].limited |  | fix<sub>10-characters</sub> | handleNavigationAndToolsAction<sub>10-acquire</sub> |  |  |  | 2/2 |
-| [].lines |  | aiAltChar<sub>10-characters</sub> fix<sub>10-characters</sub> personaAI<sub>10-characters</sub> | aiAltChar<sub>10-characters</sub> |  | c_lines |  | 2/2 |
+| [].lines |  | fix<sub>10-characters</sub> |  | apply<sub>10-characters</sub> | c_lines |  | 2/2 |
 | [].lvLines |  | fix<sub>10-characters</sub> |  |  |  |  | 2/2 |
 | [].naiBlocks |  |  | regenApply<sub>10-characters</sub> |  |  |  | 2/2 |
 | [].naiPose |  | fix<sub>10-characters</sub> |  |  |  |  | 0/2 |
 | [].naiPrompt |  | fix<sub>10-characters</sub> | regenApply<sub>10-characters</sub> | conMakeVariant<sub>10-characters</sub> | c_age c_look c_minor |  | 2/2 |
-| [].naiStyle |  | aiAltChar<sub>10-characters</sub> | aiAltChar<sub>10-characters</sub> | conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
-| [].name |  | aiAltChar<sub>10-characters</sub> aiNewPickupChar<sub>10-characters</sub> | aiAltChar<sub>10-characters</sub> aiNewPickupChar<sub>10-characters</sub> drHarmony<sub>10-characters</sub> regenApply<sub>10-characters</sub> | conMakeVariant<sub>10-characters</sub> |  |  | 2/2 |
+| [].naiStyle |  |  |  | apply<sub>10-characters</sub> conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
+| [].name |  |  | regenApply<sub>10-characters</sub> | apply<sub>10-characters</sub> edit<sub>10-newgame</sub> apply<sub>10-characters</sub> conMakeVariant<sub>10-characters</sub> |  |  | 2/2 |
 | [].over |  | inheritAll<sub>10-characters</sub> | inheritOnMark<sub>10-characters</sub> |  |  |  | 0/2 |
-| [].persona |  | personaAI<sub>10-characters</sub> |  | personaSave<sub>10-characters</sub> | c_persona c_persona_weak c_pfields |  | 2/2 |
-| [].pfields |  | personaAI<sub>10-characters</sub> |  | personaSave<sub>10-characters</sub> | c_pfields |  | 2/2 |
+| [].persona |  |  |  | personaSave<sub>10-characters</sub> | c_persona c_persona_weak c_pfields |  | 2/2 |
+| [].pfields |  |  |  | personaSave<sub>10-characters</sub> | c_pfields |  | 2/2 |
 | [].pos |  |  |  | posSpread<sub>10-characters</sub> rulesSave<sub>10-rules</sub> | c_pos |  | 2/2 |
 | [].pose |  | fix<sub>10-characters</sub> |  |  |  |  | 2/2 |
-| [].rarity |  | aiAltChar<sub>10-characters</sub> aiNewPickupChar<sub>10-characters</sub> fix<sub>10-characters</sub> | aiAltChar<sub>10-characters</sub> aiNewPickupChar<sub>10-characters</sub> | conMakeVariant<sub>10-characters</sub> |  |  | 2/2 |
+| [].rarity |  | fix<sub>10-characters</sub> |  | apply<sub>10-characters</sub> apply<sub>10-characters</sub> conMakeVariant<sub>10-characters</sub> |  |  | 2/2 |
 | [].role |  | fix<sub>10-characters</sub> |  | rulesSave<sub>10-rules</sub> |  |  | 2/2 |
 | [].roleSpeedOriginal | v2ApplyRoleSpeed<sub>combat/050-bridge</sub> | v2ApplyRoleSpeed<sub>combat/050-bridge</sub> |  |  |  |  | 2/2 |
 | [].roleSpeedRole | v2ApplyRoleSpeed<sub>combat/050-bridge</sub> | v2ApplyRoleSpeed<sub>combat/050-bridge</sub> |  |  |  |  | 2/2 |
@@ -133,7 +133,7 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | [].touch |  | fix<sub>10-characters</sub> |  |  | c_touch |  | 2/2 |
 | [].upper |  | fix<sub>10-characters</sub> | handleUpdatesAction<sub>10-characters</sub> |  |  |  | 2/2 |
 | [].useStanding | v2Ensure<sub>combat/050-bridge</sub> | v2Ensure<sub>combat/050-bridge</sub> |  |  |  |  | 2/2 |
-| [].voiceId |  | aiAltChar<sub>10-characters</sub> | aiAltChar<sub>10-characters</sub> handleSettingsAndAudioAction<sub>10-characters</sub> pubContent<sub>10-characters</sub> shareDefinition<sub>10-characters</sub> | applySharedArchive<sub>10-characters</sub> conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
+| [].voiceId |  |  | handleSettingsAndAudioAction<sub>10-characters</sub> pubContent<sub>10-characters</sub> shareDefinition<sub>10-characters</sub> | apply<sub>10-characters</sub> applySharedArchive<sub>10-characters</sub> conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
 | [].voiceName |  |  | handleSettingsAndAudioAction<sub>10-characters</sub> pubContent<sub>10-characters</sub> shareDefinition<sub>10-characters</sub> | applySharedArchive<sub>10-characters</sub> |  |  | 0/2 |
 | [].weapon | artReuse<sub>10-characters</sub> fixWeaponPrompts<sub>10-characters</sub> | fix<sub>10-characters</sub> fixWeaponPrompts<sub>10-characters</sub> v2EnsureEquipment<sub>combat/070-equipment</sub> | handleCharactersAction<sub>10-characters</sub> handleImagesAndAssetsAction<sub>10-characters</sub> v2EnsureEquipment<sub>combat/070-equipment</sub> v2GearAction<sub>combat/070-equipment</sub> …외 1 |  | c_weapon |  | 2/2 |
 
@@ -166,16 +166,16 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | [].affLines |  |  | regenParseCharacter<sub>10-art</sub> |  |  |  | 0/2 |
 | [].alias |  | shTake<sub>10-art</sub> | shTake<sub>10-art</sub> |  |  |  | 1/2 |
 | [].cast |  |  | handleNavigationAndToolsAction<sub>10-acquire</sub> |  |  |  | 1/2 |
-| [].cooldown |  | trainedSkill<sub>combat/030-core</sub> weakenGeneratedSkill<sub>combat/030-core</sub> | trainedSkill<sub>combat/030-core</sub> |  |  |  | 0/2 |
+| [].cooldown |  | trainedSkill<sub>combat/030-core</sub> weakenGeneratedSkill<sub>combat/030-core</sub> |  |  |  |  | 0/2 |
 | [].faction |  |  | regenParseCharacter<sub>10-art</sub> |  |  |  | 2/2 |
 | [].files |  |  | regenParseCharacter<sub>10-art</sub> |  |  |  | 0/2 |
 | [].id |  |  |  | conMakeVariant<sub>10-characters</sub> |  |  | 2/2 |
 | [].img | artReuse<sub>10-characters</sub> |  |  |  |  |  | 0/2 |
-| [].initial |  | trainedSkill<sub>combat/030-core</sub> | trainedSkill<sub>combat/030-core</sub> |  |  |  | 0/2 |
+| [].initial |  | trainedSkill<sub>combat/030-core</sub> |  |  |  |  | 0/2 |
 | [].intro |  |  | regenParseCharacter<sub>10-art</sub> |  |  |  | 0/2 |
 | [].lines |  |  | regenParseCharacter<sub>10-art</sub> |  |  |  | 0/2 |
 | [].live |  |  | subscribe<sub>10-art</sub> |  |  |  | 0/2 |
-| [].lockout |  | trainedSkill<sub>combat/030-core</sub> | trainedSkill<sub>combat/030-core</sub> |  |  |  | 0/2 |
+| [].lockout |  | trainedSkill<sub>combat/030-core</sub> |  |  |  |  | 0/2 |
 | [].naiPrompt |  |  | regenParseCharacter<sub>10-art</sub> | conMakeVariant<sub>10-characters</sub> |  |  | 0/2 |
 | [].name |  | fix<sub>10-characters</sub> | handleNavigationAndToolsAction<sub>10-acquire</sub> regenParseCharacter<sub>10-art</sub> | conMakeVariant<sub>10-characters</sub> |  |  | 2/2 |
 | [].profile |  |  | regenParseCharacter<sub>10-art</sub> |  |  |  | 0/2 |
@@ -184,7 +184,7 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | [].shared |  | shTake<sub>10-art</sub> | shTake<sub>10-art</sub> |  |  |  | 0/2 |
 | [].skills |  |  |  | balanceSkill<sub>combat/030-core</sub> balanceSlot<sub>combat/030-core</sub> |  |  | 0/2 |
 | [].touch |  |  | regenParseCharacter<sub>10-art</sub> |  |  |  | 0/2 |
-| [].triggerEvery |  | trainedSkill<sub>combat/030-core</sub> weakenGeneratedSkill<sub>combat/030-core</sub> | trainedSkill<sub>combat/030-core</sub> |  |  |  | 0/2 |
+| [].triggerEvery |  | trainedSkill<sub>combat/030-core</sub> weakenGeneratedSkill<sub>combat/030-core</sub> |  |  |  |  | 0/2 |
 | [].weapon |  |  | regenParseCharacter<sub>10-art</sub> |  |  |  | 0/2 |
 
 ### meta.json — 게임 설정·규칙(건조·포지션·밸런스·일정 …)
@@ -296,27 +296,27 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 
 | 기능 단위 | 종류 | 함수 | 얽힌 모듈(함수 수) | 안의 창 |
 |---|---|---|---|---|
-| 새 게임 생성 | 배경 | 222 | 10-newgame 54, 10-characters 32, 90-load 29, 00-core 27, 10-system 24 …외 12 |  |
-| 실행 중 AI | 배경 | 174 | 10-story 35, 10-characters 29, 10-liveops 29, 00-core 27, 10-art 13 …외 9 |  |
+| 새 게임 생성 | 배경 | 224 | 10-newgame 53, 90-load 32, 10-characters 30, 00-core 28, 10-system 24 …외 12 |  |
+| 실행 중 AI | 배경 | 156 | 10-story 29, 10-liveops 26, 00-core 25, 10-characters 23, 10-art 13 …외 10 |  |
 | 불러오기 | 배경 | 28 | 10-characters 13, 00-core 4, 10-rules 3, 10-challenge 2, 10-system 2 …외 3 |  |
-| 앱 시작 | 배경 | 6 | 90-load 6 |  |
+| 앱 시작 | 배경 | 8 | 90-load 6, 00-core 1, 10-world 1 |  |
 
 ## 3. 계층(MVC) — 모듈마다 View · Controller · Model, 섞인 함수, 방향 위반
 
-기준(CLAUDE.md §0-2, docs/research/developer-role.md 1-1 — 함수 자신이 하는 일로 판정, lib/arch.mjs): View = HTML 마크업 글을 만들거나 DOM을 바꿈 · Controller = 액션 처리기 또는 화면 갱신(render·toast·openModal·closeModal)을 부름 · Model = 게임 상태를 씀·저장소 쓰기·네트워크·AI·그림 서비스 또는 화면과 관계없는 계산·조회 · **섞임** = 한 함수가 화면을 만들면서 상태·저장·서비스를 직접 씀. **방향 위반** = View가 상태·저장·서비스를 바꾸는 함수를 부름(그리다가 바꿈) · Model이 화면을 만드는 함수를 부름. src/main 함수: View 477 · Controller 135 · Model 1087 · 섞임 7 · 방향 위반 126
+기준(CLAUDE.md §0-2, docs/research/developer-role.md 1-1 — 함수 자신이 하는 일로 판정, lib/arch.mjs): View = HTML 마크업 글을 만들거나 DOM을 바꿈 · Controller = 액션 처리기 또는 화면 갱신(render·toast·openModal·closeModal)을 부름 · Model = 게임 상태를 씀·저장소 쓰기·네트워크·AI·그림 서비스 또는 화면과 관계없는 계산·조회 · **섞임** = 한 함수가 화면을 만들면서 상태·저장·서비스를 직접 씀. **방향 위반** = View가 상태·저장·서비스를 바꾸는 함수를 부름(그리다가 바꿈) · Model이 화면을 만드는 함수를 부름. src/main 함수: View 482 · Controller 134 · Model 1202 · 섞임 7 · 방향 위반 122
 
 | 모듈 | View | Controller | Model | 섞임 | 방향 위반 | 섞인 함수(예) | 방향 위반(예) |
 |---|---|---|---|---|---|---|---|
-| 10-characters | 89 | 19 | 173 | 3 | 24 | handleImagesAndAssetsAction, handleCharactersAction, handleSettingsAndAudioAction | saveLlm→toast, regenApply→regenReadPreview, regenApply→toast |
-| 10-system | 60 | 20 | 139 | 0 | 27 |  | aiCall→toast, switchProject→toast, switchProject→reloadGame |
-| 00-core | 70 | 20 | 126 | 1 | 19 | checkUpdatePrivate | aiJSON→toast, saveUserPacks→toast, naiGenerate→toast |
-| 10-story | 47 | 10 | 76 | 1 | 16 | handleStoryAndAuthoringAction | liveTick→liveBar, liveTick→liveFillNotes, liveTick→openNotice |
+| 10-system | 60 | 20 | 143 | 0 | 27 |  | aiCall→toast, switchProject→toast, switchProject→reloadGame |
+| 10-characters | 90 | 18 | 204 | 3 | 20 | handleImagesAndAssetsAction, handleCharactersAction, handleSettingsAndAudioAction | saveLlm→toast, regenApply→regenReadPreview, regenApply→toast |
+| 00-core | 70 | 19 | 134 | 1 | 19 | checkUpdatePrivate | aiJSON→toast, saveUserPacks→toast, naiGenerate→toast |
+| 10-story | 47 | 10 | 83 | 1 | 16 | handleStoryAndAuthoringAction | liveTick→liveBar, liveTick→liveFillNotes, liveTick→openNotice |
 | 10-economy | 23 | 5 | 22 | 0 | 13 |  | handleEconomyAction→giveReward, handleEconomyAction→naiDrawItem, handleEconomyAction→storeImage |
 | 10-art | 30 | 3 | 63 | 0 | 11 |  | showCast→castRun, bootPrepRun→runPrep, backupImport→toast |
 | 10-acquire | 25 | 6 | 38 | 1 | 5 | handleNavigationAndToolsAction | seasonStart→liveBar, seasonStart→artAfterAI, gateCheck→toast |
-| 10-liveops | 15 | 13 | 50 | 0 | 5 |  | applyUpdate→toast, applyUpdate→updateAPKRequired, applyUpdate→openModal |
-| 10-rules | 8 | 5 | 30 | 0 | 3 |  | rulesSave→rulesRead, rulesSave→toast, rulesSave→applyMeta |
-| 10-messenger | 19 | 2 | 16 | 1 | 1 | handleMessengerAction | openPhone→openThread |
+| 10-liveops | 15 | 13 | 60 | 0 | 5 |  | applyUpdate→toast, applyUpdate→updateAPKRequired, applyUpdate→openModal |
+| 10-rules | 8 | 5 | 33 | 0 | 3 |  | rulesSave→rulesRead, rulesSave→toast, rulesSave→applyMeta |
+| 10-messenger | 19 | 2 | 27 | 1 | 1 | handleMessengerAction | openPhone→openThread |
 | 10-challenge | 27 | 13 | 50 | 0 | 1 |  | cbUlt→cbEnd |
 | 10-promptstudio | 3 | 0 | 12 | 0 | 1 |  | pstPolish→aiJSON |
 
@@ -326,27 +326,27 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 
 | 기능 | 함수 | 주로 쓰는 데이터 | 계층(View·Controller·Model·섞임) | 이어진 화면(닿는 함수 수) | 모듈(함수 수) |
 |---|---|---|---|---|---|
-| F01 | 274 | chars.json › [].weapon · lib.json › [].prompt · chars.json › [].skins | 104·30·136·4 | 새 게임 생성 50, 실행 중 AI 14, 불러오기 2 | 10-characters 69, 00-core 51, 10-art 22, 10-messenger 21, 90-load 19 …외 12 |
-| F02 | 147 | chapters.json › [].relScan · chapters.json › [].stages[].post · chapters.json › [].stages[].pre | 32·7·107·1 | 실행 중 AI 60, 새 게임 생성 40, 불러오기 1 | 10-story 42, 00-core 22, 10-characters 19, 10-newgame 16, 10-world 11 …외 8 |
-| F03 | 103 | 저장소 starfall-nai · 저장소 starfall-sound · 저장소 starfall-ai-profiles | 29·3·69·2 | 새 게임 생성 11, 실행 중 AI 1 | 10-system 31, 00-core 17, 10-art 14, 10-characters 13, 10-liveops 11 …외 7 |
-| F04 | 102 | banners.json › [].active · banners.json › [].bg · banners.json › [].desc | 23·10·69·0 | 실행 중 AI 40, 새 게임 생성 3, 앱 시작 1 | 10-acquire 21, 10-liveops 21, 10-characters 13, 00-core 9, 10-story 8 …외 8 |
-| F05 | 93 | 저장소 ggm-sync · chars.json › [].upper · chars.json › [].voiceId | 25·14·54·0 | 새 게임 생성 4 | 10-system 84, 00-core 3, 10-characters 2, 10-story 2, 10-acquire 1 …외 1 |
-| F06 | 92 | chars.json › [].skillBalance · chars.json › [].skills · chars.json › [].weapon | 24·7·61·0 | 불러오기 10, 새 게임 생성 9, 실행 중 AI 9 | 10-characters 34, 10-art 13, 10-system 12, 00-core 9, 10-story 6 …외 7 |
-| F07 | 84 | chars.json › [].faction · chars.json › [].name · chars.json › [].rarity | 22·4·58·0 | 새 게임 생성 10, 실행 중 AI 9 | 10-acquire 24, 10-world 24, 10-characters 18, 00-core 7, 90-load 5 …외 4 |
-| F08 | 73 |  | 26·10·37·0 |  | 10-challenge 55, 10-system 8, 00-core 6, 10-characters 2, 10-player 1 …외 1 |
-| F09 | 69 | banners.json · chapters.json · chars.json | 14·1·54·0 | 새 게임 생성 43, 불러오기 2, 실행 중 AI 2 | 10-newgame 23, 90-load 11, 00-core 9, 10-story 7, 10-art 6 …외 5 |
-| F10 | 63 |  | 16·1·46·0 | 새 게임 생성 6, 실행 중 AI 5, 불러오기 4 | 10-world 29, 10-story 17, 10-rules 7, 10-characters 3, 00-core 3 …외 3 |
-| F11 | 57 |  | 12·14·31·0 | 새 게임 생성 2 | 10-battle 14, 10-economy 9, 10-characters 8, 00-core 7, 10-challenge 7 …외 5 |
-| F12 | 47 | chars.json › [].persona · chars.json › [].pfields · chars.json › [].affLines | 5·10·32·0 | 실행 중 AI 20, 새 게임 생성 7 | 10-characters 17, 10-liveops 12, 00-core 4, 10-rules 4, 10-system 3 …외 5 |
-| F13 | 45 | chapters.json › [].stages[].enemies · chapters.json › [].stages[].combatBalance · chapters.json › [].stages[].enemies[].atk | 7·6·32·0 | 새 게임 생성 9, 불러오기 6, 실행 중 AI 1 | 10-challenge 12, 10-battle 9, 10-story 9, 10-newgame 4, 10-economy 4 …외 3 |
-| F14 | 36 |  | 10·1·25·0 | 새 게임 생성 10, 불러오기 5 | 10-rules 21, 10-player 3, 00-core 3, 10-characters 2, 10-system 2 …외 5 |
-| F15 | 32 |  | 6·5·21·0 |  | 10-expedition 28, 90-load 2, 10-economy 1, 10-characters 1 |
-| F16 | 27 | 저장소 ggm-voice-ja | 9·0·18·0 | 새 게임 생성 10, 실행 중 AI 6 | 10-system 9, 10-story 6, 10-characters 6, 90-load 2, 00-core 2 …외 2 |
-| F17 | 23 |  | 7·0·16·0 | 실행 중 AI 16, 새 게임 생성 8 | 10-characters 11, 10-liveops 5, 00-core 5, 80-misc 2 |
-| F18 | 18 |  | 4·1·13·0 | 새 게임 생성 3, 실행 중 AI 1 | 10-liveops 10, 10-story 3, 10-characters 2, 90-load 1, 10-art 1 …외 1 |
-| F19 | 10 | 저장소 ggm-shared-assets | 4·0·6·0 | 실행 중 AI 2 | 10-art 8, 90-load 1, 10-characters 1 |
-| F20 | 9 | chars.json › [].over · chars.json › [].skillBalance | 0·0·9·0 | 불러오기 6 | 10-characters 9 |
-| F21 | 8 | chars.json › [].pos | 1·2·5·0 | 새 게임 생성 2 | 10-rules 5, 10-newgame 2, 10-characters 1 |
+| F01 | 265 | lib.json › [].prompt · chars.json › [].skins · chars.json › [].weapon | 106·26·129·4 | 새 게임 생성 44, 실행 중 AI 16, 불러오기 2 | 10-characters 62, 00-core 47, 10-messenger 25, 10-art 24, 90-load 20 …외 12 |
+| F02 | 90 | chars.json › [].faction · chars.json › [].name · chars.json › [].rarity | 23·4·63·0 | 새 게임 생성 10, 실행 중 AI 7 | 10-world 27, 10-acquire 24, 10-characters 23, 90-load 5, 00-core 5 …외 4 |
+| F03 | 90 | 저장소 ggm-sync · lib.json › [].alias · lib.json › [].prompt | 24·12·54·0 | 새 게임 생성 4, 실행 중 AI 1 | 10-system 82, 00-core 3, 10-art 2, 10-story 2, 10-acquire 1 |
+| F04 | 88 | banners.json › [].active · banners.json › [].bg · banners.json › [].desc | 20·7·61·0 | 실행 중 AI 35, 새 게임 생성 3, 앱 시작 1 | 10-acquire 21, 10-liveops 20, 10-characters 13, 00-core 8, 10-story 5 …외 8 |
+| F05 | 86 | 저장소 starfall-nai · 저장소 starfall-sound · 저장소 starfall-ai-profiles | 24·1·60·1 | 새 게임 생성 9, 실행 중 AI 1 | 10-system 31, 00-core 15, 10-characters 13, 10-art 13, 80-misc 4 …외 5 |
+| F06 | 86 | banners.json · chapters.json · chars.json | 22·3·61·0 | 새 게임 생성 45, 실행 중 AI 4, 불러오기 2 | 10-newgame 25, 10-story 14, 00-core 13, 90-load 10, 10-art 7 …외 8 |
+| F07 | 84 | chapters.json › [].stages[].enemies[].atk · chapters.json › [].stages[].enemies[].def · chapters.json › [].stages[].enemies[].hp | 6·3·75·0 | 실행 중 AI 43, 새 게임 생성 22, 불러오기 1 | 10-story 23, 10-characters 15, 10-newgame 12, 00-core 9, 10-system 7 …외 6 |
+| F08 | 80 | chars.json › [].skillBalance · chars.json › [].skills · chars.json › [].weapon | 21·7·52·0 | 불러오기 11, 실행 중 AI 10, 새 게임 생성 5 | 10-characters 28, 10-system 12, 00-core 10, 10-art 10, 10-story 6 …외 6 |
+| F09 | 70 |  | 25·10·35·0 |  | 10-challenge 54, 10-system 8, 00-core 6, 10-player 1, 10-story 1 |
+| F10 | 63 | chars.json › [].persona · chars.json › [].pfields · chars.json › [].pos | 14·5·44·0 | 새 게임 생성 18, 실행 중 AI 3 | 10-characters 28, 10-rules 10, 10-art 9, 10-liveops 8, 90-load 5 …외 2 |
+| F11 | 62 | chapters.json › [].relScan · banners.json › [].pickup · banners.json › [].pool | 18·0·43·1 | 새 게임 생성 17, 실행 중 AI 13, 앱 시작 6 | 10-story 21, 10-world 12, 00-core 11, 10-characters 6, 10-newgame 3 …외 6 |
+| F12 | 60 |  | 14·1·45·0 | 새 게임 생성 4, 불러오기 4, 실행 중 AI 1 | 10-world 33, 10-story 16, 10-characters 3, 00-core 3, 90-load 2 …외 3 |
+| F13 | 54 |  | 11·14·29·0 | 새 게임 생성 2 | 10-battle 14, 10-economy 9, 00-core 7, 10-challenge 7, 10-characters 5 …외 5 |
+| F14 | 47 | chapters.json › [].stages[].combatBalance · chapters.json › [].stages[].enemies · chapters.json › [].stages[].enemies[].elem | 12·2·33·0 | 새 게임 생성 12, 불러오기 5 | 10-rules 23, 10-characters 5, 10-player 3, 00-core 3, 10-story 3 …외 6 |
+| F15 | 44 |  | 8·9·27·0 |  | 10-expedition 29, 90-load 4, 10-characters 3, 10-economy 2, 10-liveops 2 …외 3 |
+| F16 | 43 | chapters.json › [].stages[].enemies · chapters.json › [].stages[].field · chapters.json › [].stages[].goal | 7·5·31·0 | 새 게임 생성 9, 불러오기 6 | 10-challenge 12, 10-battle 9, 10-story 7, 10-newgame 4, 10-economy 4 …외 3 |
+| F17 | 39 | chars.json › [].weapon · 저장소 ggm-plessons | 3·7·29·0 | 실행 중 AI 15, 새 게임 생성 7 | 10-liveops 12, 10-characters 8, 10-promptstudio 5, 00-core 4, 10-rules 4 …외 5 |
+| F18 | 29 | 저장소 ggm-upd-notes · chars.json › [].upper · 저장소 starfall-live | 9·6·13·1 | 실행 중 AI 3 | 10-liveops 13, 00-core 7, 10-story 2, 10-system 2, 10-economy 2 …외 3 |
+| F19 | 25 | 저장소 ggm-voice-ja | 9·1·15·0 | 새 게임 생성 10, 실행 중 AI 3 | 10-system 9, 10-characters 7, 10-story 3, 90-load 2, 00-core 2 …외 2 |
+| F20 | 24 |  | 7·0·17·0 | 실행 중 AI 14, 새 게임 생성 8 | 10-characters 11, 10-liveops 6, 00-core 5, 80-misc 2 |
+| F21 | 18 |  | 0·1·17·0 | 새 게임 생성 3 | 10-newgame 9, 10-characters 7, 00-core 1, 90-load 1 |
 | F22 | 7 | 저장소 ggm-packs | 3·0·4·0 | 새 게임 생성 1 | 10-art 4, 00-core 2, 10-characters 1 |
 | F23 | 6 |  | 3·0·3·0 |  | 10-promptstudio 4, 10-system 2 |
 | F24 | 6 |  | 3·0·3·0 |  | 10-liveops 3, 00-core 2, 80-misc 1 |
@@ -358,35 +358,50 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | F30 | 3 |  | 1·0·2·0 |  | 10-characters 1, 90-load 1, 10-economy 1 |
 | F31 | 3 |  | 1·0·2·0 |  | 00-core 1, 80-misc 1, 10-liveops 1 |
 | F32 | 3 |  | 0·0·3·0 |  | 80-misc 3 |
-| F33 | 2 |  | 0·0·2·0 |  | 00-core 1, 10-challenge 1 |
-| F34 | 2 |  | 0·0·2·0 |  | 10-system 2 |
-| F35 | 2 |  | 0·0·2·0 |  | 10-world 2 |
+| F33 | 2 |  | 0·0·2·0 |  | 10-system 2 |
+| F34 | 2 |  | 0·0·2·0 |  | 10-newgame 1, 80-misc 1 |
+| F35 | 2 |  | 0·0·2·0 |  | 10-newgame 2 |
+| F36 | 2 |  | 0·0·2·0 |  | 10-liveops 2 |
+| F37 | 2 |  | 0·0·2·0 |  | 10-characters 1, 80-misc 1 |
+| F38 | 2 |  | 0·0·2·0 |  | 10-characters 2 |
+| F39 | 2 |  | 0·0·2·0 |  | 10-story 2 |
+| F40 | 2 |  | 0·0·2·0 |  | 10-characters 1, 80-misc 1 |
+| F41 | 2 |  | 0·0·2·0 |  | 10-liveops 2 |
+| F42 | 2 |  | 0·0·2·0 |  | 10-liveops 2 |
+| F43 | 2 |  | 0·0·2·0 |  | 10-story 2 |
+| F44 | 2 |  | 0·0·2·0 |  | 10-world 2 |
+| F45 | 2 |  | 0·0·2·0 |  | 10-characters 2 |
+| F46 | 2 |  | 0·0·2·0 |  | 10-characters 2 |
+| F47 | 2 |  | 0·0·2·0 |  | 00-core 1, 10-challenge 1 |
+| F48 | 2 |  | 0·0·2·0 |  | 10-system 2 |
+| F49 | 2 |  | 0·1·1·0 |  | 00-core 1, 10-characters 1 |
+| F50 | 2 |  | 0·0·2·0 |  | 10-world 2 |
 
-### 모듈 판정 — src/main 모듈 20: 고유 3 · 조각 1 · 흩어짐 8 · 슈퍼 7 · 기반 1 · 분배 0 · 층 0
+### 모듈 판정 — src/main 모듈 20: 고유 2 · 조각 1 · 흩어짐 10 · 슈퍼 6 · 기반 1 · 분배 0 · 층 0
 
 기준(코드 냄새 — docs/research/developer-role.md 1-3): 슈퍼 = 관계없는 기능 둘 이상이 각각 함수 max(3, 20%)↑(발산적 변경 → 기능별로 나눔) · 조각 = 중심 기능의 함수가 다른 모듈에 2배↑(게으른 모듈 → 그 모듈로 합침) · 흩어짐 = 어느 기능도 절반이 안 되고 셋 이상에 나뉨(함수마다 제 기능 모듈로) · 기반 = 허브 함수(25개↑ 함수가 부름) 중심 · 분배 = 액션 분배기 층 · 층 = 프롬프트 스튜디오(사용자 지시로 모든 기능의 프롬프트를 취합) — 분배·층은 판정 대상 아님. 기능 하나 = 모듈 하나(사용자 결정)이고 그 안에서 계층은 함수 단위로 가름(3절). `node tools/map.mjs --why <모듈>`로 근거
 
 | 모듈 | 판정 | 함수 | 기능(함수 수) | 나눌·합칠·보낼 곳 |
 |---|---|---|---|---|
-| 00-core | 흩어짐 | 217 | chars.json › [].weapon 51, chapters.json › [].relScan 22, 저장소 starfall-nai 17 | chars.json › [].weapon 51 → 10-characters / chapters.json › [].relScan 22 → 10-story / 저장소 starfall-nai 17 → 10-system / banners.json › [].active 9 → 10-acquire / banners.json 9 → 10-newgame / chars.json › [].skillBalance 9 → 10-characters / chars.json › [].faction 7 → 10-acquire / 새 게임 생성 7 → 10-battle / cardCost 6 → 10-challenge / 실행 중 AI 5 → 10-characters / chars.json › [].persona 4 → 10-characters / 새 게임 생성 3 → 10-world / 저장소 ggm-sync 3 → 10-system / 새 게임 생성 3 → 10-rules / 저장소 ggm-packs 2 → 10-art / 저장소 ggm-voice-ja 2 → 10-system / chapters.json › [].stages[].enemies 2 → 10-challenge / regenFields 2 → 10-liveops / v2DesignContext 1 → 10-characters / regenCancel 1 → 여기 / bossPatText 1 → 여기 |
-| 10-acquire | 슈퍼 | 70 | chars.json › [].faction 24, banners.json › [].active 21, chars.json › [].weapon 13 | chars.json › [].faction 24 → 여기 / banners.json › [].active 21 → 여기 |
-| 10-art | 흩어짐 | 96 | chars.json › [].weapon 22, 저장소 starfall-nai 14, chars.json › [].skillBalance 13 | chars.json › [].weapon 22 → 10-characters / 저장소 starfall-nai 14 → 10-system / chars.json › [].skillBalance 13 → 10-characters / chapters.json › [].relScan 9 → 10-story / 저장소 ggm-shared-assets 8 → 여기 / banners.json 6 → 10-newgame / 저장소 ggm-packs 4 → 여기 / 저장소 ggm-sync 1 → 10-system / 새 게임 생성 1 → 10-liveops / chars.json › [].persona 1 → 10-characters / 새 게임 생성 1 → 10-world / chars.json › [].faction 1 → 10-acquire |
-| 10-battle | 슈퍼 | 29 | 새 게임 생성 14, chapters.json › [].stages[].enemies 9, chapters.json › [].relScan 2 | 새 게임 생성 14 → 여기 / chapters.json › [].stages[].enemies 9 → 10-challenge |
-| 10-challenge | 고유 | 90 | cardCost 55, chapters.json › [].stages[].enemies 12, 새 게임 생성 7 |  |
-| 10-characters | 흩어짐 | 284 | chars.json › [].weapon 69, chars.json › [].skillBalance 34, chapters.json › [].relScan 19 | chars.json › [].weapon 69 → 여기 / chars.json › [].skillBalance 34 → 여기 / chapters.json › [].relScan 19 → 10-story / chars.json › [].faction 18 → 10-acquire / chars.json › [].persona 17 → 여기 / banners.json › [].active 13 → 10-acquire / 저장소 starfall-nai 13 → 10-system / 실행 중 AI 11 → 여기 / chars.json › [].over 9 → 여기 / 새 게임 생성 8 → 10-battle / 저장소 ggm-voice-ja 6 → 10-system / banners.json 5 → 10-newgame / v2DesignContext 4 → 여기 / chapters.json › [].stages[].enemies 3 → 10-challenge / 새 게임 생성 3 → 10-world / 새 게임 생성 2 → 10-liveops / cardCost 2 → 10-challenge / 새 게임 생성 2 → 10-rules / 저장소 ggm-sync 2 → 10-system / passClaimable 1 → 여기 / chars.json › [].pos 1 → 10-rules / EXC 1 → 10-expedition / 저장소 ggm-packs 1 → 10-art / 저장소 ggm-shared-assets 1 → 10-art |
-| 10-economy | 슈퍼 | 50 | 새 게임 생성 9, banners.json › [].active 8, chars.json › [].weapon 7 | 새 게임 생성 9 → 10-battle / banners.json › [].active 8 → 10-acquire |
-| 10-expedition | 고유 | 37 | EXC 28, chars.json › [].weapon 3, 새 게임 생성 2 |  |
-| 10-liveops | 흩어짐 | 78 | banners.json › [].active 21, chars.json › [].persona 12, 저장소 starfall-nai 11 | banners.json › [].active 21 → 10-acquire / chars.json › [].persona 12 → 10-characters / 저장소 starfall-nai 11 → 10-system / 새 게임 생성 10 → 여기 / 실행 중 AI 5 → 10-characters / chapters.json › [].relScan 3 → 10-story / regenFields 3 → 여기 / chars.json › [].weapon 3 → 10-characters / banners.json 2 → 10-newgame / regenCancel 1 → 00-core / chars.json › [].skillBalance 1 → 10-characters |
-| 10-messenger | 조각 | 38 | chars.json › [].weapon 21, banners.json › [].active 6, chapters.json › [].relScan 4 | → 10-characters (chars.json › [].weapon 21/69) |
-| 10-newgame | 슈퍼 | 62 | banners.json 23, chapters.json › [].relScan 16, chars.json › [].weapon 11 | banners.json 23 → 여기 / chapters.json › [].relScan 16 → 10-story |
-| 10-player | 슈퍼 | 15 | chars.json › [].weapon 4, 새 게임 생성 3, banners.json › [].active 2 | chars.json › [].weapon 4 → 10-characters / 새 게임 생성 3 → 10-rules |
-| 10-promptstudio | 슈퍼 | 15 | pfDef 4, chars.json › [].weapon 4, 저장소 starfall-nai 3 | pfDef 4 → 여기 / chars.json › [].weapon 4 → 10-characters / 저장소 starfall-nai 3 → 10-system |
-| 10-rules | 고유 | 43 | 새 게임 생성 21, 새 게임 생성 7, chars.json › [].pos 5 |  |
-| 10-story | 흩어짐 | 134 | chapters.json › [].relScan 42, 새 게임 생성 17, chapters.json › [].stages[].enemies 9 | chapters.json › [].relScan 42 → 여기 / 새 게임 생성 17 → 10-world / chapters.json › [].stages[].enemies 9 → 10-challenge / banners.json › [].active 8 → 10-acquire / banners.json 7 → 10-newgame / chars.json › [].skillBalance 6 → 10-characters / 저장소 ggm-voice-ja 6 → 10-system / chars.json › [].weapon 5 → 10-characters / 저장소 starfall-nai 3 → 10-system / 새 게임 생성 3 → 10-battle / 새 게임 생성 3 → 10-liveops / chars.json › [].persona 2 → 10-characters / titleLines 2 → 여기 / 저장소 ggm-sync 2 → 10-system / 새 게임 생성 1 → 10-rules / cardCost 1 → 10-challenge |
-| 10-system | 흩어짐 | 219 | 저장소 ggm-sync 84, 저장소 starfall-nai 31, chars.json › [].weapon 12 | 저장소 ggm-sync 84 → 여기 / 저장소 starfall-nai 31 → 여기 / chars.json › [].weapon 12 → 10-characters / chars.json › [].skillBalance 12 → 10-characters / 저장소 ggm-voice-ja 9 → 여기 / cardCost 8 → 10-challenge / chapters.json › [].relScan 7 → 10-story / banners.json 4 → 10-newgame / chars.json › [].persona 3 → 10-characters / banners.json › [].active 3 → 10-acquire / applyOrient 3 → 여기 / 새 게임 생성 3 → 10-battle / pfDef 2 → 10-promptstudio / crc32 2 → 여기 / chapters.json › [].stages[].enemies 2 → 10-challenge / 새 게임 생성 2 → 10-rules |
-| 10-world | 슈퍼 | 83 | 새 게임 생성 29, chars.json › [].faction 24, chars.json › [].weapon 11 | 새 게임 생성 29 → 여기 / chars.json › [].faction 24 → 10-acquire |
-| 80-misc | 흩어짐 | 55 | chars.json › [].weapon 16, 저장소 starfall-nai 4, smFocused 3 | chars.json › [].weapon 16 → 10-characters / 저장소 starfall-nai 4 → 10-system / smFocused 3 → 여기 / chapters.json › [].relScan 2 → 10-story / banners.json › [].active 2 → 10-acquire / 실행 중 AI 2 → 10-characters / regenCancel 1 → 00-core / chars.json › [].persona 1 → 10-characters / regenFields 1 → 10-liveops / 저장소 ggm-voice-ja 1 → 10-system |
-| 90-load | 흩어짐 | 90 | chars.json › [].weapon 19, banners.json 11, chapters.json › [].relScan 9 | chars.json › [].weapon 19 → 10-characters / banners.json 11 → 10-newgame / chapters.json › [].relScan 9 → 10-story / banners.json › [].active 6 → 10-acquire / chars.json › [].skillBalance 5 → 10-characters / chars.json › [].faction 5 → 10-acquire / 새 게임 생성 3 → 10-battle / 저장소 starfall-nai 2 → 10-system / 저장소 ggm-voice-ja 2 → 10-system / 새 게임 생성 2 → 10-world / EXC 2 → 10-expedition / chars.json › [].persona 2 → 10-characters / mailClean 2 → 여기 / titleLines 2 → 10-story / 저장소 ggm-shared-assets 1 → 10-art / passClaimable 1 → 10-characters / 새 게임 생성 1 → 10-liveops / 새 게임 생성 1 → 10-rules |
+| 00-core | 흩어짐 | 224 | lib.json › [].prompt 47, 저장소 starfall-nai 15, banners.json 13 | lib.json › [].prompt 47 → 10-characters / 저장소 starfall-nai 15 → 10-system / banners.json 13 → 10-newgame / chapters.json › [].relScan 11 → 10-story / chars.json › [].skillBalance 10 → 10-characters / chapters.json › [].stages[].enemies[].atk 9 → 10-story / banners.json › [].active 8 → 10-acquire / 새 게임 생성 7 → 10-battle / 저장소 ggm-upd-notes 7 → 10-liveops / cardCost 6 → 10-challenge / 실행 중 AI 5 → 10-characters / chars.json › [].faction 5 → 10-world / chars.json › [].weapon 4 → 10-liveops / 새 게임 생성 3 → 10-world / 저장소 ggm-sync 3 → 10-system / chapters.json › [].stages[].combatBalance 3 → 10-rules / 저장소 ggm-packs 2 → 10-art / 저장소 ggm-voice-ja 2 → 10-system / chapters.json › [].stages[].enemies 2 → 10-challenge / regenFields 2 → 10-liveops / v2DesignContext 1 → 10-characters / regenCancel 1 → 여기 / 새 게임 생성 1 → 10-newgame / drPolish 1 → 여기 / bossPatText 1 → 여기 |
+| 10-acquire | 슈퍼 | 70 | chars.json › [].faction 24, banners.json › [].active 21, lib.json › [].prompt 12 | chars.json › [].faction 24 → 10-world / banners.json › [].active 21 → 여기 |
+| 10-art | 흩어짐 | 96 | lib.json › [].prompt 24, 저장소 starfall-nai 13, chars.json › [].skillBalance 10 | lib.json › [].prompt 24 → 10-characters / 저장소 starfall-nai 13 → 10-system / chars.json › [].skillBalance 10 → 10-characters / chars.json › [].persona 9 → 10-characters / banners.json 7 → 10-newgame / 저장소 ggm-packs 4 → 여기 / chapters.json › [].stages[].enemies[].atk 4 → 10-story / 저장소 ggm-sync 2 → 10-system / chapters.json › [].stages[].combatBalance 1 → 10-rules / chars.json › [].weapon 1 → 10-liveops / 새 게임 생성 1 → 10-world / chars.json › [].faction 1 → 10-world / 저장소 ggm-upd-notes 1 → 10-liveops |
+| 10-battle | 슈퍼 | 29 | 새 게임 생성 14, chapters.json › [].stages[].enemies 9, chapters.json › [].stages[].enemies[].atk 2 | 새 게임 생성 14 → 여기 / chapters.json › [].stages[].enemies 9 → 10-challenge |
+| 10-challenge | 고유 | 90 | cardCost 54, chapters.json › [].stages[].enemies 12, 새 게임 생성 7 |  |
+| 10-characters | 흩어짐 | 315 | lib.json › [].prompt 62, chars.json › [].persona 28, chars.json › [].skillBalance 28 | lib.json › [].prompt 62 → 여기 / chars.json › [].persona 28 → 여기 / chars.json › [].skillBalance 28 → 여기 / chars.json › [].faction 23 → 10-world / chapters.json › [].stages[].enemies[].atk 15 → 10-story / banners.json › [].active 13 → 10-acquire / 저장소 starfall-nai 13 → 10-system / 실행 중 AI 11 → 여기 / chars.json › [].weapon 8 → 10-liveops / 새 게임 생성 7 → 10-newgame / 저장소 ggm-voice-ja 7 → 10-system / chapters.json › [].relScan 6 → 10-story / chapters.json › [].stages[].combatBalance 5 → 10-rules / 새 게임 생성 5 → 10-battle / v2DesignContext 4 → 여기 / chapters.json › [].stages[].enemies 3 → 10-challenge / EXC 3 → 10-expedition / 새 게임 생성 3 → 10-world / banners.json 3 → 10-newgame / prompt 2 → 여기 / context 2 → 여기 / context 2 → 여기 / passClaimable 1 → 여기 / drPolish 1 → 00-core / 저장소 ggm-upd-notes 1 → 10-liveops / 저장소 ggm-packs 1 → 10-art / prompt 1 → 여기 / prompt 1 → 여기 |
+| 10-economy | 흩어짐 | 50 | 새 게임 생성 9, lib.json › [].prompt 7, banners.json › [].active 5 | 새 게임 생성 9 → 10-battle / lib.json › [].prompt 7 → 10-characters / banners.json › [].active 5 → 10-acquire / chars.json › [].skillBalance 5 → 10-characters / chapters.json › [].stages[].enemies 4 → 10-challenge / EXC 2 → 10-expedition / 저장소 ggm-upd-notes 2 → 10-liveops / 저장소 ggm-voice-ja 1 → 10-system / chars.json › [].faction 1 → 10-world / mailClean 1 → 90-load / passClaimable 1 → 10-characters |
+| 10-expedition | 고유 | 37 | EXC 29, lib.json › [].prompt 3, 새 게임 생성 2 |  |
+| 10-liveops | 흩어짐 | 88 | banners.json › [].active 20, 저장소 ggm-upd-notes 13, chars.json › [].weapon 12 | banners.json › [].active 20 → 10-acquire / 저장소 ggm-upd-notes 13 → 여기 / chars.json › [].weapon 12 → 여기 / chars.json › [].persona 8 → 10-characters / 실행 중 AI 6 → 10-characters / regenFields 3 → 여기 / prompt 2 → 여기 / prompt 2 → 여기 / prompt 2 → 여기 / chapters.json › [].relScan 2 → 10-story / chapters.json › [].stages[].enemies[].atk 2 → 10-story / banners.json 2 → 10-newgame / EXC 2 → 10-expedition / lib.json › [].prompt 2 → 10-characters / regenCancel 1 → 00-core / chars.json › [].skillBalance 1 → 10-characters |
+| 10-messenger | 조각 | 49 | lib.json › [].prompt 25, banners.json › [].active 4, chapters.json › [].stages[].enemies[].atk 3 | → 10-characters (lib.json › [].prompt 25/62) |
+| 10-newgame | 흩어짐 | 90 | banners.json 25, chapters.json › [].stages[].enemies[].atk 12, lib.json › [].prompt 11 | banners.json 25 → 여기 / chapters.json › [].stages[].enemies[].atk 12 → 10-story / lib.json › [].prompt 11 → 10-characters / 새 게임 생성 9 → 여기 / chapters.json › [].stages[].enemies 4 → 10-challenge / 새 게임 생성 3 → 여기 / chapters.json › [].relScan 3 → 10-story / prompt 2 → 여기 / chapters.json › [].stages[].combatBalance 2 → 10-rules / chars.json › [].skillBalance 1 → 10-characters / context 1 → 여기 |
+| 10-player | 슈퍼 | 15 | lib.json › [].prompt 4, chapters.json › [].stages[].combatBalance 3, banners.json › [].active 2 | lib.json › [].prompt 4 → 10-characters / chapters.json › [].stages[].combatBalance 3 → 10-rules |
+| 10-promptstudio | 슈퍼 | 15 | chars.json › [].weapon 5, pfDef 4, lib.json › [].prompt 4 | chars.json › [].weapon 5 → 10-liveops / pfDef 4 → 여기 / lib.json › [].prompt 4 → 10-characters |
+| 10-rules | 슈퍼 | 46 | chapters.json › [].stages[].combatBalance 23, chars.json › [].persona 10, chars.json › [].weapon 4 | chapters.json › [].stages[].combatBalance 23 → 여기 / chars.json › [].persona 10 → 10-characters |
+| 10-story | 흩어짐 | 141 | chapters.json › [].stages[].enemies[].atk 23, chapters.json › [].relScan 21, 새 게임 생성 16 | chapters.json › [].stages[].enemies[].atk 23 → 여기 / chapters.json › [].relScan 21 → 여기 / 새 게임 생성 16 → 10-world / banners.json 14 → 10-newgame / chapters.json › [].stages[].enemies 7 → 10-challenge / chars.json › [].skillBalance 6 → 10-characters / banners.json › [].active 5 → 10-acquire / lib.json › [].prompt 5 → 10-characters / chapters.json › [].stages[].combatBalance 3 → 10-rules / 저장소 starfall-nai 3 → 10-system / 새 게임 생성 3 → 10-battle / 저장소 ggm-voice-ja 3 → 10-system / prompt 2 → 여기 / prompt 2 → 여기 / chars.json › [].weapon 2 → 10-liveops / 저장소 ggm-upd-notes 2 → 10-liveops / titleLines 2 → 여기 / 저장소 ggm-sync 2 → 10-system / EXC 1 → 10-expedition / cardCost 1 → 10-challenge |
+| 10-system | 흩어짐 | 223 | 저장소 ggm-sync 82, 저장소 starfall-nai 31, chars.json › [].skillBalance 12 | 저장소 ggm-sync 82 → 여기 / 저장소 starfall-nai 31 → 여기 / chars.json › [].skillBalance 12 → 10-characters / lib.json › [].prompt 11 → 10-characters / 저장소 ggm-voice-ja 9 → 여기 / cardCost 8 → 10-challenge / chapters.json › [].stages[].enemies[].atk 7 → 10-story / banners.json 4 → 10-newgame / banners.json › [].active 3 → 10-acquire / applyOrient 3 → 여기 / 새 게임 생성 3 → 10-battle / pfDef 2 → 10-promptstudio / prompt 2 → 여기 / crc32 2 → 여기 / chapters.json › [].stages[].enemies 2 → 10-challenge / 저장소 ggm-upd-notes 2 → 10-liveops / chars.json › [].persona 2 → 10-characters / chapters.json › [].stages[].combatBalance 2 → 10-rules / chars.json › [].weapon 1 → 10-liveops / chapters.json › [].relScan 1 → 10-story |
+| 10-world | 슈퍼 | 101 | 새 게임 생성 33, chars.json › [].faction 27, chapters.json › [].relScan 12 | 새 게임 생성 33 → 여기 / chars.json › [].faction 27 → 여기 |
+| 80-misc | 흩어짐 | 55 | lib.json › [].prompt 14, 저장소 starfall-nai 4, smFocused 3 | lib.json › [].prompt 14 → 10-characters / 저장소 starfall-nai 4 → 10-system / smFocused 3 → 여기 / chapters.json › [].relScan 2 → 10-story / banners.json › [].active 2 → 10-acquire / 실행 중 AI 2 → 10-characters / context 1 → 10-newgame / prompt 1 → 10-characters / banners.json 1 → 10-newgame / prompt 1 → 10-characters / regenCancel 1 → 00-core / chars.json › [].weapon 1 → 10-liveops / regenFields 1 → 10-liveops / 저장소 ggm-voice-ja 1 → 10-system |
+| 90-load | 흩어짐 | 90 | lib.json › [].prompt 20, banners.json 10, chapters.json › [].stages[].enemies[].atk 6 | lib.json › [].prompt 20 → 10-characters / banners.json 10 → 10-newgame / chapters.json › [].stages[].enemies[].atk 6 → 10-story / chars.json › [].persona 5 → 10-characters / chars.json › [].faction 5 → 10-world / EXC 4 → 10-expedition / chars.json › [].skillBalance 4 → 10-characters / banners.json › [].active 3 → 10-acquire / 새 게임 생성 3 → 10-battle / 저장소 starfall-nai 2 → 10-system / 저장소 ggm-voice-ja 2 → 10-system / 새 게임 생성 2 → 10-world / chapters.json › [].stages[].combatBalance 2 → 10-rules / mailClean 2 → 여기 / titleLines 2 → 10-story / passClaimable 1 → 10-characters / chapters.json › [].relScan 1 → 10-story / chars.json › [].weapon 1 → 10-liveops / 새 게임 생성 1 → 10-newgame |
 | 95-start | 기반 | 1 |  |  |
 
 ## 5. 저장 정책 — 브라우저 저장소 키 갈래
@@ -439,33 +454,33 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 |---|---|---|---|---|---|
 | src/boot/durable-storage | 4571~4618 | 3 |  |  |  |
 | src/boot/head | 6~23 | 1 |  |  |  |
-| src/boot/storage-boot | 18416~18450 | 4 |  |  |  |
-| 00-core | 4621~5937 | 217 |  |  | 90-load 171, 10-characters 100, 10-system 65, 10-art 61, 80-misc 30 |
-| 10-acquire | 5938~6574 | 70 | 실행기 23 · 편집기 30 · 생성기 3 | banners.json › [].active, banners.json › [].alt, banners.json › [].bg, banners.json › [].collab, banners.json › [].desc, banners.json › [].gate …외 19 | 00-core 122, 90-load 99, 10-characters 41, 10-system 38, 10-story 14 |
-| 10-art | 6575~7208 | 96 | 편집기 15 · 실행기 3 | lib.json › [].affLines, lib.json › [].alias, lib.json › [].faction, lib.json › [].files, lib.json › [].intro, lib.json › [].lines …외 8 | 00-core 128, 90-load 80, 10-system 24, 10-characters 19, 10-newgame 8 |
-| 10-battle | 7209~7342 | 29 |  |  | 90-load 28, 00-core 24, 10-characters 15, 10-system 7, 10-economy 4 |
-| 10-challenge | 7343~7878 | 90 |  |  | 00-core 85, 90-load 57, 10-system 22, 10-characters 18, 10-art 8 |
-| 10-characters | 7879~9984 | 284 | 실행기 67 · 편집기 47 · 기타 29 · 생성기 15 | banners.json › [].pickup, banners.json › [].pool, banners.json › [].rate, chapters.json › [].kind, chapters.json › [].stages[].post, chapters.json › [].stages[].pre …외 74 | 00-core 377, 90-load 256, 10-system 77, 10-art 46, 10-world 26 |
-| 10-economy | 9985~10273 | 50 |  |  | 90-load 85, 00-core 75, 10-characters 20, 10-system 19, 10-art 8 |
-| 10-expedition | 10274~10430 | 37 | 생성기 6 | dispatches.json, meta.json › expedition, meta.json › farms, meta.json › persona, meta.json › shop, meta.json › variants | 00-core 45, 90-load 34, 10-economy 5, 10-challenge 5, 10-system 5 |
-| 10-liveops | 10431~10802 | 78 | 생성기 1 | meta.json › auditSeen | 00-core 95, 90-load 63, 10-system 19, 10-characters 7, 10-economy 5 |
-| 10-messenger | 10803~11095 | 38 | 편집기 7 | threads.json › [].added, threads.json › [].charId, threads.json › [].id, threads.json › [].needOwn, threads.json › [].script, threads.json › [].title …외 1 | 90-load 73, 00-core 49, 10-characters 16, 10-system 9, 10-newgame 2 |
-| 10-newgame | 11096~11307 | 62 |  |  | 00-core 54, 90-load 16, 10-system 9, 10-characters 4, 10-battle 3 |
-| 10-player | 11308~11390 | 15 |  |  | 90-load 17, 00-core 17, 10-system 8, 10-newgame 2, 10-art 2 |
-| 10-promptstudio | 11391~11463 | 15 |  |  | 00-core 16, 90-load 6, 10-system 3, 10-characters 1 |
-| 10-rules | 11464~11669 | 43 | 기타 3 | chapters.json › [].stages[].enemies[].elem, chars.json › [].pos, chars.json › [].role | 00-core 28, 90-load 20, 10-system 5, 10-world 3, 10-newgame 3 |
-| 10-story | 11670~12663 | 134 | 생성기 56 · 편집기 27 · 실행기 12 | banners.json, chapters.json, chapters.json › [].__purge, chapters.json › [].eventId, chapters.json › [].lore, chapters.json › [].ord …외 67 | 00-core 167, 90-load 138, 10-system 51, 10-newgame 42, 10-characters 41 |
-| 10-system | 12664~14231 | 219 | 생성기 40 | banners.json, chapters.json, chars.json, dispatches.json, events.json, game.json › ver …외 34 | 00-core 179, 90-load 147, 10-characters 19, 10-art 16, 10-challenge 14 |
-| 10-world | 14232~14579 | 83 | 생성기 1 · 실행기 1 | meta.json › bestiary | 00-core 57, 90-load 30, 10-characters 11, 10-system 6, 10-story 5 |
-| 80-misc | 14580~14841 | 55 |  |  | 90-load 24, 00-core 23, 10-system 5, 10-world 2, 10-characters 2 |
-| 90-load | 14842~16754 | 105 |  |  | 10-system 10, 00-core 4, 10-story 2, 10-economy 2, 10-expedition 1 |
-| 95-start | 16755~16797 | 1 |  |  |  |
+| src/boot/storage-boot | 18625~18659 | 4 |  |  |  |
+| 00-core | 4621~5941 | 224 |  |  | 90-load 174, 10-characters 96, 10-system 65, 10-art 61, 80-misc 29 |
+| 10-acquire | 5942~6578 | 70 | 실행기 23 · 편집기 30 · 생성기 3 | banners.json › [].active, banners.json › [].alt, banners.json › [].bg, banners.json › [].collab, banners.json › [].desc, banners.json › [].gate …외 19 | 00-core 122, 90-load 99, 10-characters 41, 10-system 38, 10-story 14 |
+| 10-art | 6579~7212 | 96 | 편집기 15 · 실행기 3 | lib.json › [].affLines, lib.json › [].alias, lib.json › [].faction, lib.json › [].files, lib.json › [].intro, lib.json › [].lines …외 8 | 00-core 128, 90-load 80, 10-system 24, 10-characters 19, 10-newgame 8 |
+| 10-battle | 7213~7346 | 29 |  |  | 90-load 28, 00-core 24, 10-characters 15, 10-system 7, 10-economy 4 |
+| 10-challenge | 7347~7882 | 90 |  |  | 00-core 85, 90-load 57, 10-system 22, 10-characters 18, 10-art 8 |
+| 10-characters | 7883~10034 | 315 | 실행기 50 · 기타 42 · 편집기 33 · 생성기 15 | banners.json › [].pickup, banners.json › [].pool, banners.json › [].rate, chapters.json › [].kind, chapters.json › [].stages[].post, chapters.json › [].stages[].pre …외 74 | 00-core 368, 90-load 266, 10-system 77, 10-art 46, 10-world 26 |
+| 10-economy | 10035~10323 | 50 |  |  | 90-load 85, 00-core 75, 10-characters 20, 10-system 19, 10-art 8 |
+| 10-expedition | 10324~10480 | 37 | 생성기 6 | dispatches.json, meta.json › expedition, meta.json › farms, meta.json › persona, meta.json › shop, meta.json › variants | 00-core 45, 90-load 34, 10-economy 5, 10-challenge 5, 10-system 5 |
+| 10-liveops | 10481~10869 | 88 | 생성기 1 | meta.json › auditSeen | 00-core 95, 90-load 66, 10-system 19, 10-characters 7, 10-economy 5 |
+| 10-messenger | 10870~11179 | 49 | 편집기 7 | threads.json › [].added, threads.json › [].charId, threads.json › [].id, threads.json › [].needOwn, threads.json › [].script, threads.json › [].title …외 1 | 90-load 75, 00-core 51, 10-characters 16, 10-system 9, 10-newgame 2 |
+| 10-newgame | 11180~11454 | 90 | 기타 1 | chars.json › [].name | 00-core 64, 90-load 17, 10-system 9, 10-characters 9, 10-battle 3 |
+| 10-player | 11455~11537 | 15 |  |  | 90-load 17, 00-core 17, 10-system 8, 10-newgame 2, 10-art 2 |
+| 10-promptstudio | 11538~11610 | 15 |  |  | 00-core 16, 90-load 6, 10-system 3, 10-characters 1 |
+| 10-rules | 11611~11824 | 46 | 기타 3 | chapters.json › [].stages[].enemies[].elem, chars.json › [].pos, chars.json › [].role | 00-core 28, 90-load 21, 10-system 5, 10-world 3, 10-characters 3 |
+| 10-story | 11825~12833 | 141 | 생성기 56 · 편집기 27 · 실행기 12 | banners.json, chapters.json, chapters.json › [].__purge, chapters.json › [].eventId, chapters.json › [].lore, chapters.json › [].ord …외 67 | 00-core 167, 90-load 140, 10-system 51, 10-newgame 42, 10-characters 41 |
+| 10-system | 12834~14410 | 223 | 생성기 40 | banners.json, chapters.json, chars.json, dispatches.json, events.json, game.json › ver …외 34 | 00-core 179, 90-load 148, 10-characters 19, 10-art 16, 10-challenge 14 |
+| 10-world | 14411~14789 | 101 | 생성기 1 · 실행기 1 | meta.json › bestiary | 00-core 58, 90-load 34, 10-characters 11, 10-system 6, 10-story 5 |
+| 80-misc | 14790~15050 | 55 |  |  | 90-load 25, 00-core 21, 10-system 5, 10-world 2, 10-characters 2 |
+| 90-load | 15051~16963 | 105 |  |  | 10-system 10, 00-core 4, 10-story 2, 10-economy 2, 10-expedition 1 |
+| 95-start | 16964~17006 | 1 |  |  |  |
 | app/010-confirm | 2074~2091 | 1 |  |  |  |
 | app/020-construct | 2094~2208 | 18 |  |  |  |
 | app/030-expedition | 2211~2278 | 14 |  |  |  |
 | combat/010-catalog | 2282~2292 | 3 |  |  |  |
 | combat/020-visual-catalog | 2295~2379 | 3 |  |  |  |
-| combat/030-core | 2382~3310 | 128 | 실행기 6 · 편집기 4 · 기타 2 | lib.json › [].cooldown, lib.json › [].initial, lib.json › [].lockout, lib.json › [].skills, lib.json › [].triggerEvery |  |
+| combat/030-core | 2382~3310 | 128 | 실행기 6 · 기타 2 | lib.json › [].cooldown, lib.json › [].initial, lib.json › [].lockout, lib.json › [].skills, lib.json › [].triggerEvery |  |
 | combat/040-effects | 3313~3766 | 49 |  |  | 10-system 8, 90-load 1 |
 | combat/050-bridge | 3769~4144 | 70 | 실행기 22 · 편집기 14 · 생성기 17 | chapters.json › [].stages[].combatBalance, chapters.json › [].stages[].enemies, chars.json › [].generation, chars.json › [].roleSpeedOriginal, chars.json › [].roleSpeedRole, chars.json › [].roleSpeedVersion …외 12 | 90-load 25, 00-core 14, 10-characters 8, 10-system 6, 10-art 3 |
 | combat/060-generation | 4147~4369 | 29 |  |  | 10-characters 4, 10-art 2, 90-load 2, 00-core 1 |
@@ -475,6 +490,18 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 
 ## 7. 최근 변화(증분 갱신 기록)
 
+- 2026-11-04T10:26 · git fdc3c3b · src 10: 00-core, 10-characters, 10-liveops, 10-messenger, 10-newgame, 10-rules, 10-story, 10-system … · index.html 다시 빌드
+  - 함수: 추가 12 (NpcAutoGen.context, PersonaGen.context, PersonaGen.apply, PickupCharGen.apply, AltCharGen.apply, auditFix) · 삭제 11 (rgDeckModal, autoNpcs, personaAI, aiNewPickupChar, aiAltChar, drHarmony) · 옮김 0
+  - chars.json › [].affLines:  −실행기:personaAI
+  - chars.json › [].age: +기타:AltCharGen.apply −실행기:aiAltChar −편집기:aiAltChar
+  - chars.json › [].alt: +기타:AltCharGen.apply −실행기:aiAltChar −편집기:aiAltChar
+  - chars.json › [].altCanon: +기타:AltCharGen.apply −실행기:aiAltChar −편집기:aiAltChar
+  - chars.json › [].collab: +기타:PickupCharGen.apply −실행기:aiNewPickupChar −편집기:aiNewPickupChar
+  - chars.json › [].faction: +기타:AltCharGen.apply +기타:PickupCharGen.apply −편집기:aiAltChar −편집기:aiNewPickupChar −실행기:aiAltChar −실행기:aiNewPickupChar
+  - chars.json › [].lines: +기타:AltCharGen.apply −실행기:aiAltChar −실행기:personaAI −편집기:aiAltChar
+  - chars.json › [].naiStyle: +기타:AltCharGen.apply −실행기:aiAltChar −편집기:aiAltChar
+  - chars.json › [].name: +기타:AltCharGen.apply +기타:DraftHarmonyGen.edit +기타:PickupCharGen.apply −편집기:aiAltChar −편집기:aiNewPickupChar −편집기:drHarmony −실행기:aiAltChar −실행기:aiNewPickupChar
+  - chars.json › [].persona:  −실행기:personaAI
 - 2026-11-04T10:04 · git f41663d · src 2: +src/main/95-start, 90-load · index.html 다시 빌드
   - 함수: 추가 356 (relCtx, drText, naiStyle, naiGenerate, naiTarget, faceDrawOne) · 삭제 36 (llmCode, unitPower, enemyPower, balPower, module:modules/app/020-construct.js#inGroup, module:modules/app/020-construct.js#condMatch) · 옮김 0
   - chapters.json › [].kind: +실행기:fix
@@ -505,8 +532,3 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 - 2026-11-04T08:45 · git a566785 · src 2: 0020-ai-connect, 0360-sync/050-single-device · index.html 다시 빌드
 - 2026-11-04T08:33 · git a566785
 - 2026-11-04T08:32 · git a566785 · src 2: 0020-ai-connect, 0360-sync/050-single-device · index.html 다시 빌드
-- 2026-11-04T08:25 · git 5e8f873 · src 7: 0015-prompt-studio/030-builders, 0070-save, 0100-messenger, 0110-challenge-raid, 0250-story-factory, 0275-expedition, 0530-story-memory · index.html 다시 빌드
-  - 함수: 추가 1 (raidBossOf) · 삭제 0 · 옮김 1 (storyWrapUp: src/main/0530-story-memory.js → src/main/0250-story-factory.js)
-  - prog.json › exped:  −실행기:exBusyIds
-  - prog.json › fchat:  −실행기:phRooms −실행기:roomItems
-  - prog.json › raid:  −실행기:raidBoss

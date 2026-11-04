@@ -72,10 +72,7 @@ static async chatImgStore(b){ const k='chat_'+uid(); await NewGame.idbPut(IMGNS+
     /* 갠톡 기록(Model): 말 하나 더하기(대화방을 안 보고 있으면 안 읽음) · 답장 뒤 정리(기록 400개까지, 하루 호감도 20까지) · 스레드를 자유 대화로 넘김(끝으로 하고 인연 +10 — 넘겼으면 true) */
 static fcLogAdd(f,m,unread){ f.log.push(m); f.at=m.at; if(unread) f.unread=(f.unread||0)+1; Core.mark('prog'); }
 
-  static async heroTags(hr){ const r=await Core.aiJSON(NewGame.heroTagsPrompt({hr}),null,'quick');
-    let tags=String((r&&r.tags)||'').trim(); if(!tags) return '';
-    if(hr.hide) tags=Core.joinTags(Core.tagList(tags).filter(t=>!EYE_TAG.test(Core.tagKey(t))).join(', '),'hair over eyes, bangs covering eyes, long bangs');
-    return tags; }
+  static heroTags(hr){ return HeroTagsGen.run({hr}); }
 
   static modeClean(s){ const mode=String(s&&s.mode||'').trim(), cfg=Battle.modesCfg();
     if(mode==='debate'&&cfg.debate&&s.debate){ const d=s.debate, ev=(Array.isArray(d.evidence)?d.evidence:[]).slice(0,8).map((e,i)=>({id:S_(e.id,12).replace(/[^\w-]/g,'')||'e'+(i+1),name:S_(e.name,30),desc:S_(e.desc,160)})).filter(e=>e.name);
@@ -209,4 +206,70 @@ class NewGameView {
   static phTyping(c){ const ty=document.createElement('div'); ty.className='msg'; ty.innerHTML=`<div class="av sm">${CoreView.art(c)}</div><div class="bub typing"><i></i><i></i><i></i></div>`; const ch=$('#phChat'); if(ch){ ch.appendChild(ty); CoreView.phScroll(); } return ()=>ty.remove(); }
 
   static fcInputPhotoHint(on=true){ const i=$('#fcIn'); if(!i) return; i.placeholder=on?'사진과 함께 보낼 말 (비워도 돼요)':'메시지 보내기'; if(on) i.focus({preventScroll:true}); }
+}
+
+/* ===== NewGame의 AI 생성 흐름(Generator 하위 — docs/redesign.md 3절) ===== */
+/* 주인공 외모 태그(눈 가림이면 앞머리 태그) */
+class HeroTagsGen extends Generator {
+  static tier = 'quick';
+  static fail = '';
+  static prompt({hr}){ return NewGame.heroTagsPrompt({hr}); }
+  static parse(r){ const tags=String(r.tags||'').trim(); return tags||null; }
+  static apply(tags,{hr}){ if(hr.hide) tags=Core.joinTags(Core.tagList(tags).filter(t=>!EYE_TAG.test(Core.tagKey(t))).join(', '),'hair over eyes, bangs covering eyes, long bangs'); return tags; }
+}
+/* 새 게임 초안(DR2) 다듬기 무리: 답을 받으면 초안을 다시 읽고(drRead) → 되돌리기 지점(snap) → 고침(edit — 알림 글을 돌려줌) → 겹치는 문장 정리 → 저장·다시 그림·알림 */
+class DraftGen extends Generator {
+  static fail = undefined;
+  static dedupNote = false; // 알림에 겹침 정리 수를 붙이나
+  static parse(r){ return typeof r==='object'?r:null; }
+  static snap(v,ctx){ return ''; }
+  static edit(v,ctx){ return ''; }
+  static apply(v,ctx){ CoreView.drRead(); Core.drSnap(this.snap(v,ctx)); const said=this.edit(v,ctx), dn=Characters.drDedup(ctx.d); Core.drSave(); CoreView.drRerender();
+    CoreView.toast(said+(this.dedupNote&&dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); }
+}
+/* 항목 하나(세계관·설정·스토리 …)를 다른 항목에 맞춰 다듬기 */
+class DraftPolishGen extends DraftGen {
+  static dedupNote = true;
+  static context(o){ return {...o,cur:String(DR2[o.k]||'').trim(),what:Misc.drPolishWhatText({k:o.k})}; }
+  static ready({cur}){ if(cur) return true; CoreView.toast('먼저 내용을 조금 적어 주세요'); return false; }
+  static prompt({what,k,cur}){ return Characters.drPolishPrompt({what,k,cur}); }
+  static parse(r){ return r.text?r:null; }
+  static snap(r,{what}){ return what; }
+  static edit(r,{k}){ DR2[k]=String(r.text); return '다른 항목에 맞춰 다듬었어요'; }
+}
+/* 주인공 다듬기 */
+class DraftHeroGen extends DraftGen {
+  static context(o){ return {...o,h:DR2.hero}; }
+  static prompt({h}){ return Characters.drPolishHeroPrompt({h}); }
+  static snap(){ return '주인공'; }
+  static edit(r){ const S=v=>typeof v==='string'?v.trim():''; const H=DR2.hero;
+    if(S(r.call)) H.call=S(r.call).slice(0,12); if(S(r.name)&&!String(H.name||'').trim()) H.name=S(r.name).slice(0,12); if(S(r.look)) H.look=S(r.look).slice(0,400); if(S(r.bio)) H.bio=S(r.bio).slice(0,1500);
+    return '주인공을 다듬었어요'; }
+}
+/* 전체 맞추기: 세계관·설정·스토리·인물·주인공을 한꺼번에 보고 어긋난 곳을 고침 */
+class DraftHarmonyGen extends DraftGen {
+  static tier = 'complex';
+  static dedupNote = true;
+  static context(o){ CoreView.drRead(); return {...o,d:DR2}; }
+  static ready({d}){ if(Core.drText(d).trim()) return true; CoreView.toast('먼저 세계관이나 인물을 조금 적어 주세요'); return false; }
+  static prompt({d}){ return Characters.drHarmonyPrompt({d}); }
+  static snap(){ return '전체 맞추기'; }
+  static edit(r,{d}){
+    const S=v=>typeof v==='string'?v.trim():'';
+    ['world','setting','story'].forEach(k=>{ if(String(d[k]||'').trim()&&S(r[k])) d[k]=S(r[k]); });
+    if(String(d.kw||'').trim()&&S(r.kw)) d.kw=S(r.kw).slice(0,400); if(String(d.tone||'').trim()&&S(r.tone)) d.tone=S(r.tone).slice(0,200);
+    const rc=Array.isArray(r.chars)?r.chars:[]; d.chars.forEach((c,i)=>{ const o=rc[i]||rc.find(x=>x&&x.name&&x.name===c.name); if(!o) return; ['role','profile','speech','look'].forEach(k=>{ if(S(o[k])) c[k]=S(o[k]); }); if(!String(c.name||'').trim()&&S(o.name)) c.name=S(o.name); });
+    if(String(d.hero.bio||'').trim()&&S(r.heroBio)) d.hero.bio=S(r.heroBio);
+    return '서로 맞춰 다듬었어요'; }
+}
+/* 인물 하나 다듬기 */
+class DraftCharGen extends DraftGen {
+  static context(o){ return {...o,c:DR2.chars[o.i]}; }
+  static ready({c}){ return !!c; }
+  static prompt({i,c}){ return Characters.drFillCharPrompt({i,c}); }
+  static parse(r){ let o=Array.isArray(r)?r[0]:r; if(o&&!o.profile&&!o.role){ const v=Object.values(o).find(x=>x&&typeof x==='object'&&!Array.isArray(x)); if(v) o=v; } if(!o||typeof o!=='object'){ CoreView.toast('AI 응답을 읽지 못했어요. 다시 눌러 주세요'); return null; } return o; }
+  static snap(o,{i,c}){ return ((DR2.chars[i]||c).name||'인물')+' 다듬기'; }
+  static edit(o,{i,c}){ const c2=DR2.chars[i]||c; const S=v=>Array.isArray(v)?v.join(' ').trim():typeof v==='string'?v.trim():'';
+    const RK=/\s*[\[(【]\s*(SSR|SR|R)\s*[\])】]\s*/gi; let rk=''; ['role','profile','speech','look'].forEach(k=>{ let v=S(o[k]); if(!v) return; v=v.replace(RK,(m,g)=>{ rk=rk||g.toUpperCase(); return ' '; }).replace(/\s{2,}/g,' ').trim(); if(v) c2[k]=v; }); if(rk&&!c2.rank&&c2.kind!=='npc') c2.rank=({SSR:3,SR:2,R:1})[rk]; if(!String(c2.name||'').trim()&&S(o.name)) c2.name=S(o.name).replace(RK,' ').trim();
+    return `${c2.name||'인물'}을(를) 다듬었어요`; }
 }

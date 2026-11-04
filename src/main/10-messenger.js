@@ -79,15 +79,7 @@ static fcRead(f){ f.unread=0; Core.mark('prog'); }
     }
   }
 
-  static async dailyTalks(){
-    const owned=[...new Set(G.chars.filter(c=>Characters.own(c.id)).map(c=>baseChar(c)))]; if(!owned.length) return 0;
-    const picks=[...owned].sort(()=>Math.random()-.5).slice(0,Math.random()<0.5?1:2), evs=G.events.filter(ev=>ev.active!==false).map(e=>e.title).join(', ');
-    const wd=['일','월','화','수','목','금','토'][new Date().getDay()];
-    const r=await Core.aiJSON(LiveOps.dailyTalksPrompt({picks,wd,evs}),null,'default');
-    let n=0; (r&&Array.isArray(r.threads)?r.threads:[]).forEach(x=>{const c=Characters.findSpeaker(String(x.char||''));if(!c||!x.script)return;const th={id:uid(),charId:c.id,title:String(x.title||'메시지'),trigger:{type:'start'},needOwn:true,script:nl(x.script),daily:true};G.threads.push(th);Core.mark('t:'+th.id);n++;});
-    const old=G.threads.filter(t=>t.daily&&P().inbox[t.id]&&P().inbox[t.id].done); if(old.length>40){ old.slice(0,old.length-40).forEach(t=>{G.threads=G.threads.filter(x=>x!==t);Core.mark('t:'+t.id);}); }
-    return n;
-  }
+  static dailyTalks(){ return DailyTalksGen.run(); }
 
   static addThreads(arr,ch,needOwn){ const set=NewGame.storySayNorms(ch); let n=0;
     (Array.isArray(arr)?arr:[]).forEach(x=>{ const c=x&&Characters.findSpeaker(String(x.char||'')); if(!c||!x.script) return; const sc=nl(x.script); if(NewGame.threadDup(sc,set)) return;
@@ -290,4 +282,29 @@ class MessengerCtl {
     if(act){ act.s.t0=act.s.t0||Date.now(); CoreCtl.phPlay(act.t,c,act.s,token); }
     else MessengerView.fcInputFocus(50);
   }
+}
+
+/* ===== Messenger의 AI 생성 흐름(Generator 하위 — docs/redesign.md 3절) ===== */
+/* 오늘의 톡(보유 캐릭터 1~2명) — 답이 없어도 끝난 오래된 오늘의 톡은 정리 */
+class DailyTalksGen extends Generator {
+  static fail = 0;
+  static context(o){ const owned=[...new Set(G.chars.filter(c=>Characters.own(c.id)).map(c=>baseChar(c)))];
+    const picks=[...owned].sort(()=>Math.random()-.5).slice(0,Math.random()<0.5?1:2), evs=G.events.filter(ev=>ev.active!==false).map(e=>e.title).join(', ');
+    const wd=['일','월','화','수','목','금','토'][new Date().getDay()];
+    return {...o,owned,picks,evs,wd}; }
+  static ready({owned}){ return owned.length>0; }
+  static prompt({picks,wd,evs}){ return LiveOps.dailyTalksPrompt({picks,wd,evs}); }
+  static apply(r){ let n=0; (r&&Array.isArray(r.threads)?r.threads:[]).forEach(x=>{const c=Characters.findSpeaker(String(x.char||''));if(!c||!x.script)return;const th={id:uid(),charId:c.id,title:String(x.title||'메시지'),trigger:{type:'start'},needOwn:true,script:nl(x.script),daily:true};G.threads.push(th);Core.mark('t:'+th.id);n++;}); DailyTalksGen.prune(); return n; }
+  static none(){ DailyTalksGen.prune(); return 0; }
+  static prune(){ const old=G.threads.filter(t=>t.daily&&P().inbox[t.id]&&P().inbox[t.id].done); if(old.length>40){ old.slice(0,old.length-40).forEach(t=>{G.threads=G.threads.filter(x=>x!==t);Core.mark('t:'+t.id);}); } }
+}
+/* 자유 대화 요약(오래된 대화를 줄여 둠) */
+class ChatSummaryGen extends Generator {
+  static tier = 'quick';
+  static fail = undefined;
+  static context(o){ const c=charById(o.cid), f=Messenger.fcOf(o.cid); const end=f.log.length-24, part=f.log.slice(f.sumTo||0,end); return {...o,c,f,end,part}; }
+  static ready({part}){ return part.length>=20; }
+  static prompt({c,f,part}){ return Player.fcSummarizePrompt({c,f,part}); }
+  static parse(r){ return r.summary?r:null; }
+  static apply(r,{f,end}){ f.sum=String(r.summary).slice(0,1200); f.sumTo=end; Core.mark('prog'); }
 }

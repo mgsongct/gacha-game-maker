@@ -153,21 +153,9 @@ static cxMarkSeen(key){ Core.progSlot('cxSeen')[key]=1; CXMEMO=null; Core.mark('
 
   static codeToStage(code){ code=String(code||'').trim(); if(!code||/^start|처음/i.test(code)) return null; const m=World.mainStages().find(s=>s.code===code); return m?m.id:null; }
 
-  static async cxDiscover(t){
-    const st=World.mainStages(), have=World.cxEntries().map(e=>e.title);
-    const r=await Core.aiJSON(World.cxDiscoverPrompt({have,st}),t);
-    if(!r||!Array.isArray(r.entries)) return 0;
-    let n=0; r.entries.slice(0,8).forEach(x=>{ if(!x||!x.title||!x.body) return; const cat=CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term'; const sid=World.codeToStage(x.after);
-      World.cxPut({id:'cx'+uid(),cat,title:String(x.title).slice(0,40),body:String(x.body),unlock:sid?{type:'clear',value:sid}:{type:'start'},src:'ai',at:Date.now()}); n++; });
-    Core.mark('world'); return n;
-  }
+  static cxDiscover(t){ return CodexDiscoverGen.run({rep:t}); }
 
-  static async cxDeepen(key,t){
-    const e=World.cxEntries().find(x=>x.key===key); if(!e) return false;
-    const r=await Core.aiJSON(World.cxDeepenPrompt({e}),t);
-    if(!r||!r.text) return false;
-    World.cxNoteAdd(key,String(r.text),World.mainStages().filter(s=>P().cleared[s.id]).map(s=>s.code).pop()||'시작 전'); return true;
-  }
+  static cxDeepen(key,t){ return CodexDeepenGen.run({key,rep:t}); }
 
   static castCfg(){ const c=G.meta.cast||{}; return {pickupGate:c.pickupGate!==false,hostileGate:c.hostileGate!==false}; }
 
@@ -214,21 +202,9 @@ static factionReview(){ const out=[], F=World.factions(); if(F.length<2) out.pus
 
     /* 세력 장별 태도 보완(점검 w_stance·실행 중 자동 채움): 장을 만들 때만 생기는 태도가 예전 게임엔 비어 종류 기본값으로만 돌아요 —
      이미 쓴 메인 장 이야기로 세력마다 1장의 처음 관계와 바뀐 장을 정해 넣어요. 답에 없는 세력은 종류 기본값을 1장 태도로 적어 둬요(다시 비었다고 잡히지 않게) */
-static async stanceAI(){ const F=World.factions().filter(f=>f.kind!=='monster'), main=G.chapters.filter(ch=>ch.kind==='main'); if(!F.length||!main.length) return false;
-    const r=await Core.aiJSON(World.stanceAIPrompt({F,main}),null,'default'); if(!r) return false;
-    (Array.isArray(r.stance)?r.stance:[]).forEach(x=>{ const f=World.facSlot(String(x&&x.faction||'').trim()), ch=Math.max(1,Math.min(main.length,Math.round(+(x&&x.ch)||1))); if(!f||f.kind==='monster'||!FSTANCE[x.s]) return; f.stance=(f.stance||[]).filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); });
-    F.forEach(f=>{ if(!Array.isArray(f.stance)) f.stance=[]; if(!f.stance.length) f.stance.push({ch:1,s:World.stanceAt(f,1),why:''}); f.stance.sort((a,b)=>a.ch-b.ch); });
-    Core.mark('world'); return true; }
+  static stanceAI(){ return StanceGen.run(); }
 
-  static async factionAI(rep,instruction){ const F=World.factions(), M=World.monsterNames();
-    const r=await Core.aiJSON(World.factionAIPrompt({F,instruction,M}),rep,'complex');
-    if(!r) return false; const S=(v,n)=>String(v||'').trim().slice(0,n||300);
-    (Array.isArray(r.factions)?r.factions:[]).slice(0,8).forEach(x=>{ const name=S(x.name,30); if(!name) return; let f=World.facSlot(name); if(!f){ f={name,desc:''}; F.push(f); }
-      if(FKIND[x.kind]) f.kind=x.kind; [...F_FIELDS,...M_FIELDS].forEach(([k])=>{ const v=S(x[k]); if(v&&(!f[k]||String(f[k]).length<v.length||instruction)) f[k]=v; });
-      if(x.rel&&typeof x.rel==='object') Object.entries(x.rel).forEach(([k,v])=>{ if(k!==name&&World.facByName(k)) f.rel[k]=S(v,40); });
-      if(Array.isArray(x.stance)) x.stance.forEach(s=>{ const ch=Math.max(1,Math.round(+s.ch||0)); if(ch&&FSTANCE[s.s]&&!f.stance.some(y=>+y.ch===ch)) f.stance.push({ch,s:s.s,why:S(s.why,80)}); }); });
-    (Array.isArray(r.bestiary)?r.bestiary:[]).forEach(x=>{ const l=M.find(y=>y.name===S(x.name,40)); if(!l) return; ['desc','nature','weak'].forEach(k=>{ const v=S(x[k],200); if(v&&!l[k]) l[k]=v; }); const fn=S(x.faction,30); if(fn&&World.facByName(fn)) l.faction=fn; Core.mark('l:'+l.id); });
-    Core.mark('world'); return true; }
+  static factionAI(rep,instruction){ return FactionGen.run({rep,instruction}); }
 
     // 장 생성이 돌려준 관계 변화 반영: [{faction,s,why}] → 그 장부터
 static stanceApply(arr,ch){ (Array.isArray(arr)?arr:[]).forEach(x=>{ const f=World.facSlot(String(x&&x.faction||'').trim()); if(f&&FSTANCE[x.s]&&World.stanceAt(f,ch)!==x.s){ f.stance=f.stance.filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); Core.mark('world'); } }); }
@@ -345,4 +321,59 @@ static cxCardSeenShow(key){ document.querySelectorAll('.cx-card[data-k]').forEac
     <div class="row" style="gap:4px;margin:6px 0">${tabs.map(([k,l])=>`<button class="btn sm ${FW_TAB===k?'':'ghost'}" data-act="fwtab" data-k="${k}">${l}</button>`).join('')}</div>${body}
     <label class="f" style="margin-top:8px">AI 추가 지시 (선택)</label><input class="in" id="fw_ins" placeholder="예: 헬릭스는 3장 이후 내분으로 일부가 우리 편이 된다">
     <div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><button class="btn" data-act="fwsave">저장</button><button class="btn ghost" data-act="fwai">AI로 깊이 채우기</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
+}
+
+/* ===== World의 AI 생성 흐름(Generator 하위 — docs/redesign.md 3절) ===== */
+/* 도감 항목 찾기: 본편 스테이지를 읽고 아직 없는 항목을 더함(해금 = 그 스테이지 클리어) */
+class CodexDiscoverGen extends Generator {
+  static fail = 0;
+  static context(o){ const st=World.mainStages(), have=World.cxEntries().map(e=>e.title); return {...o,st,have}; }
+  static prompt({have,st}){ return World.cxDiscoverPrompt({have,st}); }
+  static parse(r){ return Array.isArray(r.entries)?r:null; }
+  static apply(r){
+    let n=0; r.entries.slice(0,8).forEach(x=>{ if(!x||!x.title||!x.body) return; const cat=CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term'; const sid=World.codeToStage(x.after);
+      World.cxPut({id:'cx'+uid(),cat,title:String(x.title).slice(0,40),body:String(x.body),unlock:sid?{type:'clear',value:sid}:{type:'start'},src:'ai',at:Date.now()}); n++; });
+    Core.mark('world'); return n;
+  }
+}
+/* 도감 항목 깊이 더하기: 지금까지 깬 곳까지의 기록 */
+class CodexDeepenGen extends Generator {
+  static context(o){ return {...o,e:World.cxEntries().find(x=>x.key===o.key)}; }
+  static ready({e}){ return !!e; }
+  static prompt({e}){ return World.cxDeepenPrompt({e}); }
+  static parse(r){ return r.text?r:null; }
+  static apply(r,{key}){
+    World.cxNoteAdd(key,String(r.text),World.mainStages().filter(s=>P().cleared[s.id]).map(s=>s.code).pop()||'시작 전'); return true;
+  }
+}
+/* 세력의 장별 태도(몬스터가 아닌 세력 × 본편 장) */
+class StanceGen extends Generator {
+  static context(o){ const F=World.factions().filter(f=>f.kind!=='monster'), main=G.chapters.filter(ch=>ch.kind==='main'); return {...o,F,main}; }
+  static ready({F,main}){ return F.length>0&&main.length>0; }
+  static prompt({F,main}){ return World.stanceAIPrompt({F,main}); }
+  static apply(r,{F,main}){
+    (Array.isArray(r.stance)?r.stance:[]).forEach(x=>{ const f=World.facSlot(String(x&&x.faction||'').trim()), ch=Math.max(1,Math.min(main.length,Math.round(+(x&&x.ch)||1))); if(!f||f.kind==='monster'||!FSTANCE[x.s]) return; f.stance=(f.stance||[]).filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); });
+    F.forEach(f=>{ if(!Array.isArray(f.stance)) f.stance=[]; if(!f.stance.length) f.stance.push({ch:1,s:World.stanceAt(f,1),why:''}); f.stance.sort((a,b)=>a.ch-b.ch); });
+    Core.mark('world'); return true;
+  }
+}
+/* 세력·몬스터 도감 채우기(추가 지시가 있으면 덮음) */
+class FactionGen extends Generator {
+  static tier = 'complex';
+  static context(o){ return {...o,F:World.factions(),M:World.monsterNames()}; }
+  static prompt({F,instruction,M}){ return World.factionAIPrompt({F,instruction,M}); }
+  static apply(r,{F,M,instruction}){ const S=(v,n)=>String(v||'').trim().slice(0,n||300);
+    (Array.isArray(r.factions)?r.factions:[]).slice(0,8).forEach(x=>{ const name=S(x.name,30); if(!name) return; let f=World.facSlot(name); if(!f){ f={name,desc:''}; F.push(f); }
+      if(FKIND[x.kind]) f.kind=x.kind; [...F_FIELDS,...M_FIELDS].forEach(([k])=>{ const v=S(x[k]); if(v&&(!f[k]||String(f[k]).length<v.length||instruction)) f[k]=v; });
+      if(x.rel&&typeof x.rel==='object') Object.entries(x.rel).forEach(([k,v])=>{ if(k!==name&&World.facByName(k)) f.rel[k]=S(v,40); });
+      if(Array.isArray(x.stance)) x.stance.forEach(s=>{ const ch=Math.max(1,Math.round(+s.ch||0)); if(ch&&FSTANCE[s.s]&&!f.stance.some(y=>+y.ch===ch)) f.stance.push({ch,s:s.s,why:S(s.why,80)}); }); });
+    (Array.isArray(r.bestiary)?r.bestiary:[]).forEach(x=>{ const l=M.find(y=>y.name===S(x.name,40)); if(!l) return; ['desc','nature','weak'].forEach(k=>{ const v=S(x[k],200); if(v&&!l[k]) l[k]=v; }); const fn=S(x.faction,30); if(fn&&World.facByName(fn)) l.faction=fn; Core.mark('l:'+l.id); });
+    Core.mark('world'); return true;
+  }
+}
+/* 인물 관계 씨앗: 관계 정리 */
+class RelSeedGen extends Generator {
+  static fail = 0;
+  static prompt(){ return Core.relSeedAIPrompt(); }
+  static apply(r){ return NewGame.relApply(r.relations,'정리'); }
 }
