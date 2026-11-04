@@ -5,11 +5,14 @@ const AKEY='starfall-ai', PKEY='starfall-ai-profiles', NKEY='starfall-nai';
 const AITYPE={anthropic:'Claude API',vertex:'Google Vertex AI',gemini:'Gemini API (AI Studio)',openai:'OpenAI 호환 (OpenRouter 등)',copilot:'GitHub Copilot (구독 필요)'};
 const DEFM={anthropic:['claude-sonnet-5-5','claude-haiku-4-5-20251001'],gemini:['gemini-2.5-pro','gemini-2.5-flash'],vertex_google:['gemini-2.5-pro','gemini-2.5-flash'],vertex_anthropic:['',''],openai:['',''],copilot:['gpt-4.1','gpt-4.1']};
 let NAIJOB=null, APD=null;
+/* AI 설정 목록(저장소 PKEY): 읽기 AIP — 없으면 예전 키(AKEY)에서 옮긴 모양을 보여 주기만, 저장은 불러올 때 한 번(aipMigrate) */
+function aipLegacy(){ const d={active:'',fallback:true,list:[]}; try{const o=JSON.parse(appStorage.getItem(AKEY)); if(o&&o.key){const p={id:'p'+Date.now(),name:'Claude',type:'anthropic',key:o.key,model:o.model||'',quick:o.quick||''};d.list.push(p);d.active=p.id;}}catch(e){} return d; }
 function AIP(){
   let d=null; try{d=JSON.parse(appStorage.getItem(PKEY));}catch(e){}
-  if(!d){ d={active:'',fallback:true,list:[]}; try{const o=JSON.parse(appStorage.getItem(AKEY)); if(o&&o.key){const p={id:'p'+Date.now(),name:'Claude',type:'anthropic',key:o.key,model:o.model||'',quick:o.quick||''};d.list.push(p);d.active=p.id;}}catch(e){} appStorage.setItem(PKEY,JSON.stringify(d)); }
-  d.list=d.list||[]; return d;
+  d=d||aipLegacy(); d.list=d.list||[]; return d;
 }
+function aipMigrate(){ try{ if(!appStorage.getItem(PKEY)) appStorage.setItem(PKEY,JSON.stringify(aipLegacy())); }catch(e){ quietErr(e,'aipMigrate'); } }
+aipMigrate();
 function saveAIP(d){appStorage.setItem(PKEY,JSON.stringify(d));setupAI();}
 function defKey(p){return p.type==='vertex'?'vertex_'+(p.pub||'google'):p.type;}
 function normBase(b){ let s=String(b||'').trim().replace(/\/+$/,'').replace(/\/chat\/completions$/i,'').replace(/\/+$/,'');

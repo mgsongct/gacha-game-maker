@@ -134,6 +134,9 @@ function displacedOf(adj, modOf, name, layer) { const out = [];
   for (const [n, nb] of adj) { const own = modOf.get(n), by = new Map(); if (layer && own === layer) continue; /* 설계상 층(프롬프트 스튜디오)은 여러 기능 데이터를 읽음 */ let tot = 0; for (const [j, w] of nb) { by.set(modOf.get(j), (by.get(modOf.get(j)) || 0) + w); tot += w; }
     const [tm, tw] = [...by].filter(([m]) => m !== own).sort((a, b) => b[1] - a[1])[0] || []; if (tm && tot >= 2 && tw / tot >= 0.6 && tw >= 2 * (by.get(own) || 0)) out.push({ fn: name.get(n), mod: own, to: tm, share: Math.round(100 * tw / tot), weight: r2(tot) }); }
   return out.sort((a, b) => a.to.localeCompare(b.to) || b.share - a.share); }
+// 함수 하나의 연결 무게를 모듈별로(자연 경계와 같은 그래프 — map.mjs --why <함수>가 보여 줌): [[모듈, 무게]] 무거운 순, 그래프에서 빠진 함수(공용 기반·분배기·층)는 null
+export function naturalLean(fns, sf, M, key, modOfFile = f => f, layer = null, consts = new Set()) { const { adj, modOf } = fnGraph(fns, sf, M, modOfFile, consts, layer), nb = adj.get(key); if (!nb) return null;
+  const by = new Map(); for (const [j, w] of nb) by.set(modOf.get(j), (by.get(modOf.get(j)) || 0) + w); return [...by].map(([m, w]) => [m, r2(w)]).sort((a, b) => b[1] - a[1]); }
 export function naturalBoundaries(fns, sf, M, modOfFile = f => f, layer = null, consts = new Set()) {
   const { adj, modOf, name } = fnGraph(fns, sf, M, modOfFile, consts, layer), comm = louvain(adj), byComm = groupBy(comm.keys(), n => comm.get(n)), byMod = groupBy(comm.keys(), n => modOf.get(n));
   /* 기능 섞임은 묶음(Louvain)에 기대고, 묶음은 노드 순서에 따라 갈림 — 순서를 바꿔 SEEDS번 묶어 과반에서 섞임으로 나온 모듈만(다른 곳을 고쳤을 뿐인데 섞임이 생겼다 사라지는 흔들림을 걸러냄) */

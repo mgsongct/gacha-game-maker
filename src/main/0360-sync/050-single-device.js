@@ -1,5 +1,8 @@
 /* ===== 한 번에 한 기기만 플레이 (다른 기기는 멈춤) ===== */
-function devId(){ let v=''; try{ v=appStorage.getItem('ggm-devid')||''; if(!v){ v='d'+uid()+uid(); appStorage.setItem('ggm-devid',v); } }catch(e){ v=v||'d0'; } return v; }
+/* 이 기기 id(저장소 ggm-devid): 불러올 때 한 번 만들어 두고(devIdEnsure) 읽기는 그 값 */
+function devIdEnsure(){ try{ if(!appStorage.getItem('ggm-devid')) appStorage.setItem('ggm-devid','d'+uid()+uid()); }catch(e){ quietErr(e,'devIdEnsure'); } }
+function devId(){ try{ return appStorage.getItem('ggm-devid')||'d0'; }catch(e){ return 'd0'; } }
+devIdEnsure();
 function LKMODE(){ const pc=PCS(); if(pc&&pc.lock!==false) return 'pc'; const o=SY(); if(syReady()&&o.lock!==false) return 'gh'; return null; }
 const LK={locked:false,t:null,busy:false,claimed:false};
 function lkAway(l){ if(!l||!l.id||l.away) return true; const now=l.now||Date.now(); return LKMODE()==='pc'?now-(l.seen||0)>45000:now-(l.at||0)>6*3600e3; }

@@ -39,6 +39,9 @@ function callSig(n, s, tmp) { const c = n.childForFieldName('function'), args = 
   if (p === 'createElement' ? !NONUI_EL.test(args[0]?.text || '') : (DOM_CALL.test(p) || STYLE.test(propOf(o)))) { s.dom = true; s.atV.push(n); } }
 /* atV·atM: 화면 바꿈·상태 바꿈이 난 자리(노드) — 섞인 함수를 나눌 때(archMap mix) */
 // 없으면 만들어 쓰는 게터(get-or-create — 읽기처럼 쓰이는데 상태를 씀): 어떤 대입의 왼쪽 사슬을 그대로 돌려줌(return x.y / return m.k) — 또는 그 대입 왼쪽의 앞부분 이름을 돌려줌
+/* 저장소 꼴: 같은 키를 getItem으로 읽고, 없을 때(if(!v) — 읽은 값을 받은 이름의 부정) setItem으로 만들어 두는 함수(devId·AIP) */
+function storageLazy(f) { const gets = new Map(); walk(f.node, n => { if (n.type !== 'variable_declarator' && n.type !== 'assignment_expression') return; const v = n.childForFieldName(n.type === 'variable_declarator' ? 'value' : 'right')?.text || '', nm = n.childForFieldName(n.type === 'variable_declarator' ? 'name' : 'left')?.text, m = /\.getItem\(([^)]+)\)/.exec(v); if (m && nm) gets.set(nm, m[1]); });
+  let hit = false; walk(f.node, n => { if (hit || n.type !== 'if_statement') return; const c = n.childForFieldName('condition')?.text || ''; for (const [nm, key] of gets) if (new RegExp(`!\\s*${nm}\\b`).test(c) && new RegExp(`\\.setItem\\(\\s*${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*,`).test(n.childForFieldName('consequence')?.text || '')) hit = true; }); return hit; }
 function lazyGetter(f) { const lhs = new Set(); let hit = false; walk(f.node, n => { if (n !== f.node && /function|arrow/.test(n.type)) return false; if (n.type === 'assignment_expression') { const l = n.childForFieldName('left'); if (l?.type === 'member_expression' || l?.type === 'subscript_expression') { lhs.add(l.text); let o = l.childForFieldName('object'); while (o) { lhs.add(o.text); o = o.childForFieldName?.('object'); } } } });
   walk(f.node, n => { if (n !== f.node && /function|arrow/.test(n.type)) return false; if (n.type === 'return_statement') { const v = n.namedChildren[0]; if (v && lhs.has(v.text.replace(/^\((.*)\)$/, '$1'))) hit = true; } }); return hit; }
 /* 새로 만든 지역 값만 채움(쓰는 대상의 뿌리가 모두 이 함수에서 새 값 — 글자 {…}·[…]·clone·만들기 함수 — 으로 만든 지역 이름): 상태를 바꾸지 않는 조립(cleanChar·응답 해석) */
@@ -53,7 +56,7 @@ function signals(f, writers, fac = new Set()) { const s = { markup: false, dom: 
     else if (t === 'assignment_expression' || t === 'augmented_assignment_expression') assignSig(n, s, f, tmp);
     else if (t === 'call_expression') callSig(n, s, tmp);
     else if (t === 'new_expression' && /^XMLHttpRequest$/.test(n.childForFieldName('constructor')?.text || '')) s.service = true; });
-  s.trigger = s.channel; s.lazy = s.write && lazyGetter(f); return s; }
+  s.trigger = s.channel; s.lazy = (s.write && lazyGetter(f)) || (s.store && storageLazy(f)); /* 상태 칸 게터는 상태 쓰기와, 저장소 게터는 저장소 쓰기와 짝 */ return s; }
 const V = s => s.markup || s.dom, S = s => s.write || s.store || s.service || s.adapter;
 // 직접 효과로 정하는 계층(효과 없으면 null — 호출로 정함)
 function layerOf(s) { if (V(s) && S(s) && !s.adapter) return '섞임'; if (V(s) && !s.adapter) return 'View'; if (s.adapter) return 'Model';

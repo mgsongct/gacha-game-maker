@@ -5391,11 +5391,14 @@ const AKEY='starfall-ai', PKEY='starfall-ai-profiles', NKEY='starfall-nai';
 const AITYPE={anthropic:'Claude API',vertex:'Google Vertex AI',gemini:'Gemini API (AI Studio)',openai:'OpenAI 호환 (OpenRouter 등)',copilot:'GitHub Copilot (구독 필요)'};
 const DEFM={anthropic:['claude-sonnet-5-5','claude-haiku-4-5-20251001'],gemini:['gemini-2.5-pro','gemini-2.5-flash'],vertex_google:['gemini-2.5-pro','gemini-2.5-flash'],vertex_anthropic:['',''],openai:['',''],copilot:['gpt-4.1','gpt-4.1']};
 let NAIJOB=null, APD=null;
+/* AI 설정 목록(저장소 PKEY): 읽기 AIP — 없으면 예전 키(AKEY)에서 옮긴 모양을 보여 주기만, 저장은 불러올 때 한 번(aipMigrate) */
+function aipLegacy(){ const d={active:'',fallback:true,list:[]}; try{const o=JSON.parse(appStorage.getItem(AKEY)); if(o&&o.key){const p={id:'p'+Date.now(),name:'Claude',type:'anthropic',key:o.key,model:o.model||'',quick:o.quick||''};d.list.push(p);d.active=p.id;}}catch(e){} return d; }
 function AIP(){
   let d=null; try{d=JSON.parse(appStorage.getItem(PKEY));}catch(e){}
-  if(!d){ d={active:'',fallback:true,list:[]}; try{const o=JSON.parse(appStorage.getItem(AKEY)); if(o&&o.key){const p={id:'p'+Date.now(),name:'Claude',type:'anthropic',key:o.key,model:o.model||'',quick:o.quick||''};d.list.push(p);d.active=p.id;}}catch(e){} appStorage.setItem(PKEY,JSON.stringify(d)); }
-  d.list=d.list||[]; return d;
+  d=d||aipLegacy(); d.list=d.list||[]; return d;
 }
+function aipMigrate(){ try{ if(!appStorage.getItem(PKEY)) appStorage.setItem(PKEY,JSON.stringify(aipLegacy())); }catch(e){ quietErr(e,'aipMigrate'); } }
+aipMigrate();
 function saveAIP(d){appStorage.setItem(PKEY,JSON.stringify(d));setupAI();}
 function defKey(p){return p.type==='vertex'?'vertex_'+(p.pub||'google'):p.type;}
 function normBase(b){ let s=String(b||'').trim().replace(/\/+$/,'').replace(/\/chat\/completions$/i,'').replace(/\/+$/,'');
@@ -12016,7 +12019,10 @@ function freshGame(){ return G.meta.title===DEFAULT_META.title&&!G.meta.draft&&!
 let PCWARNED=false;
 
 /* ===== 한 번에 한 기기만 플레이 (다른 기기는 멈춤) ===== */
-function devId(){ let v=''; try{ v=appStorage.getItem('ggm-devid')||''; if(!v){ v='d'+uid()+uid(); appStorage.setItem('ggm-devid',v); } }catch(e){ v=v||'d0'; } return v; }
+/* 이 기기 id(저장소 ggm-devid): 불러올 때 한 번 만들어 두고(devIdEnsure) 읽기는 그 값 */
+function devIdEnsure(){ try{ if(!appStorage.getItem('ggm-devid')) appStorage.setItem('ggm-devid','d'+uid()+uid()); }catch(e){ quietErr(e,'devIdEnsure'); } }
+function devId(){ try{ return appStorage.getItem('ggm-devid')||'d0'; }catch(e){ return 'd0'; } }
+devIdEnsure();
 function LKMODE(){ const pc=PCS(); if(pc&&pc.lock!==false) return 'pc'; const o=SY(); if(syReady()&&o.lock!==false) return 'gh'; return null; }
 const LK={locked:false,t:null,busy:false,claimed:false};
 function lkAway(l){ if(!l||!l.id||l.away) return true; const now=l.now||Date.now(); return LKMODE()==='pc'?now-(l.seen||0)>45000:now-(l.at||0)>6*3600e3; }

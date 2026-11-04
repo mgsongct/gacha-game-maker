@@ -20,6 +20,9 @@ import { readGame, gidOf } from './play/lib/data.mjs';
 import { stageRoots } from './lib/lifecycle.mjs';
 import { surfaceOf, fullLabel } from './lib/surface.mjs';
 import { elementParams, layers } from './lib/arch.mjs';
+import { moduleMap, naturalLean } from './lib/modules.mjs';
+import { moduleOf } from './lib/scope.mjs';
+import { fragmentFiles } from './lib/prompts.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..'), argv = process.argv.slice(2), arg = k => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : null; };
 const JSONF = join(ROOT, 'docs/map.json'), MDF = join(ROOT, 'docs/map.md'), PC = join(ROOT, 'pc'), GAMES = join(ROOT, 'tools/play/games');
@@ -118,6 +121,17 @@ function why(m, q) { const lq = q.toLowerCase(), sec = sections(q), mods = new S
   const hitF = Object.entries(m.surface?.feats || {}).filter(([, f]) => f.label.toLowerCase().includes(lq) || f.windows.some(w => w.toLowerCase().includes(lq)));
   if (hitF.length) { out.push('', `■ index.html 기능 단위 ${hitF.length}`); for (const [u, f] of hitF.slice(0, 8)) { const fs = Object.entries(m.fns).filter(([, x]) => x.place === u).map(([, x]) => `${x.name}<${short(x.module)}>`); out.push(`  ${f.label} (${KIND[f.kind] || f.kind} · ${f.menu}) — 함수 ${f.n} · 모듈 ${f.mods.slice(0, 6).map(([x, n]) => `${short(x)} ${n}`).join(', ')}${f.windows.length ? ` · 창 ${f.windows.slice(0, 5).join(' · ')}` : ''}`); if (fs.length) out.push(`    data를 쓰는 함수: ${fs.slice(0, 10).join(', ')}${fs.length > 10 ? ` …외 ${fs.length - 10}` : ''}`); } }
   return out.join('\n'); }
+// 함수 하나(--why <함수 이름>): 맵(data 경로를 쓰는 함수)이 아니라 지금 소스의 함수 그래프로 — 위치·계층(직접 효과)·부르는 곳·부르는 것·읽고 쓰는 상태 키·방향 위반·모듈별 연결 무게(자연 경계 그래프)
+async function fnWhy(m, q) { const units = await loadUnits(ROOT), { fns, tops } = buildGraph(units), hits = [...fns.values()].filter(f => f.top && !f.table && f.name === q); if (!hits.length) return [];
+  const sf = stateFlow(units, fns), L = layers(fns, new Set(Object.values(m.data).flatMap(d => Object.values(d.writers).flat()))), home = fragmentFiles(units).home, M = moduleMap(units, fns, sf, { modOf: moduleOf, layer: home }), consts = new Set([...tops].filter(([, v]) => v.kind !== 'function').map(([k]) => k));
+  const nm = k => { const f = fns.get(k); return f ? `${f.name} (${f.loc})` : k; }, list = (a, n = 12) => a.length ? a.slice(0, n).join(', ') + (a.length > n ? ` …외 ${a.length - n}` : '') : '없음', out = [];
+  for (const f of hits) { const o = L.layer.get(f.key) || {}, eff = ['markup', 'dom', 'read', 'write', 'store', 'service', 'adapter', 'channel', 'lazy'].filter(k => o[k]), keys = sf.list.filter(x => x.w.has(f.key) || x.r.has(f.key)), lean = naturalLean(fns, sf, M, f.key, moduleOf, home, consts);
+    out.push('', `■ 함수 ${f.name} (${f.loc}) — 모듈 ${short(moduleOf(f.loc.split(':')[0]))} · 계층 ${o.layer || '없음'}${eff.length ? ` (효과 ${eff.join('·')})` : ''} · 복잡도 ${f.cc} · ${f.lines}줄`,
+      `  부르는 곳 ${f.callers.size}: ${list([...f.callers].map(nm))}`, `  부르는 것 ${f.calls.size}: ${list([...f.calls.keys()].map(k => fns.get(k)?.name || k), 20)}`,
+      `  상태 키 — 씀: ${list(keys.filter(x => x.w.has(f.key)).map(x => x.key))} · 읽음: ${list(keys.filter(x => x.r.has(f.key) && !x.w.has(f.key)).map(x => x.key))}`,
+      `  방향 위반: ${list(L.bad.filter(b => b.fn === f.key).map(b => `${b.kind} → ${(b.path || []).map(k => fns.get(k)?.name || k).join(' → ')}`), 8)}`,
+      `  연결 무게(자연 경계 그래프): ${lean ? list(lean.map(([mm, w]) => `${short(mm)} ${w}`), 6) : '그래프에서 뺀 함수(공용 기반·분배기·층·홀로)'}`); }
+  return out; }
 function gameView(m, dir) { const d = resolve(dir), gid = gidOf(d) || basename(d), g = readGame(existsSync(join(d, 'game.json')) ? resolve(d, '../..') : PC, gid).game, rows = [];
   for (const [k, x] of Object.entries(m.data)) { if (!Object.keys(x.writers).length) continue; const n = valuesAt(g, x.file, x.path).length; rows.push([k, n, Object.entries(x.writers).map(([r, fs]) => `${r} ${fs.slice(0, 3).map(f => m.fns[f]?.name || f).join('·')}`).join(' / ')]); }
   return [`게임 ${gid}: data 경로 ${rows.length} · 값 없음 ${rows.filter(r => !r[1]).length}`, ...rows.sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0])).map(([k, n, w]) => `${n ? '  ' : '∅ '}${k}${n ? ` (${n})` : ''} — ${w}`)].join('\n'); }
@@ -153,5 +167,5 @@ async function splitPlan(ref) { const units = await loadUnits(ROOT), { fns } = b
   mkdirSync(join(ROOT, 'tools/out'), { recursive: true }); writeFileSync(join(ROOT, 'tools/out/split.md'), md.join('\n'));
   console.log(`섞인 함수 나누기 계획: ${rows.length}개 — ${Object.keys(SPLIT_HOW).map(k => `${k} ${by(k).length}`).join(' · ')} · 요소 매개변수 ${EP.length}(직접 ${EP.filter(x => x.direct).length}) → tools/out/split.md`); }
 if (argv.includes('--split')) await splitPlan(arg('--split') && !arg('--split').startsWith('--') ? arg('--split') : JSON.parse(readFileSync(join(ROOT, 'tools/fork-features.json'), 'utf8')).upstreamSrc);
-if (arg('--why')) console.log(why(map, arg('--why')));
+if (arg('--why')) console.log([why(map, arg('--why')), ...(await fnWhy(map, arg('--why')))].join('\n'));
 if (arg('--game')) console.log(gameView(map, arg('--game')));

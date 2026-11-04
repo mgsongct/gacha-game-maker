@@ -16,6 +16,7 @@ node tools/test.mjs             # 도구 자체 검사
 node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(기본은 미리 보기, 지운 뒤 생긴 것까지 되풀이)
 node tools/fix.mjs --rule D1 [--apply]  # 규칙의 고치는 법 적용: 읽기 결과에 쓰는(또는 결과를 버린) 자리의 읽기 호출을 쓰기 접근으로(progRead→progSlot · gameRead→gameSlot · return gameRead('칸')만 하는 읽기 함수 → 그 칸 · 읽기 함수 주석에 적은 짝 「바꿀/고칠 때는 X」 → X) — 짝이 없으면 목록만(손으로)
 node tools/fix.mjs --rule L2-read [--apply]  # L2 원인 「읽기가 progSlot」: 그 끝 함수 안의 progSlot 중 읽기만 하는 자리(결과에 쓰거나·버리거나·돌려주거나·순수하지 않은 함수에 넘기지 않고, 칸에 now가 없음 — D1 분석으로 판정)를 progRead로
+node tools/map.mjs --why <함수 이름>      # 함수 하나 조회: 위치·계층(직접 효과)·부르는 곳·부르는 것·읽고 쓰는 상태 키·방향 위반·모듈별 연결 무게(자연 경계 그래프) — 조회를 grep으로 하지 않음
 ```
 
 생성 기능과 **생성된 게임**의 QA·플레이 점검(브라우저로 실제 앱을 돌림)은 [play/README.md](play/README.md): `generate.mjs`(글 AI 응답을 파일로 주고받으며 게임 생성·재생) · `qa.mjs` · `shots.mjs` · `faults.mjs` · `test.mjs`.

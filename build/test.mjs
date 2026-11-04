@@ -111,6 +111,10 @@ try {
   await new Promise(ok => server.listen(0, ok));
   const browser = await chromium.launch(), COV = process.env.GGM_COVERAGE ? [] : null; // 동적 검증(tools/history.mjs): 페이지마다 V8 커버리지 → 실제로 실행된 함수
   if (COV) { const np = browser.newPage.bind(browser); browser.newPage = async (...a) => { for (const c of COV) await c.take(); const p = await np(...a); COV.push(await coverageStart(p)); return p; }; } // 같은 렌더러의 페이지는 계수기를 공유 — 새 페이지가 기록을 시작하면 지워지므로 먼저 받아 둠
+  /* 모든 페이지의 잡히지 않은 오류를 모아 두고, 시험이 실패(앱이 뜨지 않아 기다림이 끝나는 것 포함)하면 함께 보임 — 원인을 따로 재지 않게 */
+  { const PAGE_ERR = [], np = browser.newPage.bind(browser); browser.newPage = async (...a) => { const p = await np(...a); p.on('pageerror', e => PAGE_ERR.push(`${p.url().split('/').pop() || '?'}: ${String(e && e.stack || e).split('\n').slice(0, 3).join(' | ')}`)); return p; };
+    const show = () => { if (PAGE_ERR.length) console.error(`\n페이지 오류 ${PAGE_ERR.length}건(먼저 난 것부터):\n` + [...new Set(PAGE_ERR)].slice(0, 8).map(x => '  ' + x).join('\n')); };
+    process.on('exit', code => { if (code) show(); }); }
   const page = await browser.newPage(), errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); // 외부(폰트·AI) 차단
@@ -120,6 +124,10 @@ try {
   assert.deepEqual(errors, [], '페이지 오류');
   assert.equal(got.m, 'object'); assert.equal(got.main, 'function:object'); assert.equal(got.ed, 1); assert.ok(got.view > 100, '화면이 그려지지 않음');
   console.log('ok 4  브라우저: 추가 모듈·파트·수정 실행, 앱 화면 렌더링, 오류 없음');
+  /* 4b) 제품 자체(www/index.html 또는 GGM_HTML)가 오류 없이 뜸 — 함수 선언은 끌어올려져 있어 앱이 시작하다 멈춰도 뒤의 시험은 앱 함수를 부를 수 있으므로 여기서 먼저 막음 */
+  { const pb = await browser.newPage(), errb = []; pb.on('pageerror', e => errb.push(String(e && e.stack || e).split('\n').slice(0, 3).join(' | '))); await pb.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+    await pb.goto(`http://127.0.0.1:${server.address().port}/index.html`); await pb.waitForFunction(() => (document.querySelector('#view')?.innerHTML.length || 0) > 100, null, { timeout: 15000 }).catch(() => {});
+    assert.deepEqual(errb, [], '제품을 불러올 때 페이지 오류'); assert.ok(await pb.evaluate(() => (document.querySelector('#view')?.innerHTML.length || 0) > 100), '제품 화면이 그려지지 않음'); await pb.close(); console.log('ok 4b 제품(index.html)을 불러올 때 오류 없음·화면 그려짐'); }
 
   // 5) 실제 빌드(www/index.html)로 데이터 폴더 내보내기 → zip → 새 게임으로 가져오기 (그림 자료 포함)
   writeFileSync(join(www, 'index.html'), original);

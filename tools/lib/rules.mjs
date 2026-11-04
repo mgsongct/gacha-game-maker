@@ -17,7 +17,7 @@ export const L2_CAUSES = {
   '없으면 만들어 씀': { judge: '끝 함수가 쓴 자리를 그대로 돌려줌(if(!x.k) x.k = 기본값; return x.k 꼴의 게터)', fix: '읽기(없으면 기본값을 돌려주기만)와 만들기(쓰는 쪽·불러오기 fix·그리기 전 처리)로 나눔 — 정의는 한곳(PROG_SLOTS처럼)' },
   '상태 바꿈': { judge: '그 밖에 끝 함수가 게임 상태를 씀', fix: '상태 변경은 처리기·그리기 전 처리(SCREEN_ENTER)로 옮기고 화면은 읽기만' },
 };
-function l2Cause(c, k) { const o = c.L.layer.get(k), f = c.fns.get(k); if (!o || !f) return '상태 바꿈'; if (o.adapter || o.service || o.store) return '처리 호출'; if (o.lazy) return '없으면 만들어 씀'; if (/\bprogSlot\(/.test(f.node.text)) return '읽기가 progSlot'; return '상태 바꿈'; }
+function l2Cause(c, k) { const o = c.L.layer.get(k), f = c.fns.get(k); if (!o || !f) return '상태 바꿈'; if (o.lazy) return '없으면 만들어 씀'; /* 더 구체적인 원인 먼저(저장소에 만들어 두는 게터도) */ if (o.adapter || o.service || o.store) return '처리 호출'; if (/\bprogSlot\(/.test(f.node.text)) return '읽기가 progSlot'; return '상태 바꿈'; }
 
 // 규칙표: id · 무리 · 원칙 · 판정 · 고치는 법 · 막는 정도 · 건(ctx → [{at, what, scope}])
 export const RULES = [
