@@ -1,6 +1,6 @@
 # 연관 맵 — 모듈 → 빌드 → index.html(생성기·실행기·편집기) → data 게임 파일
 
-생성: `node tools/map.mjs` · 2026-11-04T00:15 · git 0a341ea · 입력: src 128파일 · www/index.html b8465c88e814 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
+생성: `node tools/map.mjs` · 2026-11-04T00:18 · git 1dd6b9c · 입력: src 128파일 · www/index.html b8465c88e814 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
 
 ## 읽는 법 — 거꾸로 따라가기
 
@@ -535,7 +535,7 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 
 ## 3. 모듈 판정 — 고유 · 조각(합칠 곳) · 슈퍼(나눌 기능) · 엔진 · 기반
 
-src/main 모듈 69: 고유 37 · 조각 6 · 슈퍼 13 · 엔진 13 · 기반 0 · 파편화 단위 17 — 판정(lib/surface.mjs moduleVerdicts): 고유 = 한 기능 단위가 중심(같은 데이터·창·도우미를 짝으로 같이 쓰는 실행기 화면·편집기 패널·창은 한 기능) · 조각 = 중심 단위 함수가 다른 모듈에 2배 이상 → 그 모듈로 합칠 대상 · 슈퍼 = 관계없는 기능(함수 max(3, 20%)↑)을 둘 이상, 또는 함수 2개↑ 기능을 4개 이상 담음 → 나눌 대상 · 엔진 = 여러 메뉴가 같이 쓰는 함수 중심 · 기반 = 허브 함수 중심. `node tools/map.mjs --strict`: 조각·슈퍼·파편화가 기준선(tools/baseline.json의 surface)보다 늘면 실패
+src/main 모듈 69: 고유 37 · 조각 4 · 흩어짐 1 · 슈퍼 13 · 엔진 13 · 기반 0 · 분배 1 · 파편화 단위 17 — 판정(lib/surface.mjs moduleVerdicts): 고유 = 한 기능 단위가 중심(같은 데이터·창·도우미를 짝으로 같이 쓰는 실행기 화면·편집기 패널·창은 한 기능) · 조각 = 중심 단위 함수가 다른 모듈에 2배 이상 → 그 모듈로 합칠 대상 · 흩어짐 = 기능 함수가 여러 단위에 하나씩(어느 단위도 절반 미만) → 함수마다 제 기능 쪽으로 · 슈퍼 = 관계없는 기능(함수 max(3, 20%)↑)을 둘 이상, 또는 함수 2개↑ 기능을 4개 이상 담음 → 나눌 대상 · 엔진 = 여러 메뉴가 같이 쓰는 함수 중심 · 기반 = 허브 함수 중심 · 분배 = 액션 분배기 층(판정 대상 아님). `node tools/map.mjs --strict`: 조각·흩어짐·슈퍼·파편화가 기준선(tools/baseline.json의 surface)보다 늘면 실패
 
 ### 슈퍼 모듈 — 나눌 기능
 
@@ -562,9 +562,13 @@ src/main 모듈 69: 고유 37 · 조각 6 · 슈퍼 13 · 엔진 13 · 기반 0 
 | 0200-skin-shop | 5 | 실행 중 AI | 2 | 0290-season-rotation (6) |
 | 0210-setup | 8 | 설정 › 그림 AI | 3 | 0020-ai-connect (8) |
 | 0274-dispatch | 7 | disp | 6 | 0275-expedition (21) |
-| 0410-desktop | 6 | 앱 시작 | 1 | 0015-prompt-studio/ (4) |
-| 0510-actions/ | 14 | 창 게임 목록 | 1 | 0210-setup (2) |
 | 0550-standalone-app | 4 | 창 개인 스토리 | 3 | 0100-messenger (21) |
+
+### 흩어진 모듈 — 함수마다 제 기능 쪽으로
+
+| 모듈 | 함수 | 기능 단위(함수 수) → 그 단위 함수가 많은 모듈 |
+|---|---|---|
+| 0410-desktop | 6 | 앱 시작 1 → 0015-prompt-studio/ / 설정 › 화면·연출 › 아이폰·웹 연결 1 → 0020-ai-connect / 창 홈 화면에 추가해 주세요 1 → 0020-ai-connect / 창 중계 서버 (아이폰·웹) 1 → 여기 |
 
 ### 파편화 기능 단위 — 3개 이상 모듈에 흩어지고 가장 많은 모듈 몫 60% 미만
 
@@ -637,6 +641,7 @@ src/main 모듈 69: 고유 37 · 조각 6 · 슈퍼 13 · 엔진 13 · 기반 0 
 | 0490-boss-patterns | 고유 | 6 (4·2·0·0) | 훈련 |
 | 0500-gacha | 고유 | 22 (13·9·0·0) | 계약 |
 | 0505-construct | 고유 | 31 (27·4·0·0) | 영입 |
+| 0510-actions/ | 분배 | 14 (1·1·0·12) |  |
 | 0520-backup-storage | 고유 | 26 (9·8·0·9) | 창 공유 팩 만들기 |
 | 0525-data-folder | 고유 | 12 (12·0·0·0) | 설정 › 데이터 › backupBlocks |
 | 0535-content-audit | 고유 | 18 (15·2·0·1) | 설정 › 게임 › 콘텐츠 점검·업그레이드 |
@@ -734,6 +739,7 @@ src/main 모듈 69: 고유 37 · 조각 6 · 슈퍼 13 · 엔진 13 · 기반 0 
 
 ## 5. 최근 변화(증분 갱신 기록)
 
+- 2026-11-04T00:18 · git 1dd6b9c
 - 2026-11-04T00:15 · git 0a341ea
 - 2026-11-04T00:13 · git 0a341ea
 - 2026-11-04T00:12 · git 0a341ea
@@ -744,15 +750,3 @@ src/main 모듈 69: 고유 37 · 조각 6 · 슈퍼 13 · 엔진 13 · 기반 0 
   - prog.json › mail: +실행기:mailRemove
 - 2026-11-03T23:32 · git 411bea9
 - 2026-11-03T23:30 · git 411bea9
-- 2026-11-03T23:30 · git 411bea9
-  - 함수: 추가 38 (updStam, stamUse, bump, roomItems, roomDel, raidTriesLeft) · 삭제 0 · 옮김 0
-  - banners.json: +실행기:puStoryBg −편집기:aiPickupStory −편집기:puStoryBg
-  - banners.json › [].active:  −편집기:addPickupFor −편집기:seasonStart
-  - banners.json › [].alt:  −편집기:addPickupFor
-  - banners.json › [].bg:  −편집기:addPickupFor −편집기:aiPickupStory −편집기:rotatePickups
-  - banners.json › [].collab:  −편집기:addPickupFor
-  - banners.json › [].desc:  −편집기:addPickupFor −편집기:aiPickupStory −편집기:rotatePickups
-  - banners.json › [].eventId:  −편집기:aiPickupStory
-  - banners.json › [].gate:  −편집기:addPickupFor
-  - banners.json › [].id:  −편집기:addPickupFor
-  - banners.json › [].name:  −편집기:addPickupFor −편집기:rotatePickups

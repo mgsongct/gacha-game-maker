@@ -39875,7 +39875,7 @@
    },
    {
     "mod": "src/main/0410-desktop.js",
-    "kind": "조각",
+    "kind": "흩어짐",
     "n": 6,
     "feat": 4,
     "shared": 1,
@@ -39899,10 +39899,28 @@
       1
      ]
     ],
-    "unit": "배경.앱 시작",
-    "to": "src/main/0015-prompt-studio/",
-    "n0": 1,
-    "n1": 4
+    "spread": [
+     {
+      "unit": "배경.앱 시작",
+      "n": 1,
+      "to": "src/main/0015-prompt-studio/"
+     },
+     {
+      "unit": "studio.view.2",
+      "n": 1,
+      "to": "src/main/0020-ai-connect.js"
+     },
+     {
+      "unit": "창:openA2HS",
+      "n": 1,
+      "to": "src/main/0020-ai-connect.js"
+     },
+     {
+      "unit": "창:openProxySet",
+      "n": 1,
+      "to": null
+     }
+    ]
    },
    {
     "mod": "src/main/0420-app-update.js",
@@ -40336,7 +40354,7 @@
    },
    {
     "mod": "src/main/0510-actions/",
-    "kind": "조각",
+    "kind": "분배",
     "n": 14,
     "feat": 1,
     "shared": 1,
@@ -40347,11 +40365,7 @@
       "창:openProjects",
       1
      ]
-    ],
-    "unit": "창:openProjects",
-    "to": "src/main/0210-setup.js",
-    "n0": 1,
-    "n1": 2
+    ]
    },
    {
     "mod": "src/main/0520-backup-storage.js",
@@ -41079,8 +41093,8 @@
   ]
  },
  "gamesN": 2,
- "at": "2026-11-04T00:15",
- "head": "0a341ea",
+ "at": "2026-11-04T00:18",
+ "head": "1dd6b9c",
  "inputs": {
   "src": {
    "src/boot/durable-storage.js": "9e1fdc434852",
@@ -41217,9 +41231,33 @@
    "idol-audition": "a443d928bb99",
    "sky-knights": "c782aafba942"
   },
-  "tool": "0edb014e7147"
+  "tool": "65382d0166ef"
  },
  "changes": [
+  {
+   "at": "2026-11-04T00:18",
+   "head": "1dd6b9c",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
   {
    "at": "2026-11-04T00:15",
    "head": "0a341ea",

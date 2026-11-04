@@ -130,7 +130,8 @@ const NONFEAT = p => p === '공용' || p === '공용 기반' || p === '닿지 �
 //   고유 — 한 기능 단위가 중심(같은 데이터를 쓰는 실행기 화면·편집기 패널·창을 같이 담아도 한 기능)
 //   슈퍼 — 관계없는 기능 단위를 둘 이상 의미 있게 담음(나눌 대상: 단위마다 옮길 곳 = 그 단위 함수가 가장 많은 다른 모듈, 없으면 새 자리)
 //   조각 — 중심 단위의 함수 대부분이 다른 모듈에 있음(그 모듈로 합칠 대상)
-//   엔진 — 여러 메뉴가 같이 쓰는 함수 중심 · 기반 — 공용 기반(허브) 중심
+//   엔진 — 여러 메뉴가 같이 쓰는 함수 중심 · 기반 — 공용 기반(허브) 중심 · 분배 — 액션 분배기(handle*Action·data-act 리스너) 층(판정 대상 아님)
+//   흩어짐 — 기능 함수(3개↑)가 여러 단위에 하나씩, 어느 단위도 절반이 안 됨(함수마다 그 단위 함수가 많은 모듈로 나눠 보낼 대상)
 //   의미 있는 단위 = 함수 max(3, 모듈 기능 함수의 20%) 이상
 export function moduleVerdicts(rows, rel = new Map()) { // rows: [{ mod, fn, place }]
   const byMod = new Map(), byUnit = new Map(); for (const r of rows) { if (!byMod.has(r.mod)) byMod.set(r.mod, new Map()); const m = byMod.get(r.mod); m.set(r.place, (m.get(r.place) || 0) + 1); if (!NONFEAT(r.place)) { if (!byUnit.has(r.place)) byUnit.set(r.place, new Map()); const g = byUnit.get(r.place); g.set(r.mod, (g.get(r.mod) || 0) + 1); } }
@@ -139,7 +140,10 @@ export function moduleVerdicts(rows, rel = new Map()) { // rows: [{ mod, fn, pla
   for (const [mod, m] of byMod) { const n = [...m.values()].reduce((a, b) => a + b, 0), feat = [...m].filter(([p]) => !NONFEAT(p)).sort((a, b) => b[1] - a[1]), nf = feat.reduce((a, [, c]) => a + c, 0), shared = [...m].filter(([p]) => p === '공용' || String(p).startsWith('메뉴:')).reduce((a, [, c]) => a + c, 0), base = m.get('공용 기반') || 0;
     const parts = []; for (const [u, c] of feat.filter(([, c]) => c >= 2)) { const p = parts.find(x => x.units.some(y => related(y, u))); if (p) { p.units.push(u); p.n += c; } else parts.push({ units: [u], n: c }); }
     const big = parts.filter(p => p.n >= Math.max(3, nf * 0.2)), v = { mod, n, feat: nf, shared, base, unreached: m.get('닿지 않음') || 0, units: feat, parts };
-    if (base > nf && base >= shared) v.kind = '기반'; else if (shared > nf) v.kind = '엔진';
+    const lead = feat[0] ? feat[0][1] : 0;
+    if (rows.some(r => r.mod === mod && r.dispatch) && rows.filter(r => r.mod === mod && r.dispatch).length * 2 >= n) v.kind = '분배'; /* 액션 분배기 층(원안 설계 — 화면 동작을 기능으로 넘김): 판정 대상 아님 */
+    else if (base > nf && base >= shared) v.kind = '기반'; else if (shared > nf) v.kind = '엔진';
+    else if (nf >= 3 && !parts.length && lead * 2 < nf) { v.kind = '흩어짐'; v.spread = feat.map(([u, c]) => ({ unit: u, n: c, to: home.get(u) !== mod ? home.get(u) : null })); } /* 기능 함수가 여러 단위에 하나씩 — 함수마다 제 기능 쪽으로 */
     else if (big.length >= 2 || parts.length >= MANY) { v.kind = '슈퍼'; v.split = parts.map(p => ({ units: p.units, n: p.n, to: (() => { const hm = home.get(p.units[0]); return hm !== mod ? hm : null; })() })); }
     else { const [u, c] = feat[0] || []; const hm = u && home.get(u), other = hm && hm !== mod ? byUnit.get(u).get(hm) : 0; if (u && hm !== mod && c * 2 <= other) { v.kind = '조각'; v.unit = u; v.to = hm; v.n0 = c; v.n1 = other; } else { v.kind = u ? '고유' : '엔진'; v.unit = u; } }
     out.push(v); }
@@ -149,8 +153,8 @@ export function moduleVerdicts(rows, rel = new Map()) { // rows: [{ mod, fn, pla
 
 // 맵에 넣을 요약(직렬화): 기능 단위(메뉴·종류·함수 수·얽힌 모듈·안에 든 창) · 함수마다 자리 · 모듈 판정 · 파편화 단위
 export function surfaceMap(units, fns, stf, html) { const sf = surfaceOf(units, fns, html), rel = unitRelations(sf, stf);
-  const rows = [...fns.values()].filter(f => f.top && !f.table && f.unit === 'main').map(f => ({ mod: moduleOf(f.loc.split(':')[0]), fn: f.key, place: unitPlace(sf, f.key) })), V = moduleVerdicts(rows, rel);
+  const rows = [...fns.values()].filter(f => f.top && !f.table && f.unit === 'main').map(f => ({ mod: moduleOf(f.loc.split(':')[0]), fn: f.key, place: unitPlace(sf, f.key), dispatch: /^handle\w+Action$/.test(f.name) })), V = moduleVerdicts(rows, rel);
   const feats = {}; for (const f of sf.feats.values()) { if (f.unit !== f.key) continue; const m = V.units.get(f.key) || new Map();
     feats[f.key] = { label: fullLabel(sf, f.key), kind: f.kind, menu: f.menu, n: [...m.values()].reduce((a, b) => a + b, 0), mods: [...m].sort((a, b) => b[1] - a[1]), windows: [...sf.feats.values()].filter(w => w.kind === 'window' && w.unit === f.key && w.key !== f.key).map(w => w.label), openers: (f.openers || []).map(o => sf.feats.get(o)?.unit).filter((x, i, a) => x && a.indexOf(x) === i), related: [...(rel.get(f.key) || [])].map(([u, why]) => [u, why]) }; }
-  const verdicts = V.modules.map(v => ({ mod: v.mod, kind: v.kind, n: v.n, feat: v.feat, shared: v.shared, base: v.base, unreached: v.unreached, units: v.units.slice(0, 8), ...(v.split ? { split: v.split } : {}), ...(v.to ? { unit: v.unit, to: v.to, n0: v.n0, n1: v.n1 } : v.unit ? { unit: v.unit } : {}) }));
+  const verdicts = V.modules.map(v => ({ mod: v.mod, kind: v.kind, n: v.n, feat: v.feat, shared: v.shared, base: v.base, unreached: v.unreached, units: v.units.slice(0, 8), ...(v.split ? { split: v.split } : {}), ...(v.spread ? { spread: v.spread } : {}), ...(v.to ? { unit: v.unit, to: v.to, n0: v.n0, n1: v.n1 } : v.unit ? { unit: v.unit } : {}) }));
   return { tabs: sf.tabs, feats, place: Object.fromEntries(rows.map(r => [r.fn, r.place])), verdicts, frag: V.frag.map(x => ({ unit: x.unit, n: x.n, top: x.top, mods: x.mods })) }; }

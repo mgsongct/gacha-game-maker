@@ -4,7 +4,7 @@
 //   node tools/map.mjs                 입력(src 파일·www/index.html·시험 게임 data)이 바뀌었으면 맵을 다시 만들고 바뀐 연결을 "최근 변화"에 남김(증분 갱신), 안 바뀌었으면 그대로
 //   node tools/map.mjs --check         맵이 지금 입력과 맞나(안 맞으면 exit 1 — CI)
 //   node tools/map.mjs --why <말>      거꾸로 따라가기: data 경로·함수·모듈 이름 또는 docs/modules.md 절 제목의 말(시나리오·스킬·이격 …) → 만드는 곳(역할) → index.html 줄 → src 모듈 → 점검 규칙·프롬프트 조각·연계 모듈
-//   node tools/map.mjs --strict        기능 표면 판정(조각·슈퍼 모듈·파편화 기능 단위)이 기준선보다 늘면 exit 1 · --update-baseline
+//   node tools/map.mjs --strict        기능 표면 판정(조각·흩어짐·슈퍼 모듈·파편화 기능 단위)이 기준선보다 늘면 exit 1 · --update-baseline(줄 때만, 새 판정 종류는 처음 잰 값)
 //   node tools/map.mjs --game <폴더>    게임 하나(tools/play/games/<이름> 또는 pc/data/<게임id>)의 data 경로마다 값이 있나와 만드는 곳
 //   [--force] 바뀐 게 없어도 다시 만듦 → docs/map.md(사람이 따라가는 맵) · docs/map.json(질의·차이 비교)
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'node:fs';
@@ -65,11 +65,12 @@ function surfaceMd(m, t) { const S = m.surface; if (!S) return []; const L = [],
   for (const [mk, ml] of menus) { const rows = Object.entries(F).filter(([, f]) => f.menu === mk && f.n).sort((a, b) => b[1].n - a[1].n); if (!rows.length) continue;
     L.push(`### ${ml}`, '', t(['기능 단위', '종류', '함수', '얽힌 모듈(함수 수)', '안의 창'], rows.map(([u, f]) => [f.label, KIND[f.kind] || f.kind, f.n, mods(f.mods), f.windows.slice(0, 4).join(' · ') + (f.windows.length > 4 ? ` …외 ${f.windows.length - 4}` : '')])), ''); }
   const V = S.verdicts, cnt = k => V.filter(v => v.kind === k).length;
-  L.push('## 3. 모듈 판정 — 고유 · 조각(합칠 곳) · 슈퍼(나눌 기능) · 엔진 · 기반', '', `src/main 모듈 ${V.length}: 고유 ${cnt('고유')} · 조각 ${cnt('조각')} · 슈퍼 ${cnt('슈퍼')} · 엔진 ${cnt('엔진')} · 기반 ${cnt('기반')} · 파편화 단위 ${S.frag.length} — 판정(lib/surface.mjs moduleVerdicts): 고유 = 한 기능 단위가 중심(같은 데이터·창·도우미를 짝으로 같이 쓰는 실행기 화면·편집기 패널·창은 한 기능) · 조각 = 중심 단위 함수가 다른 모듈에 2배 이상 → 그 모듈로 합칠 대상 · 슈퍼 = 관계없는 기능(함수 max(3, 20%)↑)을 둘 이상, 또는 함수 2개↑ 기능을 4개 이상 담음 → 나눌 대상 · 엔진 = 여러 메뉴가 같이 쓰는 함수 중심 · 기반 = 허브 함수 중심. \`node tools/map.mjs --strict\`: 조각·슈퍼·파편화가 기준선(tools/baseline.json의 surface)보다 늘면 실패`, '');
+  L.push('## 3. 모듈 판정 — 고유 · 조각(합칠 곳) · 슈퍼(나눌 기능) · 엔진 · 기반', '', `src/main 모듈 ${V.length}: 고유 ${cnt('고유')} · 조각 ${cnt('조각')} · 흩어짐 ${cnt('흩어짐')} · 슈퍼 ${cnt('슈퍼')} · 엔진 ${cnt('엔진')} · 기반 ${cnt('기반')} · 분배 ${cnt('분배')} · 파편화 단위 ${S.frag.length} — 판정(lib/surface.mjs moduleVerdicts): 고유 = 한 기능 단위가 중심(같은 데이터·창·도우미를 짝으로 같이 쓰는 실행기 화면·편집기 패널·창은 한 기능) · 조각 = 중심 단위 함수가 다른 모듈에 2배 이상 → 그 모듈로 합칠 대상 · 흩어짐 = 기능 함수가 여러 단위에 하나씩(어느 단위도 절반 미만) → 함수마다 제 기능 쪽으로 · 슈퍼 = 관계없는 기능(함수 max(3, 20%)↑)을 둘 이상, 또는 함수 2개↑ 기능을 4개 이상 담음 → 나눌 대상 · 엔진 = 여러 메뉴가 같이 쓰는 함수 중심 · 기반 = 허브 함수 중심 · 분배 = 액션 분배기 층(판정 대상 아님). \`node tools/map.mjs --strict\`: 조각·흩어짐·슈퍼·파편화가 기준선(tools/baseline.json의 surface)보다 늘면 실패`, '');
   const sp = V.filter(v => v.kind === '슈퍼'); if (sp.length) L.push('### 슈퍼 모듈 — 나눌 기능', '', t(['모듈', '함수(기능·공용·기반·닿지 않음)', '나눌 기능 묶음 → 옮길 곳(그 단위 함수가 가장 많은 다른 모듈, 없으면 새 자리)'], sp.map(v => [short(v.mod), `${v.n} (${v.feat}·${v.shared}·${v.base}·${v.unreached})`, v.split.map(x => `[${x.units.slice(0, 3).map(lab).join(' + ')}${x.units.length > 3 ? ' …' : ''}] ${x.n} → ${x.to ? short(x.to) : '새 자리'}`).join(' / ')])), '');
   const fr = V.filter(v => v.kind === '조각'); if (fr.length) L.push('### 조각 모듈 — 합칠 곳', '', t(['모듈', '함수', '중심 기능 단위', '이 모듈', '합칠 곳(그 단위 함수)'], fr.map(v => [short(v.mod), v.n, lab(v.unit), v.n0, `${short(v.to)} (${v.n1})`])), '');
+  const sc = V.filter(v => v.kind === '흩어짐'); if (sc.length) L.push('### 흩어진 모듈 — 함수마다 제 기능 쪽으로', '', t(['모듈', '함수', '기능 단위(함수 수) → 그 단위 함수가 많은 모듈'], sc.map(v => [short(v.mod), v.n, v.spread.map(x => `${lab(x.unit)} ${x.n} → ${x.to ? short(x.to) : '여기'}`).join(' / ')])), '');
   if (S.frag.length) L.push('### 파편화 기능 단위 — 3개 이상 모듈에 흩어지고 가장 많은 모듈 몫 60% 미만', '', t(['기능 단위', '함수', '가장 많은 모듈 몫', '모듈(함수 수)'], S.frag.map(x => [lab(x.unit), x.n, x.top + '%', mods(x.mods)])), '');
-  const rest = V.filter(v => !['슈퍼', '조각'].includes(v.kind)); L.push('### 그 밖의 모듈', '', t(['모듈', '판정', '함수(기능·공용·기반·닿지 않음)', '중심 기능 단위'], rest.map(v => [short(v.mod), v.kind, `${v.n} (${v.feat}·${v.shared}·${v.base}·${v.unreached})`, v.unit ? lab(v.unit) : ''])), '');
+  const rest = V.filter(v => !['슈퍼', '조각', '흩어짐'].includes(v.kind)); L.push('### 그 밖의 모듈', '', t(['모듈', '판정', '함수(기능·공용·기반·닿지 않음)', '중심 기능 단위'], rest.map(v => [short(v.mod), v.kind, `${v.n} (${v.feat}·${v.shared}·${v.base}·${v.unreached})`, v.unit ? lab(v.unit) : ''])), '');
   return L; }
 
 // ── 거꾸로 따라가기 ──
@@ -105,9 +106,10 @@ if (ch || argv.includes('--force') || !old) { const m = await make(), diff = map
   console.log(`연관 맵 갱신: data 경로 ${Object.keys(m.data).length} · 함수 ${Object.keys(m.fns).length} · 모듈 ${Object.keys(m.modules).length} · 바뀐 연결: 함수 +${diff.fns.added.length} −${diff.fns.removed.length} 옮김 ${diff.fns.moved.length} · data ${diff.data.length}경로 → docs/map.md · docs/map.json`); }
 else if (!arg('--why') && !arg('--game')) console.log('변화 없음 — 맵 그대로(docs/map.md)');
 /* 래칫: 조각·슈퍼 모듈과 파편화 단위가 기준선(tools/baseline.json의 surface)보다 늘면 --strict 실패. 처음엔 지금 값을 기준선으로 */
-if (argv.includes('--strict') || argv.includes('--update-baseline')) { const S = map.surface || {}, F = [...(S.verdicts || []).filter(v => v.kind === '슈퍼' || v.kind === '조각').map(v => ({ key: `기능 표면 ${v.kind}|${v.mod}`, num: { 함수: v.kind === '슈퍼' ? v.feat : v.n }, text: `${v.kind} ${short(v.mod)}` })),
+if (argv.includes('--strict') || argv.includes('--update-baseline')) { const S = map.surface || {}, F = [...(S.verdicts || []).filter(v => ['슈퍼', '조각', '흩어짐'].includes(v.kind)).map(v => ({ key: `기능 표면 ${v.kind}|${v.mod}`, num: { 함수: v.kind === '슈퍼' ? v.feat : v.n }, text: `${v.kind} ${short(v.mod)}` })),
     ...(S.frag || []).map(x => ({ key: `기능 표면 파편화|${S.feats[x.unit]?.label || x.unit}`, num: { 모듈: x.mods.length }, text: `파편화 ${S.feats[x.unit]?.label || x.unit} 모듈 ${x.mods.length}` }))], B = readBaseline(ROOT, 'surface'), D = B ? compare(B, F) : null;
-  if (argv.includes('--update-baseline')) { if (D && (D.added.length || D.worse.length)) { console.log('기준선을 올리는 갱신은 하지 않아요 — 모듈을 고치세요'); process.exit(1); } writeBaseline(ROOT, F, 'surface'); console.log(`기능 표면 기준선: ${F.length}개`); }
+  /* 판정 종류가 새로 생기면(도구가 새 분류를 재기 시작) 그 종류는 처음 잰 값을 기준선으로 — 이미 있던 종류는 늘면 안 됨 */ const kindOf = k => k.split('|')[0], had = new Set((B || []).map(f => kindOf(f.key))), fresh = f => !had.has(kindOf(f.key));
+  if (argv.includes('--update-baseline')) { if (D && ([...D.added.filter(f => !fresh(f)), ...D.worse].length)) { console.log('기준선을 올리는 갱신은 하지 않아요 — 모듈을 고치세요'); process.exit(1); } writeBaseline(ROOT, F, 'surface'); console.log(`기능 표면 기준선: ${F.length}개${D && D.added.some(fresh) ? ` (새 판정 종류 처음 잼: ${[...new Set(D.added.filter(fresh).map(f => kindOf(f.key)))].join(', ')})` : ''}`); }
   else if (D) { console.log(`기능 표면 판정 기준선 대비: 새로 생김 ${D.added.length} · 나빠짐 ${D.worse.length} · 해결 ${D.fixed.length} · 좋아짐 ${D.better.length}`); [...D.added, ...D.worse].forEach(f => console.log('  + ' + f.text)); if (D.added.length || D.worse.length) process.exit(1); }
   else console.log('기능 표면 기준선 없음 — node tools/map.mjs --update-baseline'); }
 if (arg('--why')) console.log(why(map, arg('--why')));

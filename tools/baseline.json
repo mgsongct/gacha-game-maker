@@ -2127,11 +2127,11 @@
    "text": "슈퍼 0360-sync/"
   },
   {
-   "key": "기능 표면 조각|src/main/0410-desktop.js",
+   "key": "기능 표면 흩어짐|src/main/0410-desktop.js",
    "num": {
     "함수": 6
    },
-   "text": "조각 0410-desktop"
+   "text": "흩어짐 0410-desktop"
   },
   {
    "key": "기능 표면 슈퍼|src/main/0450-relations-memory.js",
@@ -2153,13 +2153,6 @@
     "함수": 8
    },
    "text": "슈퍼 0485-battle-rules"
-  },
-  {
-   "key": "기능 표면 조각|src/main/0510-actions/",
-   "num": {
-    "함수": 14
-   },
-   "text": "조각 0510-actions/"
   },
   {
    "key": "기능 표면 슈퍼|src/main/0530-story-memory.js",
