@@ -2136,13 +2136,6 @@
    "text": "L1 계층 섞임 modules/combat/070-equipment.js 1"
   },
   {
-   "key": "규칙 L2|src/main/0010-rules.js",
-   "num": {
-    "건": 1
-   },
-   "text": "L2 그리다가 바꿈 main/0010-rules.js 1"
-  },
-  {
    "key": "규칙 L2|src/main/0015-prompt-studio/010-studio.js",
    "num": {
     "건": 1
@@ -2159,9 +2152,9 @@
   {
    "key": "규칙 L2|src/main/0030-image/010-engine.js",
    "num": {
-    "건": 4
+    "건": 3
    },
-   "text": "L2 그리다가 바꿈 main/0030-image/010-engine.js 4"
+   "text": "L2 그리다가 바꿈 main/0030-image/010-engine.js 3"
   },
   {
    "key": "규칙 L2|src/main/0040-sound.js",
@@ -2180,65 +2173,30 @@
   {
    "key": "규칙 L2|src/main/0100-messenger.js",
    "num": {
-    "건": 14
+    "건": 8
    },
-   "text": "L2 그리다가 바꿈 main/0100-messenger.js 14"
+   "text": "L2 그리다가 바꿈 main/0100-messenger.js 8"
   },
   {
    "key": "규칙 L2|src/main/0120-abyss.js",
    "num": {
-    "건": 5
+    "건": 1
    },
-   "text": "L2 그리다가 바꿈 main/0120-abyss.js 5"
+   "text": "L2 그리다가 바꿈 main/0120-abyss.js 1"
   },
   {
    "key": "규칙 L2|src/main/0180-ui-scroll.js",
    "num": {
-    "건": 9
-   },
-   "text": "L2 그리다가 바꿈 main/0180-ui-scroll.js 9"
-  },
-  {
-   "key": "규칙 L2|src/main/0185-game-rules.js",
-   "num": {
-    "건": 5
-   },
-   "text": "L2 그리다가 바꿈 main/0185-game-rules.js 5"
-  },
-  {
-   "key": "규칙 L2|src/main/0187-balance.js",
-   "num": {
     "건": 2
    },
-   "text": "L2 그리다가 바꿈 main/0187-balance.js 2"
-  },
-  {
-   "key": "규칙 L2|src/main/0210-setup.js",
-   "num": {
-    "건": 2
-   },
-   "text": "L2 그리다가 바꿈 main/0210-setup.js 2"
+   "text": "L2 그리다가 바꿈 main/0180-ui-scroll.js 2"
   },
   {
    "key": "규칙 L2|src/main/0230-modal.js",
    "num": {
-    "건": 3
-   },
-   "text": "L2 그리다가 바꿈 main/0230-modal.js 3"
-  },
-  {
-   "key": "규칙 L2|src/main/0240-growth-curve.js",
-   "num": {
     "건": 1
    },
-   "text": "L2 그리다가 바꿈 main/0240-growth-curve.js 1"
-  },
-  {
-   "key": "규칙 L2|src/main/0250-story-factory.js",
-   "num": {
-    "건": 1
-   },
-   "text": "L2 그리다가 바꿈 main/0250-story-factory.js 1"
+   "text": "L2 그리다가 바꿈 main/0230-modal.js 1"
   },
   {
    "key": "규칙 L2|src/main/0260-new-game/010-draft.js",
@@ -2248,39 +2206,11 @@
    "text": "L2 그리다가 바꿈 main/0260-new-game/010-draft.js 1"
   },
   {
-   "key": "규칙 L2|src/main/0274-dispatch.js",
-   "num": {
-    "건": 1
-   },
-   "text": "L2 그리다가 바꿈 main/0274-dispatch.js 1"
-  },
-  {
-   "key": "규칙 L2|src/main/0275-expedition.js",
-   "num": {
-    "건": 8
-   },
-   "text": "L2 그리다가 바꿈 main/0275-expedition.js 8"
-  },
-  {
    "key": "규칙 L2|src/main/0290-season-rotation.js",
    "num": {
-    "건": 3
-   },
-   "text": "L2 그리다가 바꿈 main/0290-season-rotation.js 3"
-  },
-  {
-   "key": "규칙 L2|src/main/0300-codex.js",
-   "num": {
-    "건": 3
-   },
-   "text": "L2 그리다가 바꿈 main/0300-codex.js 3"
-  },
-  {
-   "key": "규칙 L2|src/main/0310-art-after-ai.js",
-   "num": {
     "건": 1
    },
-   "text": "L2 그리다가 바꿈 main/0310-art-after-ai.js 1"
+   "text": "L2 그리다가 바꿈 main/0290-season-rotation.js 1"
   },
   {
    "key": "규칙 L2|src/main/0330-casting.js",
@@ -2292,9 +2222,9 @@
   {
    "key": "규칙 L2|src/main/0360-sync/020-pc-server.js",
    "num": {
-    "건": 6
+    "건": 5
    },
-   "text": "L2 그리다가 바꿈 main/0360-sync/020-pc-server.js 6"
+   "text": "L2 그리다가 바꿈 main/0360-sync/020-pc-server.js 5"
   },
   {
    "key": "규칙 L2|src/main/0360-sync/030-github.js",
@@ -2306,23 +2236,23 @@
   {
    "key": "규칙 L2|src/main/0360-sync/040-boot.js",
    "num": {
-    "건": 7
+    "건": 6
    },
-   "text": "L2 그리다가 바꿈 main/0360-sync/040-boot.js 7"
+   "text": "L2 그리다가 바꿈 main/0360-sync/040-boot.js 6"
   },
   {
    "key": "규칙 L2|src/main/0360-sync/050-single-device.js",
    "num": {
-    "건": 4
+    "건": 3
    },
-   "text": "L2 그리다가 바꿈 main/0360-sync/050-single-device.js 4"
+   "text": "L2 그리다가 바꿈 main/0360-sync/050-single-device.js 3"
   },
   {
    "key": "규칙 L2|src/main/0370-game-picker.js",
    "num": {
-    "건": 2
+    "건": 1
    },
-   "text": "L2 그리다가 바꿈 main/0370-game-picker.js 2"
+   "text": "L2 그리다가 바꿈 main/0370-game-picker.js 1"
   },
   {
    "key": "규칙 L2|src/main/0400-publish-subscribe.js",
@@ -2339,20 +2269,6 @@
    "text": "L2 그리다가 바꿈 main/0420-app-update.js 1"
   },
   {
-   "key": "규칙 L2|src/main/0445-factions.js",
-   "num": {
-    "건": 8
-   },
-   "text": "L2 그리다가 바꿈 main/0445-factions.js 8"
-  },
-  {
-   "key": "규칙 L2|src/main/0450-relations-memory.js",
-   "num": {
-    "건": 3
-   },
-   "text": "L2 그리다가 바꿈 main/0450-relations-memory.js 3"
-  },
-  {
    "key": "규칙 L2|src/main/0460-script-engine.js",
    "num": {
     "건": 2
@@ -2360,18 +2276,11 @@
    "text": "L2 그리다가 바꿈 main/0460-script-engine.js 2"
   },
   {
-   "key": "규칙 L2|src/main/0465-story-plan.js",
-   "num": {
-    "건": 3
-   },
-   "text": "L2 그리다가 바꿈 main/0465-story-plan.js 3"
-  },
-  {
    "key": "규칙 L2|src/main/0480-battle.js",
    "num": {
-    "건": 3
+    "건": 1
    },
-   "text": "L2 그리다가 바꿈 main/0480-battle.js 3"
+   "text": "L2 그리다가 바꿈 main/0480-battle.js 1"
   },
   {
    "key": "규칙 L2|src/main/0487-formation-sortie.js",
@@ -2379,20 +2288,6 @@
     "건": 1
    },
    "text": "L2 그리다가 바꿈 main/0487-formation-sortie.js 1"
-  },
-  {
-   "key": "규칙 L2|src/main/0500-gacha.js",
-   "num": {
-    "건": 2
-   },
-   "text": "L2 그리다가 바꿈 main/0500-gacha.js 2"
-  },
-  {
-   "key": "규칙 L2|src/main/0505-construct.js",
-   "num": {
-    "건": 2
-   },
-   "text": "L2 그리다가 바꿈 main/0505-construct.js 2"
   },
   {
    "key": "규칙 L2|src/main/0510-actions/100-images-and-assets.js",
@@ -2409,25 +2304,11 @@
    "text": "L2 그리다가 바꿈 main/0520-backup-storage.js 1"
   },
   {
-   "key": "규칙 L2|src/main/0530-story-memory.js",
-   "num": {
-    "건": 1
-   },
-   "text": "L2 그리다가 바꿈 main/0530-story-memory.js 1"
-  },
-  {
    "key": "규칙 L2|src/modules/combat/050-bridge.js",
    "num": {
-    "건": 7
+    "건": 2
    },
-   "text": "L2 그리다가 바꿈 modules/combat/050-bridge.js 7"
-  },
-  {
-   "key": "규칙 L2|src/modules/combat/070-equipment.js",
-   "num": {
-    "건": 1
-   },
-   "text": "L2 그리다가 바꿈 modules/combat/070-equipment.js 1"
+   "text": "L2 그리다가 바꿈 modules/combat/050-bridge.js 2"
   },
   {
    "key": "규칙 L3|src/main/0020-ai-connect.js",
@@ -2505,6 +2386,930 @@
     "건": 1
    },
    "text": "L3 처리가 화면을 부름 boot/storage-boot.js 1"
+  },
+  {
+   "key": "규칙 D3|banners.json",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json 1"
+  },
+  {
+   "key": "규칙 D3|banners.json › [].active",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json › [].active 1"
+  },
+  {
+   "key": "규칙 D3|banners.json › [].bg",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json › [].bg 1"
+  },
+  {
+   "key": "규칙 D3|banners.json › [].desc",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json › [].desc 1"
+  },
+  {
+   "key": "규칙 D3|banners.json › [].id",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json › [].id 1"
+  },
+  {
+   "key": "규칙 D3|banners.json › [].name",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json › [].name 1"
+  },
+  {
+   "key": "규칙 D3|banners.json › [].newAt",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json › [].newAt 1"
+  },
+  {
+   "key": "규칙 D3|banners.json › [].pickup",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json › [].pickup 1"
+  },
+  {
+   "key": "규칙 D3|banners.json › [].pool",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json › [].pool 1"
+  },
+  {
+   "key": "규칙 D3|banners.json › [].rate",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json › [].rate 1"
+  },
+  {
+   "key": "규칙 D3|banners.json › [].type",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 banners.json › [].type 1"
+  },
+  {
+   "key": "규칙 D3|chapters.json",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chapters.json 1"
+  },
+  {
+   "key": "규칙 D3|chapters.json › [].relScan",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chapters.json › [].relScan 1"
+  },
+  {
+   "key": "규칙 D3|chapters.json › [].stages[].combatBalance",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chapters.json › [].stages[].combatBalance 1"
+  },
+  {
+   "key": "규칙 D3|chapters.json › [].stages[].enemies",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chapters.json › [].stages[].enemies 1"
+  },
+  {
+   "key": "규칙 D3|chapters.json › [].stages[].enemies[].elem",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chapters.json › [].stages[].enemies[].elem 1"
+  },
+  {
+   "key": "규칙 D3|chapters.json › [].stages[].post",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chapters.json › [].stages[].post 1"
+  },
+  {
+   "key": "규칙 D3|chapters.json › [].stages[].pre",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chapters.json › [].stages[].pre 1"
+  },
+  {
+   "key": "규칙 D3|chapters.json › [].stages[].story",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chapters.json › [].stages[].story 1"
+  },
+  {
+   "key": "규칙 D3|chars.json",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].affLines",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].affLines 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].age",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].age 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].alt",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].alt 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].altCanon",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].altCanon 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].atk",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].atk 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].baseStatsVersion",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].baseStatsVersion 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].debut",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].debut 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].debutLater",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].debutLater 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].def",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].def 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].dupLines",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].dupLines 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].elem",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].elem 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].episodes",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].episodes 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].faceMask",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].faceMask 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].faces",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].faces 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].faction",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].faction 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].files",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].files 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].generation",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].generation 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].hp",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].hp 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].intro",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].intro 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].lbbg",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].lbbg 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].limited",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].limited 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].lines",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].lines 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].lvLines",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].lvLines 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].naiBlocks",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].naiBlocks 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].naiPrompt",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].naiPrompt 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].naiStyle",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].naiStyle 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].name",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].name 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].ord",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].ord 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].persona",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].persona 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].pfields",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].pfields 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].pos",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].pos 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].rarity",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].rarity 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].role",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].role 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skill",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skill 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skillBalance",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skillBalance 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skillConcept",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skillConcept 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skillDesignLog",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skillDesignLog 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skillGenerationNotice",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skillGenerationNotice 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skillGenerationWarning",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skillGenerationWarning 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skillPending",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skillPending 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skillPlan",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skillPlan 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skills",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skills 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skillTuning",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skillTuning 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skins",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skins 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].spd",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].spd 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].touch",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].touch 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].upper",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].upper 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].voiceId",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].voiceId 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].voiceName",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].voiceName 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].weapon",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].weapon 1"
+  },
+  {
+   "key": "규칙 D3|events.json",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 events.json 1"
+  },
+  {
+   "key": "규칙 D3|lib.json",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 lib.json 1"
+  },
+  {
+   "key": "규칙 D3|lib.json › [].img",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 lib.json › [].img 1"
+  },
+  {
+   "key": "규칙 D3|lib.json › [].naiPrompt",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 lib.json › [].naiPrompt 1"
+  },
+  {
+   "key": "규칙 D3|lib.json › [].name",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 lib.json › [].name 1"
+  },
+  {
+   "key": "규칙 D3|lib.json › [].prompt",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 lib.json › [].prompt 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › accent",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › accent 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › artNeg",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › artNeg 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › artTags",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › artTags 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › auditSeen",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › auditSeen 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › castSex",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › castSex 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › elems",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › elems 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › persona",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › persona 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › positions",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › positions 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › relProf",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › relProf 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › rules",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › rules 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › story",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › story 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › sub",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › sub 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › theme",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › theme 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › title",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › title 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › tone",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › tone 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › variants",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › variants 1"
+  },
+  {
+   "key": "규칙 D3|npcs.json",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 npcs.json 1"
+  },
+  {
+   "key": "규칙 D3|npcs.json › [].faces",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 npcs.json › [].faces 1"
+  },
+  {
+   "key": "규칙 D3|npcs.json › [].look",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 npcs.json › [].look 1"
+  },
+  {
+   "key": "규칙 D3|npcs.json › [].naiPrompt",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 npcs.json › [].naiPrompt 1"
+  },
+  {
+   "key": "규칙 D3|npcs.json › [].role",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 npcs.json › [].role 1"
+  },
+  {
+   "key": "규칙 D3|npcs.json › [].upper",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 npcs.json › [].upper 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › avatar",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › avatar 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › bio",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › bio 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › bootPrep",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › bootPrep 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › castDone",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › castDone 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › cres",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › cres 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › curBanner",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › curBanner 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › curEvent",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › curEvent 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › cxSeen",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › cxSeen 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › dboard",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › dboard 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › dm",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › dm 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › fchat",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › fchat 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › gems",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › gems 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › gender",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › gender 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › genderTxt",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › genderTxt 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › gifts",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › gifts 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › gold",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › gold 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › hideEyes",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › hideEyes 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › look",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › look 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › pass",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › pass 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › player",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › player 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › prepAsked",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › prepAsked 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › raid",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › raid 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › rogue",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › rogue 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › scene",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › scene 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › stam",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › stam 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › stars",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › stars 1"
+  },
+  {
+   "key": "규칙 D3|rels.json",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 rels.json 1"
+  },
+  {
+   "key": "규칙 D3|threads.json",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 threads.json 1"
+  },
+  {
+   "key": "규칙 D3|threads.json › [].charId",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 threads.json › [].charId 1"
+  },
+  {
+   "key": "규칙 D3|world.json › factions",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 world.json › factions 1"
+  },
+  {
+   "key": "규칙 D3|world.json › lore",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 world.json › lore 1"
+  },
+  {
+   "key": "규칙 D3|world.json › name",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 world.json › name 1"
+  },
+  {
+   "key": "규칙 D3|world.json › plot",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 world.json › plot 1"
+  },
+  {
+   "key": "규칙 D3|world.json › summary",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 world.json › summary 1"
   }
  ]
 }

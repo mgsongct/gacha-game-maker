@@ -214,6 +214,11 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   writeFileSync(join(r28, 'src/main/010-s.js'), "const W={};\nfunction dev(){ let v=localStorage.getItem('k'); if(!v){ v='x'; localStorage.setItem('k',v); } return v; }\nfunction cnt(){ const a=JSON.parse(localStorage.getItem('c')||'[]'); a.push(1); localStorage.setItem('c',JSON.stringify(a)); return true; }\nfunction memo(k){ if(W[k]) return W[k]; localStorage.setItem('m',k); return W[k]=k; }\n");
   const g = buildGraph(await loadUnits(r28)).fns, L = layers(g, new Set()), lz = n => !!L.layer.get([...g.values()].find(f => f.name === n).key).lazy;
   assert.deepEqual(['dev', 'cnt', 'memo'].map(lz), [true, false, false], '저장소 게터'); rmSync(r28, { recursive: true, force: true }); }
+// 규칙 D3 data 창구가 갈라짐(lib/rules.mjs): 한 data 경로를 두 모듈이 쓰면 위반, 한 모듈만 쓰면 아님
+{ const { runRules } = await import('./lib/rules.mjs'), { buildMap } = await import('./lib/map.mjs'), r29 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r29, 'src/main'), { recursive: true });
+  writeFileSync(join(r29, 'src/main/010-a.js'), "let G={meta:{}};\nfunction mark(k){ return k; }\nfunction setA(){ G.meta.x=1; G.meta.y=1; mark('meta'); }\n"); writeFileSync(join(r29, 'src/main/020-b.js'), "function setB(){ G.meta.x=2; mark('meta'); }\n"); writeFileSync(join(r29, 'src/index.html'), '<!doctype html><html><body></body></html>');
+  const A = await analyze(r29), M = buildMap(A.units, A.fns, stateFlow(A.units, A.fns), ''), D3 = runRules({ A, M }).find(r => r.id === 'D3');
+  assert.ok(D3.n === 1 && /\bx\b/.test(D3.items[0].at) && /010-a/.test(D3.items[0].what) && /020-b/.test(D3.items[0].what), 'D3: ' + JSON.stringify(D3.items)); rmSync(r29, { recursive: true, force: true }); }
 // 조건 없이 자기를 부름(lib/graph.mjs selfLoops): 본문 맨 위에서 제 이름을 부르면 잡고, 조건·반복·&&·콜백 안이나 return 뒤는 안 잡음
 { const { selfLoops } = await import('./lib/graph.mjs'), r22 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r22, 'src/main'), { recursive: true });
   writeFileSync(join(r22, 'src/main/010-s.js'), "function bad(x){ bad(x); return x; }\nfunction bad2(){ return [bad2()]; }\nfunction ok(n){ if(n>0) ok(n-1); }\nfunction ok2(n){ return n&&ok2(n-1); }\nfunction ok3(){ setTimeout(()=>ok3(),1); }\nfunction ok4(n){ return n; ok4(n); }\nfunction ok5(t){ (t.kids||[]).forEach(k=>ok5(k)); }\n");
