@@ -32,13 +32,13 @@ try {
 
   const src = join(tmp, 'src'); cpSync(join(ROOT, 'src'), src, { recursive: true });
   writeFileSync(join(src, 'modules/app/020-hello.js'), 'window.__HELLO_MODULE__=typeof GGMStorage;\n');
-  writeFileSync(join(src, 'main/0545-hello.js'), 'window.__HELLO_MAIN__=typeof render+":"+typeof G;\n');
-  const rules = join(src, 'main/0010-rules.js');
+  writeFileSync(join(src, 'main/97-hello.js'), 'window.__HELLO_MAIN__=typeof render+":"+typeof G;\n');
+  const rules = join(src, 'main/00-core.js');
   writeFileSync(rules, readFileSync(rules, 'utf8') + 'window.__EDITED__=1;\n');
   const html = build(src), at = s => { const k = html.indexOf(s); assert.ok(k >= 0, '없음: ' + s); return k; };
   assert.ok(at('<script type="text/ggm-module" id="ggm-app-confirm">') < at('<script type="text/ggm-module" id="ggm-app-hello">'));
   assert.ok(at('id="ggm-app-hello"') < at('id="ggm-combat-catalog"'));
-  assert.ok(at('window.__EDITED__=1;') < at('window.__HELLO_MAIN__') && at('window.__HELLO_MAIN__') < at('독립 앱 전용'));
+  assert.ok(at('window.__EDITED__=1;') < at('window.__HELLO_MAIN__') && at('===== 시작 —') < at('window.__HELLO_MAIN__') && at('window.__HELLO_MAIN__') < at('===== 임시 다리'));
   console.log('ok 3  추가 모듈·파트가 제 순서로 들어감');
 
   // 7) 건조/영입 엔진(순수 함수): 등급 개방·확률·역할 편향·레시피·조건·이미지 프롬프트
@@ -112,7 +112,7 @@ try {
   const browser = await chromium.launch(), COV = process.env.GGM_COVERAGE ? [] : null; // 동적 검증(tools/history.mjs): 페이지마다 V8 커버리지 → 실제로 실행된 함수
   if (COV) { const np = browser.newPage.bind(browser); browser.newPage = async (...a) => { for (const c of COV) await c.take(); const p = await np(...a); COV.push(await coverageStart(p)); return p; }; } // 같은 렌더러의 페이지는 계수기를 공유 — 새 페이지가 기록을 시작하면 지워지므로 먼저 받아 둠
   /* 모든 페이지의 잡히지 않은 오류를 모아 두고, 시험이 실패(앱이 뜨지 않아 기다림이 끝나는 것 포함)하면 함께 보임 — 원인을 따로 재지 않게 */
-  { const PAGE_ERR = [], np = browser.newPage.bind(browser); browser.newPage = async (...a) => { const p = await np(...a); p.on('pageerror', e => PAGE_ERR.push(`${p.url().split('/').pop() || '?'}: ${String(e && e.stack || e).split('\n').slice(0, 3).join(' | ')}`)); return p; };
+  { const PAGE_ERR = [], np = browser.newPage.bind(browser); browser.newPage = async (...a) => { const p = await np(...a); await p.addInitScript(() => { Error.stackTraceLimit = 40; }); p.on('pageerror', e => PAGE_ERR.push(`${p.url().split('/').pop() || '?'}: ${String(e && e.stack || e).split('\n').slice(0, 40).join(' | ')}`)); return p; };
     const show = () => { if (PAGE_ERR.length) console.error(`\n페이지 오류 ${PAGE_ERR.length}건(먼저 난 것부터):\n` + [...new Set(PAGE_ERR)].slice(0, 8).map(x => '  ' + x).join('\n')); };
     process.on('exit', code => { if (code) show(); }); }
   const page = await browser.newPage(), errors = [];
@@ -125,7 +125,7 @@ try {
   assert.equal(got.m, 'object'); assert.equal(got.main, 'function:object'); assert.equal(got.ed, 1); assert.ok(got.view > 100, '화면이 그려지지 않음');
   console.log('ok 4  브라우저: 추가 모듈·파트·수정 실행, 앱 화면 렌더링, 오류 없음');
   /* 4b) 제품 자체(www/index.html 또는 GGM_HTML)가 오류 없이 뜸 — 함수 선언은 끌어올려져 있어 앱이 시작하다 멈춰도 뒤의 시험은 앱 함수를 부를 수 있으므로 여기서 먼저 막음 */
-  { const pb = await browser.newPage(), errb = []; pb.on('pageerror', e => errb.push(String(e && e.stack || e).split('\n').slice(0, 3).join(' | '))); await pb.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  { const pb = await browser.newPage(), errb = []; pb.on('pageerror', e => errb.push(String(e && e.stack || e).split('\n').slice(0, 14).join(' | '))); await pb.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
     await pb.goto(`http://127.0.0.1:${server.address().port}/index.html`); await pb.waitForFunction(() => (document.querySelector('#view')?.innerHTML.length || 0) > 100, null, { timeout: 15000 }).catch(() => {});
     assert.deepEqual(errb, [], '제품을 불러올 때 페이지 오류'); assert.ok(await pb.evaluate(() => (document.querySelector('#view')?.innerHTML.length || 0) > 100), '제품 화면이 그려지지 않음'); await pb.close(); console.log('ok 4b 제품(index.html)을 불러올 때 오류 없음·화면 그려짐'); }
 
@@ -370,7 +370,7 @@ try {
     const c2 = planCtx(2), c5 = planCtx(5);
     o.ctx2 = c2.includes('1막 만남') && c2.includes('밤마다 사라진다') && c2.includes('아직 밝히지 말 진실') && c2.includes('[분기: id]') && c2.includes('b1') && !c2.includes('적이 우리 경로를 안다');
     o.ctx5 = c5.includes('2막 균열') && c5.includes('이번 장에서 밝힐 반전: 안내인이 적의 첩자다') && !c5.includes('아직 밝히지 말 진실');
-    o.wired = aiChapterGen0.toString().includes('planCtx(k+1)');
+    o.wired = Story.aiChapterGen0.toString().includes('planCtx(k+1)');
     playStory('분기 시험', '세라: 어떻게 할까?\n[분기: b1]\n선택: 믿는다 | 의심한다\n세라: 알겠어');
     for (let i = 0; i < 8 && !document.querySelector('[data-act="vnpick"]'); i++) { document.querySelector('#vn').click(); await new Promise(r => setTimeout(r, 30)); if (S && S.typing) document.querySelector('#vn').click(); }
     document.querySelector('[data-act="vnpick"][data-n="2"]').click(); o.flag = P().flags.b1 && P().flags.b1.n === 2 && !S.branch; vnEnd && vnEnd();

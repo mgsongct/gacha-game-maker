@@ -11,13 +11,14 @@ import { walk } from './source.mjs';
 const ACT_RE = /data-act=\\?["']([\w-]+)\\?["']|dataset\.act\s*=\s*['"]([\w-]+)['"]/g;
 export function reachable(units, fns, html = '', deadActs = new Set()) {
   const top = new Map([...fns.values()].filter(f => f.top && !f.table).map(f => [f.name, f])), seen = new Set(), queue = [], cases = new Map(), live = new Set(), literal = new Set();
+  const classes = new Set([...fns.values()].map(f => f.cls).filter(Boolean)); // class로 옮긴 함수(Class.이름 — 부름·값으로 넘김)
   for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'switch_case') { const v = String(n.childForFieldName('value')?.text || '').replace(/^['"`]|['"`]$/g, ''); if (v) { if (!cases.has(v)) cases.set(v, []); cases.get(v).push(n); } } });
   for (const u of units) for (const m of u.text.matchAll(ACT_RE)) literal.add(m[1] || m[2]);
   const hit = name => { if (top.has(name) && !seen.has(name)) { seen.add(name); queue.push(top.get(name)); } };
   const acts = text => { for (const m of String(text).matchAll(ACT_RE)) { const a = m[1] || m[2]; if (!live.has(a)) { live.add(a); (cases.get(a) || []).forEach(c => queue.push({ node: c, isCase: true })); } } };
   const idsIn = node => { acts(node.text); walk(node, n => { if (n.type === 'switch_case' && cases.has(String(n.childForFieldName('value')?.text || '').replace(/^['"`]|['"`]$/g, ''))) { const v = String(n.childForFieldName('value').text).replace(/^['"`]|['"`]$/g, ''); if (!live.has(v) && (literal.has(v) || deadActs.has(v))) return false; }
-    if (n.type === 'identifier' || n.type === 'shorthand_property_identifier') hit(n.text); else if (n.type === 'property_identifier' && /^GGM\w+$/.test(n.parent?.childForFieldName('object')?.text || '')) hit(n.text); }); }; // 다른 프로퍼티 이름(obj.name)은 함수가 아님
-  for (const u of units) { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type === 'function_declaration') continue;
+    if (n.type === 'identifier' || n.type === 'shorthand_property_identifier') hit(n.text); else if (n.type === 'property_identifier') { const o = n.parent?.childForFieldName('object')?.text || ''; if (/^GGM\w+$/.test(o) || (classes.has(o) && top.get(n.text)?.cls === o)) hit(n.text); } }); }; // 다른 프로퍼티 이름(obj.name)은 함수가 아님
+  for (const u of units) { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type === 'function_declaration' || c.type === 'class_declaration') continue; /* 선언 본문은 불러올 때 돌지 않음 */
     if (c.type === 'lexical_declaration' || c.type === 'variable_declaration') { for (const d of c.namedChildren.filter(x => x.type === 'variable_declarator')) { const v = d.childForFieldName('value'); if (v && !/^(arrow_function|function_expression)$/.test(v.type)) idsIn(v); } continue; }
     idsIn(c); } }
   acts(html); for (const m of html.matchAll(/[A-Za-z_$][\w$]*/g)) hit(m[0]);

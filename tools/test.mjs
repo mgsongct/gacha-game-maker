@@ -260,7 +260,12 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   const T = tdzRefs(await loadUnits(r10)).map(x => x.name).sort(); assert.deepEqual(T, ['B', 'OK'], 'TDZ: ' + JSON.stringify(T));
   /* 불러올 때 부르는 함수도 따라감(바로 넘긴 콜백 포함) — 갈래 안·타이머·객체 칸의 함수는 안 따라감 */
   writeFileSync(join(r10, 'src/main/010-a.js'), "function norm(x){ return K[x]; }\nfunction sync(xs){ xs.forEach(x=>norm(x)); if(xs.q) return Q; setTimeout(()=>R,1); return {get:()=>S}; }\nconst G0 = sync([1]);\nconst K = {}, Q = 1, R = 2, S = 3;\n"); writeFileSync(join(r10, 'src/main/020-b.js'), "\n");
-  const T2 = tdzRefs(await loadUnits(r10)).map(x => x.name).sort(); assert.deepEqual(T2, ['K'], 'TDZ(불러올 때 부른 함수): ' + JSON.stringify(T2)); rmSync(r10, { recursive: true, force: true }); }
+  const T2 = tdzRefs(await loadUnits(r10)).map(x => x.name).sort(); assert.deepEqual(T2, ['K'], 'TDZ(불러올 때 부른 함수): ' + JSON.stringify(T2));
+  /* class로 옮긴 코드(tools/reshape.mjs): static 메서드 = 함수, Class.이름(…) = 부름, 임시 다리(function n(...a){ return C.n(...a); })는 함수로 안 셈 · TDZ·도달·전역 만드는 메서드도 같이 */
+  writeFileSync(join(r10, 'src/main/010-a.js'), "class Box {\n  static def(k,v){ Object.defineProperty(window,k,{get:v}); }\n  static boot(){ return Box.read(); }\n  static read(){ return K2; }\n  static dead(){ return 1; }\n}\nfunction read(...a) { return Box.read(...a); }\nBox.def('RULE',()=>1);\nconst X = Box.boot();\nconst K2 = RULE;\n");
+  const U12 = await loadUnits(r10), g12 = buildGraph(U12), T3 = tdzRefs(U12).map(x => x.name), { undefinedNames: un12 } = await import('./lib/extra.mjs'), R12 = reachable(U12, g12.fns);
+  assert.ok(g12.fns.get('boot')?.cls === 'Box' && g12.fns.get('boot').calls.has('read') && !g12.issues.some(i => i.kind === '중복 정의') && T3.includes('K2') && !un12(U12, {}).some(x => x.name === 'RULE') && R12.has('read') && !R12.has('dead'), 'class 인식: ' + JSON.stringify({ T3, iss: g12.issues, R: [...R12] }));
+  rmSync(r10, { recursive: true, force: true }); }
 // 프롬프트 조립 함수(조각을 고르고 잇는 함수)가 스튜디오 밖이면 잡음 · 조각을 데이터와 바로 보내는 요청 지점은 안 잡음 · 불러올 때 조각 읽기 잡음
 { const { promptBuilders, fragmentFiles: FF2 } = await import('./lib/prompts.mjs'), r11 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r11, 'src/main/0015-s'), { recursive: true });
   writeFileSync(join(r11, 'src/main/0015-s/010-a.js'), "pfDef('A','a',()=>'가');\npfDef('B','b',()=>'나');\nfunction inStudio(){ return pf('A'); }\n");

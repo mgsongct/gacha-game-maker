@@ -168,3 +168,8 @@ Feature                     기능 하나 = 가진 Repository(창구) + Generato
 2. **함수 → class 메서드 대응표**: 두 index.html의 함수마다 역할 꼴(AI 생성·창·화면·data 쓰기)·쓰는 data로 어느 class의 무엇이 되는지 도구가 표로 냄(`tools/redesign.mjs`에 대응표) — 같은 역할의 되풀이는 상위 class 하나로 합쳐지고 하위는 다른 점(프롬프트·스키마·반영)만 가짐.
 3. **채우기**: 대응표대로 하위 class를 채움. 깨지는 것은 이슈로 쌓음(사용자 지시 U16).
 4. **복구**: 브라우저 시험·플레이 시험·규칙 전수검사로 제품 기능이 그대로인지 확인(지금 빌드된 index.html이 기준 동작).
+
+진행(2026-11-04):
+- **1단계 — 기계적 옮기기**: `node tools/reshape.mjs --apply` — 빌드된 `www/index.html`의 ggm-main 함수 1615개를 2-3절 매핑(기능·종류)대로 class 50개의 static 메서드로(기능 X → `X`(Model) · `XView`(Screen·Dialog) · `XCtl`(Controller), Shared → `Core`, 미정 → `Misc`, Image → `Art`). 함수를 가리키는 곳은 범위를 따져 `Class.이름`으로. 함수가 아닌 맨 위 문장은 `90-load.js`(원래 순서), 시작 블록은 `95-start.js`(맨 끝), 옛 이름 다리는 `99-aliases.js`. 파일 23개 모듈·136파일 → 20파일.
+- 복구: 빌드·`node build/test.mjs` 전부 통과 · `node tools/check.mjs` 오류 0 · 함수 그래프·TDZ·정의 안 된 이름·도달 도구를 class 인식으로. 남은 것은 `docs/restructure.md` 4절 R6–R11.
+- **다음 — 2단계(의미 재구성)**: 3절 상위 class(Repository·Generator·Dialog·Screen)를 `00-core.js`에 세우고, 역할 꼴이 같은 메서드 무리(AI 생성 흐름 50 · 창 124 · data 쓰기)를 그 하위 class로 합침 — data마다 Repository 하나가 창구(규칙 D3).

@@ -12,8 +12,12 @@ function fnName(n) {
   const p = n.parent; if (!p) return null;
   if (p.type === 'variable_declarator') return p.childForFieldName('name')?.text;
   if (p.type === 'assignment_expression') { const l = p.childForFieldName('left'); return l?.type === 'identifier' ? l.text : null; }
+  if (n.type === 'method_definition' && p.type === 'class_body' && n.child(0)?.text === 'static') return n.childForFieldName('name')?.text; // class의 static 메서드(tools/reshape.mjs로 옮긴 함수) — 이름은 옛 전역 함수 이름 그대로
   return null;
 }
+const clsOf = n => n.type === 'method_definition' && n.parent?.type === 'class_body' ? n.parent.parent?.childForFieldName('name')?.text || null : null;
+/* 임시 다리(src/main/99-aliases.js — function n(...a){ return Class.n(...a); }): 함수로 세지 않고 그 이름을 메서드로 풂 */
+const aliasOf = n => { if (n.type !== 'function_declaration') return null; const b = n.childForFieldName('body'), nm = n.childForFieldName('name')?.text; if (b?.namedChildCount !== 1) return null; const m = b.namedChild(0).text.match(/^return ([A-Z][\w$]*)\.([\w$]+)\(\.\.\.a\);$/); return m && m[2] === nm ? m[1] : null; };
 // 복잡도: 분기 노드 + 논리 연산(&& || ??) + 1, 최대 중첩
 function complexity(body) { let c = 1, maxDepth = 0;
   const rec = (n, d) => { if (n !== body && FN.has(n.type)) return; let dd = d;
@@ -31,10 +35,10 @@ export function buildGraph(units) {
   const depthOf = n => { let d = 0; for (let p = fnAnc(n); p; p = fnAnc(p)) d++; return d; };
   const scopeKey = (u, n) => `${u.name}@${n ? n.startIndex : 0}`, declare = (k, name, v) => { if (!scopes.has(k)) scopes.set(k, new Map()); const m = scopes.get(k); if (!m.has(name) || v) m.set(name, v); };
   for (const u of units) {
-    walk(u.tree.rootNode, n => { if (!FN.has(n.type)) return; const name = fnName(n); if (!name) return;
+    walk(u.tree.rootNode, n => { if (!FN.has(n.type) || aliasOf(n)) return; const name = fnName(n); if (!name) return;
       const d = depthOf(n), top = u.name === 'main' ? d === 0 : d <= 1; // 모듈은 IIFE 안이 최상위
       const key = u.name === 'main' && top ? name : `${u.name}#${name}${top ? '' : '@' + n.startIndex}`, body = n.childForFieldName('body') || n;
-      const { cc, depth } = complexity(body), cases = dispatchCases(body, u), rec = { key, name, unit: u.name, loc: u.loc(n), lines: n.endPosition.row - n.startPosition.row + 1, cc, depth, cases, node: n, calls: new Map(), async: new Set() /* 동기로 부르는 대상 */, callers: new Set(), top };
+      const { cc, depth } = complexity(body), cases = dispatchCases(body, u), rec = { key, name, unit: u.name, loc: u.loc(n), lines: n.endPosition.row - n.startPosition.row + 1, cc, depth, cases, node: n, calls: new Map(), async: new Set() /* 동기로 부르는 대상 */, callers: new Set(), top, cls: clsOf(n) };
       if (u.name === 'main' && top && fns.has(key) && fns.get(key).top) issues.push({ sev: 'error', kind: '중복 정의', msg: `${name}: ${fns.get(key).loc} 와 ${rec.loc} 에 두 번 정의(뒤의 것이 앞을 덮어씀)` });
       if (!fns.has(key) || top) fns.set(key, rec);
       const owner = n.type === 'function_declaration' ? fnAnc(n) : fnAnc(n.parent?.type === 'variable_declarator' ? n.parent : n); declare(scopeKey(u, owner), name, rec); });
@@ -48,8 +52,10 @@ export function buildGraph(units) {
   // 호출: 가장 안쪽 이름 있는 함수에 붙인다. 타이머·프로미스·이벤트 콜백 안의 호출은 비동기 간선(콜스택 깊이·동기 순환에서 뺌)
   const ASYNC = /^(setTimeout|setInterval|requestAnimationFrame|queueMicrotask)$|\.(then|catch|finally|addEventListener)$/;
   const owner = (u, n) => { let as = false; for (let p = fnAnc(n); p; p = fnAnc(p)) { const call = p.parent?.type === 'arguments' ? p.parent.parent : null; if (call?.type === 'call_expression' && ASYNC.test(call.childForFieldName('function')?.text || '')) as = true; const nm = fnName(p); if (nm) { const f = resolve(u, p, nm) || [...fns.values()].find(r => r.node.startIndex === p.startIndex && r.unit === u.name); if (f && f.node.startIndex === p.startIndex) return { f, as }; } } return null; };
-  for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression') return; const f = n.childForFieldName('function'); if (f?.type !== 'identifier') return;
-    const to = resolve(u, n, f.text); if (!to) return; const o = owner(u, n); if (!o || o.f === to) return; const from = o.f;
+  /* Class.메서드(…) 부름: 맨 위 class의 static 메서드로 풂 */
+  const member = f => { if (f?.type !== 'member_expression' || f.childForFieldName('object')?.type !== 'identifier') return null; const to = fns.get(f.childForFieldName('property')?.text); return to?.cls && to.cls === f.childForFieldName('object').text ? to : null; };
+  for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression') return; const f = n.childForFieldName('function'); if (f?.type !== 'identifier' && !member(f)) return;
+    const to = f.type === 'identifier' ? resolve(u, n, f.text) : member(f); if (!to) return; const o = owner(u, n); if (!o || o.f === to) return; const from = o.f;
     from.calls.set(to.key, (from.calls.get(to.key) || 0) + 1); to.callers.add(from.key); if (!o.as) from.async.add(to.key); }); /* async 집합 = 동기로 부르는 대상 */
   // 함수를 담은 최상위 표(const X=[{…, fix:{run:o=>f(o)}, test:c=>…}]): 표 안의 함수는 속성 이름별 의사 함수 "X.run"·"X.test"로 두고, 그 안에서 부르는 함수를 호출로 잡음.
   // 어떤 함수가 그 속성을 멤버로 호출하면(rule.fix.run(o) · r.test(x)) 그 의사 함수를 부르는 것으로 봄 — 표를 참조만 하는 곳(AUDIT_RULES.map(r=>r.since))은 연결하지 않음.
