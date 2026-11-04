@@ -18,6 +18,7 @@ import { inlinePrompts, pureModules, imperative, fragmentFiles } from './lib/pro
 import { moveLiteral, slotName } from './prompts-move.mjs';
 import { moduleMap } from './lib/modules.mjs';
 import { reachable, claimNames } from './lib/history.mjs';
+import { surfaceOf, placeOf, surfaceMap } from './lib/surface.mjs';
 
 const root = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w = (p, s) => { mkdirSync(join(root, p, '..'), { recursive: true }); writeFileSync(join(root, p), s); };
 w('src/index.html', '<script>\n<!--@ main/ -->\n</script>\n');
@@ -265,5 +266,29 @@ function featA(){ return [G.meta.made, G.meta.never, G.world.lore, G.world.plot2
   assert.equal(fl['G.meta.never'], 'P0', '아무도 안 만들고 기본값도 없음 → P0'); assert.equal(fl['G.meta.list'], 'P0', '빈 지연 기본값(||[]) → P0'); assert.equal(fl['G.meta.cfg'], 'P1', '쓸 만한 지연 기본값(Object.assign({on:true},…)) → P1');
   assert.equal(fl.zzNew, 'P1', '캐릭터 콜백에서 읽는 새 필드가 어디에도 없음 → P1'); assert.equal(fl.zzMade, undefined, '생성물에 있는 필드는 통과: ' + JSON.stringify(fl));
   rmSync(r3, { recursive: true, force: true }); }
+// index.html 기능 표면(lib/surface.mjs): 탭·경로표·설정 하위 화면의 패널·창·동작 처리기에서 기능 단위를 뽑고, 함수 자리·모듈 판정(조각·슈퍼)
+{ const r14 = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w14 = (p, x) => { mkdirSync(join(r14, p, '..'), { recursive: true }); writeFileSync(join(r14, p), x); };
+  const html = '<nav class="tabs"><button class="tab" data-tab="home"><b>로비</b></button><button class="tab" data-tab="shop"><b>상점</b></button><button class="tab" data-tab="studio"><b>설정</b></button></nav>';
+  w14('src/index.html', html);
+  w14('src/main/010-core.js', "let tab='home', STTAB='game';\nfunction render(){ const nav={gacha:'home',home:'home',shop:'shop',studio:'studio'}[tab]||tab; const F={home:homeHTML,shop:shopHTML,studio:studioHTML,gacha:gachaHTML}; return nav+(F[tab]||homeHTML)(); }\nfunction openModal(h){ return h; }\nconst head=t=>`<h2>${t}</h2>`;\nfunction pageHead(ko){ return ko; }\n");
+  w14('src/main/020-home.js', "function homeHTML(){ return pageHead('로비')+'<button data-act=\"go\" data-to=\"gacha\">g</button>'; }\n");
+  w14('src/main/030-shop.js', "function shopHTML(){ return pageHead('상점')+'<button data-act=\"buy\">b</button>'+shopBanner(); }\nfunction buyItem(){ const p=shopPrice()+shopTax(); openReceipt(p); return p+bothUse(); }\nfunction shopPrice(){ return 1; }\nfunction shopList(){ return [shopPrice()]; }\nfunction shopRow(){ return shopList().length; }\nfunction openReceipt(p){ openModal(head('영수증')+p+receiptLine()); }\nfunction receiptLine(){ return shopRow(); }\n");
+  w14('src/main/040-gacha.js', "function gachaHTML(){ return pageHead('뽑기')+'<button data-act=\"pull\">p</button>'+gachaBanner(); }\nfunction pullOne(){ return rollRate()+gachaPity()+bothUse(); }\nfunction rollRate(){ return gachaRate2(); }\nfunction gachaOdds(){ return rollRate(); }\nfunction gachaLog(){ return gachaOdds(); }\n");
+  w14('src/main/050-fragment.js', "function shopTax(){ return 0.1; }\n");
+  w14('src/main/060-mixed.js', "function shopBanner(){ return shopSale()+shopSign(); }\nfunction shopSale(){ return 2; }\nfunction shopSign(){ return 3; }\nfunction gachaBanner(){ return gachaPity()+gachaSign(); }\nfunction gachaPity(){ return 4; }\nfunction gachaRate2(){ return 5; }\nfunction gachaSign(){ return 6; }\nfunction bothUse(){ return 7; }\n");
+  w14('src/main/070-studio.js', "function studioHTML(){ const ST=[['game','게임','g'],['img','그림','i'],['data','데이터','d']]; const SEC={game:`<div class=\"panel\"><h3>규칙</h3><button data-act=\"rules\">r</button></div><div class=\"panel\"><h3>밸런스</h3><button data-act=\"bal\">b</button></div>`, img:`${imgPanel()}`, data:`<p>${dataInfo()}</p>`}; return ST.length+(SEC[STTAB]||''); }\nfunction imgPanel(){ return '<div class=\"panel\"><h3>그림 설정</h3></div>'; }\nfunction dataInfo(){ return 'd'; }\nfunction editRules(){ return 1; }\nfunction editBal(){ return 2; }\n");
+  w14('src/main/080-actions.js', "function handleAction(a){ switch(a){ case 'buy': buyItem(); break; case 'pull': pullOne(); break; case 'rules': editRules(); break; case 'bal': editBal(); break; } }\ndocument.addEventListener('click',e=>handleAction(e.target.dataset.act));\n");
+  const u14 = await loadUnits(r14), g14 = buildGraph(u14), S = surfaceOf(u14, g14.fns, html), F = S.feats;
+  assert.deepEqual(S.tabs.map(t => t.label), ['로비', '상점', '설정'], '기능 표면: 아래 탭 이름');
+  assert.ok(F.get('gacha')?.menu === 'home' && F.get('gacha').label === '뽑기' && F.get('shop').label === '상점', '경로표·경로 → 탭 표·pageHead 이름: ' + JSON.stringify([...F.values()].map(f => [f.key, f.menu, f.label])));
+  assert.ok(['studio.game.1', 'studio.game.2'].every(k => F.get(k)?.kind === 'panel') && F.get('studio.game.1').label === '규칙' && F.get('studio.img.1')?.label === '그림 설정' && F.get('studio.data')?.kind === 'screen', '설정 하위 화면: 글 속 패널 덩어리·패널 함수·하위 화면 하나: ' + [...F.keys()].join(','));
+  assert.equal(F.get('창:openReceipt')?.unit, 'shop', '한 화면만 여는 창은 그 화면 단위');
+  const pl = k => placeOf(S, k); assert.ok(pl('buyItem').unit === 'shop' && pl('pullOne').unit === 'gacha' && pl('editRules').unit === 'studio.game.1' && pl('receiptLine').unit === 'shop', '함수 자리 = 가장 가까운 기능 단위(동작 처리기·창 안 포함): ' + ['buyItem', 'pullOne', 'editRules', 'receiptLine'].map(k => JSON.stringify(pl(k))).join(' '));
+  assert.equal(pl('bothUse').kind, '여러 메뉴', '두 메뉴가 같은 거리로 쓰는 함수 = 공용');
+  const V = surfaceMap(u14, g14.fns, stateFlow(u14, g14.fns), html).verdicts, vd = m => V.find(v => v.mod === 'src/main/' + m);
+  assert.ok(vd('050-fragment.js').kind === '조각' && vd('050-fragment.js').to === 'src/main/030-shop.js', '조각 모듈 → 그 단위 함수가 많은 모듈로: ' + JSON.stringify(vd('050-fragment.js')));
+  assert.ok(vd('060-mixed.js').kind === '슈퍼' && vd('060-mixed.js').split.length === 2, '관계없는 두 기능을 담은 모듈 = 슈퍼: ' + JSON.stringify(vd('060-mixed.js')));
+  assert.equal(vd('030-shop.js').kind, '고유', '한 기능 중심 모듈 = 고유');
+  rmSync(r14, { recursive: true, force: true }); }
 rmSync(root, { recursive: true, force: true });
-console.log('ok tools: 연관 맵(data 경로·역할·생성 함수·목록 변수·구조 판정·차이·게임 값) · 스튜디오 밖 조립 함수·불러올 때 조각 읽기 · 불러올 때 아직 없는 이름(TDZ) · 자연 경계(모듈성 묶기)·이름 범위(지역 이름·쓰기·await) · 프롬프트 흐름 보강(지역 변수·연결 층·넘겨받은 글 AI·돌려주는 식·출력 자리) · 프롬프트 글 검사(깨짐·과잉·과소·견본 읽기·조각 구성) · 개발 내역 검증(닿는 함수·보내는 쪽 없는 액션·글 속 코드 이름) · 모듈 경계(영역 침범·남의 상태 쓰기·파편화) · 지시문 옮기기(원문 그대로·자리 이름·표식 남김) · 프롬프트 조각 한곳(흩어짐 오류) · 프롬프트 스튜디오 밖 프롬프트 글(글 AI 호출 흐름·해라체) · 순수 모듈 경계 · 분석 코드 = 빌드된 SPA · 주석 속 코드 · 함수를 담은 표(멤버 호출 연결) · 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');
+console.log('ok tools: index.html 기능 표면(탭·경로표·하위 화면 패널·창·동작 → 기능 단위·함수 자리·조각·슈퍼 모듈) · 연관 맵(data 경로·역할·생성 함수·목록 변수·구조 판정·차이·게임 값) · 스튜디오 밖 조립 함수·불러올 때 조각 읽기 · 불러올 때 아직 없는 이름(TDZ) · 자연 경계(모듈성 묶기)·이름 범위(지역 이름·쓰기·await) · 프롬프트 흐름 보강(지역 변수·연결 층·넘겨받은 글 AI·돌려주는 식·출력 자리) · 프롬프트 글 검사(깨짐·과잉·과소·견본 읽기·조각 구성) · 개발 내역 검증(닿는 함수·보내는 쪽 없는 액션·글 속 코드 이름) · 모듈 경계(영역 침범·남의 상태 쓰기·파편화) · 지시문 옮기기(원문 그대로·자리 이름·표식 남김) · 프롬프트 조각 한곳(흩어짐 오류) · 프롬프트 스튜디오 밖 프롬프트 글(글 AI 호출 흐름·해라체) · 순수 모듈 경계 · 분석 코드 = 빌드된 SPA · 주석 속 코드 · 함수를 담은 표(멤버 호출 연결) · 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');

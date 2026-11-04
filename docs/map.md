@@ -1,6 +1,6 @@
 # 연관 맵 — 모듈 → 빌드 → index.html(생성기·실행기·편집기) → data 게임 파일
 
-생성: `node tools/map.mjs` · 2026-11-03T23:43 · git fa20988 · 입력: src 128파일 · www/index.html b8465c88e814 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
+생성: `node tools/map.mjs` · 2026-11-04T00:15 · git 0a341ea · 입력: src 128파일 · www/index.html b8465c88e814 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
 
 ## 읽는 법 — 거꾸로 따라가기
 
@@ -8,7 +8,8 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 
 1. 아래 1절에서 그 파일·경로를 찾아 **누가 만들고 고치나**(역할별 함수<sub>모듈</sub>)를 봄 — 시나리오면 `chapters.json`, 캐릭터 밸런스·스킬·이격이면 `chars.json`(`[].skills`·`[].hp`·`[].alt`·`[].over` …)
 2. `node tools/map.mjs --why <경로·함수·말>` — 함수마다 src 파일:줄 · index.html 줄 · 쓰는 프롬프트 조각, 그 경로의 점검 규칙·읽는 모듈·연계 모듈까지 한 번에
-3. 2절에서 그 모듈의 index.html 줄 범위·쓰는 데이터·연계 모듈(호출 수)을 보고, 고친 뒤 `node tools/map.mjs`로 맵을 갱신
+3. 4절에서 그 모듈의 index.html 줄 범위·쓰는 데이터·연계 모듈(호출 수)을 보고, 고친 뒤 `node tools/map.mjs`로 맵을 갱신
+4. 화면·창이 이상하면 2절(기능 표면)에서 그 기능 단위에 얽힌 모듈을, 3절에서 모듈 판정(조각·슈퍼)을 봄 — `--why <화면·창 이름>`도 기능 단위를 찾음
 
 역할 판정(정적): 생성기 = 새 게임 생성 단계(newGame…)가 부르는 함수 · 실행기 = 실행 중 AI(liveTick)·불러오기(fix)·앱을 열 때(부팅·게임 열기)가 부르거나, 사용자 조작이 진행(prog.json)을 쓰거나, 플레이 조작(진행을 쓰는 사용자 함수 — CRES()·CBUILD() 같은 접근 함수로 받은 객체 포함, 액션 분배기 제외)에서 닿는 콘텐츠 쓰기(예: 건조 바리에이션) · 편집기 = 사용자 조작이 플레이 조작을 거치지 않고 콘텐츠를 씀 · 기타 = 위 시작점에서 닿지 않음(엔진 안쪽 등). 한 함수가 여러 역할일 수 있음(예: cleanChar는 생성·실행 중 AI 둘 다). 「게임」 = 시험 게임 2개 중 값이 있는 수
 
@@ -372,7 +373,277 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | source | buildManualGameDraft<sub>0260-new-game/</sub> buildNewGameDraft<sub>0260-new-game/</sub> |  |  |  |  | CAST_SEX_F CAST_SEX_M CAST_SEX_MIX CTX_ALT_CANON CTX_ALT_SIDE …외 33 | 0/2 |
 | summary | buildManualGameDraft<sub>0260-new-game/</sub> buildNewGameDraft<sub>0260-new-game/</sub> |  | handleStoryAndAuthoringAction<sub>0510-actions/</sub> |  |  | CAST_SEX_F CAST_SEX_M CAST_SEX_MIX CTX_ALT_CANON CTX_ALT_SIDE …외 45 | 2/2 |
 
-## 2. 모듈 → index.html 줄 · 역할 · 쓰는 데이터 · 연계 모듈
+## 2. index.html 기능 표면 → 기능 단위 → 얽힌 모듈
+
+산출물 index.html이 사용자에게 보여 주고 수행하는 기능을 코드에서 뽑은 분류(지금 모듈 구조는 기준이 아님 — 원안 한 파일을 고려 없이 나눈 것이라 대어 보는 대상): 아래 탭(메뉴) → 화면(경로표)·설정 하위 화면의 패널 → 창(openModal) + 배경(새 게임 생성·실행 중 AI·불러오기·앱 시작). 한 화면에서만 여는 창은 그 화면 안, 여러 단위가 여는 창은 공용 창. 함수는 동작(data-act → 처리기)과 호출을 따라 **가장 가까운 기능 단위**에 붙임(같은 거리면 같이 씀 — 공용·엔진). 「함수」 = 그 단위에서만 닿는 함수 수
+
+### 대원
+
+| 기능 단위 | 종류 | 함수 | 얽힌 모듈(함수 수) | 안의 창 |
+|---|---|---|---|---|
+| 대원 | 화면 | 2 | 0150-pickup-existing 1, 0180-ui-scroll 1 | openAddChar |
+
+### 작전
+
+| 기능 단위 | 종류 | 함수 | 얽힌 모듈(함수 수) | 안의 창 |
+|---|---|---|---|---|
+| 작전 | 화면 | 5 | 0180-ui-scroll 4, 0488-stage-modes 1 |  |
+
+### 로비
+
+| 기능 단위 | 종류 | 함수 | 얽힌 모듈(함수 수) | 안의 창 |
+|---|---|---|---|---|
+| disp | 화면 | 28 | 0275-expedition 21, 0274-dispatch 6, 0505-construct 1 | openDispSel |
+| 도전 | 화면 | 22 | 0120-abyss 13, 0125-tower 7, 0110-challenge-raid 1, 0490-boss-patterns 1 | openRgForm |
+| 도감 | 화면 | 22 | 0300-codex 19, 0015-prompt-studio/ 3 | openCx · openCxEdit |
+| 미지 탐사 | 화면 | 17 | 0120-abyss 17 |  |
+| 창 만든  | 공용 창 | 13 | 0020-ai-connect 6, 0015-prompt-studio/ 4, 0180-ui-scroll 2, 0030-image/ 1 | renderVoice |
+| 상점 | 화면 | 12 | 0190-shop 9, 0015-prompt-studio/ 2, 0030-image/ 1 | 상점 주인 |
+| 일정 | 화면 | 11 | 0135-schedule 9, 0015-prompt-studio/ 2 |  |
+| 로비 | 화면 | 10 | 0462-direction 3, 0090-growth 2, 0100-messenger 2, 0180-ui-scroll 1, 0290-season-rotation 1 …외 1 |  |
+| 캐시 상점 | 화면 | 9 | 0190-shop 5, 0270-skin-proposal 2, 0080-storage-integration 1, 0200-skin-shop 1 | 사면 함께 만들 것 |
+| 훈련 | 화면 | 7 | 0090-growth 3, 0490-boss-patterns 2, 0180-ui-scroll 1, 0240-growth-curve 1 |  |
+| evd | 화면 | 3 | 0250-story-factory 2, 0180-ui-scroll 1 | 이벤트 편집 |
+| evshop | 화면 | 2 | 0040-sound 1, 0180-ui-scroll 1 |  |
+| 시즌 패스 | 화면 | 2 | 0090-growth 1, 0180-ui-scroll 1 |  |
+| 창 수락하면 함께 만들 것 | 공용 창 | 2 | 0270-skin-proposal 2 |  |
+| 공지 | 화면 | 1 | 0290-season-rotation 1 |  |
+| 이벤트 | 화면 | 1 | 0180-ui-scroll 1 |  |
+| 창 ⚡ 행동력 | 공용 창 | 1 | 0090-growth 1 |  |
+| 창 덱 | 공용 창 | 1 | 0120-abyss 1 |  |
+| 창 rgAbandon | 공용 창 | 1 | 0120-abyss 1 |  |
+
+### 계약
+
+| 기능 단위 | 종류 | 함수 | 얽힌 모듈(함수 수) | 안의 창 |
+|---|---|---|---|---|
+| 영입 | 화면 | 19 | 0505-construct 17, 0190-shop 1, 0500-gacha 1 | conBuild |
+| 계약 | 화면 | 17 | 0500-gacha 10, 0240-growth-curve 2, 0130-gift 1, 0180-ui-scroll 1, 0250-story-factory 1 …외 2 | openBanner · openBannerFrom · 모집 포인트 교환 · openHistory |
+
+### 설정
+
+| 기능 단위 | 종류 | 함수 | 얽힌 모듈(함수 수) | 안의 창 |
+|---|---|---|---|---|
+| 설정 › 그림 AI | 화면 | 22 | 0020-ai-connect 8, 0370-game-picker 7, 0210-setup 3, 0330-casting 2, 0030-image/ 1 …외 1 |  |
+| 설정 › 게임 › 게임 규칙 (속성·포지션·능력치) | 패널 | 19 | 0185-game-rules 16, 0015-prompt-studio/ 2, 0187-balance 1 | 게임 규칙 |
+| 설정 › 게임 › 콘텐츠 점검·업그레이드 | 패널 | 18 | 0535-content-audit 15, 0015-prompt-studio/ 2, 0185-game-rules 1 | openAudit |
+| 설정 › 게임 › 세력·몬스터·등장 관리 | 패널 | 17 | 0445-factions 14, 0250-story-factory 2, 0015-prompt-studio/ 1 | 세력·몬스터·등장 관리 |
+| 창 openAp | 공용 창 | 16 | 0020-ai-connect 11, 0180-ui-scroll 3, 0015-prompt-studio/ 1, 0530-story-memory 1 |  |
+| 설정 › 게임 › 에셋 관리 | 패널 | 15 | 0565-asset-library 13, 0462-direction 2 | 에셋 관리 |
+| 설정 › 데이터 › backupBlocks | 패널 | 14 | 0525-data-folder 12, 0520-backup-storage 2 | openBackupChoice · 데이터 폴더 내보내기 완료 |
+| 설정 › 게임 › 밸런스 관리 | 패널 | 13 | 0187-balance 13 | 밸런스 점검·설정 |
+| 설정 › 게임 › 캐릭터 개성·매력 | 패널 | 13 | 0455-persona 9, 0015-prompt-studio/ 4 | 캐릭터 개성 검수·설정 |
+| 창 openFaces | 공용 창 | 12 | 0030-image/ 9, 0015-prompt-studio/ 2, 0080-storage-integration 1 |  |
+| 창 소리 | 공용 창 | 12 | 0040-sound 4, 0080-storage-integration 2, 0460-script-engine 2, 0015-prompt-studio/ 1, 0060-util 1 …외 2 |  |
+| 창 PC 서버 | 공용 창 | 11 | 0360-sync/ 9, 0020-ai-connect 2 | pcStart |
+| 창 checkUpdate | 공용 창 | 11 | 0420-app-update 11 | 새 APK 설치가 필요해요 · 업데이트를 받았어요 · 새 버전을 받았어요 |
+| 설정 › 게임 › 프롬프트 스튜디오 | 패널 | 11 | 0015-prompt-studio/ 11 | 프롬프트 스튜디오 |
+| 설정 › 화면·연출 › 연출 | 패널 | 11 | 0470-title-opening 8, 0060-util 1, 0180-ui-scroll 1, 0290-season-rotation 1 |  |
+| 설정 › 게임 › 시나리오 설계 | 패널 | 9 | 0465-story-plan 8, 0015-prompt-studio/ 1 | 시나리오 설계 |
+| 설정 › 관리관 | 화면 | 9 | 0160-free-chat 5, 0180-ui-scroll 4 |  |
+| 설정 › 글 AI | 화면 | 9 | 0020-ai-connect 8, 0180-ui-scroll 1 |  |
+| 창 🌐 게임 게시 | 공용 창 | 8 | 0400-publish-subscribe 6, 0080-storage-integration 1, 0335-github-api 1 | 게시했어요 |
+| 창 게임 목록 | 공용 창 | 7 | 0210-setup 2, 0080-storage-integration 1, 0250-story-factory 1, 0260-new-game/ 1, 0370-game-picker 1 …외 1 |  |
+| 창 공유 팩 만들기 | 공용 창 | 6 | 0520-backup-storage 5, 0230-modal 1 | 공유 팩 저장 완료 · exportFile |
+| 설정 › 게임 › conSettingsPanel | 패널 | 6 | 0505-construct 6 | 바리에이션 (공통 설정) |
+| 설정 › 게임 › exSettingsPanel | 패널 | 6 | 0275-expedition 5, 0274-dispatch 1 | openExSet |
+| 창 캐릭터 디자인 통일 | 공용 창 | 5 | 0030-image/ 4, 0015-prompt-studio/ 1 |  |
+| 창 그림 AI | 공용 창 | 5 | 0030-image/ 3, 0020-ai-connect 2 |  |
+| 설정 › 연동 › PC·폰 연동 | 패널 | 5 | 0360-sync/ 5 |  |
+| 창 게임 정의 | 공용 창 | 4 | 0440-ai-context 2, 0185-game-rules 1, 0250-story-factory 1 |  |
+| 창 🔗 게임 구독 | 공용 창 | 4 | 0400-publish-subscribe 4 |  |
+| 설정 › 시즌 운영 | 화면 | 4 | 0290-season-rotation 4 |  |
+| 창 openPresetCode | 공용 창 | 3 | 0020-ai-connect 3 |  |
+| 창 배경음 한꺼번에 만들기 | 공용 창 | 3 | 0040-sound 3 |  |
+| 창 초안 내보내기 | 공용 창 | 3 | 0260-new-game/ 3 |  |
+| 창 subCheck | 공용 창 | 3 | 0400-publish-subscribe 3 |  |
+| 설정 › 게임 › 전투 체계 | 패널 | 3 | 0487-formation-sortie 2, 0488-stage-modes 1 |  |
+| 창 피드백 보내기 | 공용 창 | 2 | 0230-modal 2 |  |
+| 창 세계관 | 공용 창 | 2 | 0015-prompt-studio/ 1, 0240-growth-curve 1 |  |
+| 창 오프닝 | 공용 창 | 2 | 0015-prompt-studio/ 1, 0240-growth-curve 1 |  |
+| 창 다른 기기에 더 새 데이터가 있어요 | 공용 창 | 2 | 0360-sync/ 2 |  |
+| 창 홈 화면에 추가해 주세요 | 공용 창 | 2 | 0020-ai-connect 1, 0410-desktop 1 |  |
+| 창 업데이트가 있어요 | 공용 창 | 2 | 0420-app-update 2 |  |
+| 창 앱 업데이트 | 공용 창 | 2 | 0420-app-update 2 |  |
+| 창 백업과 가져오기 | 공용 창 | 2 | 0080-storage-integration 1, 0420-app-update 1 |  |
+| 창 backupExport | 공용 창 | 2 | 0520-backup-storage 2 |  |
+| 설정 › 게임 › 플레이 모드 | 패널 | 2 | 0170-render 2 |  |
+| 설정 › 게임 › 패널 17 | 패널 | 2 | 0090-growth 2 |  |
+| 설정 › 화면·연출 › 아이폰·웹 연결 | 패널 | 2 | 0020-ai-connect 1, 0410-desktop 1 |  |
+| 설정 › 연동 › PC 서버 | 패널 | 2 | 0020-ai-connect 1, 0360-sync/ 1 |  |
+| 설정 › 데이터 | 화면 | 2 | 0080-storage-integration 2 |  |
+| 설정 | 화면 | 1 | 0180-ui-scroll 1 |  |
+| 창 AI로 다시 만들기 | 공용 창 | 1 | 0030-image/ 1 |  |
+| 창 shareText | 공용 창 | 1 | 0230-modal 1 |  |
+| 창 openPcHist | 공용 창 | 1 | 0360-sync/ 1 |  |
+| 창 중계 서버 (아이폰·웹) | 공용 창 | 1 | 0410-desktop 1 |  |
+| 설정 › 게임 › 게시·구독 | 패널 | 1 | 0400-publish-subscribe 1 |  |
+| 설정 › 앱 정보 › 업데이트 | 패널 | 1 | 0420-app-update 1 |  |
+| 설정 › 앱 정보 › 공유와 피드백 | 패널 | 1 | 0230-modal 1 |  |
+
+### 배경(누르지 않아도 하는 일)
+
+| 기능 단위 | 종류 | 함수 | 얽힌 모듈(함수 수) | 안의 창 |
+|---|---|---|---|---|
+| 새 게임 생성 | 배경 | 70 | 0015-prompt-studio/ 21, 0260-new-game/ 19, 0485-battle-rules 5, 0185-game-rules 4, 0250-story-factory 3 …외 10 |  |
+| 실행 중 AI | 배경 | 21 | 0290-season-rotation 6, 0280-live-ops 4, 0537-live-fill 4, 0015-prompt-studio/ 2, 0200-skin-shop 2 …외 3 | openNotice |
+| 앱 시작 | 배경 | 18 | 0015-prompt-studio/ 4, 0050-default-content 4, 0020-ai-connect 2, 0070-save 2, 0080-storage-integration 2 …외 4 |  |
+
+### 여러 메뉴가 여는 창
+
+| 기능 단위 | 종류 | 함수 | 얽힌 모듈(함수 수) | 안의 창 |
+|---|---|---|---|---|
+| 창 개인 스토리 | 공용 창 | 74 | 0100-messenger 21, 0030-image/ 9, 0160-free-chat 9, 0230-modal 9, 0015-prompt-studio/ 6 …외 10 | openImgLib |
+| 창 openCharEdit | 공용 창 | 42 | 0030-image/ 19, 0020-ai-connect 11, 0015-prompt-studio/ 9, 0230-modal 3 | 그리기 전 확인 · openNaiGen |
+| 창 등장  | 공용 창 | 29 | 0030-image/ 22, 0015-prompt-studio/ 4, 0040-sound 2, 0240-growth-curve 1 | 배경 지우기 |
+| 창 openDraft | 공용 창 | 25 | 0260-new-game/ 17, 0015-prompt-studio/ 7, 0020-ai-connect 1 |  |
+| 창 regenPreview | 공용 창 | 17 | 0030-image/ 15, 0015-prompt-studio/ 2 | 다시 만드는 중 |
+| 창 openFormation | 공용 창 | 16 | 0240-growth-curve 5, 0230-modal 4, 0485-battle-rules 3, 0487-formation-sortie 2, 0125-tower 1 …외 1 |  |
+| 창 openModeStage | 공용 창 | 13 | 0488-stage-modes 11, 0150-pickup-existing 1, 0500-gacha 1 | 증거 제시 · contestDraw |
+| 창 챕터 편집 | 공용 창 | 10 | 0015-prompt-studio/ 5, 0240-growth-curve 3, 0450-relations-memory 1, 0530-story-memory 1 |  |
+| 창 NPC | 공용 창 | 10 | 0330-casting 7, 0015-prompt-studio/ 2, 0310-art-after-ai 1 |  |
+| 창 표정 한꺼번에 만들기 | 공용 창 | 9 | 0330-casting 9 |  |
+| 창 관계 고치기 | 공용 창 | 9 | 0450-relations-memory 8, 0015-prompt-studio/ 1 | 인물 관계도 |
+| 창 sortieMap | 공용 창 | 9 | 0487-formation-sortie 9 |  |
+| 창 우편함 | 공용 창 | 8 | 0220-mail 8 |  |
+| 창 openUpConfirm | 공용 창 | 7 | 0090-growth 7 |  |
+| 창 openGift | 공용 창 | 6 | 0130-gift 4, 0090-growth 2 |  |
+| 창 이야기 기억 다시 정리 | 공용 창 | 6 | 0530-story-memory 4, 0015-prompt-studio/ 2 | openStoryMemoryEditor |
+| 창 openLib | 공용 창 | 5 | 0015-prompt-studio/ 2, 0040-sound 2, 0240-growth-curve 1 |  |
+| 창 openPickExisting | 공용 창 | 4 | 0150-pickup-existing 4 |  |
+| 창 openEpEdit | 공용 창 | 4 | 0015-prompt-studio/ 2, 0230-modal 2 |  |
+| 창 openThEdit | 공용 창 | 4 | 0230-modal 2, 0015-prompt-studio/ 1, 0100-messenger 1 |  |
+| 창 새 그림을 그릴까요? | 공용 창 | 4 | 0310-art-after-ai 3, 0020-ai-connect 1 |  |
+| 창 openStoryStage | 공용 창 | 4 | 0480-battle 3, 0250-story-factory 1 |  |
+| 창 초안 가져오기 | 공용 창 | 3 | 0260-new-game/ 3 |  |
+| 창 PC·폰 연동 | 공용 창 | 3 | 0360-sync/ 3 |  |
+| 창 스토리 기억 관리 | 공용 창 | 3 | 0530-story-memory 3 |  |
+| 창 신규 픽업 만들기 | 공용 창 | 2 | 0140-pickup-new 1, 0280-live-ops 1 |  |
+| 창 AI로 이벤트 만들기 | 공용 창 | 2 | 0250-story-factory 1, 0270-skin-proposal 1 |  |
+| 창 시즌 | 공용 창 | 2 | 0290-season-rotation 2 |  |
+| 창 openPrep | 공용 창 | 2 | 0290-season-rotation 2 |  |
+| 창 pcPush | 공용 창 | 2 | 0360-sync/ 2 |  |
+| 창 opEnd | 공용 창 | 2 | 0470-title-opening 2 |  |
+| 창 일괄 생성 | 공용 창 | 1 | 0030-image/ 1 |  |
+| 창 스토리 삭제 | 공용 창 | 1 | 0250-story-factory 1 |  |
+| 창 다른 기기의 새 데이터가 있어요 | 공용 창 | 1 | 0360-sync/ 1 |  |
+| 창 openPullFail | 공용 창 | 1 | 0360-sync/ 1 |  |
+| 창 링크 열기 | 공용 창 | 1 | 0420-app-update 1 |  |
+| 창 openAiChapter | 공용 창 | 1 | 0420-app-update 1 |  |
+| 창 프로필 | 공용 창 | 1 | 0455-persona 1 |  |
+| 창 smTextView | 공용 창 | 1 | 0530-story-memory 1 |  |
+
+## 3. 모듈 판정 — 고유 · 조각(합칠 곳) · 슈퍼(나눌 기능) · 엔진 · 기반
+
+src/main 모듈 69: 고유 37 · 조각 6 · 슈퍼 13 · 엔진 13 · 기반 0 · 파편화 단위 17 — 판정(lib/surface.mjs moduleVerdicts): 고유 = 한 기능 단위가 중심(같은 데이터·창·도우미를 짝으로 같이 쓰는 실행기 화면·편집기 패널·창은 한 기능) · 조각 = 중심 단위 함수가 다른 모듈에 2배 이상 → 그 모듈로 합칠 대상 · 슈퍼 = 관계없는 기능(함수 max(3, 20%)↑)을 둘 이상, 또는 함수 2개↑ 기능을 4개 이상 담음 → 나눌 대상 · 엔진 = 여러 메뉴가 같이 쓰는 함수 중심 · 기반 = 허브 함수 중심. `node tools/map.mjs --strict`: 조각·슈퍼·파편화가 기준선(tools/baseline.json의 surface)보다 늘면 실패
+
+### 슈퍼 모듈 — 나눌 기능
+
+| 모듈 | 함수(기능·공용·기반·닿지 않음) | 나눌 기능 묶음 → 옮길 곳(그 단위 함수가 가장 많은 다른 모듈, 없으면 새 자리) |
+|---|---|---|
+| 0015-prompt-studio/ | 156 (109·23·2·22) | [새 게임 생성 + 창 openCharEdit + 창 openDraft …] 47 → 새 자리 / [설정 › 게임 › 프롬프트 스튜디오 + 설정 › 게임 › 캐릭터 개성·매력] 15 → 새 자리 / [창 개인 스토리 + 창 openEpEdit] 8 → 0100-messenger / [창 챕터 편집] 5 → 새 자리 / [앱 시작] 4 → 새 자리 / [창 만든 ] 4 → 0020-ai-connect / [도감] 3 → 0300-codex / [창 regenPreview] 2 → 0030-image/ / [일정] 2 → 0135-schedule / [실행 중 AI] 2 → 0290-season-rotation / [창 openFaces] 2 → 0030-image/ / [창 NPC] 2 → 0330-casting / [상점] 2 → 0190-shop / [창 이야기 기억 다시 정리] 2 → 0530-story-memory |
+| 0020-ai-connect | 98 (60·29·2·7) | [창 openAp + 설정 › 글 AI + 설정 › 그림 AI …] 34 → 새 자리 / [창 openCharEdit] 11 → 0030-image/ / [창 만든 ] 6 → 새 자리 / [앱 시작] 2 → 0015-prompt-studio/ |
+| 0030-image/ | 110 (87·17·1·5) | [창 등장  + 창 openCharEdit + 창 개인 스토리] 50 → 새 자리 / [창 regenPreview] 15 → 새 자리 / [창 openFaces] 9 → 새 자리 / [창 캐릭터 디자인 통일 + 창 그림 AI] 7 → 새 자리 |
+| 0090-growth | 37 (21·14·2·0) | [창 openUpConfirm] 7 → 새 자리 / [훈련] 3 → 새 자리 / [창 개인 스토리 + 창 openGift] 4 → 0100-messenger / [설정 › 게임 › 패널 17] 2 → 새 자리 / [로비] 2 → 0462-direction |
+| 0160-free-chat | 16 (16·0·0·0) | [창 개인 스토리] 9 → 0100-messenger / [설정 › 관리관] 5 → 새 자리 / [새 게임 생성] 2 → 0015-prompt-studio/ |
+| 0230-modal | 33 (25·4·4·0) | [창 개인 스토리 + 창 openEpEdit + 창 openThEdit] 13 → 0100-messenger / [창 openFormation] 4 → 0240-growth-curve / [창 openCharEdit] 3 → 0030-image/ / [창 피드백 보내기] 2 → 새 자리 |
+| 0290-season-rotation | 28 (21·7·0·0) | [실행 중 AI] 6 → 새 자리 / [설정 › 시즌 운영 + 창 시즌] 6 → 새 자리 / [창 개인 스토리] 2 → 0100-messenger / [창 openPrep] 2 → 새 자리 |
+| 0330-casting | 18 (18·0·0·0) | [창 표정 한꺼번에 만들기] 9 → 새 자리 / [창 NPC] 7 → 새 자리 / [설정 › 그림 AI] 2 → 0020-ai-connect |
+| 0360-sync/ | 47 (25·21·0·1) | [창 PC 서버] 9 → 새 자리 / [설정 › 연동 › PC·폰 연동] 5 → 새 자리 / [창 PC·폰 연동] 3 → 새 자리 / [창 pcPush] 2 → 새 자리 / [창 다른 기기에 더 새 데이터가 있어요] 2 → 새 자리 |
+| 0450-relations-memory | 24 (12·12·0·0) | [창 관계 고치기] 8 → 새 자리 / [새 게임 생성] 3 → 0015-prompt-studio/ |
+| 0455-persona | 21 (13·5·0·3) | [설정 › 게임 › 캐릭터 개성·매력] 9 → 새 자리 / [창 개인 스토리] 3 → 0100-messenger |
+| 0485-battle-rules | 11 (8·2·0·1) | [새 게임 생성] 5 → 0015-prompt-studio/ / [창 openFormation] 3 → 0240-growth-curve |
+| 0530-story-memory | 15 (10·2·0·3) | [창 이야기 기억 다시 정리] 4 → 새 자리 / [창 스토리 기억 관리] 3 → 새 자리 |
+
+### 조각 모듈 — 합칠 곳
+
+| 모듈 | 함수 | 중심 기능 단위 | 이 모듈 | 합칠 곳(그 단위 함수) |
+|---|---|---|---|---|
+| 0200-skin-shop | 5 | 실행 중 AI | 2 | 0290-season-rotation (6) |
+| 0210-setup | 8 | 설정 › 그림 AI | 3 | 0020-ai-connect (8) |
+| 0274-dispatch | 7 | disp | 6 | 0275-expedition (21) |
+| 0410-desktop | 6 | 앱 시작 | 1 | 0015-prompt-studio/ (4) |
+| 0510-actions/ | 14 | 창 게임 목록 | 1 | 0210-setup (2) |
+| 0550-standalone-app | 4 | 창 개인 스토리 | 3 | 0100-messenger (21) |
+
+### 파편화 기능 단위 — 3개 이상 모듈에 흩어지고 가장 많은 모듈 몫 60% 미만
+
+| 기능 단위 | 함수 | 가장 많은 모듈 몫 | 모듈(함수 수) |
+|---|---|---|---|
+| 앱 시작 | 18 | 22% | 0015-prompt-studio/ 4, 0050-default-content 4, 0020-ai-connect 2, 0070-save 2, 0080-storage-integration 2 …외 4 |
+| 창 만든  | 13 | 46% | 0020-ai-connect 6, 0015-prompt-studio/ 4, 0180-ui-scroll 2, 0030-image/ 1 |
+| 창 개인 스토리 | 74 | 28% | 0100-messenger 21, 0030-image/ 9, 0160-free-chat 9, 0230-modal 9, 0015-prompt-studio/ 6 …외 10 |
+| 창 openCharEdit | 42 | 45% | 0030-image/ 19, 0020-ai-connect 11, 0015-prompt-studio/ 9, 0230-modal 3 |
+| 창 소리 | 12 | 33% | 0040-sound 4, 0080-storage-integration 2, 0460-script-engine 2, 0015-prompt-studio/ 1, 0060-util 1 …외 2 |
+| 새 게임 생성 | 70 | 30% | 0015-prompt-studio/ 21, 0260-new-game/ 19, 0485-battle-rules 5, 0185-game-rules 4, 0250-story-factory 3 …외 10 |
+| 실행 중 AI | 21 | 29% | 0290-season-rotation 6, 0280-live-ops 4, 0537-live-fill 4, 0015-prompt-studio/ 2, 0200-skin-shop 2 …외 3 |
+| 창 챕터 편집 | 10 | 50% | 0015-prompt-studio/ 5, 0240-growth-curve 3, 0450-relations-memory 1, 0530-story-memory 1 |
+| 창 openLib | 5 | 40% | 0015-prompt-studio/ 2, 0040-sound 2, 0240-growth-curve 1 |
+| 설정 › 그림 AI | 22 | 36% | 0020-ai-connect 8, 0370-game-picker 7, 0210-setup 3, 0330-casting 2, 0030-image/ 1 …외 1 |
+| 창 게임 목록 | 7 | 29% | 0210-setup 2, 0080-storage-integration 1, 0250-story-factory 1, 0260-new-game/ 1, 0370-game-picker 1 …외 1 |
+| 캐시 상점 | 9 | 56% | 0190-shop 5, 0270-skin-proposal 2, 0080-storage-integration 1, 0200-skin-shop 1 |
+| 훈련 | 7 | 43% | 0090-growth 3, 0490-boss-patterns 2, 0180-ui-scroll 1, 0240-growth-curve 1 |
+| 로비 | 10 | 30% | 0462-direction 3, 0090-growth 2, 0100-messenger 2, 0180-ui-scroll 1, 0290-season-rotation 1 …외 1 |
+| 도전 | 22 | 59% | 0120-abyss 13, 0125-tower 7, 0110-challenge-raid 1, 0490-boss-patterns 1 |
+| 창 openFormation | 16 | 31% | 0240-growth-curve 5, 0230-modal 4, 0485-battle-rules 3, 0487-formation-sortie 2, 0125-tower 1 …외 1 |
+| 계약 | 17 | 59% | 0500-gacha 10, 0240-growth-curve 2, 0130-gift 1, 0180-ui-scroll 1, 0250-story-factory 1 …외 2 |
+
+### 그 밖의 모듈
+
+| 모듈 | 판정 | 함수(기능·공용·기반·닿지 않음) | 중심 기능 단위 |
+|---|---|---|---|
+| 0010-rules | 엔진 | 5 (0·4·1·0) |  |
+| 0040-sound | 고유 | 26 (13·11·2·0) | 창 소리 |
+| 0050-default-content | 고유 | 4 (4·0·0·0) | 앱 시작 |
+| 0060-util | 엔진 | 32 (2·18·10·2) |  |
+| 0065-inherit | 엔진 | 11 (2·6·0·3) |  |
+| 0070-save | 엔진 | 13 (2·7·3·1) |  |
+| 0080-storage-integration | 엔진 | 40 (14·20·3·3) |  |
+| 0100-messenger | 고유 | 29 (24·4·0·1) | 창 개인 스토리 |
+| 0110-challenge-raid | 엔진 | 6 (1·5·0·0) |  |
+| 0120-abyss | 엔진 | 69 (32·37·0·0) |  |
+| 0125-tower | 고유 | 9 (8·1·0·0) | 도전 |
+| 0130-gift | 고유 | 9 (5·1·0·3) | 창 openGift |
+| 0135-schedule | 고유 | 10 (9·1·0·0) | 일정 |
+| 0140-pickup-new | 고유 | 1 (1·0·0·0) | 창 신규 픽업 만들기 |
+| 0150-pickup-existing | 고유 | 9 (6·3·0·0) | 창 openPickExisting |
+| 0170-render | 고유 | 2 (2·0·0·0) | 설정 › 게임 › 플레이 모드 |
+| 0180-ui-scroll | 고유 | 38 (25·9·1·3) | 설정 › 관리관 |
+| 0185-game-rules | 고유 | 35 (24·8·0·3) | 설정 › 게임 › 게임 규칙 (속성·포지션·능력치) |
+| 0187-balance | 고유 | 16 (14·1·0·1) | 설정 › 게임 › 밸런스 관리 |
+| 0190-shop | 고유 | 20 (15·5·0·0) | 상점 |
+| 0220-mail | 고유 | 11 (8·2·0·1) | 창 우편함 |
+| 0240-growth-curve | 고유 | 21 (16·5·0·0) | 창 openFormation |
+| 0250-story-factory | 엔진 | 39 (14·24·0·1) |  |
+| 0260-new-game/ | 고유 | 49 (43·6·0·0) | 새 게임 생성 |
+| 0270-skin-proposal | 엔진 | 11 (5·6·0·0) |  |
+| 0275-expedition | 고유 | 29 (26·2·0·1) | disp |
+| 0280-live-ops | 고유 | 7 (5·2·0·0) | 실행 중 AI |
+| 0300-codex | 고유 | 21 (20·1·0·0) | 도감 |
+| 0310-art-after-ai | 고유 | 4 (4·0·0·0) | 창 새 그림을 그릴까요? |
+| 0335-github-api | 엔진 | 10 (1·9·0·0) |  |
+| 0370-game-picker | 고유 | 8 (8·0·0·0) | 설정 › 그림 AI |
+| 0400-publish-subscribe | 고유 | 15 (14·1·0·0) | 창 🌐 게임 게시 |
+| 0420-app-update | 고유 | 25 (19·5·0·1) | 창 checkUpdate |
+| 0440-ai-context | 엔진 | 5 (2·3·0·0) |  |
+| 0445-factions | 고유 | 25 (18·5·0·2) | 설정 › 게임 › 세력·몬스터·등장 관리 |
+| 0460-script-engine | 엔진 | 17 (2·15·0·0) |  |
+| 0462-direction | 고유 | 18 (7·7·0·4) | 로비 |
+| 0465-story-plan | 고유 | 11 (8·3·0·0) | 설정 › 게임 › 시나리오 설계 |
+| 0470-title-opening | 고유 | 10 (10·0·0·0) | 설정 › 화면·연출 › 연출 |
+| 0480-battle | 엔진 | 16 (5·8·0·3) |  |
+| 0487-formation-sortie | 고유 | 21 (14·6·0·1) | 창 sortieMap |
+| 0488-stage-modes | 고유 | 17 (16·1·0·0) | 창 openModeStage |
+| 0490-boss-patterns | 고유 | 6 (4·2·0·0) | 훈련 |
+| 0500-gacha | 고유 | 22 (13·9·0·0) | 계약 |
+| 0505-construct | 고유 | 31 (27·4·0·0) | 영입 |
+| 0520-backup-storage | 고유 | 26 (9·8·0·9) | 창 공유 팩 만들기 |
+| 0525-data-folder | 고유 | 12 (12·0·0·0) | 설정 › 데이터 › backupBlocks |
+| 0535-content-audit | 고유 | 18 (15·2·0·1) | 설정 › 게임 › 콘텐츠 점검·업그레이드 |
+| 0537-live-fill | 고유 | 4 (4·0·0·0) | 실행 중 AI |
+| 0565-asset-library | 고유 | 14 (13·1·0·0) | 설정 › 게임 › 에셋 관리 |
+
+## 4. 모듈 → index.html 줄 · 역할 · 쓰는 데이터 · 연계 모듈
 
 | 모듈 | index.html 줄 | 함수 | 역할(쓰기 수) | 쓰는 data | 연계 모듈(호출 수) |
 |---|---|---|---|---|---|
@@ -461,8 +732,12 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | combat/080-training | 4482~4506 | 9 |  |  | 0060-util 11, 0090-growth 5, 0230-modal 3, 0010-rules 1, 0070-save 1 |
 | combat/090-practice | 4509~4562 | 9 |  |  | 0060-util 7, 0230-modal 3, 0460-script-engine 2, 0090-growth 1, 0480-battle 1 |
 
-## 3. 최근 변화(증분 갱신 기록)
+## 5. 최근 변화(증분 갱신 기록)
 
+- 2026-11-04T00:15 · git 0a341ea
+- 2026-11-04T00:13 · git 0a341ea
+- 2026-11-04T00:12 · git 0a341ea
+- 2026-11-04T00:11 · git 0a341ea
 - 2026-11-03T23:43 · git fa20988 · src 5: 0020-ai-connect, 0220-mail, 0274-dispatch, 0275-expedition, 0510-actions/030-mail · index.html 다시 빌드
   - 함수: 추가 2 (mailRemove, dispEndAll) · 삭제 0 · 옮김 0
   - prog.json › disp: +실행기:dispEndAll −실행기:exSave
@@ -481,4 +756,3 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
   - banners.json › [].gate:  −편집기:addPickupFor
   - banners.json › [].id:  −편집기:addPickupFor
   - banners.json › [].name:  −편집기:addPickupFor −편집기:rotatePickups
-- 2026-11-03T23:16 · git 2a0c2e5 · 처음 만듦

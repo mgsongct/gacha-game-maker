@@ -2040,5 +2040,259 @@
    },
    "text": "src/modules/combat/050-bridge.js 1개"
   }
+ ],
+ "surface": [
+  {
+   "key": "기능 표면 슈퍼|src/main/0015-prompt-studio/",
+   "num": {
+    "함수": 109
+   },
+   "text": "슈퍼 0015-prompt-studio/"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0020-ai-connect.js",
+   "num": {
+    "함수": 60
+   },
+   "text": "슈퍼 0020-ai-connect"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0030-image/",
+   "num": {
+    "함수": 87
+   },
+   "text": "슈퍼 0030-image/"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0090-growth.js",
+   "num": {
+    "함수": 21
+   },
+   "text": "슈퍼 0090-growth"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0160-free-chat.js",
+   "num": {
+    "함수": 16
+   },
+   "text": "슈퍼 0160-free-chat"
+  },
+  {
+   "key": "기능 표면 조각|src/main/0200-skin-shop.js",
+   "num": {
+    "함수": 5
+   },
+   "text": "조각 0200-skin-shop"
+  },
+  {
+   "key": "기능 표면 조각|src/main/0210-setup.js",
+   "num": {
+    "함수": 8
+   },
+   "text": "조각 0210-setup"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0230-modal.js",
+   "num": {
+    "함수": 25
+   },
+   "text": "슈퍼 0230-modal"
+  },
+  {
+   "key": "기능 표면 조각|src/main/0274-dispatch.js",
+   "num": {
+    "함수": 7
+   },
+   "text": "조각 0274-dispatch"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0290-season-rotation.js",
+   "num": {
+    "함수": 21
+   },
+   "text": "슈퍼 0290-season-rotation"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0330-casting.js",
+   "num": {
+    "함수": 18
+   },
+   "text": "슈퍼 0330-casting"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0360-sync/",
+   "num": {
+    "함수": 25
+   },
+   "text": "슈퍼 0360-sync/"
+  },
+  {
+   "key": "기능 표면 조각|src/main/0410-desktop.js",
+   "num": {
+    "함수": 6
+   },
+   "text": "조각 0410-desktop"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0450-relations-memory.js",
+   "num": {
+    "함수": 12
+   },
+   "text": "슈퍼 0450-relations-memory"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0455-persona.js",
+   "num": {
+    "함수": 13
+   },
+   "text": "슈퍼 0455-persona"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0485-battle-rules.js",
+   "num": {
+    "함수": 8
+   },
+   "text": "슈퍼 0485-battle-rules"
+  },
+  {
+   "key": "기능 표면 조각|src/main/0510-actions/",
+   "num": {
+    "함수": 14
+   },
+   "text": "조각 0510-actions/"
+  },
+  {
+   "key": "기능 표면 슈퍼|src/main/0530-story-memory.js",
+   "num": {
+    "함수": 10
+   },
+   "text": "슈퍼 0530-story-memory"
+  },
+  {
+   "key": "기능 표면 조각|src/main/0550-standalone-app.js",
+   "num": {
+    "함수": 4
+   },
+   "text": "조각 0550-standalone-app"
+  },
+  {
+   "key": "기능 표면 파편화|앱 시작",
+   "num": {
+    "모듈": 9
+   },
+   "text": "파편화 앱 시작 모듈 9"
+  },
+  {
+   "key": "기능 표면 파편화|창 만든 ",
+   "num": {
+    "모듈": 4
+   },
+   "text": "파편화 창 만든  모듈 4"
+  },
+  {
+   "key": "기능 표면 파편화|창 개인 스토리",
+   "num": {
+    "모듈": 15
+   },
+   "text": "파편화 창 개인 스토리 모듈 15"
+  },
+  {
+   "key": "기능 표면 파편화|창 openCharEdit",
+   "num": {
+    "모듈": 4
+   },
+   "text": "파편화 창 openCharEdit 모듈 4"
+  },
+  {
+   "key": "기능 표면 파편화|창 소리",
+   "num": {
+    "모듈": 7
+   },
+   "text": "파편화 창 소리 모듈 7"
+  },
+  {
+   "key": "기능 표면 파편화|새 게임 생성",
+   "num": {
+    "모듈": 15
+   },
+   "text": "파편화 새 게임 생성 모듈 15"
+  },
+  {
+   "key": "기능 표면 파편화|실행 중 AI",
+   "num": {
+    "모듈": 8
+   },
+   "text": "파편화 실행 중 AI 모듈 8"
+  },
+  {
+   "key": "기능 표면 파편화|창 챕터 편집",
+   "num": {
+    "모듈": 4
+   },
+   "text": "파편화 창 챕터 편집 모듈 4"
+  },
+  {
+   "key": "기능 표면 파편화|창 openLib",
+   "num": {
+    "모듈": 3
+   },
+   "text": "파편화 창 openLib 모듈 3"
+  },
+  {
+   "key": "기능 표면 파편화|설정 › 그림 AI",
+   "num": {
+    "모듈": 6
+   },
+   "text": "파편화 설정 › 그림 AI 모듈 6"
+  },
+  {
+   "key": "기능 표면 파편화|창 게임 목록",
+   "num": {
+    "모듈": 6
+   },
+   "text": "파편화 창 게임 목록 모듈 6"
+  },
+  {
+   "key": "기능 표면 파편화|캐시 상점",
+   "num": {
+    "모듈": 4
+   },
+   "text": "파편화 캐시 상점 모듈 4"
+  },
+  {
+   "key": "기능 표면 파편화|훈련",
+   "num": {
+    "모듈": 4
+   },
+   "text": "파편화 훈련 모듈 4"
+  },
+  {
+   "key": "기능 표면 파편화|로비",
+   "num": {
+    "모듈": 6
+   },
+   "text": "파편화 로비 모듈 6"
+  },
+  {
+   "key": "기능 표면 파편화|도전",
+   "num": {
+    "모듈": 4
+   },
+   "text": "파편화 도전 모듈 4"
+  },
+  {
+   "key": "기능 표면 파편화|창 openFormation",
+   "num": {
+    "모듈": 6
+   },
+   "text": "파편화 창 openFormation 모듈 6"
+  },
+  {
+   "key": "기능 표면 파편화|계약",
+   "num": {
+    "모듈": 7
+   },
+   "text": "파편화 계약 모듈 7"
+  }
  ]
 }

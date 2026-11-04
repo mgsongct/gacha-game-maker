@@ -9,6 +9,7 @@ import { generatorVocab, constLiterals, INFRA } from './wiring.mjs';
 import { stageRoots } from './lifecycle.mjs';
 import { auditRules } from './upgrade.mjs';
 import { moduleOf } from './scope.mjs';
+import { surfaceMap } from './surface.mjs';
 
 // 엔티티 → data 파일·경로(목록 안 원소). 컬렉션을 도는 콜백·찾기 함수·생성 함수 결과·매개변수(호출 지점에서 전파)로 묶인 변수의 프로퍼티를 필드로 셈 — 변수 이름으로 짐작하지 않음
 export const ENT = { 캐릭터: ['chars', '[]'], NPC: ['npcs', '[]'], 장: ['chapters', '[]'], 스테이지: ['chapters', '[].stages[]'], 적: ['chapters', '[].stages[].enemies[]'], 자료: ['lib', '[]'], 세력: ['world', 'factions[]'], 메신저: ['threads', '[]'], 이벤트: ['events', '[]'], 배너: ['banners', '[]'], 파견: ['dispatches', '[]'] };
@@ -206,7 +207,8 @@ export function buildMap(units, fns, sf, html = '') { const types = constLiteral
   attachAudits(data, auditRules(units, fns, sf), entFields, types);
   const base = wwwBase(units, html), FN = fnIndex(fns, data, promptIndex(fns, T.nameMap), base), { mods, M } = moduleSummary(units, fns, base), DATA = dataSummary(data, FN, M);
   const MODS = Object.fromEntries(Object.entries(mods).sort((a, b) => a[0].localeCompare(b[0])).map(([m, v]) => [m, { files: v.files, fns: v.fns, roles: v.roles, writes: [...v.writes].sort(), reads: v.reads.size, neighbors: [...v.calls].sort((a, b) => b[1] - a[1]).slice(0, 8) }]));
-  return { types, data: DATA, fns: FN, modules: MODS }; }
+  /* index.html 기능 표면(메뉴 → 화면·패널·창 · 배경)과 모듈 판정 — 함수마다 자리(place)를 함수 색인에 */ const S = surfaceMap(units, fns, sf, html); for (const [k, p] of Object.entries(S.place)) if (FN[k]) FN[k].place = p;
+  return { types, data: DATA, fns: FN, modules: MODS, surface: { tabs: S.tabs, feats: S.feats, verdicts: S.verdicts, frag: S.frag } }; }
 
 // 두 맵의 차이(증분 갱신 기록): 함수 추가·삭제·옮김, data 경로의 만드는 곳 추가·삭제
 export function mapDiff(a, b) { const out = { fns: { added: [], removed: [], moved: [] }, data: [] }; if (!a) return out;
