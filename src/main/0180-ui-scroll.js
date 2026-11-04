@@ -33,7 +33,8 @@ function uiSelectText(field){if(!field)return;const root=field.closest('.sheet')
 /* 그리기 전 처리(Controller — CLAUDE.md §0-2 화면은 상태를 바꾸지 않음): 진행 칸의 하루/주 새로 만들기·형식 맞춤(progTick), 탐사를 야영지 저장 없이 떠나면 끝냄 표시, 로비에서 우편·캐시 처리 → 그리기(renderView) */
 function render(){ progTick();
   // 심연 탐사는 야영지에서 저장해야만 나갔다 올 수 있어요. 다른 길로 나가면 탐사가 끝나요.
-  if(PREVTAB==='abyss'&&tab!=='abyss'){ const r=progSlot('rogue').run; if(r&&!r.saved) r.left=true; } PREVTAB=tab;
+  if(PREVTAB==='abyss'&&tab!=='abyss'){ const r=progSlot('rogue').run; if(r&&!r.saved) r.left=true; }
+  rogueTick(); PREVTAB=tab;
   if(tab==='lobby'&&typeof mailTick==='function') mailTick();
   if(tab==='lobby'&&typeof cashTick==='function') cashTick();
   renderView(); }

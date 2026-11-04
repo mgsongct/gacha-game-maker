@@ -152,12 +152,14 @@ function mark(...k){if(NEW_GAME_SOURCE&&G!==NEW_GAME_SOURCE)return;naiBlocksGame
 function flushNow(){if(dirty.size){clearTimeout(flushT);flush().catch(()=>{});}}
 addEventListener('pagehide',flushNow);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushNow();},true);
 function markAll(){mark('meta','world','prog','opening',...G.chars.map(c=>'c:'+c.id),...G.chapters.map(ch=>'ch:'+ch.id),...G.lib.map(l=>'l:'+l.id),...G.threads.map(t=>'t:'+t.id));}
+/* 저장 결과 알림(Model → 화면은 창 이벤트로 받음: ggm-saved · ggm-storage-error — 0080이 경고를 띄우고 지움) */
+function saveFailed(message){ dispatchEvent(new CustomEvent('ggm-storage-error',{detail:{message}})); }
 function flush(){
  if(window.__NOFLUSH)return appStorage.drain();
  const run=async()=>{if(!dirty.size)return appStorage.drain();const game=NEW_GAME_SOURCE||G,revision=saveRevision,keys=[...dirty],oldAt=game.prog.savedAt;const at=Date.now();
  try{const bases=new Set((game.chars||[]).filter(x=>!x.alt).map(x=>x.id)),snapshot=JSON.stringify({...game,chars:(game.chars||[]).map(c=>inheritStore(c,bases)),prog:{...game.prog,savedAt:at}});appStorage.setItem(LKEY,snapshot);await appStorage.drain();game.prog.savedAt=at;
  if(DB)for(const k of keys)await writeKey(k,game);
- if(revision===saveRevision)dirty.clear();const el=document.getElementById('save-warning');if(el)el.remove();
- }catch(e){game.prog.savedAt=oldAt;storageWarning(e.message||'기기에 저장하지 못했습니다');throw e;}};
+ if(revision===saveRevision)dirty.clear();dispatchEvent(new CustomEvent('ggm-saved'));
+ }catch(e){game.prog.savedAt=oldAt;saveFailed(e.message||'기기에 저장하지 못했습니다');throw e;}};
  saveTail=saveTail.catch(()=>{}).then(run);return saveTail;
 }

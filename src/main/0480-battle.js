@@ -90,34 +90,40 @@ function bCheck(){
  if(delay){battle.ending=true;battle.finishTimer=setTimeout(()=>{if(B!==battle||battle.over)return;battle.ending=false;bEnd(win);},delay);}
  else bEnd(win);
 }
+/* 전투 끝(Controller): 전투를 멈추고 정산 → 효과음 → 결과 창(출격 경로·레이드·탐사·탑은 각 기능의 끝 처리) */
 function bEnd(win){
   if(B.ctx.kind==='practice'){v2StopPractice();return;}
   B.over=true; clearInterval(B.timer); try{ window.GGMVFX&&GGMVFX.clear(); }catch(e){} bUpdate(); bump('battle'); // 공격 중이던 카드·이펙트가 결과 화면 위에 남지 않게
-  const so=sortieResult(win); if(so!==null){ const d=document.createElement('div');d.className='result';d.innerHTML=so;$('#ov > .bt').appendChild(d); return; } // 출격 경로(0487)
-  if(B.ctx.kind==='raid'||B.ctx.kind==='rogue'||B.ctx.kind==='tower'){ const html=B.ctx.kind==='raid'?raidEnd(win):B.ctx.kind==='tower'?towerEnd(win):rogueEnd(win); const d=document.createElement('div');d.className='result';d.innerHTML=html;$('#ov > .bt').appendChild(d); return; }
-  const s=B.s, kind=B.ctx.kind; let html;
-  if(win){
-    sfx('승리'); const p=P(); let r={}, first=false, exp=60, note='';
-    if(kind==='farm'){ const f=s.farm; r=farmReward(f.key,f.lv); p.farmClear[s.id]=true; exp=20+20*farmRec(f.lv); }
-    else if(kind==='event'){ const ev=G.events.find(e=>e.id===B.ch.eventId); first=!p.cleared[s.id]; r={token:s.reward*(first?2:1),tokenName:ev?ev.token:'토큰'}; if(first) r.gems=100; giveReward(r,ev&&ev.id); r={...r}; p.cleared[s.id]=true; if(first) recruitCheck(B.ch,s); exp=80; }
-    else { first=!p.cleared[s.id]; r=first?{gems:s.reward*2,gold:3000,exp:10}:{gold:1500,exp:3}; p.cleared[s.id]=true; if(first){ gateCheck(); recruitCheck(B.ch,s); } exp=120+Math.max(0,G.chapters.filter(ch=>ch.kind==='main').indexOf(B.ch))*40; }
-    if(kind!=='event'){ Object.assign(r,rateR(r)); giveReward(r); }
-    if(first&&kind!=='farm') newBonds(s);
-    B.allies.forEach(u=>{const o=own(u.c.id);if(o)gainExp(o,expR(exp));});
-    mark('prog');
-    const noDeath=B.allies.every(u=>u.hp>0), fast=s.goal&&GOALS[s.goal.k]?GOALS[s.goal.k].ok(B,s.goal.a):B.ticks<=420, stars=1+(noDeath?1:0)+(fast?1:0);
-    p.stars=p.stars||{}; const was=p.stars[s.id]||0; if(stars>was) p.stars[s.id]=stars; let bonus='';
-    if(stars===3&&was<3&&kind!=='farm'){ giveReward({gems:50}); bonus=` · 첫 ★3 보너스 ◆50`; }
-    const mvp=[...B.allies].sort((a,b)=>(b.dmg||0)-(a.dmg||0))[0], tot=B.allies.reduce((a,u)=>a+(u.dmg||0),0)||1, ml=mvp&&rand((mvp.c.lvLines.length?mvp.c.lvLines:[]).concat(mvp.c.lines));
-    html=`<div class="rs-stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}" style="animation-delay:${i*0.18}s">★</span>`).join('')}</div>
+  const so=sortieResult(win); if(so!==null){ bResultShow(so); return; } // 출격 경로(0487)
+  if(B.ctx.kind==='raid'||B.ctx.kind==='rogue'||B.ctx.kind==='tower'){ bResultShow(B.ctx.kind==='raid'?raidEnd(win):B.ctx.kind==='tower'?towerEnd(win):rogueEnd(win)); return; }
+  const R=stageSettle(win); sfx(win?'승리':'패배'); bResultShow(stageResultHTML(R));
+  if(R.mvp&&R.mvp.c.voiceId&&SND().voiceLobby&&R.ml) setTimeout(()=>speak(R.mvp.c,R.ml),700);
+}
+/* 스테이지 정산(Model): 보상(첫 클리어·재료 던전·이벤트 토큰)·클리어 기록·영입·인연·경험치·별(전원 생존·목표)·첫 ★3 보너스, MVP와 한마디 */
+function stageSettle(win){ const s=B.s, kind=B.ctx.kind; if(!win) return {win:false};
+  const p=P(); let r={}, first=false, exp=60;
+  if(kind==='farm'){ const f=s.farm; r=farmReward(f.key,f.lv); p.farmClear[s.id]=true; exp=20+20*farmRec(f.lv); }
+  else if(kind==='event'){ const ev=G.events.find(e=>e.id===B.ch.eventId); first=!p.cleared[s.id]; r={token:s.reward*(first?2:1),tokenName:ev?ev.token:'토큰'}; if(first) r.gems=100; giveReward(r,ev&&ev.id); r={...r}; p.cleared[s.id]=true; if(first) recruitCheck(B.ch,s); exp=80; }
+  else { first=!p.cleared[s.id]; r=first?{gems:s.reward*2,gold:3000,exp:10}:{gold:1500,exp:3}; p.cleared[s.id]=true; if(first){ gateCheck(); recruitCheck(B.ch,s); } exp=120+Math.max(0,G.chapters.filter(ch=>ch.kind==='main').indexOf(B.ch))*40; }
+  if(kind!=='event'){ Object.assign(r,rateR(r)); giveReward(r); }
+  if(first&&kind!=='farm') newBonds(s);
+  B.allies.forEach(u=>{const o=own(u.c.id);if(o)gainExp(o,expR(exp));});
+  mark('prog');
+  const noDeath=B.allies.every(u=>u.hp>0), fast=s.goal&&GOALS[s.goal.k]?GOALS[s.goal.k].ok(B,s.goal.a):B.ticks<=420, stars=1+(noDeath?1:0)+(fast?1:0);
+  p.stars=p.stars||{}; const was=p.stars[s.id]||0; if(stars>was) p.stars[s.id]=stars; let bonus='';
+  if(stars===3&&was<3&&kind!=='farm'){ giveReward({gems:50}); bonus=` · 첫 ★3 보너스 ◆50`; }
+  const mvp=[...B.allies].sort((a,b)=>(b.dmg||0)-(a.dmg||0))[0], tot=B.allies.reduce((a,u)=>a+(u.dmg||0),0)||1, ml=mvp&&rand((mvp.c.lvLines.length?mvp.c.lvLines:[]).concat(mvp.c.lines));
+  return {win:true,s,kind,r,first,exp,noDeath,fast,stars,bonus,mvp,tot,ml}; }
+/* 스테이지 결과(View): 별·조건·MVP·피해 막대·보상, 실패면 다시 도전 */
+function stageResultHTML(R){ if(!R.win) return `<h2 class="disp" style="color:#ff5277">작전 실패</h2><p>${T('enhance')}로 레벨을 올리거나 편성과 속성을 바꿔 보세요.<br>${esc(elemLine())}.</p><div class="row"><button class="btn ghost" data-act="bdone">돌아가기</button><button class="btn" data-act="bretry">다시 도전</button></div>`;
+  const {s,kind,r,first,exp,noDeath,fast,stars,bonus,mvp,tot,ml}=R;
+  return `<div class="rs-stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}" style="animation-delay:${i*0.18}s">★</span>`).join('')}</div>
       <h2 class="disp" style="color:var(--rose);margin:0">${esc(T('ops'))} 성공</h2>
       <div class="rs-cond"><span class="on">✓ 승리</span><span class="${noDeath?'on':''}">${noDeath?'✓':'✗'} 전원 생존</span><span class="${fast?'on':''}">${fast?'✓':'✗'} ${esc(goalText(s.goal))}</span></div>
       ${mvp?`<div class="rs-mvp"><div class="rs-art">${art(mvp.c)}</div><div class="rs-mt"><i>MVP</i><b>${esc(mvp.name)}</b>${ml?`<span>“${esc(sub(ml))}”</span>`:''}</div></div>
       <div class="rs-dmg">${B.allies.map(u=>`<div><b>${esc(u.name)}</b><span class="bar"><i style="width:${Math.round((u.dmg||0)/tot*100)}%"></i></span><em>${nf(u.dmg||0)}</em></div>`).join('')}</div>`:''}
-      <p style="margin:4px 0">${rewardText(r)}${first?' (첫 클리어 보상)':(kind==='farm'?'':`<br><small class="muted">${esc(T('currency'))}은(는) 첫 클리어 때만 받아요</small>`)}${bonus}<br>참가 ${T('crew')} 경험치 +${exp}</p><button class="btn" data-act="bdone" data-win="1" data-first="${first?1:0}">계속</button>`;
-    if(mvp&&mvp.c.voiceId&&SND().voiceLobby&&ml) setTimeout(()=>speak(mvp.c,ml),700);
-  } else { sfx('패배'); html=`<h2 class="disp" style="color:#ff5277">작전 실패</h2><p>${T('enhance')}로 레벨을 올리거나 편성과 속성을 바꿔 보세요.<br>${esc(elemLine())}.</p><div class="row"><button class="btn ghost" data-act="bdone">돌아가기</button><button class="btn" data-act="bretry">다시 도전</button></div>`; }
-  const d=document.createElement('div');d.className='result';d.innerHTML=html;$('#ov > .bt').appendChild(d);
-}
+      <p style="margin:4px 0">${rewardText(r)}${first?' (첫 클리어 보상)':(kind==='farm'?'':`<br><small class="muted">${esc(T('currency'))}은(는) 첫 클리어 때만 받아요</small>`)}${bonus}<br>참가 ${T('crew')} 경험치 +${exp}</p><button class="btn" data-act="bdone" data-win="1" data-first="${first?1:0}">계속</button>`; }
+/* 전투 결과 창 붙이기(View) — 전투 화면(기본) 또는 카드 전투 화면 */
+function bResultShow(html,host='#ov > .bt'){ const d=document.createElement('div'); d.className='result'; d.innerHTML=html; $(host).appendChild(d); }
 /* 전투 배속 단추 표시(View) */
 function bSpeedShow(t){ t.textContent=B.speed+'x'; chipOn(t,B.speed>1); }

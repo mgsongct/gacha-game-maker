@@ -11,10 +11,14 @@ function raidBoss(){ const r=progSlot('raid'), pool=[], bgOf={}; G.chapters.filt
   if(r.total){ const k=r.total/30/b.hp; b.hp=Math.round(r.total/30); b.atk=Math.round(b.atk*Math.min(1.5,Math.max(0.7,k))); } else { r.total=b.hp*30; mark('prog'); }
   if(r.killed&&r.dmg<r.total) r.killed=false; return Object.assign(b,{total:r.total}); }
 function raidTriesLeft(){ const r=progRead('raid'); return Math.max(0,3-(r.tries[today()]||0)); }
-function raidEnd(win){ const r=progSlot('raid'), b=B.enemies[0], dealt=Math.max(0,Math.round((B.ctx.hp0||0)-b.hp)); r.dmg=Math.min(B.ctx.total,r.dmg+dealt); r.best=Math.max(r.best||0,dealt);
+/* 레이드 끝(Controller): 정산 → 효과음 → 결과 */
+function raidEnd(win){ const R=raidSettle(win); sfx(R.killed?'승리':'확인'); return raidResultHTML(R); }
+/* 레이드 정산(Model): 이번 피해·누적 피해·달성 보상·참가 대원 경험치 */
+function raidSettle(win){ const r=progSlot('raid'), b=B.enemies[0], dealt=Math.max(0,Math.round((B.ctx.hp0||0)-b.hp)); r.dmg=Math.min(B.ctx.total,r.dmg+dealt); r.best=Math.max(r.best||0,dealt);
   const ratio=r.dmg/B.ctx.total; if(ratio>=1) r.killed=true; let got={}; RAID_MS.forEach(([t,rw],i)=>{ if(ratio>=t&&!r.got.includes(i)){ r.got.push(i); giveReward(rw); Object.entries(rw).forEach(([k,v])=>got[k]=(got[k]||0)+v); } });
-  B.allies.forEach(u=>{ const o=own(u.c.id); if(o) gainExp(o,expR(80)); }); mark('prog'); sfx(r.killed?'승리':'확인');
-  return `<h2 class="disp" style="color:var(--rose);margin:0">${r.killed?'토벌 완료!':'레이드 종료'}</h2><div class="rd-big">${nf(dealt)}<small>이번 피해</small></div>
-    <div class="rd-bar"><i style="width:${Math.min(100,ratio*100)}%"></i><span>${Math.min(100,Math.floor(ratio*1000)/10)}%</span></div>
-    <p style="margin:6px 0">${Object.keys(got).length?'달성 보상: '+rewardText(got):'다음 보상까지 '+(RAID_MS.find(([t],i)=>!r.got.includes(i))?Math.ceil((RAID_MS.find(([t],i)=>!r.got.includes(i))[0]-ratio)*100)+'%':'—')}<br>참가 ${T('crew')} 경험치 +80</p>
+  B.allies.forEach(u=>{ const o=own(u.c.id); if(o) gainExp(o,expR(80)); }); mark('prog'); const nx=RAID_MS.find(([t],i)=>!r.got.includes(i)); return {killed:!!r.killed,dealt,ratio,got,next:nx?nx[0]:null}; }
+/* 레이드 결과(View) */
+function raidResultHTML(R){ return `<h2 class="disp" style="color:var(--rose);margin:0">${R.killed?'토벌 완료!':'레이드 종료'}</h2><div class="rd-big">${nf(R.dealt)}<small>이번 피해</small></div>
+    <div class="rd-bar"><i style="width:${Math.min(100,R.ratio*100)}%"></i><span>${Math.min(100,Math.floor(R.ratio*1000)/10)}%</span></div>
+    <p style="margin:6px 0">${Object.keys(R.got).length?'달성 보상: '+rewardText(R.got):'다음 보상까지 '+(R.next!=null?Math.ceil((R.next-R.ratio)*100)+'%':'—')}<br>참가 ${T('crew')} 경험치 +80</p>
     <button class="btn" data-act="bdone">계속</button>`; }

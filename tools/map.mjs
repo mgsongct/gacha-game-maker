@@ -91,7 +91,7 @@ function verdictWhy(m, q) { const A = m.arch; if (!A) return []; const lq = q.to
   return out; }
 
 // 섞인 함수 나눌 자리(--why <함수 이름>): View 줄 · Model 줄, 액션 처리기는 창 HTML·DOM이 든 case
-function mixWhy(m, q) { const hit = Object.values(m.fns).filter(x => x.name === q && x.mix); if (!hit.length) return []; const ln = a => a.length ? a.slice(0, 30).join(', ') + (a.length > 30 ? ` …외 ${a.length - 30}` : '') : '없음';
+function mixWhy(m, q) { const hit = Object.values(m.arch?.mixed || {}).filter(x => x.name === q); if (!hit.length) return []; const ln = a => a.length ? a.slice(0, 30).join(', ') + (a.length > 30 ? ` …외 ${a.length - 30}` : '') : '없음';
   return hit.flatMap(x => ['', `■ 섞인 함수 ${x.name} (${x.file}:${x.line}) — View(마크업·DOM) 줄 ${x.mix.view.length} · Model(상태 쓰기·저장·서비스) 줄 ${x.mix.model.length}`, `  View 줄: ${ln(x.mix.view)}`, `  Model 줄: ${ln(x.mix.model)}`,
     ...(x.mix.cases ? [`  창 HTML·DOM이 든 case ${x.mix.cases.length}: ${x.mix.cases.map(c => `${c.act}(${c.line}줄·${c.view})`).join(', ')}`] : [])]); }
 

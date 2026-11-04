@@ -19,9 +19,13 @@ function towerReward(floor){ return floor%5===0?{gems:80,gold:3000+floor*300,cor
 function towerGo(tid){ const t=towerById(tid); if(!t) return; const fl=((progRead('tower')[tid]||{}).best||0)+1, st=towerStage(tid,fl);
   if(t.allow&&!G.chars.some(c=>own(c.id)&&t.allow(c))){ toast(`${t.desc} — 출전할 수 있는 ${T('crew')}이(가) 없어요`); return; }
   squadSel=null; FORM=null; openFormation(st,{kind:'tower',tid,floor:fl,allow:t.allow,code:'',extra:`data-v="${esc(tid)}"`},'towerstart'); }
-function towerEnd(win){ const c=B.ctx, T0=progSlot('tower'), rec=T0[c.tid]||(T0[c.tid]={best:0}); let r=null;
-  if(win&&c.floor>rec.best){ rec.best=c.floor; r=rateR(towerReward(c.floor)); giveReward(r); } B.allies.forEach(u=>{ const o=own(u.c.id); if(o) gainExp(o,expR(40+c.floor*4)); }); mark('prog'); sfx(win?'승리':'패배');
-  return `<h2 class="disp" style="color:${win?'var(--rose)':'#ff5277'};margin:0">${win?`${c.floor}층 돌파!`:`${c.floor}층 실패`}</h2><p>${r?'첫 돌파 보상: '+rewardText(r):win?'':'편성·속성을 바꾸거나 더 키워서 다시 도전하세요. 전장 규칙을 확인해 보세요.'}</p><button class="btn" data-act="bdone">계속</button>`; }
+/* 탑 끝(Controller): 정산 → 효과음 → 결과 */
+function towerEnd(win){ const R=towerSettle(win); sfx(win?'승리':'패배'); return towerResultHTML(R); }
+/* 탑 정산(Model): 첫 돌파 기록·보상, 참가 대원 경험치 */
+function towerSettle(win){ const c=B.ctx, T0=progSlot('tower'), rec=T0[c.tid]||(T0[c.tid]={best:0}); let r=null;
+  if(win&&c.floor>rec.best){ rec.best=c.floor; r=rateR(towerReward(c.floor)); giveReward(r); } B.allies.forEach(u=>{ const o=own(u.c.id); if(o) gainExp(o,expR(40+c.floor*4)); }); mark('prog'); return {win,floor:c.floor,r}; }
+/* 탑 결과(View) */
+function towerResultHTML(R){ return `<h2 class="disp" style="color:${R.win?'var(--rose)':'#ff5277'};margin:0">${R.win?`${R.floor}층 돌파!`:`${R.floor}층 실패`}</h2><p>${R.r?'첫 돌파 보상: '+rewardText(R.r):R.win?'':'편성·속성을 바꾸거나 더 키워서 다시 도전하세요. 전장 규칙을 확인해 보세요.'}</p><button class="btn" data-act="bdone">계속</button>`; }
 function towerHTML(){ const T0=progRead('tower'); return `<section class="ch-card"><div class="ch-h"><i>TRIAL TOWER</i><h3>시련의 탑</h3><span>층마다 강해지는 적과 바뀌는 전장 규칙. 제한 탑은 그 소속·속성 ${T('crew')}만 출전해요. 5층마다 보스와 큰 보상.</span></div>
   <div class="tw-list">${towerList().map(t=>{ const b=(T0[t.id]||{}).best||0, n=t.allow?G.chars.filter(c=>own(c.id)&&t.allow(c)).length:G.chars.filter(c=>own(c.id)).length;
     return `<button class="tw-card" data-act="towergo" data-v="${esc(t.id)}" ${n?'':'disabled'}><b>${esc(t.name)}</b><span>${esc(t.desc)} · 보유 ${n}명</span><br><span>최고 ${b}층 → 다음 ${b+1}층</span></button>`; }).join('')}</div></section>`; }

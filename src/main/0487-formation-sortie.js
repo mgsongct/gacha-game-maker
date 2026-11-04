@@ -49,10 +49,15 @@ function sortieFight(){ const x=sortieParts(); if(!x) return; const {run,ch,s,R}
   if(n.kind==='supply'){ run.squad.forEach(id=>{ const h=run.hp[id]??1; if(h>0) run.hp[id]=Math.min(1,h+.3); }); run.path.push(n.id); mark('prog'); sortieMap('보급을 받았어요. 체력 30% 회복'); return; }
   closeModal(); const st=nodeStage(s,n,R); startStage(st,{kind:ch.kind||'main',ch,sortie:true,boss:n.kind==='boss',noStam:true,squad:run.squad,prep:al=>al.forEach(u=>{ const h=run.hp[u.c.id]??1; u.hp=Math.max(0,Math.round(u.maxhp*h)); })}); }
 // 지점 전투가 끝나면(보스 아님) — bEnd가 부름
-function sortieNodeEnd(win){ const x=sortieParts(); if(!x) return ''; const {run}=x; B.allies.forEach(u=>{ run.hp[u.c.id]=u.hp>0?u.hp/u.maxhp:0; });
-  if(!win){ P().sortie=null; mark('prog'); sfx('패배'); return `<h2 class="disp" style="color:#ff5277">작전 실패</h2><p>${esc(nodeById(x.R,run.node).name)}에서 밀려났어요. 편성·대열을 바꿔 다시 출격하세요.</p><button class="btn" data-act="bdone">계속</button>`; }
-  const g=rateR({gold:400+120*run.path.length}), xp=expR(30); giveReward(g); run.gained.gold+=g.gold||0; run.gained.exp+=xp; B.allies.forEach(u=>{ const o=own(u.c.id); if(o) gainExp(o,xp); }); run.path.push(run.node); mark('prog'); sfx('승리');
-  return `<h2 class="disp" style="color:var(--rose);margin:0">${esc(nodeById(x.R,run.node).name)} 돌파</h2><p>${rewardText(g)} · 경험치 +${xp}</p><button class="btn" data-act="somap">경로로</button>`; }
+/* 출격 지점 전투 끝(Controller): 정산 → 효과음 → 결과 */
+function sortieNodeEnd(win){ const R=sortieNodeSettle(win); if(!R) return ''; sfx(win?'승리':'패배'); return sortieNodeResultHTML(R); }
+/* 출격 지점 정산(Model): 대원 체력 이어 가기, 실패면 출격 끝, 돌파면 골드·경험치·경로 기록 */
+function sortieNodeSettle(win){ const x=sortieParts(); if(!x) return null; const {run}=x, name=nodeById(x.R,run.node).name; B.allies.forEach(u=>{ run.hp[u.c.id]=u.hp>0?u.hp/u.maxhp:0; });
+  if(!win){ P().sortie=null; mark('prog'); return {win,name}; }
+  const g=rateR({gold:400+120*run.path.length}), xp=expR(30); giveReward(g); run.gained.gold+=g.gold||0; run.gained.exp+=xp; B.allies.forEach(u=>{ const o=own(u.c.id); if(o) gainExp(o,xp); }); run.path.push(run.node); mark('prog'); return {win,name,g,xp}; }
+/* 출격 지점 결과(View) */
+function sortieNodeResultHTML(R){ return R.win?`<h2 class="disp" style="color:var(--rose);margin:0">${esc(R.name)} 돌파</h2><p>${rewardText(R.g)} · 경험치 +${R.xp}</p><button class="btn" data-act="somap">경로로</button>`
+  :`<h2 class="disp" style="color:#ff5277">작전 실패</h2><p>${esc(R.name)}에서 밀려났어요. 편성·대열을 바꿔 다시 출격하세요.</p><button class="btn" data-act="bdone">계속</button>`; }
 function sortieEnd(){ P().sortie=null; mark('prog'); }
 // 출격 전투가 끝났을 때 결과 화면(bEnd가 부름, 출격이 아니면 null): 지점 승패·보스 패배는 출격 결과(패배하면 출격 끝 — 행동력 없이 "다시 도전"하던 것 막음), 보스 승리는 출격을 닫고 보통 클리어 화면
 function sortieResult(win){ if(!B.ctx.sortie) return null; if(B.ctx.boss&&win){ sortieEnd(); return null; } return sortieNodeEnd(win); }

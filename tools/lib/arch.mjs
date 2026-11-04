@@ -47,6 +47,9 @@ export function layers(fns, writers) { const top = [...fns.values()].filter(f =>
   const quiet = s => !(s.markup || s.dom || s.write || s.store || s.service || s.handler || s.trigger), changes = o => o && (o.write || o.store || o.service || o.layer === '섞임' || o.layer === 'Controller');
   for (let more = true; more;) { more = false; for (const f of top) { const me = out.get(f.key); if (me.layer !== 'Model' || !quiet(me)) continue; const cs = [...f.calls.keys()].map(k => out.get(k)).filter(Boolean);
     if (cs.some(o => o.layer === 'View') && !cs.some(changes)) { me.layer = 'View'; more = true; } } }
+  /* 직접 신호 없이 상태를 바꾸는 함수와 View 함수를 함께 부르면 Controller(정산한 뒤 결과를 그리게 하는 흐름 — 예: 전투 끝 bEnd) */
+  for (const f of top) { const me = out.get(f.key); if (me.layer !== 'Model' || !quiet(me)) continue; const cs = [...f.calls.keys()].map(k => out.get(k)).filter(Boolean);
+    if (cs.some(o => o.layer === 'View') && cs.some(o => o.write || o.store || o.service)) me.layer = 'Controller'; }
   /* 방향 위반: View → 상태를 쓰거나 저장하는 함수(그리다가 바꿈) · Model → 화면을 만드는 함수 */
   const bad = []; for (const f of top) { const me = out.get(f.key); for (const k of f.calls.keys()) { const o = out.get(k); if (!o) continue;
     if (me.layer === 'View' && (o.write || o.store || o.service) && o.layer !== 'View' && !TRIGGER.has(fns.get(k)?.name)) bad.push({ fn: f.key, to: k, kind: 'View가 상태를 바꾸거나 저장·외부 서비스를 부르는 함수를 부름' }); /* 화면 갱신 통로(render 등)를 부르는 것은 갱신 요청이지 상태 변경이 아님 */

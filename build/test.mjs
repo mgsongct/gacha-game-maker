@@ -690,6 +690,8 @@ try {
     P().mail = [{ id: 'mt1', title: '시험 우편', from: '운영', body: '본문', at: Date.now(), reward: {} }]; await act('mailview', { id: 'mt1' }); o.mailView = P().mail[0].read === true && document.querySelector('#modal').textContent.includes('시험 우편'); closeModal();
     openModal('<select id="mt_logo"><option value="star">s</option></select>'); await act('logoprev'); const prev = !!document.querySelector('#ov .title[data-act="logoprevclose"]') && $('#modal').hidden; await act('logoprevclose'); o.logoPrev = prev && $('#ov').hidden && !$('#modal').hidden; closeModal();
     await act('go', { to: 'shop' }); o.go = tab === 'shop';
+    /* 저장 결과는 창 이벤트로(Model은 화면을 부르지 않음): 실패 알림 → 경고·다시 시도 단추(액션), 저장됨 알림 → 경고 지움 */
+    saveFailed('시험 저장 실패'); o.saveWarn = !!document.querySelector('#save-warning [data-act="saveretry"]') && document.getElementById('save-warning').textContent.includes('시험 저장 실패'); dispatchEvent(new CustomEvent('ggm-saved')); o.saveClear = !document.getElementById('save-warning');
     o.noFail = !said.some(m => m.includes('작업을 완료하지 못했습니다')) || said.join(' / '); window.toast = toast0; if (!had0) delete P().owned[own0.id];
     return o; });
   assert.ok(Object.values(r26).every(v => v === true), JSON.stringify(r26)); assert.deepEqual(err26, [], '페이지 오류');

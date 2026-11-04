@@ -283,7 +283,7 @@ function cbEndTurn(){ if(!CB||CB.busy||CB.over) return; CB.busy=true; CB.sel=-1;
   setTimeout(step,250); }
 function cbEnd(win){ if(!CB||CB.over) return; CB.over=true; CB.busy=true; cbRender(); const L=cbLead();
   B={ctx:{kind:'rogue',node:CB.kind},allies:[{c:L.c,hp:L.hp,maxhp:L.maxhp}],enemies:[],over:true,s:{}};
-  bump('battle'); const html=rogueEnd(win); const d=document.createElement('div'); d.className='result'; d.innerHTML=html; $('.cb').appendChild(d); CB=null; }
+  bump('battle'); bResultShow(rogueEnd(win),'.cb'); CB=null; }
 
 /* --- 던전 화면 --- */
 function dgHTML(run){ const map=run.map, here=run.pos, W=map.w;
@@ -366,13 +366,17 @@ function openRgForm(){ const busy=busyIds();
     <div class="row" style="margin-top:14px"><button class="btn block" data-act="rfgo" ${L?'':'disabled'}>${L?`탐사 시작 (리더 ${esc(L.name)} · 카드 ${ids.length-1}명)`:'리더를 먼저 골라 주세요'}</button></div>`); }
 
 // 심연 탐사 전용 화면(진행 중일 때 화면 전체를 써요)
-function rgAbandon(why){ const html=rgFinish(false); setTimeout(()=>openModal(`<div class="result" style="position:static"><p style="margin:0 0 6px"><b>탐사가 끝났어요</b><br><span class="muted">${esc(why)}</span></p>${html.replace('data-act="bdone"','data-act="close"')}</div>`),0); }
-function abyssHTML(){ const g=progSlot('rogue'), run=g.run; if(!run||run.v!==2){ tab='challenge'; return challengeHTML(); }
-  if(run.left||(!RG_LIVE&&!run.saved)){ rgAbandon('야영지에서 저장하지 않고 나가서 탐사가 끝났어요. 저장은 야영지의 \'저장하고 나가기\'로만 할 수 있어요.'); tab='challenge'; return challengeHTML(); }
-  RG_LIVE=true;
-  if(!run.wk){ run.wk=weekKey(); mark('prog'); }
-  if(run.wk!==weekKey()){ const sq=run.squad.slice(), html=rgFinish(false); setTimeout(()=>{ rgStart(sq,'card'); progSlot('rogue').run.msg='탐사 경로가 바뀌어 제1구역으로 돌아왔어요. 같은 탐사대로 처음부터 다시 시작해요.'; mark('prog'); render(); openModal(`<div class="result" style="position:static"><p style="margin:0 0 6px"><b>탐사 경로가 바뀌었어요</b><br><span class="muted">지난주 탐사는 여기까지예요. 제1구역부터 다시 시작해요.</span></p>${html.replace('data-act="bdone"','data-act="close"')}</div>`); },0); return pageHead(T('abyss'),'EXPEDITION','challenge'); }
-  if(run.saved){ delete run.saved; mark('prog'); }
+/* 탐사 끝내기(Controller): 정산 뒤 결과 창 */
+function rgAbandon(why){ const html=rgFinish(false); setTimeout(()=>openRgResult(html,'탐사가 끝났어요',why),0); }
+/* 심연·도전 화면에 들어가기 전 처리(Controller — render가 그리기 전에 부름): 저장 없이 나간 탐사는 끝내고, 심연 화면은 탐사가 없으면 도전 화면으로·주가 바뀌면 같은 탐사대로 처음부터·저장 표시 지움, 예전 형식 탐사는 고를 유물이 비면 다시 뽑음 */
+function rogueTick(){ if(tab!=='abyss'&&tab!=='challenge') return; const g=progSlot('rogue'), run=g.run;
+  if(run&&run.v===2&&(run.left||(!RG_LIVE&&!run.saved))){ rgAbandon('야영지에서 저장하지 않고 나가서 탐사가 끝났어요. 저장은 야영지의 \'저장하고 나가기\'로만 할 수 있어요.'); if(tab==='abyss') tab='challenge'; return; }
+  if(tab==='challenge'){ if(run&&run.v!==2&&run.pick&&!run.pick.filter(k=>RELICS[k]).length){ run.pick=rgPick3(run); mark('prog'); } return; }
+  if(!run||run.v!==2){ tab='challenge'; return; }
+  RG_LIVE=true; if(!run.wk){ run.wk=weekKey(); mark('prog'); }
+  if(run.wk!==weekKey()){ const sq=run.squad.slice(), html=rgFinish(false); rgRunNew(sq,'card'); progSlot('rogue').run.msg='탐사 경로가 바뀌어 제1구역으로 돌아왔어요. 같은 탐사대로 처음부터 다시 시작해요.'; mark('prog'); setTimeout(()=>openRgResult(html,'탐사 경로가 바뀌었어요','지난주 탐사는 여기까지예요. 제1구역부터 다시 시작해요.'),0); }
+  if(run.saved){ delete run.saved; mark('prog'); } }
+function abyssHTML(){ const run=progRead('rogue').run; if(!run||run.v!==2) return challengeHTML();
   setTimeout(pixFill,30);
   return `<div class="phead"><button class="back" data-act="rgleave" aria-label="나가기">‹</button><div><i>EXPEDITION</i><h2>${esc(T('abyss'))}</h2></div></div>${rgRunHTML2(run)}`; }
 function challengeHTML(){
@@ -391,9 +395,8 @@ function challengeHTML(){
   let rog;
   if(!run){ rog=`<section class="ch-card rog"><div class="ch-h"><i>EXPEDITION · ${DG_FLOORS} AREAS</i><h3>${esc(T('abyss'))}</h3><span>한 번 고른 4명으로 ${DG_FLOORS}개 구역을 탐사해요. 미지의 경로에서 전투·보물·야영지·사건을 만나고 다음 구역으로 이동해요. 마지막 구역에는 보스가 기다려요. 체력은 이어져요.</span></div>
       <p class="muted" style="margin:8px 0">최고 진척 ${g.best||0}/${RG_FLOORS} · 오늘 ${g.day===today()?g.n:0}번 (3번째부터 보상 25%)</p><div class="rg-mode one"><button class="rg-node n-treasure" data-act="rgnew" data-v="card"><em>🂠</em><b>탐사 시작</b><span>첫 번째로 고른 ${esc(T('crew'))}이(가) 리더로 싸우고, 나머지는 카드가 되어 능력을 빌려줘요.</span></button></div></section>`; }
-  else if(run.v===2&&(run.left||(!RG_LIVE&&!run.saved))){ rgAbandon('야영지에서 저장하지 않고 나가서 탐사가 끝났어요. 저장은 야영지의 \'저장하고 나가기\'로만 할 수 있어요.'); return challengeHTML(); }
   else if(run.v===2){ const L=charById(run.squad[0]), c=run.map.cells[run.pos]; rog=`<section class="ch-card rog dgcard"><div class="ch-h"><i>EXPEDITION · ${run.floor}/${DG_FLOORS}</i><h3>${esc(T('abyss'))} 진행 중</h3><span>${L?`리더 ${esc(L.name)} · `:''}제${run.floor}구역${run.rest?' 야영지':''}${run.saved?' · 저장됨':''}${run.wk&&run.wk!==weekKey()?' · 탐사 경로가 바뀌었어요(제1구역부터 다시)':''}</span></div><div class="rg-mode one"><button class="rg-node n-treasure" data-act="go" data-to="abyss"><em>▶</em><b>이어서 탐사하기</b><span>화면 전체로 던전을 탐색해요</span></button></div></section>`; }
-  else { if(run.pick&&!run.pick.filter(k=>RELICS[k]).length) run.pick=rgPick3(run);
+  else {
     const nodes=run.pick?`<h4 class="ch-sub">유물을 하나 고르세요</h4><div class="rg-picks">${run.pick.filter(k=>RELICS[k]).map(k=>{ const n=run.relics.filter(x=>x===k).length; return `<button class="rg-relic" data-act="rgrelic" data-v="${k}"><b>${esc(RELICS[k][0])}${n?` <small>×${n+1}</small>`:''}</b><span>${esc(RELICS[k][1])}${n?' · 겹쳐서 더 강해져요':''}</span></button>`; }).join('')}</div><div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="rgskip">고르지 않고 지나가기 (체력 10% 회복)</button></div>`
       :`<h4 class="ch-sub">${run.floor}구역 · 어디로 갈까요?</h4><div class="rg-nodes">${(run.opts||[]).map(k=>`<button class="rg-node n-${k}" data-act="rgnode" data-v="${k}"><em>${RG_NODE[k][0]}</em><b>${RG_NODE[k][1]}</b><span>${RG_NODE[k][2]}</span></button>`).join('')}</div>`;
     rog=`<section class="ch-card rog"><div class="ch-h"><i>EXPEDITION · ${run.floor}/${RG_FLOORS}구역</i><h3>${esc(T('abyss'))}</h3>${run.msg?`<span class="rg-msg">${esc(rgMessage(run))}</span>`:''}</div>
@@ -425,23 +428,33 @@ function rgEnemies(run,kind){ const pool=[]; G.chapters.filter(ch=>ch.kind==='ma
   else { en=Array.from({length:2+(Math.random()<0.5?1:0)},()=>pick(false)); en.forEach(e=>fitEnemy(e,enemyTarget(k,i,false)*0.85)); }
   return en; }
 let RGMODE='card';
-function rgStart(ids,mode){ const g=progSlot('rogue'); mode=mode||'card'; const map=dgGen(1); RG_LIVE=true; g.run={v:2,c3:1,wk:weekKey(),mode:'card',floor:1,fw:0,squad:ids,hp:Object.fromEntries(ids.map(id=>[id,1])),relics:[],deck:mode==='card'?rgDeck(ids):[],map,pos:map.start,pick:null,cpick:null,k:progK(),at:Date.now(),msg:mode==='card'?'카드 전투 탐사를 시작해요. 매 턴 에너지 3으로 카드를 써요. 적 머리 위의 표시가 다음 행동이에요.':'탐사를 시작해요.'}; mark('prog'); tab='abyss'; render(); }
+/* 탐사 새로 만들기(Model) */
+function rgRunNew(ids,mode){ const g=progSlot('rogue'); mode=mode||'card'; const map=dgGen(1); RG_LIVE=true; g.run={v:2,c3:1,wk:weekKey(),mode:'card',floor:1,fw:0,squad:ids,hp:Object.fromEntries(ids.map(id=>[id,1])),relics:[],deck:mode==='card'?rgDeck(ids):[],map,pos:map.start,pick:null,cpick:null,k:progK(),at:Date.now(),msg:mode==='card'?'카드 전투 탐사를 시작해요. 매 턴 에너지 3으로 카드를 써요. 적 머리 위의 표시가 다음 행동이에요.':'탐사를 시작해요.'}; mark('prog'); }
+/* 탐사 시작(Controller): 새로 만들고 심연 화면으로 */
+function rgStart(ids,mode){ rgRunNew(ids,mode); tab='abyss'; render(); }
 function rgBattle(kind){ const run=progSlot('rogue').run; const en=rgEnemies(run.v===2?{k:run.k,floor:rgEq(run,kind)}:run,kind); const s={id:'rg_'+run.floor,title:`${T('abyss')} · ${run.floor}구역 · ${RG_NODE[kind][1]}`,enemies:en,pre:'',post:''};
   const m=id=>rgCount(id);
   startStage(s,{kind:'rogue',node:kind,squad:run.squad,burst0:m('burst')?40:0,prep:(al)=>{ al.forEach(u=>{ const fr=run.hp[u.c.id]; const hpM=1+0.2*m('hp')+0.08*m('res');
       u.maxhp=Math.round(u.maxhp*hpM); u.atk=Math.round(u.atk*(1+0.15*m('atk')+0.08*m('res')+0.05*m('train'))); u.def=Math.round(u.def*(1+0.25*m('def'))); u.spd=Math.round(u.spd*(1+0.1*m('spd'))); u.hp=Math.round(u.maxhp*(fr==null?1:fr)); }); }}); }
-function rogueEnd(win){ const g=progSlot('rogue'), run=g.run; if(!run) return '<button class="btn" data-act="bdone">계속</button>';
+/* 탐사 전투 끝(Controller): 정산 → 보스 승리·패배면 탐사 끝, 아니면 효과음 → 결과 */
+function rogueEnd(win){ const R=rogueSettle(win); if(R&&R.finish) return rgFinish(R.done); if(R) sfx('승리'); return rogueResultHTML(R); }
+/* 탐사 전투 정산(Model): 체력 이어 가기(응급 키트 회복)·경험치, 이긴 칸 표시·유물/카드 고르기, 예전 형식은 다음 구역 */
+function rogueSettle(win){ const g=progSlot('rogue'), run=g.run; if(!run) return null;
   const heal=0.15*rgCount('heal'); B.allies.forEach(u=>{ run.hp[u.c.id]=u.hp>0?Math.min(1,u.hp/u.maxhp+heal):0; const o=own(u.c.id); if(o&&win) gainExp(o,expR(40)); });
-  const node=B.ctx.node;
-  if(win&&node==='boss'){ const html=rgFinish(true); return html; }
-  if(!win){ return rgFinish(false); }
-  if(run.v===2){ const cell=run.map.cells[run.pos]; if(cell) cell.done=true; run.fw=(run.fw||0)+(node==='elite'?2:1); if(node==='elite') run.pick=rgPick3(run); if(run.mode==='card') run.cpick=cardOffer(run); run.msg=''; mark('prog'); sfx('승리');
-    return `<h2 class="disp" style="color:var(--rose);margin:0">전투 승리</h2><p>${node==='elite'?'정예를 쓰러뜨렸어요. 유물을 고를 수 있어요.<br>':''}${run.mode==='card'?'새 카드를 하나 고를 수 있어요.':'계속 탐사해요.'}${heal?'<br>응급 키트로 체력을 회복했어요.':''}</p><button class="btn" data-act="bdone">계속</button>`; }
-  run.floor++; run.opts=rgOpts(run); if(node==='elite') run.pick=rgPick3(run); mark('prog'); sfx('승리');
-  return `<h2 class="disp" style="color:var(--rose);margin:0">${run.floor-1}구역 돌파</h2><p>${node==='elite'?'정예를 쓰러뜨렸어요. 유물을 하나 고를 수 있어요.':'다음 구역으로 가요.'}${heal?'<br>응급 키트로 체력을 회복했어요.':''}</p><button class="btn" data-act="bdone">계속</button>`; }
+  const node=B.ctx.node; if(!win||node==='boss') return {finish:true,done:win&&node==='boss'};
+  if(run.v===2){ const cell=run.map.cells[run.pos]; if(cell) cell.done=true; run.fw=(run.fw||0)+(node==='elite'?2:1); if(node==='elite') run.pick=rgPick3(run); if(run.mode==='card') run.cpick=cardOffer(run); run.msg=''; mark('prog'); return {v:2,node,card:run.mode==='card',heal}; }
+  run.floor++; run.opts=rgOpts(run); if(node==='elite') run.pick=rgPick3(run); mark('prog'); return {v:1,node,floor:run.floor,heal}; }
+/* 탐사 전투 결과(View) */
+function rogueResultHTML(R){ if(!R) return '<button class="btn" data-act="bdone">계속</button>';
+  if(R.v===2) return `<h2 class="disp" style="color:var(--rose);margin:0">전투 승리</h2><p>${R.node==='elite'?'정예를 쓰러뜨렸어요. 유물을 고를 수 있어요.<br>':''}${R.card?'새 카드를 하나 고를 수 있어요.':'계속 탐사해요.'}${R.heal?'<br>응급 키트로 체력을 회복했어요.':''}</p><button class="btn" data-act="bdone">계속</button>`;
+  return `<h2 class="disp" style="color:var(--rose);margin:0">${R.floor-1}구역 돌파</h2><p>${R.node==='elite'?'정예를 쓰러뜨렸어요. 유물을 하나 고를 수 있어요.':'다음 구역으로 가요.'}${R.heal?'<br>응급 키트로 체력을 회복했어요.':''}</p><button class="btn" data-act="bdone">계속</button>`; }
 function rgReward(f,done,prev,won){ prev=prev||0; const nf2=Math.max(0,f-prev); let r={gold:1200*f,exp:3*f,wmat:2*f,core:Math.floor(f/3)+(done?5:0),gift:Math.floor(f/4)+(done?2:0)}; const m=(1+0.3*rgCount('loot'))*(progRead('rogue').n>=2?0.25:1); Object.keys(r).forEach(k=>r[k]=Math.round(r[k]*m)); const gm=40*nf2+(done&&!won?500:0); if(gm) r.gems=gm; return r; }
-function rgFinish(done){ const g=progSlot('rogue'), run=g.run, f=done?RG_FLOORS:run.v===2?rgScore(run):run.floor-1; if(g.day!==today()){ g.day=today(); g.n=0; } const r=rgReward(f,done,g.best||0,!!g.won); giveReward(r); g.n++; g.best=Math.max(g.best||0,f); if(done) g.won=true; g.run=null; mark('prog'); sfx(done?'SSR':'확인');
-  return `<h2 class="disp" style="color:${done?'var(--rose)':'#ff5277'};margin:0">${esc(T('abyss'))} · ${done?'탐사 완료!':'탐사 종료'}</h2><p>${run.v===2?`제${run.floor}구역까지 탐사했어요 (진척 ${f}/${RG_FLOORS})`:f+'구역까지 갔어요'}.${g.n>2?' (오늘 3번째부터는 보상 25%)':''}<br>${rewardText(r)}${r.gems?'':`<br><small class="muted">${esc(T('currency'))}은(는) 최고 진척 기록을 갱신할 때만 받아요</small>`}</p><button class="btn" data-act="bdone">계속</button>`; }
+/* 탐사 끝(Controller): 정산 → 효과음 → 결과 */
+function rgFinish(done){ const R=rgFinishSettle(done); sfx(done?'SSR':'확인'); return rgFinishHTML(R); }
+/* 탐사 끝 정산(Model): 진척에 따른 보상(오늘 3번째부터 25%·최고 기록 갱신 때만 재화), 기록, 탐사 비움 */
+function rgFinishSettle(done){ const g=progSlot('rogue'), run=g.run, f=done?RG_FLOORS:run.v===2?rgScore(run):run.floor-1; if(g.day!==today()){ g.day=today(); g.n=0; } const r=rgReward(f,done,g.best||0,!!g.won); giveReward(r); g.n++; g.best=Math.max(g.best||0,f); if(done) g.won=true; g.run=null; mark('prog'); return {done,v:run.v,floor:run.floor,f,n:g.n,r}; }
+/* 탐사 끝 결과(View) */
+function rgFinishHTML(R){ return `<h2 class="disp" style="color:${R.done?'var(--rose)':'#ff5277'};margin:0">${esc(T('abyss'))} · ${R.done?'탐사 완료!':'탐사 종료'}</h2><p>${R.v===2?`제${R.floor}구역까지 탐사했어요 (진척 ${R.f}/${RG_FLOORS})`:R.f+'구역까지 갔어요'}.${R.n>2?' (오늘 3번째부터는 보상 25%)':''}<br>${rewardText(R.r)}${R.r.gems?'':`<br><small class="muted">${esc(T('currency'))}은(는) 최고 진척 기록을 갱신할 때만 받아요</small>`}</p><button class="btn" data-act="bdone">계속</button>`; }
 function rgNode(kind){ const g=progSlot('rogue'), run=g.run; if(!run) return;
   if(kind==='battle'||kind==='elite'||kind==='boss'){ rgBattle(kind); return; }
   let msg='';
@@ -454,4 +467,4 @@ function rgNode(kind){ const g=progSlot('rogue'), run=g.run; if(!run) return;
   run.floor++; run.opts=rgOpts(run); run.msg=msg; mark('prog'); render(); }
 /* 심연 탐사 화면 보조(View): 탐사 카드로 스크롤 · 탐사 결과 창 */
 function abyssCardFocus(){ setTimeout(()=>{ const el=document.querySelector('.ch-card.rog'); if(el) el.scrollIntoView({block:'start',behavior:'smooth'}); },60); }
-function openRgResult(html){ openModal(`<div class="result" style="position:static">${html.replace('data-act="bdone"','data-act="close"')}</div>`); }
+function openRgResult(html,title,note){ openModal(`<div class="result" style="position:static">${title?`<p style="margin:0 0 6px"><b>${esc(title)}</b><br><span class="muted">${esc(note||'')}</span></p>`:''}${html.replace('data-act="bdone"','data-act="close"')}</div>`); }
