@@ -52,6 +52,11 @@ async function updateDownloadHTML(base,path,man){
  return html;
 }
 
+/* 새 업데이트 안내 창 내용(View) */
+function updateFoundHTML(man){ return `${head('업데이트가 있어요',`<span class="muted">${esc(APP_BUILD)} → <b>${esc(man.build)}</b></span>`)}${notesHTML(man)}
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="updget">받기</button><button class="btn ghost" data-act="updskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`; }
+/* 전에 문제가 있던 버전 안내 창 내용(View) */
+function updateBadHTML(man){ return `${head('이 버전은 전에 문제가 있었어요',`<span class="muted">${esc(man.build)}</span>`)}<p>이 버전은 이 기기에서 제대로 실행되지 않아서 설치 버전으로 돌아왔었어요. 새 버전이 나오면 자동으로 다시 알려 드려요.</p><div class="row" style="margin-top:12px"><button class="btn ghost" data-act="updget">그래도 받기</button><button class="btn" data-act="close">닫기</button></div>`; }
 async function checkUpdate(manual){
   UPD=null;const o=LV(), repo=updRepo(o), branch=(o.branch||'main').trim();
   if(o.token) return checkUpdatePrivate(manual);
@@ -72,11 +77,12 @@ async function checkUpdate(manual){
   try{html=await updateDownloadHTML(raw,path,man);}catch(e){updateCheckRecord(man,repo,branch,'확인 실패: '+e.message);if(manual)toast(e.message);return;}
   if(updateAPKRequired(man,html,repo,branch))return;
   updateCheckRecord(man,repo,branch,'웹 패치 가능',html);UPD={man,raw,path,html};
-  if(isBad){ openModal(`${head('이 버전은 전에 문제가 있었어요',`<span class="muted">${esc(man.build)}</span>`)}<p>이 버전은 이 기기에서 제대로 실행되지 않아서 설치 버전으로 돌아왔었어요. 새 버전이 나오면 자동으로 다시 알려 드려요.</p><div class="row" style="margin-top:12px"><button class="btn ghost" data-act="updget">그래도 받기</button><button class="btn" data-act="close">닫기</button></div>`); return; }
+  if(isBad){ openModal(updateBadHTML(man)); return; }
   if(o.mode==='silent'&&!manual) return applyUpdate(true);
-  openModal(`${head('업데이트가 있어요',`<span class="muted">${esc(APP_BUILD)} → <b>${esc(man.build)}</b></span>`)}${notesHTML(man)}
-    <div class="row" style="margin-top:12px"><button class="btn" data-act="updget">받기</button><button class="btn ghost" data-act="updskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`);
+  openModal(updateFoundHTML(man));
 }
+/* 업데이트를 받은 뒤 창 내용(View) */
+function updateReadyHTML(build){ return `${head('업데이트를 받았어요')}<p>버전 <b>${esc(build)}</b>. 다시 시작하면 적용돼요. 문제가 생기면 설정 → 앱 업데이트에서 이전 버전으로 되돌릴 수 있어요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="reload">지금 다시 시작</button><button class="btn ghost" data-act="close">나중에</button></div>`; }
 async function applyUpdate(silent){
   const u=UPD;if(!u)return;let html;
   try{html=u.html||await updateDownloadHTML(u.raw,u.path,u.man);}catch(e){toast(e.message);return;}
@@ -85,7 +91,7 @@ async function applyUpdate(silent){
   try{ await appStorage.saveLive(html); }catch(e){ toast('업데이트 저장 실패: '+(e.message||'저장 공간을 확인해 주세요')); return; }
   const o=LV(); Object.assign(o,{on:true,prevBuild:o.build||'',build,boots:0,failed:false,at:Date.now()}); if(o.badBuild===build) delete o.badBuild; saveLV(o); await flush();
   if(silent){ toast('새 버전을 받았어요. 다음 실행부터 적용돼요'); return; }
-  openModal(`${head('업데이트를 받았어요')}<p>버전 <b>${esc(build)}</b>. 다시 시작하면 적용돼요. 문제가 생기면 설정 → 앱 업데이트에서 이전 버전으로 되돌릴 수 있어요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="reload">지금 다시 시작</button><button class="btn ghost" data-act="close">나중에</button></div>`);
+  openModal(updateReadyHTML(build));
 }
 async function checkUpdatePrivate(manual){
   UPD=null;const o=LV(); if(!o.repo){ if(manual) toast('업데이트 설정에서 GitHub 저장소를 먼저 넣어 주세요'); return; }

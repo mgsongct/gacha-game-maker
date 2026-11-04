@@ -6,6 +6,8 @@ function bossNext(u){return B&&B.engine&&u.ready&&u.ready.active-B.engine.time<=
 // 훈련: 10단계, 단계마다 권장 레벨이 있어요(그 레벨 대원의 능력치에 맞춰 적이 강해져요)
 const FARM_LV=[1,5,10,15,20,30,40,50,60,70], FARM_N=FARM_LV.length;
 const FARM_RW={exp:[10,20,35,55,80,110,150,200,260,330],gold:[4000,7000,11000,16000,22000,30000,40000,52000,66000,82000],wmat:[5,9,14,20,28,38,50,64,80,100],core:[1,1,2,2,3,4,5,6,7,8]};
+/* 훈련 기록 형식 이전(불러오기 fix가 부름): 단계가 바뀌어서(5→10단계, 권장 레벨) 예전 3단계 이상 기록은 다시 깨야 소탕 */
+function farmClearV2(pr){ if(pr.farmV===2) return; Object.keys(pr.farmClear).forEach(k=>{ const m=k.match(/^farm_.+_(\d+)$/); if(m&&+m[1]>=3) delete pr.farmClear[k]; }); pr.farmV=2; }
 function farmReward(key,lv){ const m=seasonIs('train')?2:1, i=Math.max(0,Math.min(FARM_N-1,lv-1)); return key==='exp'?{exp:FARM_RW.exp[i]*m}:key==='gold'?{gold:FARM_RW.gold[i]*m}:key==='wmat'?{wmat:FARM_RW.wmat[i]*m}:{core:FARM_RW.core[i]*m}; }
 function farmRec(lv){ return FARM_LV[Math.max(0,Math.min(FARM_N-1,lv-1))]; }
 function farmStage(key,lv){

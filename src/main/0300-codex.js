@@ -30,14 +30,17 @@ function cxEntries(){
 }
 
 let CXMEMO=null;
-function cxNewFast(){ const p=P(), sig=[Object.keys(p.cleared).length,Object.keys(p.owned).length,cxStore().length,G.lib.length,G.chapters.length,Object.keys(progRead('cxSeen')).length,Object.keys(p.cxBadge||{}).length].join('|'); if(CXMEMO&&CXMEMO.sig===sig) return CXMEMO.n; cxNew(); const s=progRead('cxSeen'), bd=p.cxBadge||{}; const n=cxEntries().filter(e=>e.open&&!s[e.key]&&!bd[e.key]).length; CXMEMO={sig,n}; return n; }
-function cxNew(list){ const p=P(); if(!p.cxSeen||typeof p.cxSeen!=='object'){ p.cxSeen={}; (list||cxEntries()).forEach(e=>{ if(e.open&&!e.stored) p.cxSeen[e.key]=1; }); mark('prog'); } const s=progRead('cxSeen'); return (list||cxEntries()).filter(e=>e.open&&!s[e.key]).length; }
+function cxNewFast(){ const p=P(), sig=[Object.keys(p.cleared).length,Object.keys(p.owned).length,cxStore().length,G.lib.length,G.chapters.length,Object.keys(progRead('cxSeen')).length,Object.keys(p.cxBadge||{}).length].join('|'); if(CXMEMO&&CXMEMO.sig===sig) return CXMEMO.n; const s=progRead('cxSeen'), bd=p.cxBadge||{}; const n=cxEntries().filter(e=>e.open&&!s[e.key]&&!bd[e.key]).length; CXMEMO={sig,n}; return n; }
+/* 도감 본 기록 칸 처음 만들기: 그때 열려 있는 기록(직접 적은 것 빼고)은 본 것으로 — 진행 칸 cxSeen의 정의(0070 PROG_SLOTS) */
+function cxSeenNew(){ const s={}; cxEntries().forEach(e=>{ if(e.open&&!e.stored) s[e.key]=1; }); return s; }
+/* 도감 새 기록 표시(Model — 도감 화면에 들어가기 전): 새로 열린 기록에 표시 */
+function cxBadgeSync(){ const p=P(), s=progSlot('cxSeen'); p.cxBadge=p.cxBadge||{}; let ch=false; cxEntries().forEach(e=>{ if(e.open&&!s[e.key]&&!p.cxBadge[e.key]){ p.cxBadge[e.key]=1; ch=true; } }); if(ch){ CXMEMO=null; mark('prog'); } }
 function cxCard(e){ const isNew=e.open&&!progRead('cxSeen')[e.key];
   const pic=e.open?(e.char?art(e.char,'cx-ch'):e.img?`<img src="${esc(e.img)}" alt="" class="${e.contain?'ct':''}" loading="lazy">`:`<span class="cx-glyph">${esc((e.title||'?').slice(0,1))}</span>`):'<span class="cx-glyph">?</span>';
   const snip=e.open?String(e.body||(e.notes[0]&&e.notes[0].text)||'아직 기록이 없어요').replace(/\n+/g,' ').slice(0,70):cxLockText(e.unlock);
   return `<button class="cx-card ${e.open?'':'lock'} c-${esc(e.cat)}" data-act="cxview" data-k="${esc(e.key)}"><span class="cx-pic">${pic}</span><span class="cx-tx"><i>${esc(CX_LABEL[e.cat]||'')}</i><b>${e.open?esc(e.title):'???'}</b><span>${esc(snip)}</span></span>${isNew?'<em>NEW</em>':''}</button>`; }
 function codexHTML(){
-  const all=cxEntries(), cat=CXCAT, list=all.filter(e=>cat==='all'||e.cat===cat), un=all.filter(e=>e.open).length; cxNew(all); { const p=P(), s=progRead('cxSeen'); p.cxBadge=p.cxBadge||{}; let ch=false; all.forEach(e=>{ if(e.open&&!s[e.key]&&!p.cxBadge[e.key]){ p.cxBadge[e.key]=1; ch=true; } }); if(ch){ CXMEMO=null; mark('prog'); } }
+  const all=cxEntries(), cat=CXCAT, list=all.filter(e=>cat==='all'||e.cat===cat), un=all.filter(e=>e.open).length;
   const cnt=k=>k==='all'?all.length:all.filter(e=>e.cat===k).length;
   return `${pageHead('도감','LORE BOOK','lobby')}
   <div class="cx-head"><div class="cx-meter"><b>${un}</b><span>/ ${all.length} 기록 해금</span></div><div class="cx-bar"><i style="width:${all.length?un/all.length*100:0}%"></i></div>
@@ -46,20 +49,25 @@ function codexHTML(){
   ${!cxStore().length&&SAMPLE?`<div class="panel cx-hint"><b>세계를 더 깊게</b><p class="muted" style="margin:4px 0 0">AI가 세계관과 메인 플롯을 바탕으로 장소, 용어, 역사, 숨은 인물 같은 기록을 써요. 비밀이 담긴 기록은 해당 스테이지를 깨야 열려요.</p></div>`:''}
   <div class="cx-list">${list.map(cxCard).join('')||'<p class="muted">항목이 없어요</p>'}</div>`;
 }
+/* 도감 기록 보기(Controller): 잠겼으면 알림, 열렸으면 본 것으로 하고 카드의 새 표시를 지운 뒤 창 */
 function openCx(key){
   const e=cxEntries().find(x=>x.key===key); if(!e) return;
   if(!e.open){ toast(cxLockText(e.unlock)||'아직 잠겨 있어요'); return; }
-  progSlot('cxSeen')[key]=1; CXMEMO=null; mark('prog'); document.querySelectorAll('.cx-card[data-k]').forEach(el=>{ if(el.dataset.k===key){ const em=el.querySelector('em'); if(em) em.remove(); } });
-  const para=t=>String(t||'').split(/\n{2,}/).map(x=>`<p>${esc(x).replace(/\n/g,'<br>')}</p>`).join('');
-  openModal(`<div class="cx-view c-${esc(e.cat)}">
+  cxMarkSeen(key); cxCardSeenShow(key); openModal(cxViewHTML(e,key));
+}
+/* 도감 기록을 봄(Model) */
+function cxMarkSeen(key){ progSlot('cxSeen')[key]=1; CXMEMO=null; mark('prog'); }
+/* 도감 카드의 새 표시 지우기 · 기록 보기 창 내용(View) */
+function cxCardSeenShow(key){ document.querySelectorAll('.cx-card[data-k]').forEach(el=>{ if(el.dataset.k===key){ const em=el.querySelector('em'); if(em) em.remove(); } }); }
+function cxViewHTML(e,key){ const para=t=>String(t||'').split(/\n{2,}/).map(x=>`<p>${esc(x).replace(/\n/g,'<br>')}</p>`).join('');
+  return `<div class="cx-view c-${esc(e.cat)}">
     ${e.img||e.char?`<div class="cx-hero">${e.char?art(e.char,'cx-ch'):`<img src="${esc(e.img)}" alt="" class="${e.contain?'ct':''}">`}</div>`:''}
     <div class="cx-vh"><i>${esc(CX_LABEL[e.cat]||'')}</i><h2>${esc(e.title)}</h2><span class="muted">${esc(e.sub||'')}</span></div>
     <div class="cx-body">${e.body?para(e.body):'<p class="muted">아직 기록이 없어요. 아래 \'더 알아보기\'를 누르면 AI가 지금까지 밝혀진 범위 안에서 써 줘요.</p>'}
       ${e.notes.map(n=>`<div class="cx-note"><small>${esc(n.at||'')}</small>${para(n.text)}</div>`).join('')}</div>
     ${SAMPLE?`<button class="btn block" data-act="cxdeep" data-k="${esc(key)}" style="margin-top:14px">✦ 더 알아보기</button>`:''}
     <div class="cx-sub">${e.char&&own(e.char.id)?`<button class="btn sm ghost" data-act="char" data-id="${esc(e.char.id)}">${esc(T('crew'))} 정보</button>`:''}${e.stored?`<button class="btn sm ghost" data-act="cxedit" data-id="${esc(e.stored.id)}">편집</button>`:''}<button class="btn sm ghost" data-act="cxnote" data-k="${esc(key)}">메모 추가</button><button class="btn sm ghost" data-act="close">닫기</button></div>
-  </div>`);
-}
+  </div>`; }
 function openCxEdit(id){
   const x=id?cxStore().find(q=>q.id===id):{id:'',cat:'term',title:'',body:'',unlock:{type:'start'}}; if(!x) return;
   const st=mainStages();

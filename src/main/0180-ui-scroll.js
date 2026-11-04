@@ -34,10 +34,10 @@ function uiSelectText(field){if(!field)return;const root=field.closest('.sheet')
 function render(){ progTick();
   // 심연 탐사는 야영지에서 저장해야만 나갔다 올 수 있어요. 다른 길로 나가면 탐사가 끝나요.
   if(PREVTAB==='abyss'&&tab!=='abyss'){ const r=progSlot('rogue').run; if(r&&!r.saved) r.left=true; }
-  rogueTick(); PREVTAB=tab;
-  if(tab==='lobby'&&typeof mailTick==='function') mailTick();
-  if(tab==='lobby'&&typeof cashTick==='function') cashTick();
+  (SCREEN_ENTER[tab]||[]).forEach(f=>f()); PREVTAB=tab;
   renderView(); }
+/* 화면에 들어가기 전 처리(Controller — 그리기 전): 화면마다 그 기능이 상태를 맞춤 — 그리기(…HTML)는 상태를 바꾸지 않음 */
+const SCREEN_ENTER={lobby:[mailTick,cashTick],abyss:[rogueTick],challenge:[rogueTick],notice:[noticeSeen],codex:[cxBadgeSync]};
 /* 그리기(View): 지금 탭 화면·머리 재화·탭 표시 */
 function renderView(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewState=UI_PAGE_SCROLL_ROUTE===scrollKey&&UI_PAGE_SCROLL_GAME===G?uiScrollCapture(viewBefore):null; setTimeout(()=>{ try{ fitLobby(); }catch(e){} },0); document.body.classList.toggle('play',playMode()); if(playMode()&&PLAY_HIDE_ST.includes(STTAB)) STTAB='';
   updStam(); $('#gems').textContent=nf(P().gems); try{ $('#ic_gold').innerHTML=rIco('gold'); $('#ic_gems').innerHTML=rIco('gems'); }catch(e){} $('#gold').textContent=nf(P().gold);
@@ -236,8 +236,6 @@ function evShopHTML(){
 }
 function farmHTML(){
   const p=P(), top4=G.chars.filter(c=>own(c.id)).map(c=>own(c.id).lv||1).sort((a,b)=>b-a).slice(0,4), topLv=top4.length?Math.round(top4.reduce((a,b)=>a+b,0)/top4.length):1;
-  // 훈련 단계가 바뀌어서(5→10단계, 권장 레벨) 예전 3단계 이상 기록은 다시 깨야 소탕할 수 있어요
-  if(p.farmV!==2){ Object.keys(p.farmClear||{}).forEach(k=>{ const m=k.match(/^farm_.+_(\d+)$/); if(m&&+m[1]>=3) delete p.farmClear[k]; }); p.farmV=2; mark('prog'); }
   return `${pageHead(T('farm'),'TRAINING','lobby')}<p class="muted">반복해서 재료를 모으는 곳이에요. 단계마다 권장 레벨이 있고, 높은 단계일수록 보상이 커요. 한 번 깬 단계는 소탕으로 바로 보상을 받을 수 있어요. 보유: ${rewardText({exp:p.mat.exp,wmat:p.mat.wmat,core:p.mat.core,gold:p.gold})}</p>
   ${G.meta.farms.map(f=>`<h3 class="sec">${esc(f.name)}</h3>${Array.from({length:FARM_N},(_,k)=>k+1).map(lv=>{const id=`farm_${f.key}_${lv}`, rec=farmRec(lv), low=topLv<rec,cl=!!p.farmClear[id],open=lv===1||!!p.farmClear[`farm_${f.key}_${lv-1}`];
     return `<div class="stage ${cl?'clear':''} ${open?'':'lock'}"><span class="code">${lv}</span><span class="t"><b>${lv}단계 <small class="${low?'farm-low':'muted'}">권장 Lv.${rec}</small></b><span class="st">${rewardText(farmReward(f.key,lv))}</span></span>${open?`<button class="btn sm ghost" data-act="farmgo" data-k="${f.key}" data-lv="${lv}">출격</button>`:''}${cl?`<button class="btn sm" data-act="sweep" data-k="${f.key}" data-lv="${lv}">소탕</button><button class="btn sm ghost" data-act="sweep" data-k="${f.key}" data-lv="${lv}" data-n="5">×5</button>`:''}</div>`;}).join('')}`).join('')}`;

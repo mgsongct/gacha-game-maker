@@ -170,8 +170,10 @@ async function runPrep(cats,filter,opt){
   }
   PREPJOB=null; prepChip(); render(); toast(`그림 ${j.done}장을 준비했어요`); if(opt.done) opt.done(j);
 }
+/* 공지를 봄(Model — 화면에 들어가기 전) */
+function noticeSeen(){ P().live.seen=Date.now(); mark('prog'); }
 function noticeHTML(){
-  const L=P().live; L.seen=Date.now(); mark('prog'); const todo=drawTodo();
+  const L=P().live, todo=drawTodo();
   return `${pageHead('공지','NOTICE','lobby')}
   ${L.notices.length?L.notices.map((n,i)=>`<div class="panel"><h3>${esc(n.title)}</h3><ul class="notice">${n.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div>`).join(''):'<div class="panel"><p class="muted">아직 공지가 없어요. 설정의 라이브 운영을 켜 두면 날짜에 맞춰 새 콘텐츠가 생겨요.</p></div>'}
   <div class="panel"><h3>NAI로 그릴 것 ${todo.length}개</h3><p class="muted" style="margin:0 0 10px">${todo.slice(0,12).map(x=>esc(x.label)).join(', ')}${todo.length>12?' 외':''}</p>${todo.length?'<button class="btn" data-act="prepopen">그림 준비실 열기</button>':''}</div>`;

@@ -2220,53 +2220,25 @@
    "text": "섞인 함수 0060-util 1"
   },
   {
-   "key": "계층 섞임|src/main/0070-save.js",
-   "num": {
-    "함수": 1
-   },
-   "text": "섞인 함수 0070-save 1"
-  },
-  {
-   "key": "계층 섞임|src/main/0080-storage-integration.js",
-   "num": {
-    "함수": 1
-   },
-   "text": "섞인 함수 0080-storage-integration 1"
-  },
-  {
    "key": "계층 섞임|src/main/0100-messenger.js",
    "num": {
-    "함수": 2
+    "함수": 5
    },
-   "text": "섞인 함수 0100-messenger 2"
-  },
-  {
-   "key": "계층 섞임|src/main/0110-challenge-raid.js",
-   "num": {
-    "함수": 1
-   },
-   "text": "섞인 함수 0110-challenge-raid 1"
+   "text": "섞인 함수 0100-messenger 5"
   },
   {
    "key": "계층 섞임|src/main/0120-abyss.js",
    "num": {
-    "함수": 5
+    "함수": 2
    },
-   "text": "섞인 함수 0120-abyss 5"
+   "text": "섞인 함수 0120-abyss 2"
   },
   {
-   "key": "계층 섞임|src/main/0125-tower.js",
+   "key": "계층 섞임|src/main/0160-player-profile.js",
    "num": {
     "함수": 1
    },
-   "text": "섞인 함수 0125-tower 1"
-  },
-  {
-   "key": "계층 섞임|src/main/0160-free-chat.js",
-   "num": {
-    "함수": 4
-   },
-   "text": "섞인 함수 0160-free-chat 4"
+   "text": "섞인 함수 0160-player-profile 1"
   },
   {
    "key": "계층 섞임|src/main/0180-ui-scroll.js",
@@ -2346,32 +2318,11 @@
    "text": "섞인 함수 0420-app-update 4"
   },
   {
-   "key": "계층 섞임|src/main/0480-battle.js",
-   "num": {
-    "함수": 1
-   },
-   "text": "섞인 함수 0480-battle 1"
-  },
-  {
-   "key": "계층 섞임|src/main/0487-formation-sortie.js",
-   "num": {
-    "함수": 1
-   },
-   "text": "섞인 함수 0487-formation-sortie 1"
-  },
-  {
    "key": "계층 섞임|src/main/0505-construct.js",
    "num": {
     "함수": 1
    },
    "text": "섞인 함수 0505-construct 1"
-  },
-  {
-   "key": "계층 섞임|src/main/0510-actions/",
-   "num": {
-    "함수": 12
-   },
-   "text": "섞인 함수 0510-actions/ 12"
   },
   {
    "key": "계층 섞임|src/main/0520-backup-storage.js",
@@ -2397,30 +2348,16 @@
   {
    "key": "계층 방향|src/main/0020-ai-connect.js",
    "num": {
-    "위반": 6
+    "위반": 7
    },
-   "text": "방향 위반 0020-ai-connect 6"
+   "text": "방향 위반 0020-ai-connect 7"
   },
   {
    "key": "계층 방향|src/main/0030-image/",
    "num": {
-    "위반": 3
-   },
-   "text": "방향 위반 0030-image/ 3"
-  },
-  {
-   "key": "계층 방향|src/main/0070-save.js",
-   "num": {
     "위반": 2
    },
-   "text": "방향 위반 0070-save 2"
-  },
-  {
-   "key": "계층 방향|src/main/0080-storage-integration.js",
-   "num": {
-    "위반": 2
-   },
-   "text": "방향 위반 0080-storage-integration 2"
+   "text": "방향 위반 0030-image/ 2"
   },
   {
    "key": "계층 방향|src/main/0090-growth.js",
@@ -2432,30 +2369,16 @@
   {
    "key": "계층 방향|src/main/0100-messenger.js",
    "num": {
-    "위반": 5
+    "위반": 6
    },
-   "text": "방향 위반 0100-messenger 5"
+   "text": "방향 위반 0100-messenger 6"
   },
   {
    "key": "계층 방향|src/main/0120-abyss.js",
    "num": {
-    "위반": 5
+    "위반": 4
    },
-   "text": "방향 위반 0120-abyss 5"
-  },
-  {
-   "key": "계층 방향|src/main/0135-schedule.js",
-   "num": {
-    "위반": 2
-   },
-   "text": "방향 위반 0135-schedule 2"
-  },
-  {
-   "key": "계층 방향|src/main/0160-free-chat.js",
-   "num": {
-    "위반": 3
-   },
-   "text": "방향 위반 0160-free-chat 3"
+   "text": "방향 위반 0120-abyss 4"
   },
   {
    "key": "계층 방향|src/main/0180-ui-scroll.js",
@@ -2467,9 +2390,9 @@
   {
    "key": "계층 방향|src/main/0185-game-rules.js",
    "num": {
-    "위반": 3
+    "위반": 1
    },
-   "text": "방향 위반 0185-game-rules 3"
+   "text": "방향 위반 0185-game-rules 1"
   },
   {
    "key": "계층 방향|src/main/0187-balance.js",
@@ -2477,13 +2400,6 @@
     "위반": 2
    },
    "text": "방향 위반 0187-balance 2"
-  },
-  {
-   "key": "계층 방향|src/main/0190-shop.js",
-   "num": {
-    "위반": 1
-   },
-   "text": "방향 위반 0190-shop 1"
   },
   {
    "key": "계층 방향|src/main/0210-setup.js",
@@ -2500,18 +2416,11 @@
    "text": "방향 위반 0230-modal 1"
   },
   {
-   "key": "계층 방향|src/main/0240-growth-curve.js",
-   "num": {
-    "위반": 2
-   },
-   "text": "방향 위반 0240-growth-curve 2"
-  },
-  {
    "key": "계층 방향|src/main/0250-story-factory.js",
    "num": {
-    "위반": 4
+    "위반": 1
    },
-   "text": "방향 위반 0250-story-factory 4"
+   "text": "방향 위반 0250-story-factory 1"
   },
   {
    "key": "계층 방향|src/main/0260-new-game/",
@@ -2521,39 +2430,25 @@
    "text": "방향 위반 0260-new-game/ 3"
   },
   {
-   "key": "계층 방향|src/main/0270-skin-proposal.js",
-   "num": {
-    "위반": 1
-   },
-   "text": "방향 위반 0270-skin-proposal 1"
-  },
-  {
-   "key": "계층 방향|src/main/0280-live-ops.js",
-   "num": {
-    "위반": 1
-   },
-   "text": "방향 위반 0280-live-ops 1"
-  },
-  {
    "key": "계층 방향|src/main/0290-season-rotation.js",
    "num": {
-    "위반": 6
+    "위반": 4
    },
-   "text": "방향 위반 0290-season-rotation 6"
+   "text": "방향 위반 0290-season-rotation 4"
   },
   {
    "key": "계층 방향|src/main/0300-codex.js",
    "num": {
-    "위반": 3
+    "위반": 1
    },
-   "text": "방향 위반 0300-codex 3"
+   "text": "방향 위반 0300-codex 1"
   },
   {
    "key": "계층 방향|src/main/0330-casting.js",
    "num": {
-    "위반": 2
+    "위반": 1
    },
-   "text": "방향 위반 0330-casting 2"
+   "text": "방향 위반 0330-casting 1"
   },
   {
    "key": "계층 방향|src/main/0360-sync/",
@@ -2579,9 +2474,9 @@
   {
    "key": "계층 방향|src/main/0445-factions.js",
    "num": {
-    "위반": 4
+    "위반": 2
    },
-   "text": "방향 위반 0445-factions 4"
+   "text": "방향 위반 0445-factions 2"
   },
   {
    "key": "계층 방향|src/main/0450-relations-memory.js",
@@ -2591,13 +2486,6 @@
    "text": "방향 위반 0450-relations-memory 2"
   },
   {
-   "key": "계층 방향|src/main/0455-persona.js",
-   "num": {
-    "위반": 3
-   },
-   "text": "방향 위반 0455-persona 3"
-  },
-  {
    "key": "계층 방향|src/main/0460-script-engine.js",
    "num": {
     "위반": 1
@@ -2605,39 +2493,25 @@
    "text": "방향 위반 0460-script-engine 1"
   },
   {
-   "key": "계층 방향|src/main/0462-direction.js",
+   "key": "계층 방향|src/main/0465-story-plan.js",
    "num": {
     "위반": 1
    },
-   "text": "방향 위반 0462-direction 1"
-  },
-  {
-   "key": "계층 방향|src/main/0465-story-plan.js",
-   "num": {
-    "위반": 2
-   },
-   "text": "방향 위반 0465-story-plan 2"
+   "text": "방향 위반 0465-story-plan 1"
   },
   {
    "key": "계층 방향|src/main/0480-battle.js",
    "num": {
-    "위반": 6
+    "위반": 1
    },
-   "text": "방향 위반 0480-battle 6"
+   "text": "방향 위반 0480-battle 1"
   },
   {
    "key": "계층 방향|src/main/0487-formation-sortie.js",
    "num": {
-    "위반": 2
+    "위반": 1
    },
-   "text": "방향 위반 0487-formation-sortie 2"
-  },
-  {
-   "key": "계층 방향|src/main/0488-stage-modes.js",
-   "num": {
-    "위반": 2
-   },
-   "text": "방향 위반 0488-stage-modes 2"
+   "text": "방향 위반 0487-formation-sortie 1"
   },
   {
    "key": "계층 방향|src/main/0510-actions/",
@@ -2661,18 +2535,11 @@
    "text": "방향 위반 0530-story-memory 1"
   },
   {
-   "key": "계층 방향|src/main/0535-content-audit.js",
-   "num": {
-    "위반": 2
-   },
-   "text": "방향 위반 0535-content-audit 2"
-  },
-  {
    "key": "계층 방향|src/main/0537-live-fill.js",
    "num": {
-    "위반": 2
+    "위반": 1
    },
-   "text": "방향 위반 0537-live-fill 2"
+   "text": "방향 위반 0537-live-fill 1"
   }
  ]
 }

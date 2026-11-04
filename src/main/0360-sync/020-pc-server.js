@@ -4,6 +4,8 @@ async function pcApi(path,opt){ const pc=PCS(); if(!pc) throw {code:'network',me
   if(r.status===404&&opt.ok404) return null; if(r.status===401) throw {code:'bad_key',message:'PC 서버 키가 맞지 않아요. QR을 다시 찍어 주세요'}; if(r.status>=400) throw errOf(r);
   if(opt.binary) return r; try{return r.text?JSON.parse(r.text):{};}catch(e){throw Error('PC 서버 응답을 읽지 못했습니다');} }
 let PCJOB=false;
+/* PC 저장 덮어쓰기 확인 창 내용(View) */
+function pcConflictHTML(other,S0){ return `${head(other?'PC에 더 새 진행이 있어요':'PC의 저장을 덮어쓸까요?')}<p>${other?`<b>${esc(S0.device||'다른 기기')}</b> · ${esc(new Date(S0.at).toLocaleString())}에 저장한 진행이 PC에 있어요. 이 기기의 게임으로 올리면 그 진행을 덮어써요.`:'이 기기의 게임은 아직 시작하지 않은 샘플 게임이에요. 올리면 PC에 저장된 게임을 덮어써요.'}</p><div class="row" style="margin-top:12px"><button class="btn" data-act="pcpullgo">PC의 게임 받기</button><button class="btn ghost" data-act="pcpushf">그래도 올리기</button></div>`; }
 async function pcPush(silent,force){
   if(PCJOB||!PCS()) return; PCJOB=true; try{
     if(!silent) syBar('PC에 저장하는 중…'); await flush();
@@ -11,7 +13,7 @@ async function pcPush(silent,force){
     if(S0&&!force&&(other||freshGame())){
       if(silent){ if(!PCWARNED){ PCWARNED=true; toast(other?'PC에 다른 기기의 더 새 진행이 있어서 자동 저장을 멈췄어요. 설정 → PC 서버에서 받기를 눌러 주세요':'이 기기의 게임이 아직 시작 전이라 PC의 저장을 덮어쓰지 않았어요'); } return; }
       PCJOB=false; syBar('');
-      openModal(`${head(other?'PC에 더 새 진행이 있어요':'PC의 저장을 덮어쓸까요?')}<p>${other?`<b>${esc(S0.device||'다른 기기')}</b> · ${esc(new Date(S0.at).toLocaleString())}에 저장한 진행이 PC에 있어요. 이 기기의 게임으로 올리면 그 진행을 덮어써요.`:'이 기기의 게임은 아직 시작하지 않은 샘플 게임이에요. 올리면 PC에 저장된 게임을 덮어써요.'}</p><div class="row" style="margin-top:12px"><button class="btn" data-act="pcpullgo">PC의 게임 받기</button><button class="btn ghost" data-act="pcpushf">그래도 올리기</button></div>`); return; }
+      openModal(pcConflictHTML(other,S0)); return; }
     const have=new Set(((await pcApi('/api/store/list'))||{}).blobs||[]), idx=syIdx(), keys=await idbKeys(), bin={}, types={};
     for(const k of keys){ const b=await idbGet(k); if(!b||!(b instanceof Blob)) continue; types[k]=b.type||''; const ent=idx[k]; let h;
       if(ent&&ent.size===b.size&&ent.hash) h=ent.hash; else { h=await shaHex(await b.arrayBuffer()); idx[k]={hash:h,size:b.size}; } bin[k]=h;

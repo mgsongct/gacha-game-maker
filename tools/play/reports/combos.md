@@ -207,8 +207,8 @@
 | modules/combat/060-generation.js v2GenerateSelected#2 | src/modules/combat/060-generation.js:188 | 4 |
 | modules/combat/070-equipment.js v2GearGenerate | src/modules/combat/070-equipment.js:73 | 0 |
 | 그림 0030-image/010-engine.js naiDraw#2 | src/main/0030-image/010-engine.js:178 | 1 |
-| 그림 0030-image/010-engine.js openNaiGen | src/main/0030-image/010-engine.js:744 | 0 |
-| 그림 0030-image/010-engine.js faceDrawOne | src/main/0030-image/010-engine.js:831 | 1 |
+| 그림 0030-image/010-engine.js openNaiGen | src/main/0030-image/010-engine.js:749 | 0 |
+| 그림 0030-image/010-engine.js faceDrawOne | src/main/0030-image/010-engine.js:837 | 1 |
 
 ## 흐름 오류 (15)
 

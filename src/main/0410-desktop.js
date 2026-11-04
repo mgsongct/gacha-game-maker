@@ -31,12 +31,14 @@ document.addEventListener('keydown',e=>{
     return; }
   const map={'1':'crew','2':'ops','3':'lobby','4':'contract','5':'studio'}; if(map[e.key]){ const b=document.querySelector(`.tab[data-tab="${map[e.key]}"]`); if(b) b.click(); }
 });
-function openA2HS(first){ if(first) appStorage.setItem('ggm-a2hs','1');
-  openModal(`${head('홈 화면에 추가해 주세요',`<span class="muted">아이폰은 앱처럼 쓰려면 이 단계가 필요해요</span>`)}
+/* 홈 화면에 추가 안내 창 내용(View) */
+function a2hsHTML(){ return `${head('홈 화면에 추가해 주세요',`<span class="muted">아이폰은 앱처럼 쓰려면 이 단계가 필요해요</span>`)}
     <ol class="a2hs"><li>Safari 아래쪽(또는 위쪽)의 <b>공유 버튼</b> <span class="kbd">⬆︎</span>을 눌러요.</li><li>목록을 내려서 <b>홈 화면에 추가</b>를 눌러요.</li><li>오른쪽 위 <b>추가</b>를 누르면 홈 화면에 '가챠 메이커' 아이콘이 생겨요.</li><li>앞으로는 그 아이콘으로 열어요. 전체 화면으로 열리고, 저장한 게임도 안전하게 남아요.</li></ol>
     <p class="muted">Safari 탭에서 그냥 쓰면 오래 안 열었을 때 아이폰이 저장 데이터를 지울 수 있어요. 가끔 설정 → 백업으로 내보내 두면 더 안전해요.</p>
     ${pcOrigin()?'<p class="muted"><b>PC 서버로 접속 중이에요.</b> 게임은 PC에 저장되니 홈 화면에 추가하지 않아도 돼요. 바깥 주소(trycloudflare)는 PC 서버를 켤 때마다 바뀌어서, 홈 화면 아이콘은 다음에 안 열릴 수 있어요. 그럴 땐 PC의 QR을 다시 찍으면 PC에 저장된 게임이 그대로 이어져요.</p>':''}
-    <div class="row" style="margin-top:12px"><button class="btn" data-act="close">알겠어요</button></div>`); }
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="close">알겠어요</button></div>`; }
+function openA2HS(first){ if(first) appStorage.setItem('ggm-a2hs','1');
+  openModal(a2hsHTML()); }
 function openProxySet(){
   openModal(`${head('중계 서버 (아이폰·웹)')}
     <p class="muted">브라우저는 보안 규칙(CORS) 때문에 일부 AI 서비스에 직접 연결하지 못해요. 그럴 때만 중계 서버를 거쳐요. 직접 연결이 되는 서비스는 그대로 직접 연결해요.</p>

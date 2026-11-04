@@ -16,13 +16,17 @@ const NONUI_EL = /^['"`](canvas|img|audio|video|a|input|script|link|source)['"`]
 const STYLE = /^(classList|style|dataset)$/;
 const TRIGGER = new Set(['render', 'renderView', 'toast', 'openModal', 'closeModal']); // 화면 갱신(render = 그리기 전 처리 + renderView)
 // 저장·외부 서비스(직접 쓰면 Model): 읽기(저장소·IndexedDB 읽기) · 쓰기(저장소 쓰기·IndexedDB 쓰기·저장 표시) · 서비스(네트워크·글 AI·그림 AI — 부작용·비용)
-const IO_READ = new Set(['idbGet', 'idbKeys', 'idbGetNS']), IO_WRITE = new Set(['idbPut', 'idbDel', 'storeImage', 'storeAudio', 'mark', 'markAll', 'flush']), SERVICE = new Set(['fetch', 'aiOne', 'aiCall', 'aiJSON', 'naiDraw', 'naiGenerate']);
+const IO_READ = new Set(['idbGet', 'idbKeys', 'idbGetNS']), IO_WRITE = new Set(['idbPut', 'idbDel', 'storeImage', 'storeAudio', 'mark', 'markAll', 'flush', 'downloadBlob']), SERVICE = new Set(['fetch', 'aiOne', 'aiCall', 'aiJSON', 'naiDraw', 'naiGenerate']);
 const STORE = /^(appStorage|localStorage|sessionStorage)$/, STORE_W = /^(setItem|removeItem|clear|mediaWrite)$/;
 
 // 함수마다 직접 신호: markup · dom(바꿈) · trigger(화면 갱신 호출) · write(게임 상태 씀 — writers) · read(저장소 읽기) · store(저장소 쓰기·저장 표시) · service(네트워크·AI) · handler
 const propOf = m => m?.type === 'member_expression' ? m.childForFieldName('property')?.text || '' : '';
 // 대입: DOM 속성 바꾸기(innerHTML·hidden …) 또는 el.style.x = … · el.classList… 
-function assignSig(n, s) { const l = n.childForFieldName('left'); if (l?.type !== 'member_expression') return; if (DOM_WRITE.test(propOf(l)) || STYLE.test(propOf(l.childForFieldName('object')))) { s.dom = true; s.atV.push(n); } }
+//   hidden·disabled·checked·selectedIndex는 데이터 칸 이름으로도 쓰여서(예: 설정의 checked = 확인 시각) 대상이 함수 안에서 DOM이 아닌 값으로 만든 이름이면 뺌
+const AMBIG = /^(hidden|disabled|checked|selectedIndex)$/, DOM_Q = /\$\(|querySelector|getElementById|createElement|closest\(|\.target\b|children|firstElementChild|parentNode|parentElement/;
+function notElement(obj, f) { const root = (obj?.text || '').split(/[.[(]/)[0]; let init = null; walk(f.node, n => { if (init === null && n.type === 'variable_declarator' && n.childForFieldName('name')?.text === root) init = n.childForFieldName('value')?.text || ''; }); return init !== null && !DOM_Q.test(init); }
+function assignSig(n, s, f) { const l = n.childForFieldName('left'); if (l?.type !== 'member_expression') return; const p = propOf(l);
+  if ((DOM_WRITE.test(p) && !(AMBIG.test(p) && notElement(l.childForFieldName('object'), f))) || STYLE.test(propOf(l.childForFieldName('object')))) { s.dom = true; s.atV.push(n); } }
 // 이름 호출: 화면 갱신·저장소·서비스 기본 함수
 function nameSig(c, s) { if (TRIGGER.has(c.text)) s.trigger = true; if (IO_READ.has(c.text)) s.read = true; if (IO_WRITE.has(c.text)) { s.store = true; s.atM.push(c); } if (SERVICE.has(c.text)) { s.service = true; s.atM.push(c); } }
 // 멤버 호출: DOM 바꾸기(화면이 아닌 canvas·이미지 등 만들기는 뺌) · el.classList.add … · 저장소 읽기/쓰기
@@ -33,7 +37,7 @@ function memberSig(n, c, s) { const p = propOf(c), o = c.childForFieldName('obje
 function signals(f, writers) { const s = { markup: false, dom: false, trigger: false, write: writers.has(f.key), read: false, store: false, service: false, handler: /^handle\w+Action$/.test(f.name), atV: [], atM: [] };
   walk(f.node, n => { const t = n.type;
     if (t === 'string' || t === 'template_string' || t === 'string_fragment') { if (MARKUP.test(n.text)) { s.markup = true; s.atV.push(n); } }
-    else if (t === 'assignment_expression' || t === 'augmented_assignment_expression') assignSig(n, s);
+    else if (t === 'assignment_expression' || t === 'augmented_assignment_expression') assignSig(n, s, f);
     else if (t === 'call_expression') { const c = n.childForFieldName('function'); if (c?.type === 'identifier') nameSig(c, s); else if (c?.type === 'member_expression') memberSig(n, c, s); } });
   return s; }
 // 계층: 직접 신호로 정함(부르는 함수의 계층은 방향 위반에서만 봄)
@@ -42,7 +46,7 @@ function layerOf(s) { const view = s.markup || s.dom, model = s.write || s.store
 
 // fns: buildGraph 함수 표 · writers: 게임 상태를 직접 쓰는 함수 키(lib/flow.mjs mutations + 연관 맵 data 쓰기)
 export function layers(fns, writers) { const top = [...fns.values()].filter(f => f.top && !f.table), sig = new Map(top.map(f => [f.key, signals(f, writers)])), out = new Map();
-  for (const f of top) { const s = sig.get(f.key); out.set(f.key, { layer: layerOf(s), ...s }); }
+  for (const f of top) { const s = sig.get(f.key); out.set(f.key, { layer: IO_WRITE.has(f.name) || SERVICE.has(f.name) ? 'Model' : layerOf(s), ...s }); } /* 저장·서비스 함수 자체는 입출력 어댑터(Model — 파일 내려받기의 임시 링크 같은 DOM은 화면이 아님) */
   /* 직접 신호 없이 View 함수만 부르고 상태·저장·서비스를 바꾸는 함수는 부르지 않으면 View(화면 조각을 엮는 함수 — 예: 칩 여럿을 chipOn으로 켬) — 더 바뀌지 않을 때까지 */
   const quiet = s => !(s.markup || s.dom || s.write || s.store || s.service || s.handler || s.trigger), changes = o => o && (o.write || o.store || o.service || o.layer === '섞임' || o.layer === 'Controller');
   for (let more = true; more;) { more = false; for (const f of top) { const me = out.get(f.key); if (me.layer !== 'Model' || !quiet(me)) continue; const cs = [...f.calls.keys()].map(k => out.get(k)).filter(Boolean);

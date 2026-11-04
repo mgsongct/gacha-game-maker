@@ -24,9 +24,15 @@ function pubContent(){ const game=JSON.parse(JSON.stringify(G)); delete game.pro
   delete game.meta.subscr; if(game.meta.pub) game.meta.pub={slug:game.meta.pub.slug,ver:game.meta.pub.ver};
   return game; }
 let PUBJOB=null;
+/* 게임 게시 완료 창 내용(View) */
+function pubDoneHTML(ver,o,dir,need){ return `${head('게시했어요',`<span class="muted">「${esc(G.meta.title)}」 v${ver}</span>`)}
+      <p style="margin:0 0 6px">이 주소를 받은 사람은 설정 → 게임 → 🔗 게임 구독에 넣으면 이 게임을 받고, 다음 게시부터 자동으로 업데이트를 받아요.</p>
+      <textarea class="in" id="pub_addr" readonly style="min-height:56px">${esc(subAddr(o.repo,o.branch,dir))}</textarea>
+      <p class="muted" style="font-size:.78rem;margin:4px 0 0">새 그림 ${need.length}장을 올렸어요. GitHub가 파일을 퍼뜨리는 데 몇 분 걸릴 수 있어요. 저장소는 꼭 공개(Public)로 두세요.</p>
+      <div class="row" style="margin-top:10px"><button class="btn" data-act="pubcopy">주소 복사</button><button class="btn ghost" data-act="close">닫기</button></div>`; }
 async function pubUpload(notes,btn){ const P0=PUB(); if(!P0.token||!/^[\w.-]+\/[\w.-]+$/.test(String(P0.repo||'').trim())){ toast('토큰과 저장소(주인/이름)를 넣어 주세요'); return; } if(PUBJOB){ toast('이미 게시하는 중이에요'); return; }
-  const o={token:P0.token,repo:P0.repo.trim(),branch:P0.branch||'main'}, M=pubMeta(), dir='games/'+M.slug, lbl=btn&&btn.textContent; PUBJOB=true; if(btn) btn.disabled=true;
-  const st=m=>{ syBar(m); if(btn&&btn.isConnected) btn.textContent=m; };
+  const o={token:P0.token,repo:P0.repo.trim(),branch:P0.branch||'main'}, M=pubMeta(), dir='games/'+M.slug, done=btn?busy(btn):()=>{}; PUBJOB=true;
+  const st=m=>{ syBar(m); if(btn&&btn.isConnected) say(btn,m); };
   try{ st('저장소 확인 중…'); await flush();
     const ref=await ghEnsureBranch(o);
     let hd=ref.object.sha; const cm0=await gh(o,'/git/commits/'+hd), tree0=await gh(o,'/git/trees/'+cm0.tree.sha+'?recursive=1'), have=new Set((tree0.tree||[]).filter(x=>x.type==='blob').map(x=>x.path));
@@ -43,13 +49,9 @@ async function pubUpload(notes,btn){ const P0=PUB(); if(!P0.token||!/^[\w.-]+\/[
     entries.push({path:dir+'/game.json',mode:'100644',type:'blob',sha:gb.sha},{path:dir+'/manifest.json',mode:'100644',type:'blob',sha:mb.sha});
     await ghCommitFiles(o,{head:hd,treeSha:cm0.tree.sha},entries,`${G.meta.title} v${ver}`);
     M.ver=ver; M.at=man.at; M.repo=o.repo; M.branch=o.branch; mark('meta');
-    openModal(`${head('게시했어요',`<span class="muted">「${esc(G.meta.title)}」 v${ver}</span>`)}
-      <p style="margin:0 0 6px">이 주소를 받은 사람은 설정 → 게임 → 🔗 게임 구독에 넣으면 이 게임을 받고, 다음 게시부터 자동으로 업데이트를 받아요.</p>
-      <textarea class="in" id="pub_addr" readonly style="min-height:56px">${esc(subAddr(o.repo,o.branch,dir))}</textarea>
-      <p class="muted" style="font-size:.78rem;margin:4px 0 0">새 그림 ${need.length}장을 올렸어요. GitHub가 파일을 퍼뜨리는 데 몇 분 걸릴 수 있어요. 저장소는 꼭 공개(Public)로 두세요.</p>
-      <div class="row" style="margin-top:10px"><button class="btn" data-act="pubcopy">주소 복사</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
+    openModal(pubDoneHTML(ver,o,dir,need)); }
   catch(e){ toast('게시 실패. '+syErr(e)); }
-  finally{ PUBJOB=null; syBar(''); if(btn&&btn.isConnected){ btn.disabled=false; if(lbl) btn.textContent=lbl; } } }
+  finally{ PUBJOB=null; syBar(''); done(); } }
 function openPub(){ const P0=PUB(), M=G.meta.pub||{}, dir=M.slug?'games/'+M.slug:'';
   openModal(`${head('🌐 게임 게시',`<span class="muted">다른 사람이 구독하고 업데이트를 받아요</span>`)}
     <p class="muted" style="margin:0 0 8px;font-size:.82rem">내 GitHub <b>공개</b> 저장소에 이 게임을 올려요. 진행 상황·API 키·음성은 올라가지 않아요. 새 장·이벤트를 만든 뒤 다시 게시하면 구독한 사람에게 업데이트가 가요(그 사람의 진행·보유 캐릭터는 그대로).</p>

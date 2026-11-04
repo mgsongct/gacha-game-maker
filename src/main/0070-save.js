@@ -16,7 +16,7 @@ const PROG_SLOTS={
   dm:{make:()=>({date:today(),cnt:{login:1},got:{}}), stale:v=>v.date!==today(), tick:true}, // 일일 임무 — 날이 바뀌면 새로
   raid:{make:raidNew, stale:r=>r.wk!==weekKey(), tick:true}, // 주간 레이드 — 주가 바뀌면 지난주 결과로 단계를 정해 새로
   rogue:{make:()=>({run:null,best:0,day:'',n:0}), fill:r=>{ const x=r.run; if(x&&x.v===3){ x.v=2; x.c3=1; } }}, // 탐사 — 예전 3판 형식은 2판으로
-  tower:{make:()=>({})}, gifts:{make:()=>({})}, fchat:{make:()=>({})}, cxSeen:{make:()=>({})}, // 탑 · 선물 보관함 · 자유 대화 · 도감에서 본 항목
+  tower:{make:()=>({})}, gifts:{make:()=>({})}, fchat:{make:()=>({})}, cxSeen:{make:cxSeenNew,tick:true}, // 탑 · 선물 보관함 · 자유 대화 · 도감에서 본 항목
   sched:{make:()=>({day:today(),left:SCHED_N,done:[]}), stale:v=>v.day!==today(), tick:true}, // 오늘의 일정 — 날이 바뀌면 새로
   avatar:{make:()=>({id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null})}, // 프로필 그림
   shop:{make:()=>({day:today(),buy:{}}), stale:v=>v.day!==today(), tick:true}, // 상점 일일 구매 — 날이 바뀌면 새로
@@ -126,7 +126,7 @@ function fix(g){
   [['gems','currency','blue crystal gem, faceted crystal, glowing, sparkle'],['gold','gold','gold coin, embossed star emblem, shiny metal'],['exp','expMat','glowing data chip, holographic record, blue light'],['wmat','wMat','mechanical parts, gears and bolts, metal'],['core','core','hexagonal energy core, pink glow, crystal inside'],['gearMat','gearMat','polished alloy ingot, metallic shine, gear emblem'],['transcMat','transcMat','radiant transcendence crystal, violet and gold glow']].forEach(([k,t,pr])=>{ if(!g.lib.some(l=>l.kind==='icon'&&l.key===k)) g.lib.push({id:'ic_'+k,kind:'icon',key:k,name:((g.meta.terms||{})[t]||t)+' 아이콘',prompt:pr,img:null}); });
   const pd=clone(DEFAULT_PROG); ['mat','dm','pass'].forEach(k=>{g.prog[k]=Object.assign(clone(pd[k]),g.prog[k]||{});});
   { const dl=clone(DEFAULT_PROG.live), l0=g.prog.live||{}; g.prog.live=Object.assign(dl,l0); g.prog.live.on=Object.assign(clone(DEFAULT_PROG.live.on),l0.on||{}); g.prog.live.seasons=Object.assign(clone(DEFAULT_PROG.live.seasons),l0.seasons||{}); g.prog.live.last=l0.last||{}; g.prog.live.notices=Array.isArray(l0.notices)?l0.notices:[]; g.prog.live.recentPU=Array.isArray(l0.recentPU)?l0.recentPU:[]; }
-  ['pities','tokens','disp','farmClear','shopBuy'].forEach(k=>{if(!g.prog[k]||typeof g.prog[k]!=='object')g.prog[k]={};});
+  ['pities','tokens','disp','farmClear','shopBuy'].forEach(k=>{if(!g.prog[k]||typeof g.prog[k]!=='object')g.prog[k]={};}); farmClearV2(g.prog);
   g.prog.shop=Object.assign({day:'',buy:{}},g.prog.shop||{}); g.prog.cash=Object.assign({first:{},month:{until:0,last:''},total:0},g.prog.cash||{}); g.prog.cash.first=g.prog.cash.first||{}; g.prog.cash.month=Object.assign({until:0,last:''},g.prog.cash.month||{});
   g.meta.shop=Object.assign(clone(DEFAULT_META.shop),g.meta.shop||{});
   if(g.prog.gold==null) g.prog.gold=20000;

@@ -74,6 +74,10 @@ node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(
 - **섞인 함수 나눌 자리**: `--why <함수 이름>` — View(마크업·DOM 바꿈) 줄과 Model(상태 쓰기·저장·서비스) 줄, 액션 처리기는 창 HTML·DOM을 만지는 case. 직접 신호 없이 View 함수만 엮는 함수(예: 칩 여럿을 `chipOn`으로)는 View, `classList.contains` 같은 읽기는 화면 바꿈이 아님
 - **거꾸로 따라가기**: `--why chars.json › [].skills` · `--why 이격`(docs/modules.md 그 말 줄의 필드·함수·모듈) · `--why balRemasterAI` · `--game tools/play/games/<이름>`(그 게임에 값이 없는 경로와 만드는 곳) · `--why 상점`(기능 단위 이름 — 그 단위의 함수 수·얽힌 모듈·창)
 
+## 식을 함수로 떼기 (`node tools/extract.mjs --at <src 파일:줄> --call <호출 이름> [--arg n] --name <새 함수> --doc "설명" [--to <src 파일>] [--dry]`)
+
+섞인 함수(`map.mjs --split`)의 화면 식(예: `openModal(…)`의 창 HTML)을 View 함수로 떼어 그 함수를 Controller·Model로 남김. 식이 쓰는 이름 중 그 함수 안에서 묶인 지역 이름만 인자로(`lib/scope.mjs` freeNames — 최상위·전역 이름은 그대로라 뜻이 같음), await·this·바깥 지역 이름에 쓰기가 든 식은 옮기지 않음. 새 함수는 원래 함수 바로 앞(또는 `--to` 파일 끝). 한 파일에서 여러 번 뗄 때는 아래 줄부터(위에 함수가 들어가 줄이 밀림). 뗀 뒤 빌드·`check.mjs --strict`(정의 안 된 이름·TDZ)·브라우저 시험
+
 ## 코드 옮기기 (`node tools/move.mjs --to <src 파일> [--head 제목] 이름,… [--dry]`)
 
 최상위 선언(function·const·let — 바로 위 설명 주석(`//` 줄·`/* */`)과 같은 줄 뒤 주석째, 파일 머리말 `/* =====`·옮김 표식은 남김)을 이름으로 찾아 다른 src 파일로 원문 그대로 옮겨요. 과잉 분할·기능 섞임·기능 분산(자연 경계)을 고쳐 한 기능을 한 모듈로 모을 때. 옮긴 뒤 불러올 때 아직 없는 이름(TDZ)이 생기면 되돌려요. 옮겨 붙인 묶음에는 `/* <원래 파일>에서 옮김 */` 표식이 붙으니 구획 설명으로 바꾸세요. 최상위 문장(리스너 등록 등)은 옮기지 않으니 원래 파일에 남은 것을 확인하세요. 프롬프트 코드는 `tools/prompts-move.mjs`(`--req` 요청 조립 식 — 지역 값·화면 입력은 인자로, `--fns --only` 조립 함수, 목록 파일 — 지시문을 스튜디오 조각으로).

@@ -9,18 +9,20 @@ function backupChatKeys(g){const keys=new Set();function visit(o){if(!o||typeof 
 function backupMedia(g){return {chat:backupChatKeys(g),images:[...new Map(imgObjsOf(g).map(x=>[x.id,x])).values()].filter(x=>x.img?.idb).map(x=>({id:x.id,img:{idb:true},...(x.seed!=null?{seed:x.seed}:{})})),audios:(g.lib||[]).filter(x=>x.audio?.idb).map(x=>({id:x.id,audio:{idb:true}}))};}
 function openBackupChoice(kind){const v=BACKUP_TYPES[kind];if(!v)return;openModal(`${head(v.name+' 저장')}<p>${v.desc}</p><label class="f" for="backup-dest">저장 위치</label><select class="in" id="backup-dest">${opt_(bkDests(),bkDest())}</select>${kind!=='progress'?'<label class="f"><input type="checkbox" id="backup-voices"> 기기 전체의 생성 음성 캐시도 추가 (다른 게임의 캐시 포함, 용량 증가)</label>':''}<p class="muted">현재 선택한 게임 하나를 저장합니다. 저장 중에는 앱을 닫지 마세요. 파일 생성 완료 안내를 확인해 주세요.</p><div class="row"><button class="btn" data-act="backup-start" data-kind="${kind}">저장 시작</button><button class="btn ghost" data-act="close">취소</button></div>`);}
 async function backupBytes(blob){return String(await blobToData(blob)).split(',')[1];}
+/* 백업 저장 완료 창 내용(View) */
+function backupDoneHTML(label,result,name,kind){ return `${head(label+' 저장 완료')}<p>${esc(result.where||name)}</p><p class="muted">${BACKUP_TYPES[kind].desc}</p><button class="btn" data-act="close">확인</button>`; }
 async function backupExport(kind,dest,voices=false){
  if(BACKUP_BUSY)return;BACKUP_BUSY=true;backupBusyOverlay(true);const label=BACKUP_TYPES[kind].name;let writer;
  try{await flush().catch(()=>{});await appStorage.drain().catch(()=>{});const game=JSON.parse(JSON.stringify(G)),media=backupMedia(game),stamp=new Date().toISOString(),name='gacha-'+kind+'-'+stamp.replace(/[:.]/g,'-')+'.ggmbak';writer=await bkWriter(dest,name);const write=o=>writer.write(JSON.stringify(o)+'\n');
  await write({format:'ggm-backup',version:2,kind,at:stamp,identity:backupIdentity(game),...(kind!=='assets'?{game}:{}),...(kind!=='progress'?{media}:{} )});let count=0;
  if(kind!=='progress'){
  const entries=[...media.images.map(x=>({key:x.id})),...media.audios.map(x=>({key:'a_'+x.id})),...media.chat.map(key=>({key}))];if(voices)for(const k of await idbKeys())if(String(k).startsWith('v_'))entries.push({key:k,global:true});
- for(const item of entries){syBar(`${label}: 자료 저장 ${++count}/${entries.length}…`);const status=document.querySelector('#backup-busy-lock b');if(status)status.textContent=`${label}: 자료 저장 ${count}/${entries.length}…`;const blob=item.global?await idbGet(item.key):await idbGetNS(item.key);if(!blob)throw Error('자료 파일을 찾지 못했습니다: '+item.key);await write({record:'media',key:item.key,global:!!item.global,type:blob.type,size:blob.size});for(let p=0;p<blob.size;p+=262144)await write({record:'chunk',data:await backupBytes(blob.slice(p,p+262144))});await write({record:'media-end'});}
+ for(const item of entries){syBar(`${label}: 자료 저장 ${++count}/${entries.length}…`);say('#backup-busy-lock b',`${label}: 자료 저장 ${count}/${entries.length}…`);const blob=item.global?await idbGet(item.key):await idbGetNS(item.key);if(!blob)throw Error('자료 파일을 찾지 못했습니다: '+item.key);await write({record:'media',key:item.key,global:!!item.global,type:blob.type,size:blob.size});for(let p=0;p<blob.size;p+=262144)await write({record:'chunk',data:await backupBytes(blob.slice(p,p+262144))});await write({record:'media-end'});}
  }
  await write({record:'end',count});const result=await writer.close();syBar('');
  if(result.uri&&dest==='share'){if(!CAP?.Share)throw Error('공유 기능을 사용할 수 없습니다');await CAP.Share.share({title:label,files:[result.uri]});}
- else if(result.blob){const a=document.createElement('a');a.href=URL.createObjectURL(result.blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);}
- openModal(`${head(label+' 저장 완료')}<p>${esc(result.where||name)}</p><p class="muted">${BACKUP_TYPES[kind].desc}</p><button class="btn" data-act="close">확인</button>`);
+ else if(result.blob){downloadBlob(result.blob,name);}
+ openModal(backupDoneHTML(label,result,name,kind));
  }catch(e){syBar('');toast(label+' 실패: '+(e.message||e)+'. 완료되지 않은 파일은 복원용으로 사용하지 마세요.');}finally{BACKUP_BUSY=false;backupBusyOverlay(false);}
 }
 async function* backupLines(file){const decoder=new TextDecoder();let carry='';for(let p=0;p<file.size;p+=262144){carry+=decoder.decode(await file.slice(p,p+262144).arrayBuffer(),{stream:true});let n;while((n=carry.indexOf('\n'))>=0){const line=carry.slice(0,n);carry=carry.slice(n+1);if(line.trim())yield JSON.parse(line);}if(carry.length>134217728)throw Error('백업 항목이 너무 큽니다');}carry+=decoder.decode();if(carry.trim())yield JSON.parse(carry);}
@@ -104,6 +106,8 @@ function shareDefinition(options){
  for(const l of game.lib||[])if(!options.audio)l.audio=null;
  return game;
 }
+/* 공유 팩 저장 완료 창 내용(View) */
+function shareDoneHTML(result,name){ return `${head('공유 팩 저장 완료')}<p style="overflow-wrap:anywhere">${esc(result.where||name)}</p><p>받는 사람은 패치된 메이커의 설정 → 데이터 → 공유 팩 불러오기에서 새 게임으로 추가할 수 있어요. 기존 JSON 공유팩도 같은 곳에서 불러올 수 있어요.</p><button class="btn" data-act="close">확인</button>`; }
 async function shareExport(options){
  if(BACKUP_BUSY)return;BACKUP_BUSY=true;backupBusyOverlay(true);let writer,destinationFailed=false,retryAsShare=false;
  try{
@@ -115,8 +119,8 @@ async function shareExport(options){
   for(const item of entries){backupTransferStatus(`공유팩 자료 저장 ${++count}/${entries.length}…`);const blob=await idbGetNS(item.key);if(!blob)throw Error('자료 파일을 찾지 못했습니다: '+item.key);await write({record:'media',key:item.key,type:blob.type,size:blob.size});for(let p=0;p<blob.size;p+=262144){await write({record:'chunk',data:await backupBytes(blob.slice(p,p+262144))});backupTransferStatus(`공유팩 자료 저장 ${count}/${entries.length} · ${(Math.min(p+262144,blob.size)/1048576).toFixed(1)} / ${(blob.size/1048576).toFixed(1)} MiB`);}await write({record:'media-end'});}
   await write({record:'end',count});backupTransferStatus('공유팩 파일 저장 중…');let result;try{result=await writer.close();}catch(e){destinationFailed=true;throw e;}
   if(result.uri&&options.dest==='share'){if(!CAP?.Share)throw Error('공유 기능을 사용할 수 없습니다');await CAP.Share.share({title:game.meta.title+' 공유팩',files:[result.uri]});}
-  else if(result.blob){const file=new File([result.blob],name,{type:'application/octet-stream'});if(options.dest==='share'&&navigator.canShare?.({files:[file]}))await navigator.share({title:game.meta.title+' 공유팩',files:[file]});else{const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);}}
-  openModal(`${head('공유 팩 저장 완료')}<p style="overflow-wrap:anywhere">${esc(result.where||name)}</p><p>받는 사람은 패치된 메이커의 설정 → 데이터 → 공유 팩 불러오기에서 새 게임으로 추가할 수 있어요. 기존 JSON 공유팩도 같은 곳에서 불러올 수 있어요.</p><button class="btn" data-act="close">확인</button>`);
+  else if(result.blob){const file=new File([result.blob],name,{type:'application/octet-stream'});if(options.dest==='share'&&navigator.canShare?.({files:[file]}))await navigator.share({title:game.meta.title+' 공유팩',files:[file]});else{downloadBlob(file,name);}}
+  openModal(shareDoneHTML(result,name));
  }catch(e){if(e?.name!=='AbortError'){if(destinationFailed&&IS_NATIVE&&options.dest!=='share'){retryAsShare=true;toast('이 폴더에 저장할 수 없어 공유하기로 다시 저장합니다.');}else toast('공유팩 저장 실패: '+(e.message||e)+'. 완료되지 않은 파일은 사용하지 마세요. 저장 위치도 확인해 주세요.');}}
  finally{BACKUP_BUSY=false;backupBusyOverlay(false);syBar('');}
  if(retryAsShare)return shareExport({...options,dest:'share'});
@@ -177,3 +181,5 @@ async function bkWriter(dest,name){
   const parts=[]; return {write:async s=>{ parts.push(s); },close:async()=>({blob:new Blob(parts,{type:/\.(ggmbak|ggmpack)$/i.test(name)?'application/octet-stream':'application/json'})})};
 }
 async function exportGo(o){return o.share?shareExport(o):backupExport('full',o.dest,!!o.voice);}
+/* 파일 내려받기(입출력 — 임시 링크를 눌러 브라우저 다운로드 폴더로): 백업·공유 팩·데이터 폴더·초안·그림 저장이 함께 씀 */
+function downloadBlob(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000); }

@@ -23,7 +23,7 @@ async function saveTextFile(text,name){ const b=new Blob([text],{type:'applicati
     catch(e){ try{ await FS.writeFile({path:name,data:text,directory:'CACHE',encoding:'utf8'}); const u=await FS.getUri({path:name,directory:'CACHE'}); if(CAP.Share){ await CAP.Share.share({title:name,files:[u.uri]}); return; } }catch(e2){ quietErr(e2,'0260-new-game-draft.js:23'); } toast('파일을 저장하지 못했어요. 코드 복사를 써 주세요'); return; } }
   const file=new File([b],name,{type:'application/json'});
   if(/iPhone|iPad|Android/i.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],title:name}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
-  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000); toast('다운로드 폴더에 저장했어요 · '+name); }
+  downloadBlob(file,name); toast('다운로드 폴더에 저장했어요 · '+name); }
 let DRX=null; // 내보낼 초안 {name,d}
 function openDraftExport(name,d,back){ DRX={name,d,back}; const code=draftCode(d,name);
   openModal(`${head('초안 내보내기',`<span class="muted">「${esc(name)}」</span>`)}

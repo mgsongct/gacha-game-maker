@@ -726,12 +726,17 @@ function reNaiPrep(){
   if(NPREP.k==='cg'){ const p=composeCG(o,{styleId:st}); $('#np_in').value=p.input; $('#np_neg').value=p.neg; return; }
   const p=composeNai(NPREP.k,NPREP.base,{pose:$('#np_pose')?$('#np_pose').value:'',styleId:st,frame:$('#np_frame')?$('#np_frame').value:''}); $('#np_in').value=p.input; $('#np_neg').value=p.neg;
 }
+/* 그림 생성 결과 창 내용(View) */
+function naiResultHTML(o,op,k,url,job){ return `${head('생성 결과',`<span class="muted">${esc(o.name)} · ${esc(op.usedModel)} · 시드 ${op.usedSeed}${op.usedTp?' · 투명 배경':''}</span>`)}<div class="naiprev ${k} done"><img src="${url}" alt="${esc(o.name)}" data-original-src="${esc(job.originalSrc)}"></div>
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="naiuse">이걸로 등록</button><button class="btn ghost" data-act="naiagain">다시 뽑기</button><button class="btn ghost" data-act="naiedit">설정 고치기</button></div>`; }
+/* 그리는 중 창 내용(View) */
+function naiDrawingHTML(o,k){ return `${head('그리는 중',`<span class="muted">${esc(o.name)}</span>`)}<div class="naiprev ${k}"><div class="spin"></div></div><p class="muted" id="nai_stat" style="text-align:center">보통 10~30초 걸려요. 창을 닫으면 결과를 버려요.</p>`; }
 async function openNaiGen(kind,id,custom){
   const o=naiTarget(kind,id); if(!o) return;
   const c=naiCfg(), k=kind==='char'?'char':kind==='weapon'?'prop':o.kind, job={kind,id,custom,originalSrc:imgSrcRaw(o)||''}; NAIJOB=job;
-  openModal(`${head('그리는 중',`<span class="muted">${esc(o.name)}</span>`)}<div class="naiprev ${k}"><div class="spin"></div></div><p class="muted" id="nai_stat" style="text-align:center">보통 10~30초 걸려요. 창을 닫으면 결과를 버려요.</p>`);
+  openModal(naiDrawingHTML(o,k));
   try{
-    const op={originalSrc:job.originalSrc,promptParts:custom.promptParts,candidateEligible:custom.candidateEligible===true||imageCandidateEligible(kind==='lib'?o.kind:kind,o,charById(id)),neg:custom.neg,seed:custom.seed,model:custom.model,size:custom.size,chars:custom.chars,onRetry:(a,n,why)=>{const el=$('#nai_stat');if(el&&NAIJOB===job)el.textContent=`${why} · 다시 시도 ${a}/${n-1}…`;}};
+    const op={originalSrc:job.originalSrc,promptParts:custom.promptParts,candidateEligible:custom.candidateEligible===true||imageCandidateEligible(kind==='lib'?o.kind:kind,o,charById(id)),neg:custom.neg,seed:custom.seed,model:custom.model,size:custom.size,chars:custom.chars,onRetry:(a,n,why)=>{if(NAIJOB===job)say('#nai_stat',`${why} · 다시 시도 ${a}/${n-1}…`);}};
     if(custom.ref){
       const rf={type:custom.ref.type,strength:custom.ref.strength,fidelity:custom.ref.fidelity};
       if(k==='char'&&imgSrc(o)) op.refs=[Object.assign({image:await refImage(imgSrc(o))},rf)];
@@ -746,8 +751,7 @@ async function openNaiGen(kind,id,custom){
     if(blob.__candidateConfig){custom.promptParts=blob.__candidateConfig.promptParts;custom.input=blob.__candidateConfig.prompt;custom.neg=blob.__candidateConfig.neg??custom.neg;custom.sceneTags=blob.__candidateConfig.sceneTags;custom.sceneReady=!!blob.__candidateConfig.sceneReady;}
     if(NAIJOB!==job) return;
     job.blob=blob; job.seed=op.usedSeed; NLASTSEED[id]=''; if(blob.__candidateRegistered){await registerNaiJob();return;} const url=URL.createObjectURL(blob);
-    openModal(`${head('생성 결과',`<span class="muted">${esc(o.name)} · ${esc(op.usedModel)} · 시드 ${op.usedSeed}${op.usedTp?' · 투명 배경':''}</span>`)}<div class="naiprev ${k} done"><img src="${url}" alt="${esc(o.name)}" data-original-src="${esc(job.originalSrc)}"></div>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="naiuse">이걸로 등록</button><button class="btn ghost" data-act="naiagain">다시 뽑기</button><button class="btn ghost" data-act="naiedit">설정 고치기</button></div>`);
+    openModal(naiResultHTML(o,op,k,url,job));
     NAIJOB=job;
   }catch(e){ if(NAIJOB!==job) return; if(e?.code==='image_cancelled'){window.navBack();return;} NAIJOB=null; closeModal(); toast(naiErr(e)); }
 }
@@ -758,15 +762,17 @@ async function registerNaiJob(){ const j=NAIJOB; if(!j||!j.blob) return; NAIJOB=
       if(j.kind==='char'&&o.upper&&!imgSrc(o.upper)&&o.naiPrompt&&imgReady()){ artRun(new Set([artKey({k:'upper',o:o.upper,c:o})])); setTimeout(()=>toast(`${o.name} 상반신도 이어서 그려요`),1200); } return;
 }
 let NAIBATCH=null;
+/* 일괄 생성 진행 창 내용(View) */
+function naiBatchHTML(items){ return `${head('일괄 생성')}<p id="nbStat">0 / ${items.length}</p><p class="muted">한 장씩 그려서 자동으로 등록해요. 창을 닫아도 계속 진행돼요.</p><div class="row"><button class="btn ghost" data-act="naistop">중지</button></div>`; }
 async function naiBatch(kind){
   const items=G.lib.filter(l=>l.kind===kind&&!l.img&&((l.prompt||'').trim()||(kind==='cg'&&cgCast(l).length)));
   if(!items.length){toast('그릴 미등록 항목이 없어요');return;}
   if(!imgReady()){toast(imgNeed());return;}
   if(NAIBATCH){toast('이미 일괄 생성 중이에요');return;}
   const job={stop:false}; NAIBATCH=job; let done=0;
-  openModal(`${head('일괄 생성')}<p id="nbStat">0 / ${items.length}</p><p class="muted">한 장씩 그려서 자동으로 등록해요. 창을 닫아도 계속 진행돼요.</p><div class="row"><button class="btn ghost" data-act="naistop">중지</button></div>`);
+  openModal(naiBatchHTML(items));
   for(const l of items){
-    if(job.stop) break; const el=$('#nbStat'); if(el) el.textContent=`${done} / ${items.length} · ${l.name} 그리는 중`;
+    if(job.stop) break; say('#nbStat',`${done} / ${items.length} · ${l.name} 그리는 중`);
     try{ const b=await naiDrawItem({k:kind,o:l}); await storeImage(l,b,'l:'); done++; await wait(600); }catch(e){ toast(naiErr(e)); break; }
   }
   NAIBATCH=null; render(); if($('#nbStat')) openLib(kind); toast(`${done}개를 그려서 등록했어요`);

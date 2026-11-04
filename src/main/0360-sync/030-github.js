@@ -9,13 +9,15 @@ async function syRemote(o){ // -> {head,tree,paths,state}
   return {head,treeSha:commit.tree.sha,paths,state};
 }
 /* 올리기·받기·시작할 때 확인·설정 화면 */
+/* 다른 기기에 더 새 데이터가 있을 때 창 내용(View) */
+function syConflictHTML(R){ return `${head('다른 기기에 더 새 데이터가 있어요')}<p><b>${esc(R.state.device||'다른 기기')}</b>에서 ${esc(new Date(R.state.at).toLocaleString())}에 올린 데이터가 있어요. 그대로 올리면 그 데이터를 덮어써요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="sypull">그 데이터 받기</button><button class="btn ghost" data-act="sypushf">그래도 올리기</button></div>`; }
 async function syPush(force){
   const o=SY(); if(!syReady()){ openSync(); return; } if(SYJOB){ toast('동기화 중이에요'); return; }
   SYJOB='push'; try{
     syBar('클라우드 확인 중…'); await flush();
     const R=await syRemote(o);
     if(!force&&R.state&&R.state.at>(o.last||0)&&R.state.device!==syDevice()){ syBar(''); SYJOB=null;
-      openModal(`${head('다른 기기에 더 새 데이터가 있어요')}<p><b>${esc(R.state.device||'다른 기기')}</b>에서 ${esc(new Date(R.state.at).toLocaleString())}에 올린 데이터가 있어요. 그대로 올리면 그 데이터를 덮어써요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="sypull">그 데이터 받기</button><button class="btn ghost" data-act="sypushf">그래도 올리기</button></div>`); return; }
+      openModal(syConflictHTML(R)); return; }
     const idx=syIdx(), keys=await idbKeys(), bin={}, types={};
     let i=0; for(const k of keys){ i++; if(i%10===0) syBar(`그림 확인 ${i}/${keys.length}`);
       const b=await idbGet(k); if(!b||!(b instanceof Blob)) continue; types[k]=b.type||'';

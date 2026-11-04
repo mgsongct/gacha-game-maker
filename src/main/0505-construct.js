@@ -47,6 +47,8 @@ function conDefaultInput(){ const cfg=CON(), v=[cfg.min,cfg.min,cfg.min,cfg.min]
 function conReadInput(){ const B=progRead('cbuild'), d=B.input||conDefaultInput(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:d[i]; }); }
 /* 나올 대원이 없는 까닭(엔진 suggest의 why) — 화면·확인 창 글 */
 function conEmptyWhy(why){ if(!why) return ''; const rr=a=>a.map(k=>RL[k]).join('·'); return why.open.length?`열린 분류 ${why.open.map(g=>`「${g.name}」(${g.rarity.length?rr(g.rarity):'대원 없음'})`).join(', ')}에 지금 투입으로 나오는 희귀도(${rr(why.allowed)})의 ${T('crew')}이(가) 없어요`:'이 투입으로 열리는 분류가 없어요'; }
+/* 바리에이션 설계 중 창 내용(View) */
+function conDecodeHTML(res){ return `<div class="decode"><div class="dc-ring"></div><div class="dc-ring b"></div><b>${esc(res.base.name)}의 「${esc(res.tpl.name)}」 설계 중…</b><span>새로운 모습을 디자인하고 있어요</span></div>`; }
 async function conBuild(){
   if(CONJOB||NEW_GAME_SOURCE||!conOn()) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
   const cfg=CON(), r=progSlot('cres'); let input=GGMConstruct.normalize(conReadInput(),cfg);
@@ -65,7 +67,7 @@ async function conBuild(){
     let c;
     if(res.kind==='variant'){ const key='v:'+res.tpl.id; if(!B.found[key]) B.found[key]=Date.now();
       c=conVariantOf(res.base,res.tpl);
-      if(!c){ openModal(`<div class="decode"><div class="dc-ring"></div><div class="dc-ring b"></div><b>${esc(res.base.name)}의 「${esc(res.tpl.name)}」 설계 중…</b><span>새로운 모습을 디자인하고 있어요</span></div>`,true);
+      if(!c){ openModal(conDecodeHTML(res),true);
         try{ c=await conMakeVariant(res.base,res.tpl); }finally{ closeModal(); } } }
     else c=charById(res.id);
     const got=grantOwned(c,T('construct')); B.log.unshift({id:c.id,at:Date.now(),input,v:res.kind==='variant'?res.tpl.id:''}); B.log=B.log.slice(0,30);

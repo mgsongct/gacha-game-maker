@@ -105,10 +105,8 @@ async function auditConvert(chars,fields,instruction){
 
 /* 화면 */
 let AUDIT_FOCUS=null; // 캐릭터 하나만 볼 때 id
-function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen=auditVer(); mark('meta'); }
-  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기','ai-rules':'AI로 설명 채우기','ai-persona':'AI로 개성 채우기·다듬기','ai-afftalk':'AI로 인연 톡 만들기','ai-memo':'AI로 메모리얼 만들기','skills-remaster':'세대 맞추기(AS)',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
-  const chars=focus?G.chars.filter(c=>c.id===focus):G.chars;
-  openModal(`${head(focus?`${charById(focus)?.name||''} 점검`:'콘텐츠 점검·업그레이드',`<span class="muted">생성 규칙 v${auditGenVer()} · ${focus?'':`구버전 생성물 ${old}명`}</span>`)}
+/* 콘텐츠 점검·업그레이드 창 내용(View) */
+function auditHTML(focus,old,res,kinds,how,chars){ return `${head(focus?`${charById(focus)?.name||''} 점검`:'콘텐츠 점검·업그레이드',`<span class="muted">생성 규칙 v${auditGenVer()} · ${focus?'':`구버전 생성물 ${old}명`}</span>`)}
     <p class="muted" style="font-size:.82rem;margin:0 0 8px">생성 기능이 좋아졌거나 예전에 만든 콘텐츠에 빠진 게 있으면 여기에서 찾아 고쳐요. 고치기 전 상태는 마지막 작업 한 번까지 되돌릴 수 있어요.</p>
     ${AUDIT_UNDO?`<div class="panel" style="padding:8px 10px"><span class="muted">마지막 작업: ${esc(AUDIT_UNDO.label)} (${AUDIT_UNDO.items.length}개)</span> <button class="btn sm ghost" data-act="audundo">되돌리기</button></div>`:''}
     ${res.length?res.map(({rule:r,items},gi)=>`<details class="panel" style="margin:6px 0" ${gi<3?'open':''}><summary><span class="badge">${kinds[r.kind]}</span> <b>${esc(r.label)}</b> <span class="muted">${items.length}개</span></summary>
@@ -119,7 +117,11 @@ function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen
       <label class="f">항목</label><div class="row" style="flex-wrap:wrap">${Object.entries(AUDIT_FIELDS).map(([k,[l]])=>`<label style="display:inline-flex;gap:4px"><input type="checkbox" data-audf="${k}">${esc(l)}</label>`).join('')}</div>
       <label class="f" for="aud_ins">지시</label><textarea class="in" id="aud_ins" rows="2" placeholder="예: 대사를 모두 반말로 / 프로필에 출신지와 좋아하는 음식 추가 / 외모 태그를 겨울 분위기로"></textarea>
       <div class="row" style="margin-top:6px"><button class="btn sm" data-act="audconv">지정 변환 시작</button></div></details>
-    <div class="row" style="margin-top:12px">${AUDIT_JOB?'<button class="btn ghost" data-act="audstop">작업 멈추기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>`); }
+    <div class="row" style="margin-top:12px">${AUDIT_JOB?'<button class="btn ghost" data-act="audstop">작업 멈추기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>`; }
+function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen=auditVer(); mark('meta'); }
+  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기','ai-rules':'AI로 설명 채우기','ai-persona':'AI로 개성 채우기·다듬기','ai-afftalk':'AI로 인연 톡 만들기','ai-memo':'AI로 메모리얼 만들기','skills-remaster':'세대 맞추기(AS)',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
+  const chars=focus?G.chars.filter(c=>c.id===focus):G.chars;
+  openModal(auditHTML(focus,old,res,kinds,how,chars)); }
 function auditPanel(){ const n=auditScan().reduce((a,x)=>a+x.items.length,0), fresh=(+G.meta.auditSeen||0)<auditVer();
   return `<div class="panel pm-hide"><h3>콘텐츠 점검·업그레이드 ${fresh?'<span class="badge">생성 기능 향상</span>':''}</h3><p class="muted" style="margin:0 0 10px">${n?`고칠 수 있는 항목 ${n}개. `:''}빠진 대사·그림·태그, 구버전 생성물을 찾아 자동·AI로 고치거나, 고른 캐릭터를 지시대로 바꿔요.</p><button class="btn sm" data-act="audopen">점검 열기</button></div>`; }
 function auditNotice(){ try{ if((+G.meta.auditSeen||0)>=auditVer()||!P().seenOpening) return; const n=auditScan().reduce((a,x)=>a+x.items.length,0); if(n) toast(`생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 ${n}개를 업그레이드할 수 있어요`); }catch(e){} }

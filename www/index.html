@@ -6690,12 +6690,17 @@ function reNaiPrep(){
   if(NPREP.k==='cg'){ const p=composeCG(o,{styleId:st}); $('#np_in').value=p.input; $('#np_neg').value=p.neg; return; }
   const p=composeNai(NPREP.k,NPREP.base,{pose:$('#np_pose')?$('#np_pose').value:'',styleId:st,frame:$('#np_frame')?$('#np_frame').value:''}); $('#np_in').value=p.input; $('#np_neg').value=p.neg;
 }
+/* 그림 생성 결과 창 내용(View) */
+function naiResultHTML(o,op,k,url,job){ return `${head('생성 결과',`<span class="muted">${esc(o.name)} · ${esc(op.usedModel)} · 시드 ${op.usedSeed}${op.usedTp?' · 투명 배경':''}</span>`)}<div class="naiprev ${k} done"><img src="${url}" alt="${esc(o.name)}" data-original-src="${esc(job.originalSrc)}"></div>
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="naiuse">이걸로 등록</button><button class="btn ghost" data-act="naiagain">다시 뽑기</button><button class="btn ghost" data-act="naiedit">설정 고치기</button></div>`; }
+/* 그리는 중 창 내용(View) */
+function naiDrawingHTML(o,k){ return `${head('그리는 중',`<span class="muted">${esc(o.name)}</span>`)}<div class="naiprev ${k}"><div class="spin"></div></div><p class="muted" id="nai_stat" style="text-align:center">보통 10~30초 걸려요. 창을 닫으면 결과를 버려요.</p>`; }
 async function openNaiGen(kind,id,custom){
   const o=naiTarget(kind,id); if(!o) return;
   const c=naiCfg(), k=kind==='char'?'char':kind==='weapon'?'prop':o.kind, job={kind,id,custom,originalSrc:imgSrcRaw(o)||''}; NAIJOB=job;
-  openModal(`${head('그리는 중',`<span class="muted">${esc(o.name)}</span>`)}<div class="naiprev ${k}"><div class="spin"></div></div><p class="muted" id="nai_stat" style="text-align:center">보통 10~30초 걸려요. 창을 닫으면 결과를 버려요.</p>`);
+  openModal(naiDrawingHTML(o,k));
   try{
-    const op={originalSrc:job.originalSrc,promptParts:custom.promptParts,candidateEligible:custom.candidateEligible===true||imageCandidateEligible(kind==='lib'?o.kind:kind,o,charById(id)),neg:custom.neg,seed:custom.seed,model:custom.model,size:custom.size,chars:custom.chars,onRetry:(a,n,why)=>{const el=$('#nai_stat');if(el&&NAIJOB===job)el.textContent=`${why} · 다시 시도 ${a}/${n-1}…`;}};
+    const op={originalSrc:job.originalSrc,promptParts:custom.promptParts,candidateEligible:custom.candidateEligible===true||imageCandidateEligible(kind==='lib'?o.kind:kind,o,charById(id)),neg:custom.neg,seed:custom.seed,model:custom.model,size:custom.size,chars:custom.chars,onRetry:(a,n,why)=>{if(NAIJOB===job)say('#nai_stat',`${why} · 다시 시도 ${a}/${n-1}…`);}};
     if(custom.ref){
       const rf={type:custom.ref.type,strength:custom.ref.strength,fidelity:custom.ref.fidelity};
       if(k==='char'&&imgSrc(o)) op.refs=[Object.assign({image:await refImage(imgSrc(o))},rf)];
@@ -6710,8 +6715,7 @@ async function openNaiGen(kind,id,custom){
     if(blob.__candidateConfig){custom.promptParts=blob.__candidateConfig.promptParts;custom.input=blob.__candidateConfig.prompt;custom.neg=blob.__candidateConfig.neg??custom.neg;custom.sceneTags=blob.__candidateConfig.sceneTags;custom.sceneReady=!!blob.__candidateConfig.sceneReady;}
     if(NAIJOB!==job) return;
     job.blob=blob; job.seed=op.usedSeed; NLASTSEED[id]=''; if(blob.__candidateRegistered){await registerNaiJob();return;} const url=URL.createObjectURL(blob);
-    openModal(`${head('생성 결과',`<span class="muted">${esc(o.name)} · ${esc(op.usedModel)} · 시드 ${op.usedSeed}${op.usedTp?' · 투명 배경':''}</span>`)}<div class="naiprev ${k} done"><img src="${url}" alt="${esc(o.name)}" data-original-src="${esc(job.originalSrc)}"></div>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="naiuse">이걸로 등록</button><button class="btn ghost" data-act="naiagain">다시 뽑기</button><button class="btn ghost" data-act="naiedit">설정 고치기</button></div>`);
+    openModal(naiResultHTML(o,op,k,url,job));
     NAIJOB=job;
   }catch(e){ if(NAIJOB!==job) return; if(e?.code==='image_cancelled'){window.navBack();return;} NAIJOB=null; closeModal(); toast(naiErr(e)); }
 }
@@ -6722,15 +6726,17 @@ async function registerNaiJob(){ const j=NAIJOB; if(!j||!j.blob) return; NAIJOB=
       if(j.kind==='char'&&o.upper&&!imgSrc(o.upper)&&o.naiPrompt&&imgReady()){ artRun(new Set([artKey({k:'upper',o:o.upper,c:o})])); setTimeout(()=>toast(`${o.name} 상반신도 이어서 그려요`),1200); } return;
 }
 let NAIBATCH=null;
+/* 일괄 생성 진행 창 내용(View) */
+function naiBatchHTML(items){ return `${head('일괄 생성')}<p id="nbStat">0 / ${items.length}</p><p class="muted">한 장씩 그려서 자동으로 등록해요. 창을 닫아도 계속 진행돼요.</p><div class="row"><button class="btn ghost" data-act="naistop">중지</button></div>`; }
 async function naiBatch(kind){
   const items=G.lib.filter(l=>l.kind===kind&&!l.img&&((l.prompt||'').trim()||(kind==='cg'&&cgCast(l).length)));
   if(!items.length){toast('그릴 미등록 항목이 없어요');return;}
   if(!imgReady()){toast(imgNeed());return;}
   if(NAIBATCH){toast('이미 일괄 생성 중이에요');return;}
   const job={stop:false}; NAIBATCH=job; let done=0;
-  openModal(`${head('일괄 생성')}<p id="nbStat">0 / ${items.length}</p><p class="muted">한 장씩 그려서 자동으로 등록해요. 창을 닫아도 계속 진행돼요.</p><div class="row"><button class="btn ghost" data-act="naistop">중지</button></div>`);
+  openModal(naiBatchHTML(items));
   for(const l of items){
-    if(job.stop) break; const el=$('#nbStat'); if(el) el.textContent=`${done} / ${items.length} · ${l.name} 그리는 중`;
+    if(job.stop) break; say('#nbStat',`${done} / ${items.length} · ${l.name} 그리는 중`);
     try{ const b=await naiDrawItem({k:kind,o:l}); await storeImage(l,b,'l:'); done++; await wait(600); }catch(e){ toast(naiErr(e)); break; }
   }
   NAIBATCH=null; render(); if($('#nbStat')) openLib(kind); toast(`${done}개를 그려서 등록했어요`);
@@ -7692,7 +7698,7 @@ const PROG_SLOTS={
   dm:{make:()=>({date:today(),cnt:{login:1},got:{}}), stale:v=>v.date!==today(), tick:true}, // 일일 임무 — 날이 바뀌면 새로
   raid:{make:raidNew, stale:r=>r.wk!==weekKey(), tick:true}, // 주간 레이드 — 주가 바뀌면 지난주 결과로 단계를 정해 새로
   rogue:{make:()=>({run:null,best:0,day:'',n:0}), fill:r=>{ const x=r.run; if(x&&x.v===3){ x.v=2; x.c3=1; } }}, // 탐사 — 예전 3판 형식은 2판으로
-  tower:{make:()=>({})}, gifts:{make:()=>({})}, fchat:{make:()=>({})}, cxSeen:{make:()=>({})}, // 탑 · 선물 보관함 · 자유 대화 · 도감에서 본 항목
+  tower:{make:()=>({})}, gifts:{make:()=>({})}, fchat:{make:()=>({})}, cxSeen:{make:cxSeenNew,tick:true}, // 탑 · 선물 보관함 · 자유 대화 · 도감에서 본 항목
   sched:{make:()=>({day:today(),left:SCHED_N,done:[]}), stale:v=>v.day!==today(), tick:true}, // 오늘의 일정 — 날이 바뀌면 새로
   avatar:{make:()=>({id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null})}, // 프로필 그림
   shop:{make:()=>({day:today(),buy:{}}), stale:v=>v.day!==today(), tick:true}, // 상점 일일 구매 — 날이 바뀌면 새로
@@ -7802,7 +7808,7 @@ function fix(g){
   [['gems','currency','blue crystal gem, faceted crystal, glowing, sparkle'],['gold','gold','gold coin, embossed star emblem, shiny metal'],['exp','expMat','glowing data chip, holographic record, blue light'],['wmat','wMat','mechanical parts, gears and bolts, metal'],['core','core','hexagonal energy core, pink glow, crystal inside'],['gearMat','gearMat','polished alloy ingot, metallic shine, gear emblem'],['transcMat','transcMat','radiant transcendence crystal, violet and gold glow']].forEach(([k,t,pr])=>{ if(!g.lib.some(l=>l.kind==='icon'&&l.key===k)) g.lib.push({id:'ic_'+k,kind:'icon',key:k,name:((g.meta.terms||{})[t]||t)+' 아이콘',prompt:pr,img:null}); });
   const pd=clone(DEFAULT_PROG); ['mat','dm','pass'].forEach(k=>{g.prog[k]=Object.assign(clone(pd[k]),g.prog[k]||{});});
   { const dl=clone(DEFAULT_PROG.live), l0=g.prog.live||{}; g.prog.live=Object.assign(dl,l0); g.prog.live.on=Object.assign(clone(DEFAULT_PROG.live.on),l0.on||{}); g.prog.live.seasons=Object.assign(clone(DEFAULT_PROG.live.seasons),l0.seasons||{}); g.prog.live.last=l0.last||{}; g.prog.live.notices=Array.isArray(l0.notices)?l0.notices:[]; g.prog.live.recentPU=Array.isArray(l0.recentPU)?l0.recentPU:[]; }
-  ['pities','tokens','disp','farmClear','shopBuy'].forEach(k=>{if(!g.prog[k]||typeof g.prog[k]!=='object')g.prog[k]={};});
+  ['pities','tokens','disp','farmClear','shopBuy'].forEach(k=>{if(!g.prog[k]||typeof g.prog[k]!=='object')g.prog[k]={};}); farmClearV2(g.prog);
   g.prog.shop=Object.assign({day:'',buy:{}},g.prog.shop||{}); g.prog.cash=Object.assign({first:{},month:{until:0,last:''},total:0},g.prog.cash||{}); g.prog.cash.first=g.prog.cash.first||{}; g.prog.cash.month=Object.assign({until:0,last:''},g.prog.cash.month||{});
   g.meta.shop=Object.assign(clone(DEFAULT_META.shop),g.meta.shop||{});
   if(g.prog.gold==null) g.prog.gold=20000;
@@ -9073,10 +9079,10 @@ function uiSelectText(field){if(!field)return;const root=field.closest('.sheet')
 function render(){ progTick();
   // 심연 탐사는 야영지에서 저장해야만 나갔다 올 수 있어요. 다른 길로 나가면 탐사가 끝나요.
   if(PREVTAB==='abyss'&&tab!=='abyss'){ const r=progSlot('rogue').run; if(r&&!r.saved) r.left=true; }
-  rogueTick(); PREVTAB=tab;
-  if(tab==='lobby'&&typeof mailTick==='function') mailTick();
-  if(tab==='lobby'&&typeof cashTick==='function') cashTick();
+  (SCREEN_ENTER[tab]||[]).forEach(f=>f()); PREVTAB=tab;
   renderView(); }
+/* 화면에 들어가기 전 처리(Controller — 그리기 전): 화면마다 그 기능이 상태를 맞춤 — 그리기(…HTML)는 상태를 바꾸지 않음 */
+const SCREEN_ENTER={lobby:[mailTick,cashTick],abyss:[rogueTick],challenge:[rogueTick],notice:[noticeSeen],codex:[cxBadgeSync]};
 /* 그리기(View): 지금 탭 화면·머리 재화·탭 표시 */
 function renderView(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewState=UI_PAGE_SCROLL_ROUTE===scrollKey&&UI_PAGE_SCROLL_GAME===G?uiScrollCapture(viewBefore):null; setTimeout(()=>{ try{ fitLobby(); }catch(e){} },0); document.body.classList.toggle('play',playMode()); if(playMode()&&PLAY_HIDE_ST.includes(STTAB)) STTAB='';
   updStam(); $('#gems').textContent=nf(P().gems); try{ $('#ic_gold').innerHTML=rIco('gold'); $('#ic_gems').innerHTML=rIco('gems'); }catch(e){} $('#gold').textContent=nf(P().gold);
@@ -9275,8 +9281,6 @@ function evShopHTML(){
 }
 function farmHTML(){
   const p=P(), top4=G.chars.filter(c=>own(c.id)).map(c=>own(c.id).lv||1).sort((a,b)=>b-a).slice(0,4), topLv=top4.length?Math.round(top4.reduce((a,b)=>a+b,0)/top4.length):1;
-  // 훈련 단계가 바뀌어서(5→10단계, 권장 레벨) 예전 3단계 이상 기록은 다시 깨야 소탕할 수 있어요
-  if(p.farmV!==2){ Object.keys(p.farmClear||{}).forEach(k=>{ const m=k.match(/^farm_.+_(\d+)$/); if(m&&+m[1]>=3) delete p.farmClear[k]; }); p.farmV=2; mark('prog'); }
   return `${pageHead(T('farm'),'TRAINING','lobby')}<p class="muted">반복해서 재료를 모으는 곳이에요. 단계마다 권장 레벨이 있고, 높은 단계일수록 보상이 커요. 한 번 깬 단계는 소탕으로 바로 보상을 받을 수 있어요. 보유: ${rewardText({exp:p.mat.exp,wmat:p.mat.wmat,core:p.mat.core,gold:p.gold})}</p>
   ${G.meta.farms.map(f=>`<h3 class="sec">${esc(f.name)}</h3>${Array.from({length:FARM_N},(_,k)=>k+1).map(lv=>{const id=`farm_${f.key}_${lv}`, rec=farmRec(lv), low=topLv<rec,cl=!!p.farmClear[id],open=lv===1||!!p.farmClear[`farm_${f.key}_${lv-1}`];
     return `<div class="stage ${cl?'clear':''} ${open?'':'lock'}"><span class="code">${lv}</span><span class="t"><b>${lv}단계 <small class="${low?'farm-low':'muted'}">권장 Lv.${rec}</small></b><span class="st">${rewardText(farmReward(f.key,lv))}</span></span>${open?`<button class="btn sm ghost" data-act="farmgo" data-k="${f.key}" data-lv="${lv}">출격</button>`:''}${cl?`<button class="btn sm" data-act="sweep" data-k="${f.key}" data-lv="${lv}">소탕</button><button class="btn sm ghost" data-act="sweep" data-k="${f.key}" data-lv="${lv}" data-n="5">×5</button>`:''}</div>`;}).join('')}`).join('')}`;
@@ -10670,7 +10674,7 @@ async function saveTextFile(text,name){ const b=new Blob([text],{type:'applicati
     catch(e){ try{ await FS.writeFile({path:name,data:text,directory:'CACHE',encoding:'utf8'}); const u=await FS.getUri({path:name,directory:'CACHE'}); if(CAP.Share){ await CAP.Share.share({title:name,files:[u.uri]}); return; } }catch(e2){ quietErr(e2,'0260-new-game-draft.js:23'); } toast('파일을 저장하지 못했어요. 코드 복사를 써 주세요'); return; } }
   const file=new File([b],name,{type:'application/json'});
   if(/iPhone|iPad|Android/i.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],title:name}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
-  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000); toast('다운로드 폴더에 저장했어요 · '+name); }
+  downloadBlob(file,name); toast('다운로드 폴더에 저장했어요 · '+name); }
 let DRX=null; // 내보낼 초안 {name,d}
 function openDraftExport(name,d,back){ DRX={name,d,back}; const code=draftCode(d,name);
   openModal(`${head('초안 내보내기',`<span class="muted">「${esc(name)}」</span>`)}
@@ -11415,8 +11419,10 @@ async function runPrep(cats,filter,opt){
   }
   PREPJOB=null; prepChip(); render(); toast(`그림 ${j.done}장을 준비했어요`); if(opt.done) opt.done(j);
 }
+/* 공지를 봄(Model — 화면에 들어가기 전) */
+function noticeSeen(){ P().live.seen=Date.now(); mark('prog'); }
 function noticeHTML(){
-  const L=P().live; L.seen=Date.now(); mark('prog'); const todo=drawTodo();
+  const L=P().live, todo=drawTodo();
   return `${pageHead('공지','NOTICE','lobby')}
   ${L.notices.length?L.notices.map((n,i)=>`<div class="panel"><h3>${esc(n.title)}</h3><ul class="notice">${n.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div>`).join(''):'<div class="panel"><p class="muted">아직 공지가 없어요. 설정의 라이브 운영을 켜 두면 날짜에 맞춰 새 콘텐츠가 생겨요.</p></div>'}
   <div class="panel"><h3>NAI로 그릴 것 ${todo.length}개</h3><p class="muted" style="margin:0 0 10px">${todo.slice(0,12).map(x=>esc(x.label)).join(', ')}${todo.length>12?' 외':''}</p>${todo.length?'<button class="btn" data-act="prepopen">그림 준비실 열기</button>':''}</div>`;
@@ -11456,14 +11462,17 @@ function cxEntries(){
 }
 
 let CXMEMO=null;
-function cxNewFast(){ const p=P(), sig=[Object.keys(p.cleared).length,Object.keys(p.owned).length,cxStore().length,G.lib.length,G.chapters.length,Object.keys(progRead('cxSeen')).length,Object.keys(p.cxBadge||{}).length].join('|'); if(CXMEMO&&CXMEMO.sig===sig) return CXMEMO.n; cxNew(); const s=progRead('cxSeen'), bd=p.cxBadge||{}; const n=cxEntries().filter(e=>e.open&&!s[e.key]&&!bd[e.key]).length; CXMEMO={sig,n}; return n; }
-function cxNew(list){ const p=P(); if(!p.cxSeen||typeof p.cxSeen!=='object'){ p.cxSeen={}; (list||cxEntries()).forEach(e=>{ if(e.open&&!e.stored) p.cxSeen[e.key]=1; }); mark('prog'); } const s=progRead('cxSeen'); return (list||cxEntries()).filter(e=>e.open&&!s[e.key]).length; }
+function cxNewFast(){ const p=P(), sig=[Object.keys(p.cleared).length,Object.keys(p.owned).length,cxStore().length,G.lib.length,G.chapters.length,Object.keys(progRead('cxSeen')).length,Object.keys(p.cxBadge||{}).length].join('|'); if(CXMEMO&&CXMEMO.sig===sig) return CXMEMO.n; const s=progRead('cxSeen'), bd=p.cxBadge||{}; const n=cxEntries().filter(e=>e.open&&!s[e.key]&&!bd[e.key]).length; CXMEMO={sig,n}; return n; }
+/* 도감 본 기록 칸 처음 만들기: 그때 열려 있는 기록(직접 적은 것 빼고)은 본 것으로 — 진행 칸 cxSeen의 정의(0070 PROG_SLOTS) */
+function cxSeenNew(){ const s={}; cxEntries().forEach(e=>{ if(e.open&&!e.stored) s[e.key]=1; }); return s; }
+/* 도감 새 기록 표시(Model — 도감 화면에 들어가기 전): 새로 열린 기록에 표시 */
+function cxBadgeSync(){ const p=P(), s=progSlot('cxSeen'); p.cxBadge=p.cxBadge||{}; let ch=false; cxEntries().forEach(e=>{ if(e.open&&!s[e.key]&&!p.cxBadge[e.key]){ p.cxBadge[e.key]=1; ch=true; } }); if(ch){ CXMEMO=null; mark('prog'); } }
 function cxCard(e){ const isNew=e.open&&!progRead('cxSeen')[e.key];
   const pic=e.open?(e.char?art(e.char,'cx-ch'):e.img?`<img src="${esc(e.img)}" alt="" class="${e.contain?'ct':''}" loading="lazy">`:`<span class="cx-glyph">${esc((e.title||'?').slice(0,1))}</span>`):'<span class="cx-glyph">?</span>';
   const snip=e.open?String(e.body||(e.notes[0]&&e.notes[0].text)||'아직 기록이 없어요').replace(/\n+/g,' ').slice(0,70):cxLockText(e.unlock);
   return `<button class="cx-card ${e.open?'':'lock'} c-${esc(e.cat)}" data-act="cxview" data-k="${esc(e.key)}"><span class="cx-pic">${pic}</span><span class="cx-tx"><i>${esc(CX_LABEL[e.cat]||'')}</i><b>${e.open?esc(e.title):'???'}</b><span>${esc(snip)}</span></span>${isNew?'<em>NEW</em>':''}</button>`; }
 function codexHTML(){
-  const all=cxEntries(), cat=CXCAT, list=all.filter(e=>cat==='all'||e.cat===cat), un=all.filter(e=>e.open).length; cxNew(all); { const p=P(), s=progRead('cxSeen'); p.cxBadge=p.cxBadge||{}; let ch=false; all.forEach(e=>{ if(e.open&&!s[e.key]&&!p.cxBadge[e.key]){ p.cxBadge[e.key]=1; ch=true; } }); if(ch){ CXMEMO=null; mark('prog'); } }
+  const all=cxEntries(), cat=CXCAT, list=all.filter(e=>cat==='all'||e.cat===cat), un=all.filter(e=>e.open).length;
   const cnt=k=>k==='all'?all.length:all.filter(e=>e.cat===k).length;
   return `${pageHead('도감','LORE BOOK','lobby')}
   <div class="cx-head"><div class="cx-meter"><b>${un}</b><span>/ ${all.length} 기록 해금</span></div><div class="cx-bar"><i style="width:${all.length?un/all.length*100:0}%"></i></div>
@@ -11472,20 +11481,25 @@ function codexHTML(){
   ${!cxStore().length&&SAMPLE?`<div class="panel cx-hint"><b>세계를 더 깊게</b><p class="muted" style="margin:4px 0 0">AI가 세계관과 메인 플롯을 바탕으로 장소, 용어, 역사, 숨은 인물 같은 기록을 써요. 비밀이 담긴 기록은 해당 스테이지를 깨야 열려요.</p></div>`:''}
   <div class="cx-list">${list.map(cxCard).join('')||'<p class="muted">항목이 없어요</p>'}</div>`;
 }
+/* 도감 기록 보기(Controller): 잠겼으면 알림, 열렸으면 본 것으로 하고 카드의 새 표시를 지운 뒤 창 */
 function openCx(key){
   const e=cxEntries().find(x=>x.key===key); if(!e) return;
   if(!e.open){ toast(cxLockText(e.unlock)||'아직 잠겨 있어요'); return; }
-  progSlot('cxSeen')[key]=1; CXMEMO=null; mark('prog'); document.querySelectorAll('.cx-card[data-k]').forEach(el=>{ if(el.dataset.k===key){ const em=el.querySelector('em'); if(em) em.remove(); } });
-  const para=t=>String(t||'').split(/\n{2,}/).map(x=>`<p>${esc(x).replace(/\n/g,'<br>')}</p>`).join('');
-  openModal(`<div class="cx-view c-${esc(e.cat)}">
+  cxMarkSeen(key); cxCardSeenShow(key); openModal(cxViewHTML(e,key));
+}
+/* 도감 기록을 봄(Model) */
+function cxMarkSeen(key){ progSlot('cxSeen')[key]=1; CXMEMO=null; mark('prog'); }
+/* 도감 카드의 새 표시 지우기 · 기록 보기 창 내용(View) */
+function cxCardSeenShow(key){ document.querySelectorAll('.cx-card[data-k]').forEach(el=>{ if(el.dataset.k===key){ const em=el.querySelector('em'); if(em) em.remove(); } }); }
+function cxViewHTML(e,key){ const para=t=>String(t||'').split(/\n{2,}/).map(x=>`<p>${esc(x).replace(/\n/g,'<br>')}</p>`).join('');
+  return `<div class="cx-view c-${esc(e.cat)}">
     ${e.img||e.char?`<div class="cx-hero">${e.char?art(e.char,'cx-ch'):`<img src="${esc(e.img)}" alt="" class="${e.contain?'ct':''}">`}</div>`:''}
     <div class="cx-vh"><i>${esc(CX_LABEL[e.cat]||'')}</i><h2>${esc(e.title)}</h2><span class="muted">${esc(e.sub||'')}</span></div>
     <div class="cx-body">${e.body?para(e.body):'<p class="muted">아직 기록이 없어요. 아래 \'더 알아보기\'를 누르면 AI가 지금까지 밝혀진 범위 안에서 써 줘요.</p>'}
       ${e.notes.map(n=>`<div class="cx-note"><small>${esc(n.at||'')}</small>${para(n.text)}</div>`).join('')}</div>
     ${SAMPLE?`<button class="btn block" data-act="cxdeep" data-k="${esc(key)}" style="margin-top:14px">✦ 더 알아보기</button>`:''}
     <div class="cx-sub">${e.char&&own(e.char.id)?`<button class="btn sm ghost" data-act="char" data-id="${esc(e.char.id)}">${esc(T('crew'))} 정보</button>`:''}${e.stored?`<button class="btn sm ghost" data-act="cxedit" data-id="${esc(e.stored.id)}">편집</button>`:''}<button class="btn sm ghost" data-act="cxnote" data-k="${esc(key)}">메모 추가</button><button class="btn sm ghost" data-act="close">닫기</button></div>
-  </div>`);
-}
+  </div>`; }
 function openCxEdit(id){
   const x=id?cxStore().find(q=>q.id===id):{id:'',cat:'term',title:'',body:'',unlock:{type:'start'}}; if(!x) return;
   const st=mainStages();
@@ -11712,6 +11726,8 @@ async function pcApi(path,opt){ const pc=PCS(); if(!pc) throw {code:'network',me
   if(r.status===404&&opt.ok404) return null; if(r.status===401) throw {code:'bad_key',message:'PC 서버 키가 맞지 않아요. QR을 다시 찍어 주세요'}; if(r.status>=400) throw errOf(r);
   if(opt.binary) return r; try{return r.text?JSON.parse(r.text):{};}catch(e){throw Error('PC 서버 응답을 읽지 못했습니다');} }
 let PCJOB=false;
+/* PC 저장 덮어쓰기 확인 창 내용(View) */
+function pcConflictHTML(other,S0){ return `${head(other?'PC에 더 새 진행이 있어요':'PC의 저장을 덮어쓸까요?')}<p>${other?`<b>${esc(S0.device||'다른 기기')}</b> · ${esc(new Date(S0.at).toLocaleString())}에 저장한 진행이 PC에 있어요. 이 기기의 게임으로 올리면 그 진행을 덮어써요.`:'이 기기의 게임은 아직 시작하지 않은 샘플 게임이에요. 올리면 PC에 저장된 게임을 덮어써요.'}</p><div class="row" style="margin-top:12px"><button class="btn" data-act="pcpullgo">PC의 게임 받기</button><button class="btn ghost" data-act="pcpushf">그래도 올리기</button></div>`; }
 async function pcPush(silent,force){
   if(PCJOB||!PCS()) return; PCJOB=true; try{
     if(!silent) syBar('PC에 저장하는 중…'); await flush();
@@ -11719,7 +11735,7 @@ async function pcPush(silent,force){
     if(S0&&!force&&(other||freshGame())){
       if(silent){ if(!PCWARNED){ PCWARNED=true; toast(other?'PC에 다른 기기의 더 새 진행이 있어서 자동 저장을 멈췄어요. 설정 → PC 서버에서 받기를 눌러 주세요':'이 기기의 게임이 아직 시작 전이라 PC의 저장을 덮어쓰지 않았어요'); } return; }
       PCJOB=false; syBar('');
-      openModal(`${head(other?'PC에 더 새 진행이 있어요':'PC의 저장을 덮어쓸까요?')}<p>${other?`<b>${esc(S0.device||'다른 기기')}</b> · ${esc(new Date(S0.at).toLocaleString())}에 저장한 진행이 PC에 있어요. 이 기기의 게임으로 올리면 그 진행을 덮어써요.`:'이 기기의 게임은 아직 시작하지 않은 샘플 게임이에요. 올리면 PC에 저장된 게임을 덮어써요.'}</p><div class="row" style="margin-top:12px"><button class="btn" data-act="pcpullgo">PC의 게임 받기</button><button class="btn ghost" data-act="pcpushf">그래도 올리기</button></div>`); return; }
+      openModal(pcConflictHTML(other,S0)); return; }
     const have=new Set(((await pcApi('/api/store/list'))||{}).blobs||[]), idx=syIdx(), keys=await idbKeys(), bin={}, types={};
     for(const k of keys){ const b=await idbGet(k); if(!b||!(b instanceof Blob)) continue; types[k]=b.type||''; const ent=idx[k]; let h;
       if(ent&&ent.size===b.size&&ent.hash) h=ent.hash; else { h=await shaHex(await b.arrayBuffer()); idx[k]={hash:h,size:b.size}; } bin[k]=h;
@@ -11794,13 +11810,15 @@ async function syRemote(o){ // -> {head,tree,paths,state}
   return {head,treeSha:commit.tree.sha,paths,state};
 }
 /* 올리기·받기·시작할 때 확인·설정 화면 */
+/* 다른 기기에 더 새 데이터가 있을 때 창 내용(View) */
+function syConflictHTML(R){ return `${head('다른 기기에 더 새 데이터가 있어요')}<p><b>${esc(R.state.device||'다른 기기')}</b>에서 ${esc(new Date(R.state.at).toLocaleString())}에 올린 데이터가 있어요. 그대로 올리면 그 데이터를 덮어써요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="sypull">그 데이터 받기</button><button class="btn ghost" data-act="sypushf">그래도 올리기</button></div>`; }
 async function syPush(force){
   const o=SY(); if(!syReady()){ openSync(); return; } if(SYJOB){ toast('동기화 중이에요'); return; }
   SYJOB='push'; try{
     syBar('클라우드 확인 중…'); await flush();
     const R=await syRemote(o);
     if(!force&&R.state&&R.state.at>(o.last||0)&&R.state.device!==syDevice()){ syBar(''); SYJOB=null;
-      openModal(`${head('다른 기기에 더 새 데이터가 있어요')}<p><b>${esc(R.state.device||'다른 기기')}</b>에서 ${esc(new Date(R.state.at).toLocaleString())}에 올린 데이터가 있어요. 그대로 올리면 그 데이터를 덮어써요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="sypull">그 데이터 받기</button><button class="btn ghost" data-act="sypushf">그래도 올리기</button></div>`); return; }
+      openModal(syConflictHTML(R)); return; }
     const idx=syIdx(), keys=await idbKeys(), bin={}, types={};
     let i=0; for(const k of keys){ i++; if(i%10===0) syBar(`그림 확인 ${i}/${keys.length}`);
       const b=await idbGet(k); if(!b||!(b instanceof Blob)) continue; types[k]=b.type||'';
@@ -12051,9 +12069,15 @@ function pubContent(){ const game=JSON.parse(JSON.stringify(G)); delete game.pro
   delete game.meta.subscr; if(game.meta.pub) game.meta.pub={slug:game.meta.pub.slug,ver:game.meta.pub.ver};
   return game; }
 let PUBJOB=null;
+/* 게임 게시 완료 창 내용(View) */
+function pubDoneHTML(ver,o,dir,need){ return `${head('게시했어요',`<span class="muted">「${esc(G.meta.title)}」 v${ver}</span>`)}
+      <p style="margin:0 0 6px">이 주소를 받은 사람은 설정 → 게임 → 🔗 게임 구독에 넣으면 이 게임을 받고, 다음 게시부터 자동으로 업데이트를 받아요.</p>
+      <textarea class="in" id="pub_addr" readonly style="min-height:56px">${esc(subAddr(o.repo,o.branch,dir))}</textarea>
+      <p class="muted" style="font-size:.78rem;margin:4px 0 0">새 그림 ${need.length}장을 올렸어요. GitHub가 파일을 퍼뜨리는 데 몇 분 걸릴 수 있어요. 저장소는 꼭 공개(Public)로 두세요.</p>
+      <div class="row" style="margin-top:10px"><button class="btn" data-act="pubcopy">주소 복사</button><button class="btn ghost" data-act="close">닫기</button></div>`; }
 async function pubUpload(notes,btn){ const P0=PUB(); if(!P0.token||!/^[\w.-]+\/[\w.-]+$/.test(String(P0.repo||'').trim())){ toast('토큰과 저장소(주인/이름)를 넣어 주세요'); return; } if(PUBJOB){ toast('이미 게시하는 중이에요'); return; }
-  const o={token:P0.token,repo:P0.repo.trim(),branch:P0.branch||'main'}, M=pubMeta(), dir='games/'+M.slug, lbl=btn&&btn.textContent; PUBJOB=true; if(btn) btn.disabled=true;
-  const st=m=>{ syBar(m); if(btn&&btn.isConnected) btn.textContent=m; };
+  const o={token:P0.token,repo:P0.repo.trim(),branch:P0.branch||'main'}, M=pubMeta(), dir='games/'+M.slug, done=btn?busy(btn):()=>{}; PUBJOB=true;
+  const st=m=>{ syBar(m); if(btn&&btn.isConnected) say(btn,m); };
   try{ st('저장소 확인 중…'); await flush();
     const ref=await ghEnsureBranch(o);
     let hd=ref.object.sha; const cm0=await gh(o,'/git/commits/'+hd), tree0=await gh(o,'/git/trees/'+cm0.tree.sha+'?recursive=1'), have=new Set((tree0.tree||[]).filter(x=>x.type==='blob').map(x=>x.path));
@@ -12070,13 +12094,9 @@ async function pubUpload(notes,btn){ const P0=PUB(); if(!P0.token||!/^[\w.-]+\/[
     entries.push({path:dir+'/game.json',mode:'100644',type:'blob',sha:gb.sha},{path:dir+'/manifest.json',mode:'100644',type:'blob',sha:mb.sha});
     await ghCommitFiles(o,{head:hd,treeSha:cm0.tree.sha},entries,`${G.meta.title} v${ver}`);
     M.ver=ver; M.at=man.at; M.repo=o.repo; M.branch=o.branch; mark('meta');
-    openModal(`${head('게시했어요',`<span class="muted">「${esc(G.meta.title)}」 v${ver}</span>`)}
-      <p style="margin:0 0 6px">이 주소를 받은 사람은 설정 → 게임 → 🔗 게임 구독에 넣으면 이 게임을 받고, 다음 게시부터 자동으로 업데이트를 받아요.</p>
-      <textarea class="in" id="pub_addr" readonly style="min-height:56px">${esc(subAddr(o.repo,o.branch,dir))}</textarea>
-      <p class="muted" style="font-size:.78rem;margin:4px 0 0">새 그림 ${need.length}장을 올렸어요. GitHub가 파일을 퍼뜨리는 데 몇 분 걸릴 수 있어요. 저장소는 꼭 공개(Public)로 두세요.</p>
-      <div class="row" style="margin-top:10px"><button class="btn" data-act="pubcopy">주소 복사</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
+    openModal(pubDoneHTML(ver,o,dir,need)); }
   catch(e){ toast('게시 실패. '+syErr(e)); }
-  finally{ PUBJOB=null; syBar(''); if(btn&&btn.isConnected){ btn.disabled=false; if(lbl) btn.textContent=lbl; } } }
+  finally{ PUBJOB=null; syBar(''); done(); } }
 function openPub(){ const P0=PUB(), M=G.meta.pub||{}, dir=M.slug?'games/'+M.slug:'';
   openModal(`${head('🌐 게임 게시',`<span class="muted">다른 사람이 구독하고 업데이트를 받아요</span>`)}
     <p class="muted" style="margin:0 0 8px;font-size:.82rem">내 GitHub <b>공개</b> 저장소에 이 게임을 올려요. 진행 상황·API 키·음성은 올라가지 않아요. 새 장·이벤트를 만든 뒤 다시 게시하면 구독한 사람에게 업데이트가 가요(그 사람의 진행·보유 캐릭터는 그대로).</p>
@@ -12166,12 +12186,14 @@ document.addEventListener('keydown',e=>{
     return; }
   const map={'1':'crew','2':'ops','3':'lobby','4':'contract','5':'studio'}; if(map[e.key]){ const b=document.querySelector(`.tab[data-tab="${map[e.key]}"]`); if(b) b.click(); }
 });
-function openA2HS(first){ if(first) appStorage.setItem('ggm-a2hs','1');
-  openModal(`${head('홈 화면에 추가해 주세요',`<span class="muted">아이폰은 앱처럼 쓰려면 이 단계가 필요해요</span>`)}
+/* 홈 화면에 추가 안내 창 내용(View) */
+function a2hsHTML(){ return `${head('홈 화면에 추가해 주세요',`<span class="muted">아이폰은 앱처럼 쓰려면 이 단계가 필요해요</span>`)}
     <ol class="a2hs"><li>Safari 아래쪽(또는 위쪽)의 <b>공유 버튼</b> <span class="kbd">⬆︎</span>을 눌러요.</li><li>목록을 내려서 <b>홈 화면에 추가</b>를 눌러요.</li><li>오른쪽 위 <b>추가</b>를 누르면 홈 화면에 '가챠 메이커' 아이콘이 생겨요.</li><li>앞으로는 그 아이콘으로 열어요. 전체 화면으로 열리고, 저장한 게임도 안전하게 남아요.</li></ol>
     <p class="muted">Safari 탭에서 그냥 쓰면 오래 안 열었을 때 아이폰이 저장 데이터를 지울 수 있어요. 가끔 설정 → 백업으로 내보내 두면 더 안전해요.</p>
     ${pcOrigin()?'<p class="muted"><b>PC 서버로 접속 중이에요.</b> 게임은 PC에 저장되니 홈 화면에 추가하지 않아도 돼요. 바깥 주소(trycloudflare)는 PC 서버를 켤 때마다 바뀌어서, 홈 화면 아이콘은 다음에 안 열릴 수 있어요. 그럴 땐 PC의 QR을 다시 찍으면 PC에 저장된 게임이 그대로 이어져요.</p>':''}
-    <div class="row" style="margin-top:12px"><button class="btn" data-act="close">알겠어요</button></div>`); }
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="close">알겠어요</button></div>`; }
+function openA2HS(first){ if(first) appStorage.setItem('ggm-a2hs','1');
+  openModal(a2hsHTML()); }
 function openProxySet(){
   openModal(`${head('중계 서버 (아이폰·웹)')}
     <p class="muted">브라우저는 보안 규칙(CORS) 때문에 일부 AI 서비스에 직접 연결하지 못해요. 그럴 때만 중계 서버를 거쳐요. 직접 연결이 되는 서비스는 그대로 직접 연결해요.</p>
@@ -12232,6 +12254,11 @@ async function updateDownloadHTML(base,path,man){
  return html;
 }
 
+/* 새 업데이트 안내 창 내용(View) */
+function updateFoundHTML(man){ return `${head('업데이트가 있어요',`<span class="muted">${esc(APP_BUILD)} → <b>${esc(man.build)}</b></span>`)}${notesHTML(man)}
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="updget">받기</button><button class="btn ghost" data-act="updskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`; }
+/* 전에 문제가 있던 버전 안내 창 내용(View) */
+function updateBadHTML(man){ return `${head('이 버전은 전에 문제가 있었어요',`<span class="muted">${esc(man.build)}</span>`)}<p>이 버전은 이 기기에서 제대로 실행되지 않아서 설치 버전으로 돌아왔었어요. 새 버전이 나오면 자동으로 다시 알려 드려요.</p><div class="row" style="margin-top:12px"><button class="btn ghost" data-act="updget">그래도 받기</button><button class="btn" data-act="close">닫기</button></div>`; }
 async function checkUpdate(manual){
   UPD=null;const o=LV(), repo=updRepo(o), branch=(o.branch||'main').trim();
   if(o.token) return checkUpdatePrivate(manual);
@@ -12252,11 +12279,12 @@ async function checkUpdate(manual){
   try{html=await updateDownloadHTML(raw,path,man);}catch(e){updateCheckRecord(man,repo,branch,'확인 실패: '+e.message);if(manual)toast(e.message);return;}
   if(updateAPKRequired(man,html,repo,branch))return;
   updateCheckRecord(man,repo,branch,'웹 패치 가능',html);UPD={man,raw,path,html};
-  if(isBad){ openModal(`${head('이 버전은 전에 문제가 있었어요',`<span class="muted">${esc(man.build)}</span>`)}<p>이 버전은 이 기기에서 제대로 실행되지 않아서 설치 버전으로 돌아왔었어요. 새 버전이 나오면 자동으로 다시 알려 드려요.</p><div class="row" style="margin-top:12px"><button class="btn ghost" data-act="updget">그래도 받기</button><button class="btn" data-act="close">닫기</button></div>`); return; }
+  if(isBad){ openModal(updateBadHTML(man)); return; }
   if(o.mode==='silent'&&!manual) return applyUpdate(true);
-  openModal(`${head('업데이트가 있어요',`<span class="muted">${esc(APP_BUILD)} → <b>${esc(man.build)}</b></span>`)}${notesHTML(man)}
-    <div class="row" style="margin-top:12px"><button class="btn" data-act="updget">받기</button><button class="btn ghost" data-act="updskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`);
+  openModal(updateFoundHTML(man));
 }
+/* 업데이트를 받은 뒤 창 내용(View) */
+function updateReadyHTML(build){ return `${head('업데이트를 받았어요')}<p>버전 <b>${esc(build)}</b>. 다시 시작하면 적용돼요. 문제가 생기면 설정 → 앱 업데이트에서 이전 버전으로 되돌릴 수 있어요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="reload">지금 다시 시작</button><button class="btn ghost" data-act="close">나중에</button></div>`; }
 async function applyUpdate(silent){
   const u=UPD;if(!u)return;let html;
   try{html=u.html||await updateDownloadHTML(u.raw,u.path,u.man);}catch(e){toast(e.message);return;}
@@ -12265,7 +12293,7 @@ async function applyUpdate(silent){
   try{ await appStorage.saveLive(html); }catch(e){ toast('업데이트 저장 실패: '+(e.message||'저장 공간을 확인해 주세요')); return; }
   const o=LV(); Object.assign(o,{on:true,prevBuild:o.build||'',build,boots:0,failed:false,at:Date.now()}); if(o.badBuild===build) delete o.badBuild; saveLV(o); await flush();
   if(silent){ toast('새 버전을 받았어요. 다음 실행부터 적용돼요'); return; }
-  openModal(`${head('업데이트를 받았어요')}<p>버전 <b>${esc(build)}</b>. 다시 시작하면 적용돼요. 문제가 생기면 설정 → 앱 업데이트에서 이전 버전으로 되돌릴 수 있어요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="reload">지금 다시 시작</button><button class="btn ghost" data-act="close">나중에</button></div>`);
+  openModal(updateReadyHTML(build));
 }
 async function checkUpdatePrivate(manual){
   UPD=null;const o=LV(); if(!o.repo){ if(manual) toast('업데이트 설정에서 GitHub 저장소를 먼저 넣어 주세요'); return; }
@@ -13296,6 +13324,8 @@ function bossNext(u){return B&&B.engine&&u.ready&&u.ready.active-B.engine.time<=
 // 훈련: 10단계, 단계마다 권장 레벨이 있어요(그 레벨 대원의 능력치에 맞춰 적이 강해져요)
 const FARM_LV=[1,5,10,15,20,30,40,50,60,70], FARM_N=FARM_LV.length;
 const FARM_RW={exp:[10,20,35,55,80,110,150,200,260,330],gold:[4000,7000,11000,16000,22000,30000,40000,52000,66000,82000],wmat:[5,9,14,20,28,38,50,64,80,100],core:[1,1,2,2,3,4,5,6,7,8]};
+/* 훈련 기록 형식 이전(불러오기 fix가 부름): 단계가 바뀌어서(5→10단계, 권장 레벨) 예전 3단계 이상 기록은 다시 깨야 소탕 */
+function farmClearV2(pr){ if(pr.farmV===2) return; Object.keys(pr.farmClear).forEach(k=>{ const m=k.match(/^farm_.+_(\d+)$/); if(m&&+m[1]>=3) delete pr.farmClear[k]; }); pr.farmV=2; }
 function farmReward(key,lv){ const m=seasonIs('train')?2:1, i=Math.max(0,Math.min(FARM_N-1,lv-1)); return key==='exp'?{exp:FARM_RW.exp[i]*m}:key==='gold'?{gold:FARM_RW.gold[i]*m}:key==='wmat'?{wmat:FARM_RW.wmat[i]*m}:{core:FARM_RW.core[i]*m}; }
 function farmRec(lv){ return FARM_LV[Math.max(0,Math.min(FARM_N-1,lv-1))]; }
 function farmStage(key,lv){
@@ -13492,6 +13522,8 @@ function conDefaultInput(){ const cfg=CON(), v=[cfg.min,cfg.min,cfg.min,cfg.min]
 function conReadInput(){ const B=progRead('cbuild'), d=B.input||conDefaultInput(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:d[i]; }); }
 /* 나올 대원이 없는 까닭(엔진 suggest의 why) — 화면·확인 창 글 */
 function conEmptyWhy(why){ if(!why) return ''; const rr=a=>a.map(k=>RL[k]).join('·'); return why.open.length?`열린 분류 ${why.open.map(g=>`「${g.name}」(${g.rarity.length?rr(g.rarity):'대원 없음'})`).join(', ')}에 지금 투입으로 나오는 희귀도(${rr(why.allowed)})의 ${T('crew')}이(가) 없어요`:'이 투입으로 열리는 분류가 없어요'; }
+/* 바리에이션 설계 중 창 내용(View) */
+function conDecodeHTML(res){ return `<div class="decode"><div class="dc-ring"></div><div class="dc-ring b"></div><b>${esc(res.base.name)}의 「${esc(res.tpl.name)}」 설계 중…</b><span>새로운 모습을 디자인하고 있어요</span></div>`; }
 async function conBuild(){
   if(CONJOB||NEW_GAME_SOURCE||!conOn()) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
   const cfg=CON(), r=progSlot('cres'); let input=GGMConstruct.normalize(conReadInput(),cfg);
@@ -13510,7 +13542,7 @@ async function conBuild(){
     let c;
     if(res.kind==='variant'){ const key='v:'+res.tpl.id; if(!B.found[key]) B.found[key]=Date.now();
       c=conVariantOf(res.base,res.tpl);
-      if(!c){ openModal(`<div class="decode"><div class="dc-ring"></div><div class="dc-ring b"></div><b>${esc(res.base.name)}의 「${esc(res.tpl.name)}」 설계 중…</b><span>새로운 모습을 디자인하고 있어요</span></div>`,true);
+      if(!c){ openModal(conDecodeHTML(res),true);
         try{ c=await conMakeVariant(res.base,res.tpl); }finally{ closeModal(); } } }
     else c=charById(res.id);
     const got=grantOwned(c,T('construct')); B.log.unshift({id:c.id,at:Date.now(),input,v:res.kind==='variant'?res.tpl.id:''}); B.log=B.log.slice(0,30);
@@ -14557,18 +14589,20 @@ function backupChatKeys(g){const keys=new Set();function visit(o){if(!o||typeof 
 function backupMedia(g){return {chat:backupChatKeys(g),images:[...new Map(imgObjsOf(g).map(x=>[x.id,x])).values()].filter(x=>x.img?.idb).map(x=>({id:x.id,img:{idb:true},...(x.seed!=null?{seed:x.seed}:{})})),audios:(g.lib||[]).filter(x=>x.audio?.idb).map(x=>({id:x.id,audio:{idb:true}}))};}
 function openBackupChoice(kind){const v=BACKUP_TYPES[kind];if(!v)return;openModal(`${head(v.name+' 저장')}<p>${v.desc}</p><label class="f" for="backup-dest">저장 위치</label><select class="in" id="backup-dest">${opt_(bkDests(),bkDest())}</select>${kind!=='progress'?'<label class="f"><input type="checkbox" id="backup-voices"> 기기 전체의 생성 음성 캐시도 추가 (다른 게임의 캐시 포함, 용량 증가)</label>':''}<p class="muted">현재 선택한 게임 하나를 저장합니다. 저장 중에는 앱을 닫지 마세요. 파일 생성 완료 안내를 확인해 주세요.</p><div class="row"><button class="btn" data-act="backup-start" data-kind="${kind}">저장 시작</button><button class="btn ghost" data-act="close">취소</button></div>`);}
 async function backupBytes(blob){return String(await blobToData(blob)).split(',')[1];}
+/* 백업 저장 완료 창 내용(View) */
+function backupDoneHTML(label,result,name,kind){ return `${head(label+' 저장 완료')}<p>${esc(result.where||name)}</p><p class="muted">${BACKUP_TYPES[kind].desc}</p><button class="btn" data-act="close">확인</button>`; }
 async function backupExport(kind,dest,voices=false){
  if(BACKUP_BUSY)return;BACKUP_BUSY=true;backupBusyOverlay(true);const label=BACKUP_TYPES[kind].name;let writer;
  try{await flush().catch(()=>{});await appStorage.drain().catch(()=>{});const game=JSON.parse(JSON.stringify(G)),media=backupMedia(game),stamp=new Date().toISOString(),name='gacha-'+kind+'-'+stamp.replace(/[:.]/g,'-')+'.ggmbak';writer=await bkWriter(dest,name);const write=o=>writer.write(JSON.stringify(o)+'\n');
  await write({format:'ggm-backup',version:2,kind,at:stamp,identity:backupIdentity(game),...(kind!=='assets'?{game}:{}),...(kind!=='progress'?{media}:{} )});let count=0;
  if(kind!=='progress'){
  const entries=[...media.images.map(x=>({key:x.id})),...media.audios.map(x=>({key:'a_'+x.id})),...media.chat.map(key=>({key}))];if(voices)for(const k of await idbKeys())if(String(k).startsWith('v_'))entries.push({key:k,global:true});
- for(const item of entries){syBar(`${label}: 자료 저장 ${++count}/${entries.length}…`);const status=document.querySelector('#backup-busy-lock b');if(status)status.textContent=`${label}: 자료 저장 ${count}/${entries.length}…`;const blob=item.global?await idbGet(item.key):await idbGetNS(item.key);if(!blob)throw Error('자료 파일을 찾지 못했습니다: '+item.key);await write({record:'media',key:item.key,global:!!item.global,type:blob.type,size:blob.size});for(let p=0;p<blob.size;p+=262144)await write({record:'chunk',data:await backupBytes(blob.slice(p,p+262144))});await write({record:'media-end'});}
+ for(const item of entries){syBar(`${label}: 자료 저장 ${++count}/${entries.length}…`);say('#backup-busy-lock b',`${label}: 자료 저장 ${count}/${entries.length}…`);const blob=item.global?await idbGet(item.key):await idbGetNS(item.key);if(!blob)throw Error('자료 파일을 찾지 못했습니다: '+item.key);await write({record:'media',key:item.key,global:!!item.global,type:blob.type,size:blob.size});for(let p=0;p<blob.size;p+=262144)await write({record:'chunk',data:await backupBytes(blob.slice(p,p+262144))});await write({record:'media-end'});}
  }
  await write({record:'end',count});const result=await writer.close();syBar('');
  if(result.uri&&dest==='share'){if(!CAP?.Share)throw Error('공유 기능을 사용할 수 없습니다');await CAP.Share.share({title:label,files:[result.uri]});}
- else if(result.blob){const a=document.createElement('a');a.href=URL.createObjectURL(result.blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);}
- openModal(`${head(label+' 저장 완료')}<p>${esc(result.where||name)}</p><p class="muted">${BACKUP_TYPES[kind].desc}</p><button class="btn" data-act="close">확인</button>`);
+ else if(result.blob){downloadBlob(result.blob,name);}
+ openModal(backupDoneHTML(label,result,name,kind));
  }catch(e){syBar('');toast(label+' 실패: '+(e.message||e)+'. 완료되지 않은 파일은 복원용으로 사용하지 마세요.');}finally{BACKUP_BUSY=false;backupBusyOverlay(false);}
 }
 async function* backupLines(file){const decoder=new TextDecoder();let carry='';for(let p=0;p<file.size;p+=262144){carry+=decoder.decode(await file.slice(p,p+262144).arrayBuffer(),{stream:true});let n;while((n=carry.indexOf('\n'))>=0){const line=carry.slice(0,n);carry=carry.slice(n+1);if(line.trim())yield JSON.parse(line);}if(carry.length>134217728)throw Error('백업 항목이 너무 큽니다');}carry+=decoder.decode();if(carry.trim())yield JSON.parse(carry);}
@@ -14652,6 +14686,8 @@ function shareDefinition(options){
  for(const l of game.lib||[])if(!options.audio)l.audio=null;
  return game;
 }
+/* 공유 팩 저장 완료 창 내용(View) */
+function shareDoneHTML(result,name){ return `${head('공유 팩 저장 완료')}<p style="overflow-wrap:anywhere">${esc(result.where||name)}</p><p>받는 사람은 패치된 메이커의 설정 → 데이터 → 공유 팩 불러오기에서 새 게임으로 추가할 수 있어요. 기존 JSON 공유팩도 같은 곳에서 불러올 수 있어요.</p><button class="btn" data-act="close">확인</button>`; }
 async function shareExport(options){
  if(BACKUP_BUSY)return;BACKUP_BUSY=true;backupBusyOverlay(true);let writer,destinationFailed=false,retryAsShare=false;
  try{
@@ -14663,8 +14699,8 @@ async function shareExport(options){
   for(const item of entries){backupTransferStatus(`공유팩 자료 저장 ${++count}/${entries.length}…`);const blob=await idbGetNS(item.key);if(!blob)throw Error('자료 파일을 찾지 못했습니다: '+item.key);await write({record:'media',key:item.key,type:blob.type,size:blob.size});for(let p=0;p<blob.size;p+=262144){await write({record:'chunk',data:await backupBytes(blob.slice(p,p+262144))});backupTransferStatus(`공유팩 자료 저장 ${count}/${entries.length} · ${(Math.min(p+262144,blob.size)/1048576).toFixed(1)} / ${(blob.size/1048576).toFixed(1)} MiB`);}await write({record:'media-end'});}
   await write({record:'end',count});backupTransferStatus('공유팩 파일 저장 중…');let result;try{result=await writer.close();}catch(e){destinationFailed=true;throw e;}
   if(result.uri&&options.dest==='share'){if(!CAP?.Share)throw Error('공유 기능을 사용할 수 없습니다');await CAP.Share.share({title:game.meta.title+' 공유팩',files:[result.uri]});}
-  else if(result.blob){const file=new File([result.blob],name,{type:'application/octet-stream'});if(options.dest==='share'&&navigator.canShare?.({files:[file]}))await navigator.share({title:game.meta.title+' 공유팩',files:[file]});else{const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);}}
-  openModal(`${head('공유 팩 저장 완료')}<p style="overflow-wrap:anywhere">${esc(result.where||name)}</p><p>받는 사람은 패치된 메이커의 설정 → 데이터 → 공유 팩 불러오기에서 새 게임으로 추가할 수 있어요. 기존 JSON 공유팩도 같은 곳에서 불러올 수 있어요.</p><button class="btn" data-act="close">확인</button>`);
+  else if(result.blob){const file=new File([result.blob],name,{type:'application/octet-stream'});if(options.dest==='share'&&navigator.canShare?.({files:[file]}))await navigator.share({title:game.meta.title+' 공유팩',files:[file]});else{downloadBlob(file,name);}}
+  openModal(shareDoneHTML(result,name));
  }catch(e){if(e?.name!=='AbortError'){if(destinationFailed&&IS_NATIVE&&options.dest!=='share'){retryAsShare=true;toast('이 폴더에 저장할 수 없어 공유하기로 다시 저장합니다.');}else toast('공유팩 저장 실패: '+(e.message||e)+'. 완료되지 않은 파일은 사용하지 마세요. 저장 위치도 확인해 주세요.');}}
  finally{BACKUP_BUSY=false;backupBusyOverlay(false);syBar('');}
  if(retryAsShare)return shareExport({...options,dest:'share'});
@@ -14725,6 +14761,8 @@ async function bkWriter(dest,name){
   const parts=[]; return {write:async s=>{ parts.push(s); },close:async()=>({blob:new Blob(parts,{type:/\.(ggmbak|ggmpack)$/i.test(name)?'application/octet-stream':'application/json'})})};
 }
 async function exportGo(o){return o.share?shareExport(o):backupExport('full',o.dest,!!o.voice);}
+/* 파일 내려받기(입출력 — 임시 링크를 눌러 브라우저 다운로드 폴더로): 백업·공유 팩·데이터 폴더·초안·그림 저장이 함께 씀 */
+function downloadBlob(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000); }
 /* DATA_FOLDER_MODULE
    게임 하나 = data/<게임id>/ 폴더, 종류별 JSON (meta.json, world.json, chars.json, chapters.json …).
    PC 서버(pc/ggm-server.py)가 영구 저장소로 쓰는 배치와 같아요. 여기서는 그 배치로 내보내기·가져오기(.zip)를 해요.
@@ -14785,12 +14823,14 @@ async function dataSaveBlob(blob,name){
  if(IS_NATIVE&&CAP&&CAP.Filesystem){const FS=CAP.Filesystem,path='가챠게임메이커/'+name;try{if(FS.requestPermissions)await FS.requestPermissions();}catch(e){ quietErr(e,'0525-data-folder.js:58'); }
   await FS.writeFile({path,data:String(await blobToData(blob)).split(',')[1],directory:'DOCUMENTS',recursive:true});return 'Documents/'+path;}
  if(window.showSaveFilePicker){try{const h=await showSaveFilePicker({suggestedName:name,types:[{description:'데이터 폴더 zip',accept:{'application/zip':['.zip']}}]}),w=await h.createWritable();await w.write(blob);await w.close();return h.name;}catch(e){if(e?.name==='AbortError')return null;}}
- const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);return name;}
+ downloadBlob(blob,name);return name;}
+/* 데이터 폴더 내보내기 완료 창 내용(View) */
+function dataExportDoneHTML(where,gid){ return `${head('데이터 폴더 내보내기 완료')}<p>${esc(where)}</p><p class="muted">압축을 풀면 data/${esc(gid)}/ 안에 종류별 JSON(chars.json, chapters.json, world.json …)과 media 폴더가 있어요.</p><button class="btn" data-act="close">확인</button>`; }
 async function dataExport(){
  if(BACKUP_BUSY)return;BACKUP_BUSY=true;backupBusyOverlay(true);
  try{await flush();await appStorage.drain();const gid=PJ().active,game=JSON.parse(JSON.stringify(G)),blob=await dataExportZip(game,gid),
   name='ggm-data-'+String(game.meta?.title||gid).replace(/[^\w가-힣-]+/g,'_').slice(0,30)+'-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.zip',where=await dataSaveBlob(blob,name);
-  syBar('');if(where)openModal(`${head('데이터 폴더 내보내기 완료')}<p>${esc(where)}</p><p class="muted">압축을 풀면 data/${esc(gid)}/ 안에 종류별 JSON(chars.json, chapters.json, world.json …)과 media 폴더가 있어요.</p><button class="btn" data-act="close">확인</button>`);}
+  syBar('');if(where)openModal(dataExportDoneHTML(where,gid));}
  catch(e){syBar('');toast('내보내기 실패: '+(e.message||e));}finally{BACKUP_BUSY=false;backupBusyOverlay(false);}}
 async function dataImport(file){
  if(BACKUP_BUSY)return;if(!appStorage.durable){toast('이 환경은 안전한 가져오기를 지원하지 않습니다.');return;}
@@ -14962,10 +15002,8 @@ async function auditConvert(chars,fields,instruction){
 
 /* 화면 */
 let AUDIT_FOCUS=null; // 캐릭터 하나만 볼 때 id
-function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen=auditVer(); mark('meta'); }
-  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기','ai-rules':'AI로 설명 채우기','ai-persona':'AI로 개성 채우기·다듬기','ai-afftalk':'AI로 인연 톡 만들기','ai-memo':'AI로 메모리얼 만들기','skills-remaster':'세대 맞추기(AS)',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
-  const chars=focus?G.chars.filter(c=>c.id===focus):G.chars;
-  openModal(`${head(focus?`${charById(focus)?.name||''} 점검`:'콘텐츠 점검·업그레이드',`<span class="muted">생성 규칙 v${auditGenVer()} · ${focus?'':`구버전 생성물 ${old}명`}</span>`)}
+/* 콘텐츠 점검·업그레이드 창 내용(View) */
+function auditHTML(focus,old,res,kinds,how,chars){ return `${head(focus?`${charById(focus)?.name||''} 점검`:'콘텐츠 점검·업그레이드',`<span class="muted">생성 규칙 v${auditGenVer()} · ${focus?'':`구버전 생성물 ${old}명`}</span>`)}
     <p class="muted" style="font-size:.82rem;margin:0 0 8px">생성 기능이 좋아졌거나 예전에 만든 콘텐츠에 빠진 게 있으면 여기에서 찾아 고쳐요. 고치기 전 상태는 마지막 작업 한 번까지 되돌릴 수 있어요.</p>
     ${AUDIT_UNDO?`<div class="panel" style="padding:8px 10px"><span class="muted">마지막 작업: ${esc(AUDIT_UNDO.label)} (${AUDIT_UNDO.items.length}개)</span> <button class="btn sm ghost" data-act="audundo">되돌리기</button></div>`:''}
     ${res.length?res.map(({rule:r,items},gi)=>`<details class="panel" style="margin:6px 0" ${gi<3?'open':''}><summary><span class="badge">${kinds[r.kind]}</span> <b>${esc(r.label)}</b> <span class="muted">${items.length}개</span></summary>
@@ -14976,7 +15014,11 @@ function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen
       <label class="f">항목</label><div class="row" style="flex-wrap:wrap">${Object.entries(AUDIT_FIELDS).map(([k,[l]])=>`<label style="display:inline-flex;gap:4px"><input type="checkbox" data-audf="${k}">${esc(l)}</label>`).join('')}</div>
       <label class="f" for="aud_ins">지시</label><textarea class="in" id="aud_ins" rows="2" placeholder="예: 대사를 모두 반말로 / 프로필에 출신지와 좋아하는 음식 추가 / 외모 태그를 겨울 분위기로"></textarea>
       <div class="row" style="margin-top:6px"><button class="btn sm" data-act="audconv">지정 변환 시작</button></div></details>
-    <div class="row" style="margin-top:12px">${AUDIT_JOB?'<button class="btn ghost" data-act="audstop">작업 멈추기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>`); }
+    <div class="row" style="margin-top:12px">${AUDIT_JOB?'<button class="btn ghost" data-act="audstop">작업 멈추기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>`; }
+function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen=auditVer(); mark('meta'); }
+  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기','ai-rules':'AI로 설명 채우기','ai-persona':'AI로 개성 채우기·다듬기','ai-afftalk':'AI로 인연 톡 만들기','ai-memo':'AI로 메모리얼 만들기','skills-remaster':'세대 맞추기(AS)',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
+  const chars=focus?G.chars.filter(c=>c.id===focus):G.chars;
+  openModal(auditHTML(focus,old,res,kinds,how,chars)); }
 function auditPanel(){ const n=auditScan().reduce((a,x)=>a+x.items.length,0), fresh=(+G.meta.auditSeen||0)<auditVer();
   return `<div class="panel pm-hide"><h3>콘텐츠 점검·업그레이드 ${fresh?'<span class="badge">생성 기능 향상</span>':''}</h3><p class="muted" style="margin:0 0 10px">${n?`고칠 수 있는 항목 ${n}개. `:''}빠진 대사·그림·태그, 구버전 생성물을 찾아 자동·AI로 고치거나, 고른 캐릭터를 지시대로 바꿔요.</p><button class="btn sm" data-act="audopen">점검 열기</button></div>`; }
 function auditNotice(){ try{ if((+G.meta.auditSeen||0)>=auditVer()||!P().seenOpening) return; const n=auditScan().reduce((a,x)=>a+x.items.length,0); if(n) toast(`생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 ${n}개를 업그레이드할 수 있어요`); }catch(e){} }
@@ -15057,7 +15099,7 @@ async function saveImgBlob(b,base){
     catch(e){ try{ await FS.writeFile({path:name,data,directory:'CACHE'}); const u=await FS.getUri({path:name,directory:'CACHE'}); if(CAP.Share){ await CAP.Share.share({title:name,files:[u.uri]}); return; } }catch(e2){ quietErr(e2,'0550-standalone-app.js:39'); } toast('그림을 저장하지 못했어요'); return; } }
   const file=new File([b],name,{type:b.type||'image/webp'});
   if(/iPhone|iPad|Android/i.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],title:name}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
-  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000); toast('다운로드 폴더에 저장했어요 · '+name);
+  downloadBlob(file,name); toast('다운로드 폴더에 저장했어요 · '+name);
 }
 function charImgList(c){return charImgItems(c).filter(x=>x.o?.id&&imgSrcRaw(x.o)).map(x=>[x.o,x.label,x.group]);}
 async function saveImgUrl(u,base){ try{ const b=await (await fetch(u)).blob(); await saveImgBlob(b,base); }catch(e){ toast('그림을 저장하지 못했어요'); } }

@@ -59,7 +59,7 @@
 
 ## 2. 액션 디스패치
 
-처리기(`handle*Action`)는 **Controller**(CLAUDE.md §0-2): 입력을 읽고 Model을 부르고 다시 그리게 할 뿐, 창 HTML·DOM은 직접 만지지 않아요 — 그 기능 모듈의 View 함수(예: 우편 `openMailView`, 로비 `lobbyPokeShow`, 초안 `drTabShow`)나 공용 View 도우미를 불러요. 공용 View 도우미: `busy(t,글)`(버튼 처리 중 표시 — 되돌리는 함수를 돌려줌) · `say(칸,글)` · `chipOn(칩,켜짐)`·`chipIsOn` · `switchFlip(스위치)`(0060-util) · `modalKeep(다시 그리기)`(창 스크롤 유지 — 0230-modal). 처리기 시험: 브라우저 시험 26(실제 클릭 분배).
+처리기(`handle*Action`)는 **Controller**(CLAUDE.md §0-2): 입력을 읽고 Model을 부르고 다시 그리게 할 뿐, 창 HTML·DOM은 직접 만지지 않아요 — 그 기능 모듈의 View 함수(예: 우편 `openMailView`, 로비 `lobbyPokeShow`, 초안 `drTabShow`)나 공용 View 도우미를 불러요. 화면에 들어가기 전 처리는 `render`의 표 `SCREEN_ENTER`(0180 — 로비 우편·현금, 심연·도전 `rogueTick`, 공지 `noticeSeen`, 도감 `cxBadgeSync`)에서 — 그리기(`…HTML`)는 상태를 바꾸지 않아요. 파일 내려받기는 `downloadBlob`(0520) 하나. 공용 View 도우미: `busy(t,글)`(버튼 처리 중 표시 — 되돌리는 함수를 돌려줌) · `say(칸,글)` · `chipOn(칩,켜짐)`·`chipIsOn` · `switchFlip(스위치)`(0060-util) · `modalKeep(다시 그리기)`(창 스크롤 유지 — 0230-modal). 처리기 시험: 브라우저 시험 26(실제 클릭 분배).
 
 ```js
 // 클릭 위임 (이벤트 섹션 끝)
