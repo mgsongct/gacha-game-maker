@@ -26,7 +26,9 @@ function l2Cause(c, k) { const o = c.L.layer.get(k), f = c.fns.get(k); if (!o ||
 
 // 역할 꼴(무리): 그 역할의 중심 함수를 부르는 함수 — 같은 역할을 따로 구현하는 무리(docs/redesign.md 1절 ③). 무리마다 맡을 상위 class(3절 설계)
 export const ROLES = { 'AI 생성 흐름': /^(aiJSON|aiCall|aiJSONRetry|aiOne)$/, '그림 생성': /^(naiGenerate|naiDraw|naiDrawItem|naiDrawItem0|comfyGenerate|imageCandidates)$/, '창 열기': /^openModal$/, '진행 칸 쓰기': /^progSlot$/, '게임 칸 쓰기': /^gameSlot$/ };
-export const ROLE_BASE = { 'AI 생성 흐름': 'Generator', '그림 생성': 'ImageJob', '창 열기': 'Dialog', '진행 칸 쓰기': 'Slot', '게임 칸 쓰기': 'Repository', '화면 그리기(HTML)': 'Screen' };
+/* 무리의 상위 class: 같은 흐름을 따로 구현하는 무리만(템플릿 메서드로 합칠 것). 진행 칸·게임 칸 쓰기(progSlot·gameSlot을 부름)는 창구를 쓰는 쪽이라 무리 위반이 아님 —
+   data 창구가 갈라졌는지는 규칙 D3(한 data 경로를 여러 모듈이 씀)가 잼 */
+export const ROLE_BASE = { 'AI 생성 흐름': 'Generator', '그림 생성': 'ImageJob', '창 열기': 'Dialog', '화면 그리기(HTML)': 'Screen' };
 /* 무리 구성원(중심 함수 자신은 뺌)마다 class와 그 무리의 상위 class 아래인지(under) */
 export function roleFamilies(fns, classes = new Map()) { const under = (c, base) => { for (let k = c, i = 0; k && i < 20; k = classes.get(k), i++) if (k === base) return true; return false; };
   const row = (f, role) => ({ name: f.name, key: f.key, cls: f.cls || null, mod: f.loc.split(':')[0], loc: f.loc, under: under(f.cls, ROLE_BASE[role]) }), out = {};
@@ -111,11 +113,17 @@ export const RULES = [
     judge: '스튜디오 모듈(0015-prompt-studio/) 밖의 LLM 지시문·프롬프트 글·그림 태그·조립 함수(lib/prompts.mjs)', fix: 'tools/prompts-move.mjs로 스튜디오 조각(pfDef)·요청 조립·조립 함수로', block: '오류(check.mjs)',
     find: c => [...c.R.prompts, ...c.R.promptAll, ...c.R.promptImg].map(x => ({ at: x.loc, what: `${x.key} ${x.chars}자`, scope: scopeOfLoc(x.loc) })).concat(c.R.builders.builders.map(x => ({ at: x.loc, what: x.fn, scope: scopeOfLoc(x.loc) }))) },
   { id: 'C1', group: '재설계', name: '역할 무리가 상위 class 밖', why: '같은 역할(AI 생성 흐름·창·화면 그리기·칸 쓰기·그림 생성)은 상위 class 하나(템플릿 메서드)의 하위가 다른 점만 가짐 — 같은 흐름을 따로 구현하지 않음(DRY · docs/redesign.md 3절)',
-    judge: '역할 무리(ROLES — 그 역할의 중심 함수 aiJSON·openModal·progSlot·gameSlot·naiGenerate…를 부르는 함수, 이름이 …HTML인 화면 그리기)가 무리의 상위 class(ROLE_BASE) 하위의 메서드가 아님', fix: '무리의 상위 class 하위로 — 흐름은 상위의 템플릿 메서드, 하위는 다른 점(프롬프트·검사·반영·창 내용)만', block: '래칫(rules.mjs --strict)',
-    find: c => Object.entries(c.RF).flatMap(([role, xs]) => xs.filter(x => !x.under).map(x => ({ at: x.loc, what: `${role} → ${ROLE_BASE[role]}: ${x.cls ? x.cls + '.' : ''}${x.name}`, kind: `${role} → ${ROLE_BASE[role]}`, scope: scopeOfLoc(x.loc) }))) },
+    judge: '역할 무리(ROLES — 그 역할의 중심 함수 aiJSON·openModal·naiGenerate…를 부르는 함수, 이름이 …HTML인 화면 그리기)가 무리의 상위 class(ROLE_BASE) 하위의 메서드가 아님. 칸 쓰기(progSlot·gameSlot을 부름)는 창구를 쓰는 쪽이라 셈하지 않음(창구 갈라짐은 D3)', fix: '무리의 상위 class 하위로 — 흐름은 상위의 템플릿 메서드, 하위는 다른 점(프롬프트·검사·반영·창 내용)만', block: '래칫(rules.mjs --strict)',
+    find: c => Object.entries(c.RF).filter(([role]) => ROLE_BASE[role]).flatMap(([role, xs]) => xs.filter(x => !x.under).map(x => ({ at: x.loc, what: `${role} → ${ROLE_BASE[role]}: ${x.cls ? x.cls + '.' : ''}${x.name}`, kind: `${role} → ${ROLE_BASE[role]}`, scope: scopeOfLoc(x.loc) }))) },
   { id: 'A1', group: '재설계', name: '옛 이름 다리로 부름', why: '함수는 class에 — 옛 전역 이름 다리(src/main/99-aliases.js)는 옮기는 동안만 두는 임시 길(docs/restructure.md R6)',
     judge: '코드의 풀리지 않는 참조·HTML과 글 속 처리기(onclick="이름(…)")가 다리 이름을 부름 · 페이지를 모는 시험 도구(build/test.mjs·tools/play)가 다리 이름을 덮어써 가로챔(aliasUses)', fix: 'Class.이름으로 바꿈 — 다 바꾸면 다리를 지움', block: '래칫(rules.mjs --strict)',
     find: c => c.AU.map(x => ({ at: x.at, what: `${x.name} → ${x.to}.${x.name}${x.inText ? ' (글 속)' : ''}${x.text ? ` — ${x.text}` : ''}`, kind: x.kind, scope: x.driver ? 'tools' : scopeOfLoc(x.at) })) },
+  { id: 'Y1', group: '재설계', name: '닿는 곳이 쓰고 닿지 않는 곳만 읽는 상태', why: '기능은 CRUD 일괄 — 만들고 쌓는 쪽이 살아 있으면 읽고 보는 쪽도 닿아야 함(들어가는 길이 끊긴 기능은 쌓이기만 함)',
+    judge: '상태 키(lib/flow.mjs stateFlow — G·P()·칸 접근)를 쓰는 함수 중 진입점에서 닿는 것(lib/history.mjs reachable)이 있는데, 읽는 함수는 있고 모두 닿지 않음', fix: '읽는 화면·처리로 들어가는 길(버튼·data-act·탭)을 잇거나, 그 기능을 통째로 지움(쓰는 쪽까지)', block: '래칫(rules.mjs --strict)',
+    find: c => (c.R.sf?.list || []).filter(x => x.r?.size && [...(x.w || [])].some(k => c.reach.has(k)) && ![...x.r].filter(k => !(x.w || new Set()).has(k)).some(k => c.reach.has(k)) && [...x.r].some(k => !(x.w || new Set()).has(k))).map(x => ({ at: x.wl?.[0] || x.key, what: `${x.key} — 쓰는 곳(닿음): ${[...x.w].filter(k => c.reach.has(k)).map(k => c.fns.get(k)?.name || k).slice(0, 4).join('·')} · 읽는 곳(닿지 않음): ${[...x.r].filter(k => !x.w.has(k)).map(k => c.fns.get(k)?.name || k).slice(0, 4).join('·')}`, scope: 'main' })) },
+  { id: 'Y2', group: '재설계', name: '닿는 곳에서 보내지 않는 동작', why: '기능은 CRUD 일괄 — 처리기(case)가 있으면 그 동작을 보내는 버튼·탭이 닿는 화면에 있어야 함(아니면 기능 전체가 쓰이지 않거나 들어가는 길이 끊김)',
+    judge: '액션 처리기의 case(data-act 이름)가 진입점에서 닿는 코드·src/index.html 어디에서도 보내지지 않음(lib/history.mjs reachable — unsent). 보내는 글이 닿지 않는 화면에만 있으면 「길 끊김」, 아예 없으면 「보내는 곳 없음」', fix: '길 끊김: 그 화면을 여는 버튼·탭을 닿는 화면에 잇거나 기능을 통째로 지움 · 보내는 곳 없음: case를 지움', block: '래칫(rules.mjs --strict)',
+    find: c => (c.reach.unsent || []).map(x => ({ at: x.at, what: x.act, kind: x.emittedSomewhere ? '길 끊김(닿지 않는 화면에서만 보냄)' : '보내는 곳 없음', scope: scopeOfLoc(x.at) })) },
   { id: 'X1', group: '보안', name: 'HTML에 이스케이프 없이 넣음', why: 'innerHTML로 가는 값은 esc(), AI 출력은 신뢰하지 않는 입력(OWASP XSS·LLM Top 10)',
     judge: 'HTML 템플릿의 ${…}에 esc() 없이 이름·제목·설명·용어 같은 글(또는 HTML 안전하지 않은 함수의 결과)이 들어감(lib/extra.mjs htmlInject)', fix: 'esc(값)', block: '경고(check.mjs)',
     find: c => c.R.inj.out.map(x => ({ at: x.loc, what: x.what, scope: scopeOfLoc(x.loc) })) },
@@ -151,5 +159,5 @@ export function judgeModules(c, RS, { units = [], html = '', cov = null } = {}) 
     .sort((a, b) => ['폐기', '통합', '해체', '재구축', '유지'].indexOf(a.verdict) - ['폐기', '통합', '해체', '재구축', '유지'].indexOf(b.verdict) || a.mod.localeCompare(b.mod)); }
 export function runRules({ A, M, html = '', drivers = [] }) { const writers = new Set(Object.values(M.data).flatMap(d => Object.values(d.writers).flat())), L = layers(A.fns, writers);
   const EP = elementParams(A.fns).filter(x => !['View', 'Controller'].includes(L.layer.get(x.fn)?.layer) && !L.layer.get(x.fn)?.handler);
-  const ctx = { fns: A.fns, R: A.R, mu: A.mu, M, L, EP, RF: roleFamilies(A.fns, classTable(A.units || [])), AU: aliasUses(A.units || [], html, drivers) };
+  const ctx = { fns: A.fns, R: A.R, mu: A.mu, M, L, EP, reach: A.units ? reachable(A.units, A.fns, html, new Set((A.R.act?.deadH || []).map(x => x.act))) : new Set(), RF: roleFamilies(A.fns, classTable(A.units || [])), AU: aliasUses(A.units || [], html, drivers) };
   return RULES.map(r => { const items = r.find(ctx), by = { main: 0, modules: 0, boot: 0 }; items.forEach(x => { by[x.scope] = (by[x.scope] || 0) + 1; }); return { ...r, find: undefined, n: items.length, by, items }; }); }

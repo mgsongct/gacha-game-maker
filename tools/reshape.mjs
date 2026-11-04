@@ -109,6 +109,19 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       if (!m || !bad.length) break; const line = Math.max(...bad.map(x => +x.decl.split(':')[1])), root2 = parser.parse(t).rootNode; let endAt = -1; for (let i = 0; i < root2.childCount; i++) { const c = root2.child(i); if (c.startPosition.row + 1 <= line && c.endPosition.row + 1 >= line) { endAt = c.endIndex; break; } }
       if (endAt < 0) break; const u = t.replace(CALL, ''), shift = endAt > m.index ? m[0].length : 0, at = endAt - shift; writeFileSync(F, u.slice(0, at) + m[0] + u.slice(at)); console.log(`부르는 자리를 ${bad.map(x => x.name).join('·')} 선언 뒤로(90-load.js:${line})`); } }
   process.exit(0); }
+// node tools/reshape.mjs --dead [--apply]: 진입점(부팅·src/index.html·화면 조작·생성·실행 중 AI·불러오기 — lib/history.mjs reachable)에서 닿지 않는 class의 static 메서드(YAGNI — 규칙 판정
+//   「닿지 않음」)를 설명 주석과 함께 지움(사용자 지시: 폐기, 지운 것은 git 이력에서). 시험 도구(build/test.mjs·tools/play)가 이름으로 부르는 것은 두고 알림
+export function dropMethods(src, names, parser) { const root = parser.parse(src).rootNode, cuts = [];
+  walk(root, n => { if (n.type !== 'method_definition' || n.parent?.type !== 'class_body' || !names.has(`${n.parent.parent?.childForFieldName('name')?.text}.${n.childForFieldName('name')?.text}`)) return;
+    let first = n; for (let p = n.previousSibling; p?.type === 'comment' && !/\n\s*\n/.test(src.slice(p.endIndex, first.startIndex)); p = p.previousSibling) first = p; cuts.push([src.lastIndexOf('\n', first.startIndex - 1) + 1, n.endIndex]); return false; });
+  let t = src; for (const [a, b] of cuts.sort((x, y) => y[0] - x[0])) t = t.slice(0, a) + t.slice(b).replace(/^[ \t]*\n/, ''); return { text: t, n: cuts.length }; }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--dead')) {
+  const { analyze } = await import('./lib/analyze.mjs'), { reachable } = await import('./lib/history.mjs'), A = await analyze(ROOT), html = readFileSync(join(ROOT, 'src/index.html'), 'utf8'), reach = reachable(A.units, A.fns, html, new Set((A.R.act?.deadH || []).map(x => x.act)));
+  const drv = ['build/test.mjs', ...readdirSync(join(ROOT, 'tools/play'), { recursive: true }).filter(f => String(f).endsWith('.mjs') && !/^(games|reports|fixtures|node_modules)\//.test(f)).map(f => `tools/play/${f}`)].map(f => readFileSync(join(ROOT, f), 'utf8')).join('\n');
+  const dead = [...A.fns.values()].filter(f => f.top && f.cls && f.unit === 'main' && !reach.has(f.key)), inTests = dead.filter(f => new RegExp(`\\b${f.name}\\b`).test(drv)), drop = dead.filter(f => !inTests.includes(f));
+  console.log(`닿지 않는 메서드 ${dead.length}: 지울 것 ${drop.length}(${drop.map(f => `${f.cls}.${f.name}`).join(' · ')}) · 시험 도구가 부르니 둠 ${inTests.length}(${inTests.map(f => `${f.cls}.${f.name}`).join(' · ')})`);
+  if (APPLY && drop.length) { const names = new Set(drop.map(f => `${f.cls}.${f.name}`)); for (const f of readdirSync(MAIN).filter(f => f.endsWith('.js'))) { const R = dropMethods(readFileSync(join(MAIN, f), 'utf8'), names, TS.parser); if (R.n) { writeFileSync(join(MAIN, f), R.text); console.log(`${f}: ${R.n}개 지움`); } } }
+  process.exit(0); }
 // node tools/reshape.mjs --refs [--apply] [--drop-aliases]: 규칙 A1(옛 이름 다리로 부름)이 낸 고칠 자리(파일·줄·칸·길이)를 그대로 바꿈 — 앱 코드·시험 도구의 페이지 안 코드에서
 //   다리 이름 → Class.이름(줄임 {이름} → 이름: Class.이름, window.이름 → Class.이름). 동적 전역 접근(window[…])은 바꾸지 않고 남은 수만 알림. --drop-aliases: 다 바꿨으면 src/main/99-aliases.js를 지움
 export function applyRefEdits(text, edits) { const L = String(text).split('\n'), seen = new Set(); for (const e of [...edits].sort((x, y) => y.line - x.line || y.col - x.col)) { const k = `${e.line}:${e.col}`; if (seen.has(k)) continue; seen.add(k); const l = L[e.line - 1]; L[e.line - 1] = l.slice(0, e.col) + e.to + l.slice(e.col + e.len); } return L.join('\n'); }

@@ -1,6 +1,6 @@
 # 연관 맵 — 모듈 → 빌드 → index.html(생성기·실행기·편집기) → data 게임 파일
 
-생성: `node tools/map.mjs` · 2026-11-04T22:37 · git 883b36b · 입력: src 56파일 · www/index.html 84079ca6c143 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
+생성: `node tools/map.mjs` · 2026-11-04T22:54 · git 66e349f · 입력: src 56파일 · www/index.html 84079ca6c143 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
 
 ## 읽는 법 — 거꾸로 따라가기
 
@@ -478,6 +478,10 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 
 ## 7. 최근 변화(증분 갱신 기록)
 
+- 2026-11-04T22:54 · git 66e349f
+- 2026-11-04T22:51 · git 66e349f
+- 2026-11-04T22:51 · git 66e349f
+- 2026-11-04T22:47 · git 66e349f
 - 2026-11-04T22:37 · git 883b36b · src 10: −src/main/99-aliases, 10-liveops, 90-load, app/010-confirm, combat/040-effects, combat/050-bridge, combat/060-generation, combat/070-equipment … · index.html 다시 빌드
   - chars.json › [].over: +기타:inheritOnMark −편집기:inheritOnMark
   - chars.json › [].skillBalance:  −편집기:inheritApply
@@ -494,40 +498,3 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
   - chars.json › [].name: +편집기:AltCharGen.apply +편집기:PickupCharGen.apply +실행기:AltCharGen.apply +실행기:PickupCharGen.apply −기타:AltCharGen.apply −기타:PickupCharGen.apply
   - chars.json › [].pos: +생성기:posSpread +실행기:posSpread −기타:posSpread
   - chars.json › [].rarity: +실행기:AltCharGen.apply +실행기:PickupCharGen.apply +편집기:AltCharGen.apply +편집기:PickupCharGen.apply −기타:AltCharGen.apply −기타:PickupCharGen.apply
-- 2026-11-04T10:26 · git fdc3c3b · src 10: 00-core, 10-characters, 10-liveops, 10-messenger, 10-newgame, 10-rules, 10-story, 10-system … · index.html 다시 빌드
-  - 함수: 추가 12 (NpcAutoGen.context, PersonaGen.context, PersonaGen.apply, PickupCharGen.apply, AltCharGen.apply, auditFix) · 삭제 11 (rgDeckModal, autoNpcs, personaAI, aiNewPickupChar, aiAltChar, drHarmony) · 옮김 0
-  - chars.json › [].affLines:  −실행기:personaAI
-  - chars.json › [].age: +기타:AltCharGen.apply −실행기:aiAltChar −편집기:aiAltChar
-  - chars.json › [].alt: +기타:AltCharGen.apply −실행기:aiAltChar −편집기:aiAltChar
-  - chars.json › [].altCanon: +기타:AltCharGen.apply −실행기:aiAltChar −편집기:aiAltChar
-  - chars.json › [].collab: +기타:PickupCharGen.apply −실행기:aiNewPickupChar −편집기:aiNewPickupChar
-  - chars.json › [].faction: +기타:AltCharGen.apply +기타:PickupCharGen.apply −편집기:aiAltChar −편집기:aiNewPickupChar −실행기:aiAltChar −실행기:aiNewPickupChar
-  - chars.json › [].lines: +기타:AltCharGen.apply −실행기:aiAltChar −실행기:personaAI −편집기:aiAltChar
-  - chars.json › [].naiStyle: +기타:AltCharGen.apply −실행기:aiAltChar −편집기:aiAltChar
-  - chars.json › [].name: +기타:AltCharGen.apply +기타:DraftHarmonyGen.edit +기타:PickupCharGen.apply −편집기:aiAltChar −편집기:aiNewPickupChar −편집기:drHarmony −실행기:aiAltChar −실행기:aiNewPickupChar
-  - chars.json › [].persona:  −실행기:personaAI
-- 2026-11-04T10:04 · git f41663d · src 2: +src/main/95-start, 90-load · index.html 다시 빌드
-  - 함수: 추가 356 (relCtx, drText, naiStyle, naiGenerate, naiTarget, faceDrawOne) · 삭제 36 (llmCode, unitPower, enemyPower, balPower, module:modules/app/020-construct.js#inGroup, module:modules/app/020-construct.js#condMatch) · 옮김 0
-  - chapters.json › [].kind: +실행기:fix
-  - chapters.json › [].stages: +편집기:handleStoryAndAuthoringAction
-  - chapters.json › [].stages[].combatBalance: +편집기:module:modules/combat/050-bridge.js#v2BalanceChapter +편집기:module:modules/combat/050-bridge.js#v2PrepareStage +편집기:readChForm
-  - chapters.json › [].stages[].enemies: +실행기:rebalanceChapter +편집기:module:modules/combat/050-bridge.js#v2BalanceChapter +편집기:module:modules/combat/050-bridge.js#v2PrepareStage +편집기:readChForm +생성기:buildNewGameDraft
-  - chapters.json › [].stages[].story: +편집기:readChForm +생성기:buildNewGameDraft
-  - chars.json: +생성기:buildManualGameDraft +생성기:buildNewGameDraft
-  - chars.json › [].activeStarted:  −실행기:module:modules/combat/030-core.js#cast −편집기:module:modules/combat/030-core.js#cast
-  - chars.json › [].alt: +실행기:aiAltChar +편집기:aiAltChar +기타:conMakeVariant
-  - chars.json › [].atk: +기타:rulesRecalc
-  - chars.json › [].aura:  −실행기:module:modules/combat/030-core.js#reactHit −편집기:module:modules/combat/030-core.js#reactHit
-- 2026-11-04T09:50 · git f41663d · src 112: +src/main/00-core, +src/main/10-acquire, +src/main/10-art, +src/main/10-battle, +src/main/10-challenge, +src/main/10-characters, +src/main/10-economy, +src/main/10-expedition … · index.html 다시 빌드
-  - 함수: 추가 34 (llmCode, unitPower, module:modules/app/020-construct.js#inGroup, module:modules/app/020-construct.js#condMatch, module:modules/combat/030-core.js#baseStats, module:modules/combat/030-core.js#isRanged) · 삭제 696 (elemLine, T, applyMeta, skinFaces, promptOv, imgAuditScan) · 옮김 19 (charById: src/main/0010-base/0060-util.js → src/main/90-load.js; libById: src/main/0010-base/0060-util.js → src/main/90-load.js; playerName: src/main/0010-base/0060-util.js → src/main/90-load.js; isMe: src/main/0010-base/0060-util.js → src/main/90-load.js)
-  - banners.json:  −실행기:aiPickupStory −실행기:puStoryBg −편집기:handleNavigationAndToolsAction −편집기:handleStoryAndAuthoringAction −생성기:buildManualGameDraft −생성기:buildNewGameDraft
-  - banners.json › [].active:  −실행기:addPickupFor −실행기:seasonStart −편집기:readBanner
-  - banners.json › [].alt:  −실행기:addPickupFor
-  - banners.json › [].bg:  −실행기:addPickupFor −실행기:aiPickupStory −실행기:rotatePickups −편집기:readBanner
-  - banners.json › [].collab:  −실행기:addPickupFor
-  - banners.json › [].desc:  −실행기:addPickupFor −실행기:aiPickupStory −실행기:rotatePickups −편집기:handleNavigationAndToolsAction −편집기:readBanner
-  - banners.json › [].eventId:  −실행기:aiPickupStory
-  - banners.json › [].gate:  −실행기:addPickupFor
-  - banners.json › [].id:  −실행기:addPickupFor −편집기:handleNavigationAndToolsAction
-  - banners.json › [].name:  −실행기:addPickupFor −실행기:rotatePickups −편집기:handleNavigationAndToolsAction −편집기:readBanner −편집기:renameEverywhere
-- 2026-11-04T09:06 · git 1251f3a

@@ -1,5 +1,5 @@
 // 데이터 ↔ 화면 흐름: ① 화면 액션(data-act) 발신·처리 짝 ② 상태(G·P()) 변경과 저장 표시(mark) ③ 상태 키별 쓰는 곳·읽는 화면
-import { walk } from './source.mjs';
+import { walk, calleeName } from './source.mjs';
 
 const ACT_VAR = /^(a|act)$|\.dataset\.act$/;
 const ownerFn = (fns, unit, n) => { for (let p = n.parent; p; p = p.parent) if (/function|arrow_function|method_definition/.test(p.type)) { const nm = p.type === 'function_declaration' ? p.childForFieldName('name')?.text : p.parent?.type === 'variable_declarator' ? p.parent.childForFieldName('name')?.text : null; if (nm) return fns.get(unit.name === 'main' ? nm : `${unit.name}#${nm}`) || null; } return null; };
@@ -84,7 +84,7 @@ export function stateFlow(units, fns) { const acc = progAccessors(fns);
     /* 칸 접근: progSlot('x')·예전 접근 함수(RG() 같은 칸 하나를 돌려주는 함수 — 없으면 만들어 저장) = 진행 칸 P().x를 맞춰 쓰고 읽음 · progRead('x') = 읽기만.
        게임 칸 gameSlot('meta.x')·gameRead('meta.x') = G.meta.x(경로 그대로 — 'rels'는 G.rels)를 같은 뜻으로.
        접근 함수 뒤에 숨은 칸 쓰기도 보이게 — 접근 함수를 칸 이름 접근으로 바꿔도 같은 흐름으로 잼 */
-    walk(u.tree.rootNode, n => { if (n.type !== 'call_expression') return; const fn = n.childForFieldName('function')?.text, as = n.childForFieldName('arguments')?.namedChildren || [], f = ownerFn(fns, u, n), lit = as[0]?.type === 'string' ? as[0].text.slice(1, -1) : null;
+    walk(u.tree.rootNode, n => { if (n.type !== 'call_expression') return; const fn = calleeName(n) /* Class.이름(…)은 이름으로 */, as = n.childForFieldName('arguments')?.namedChildren || [], f = ownerFn(fns, u, n), lit = as[0]?.type === 'string' ? as[0].text.slice(1, -1) : null;
       const key = /^(prog|game)(Slot|Read)$/.test(fn || '') && lit ? (fn.startsWith('game') ? 'G.' : 'P().') + lit : !as.length && acc.has(fn) && f?.name !== fn ? 'P().' + acc.get(fn) : null; if (!key) return;
       const rec = K(key); if (fn !== 'progRead' && fn !== 'gameRead') { if (f) rec.w.add(f.key); rec.wl.push(u.loc(n)); } if (f) rec.r.add(f.key); });
     walk(u.tree.rootNode, n => { if (n.type !== 'member_expression') return; const o = n.childForFieldName('object'), p = n.childForFieldName('property'); if (!o || !p) return;

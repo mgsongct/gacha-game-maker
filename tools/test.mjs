@@ -352,6 +352,10 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   writeFileSync(join(r9, 'src/main/010-h.js'), "function used(){ return 1; } function viaTable(){ return 2; } function dead(){ return 3; } function onlyDeadAct(){ return 4; }\nfunction handleXAction(a){ switch(a){ case 'live': used(); break; case 'gone': onlyDeadAct(); break; } }\nconst TBL={k:viaTable};\ndocument.addEventListener('click',e=>handleXAction(e.target.dataset.act));\n");
   const U = await loadUnits(r9), g9 = buildGraph(U).fns, R = reachable(U, g9, '<button data-act=\"live\">', new Set(['gone']));
   assert.ok(R.has('used') && R.has('viaTable') && R.has('handleXAction') && !R.has('dead') && !R.has('onlyDeadAct'), '닿는 함수: ' + [...R]);
+  /* 닿는 곳에서 보내지 않는 동작(규칙 Y2): 닿지 않는 화면에서만 보냄 → 길 끊김 · 보내는 곳 없음 · 글자 값으로 넘겨 동적으로 보낼 수 있는 동작은 셈하지 않음(도달도 따라감) */
+  writeFileSync(join(r9, 'src/main/020-y.js'), "function handleYAction(a){ switch(a){ case 'lost': lostView(); break; case 'dyn': dynGo(); break; case 'nowhere': break; } }\nfunction lostView(){ return '<b data-act=\\\"lost\\\">'; }\nfunction dynGo(){ return 1; }\nfunction form(o){ return `<b data-act=\\\"${o.start}\\\">`; }\nconst YT={h:handleYAction};\nform({start:'dyn'});\n");
+  const U2 = await loadUnits(r9), g92 = buildGraph(U2).fns, R2 = reachable(U2, g92, '', new Set(['dyn', 'nowhere'])), un = Object.fromEntries((R2.unsent || []).map(x => [x.act, x.emittedSomewhere]));
+  assert.deepEqual(un, { lost: true, nowhere: false }, 'Y2 보내지 않는 동작: ' + JSON.stringify(R2.unsent)); assert.ok(R2.has('dynGo') && !R2.has('lostView'), '글자 값으로 넘긴 동작의 case는 따라감: ' + [...R2]);
   assert.deepEqual(claimNames('`liveFill`·`G.meta.story` 정리, castLockCtx 추가, FINALE_RULE, 0465-story-plan').sort(), ['0465-story-plan', 'FINALE_RULE', 'G.meta.story', 'castLockCtx', 'liveFill'], '글 속 코드 이름');
   rmSync(r9, { recursive: true, force: true }); }
 // 위반 래칫: 줄만 밀린 것은 같은 항목, 새 빈 catch·복잡도 증가는 잡음

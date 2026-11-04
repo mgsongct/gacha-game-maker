@@ -7,12 +7,14 @@
 //   (계층·저장 정책 래칫은 node tools/rules.mjs --strict — 규칙 전수검사로 옮김)
 //   node tools/map.mjs --game <폴더>    게임 하나(tools/play/games/<이름> 또는 pc/data/<게임id>)의 data 경로마다 값이 있나와 만드는 곳
 //   [--force] 바뀐 게 없어도 다시 만듦 → docs/map.md(사람이 따라가는 맵) · docs/map.json(질의·차이 비교)
+import { srcAt } from './lib/gitsrc.mjs';
+import { reachable } from './lib/history.mjs';
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdirSync } from 'node:fs';
 import { join, dirname, resolve, relative, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { execSync } from 'node:child_process';
-import { loadUnits } from './lib/source.mjs';
+import { loadUnits, walk } from './lib/source.mjs';
 import { buildGraph } from './lib/graph.mjs';
 import { stateFlow } from './lib/flow.mjs';
 import { buildMap, mapDiff, valuesAt } from './lib/map.mjs';
@@ -121,6 +123,15 @@ function why(m, q) { const lq = q.toLowerCase(), sec = sections(q), mods = new S
   const hitF = Object.entries(m.surface?.feats || {}).filter(([, f]) => f.label.toLowerCase().includes(lq) || f.windows.some(w => w.toLowerCase().includes(lq)));
   if (hitF.length) { out.push('', `■ index.html 기능 단위 ${hitF.length}`); for (const [u, f] of hitF.slice(0, 8)) { const fs = Object.entries(m.fns).filter(([, x]) => x.place === u).map(([, x]) => `${x.name}<${short(x.module)}>`); out.push(`  ${f.label} (${KIND[f.kind] || f.kind} · ${f.menu}) — 함수 ${f.n} · 모듈 ${f.mods.slice(0, 6).map(([x, n]) => `${short(x)} ${n}`).join(', ')}${f.windows.length ? ` · 창 ${f.windows.slice(0, 5).join(' · ')}` : ''}`); if (fs.length) out.push(`    data를 쓰는 함수: ${fs.slice(0, 10).join(', ')}${fs.length > 10 ? ` …외 ${fs.length - 10}` : ''}`); } }
   return out.join('\n'); }
+// 동작 하나(--why <data-act 이름>): 그 동작을 보내는 함수(data-act="이름" 글을 가진 함수 — 진입점에서 닿는지)·src/index.html·처리하는 case 자리 — 「닿는 곳에서 보내지 않는 동작」(규칙 Y2)을 가릴 때
+//   --rev <커밋>: 그 커밋의 src에서도(재구조화 전·원안에선 닿았나 — 고칠지 지울지의 근거)
+async function actWhy(q, rev) { const out = [], at = async dir => { const units = await loadUnits(dir), { fns } = buildGraph(units); return { units, fns, html: readFileSync(join(dir, 'src/index.html'), 'utf8'), reach: reachable(units, fns, readFileSync(join(dir, 'src/index.html'), 'utf8')) }; };
+  const now = await at(ROOT), old = rev ? (await srcAt(ROOT, join(ROOT, 'tools/out'), rev), await at(join(ROOT, 'tools/out/ref-src', execSync(`git rev-parse --verify ${JSON.stringify(rev + '^{commit}')}`, { cwd: ROOT, encoding: 'utf8' }).trim()))) : null;
+  for (const [label, S] of [['', now], ...(old ? [[` [${rev}]`, old]] : [])]) { const { units, fns, html, reach } = S;
+  for (const a of String(q).split(',')) { const re = new RegExp(`data-act=\\\\?["']${a}\\\\?["']|dataset\\.act\\s*=\\s*['"]${a}['"]`), em = [...fns.values()].filter(f => f.top && !f.table && re.test(f.node.text)), cs = []; for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'switch_case' && String(n.childForFieldName('value')?.text || '').replace(/^['"`]|['"`]$/g, '') === a) cs.push(u.loc(n)); });
+    if (!em.length && !cs.length && !re.test(html)) continue; const inner = f => { for (let p = f.node.parent; p; p = p.parent) if (p.type === 'method_definition' || p.type === 'function_declaration') return true; return false; };
+    out.push('', `■ 동작 ${a}${label} — 처리 case ${cs.length}: ${cs.join(', ') || '없음'}`, `  보내는 함수 ${em.length}: ${em.map(f => `${f.cls ? f.cls + '.' : ''}${f.name} (${f.loc}) ${reach.has(f.key) ? '닿음' : '닿지 않음'}`).join(', ') || '없음'}${re.test(html) ? ' · src/index.html에 있음' : ''}`); } }
+  return out; }
 // 함수 하나(--why <함수 이름>): 맵(data 경로를 쓰는 함수)이 아니라 지금 소스의 함수 그래프로 — 위치·계층(직접 효과)·부르는 곳·부르는 것·읽고 쓰는 상태 키·방향 위반·모듈별 연결 무게(자연 경계 그래프)
 async function fnWhy(m, q) { const units = await loadUnits(ROOT), { fns, tops } = buildGraph(units), names = new Set(String(q).split(',')), hits = [...fns.values()].filter(f => f.top && !f.table && names.has(f.name)); if (!hits.length) return []; /* 쉼표로 여러 함수 */
   const sf = stateFlow(units, fns), L = layers(fns, new Set(Object.values(m.data).flatMap(d => Object.values(d.writers).flat()))), home = fragmentFiles(units).home, M = moduleMap(units, fns, sf, { modOf: moduleOf, layer: home }), consts = new Set([...tops].filter(([, v]) => v.kind !== 'function').map(([k]) => k));
@@ -168,5 +179,5 @@ async function splitPlan(ref) { const units = await loadUnits(ROOT), { fns } = b
   mkdirSync(join(ROOT, 'tools/out'), { recursive: true }); writeFileSync(join(ROOT, 'tools/out/split.md'), md.join('\n'));
   console.log(`섞인 함수 나누기 계획: ${rows.length}개 — ${Object.keys(SPLIT_HOW).map(k => `${k} ${by(k).length}`).join(' · ')} · 요소 매개변수 ${EP.length}(직접 ${EP.filter(x => x.direct).length}) → tools/out/split.md`); }
 if (argv.includes('--split')) await splitPlan(arg('--split') && !arg('--split').startsWith('--') ? arg('--split') : JSON.parse(readFileSync(join(ROOT, 'tools/fork-features.json'), 'utf8')).upstreamSrc);
-if (arg('--why')) console.log([why(map, arg('--why')), ...(await fnWhy(map, arg('--why')))].join('\n'));
+if (arg('--why')) console.log([why(map, arg('--why')), ...(await fnWhy(map, arg('--why'))), ...(await actWhy(arg('--why'), arg('--rev')))].join('\n'));
 if (arg('--game')) console.log(gameView(map, arg('--game')));

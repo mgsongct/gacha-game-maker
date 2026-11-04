@@ -18306,8 +18306,8 @@
   }
  },
  "gamesN": 2,
- "at": "2026-11-04T22:37",
- "head": "883b36b",
+ "at": "2026-11-04T22:54",
+ "head": "66e349f",
  "inputs": {
   "src": {
    "src/boot/durable-storage.js": "9e1fdc434852",
@@ -18372,9 +18372,105 @@
    "idol-audition": "a443d928bb99",
    "sky-knights": "c782aafba942"
   },
-  "tool": "2c794f496ca1"
+  "tool": "b55c05b1ea6c"
  },
  "changes": [
+  {
+   "at": "2026-11-04T22:54",
+   "head": "66e349f",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-04T22:51",
+   "head": "66e349f",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-04T22:51",
+   "head": "66e349f",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-04T22:47",
+   "head": "66e349f",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
   {
    "at": "2026-11-04T22:37",
    "head": "883b36b",
@@ -25911,189 +26007,6 @@
      "changed": []
     },
     "tool": true
-   },
-   "fns": {
-    "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": []
-  },
-  {
-   "at": "2026-11-04T04:12",
-   "head": "ed9e79b",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": [
-      "src/main/0020-ai-connect.js",
-      "src/main/0030-image/010-engine.js",
-      "src/main/0060-util.js",
-      "src/main/0070-save.js",
-      "src/main/0120-abyss.js"
-     ]
-    },
-    "www": true,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": false
-   },
-   "fns": {
-    "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": [
-    {
-     "path": "prog.json › avatar",
-     "added": [],
-     "removed": [
-      "실행기:naiBlocksOwner"
-     ]
-    }
-   ]
-  },
-  {
-   "at": "2026-11-04T04:09",
-   "head": "1c851e1",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": [
-      "src/main/0100-messenger.js"
-     ]
-    },
-    "www": true,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": false
-   },
-   "fns": {
-    "added": [
-     "roomShow",
-     "thrDone",
-     "phChoicesShow",
-     "phSayShow",
-     "fcAfterReply",
-     "threadFree"
-    ],
-    "removed": [
-     "openRoom"
-    ],
-    "moved": []
-   },
-   "data": [
-    {
-     "path": "prog.json › fcAff",
-     "added": [
-      "실행기:fcAfterReply"
-     ],
-     "removed": [
-      "실행기:fcSend"
-     ]
-    }
-   ]
-  },
-  {
-   "at": "2026-11-04T03:59",
-   "head": "397377a",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": [
-      "src/main/0150-pickup-existing.js",
-      "src/main/0230-modal.js",
-      "src/main/0240-growth-curve.js",
-      "src/main/0250-story-factory.js",
-      "src/main/0290-season-rotation.js",
-      "src/main/0420-app-update.js",
-      "src/main/0510-actions/040-story-and-authoring.js"
-     ]
-    },
-    "www": true,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": false
-   },
-   "fns": {
-    "added": [
-     "cgFirstSeen",
-     "charSheetShow"
-    ],
-    "removed": [
-     "openChar"
-    ],
-    "moved": []
-   },
-   "data": [
-    {
-     "path": "chars.json › [].weapon",
-     "added": [],
-     "removed": [
-      "실행기:module:modules/combat/070-equipment.js#v2EnsureEquipment"
-     ]
-    }
-   ]
-  },
-  {
-   "at": "2026-11-04T03:46",
-   "head": "5b06d05",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": [
-      "src/main/0015-prompt-studio/010-studio.js",
-      "src/main/0020-ai-connect.js",
-      "src/main/0030-image/010-engine.js",
-      "src/main/0060-util.js",
-      "src/main/0120-abyss.js",
-      "src/main/0135-schedule.js",
-      "src/main/0160-player-profile.js",
-      "src/main/0185-game-rules.js",
-      "src/main/0260-new-game/010-draft.js",
-      "src/main/0260-new-game/020-build.js",
-      "src/main/0270-skin-proposal.js",
-      "src/main/0290-season-rotation.js",
-      "src/main/0330-casting.js",
-      "src/main/0400-publish-subscribe.js",
-      "src/main/0420-app-update.js",
-      "src/main/0445-factions.js",
-      "src/main/0450-relations-memory.js",
-      "src/main/0455-persona.js",
-      "src/main/0462-direction.js",
-      "src/main/0465-story-plan.js",
-      "src/main/0510-actions/010-setup.js",
-      "src/main/0510-actions/020-navigation-and-tools.js",
-      "src/main/0510-actions/040-story-and-authoring.js",
-      "src/main/0510-actions/050-settings-and-audio.js",
-      "src/main/0510-actions/060-storage-and-sharing.js",
-      "src/main/0510-actions/080-updates.js",
-      "src/main/0510-actions/090-characters.js",
-      "src/main/0510-actions/100-images-and-assets.js",
-      "src/main/0510-actions/110-economy.js",
-      "src/main/0510-actions/120-messenger.js"
-     ]
-    },
-    "www": true,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": false
    },
    "fns": {
     "added": [],

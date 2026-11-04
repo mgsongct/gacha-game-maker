@@ -2,141 +2,6 @@
  "note": "자기점검·배선 점검 기준선 — 늘리지 않음(CLAUDE.md §2). 줄면 node tools/check.mjs --update-baseline · node tools/wiring.mjs --update-baseline",
  "findings": [
   {
-   "key": "오류|프롬프트 글이 스튜디오 모듈 밖(스튜디오로 옮기거나, 화면과 같이 쓰는 글 도구면 tools/prompt-shared.json에 이유와 함께) src/main/10-promptstudio.js pstPolish 「<원문></원문>JSON만 출력: {\"text\":\"다듬은 조각 전체\",\"」 64자 (@)",
-   "num": {},
-   "text": "프롬프트 글이 스튜디오 모듈 밖(스튜디오로 옮기거나, 화면과 같이 쓰는 글 도구면 tools/prompt-shared.json에 이유와 함께): src/main/10-promptstudio.js pstPolish 「<원문></원문>JSON만 출력: {\"text\":\"다듬은 조각 전체\",\"」 64자 (src/main/10-promptstudio.js:31)"
-  },
-  {
-   "key": "오류|프롬프트 글이 스튜디오 모듈 밖(스튜디오로 옮기거나, 화면과 같이 쓰는 글 도구면 tools/prompt-shared.json에 이유와 함께) src/main/10-promptstudio.js pstPolish 「지금까지 쌓인 교훈:」 13자 (@)",
-   "num": {},
-   "text": "프롬프트 글이 스튜디오 모듈 밖(스튜디오로 옮기거나, 화면과 같이 쓰는 글 도구면 tools/prompt-shared.json에 이유와 함께): src/main/10-promptstudio.js pstPolish 「지금까지 쌓인 교훈:」 13자 (src/main/10-promptstudio.js:31)"
-  },
-  {
-   "key": "오류|프롬프트 글이 스튜디오 모듈 밖(스튜디오로 옮기거나, 화면과 같이 쓰는 글 도구면 tools/prompt-shared.json에 이유와 함께) src/main/10-promptstudio.js pstPolish 「최근 실패:」 8자 (@)",
-   "num": {},
-   "text": "프롬프트 글이 스튜디오 모듈 밖(스튜디오로 옮기거나, 화면과 같이 쓰는 글 도구면 tools/prompt-shared.json에 이유와 함께): src/main/10-promptstudio.js pstPolish 「최근 실패:」 8자 (src/main/10-promptstudio.js:31)"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) STAM_MS @ — 선언 @ · 길: @ → System.aipMigrate → System.aipLegacy → .now → Misc.stamRegen",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): STAM_MS src/main/80-misc.js:124 — 선언 src/main/90-load.js:1161 · 길: src/main/90-load.js:419 → System.aipMigrate → System.aipLegacy → .now → Misc.stamRegen"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) STAM_MAX @ — 선언 @ · 길: @ → System.aipMigrate → System.aipLegacy → .now",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): STAM_MAX src/main/90-load.js:1037 — 선언 src/main/90-load.js:1161 · 길: src/main/90-load.js:419 → System.aipMigrate → System.aipLegacy → .now"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) NEW_GAME_SOURCE @ — 선언 @ · 길: @ → Characters.fix → Story.syncEnemies → Core.mark",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): NEW_GAME_SOURCE src/main/00-core.js:422 — 선언 src/main/90-load.js:1072 · 길: src/main/90-load.js:1069 → Characters.fix → Story.syncEnemies → Core.mark"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) INHERIT_SYNC @ — 선언 @ · 길: @ → Characters.fix → Story.syncEnemies → Core.mark → Characters.inheritOnMark",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): INHERIT_SYNC src/main/10-characters.js:750 — 선언 src/main/90-load.js:1156 · 길: src/main/90-load.js:1069 → Characters.fix → Story.syncEnemies → Core.mark → Characters.inheritOnMark"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) INHERIT_SYNC @ — 선언 @ · 길: @ → Characters.fix → Story.syncEnemies → Core.mark → Characters.inheritOnMark",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): INHERIT_SYNC src/main/10-characters.js:753 — 선언 src/main/90-load.js:1156 · 길: src/main/90-load.js:1069 → Characters.fix → Story.syncEnemies → Core.mark → Characters.inheritOnMark"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) dirty @ — 선언 @ · 길: @ → Characters.fix → Story.syncEnemies → Core.mark → Characters.inheritOnMark",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): dirty src/main/10-characters.js:753 — 선언 src/main/90-load.js:1073 · 길: src/main/90-load.js:1069 → Characters.fix → Story.syncEnemies → Core.mark → Characters.inheritOnMark"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) dirty @ — 선언 @ · 길: @ → Characters.fix → Story.syncEnemies → Core.mark",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): dirty src/main/00-core.js:422 — 선언 src/main/90-load.js:1073 · 길: src/main/90-load.js:1069 → Characters.fix → Story.syncEnemies → Core.mark"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) saveRevision @ — 선언 @ · 길: @ → Characters.fix → Story.syncEnemies → Core.mark",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): saveRevision src/main/00-core.js:422 — 선언 src/main/90-load.js:1074 · 길: src/main/90-load.js:1069 → Characters.fix → Story.syncEnemies → Core.mark"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) flushT @ — 선언 @ · 길: @ → Characters.fix → Story.syncEnemies → Core.mark",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): flushT src/main/00-core.js:422 — 선언 src/main/90-load.js:1074 · 길: src/main/90-load.js:1069 → Characters.fix → Story.syncEnemies → Core.mark"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) B @ — 선언 @ · 길: @ → Characters.fix → v2Ensure → v2SyncEquipment → v2RefreshBattleEquipment",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): B src/modules/combat/070-equipment.js:4 — 선언 src/main/90-load.js:1864 · 길: src/main/90-load.js:1069 → Characters.fix → v2Ensure → v2SyncEquipment → v2RefreshBattleEquipment"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) imgCache @ — 선언 @ · 길: @ → Characters.fix → Characters.gameSlotsFix → Core.gameSlot → World.cxSeenNew → World.cxEntries → World.libSrc → Characters.imgSrc → Core.skinPreviewSrc → Art.imgSrcRaw",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): imgCache src/main/10-art.js:489 — 선언 src/main/90-load.js:1087 · 길: src/main/90-load.js:1069 → Characters.fix → Characters.gameSlotsFix → Core.gameSlot → World.cxSeenNew → World.cxEntries → World.libSrc → Characters.imgSrc → Core.skinPreviewSrc → Art.imgSrcRaw"
-  },
-  {
-   "key": "오류|불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음) CX_LABEL @ — 선언 @ · 길: @ → Characters.fix → Characters.gameSlotsFix → Core.gameSlot → World.cxSeenNew → World.cxEntries",
-   "num": {},
-   "text": "불러올 때 아직 없는 이름(TDZ — 갈래 안: data에 따라 앱이 뜨지 않음): CX_LABEL src/main/10-world.js:140 — 선언 src/main/90-load.js:1757 · 길: src/main/90-load.js:1069 → Characters.fix → Characters.gameSlotsFix → Core.gameSlot → World.cxSeenNew → World.cxEntries"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('c:…') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('c:…') src/modules/combat/050-bridge.js:54 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('c:…') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('c:…') src/modules/combat/050-bridge.js:180 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('prog') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('prog') src/modules/combat/050-bridge.js:187 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('ch:…') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('ch:…') src/modules/combat/050-bridge.js:219 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('meta') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('meta') src/modules/combat/050-bridge.js:219 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('ch:…') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('ch:…') src/modules/combat/050-bridge.js:271 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('c:…') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('c:…') src/modules/combat/050-bridge.js:343 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('c:…') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('c:…') src/modules/combat/050-bridge.js:347 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('c:…') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('c:…') src/modules/combat/070-equipment.js:8 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('c:…') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('c:…') src/modules/combat/070-equipment.js:12 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('c:…') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('c:…') src/modules/combat/070-equipment.js:103 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
-   "key": "경고|writeKey가 모르는 저장 키 mark('prog') @ — PC·클라우드 문서 저장에서 빠짐",
-   "num": {},
-   "text": "writeKey가 모르는 저장 키: mark('prog') src/modules/combat/080-training.js:22 — PC·클라우드 문서 저장에서 빠짐"
-  },
-  {
    "key": "복잡한 함수|buildNewGameDraft",
    "num": {
     "복잡도": 142,
@@ -476,7 +341,7 @@
     "줄": 29,
     "중첩": 3
    },
-   "text": "(최상위)→$('#file').addEventListener @src/main/90-load.js (src/main/90-load.js:1107) 복잡도 76 · 29줄 · 중첩 3"
+   "text": "(최상위)→$('#file').addEventListener @src/main/90-load.js (src/main/90-load.js:1489) 복잡도 76 · 29줄 · 중첩 3"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener #31 @src/main/90-load.js",
@@ -485,7 +350,7 @@
     "줄": 14,
     "중첩": 13
    },
-   "text": "(최상위)→document.addEventListener #31 @src/main/90-load.js (src/main/90-load.js:1215) 복잡도 38 · 14줄 · 중첩 13"
+   "text": "(최상위)→document.addEventListener #31 @src/main/90-load.js (src/main/90-load.js:1550) 복잡도 38 · 14줄 · 중첩 13"
   },
   {
    "key": "복잡한 익명 콜백|main rulesRead→rySelectorAll('#modal[data-rk]').forEach @src/main/10-rules.js",
@@ -503,7 +368,7 @@
     "줄": 9,
     "중첩": 8
    },
-   "text": "(최상위)→document.addEventListener #35 @src/main/90-load.js (src/main/90-load.js:1334) 복잡도 27 · 9줄 · 중첩 8"
+   "text": "(최상위)→document.addEventListener #35 @src/main/90-load.js (src/main/90-load.js:1574) 복잡도 27 · 9줄 · 중첩 8"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener #8 @src/main/90-load.js",
@@ -512,7 +377,7 @@
     "줄": 10,
     "중첩": 10
    },
-   "text": "(최상위)→document.addEventListener #8 @src/main/90-load.js (src/main/90-load.js:537) 복잡도 21 · 10줄 · 중첩 10"
+   "text": "(최상위)→document.addEventListener #8 @src/main/90-load.js (src/main/90-load.js:1161) 복잡도 21 · 10줄 · 중첩 10"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener #51 @src/main/90-load.js",
@@ -521,7 +386,7 @@
     "줄": 16,
     "중첩": 13
    },
-   "text": "(최상위)→document.addEventListener #51 @src/main/90-load.js (src/main/90-load.js:1627) 복잡도 20 · 16줄 · 중첩 13"
+   "text": "(최상위)→document.addEventListener #51 @src/main/90-load.js (src/main/90-load.js:1754) 복잡도 20 · 16줄 · 중첩 13"
   },
   {
    "key": "복잡한 익명 콜백|main parseScript→r(Boolean).flatMap(System.splitTags).map @src/main/10-system.js",
@@ -539,7 +404,7 @@
     "줄": 11,
     "중첩": 11
    },
-   "text": "(최상위)→document.addEventListener #4 @src/main/90-load.js (src/main/90-load.js:361) 복잡도 17 · 11줄 · 중첩 11"
+   "text": "(최상위)→document.addEventListener #4 @src/main/90-load.js (src/main/90-load.js:1119) 복잡도 17 · 11줄 · 중첩 11"
   },
   {
    "key": "복잡한 익명 콜백|main openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/10-characters.js",
@@ -557,7 +422,7 @@
     "줄": 7,
     "중첩": 7
    },
-   "text": "(최상위)→document.addEventListener #61 @src/main/90-load.js (src/main/90-load.js:1774) 복잡도 14 · 7줄 · 중첩 7"
+   "text": "(최상위)→document.addEventListener #61 @src/main/90-load.js (src/main/90-load.js:1809) 복잡도 14 · 7줄 · 중첩 7"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener #59 @src/main/90-load.js",
@@ -566,7 +431,7 @@
     "줄": 10,
     "중첩": 9
    },
-   "text": "(최상위)→document.addEventListener #59 @src/main/90-load.js (src/main/90-load.js:1745) 복잡도 13 · 10줄 · 중첩 9"
+   "text": "(최상위)→document.addEventListener #59 @src/main/90-load.js (src/main/90-load.js:1798) 복잡도 13 · 10줄 · 중첩 9"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener #39 @src/main/90-load.js",
@@ -575,7 +440,7 @@
     "줄": 9,
     "중첩": 8
    },
-   "text": "(최상위)→document.addEventListener #39 @src/main/90-load.js (src/main/90-load.js:1443) 복잡도 12 · 9줄 · 중첩 8"
+   "text": "(최상위)→document.addEventListener #39 @src/main/90-load.js (src/main/90-load.js:1638) 복잡도 12 · 9줄 · 중첩 8"
   },
   {
    "key": "복잡한 분배기 case|handleImagesAndAssetsAction facego",
@@ -869,6 +734,121 @@
    "text": "src/boot/storage-boot.js 의도 표시 1개"
   },
   {
+   "key": "쓰기만 하는 키|P().cres",
+   "num": {},
+   "text": "P().cres"
+  },
+  {
+   "key": "쓰기만 하는 키|P().cbuild",
+   "num": {},
+   "text": "P().cbuild"
+  },
+  {
+   "key": "쓰기만 하는 키|P().rogue",
+   "num": {},
+   "text": "P().rogue"
+  },
+  {
+   "key": "쓰기만 하는 키|P().avatar",
+   "num": {},
+   "text": "P().avatar"
+  },
+  {
+   "key": "쓰기만 하는 키|P().dm",
+   "num": {},
+   "text": "P().dm"
+  },
+  {
+   "key": "쓰기만 하는 키|P().raid",
+   "num": {},
+   "text": "P().raid"
+  },
+  {
+   "key": "쓰기만 하는 키|P().tower",
+   "num": {},
+   "text": "P().tower"
+  },
+  {
+   "key": "쓰기만 하는 키|P().gifts",
+   "num": {},
+   "text": "P().gifts"
+  },
+  {
+   "key": "쓰기만 하는 키|P().cxSeen",
+   "num": {},
+   "text": "P().cxSeen"
+  },
+  {
+   "key": "쓰기만 하는 키|P().sched",
+   "num": {},
+   "text": "P().sched"
+  },
+  {
+   "key": "쓰기만 하는 키|P().stam",
+   "num": {},
+   "text": "P().stam"
+  },
+  {
+   "key": "쓰기만 하는 키|P().mail",
+   "num": {},
+   "text": "P().mail"
+  },
+  {
+   "key": "쓰기만 하는 키|P().shop",
+   "num": {},
+   "text": "P().shop"
+  },
+  {
+   "key": "쓰기만 하는 키|P().dboard",
+   "num": {},
+   "text": "P().dboard"
+  },
+  {
+   "key": "쓰기만 하는 키|P().fchat",
+   "num": {},
+   "text": "P().fchat"
+  },
+  {
+   "key": "쓰기만 하는 키|G.meta.rules",
+   "num": {},
+   "text": "G.meta.rules"
+  },
+  {
+   "key": "쓰기만 하는 키|G.meta.balance",
+   "num": {},
+   "text": "G.meta.balance"
+  },
+  {
+   "key": "쓰기만 하는 키|G.world.plan",
+   "num": {},
+   "text": "G.world.plan"
+  },
+  {
+   "key": "쓰기만 하는 키|G.meta.storyMemory",
+   "num": {},
+   "text": "G.meta.storyMemory"
+  },
+  {
+   "key": "쓰기만 하는 키|G.rels",
+   "num": {},
+   "text": "G.rels"
+  },
+  {
+   "key": "쓰기만 하는 키|G.world.codex",
+   "num": {},
+   "text": "G.world.codex"
+  },
+  {
+   "key": "쓰기만 하는 키|G.world.codexNotes",
+   "num": {},
+   "text": "G.world.codexNotes"
+  },
+  {
+   "key": "쓰기만 하는 키|G.world.factions",
+   "num": {},
+   "text": "G.world.factions"
+  },
+  {
    "key": "쓰기만 하는 키|G.banners",
    "num": {},
    "text": "G.banners"
@@ -1029,11 +1009,6 @@
    "text": "G.meta.story"
   },
   {
-   "key": "쓰기만 하는 키|G.meta.rules",
-   "num": {},
-   "text": "G.meta.rules"
-  },
-  {
    "key": "쓰기만 하는 키|P().sortie",
    "num": {},
    "text": "P().sortie"
@@ -1042,11 +1017,6 @@
    "key": "쓰기만 하는 키|P().presets",
    "num": {},
    "text": "P().presets"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.factions",
-   "num": {},
-   "text": "G.world.factions"
   },
   {
    "key": "쓰기만 하는 키|G.meta.persona",
@@ -1082,11 +1052,6 @@
    "key": "쓰기만 하는 키|G.world.summary",
    "num": {},
    "text": "G.world.summary"
-  },
-  {
-   "key": "쓰기만 하는 키|P().mail",
-   "num": {},
-   "text": "P().mail"
   },
   {
    "key": "쓰기만 하는 키|P().mailInit",
@@ -1174,19 +1139,9 @@
    "text": "G.meta.positions"
   },
   {
-   "key": "쓰기만 하는 키|G.meta.balance",
-   "num": {},
-   "text": "G.meta.balance"
-  },
-  {
    "key": "쓰기만 하는 키|G.meta.tone",
    "num": {},
    "text": "G.meta.tone"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.plan",
-   "num": {},
-   "text": "G.world.plan"
   },
   {
    "key": "쓰기만 하는 키|G.meta.relProf",
@@ -1237,16 +1192,6 @@
    "key": "쓰기만 하는 키|G.meta.pub",
    "num": {},
    "text": "G.meta.pub"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.codex",
-   "num": {},
-   "text": "G.world.codex"
-  },
-  {
-   "key": "쓰기만 하는 키|G.rels",
-   "num": {},
-   "text": "G.rels"
   },
   {
    "key": "발신 없는 처리기|raidstart",
@@ -1544,6 +1489,125 @@
    "text": "studioHTML (src/main/10-system.js) — 참조 50%가 src/main/10-liveops.js"
   },
   {
+   "key": "남의 상태 쓰기|src/main/10-economy.js P().cres",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-economy.js가 P().cres(주인 src/main/10-acquire.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/90-load.js P().cbuild",
+   "num": {
+    "곳": 2
+   },
+   "text": "src/main/90-load.js가 P().cbuild(주인 src/main/10-acquire.js)를 씀 2곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-acquire.js P().rogue",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-acquire.js가 P().rogue(주인 src/main/10-challenge.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-characters.js P().rogue",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-characters.js가 P().rogue(주인 src/main/10-challenge.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-acquire.js P().avatar",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-acquire.js가 P().avatar(주인 src/main/10-player.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/90-load.js P().avatar",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/90-load.js가 P().avatar(주인 src/main/10-player.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-economy.js P().dm",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-economy.js가 P().dm(주인 src/main/10-acquire.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-story.js P().cxSeen",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-story.js가 P().cxSeen(주인 src/main/10-world.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-story.js P().stam",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-story.js가 P().stam(주인 src/main/10-economy.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-story.js P().dboard",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-story.js가 P().dboard(주인 src/main/10-expedition.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/90-load.js P().exped",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/90-load.js가 P().exped(주인 src/main/10-expedition.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/90-load.js G.meta.rules",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/90-load.js가 G.meta.rules(주인 src/main/10-rules.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/90-load.js G.world.plan",
+   "num": {
+    "곳": 2
+   },
+   "text": "src/main/90-load.js가 G.world.plan(주인 src/main/10-story.js)를 씀 2곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/90-load.js G.meta.storyMemory",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/90-load.js가 G.meta.storyMemory(주인 src/main/10-story.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-story.js G.rels",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-story.js가 G.rels(주인 src/main/10-world.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-world.js G.world.factions",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-world.js가 G.world.factions(주인 src/main/10-characters.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-story.js G.world.factions",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-story.js가 G.world.factions(주인 src/main/10-characters.js)를 씀 1곳"
+  },
+  {
    "key": "남의 상태 쓰기|src/main/10-story.js G.banners",
    "num": {
     "곳": 2
@@ -1642,13 +1706,6 @@
    "text": "src/main/90-load.js가 G.meta.story(주인 src/main/10-story.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/10-story.js G.world.factions",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/10-story.js가 G.world.factions(주인 src/main/10-characters.js)를 씀 1곳"
-  },
-  {
    "key": "남의 상태 쓰기|src/main/10-story.js P().gold",
    "num": {
     "곳": 1
@@ -1670,6 +1727,27 @@
    "text": "src/main/10-world.js가 G.meta.relProf(주인 src/main/10-story.js)를 씀 1곳"
   },
   {
+   "key": "파편화 상태|P().rogue",
+   "num": {
+    "모듈": 3
+   },
+   "text": "P().rogue — 3개 모듈이 씀"
+  },
+  {
+   "key": "파편화 상태|P().avatar",
+   "num": {
+    "모듈": 3
+   },
+   "text": "P().avatar — 3개 모듈이 씀"
+  },
+  {
+   "key": "파편화 상태|G.world.factions",
+   "num": {
+    "모듈": 3
+   },
+   "text": "G.world.factions — 3개 모듈이 씀"
+  },
+  {
    "key": "파편화 상태|G.threads",
    "num": {
     "모듈": 3
@@ -1686,7 +1764,7 @@
   {
    "key": "과잉 분할|src/main/10-newgame.js ↔ src/main/10-story.js",
    "num": {},
-   "text": "서로 강하게 묶임: src/main/10-newgame.js ↔ src/main/10-story.js — 사이 27.51 · 안 21.16/72.52"
+   "text": "서로 강하게 묶임: src/main/10-newgame.js ↔ src/main/10-story.js — 사이 27.51 · 안 22.36/72.35"
   },
   {
    "key": "기능 섞임|src/main/10-world.js",
@@ -1715,12 +1793,7 @@
   {
    "key": "기능 분산|src/main/10-story.js recruitCheck",
    "num": {},
-   "text": "recruitCheck (src/main/10-story.js) — 연결 87%가 src/main/10-battle.js"
-  },
-  {
-   "key": "기능 분산|src/main/10-newgame.js modeClean",
-   "num": {},
-   "text": "modeClean (src/main/10-newgame.js) — 연결 63%가 src/main/10-battle.js"
+   "text": "recruitCheck (src/main/10-story.js) — 연결 73%가 src/main/10-battle.js"
   },
   {
    "key": "기능 분산|src/main/10-expedition.js ngWorldExtras",
@@ -1766,27 +1839,6 @@
    "key": "기능 분산|src/main/10-art.js showCast",
    "num": {},
    "text": "showCast (src/main/10-art.js) — 연결 76%가 src/main/80-misc.js"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/10-promptstudio.js pstPolish 「<원문></원문>JSON만 출력: {\"text\":\"다듬은 조각 전체\",\"」",
-   "num": {
-    "글자": 64
-   },
-   "text": "src/main/10-promptstudio.js pstPolish 「<원문></원문>JSON만 출력: {\"text\":\"다듬은 조각 전체\",\"」 64자 (src/main/10-promptstudio.js:31)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/10-promptstudio.js pstPolish 「지금까지 쌓인 교훈:」",
-   "num": {
-    "글자": 13
-   },
-   "text": "src/main/10-promptstudio.js pstPolish 「지금까지 쌓인 교훈:」 13자 (src/main/10-promptstudio.js:31)"
-  },
-  {
-   "key": "스튜디오 밖 LLM 프롬프트 글|src/main/10-promptstudio.js pstPolish 「최근 실패:」",
-   "num": {
-    "글자": 8
-   },
-   "text": "src/main/10-promptstudio.js pstPolish 「최근 실패:」 8자 (src/main/10-promptstudio.js:31)"
   },
   {
    "key": "도구 복잡한 함수|tool:tools/play/lib/qa.mjs runQA",
@@ -2854,9 +2906,9 @@
   {
    "key": "규칙 C1|src/main/10-acquire.js",
    "num": {
-    "건": 20
+    "건": 16
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-acquire.js 20"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-acquire.js 16"
   },
   {
    "key": "규칙 C1|src/main/10-art.js",
@@ -2868,30 +2920,30 @@
   {
    "key": "규칙 C1|src/main/10-characters.js",
    "num": {
-    "건": 44
+    "건": 40
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-characters.js 44"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-characters.js 40"
   },
   {
    "key": "규칙 C1|src/main/10-economy.js",
    "num": {
-    "건": 18
+    "건": 12
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-economy.js 18"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-economy.js 12"
   },
   {
    "key": "규칙 C1|src/main/10-liveops.js",
    "num": {
-    "건": 18
+    "건": 17
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-liveops.js 18"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-liveops.js 17"
   },
   {
    "key": "규칙 C1|src/main/10-messenger.js",
    "num": {
-    "건": 6
+    "건": 3
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-messenger.js 6"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-messenger.js 3"
   },
   {
    "key": "규칙 C1|src/main/10-promptstudio.js",
@@ -2903,23 +2955,23 @@
   {
    "key": "규칙 C1|src/main/10-rules.js",
    "num": {
-    "건": 9
+    "건": 6
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-rules.js 9"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-rules.js 6"
   },
   {
    "key": "규칙 C1|src/main/10-story.js",
    "num": {
-    "건": 35
+    "건": 30
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-story.js 35"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-story.js 30"
   },
   {
    "key": "규칙 C1|src/main/10-system.js",
    "num": {
-    "건": 34
+    "건": 33
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-system.js 34"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-system.js 33"
   },
   {
    "key": "규칙 C1|src/main/10-newgame.js",
@@ -2931,9 +2983,9 @@
   {
    "key": "규칙 C1|src/main/10-player.js",
    "num": {
-    "건": 5
+    "건": 3
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-player.js 5"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-player.js 3"
   },
   {
    "key": "규칙 C1|src/modules/combat/050-bridge.js",
@@ -2952,23 +3004,23 @@
   {
    "key": "규칙 C1|src/main/10-challenge.js",
    "num": {
-    "건": 25
+    "건": 14
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-challenge.js 25"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-challenge.js 14"
   },
   {
    "key": "규칙 C1|src/main/10-expedition.js",
    "num": {
-    "건": 14
+    "건": 5
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-expedition.js 14"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-expedition.js 5"
   },
   {
    "key": "규칙 C1|src/main/10-world.js",
    "num": {
-    "건": 13
+    "건": 6
    },
-   "text": "C1 역할 무리가 상위 class 밖 main/10-world.js 13"
+   "text": "C1 역할 무리가 상위 class 밖 main/10-world.js 6"
   },
   {
    "key": "규칙 C1|src/main/80-misc.js",
@@ -3006,130 +3058,32 @@
    "text": "C1 역할 무리가 상위 class 밖 modules/combat/060-generation.js 1"
   },
   {
-   "key": "규칙 A1|src/main/10-liveops.js",
-   "num": {
-    "건": 3
-   },
-   "text": "A1 옛 이름 다리로 부름 main/10-liveops.js 3"
-  },
-  {
-   "key": "규칙 A1|src/main/90-load.js",
-   "num": {
-    "건": 3
-   },
-   "text": "A1 옛 이름 다리로 부름 main/90-load.js 3"
-  },
-  {
-   "key": "규칙 A1|src/modules/app/010-confirm.js",
-   "num": {
-    "건": 4
-   },
-   "text": "A1 옛 이름 다리로 부름 modules/app/010-confirm.js 4"
-  },
-  {
-   "key": "규칙 A1|src/modules/combat/040-effects.js",
-   "num": {
-    "건": 13
-   },
-   "text": "A1 옛 이름 다리로 부름 modules/combat/040-effects.js 13"
-  },
-  {
-   "key": "규칙 A1|src/modules/combat/050-bridge.js",
-   "num": {
-    "건": 53
-   },
-   "text": "A1 옛 이름 다리로 부름 modules/combat/050-bridge.js 53"
-  },
-  {
-   "key": "규칙 A1|src/modules/combat/060-generation.js",
-   "num": {
-    "건": 8
-   },
-   "text": "A1 옛 이름 다리로 부름 modules/combat/060-generation.js 8"
-  },
-  {
-   "key": "규칙 A1|src/modules/combat/070-equipment.js",
-   "num": {
-    "건": 15
-   },
-   "text": "A1 옛 이름 다리로 부름 modules/combat/070-equipment.js 15"
-  },
-  {
-   "key": "규칙 A1|src/modules/combat/080-training.js",
-   "num": {
-    "건": 17
-   },
-   "text": "A1 옛 이름 다리로 부름 modules/combat/080-training.js 17"
-  },
-  {
-   "key": "규칙 A1|src/modules/combat/090-practice.js",
-   "num": {
-    "건": 9
-   },
-   "text": "A1 옛 이름 다리로 부름 modules/combat/090-practice.js 9"
-  },
-  {
    "key": "규칙 A1|build/test.mjs",
    "num": {
-    "건": 605
+    "건": 2
    },
-   "text": "A1 옛 이름 다리로 부름 build/test.mjs 605"
-  },
-  {
-   "key": "규칙 A1|tools/play/combos.mjs",
-   "num": {
-    "건": 67
-   },
-   "text": "A1 옛 이름 다리로 부름 tools/play/combos.mjs 67"
-  },
-  {
-   "key": "규칙 A1|tools/play/lib/generate.mjs",
-   "num": {
-    "건": 12
-   },
-   "text": "A1 옛 이름 다리로 부름 tools/play/lib/generate.mjs 12"
+   "text": "A1 옛 이름 다리로 부름 build/test.mjs 2"
   },
   {
    "key": "규칙 A1|tools/play/lib/page.mjs",
    "num": {
-    "건": 14
+    "건": 3
    },
-   "text": "A1 옛 이름 다리로 부름 tools/play/lib/page.mjs 14"
+   "text": "A1 옛 이름 다리로 부름 tools/play/lib/page.mjs 3"
   },
   {
-   "key": "규칙 A1|tools/play/lib/qa.mjs",
+   "key": "규칙 Y2|src/main/10-economy.js",
    "num": {
-    "건": 35
+    "건": 6
    },
-   "text": "A1 옛 이름 다리로 부름 tools/play/lib/qa.mjs 35"
+   "text": "Y2 닿는 곳에서 보내지 않는 동작 main/10-economy.js 6"
   },
   {
-   "key": "규칙 A1|tools/play/link.mjs",
+   "key": "규칙 Y2|src/main/10-story.js",
    "num": {
-    "건": 72
+    "건": 8
    },
-   "text": "A1 옛 이름 다리로 부름 tools/play/link.mjs 72"
-  },
-  {
-   "key": "규칙 A1|tools/play/prompts.mjs",
-   "num": {
-    "건": 4
-   },
-   "text": "A1 옛 이름 다리로 부름 tools/play/prompts.mjs 4"
-  },
-  {
-   "key": "규칙 A1|tools/play/shots.mjs",
-   "num": {
-    "건": 22
-   },
-   "text": "A1 옛 이름 다리로 부름 tools/play/shots.mjs 22"
-  },
-  {
-   "key": "규칙 A1|tools/play/upgrade.mjs",
-   "num": {
-    "건": 9
-   },
-   "text": "A1 옛 이름 다리로 부름 tools/play/upgrade.mjs 9"
+   "text": "Y2 닿는 곳에서 보내지 않는 동작 main/10-story.js 8"
   }
  ]
 }
