@@ -169,7 +169,7 @@
 | 0030-image/010-engine.js illustrationScenePreparation | src/main/0030-image/010-engine.js:145 | 7 |
 | 0100-messenger.js fcSend | src/main/0100-messenger.js:152 | 41 |
 | 0100-messenger.js fcSummarize | src/main/0100-messenger.js:178 | 0 |
-| 0185-game-rules.js posAI | src/main/0185-game-rules.js:129 | 25 |
+| 0185-game-rules.js posAI | src/main/0185-game-rules.js:128 | 25 |
 | 0200-skin-shop.js skinAuto | src/main/0200-skin-shop.js:16 | 7 |
 | 0260-new-game/010-draft.js drPolish | src/main/0260-new-game/010-draft.js:148 | 9 |
 | 0260-new-game/010-draft.js drFillChar | src/main/0260-new-game/010-draft.js:167 | 6 |
@@ -196,9 +196,9 @@
 | 0510-actions/090-characters.js handleCharactersAction#5 | src/main/0510-actions/090-characters.js:42 | 0 |
 | 0510-actions/100-images-and-assets.js handleImagesAndAssetsAction | src/main/0510-actions/100-images-and-assets.js:29 | 0 |
 | 0510-actions/100-images-and-assets.js handleImagesAndAssetsAction#2 | src/main/0510-actions/100-images-and-assets.js:92 | 25 |
-| 0530-story-memory.js smExtract#2 | src/main/0530-story-memory.js:14 | 0 |
-| 0530-story-memory.js smExtract#3 | src/main/0530-story-memory.js:15 | 0 |
-| 0530-story-memory.js smExtract#4 | src/main/0530-story-memory.js:16 | 0 |
+| 0530-story-memory.js smExtract#2 | src/main/0530-story-memory.js:11 | 0 |
+| 0530-story-memory.js smExtract#3 | src/main/0530-story-memory.js:12 | 0 |
+| 0530-story-memory.js smExtract#4 | src/main/0530-story-memory.js:13 | 0 |
 | 0535-content-audit.js auditAIFill | src/main/0535-content-audit.js:62 | 27 |
 | modules/combat/050-bridge.js v2GenerateSkills | src/modules/combat/050-bridge.js:292 | 4 |
 | modules/combat/050-bridge.js v2ConceptPrompt | src/modules/combat/050-bridge.js:365 | 0 |

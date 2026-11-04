@@ -1,7 +1,13 @@
 /* ===== 인물 관계도 · 스토리 기억 =====
    관계는 두 사람(대원·NPC·플레이어) 사이의 기록이에요. 로어북처럼 글에 이름이 나오면 그 사람의 관계만 골라 AI에 넣어요. */
 const REL_ME='me';
-function RELS(){ if(!Array.isArray(G.rels)) G.rels=[]; return G.rels; }
+function RELS(){ return gameRead('rels'); } // 읽기 — 바꿀 때는 아래 관계 함수(relPut·relKeep)
+/* 관계 기록 바꾸기(Model — 관계 칸 G.rels는 이 모듈만 씀): 넣기 · 조건에 맞는 것만 남기기 */
+function relPut(r){ gameSlot('rels').push(r); return r; }
+function relKeep(keep){ G.rels=RELS().filter(keep); }
+/* 스토리 삭제 때 관계 정리(storyPurge가 부름 — L: storyLinks, pick: 지울 갈래): 그 스토리에서 생긴 관계와 남은 관계의 그 스토리 기록, 지운 인물의 관계를 빼고 청소(relGC) */
+function relPurgeStory(L,pick){ if(pick.rels){ const gone=new Set(L.rels.filter(L.born).map(r=>r.id)); relKeep(r=>!gone.has(r.id)); RELS().forEach(r=>{ if(r.hist) r.hist=r.hist.filter(h=>!L.src.includes(h.src)); }); mark('meta'); }
+  if(pick.chars){ const cs=new Set(L.chars.map(c=>c.id)); relKeep(r=>!cs.has(r.a)&&!cs.has(r.b)); mark('meta'); } relGC(); }
 function relRef(name){ let n=String(name||'').trim().replace(/^\{|\}$/g,'').replace(/\s*\(.*?플레이어.*?\)$/,''); if(!n) return '';
   const pn=String(P().player||'').trim(); if(n===T('player')||n==='플레이어'||n==='주인공'||n==='나'||(pn&&n===pn&&!G.chars.some(c=>c.name===n))) return REL_ME;
   const c=findSpeaker(n); if(c) return baseChar(c).id; const m=npcBy(n); if(m) return m.id;
@@ -22,14 +28,14 @@ function loreLabel(l){ return l==='if'?'IF 스토리':(l&&charById(l)?'이격 �
 function loreOpts(cur){ return [['','정사 — 관계·기억(로어북)에 반영'],['if','IF 스토리 — 로어북에 반영 안 함'],...G.chars.filter(c=>c.alt&&charById(c.alt)).map(c=>[c.id,'이격 「'+c.name+'」의 기록에만 반영'])]; }
 function relApply(arr,src,quiet,lore){ let n=0; if(lore==='if') return 0; (Array.isArray(arr)?arr:[]).slice(0,40).forEach(x=>{ if(!x) return; let a=relRef(x.a), b=relRef(x.b); if(!a||!b||a===b) return; const m=loreMap(a,b,lore); if(!m) return; [a,b]=m;
     let r=relPair(a,b); const kind=String(x.kind||'').trim().slice(0,16), note=String(x.note||'').trim().slice(0,800), ev=String(x.event||'').trim().slice(0,400);
-    if(!r){ r={id:'r'+uid(),a,b,kind:kind||'아는 사이',note,hist:[],src:String(src||'')}; RELS().push(r); } else { if(kind) r.kind=kind; if(note) r.note=note; if(kind||note) r.sys=false; } relNames(r);
+    if(!r){ r={id:'r'+uid(),a,b,kind:kind||'아는 사이',note,hist:[],src:String(src||'')}; relPut(r); } else { if(kind) r.kind=kind; if(note) r.note=note; if(kind||note) r.sys=false; } relNames(r);
     if(ev) { r.hist=(r.hist||[]).concat([{src:String(src||''),text:ev,at:Date.now()}]).slice(-30); } r.at=Date.now(); n++; });
   if(n&&!quiet) mark('meta'); return n; }
 function relLine(r){ const last=(r.hist||[]).slice(-4).map(h=>(h.src?h.src+': ':'')+h.text).join(' / '); return `- ${relName(r.a)} ↔ ${relName(r.b)}: [${r.kind||'아는 사이'}] ${r.note||''}${last?' (최근: '+last+')':''}`; }
 // 장별 요약(스토리 기억)
 /* 시스템이 맡는 기록: 대본·설정을 읽어 관계와 요약을 채워요(AI 호출 없이) */
 function stageCast(s,withMe){ const set=new Set(); parseScript((s.pre||'')+'\n'+(s.post||'')).forEach(L=>{ if(L.type!=='say'||isMe(L.who)) return; const r=relRef(L.who); if(r&&!r.startsWith('x:')) set.add(r); }); if(withMe&&set.size) set.add(REL_ME); return set; }
-function relNew(a,b,kind,note,src,quiet,stage){ if(!a||!b||a===b||relPair(a,b)) return 0; RELS().push(relNames({id:'r'+uid(),a,b,kind,note:(src&&note?src+': ':'')+note,hist:[],sys:true,at:Date.now(),stage:stage||''})); if(!quiet) mark('meta'); return 1; }
+function relNew(a,b,kind,note,src,quiet,stage){ if(!a||!b||a===b||relPair(a,b)) return 0; relPut(relNames({id:'r'+uid(),a,b,kind,note:(src&&note?src+': ':'')+note,hist:[],sys:true,at:Date.now(),stage:stage||''})); if(!quiet) mark('meta'); return 1; }
 // 관계에 두 사람 이름도 적어 둬요: 나중에 id가 바뀌어도(리롤·가져오기) 이름으로 다시 이어 붙일 수 있게
 function relNames(r){ [['a','an'],['b','bn']].forEach(([k,n])=>{ const o=relObj(r[k]); if(o) r[n]=o.name; }); return r; }
 // 같은 스테이지에 함께 나온 두 사람은 '아는 사이'(플레이어와는 '함께한 사이')로 처음 한 번 기록해요
@@ -68,3 +74,10 @@ function openRelEdit(id){ const r=RELS().find(x=>x.id===id); if(!r) return;
     <label class="f" for="rle_n">설명</label><textarea class="in" id="rle_n" maxlength="240">${esc(r.note||'')}</textarea>
     <label class="f" for="rle_h">있었던 일 (한 줄에 하나, 최근이 아래)</label><textarea class="in" id="rle_h">${esc((r.hist||[]).map(h=>(h.src?h.src+' · ':'')+h.text).join('\n'))}</textarea>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="relsave" data-id="${r.id}">저장</button><button class="btn ghost" data-act="reldel" data-id="${r.id}">이 관계 지우기</button><button class="btn ghost" data-act="relgo" data-r="${esc(RELC)}">돌아가기</button></div>`); }
+/* src/main/0250-story-factory.js에서 옮김 */
+// 관계 청소: 없어진 인물·스테이지에서 생긴 자동 기록, 내용이 다 지워진 빈 기록을 지워요
+function relGC(){ const ok=x=>x===REL_ME||x.startsWith('x:')||!!relObj(x); let fixd=0;
+  RELS().forEach(r=>{ [['a','an'],['b','bn']].forEach(([k,n])=>{ if(ok(r[k])||!r[n]) return; const c=findSpeaker(r[n])||npcBy(r[n]); if(c){ r[k]=baseChar(c).id||c.id; fixd++; } }); if(!r.an||!r.bn) relNames(r); });
+  if(fixd){ const seen=new Map(); relKeep(r=>{ if(r.a===r.b) return false; const k=[r.a,r.b].sort().join('|'); if(seen.has(k)){ const o=seen.get(k); o.hist=[...(o.hist||[]),...(r.hist||[])].slice(-12); return false; } seen.set(k,r); return true; }); mark('meta'); }
+  const n0=RELS().length;
+  relKeep(r=>ok(r.a)&&ok(r.b)&&!(r.stage&&!stageById(r.stage))&&!(!r.sys&&!r.note&&!(r.hist||[]).length&&r.src)); if(RELS().length!==n0) mark('meta'); return n0-RELS().length; }

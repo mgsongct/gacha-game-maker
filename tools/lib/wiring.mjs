@@ -73,7 +73,16 @@ export function schemaKeys(text) { const out = new Set(), stack = []; let last =
 // 기능이 그 키를 "없으면 기본값"으로 읽는가: 기능 함수가 그 키에 직접 대입(지연 초기화)하거나, 읽는 곳이 ||·??·Object.assign(기본값, 키) 안
 // 돌려주는 값: false(기본값 없음) · 'empty'(기본값이 빈 값 — [] · {} · 빈 배열만 든 객체: 기능이 비어 있는 채로 시작) · 'value'(쓸 만한 공통 기본값)
 const deepEmpty = v => v == null || v === '' || (Array.isArray(v) && !v.length) || (typeof v === 'object' && !Array.isArray(v) && Object.values(v).every(deepEmpty));
+// 칸 정의 표의 기본값: 기능 함수가 칸 이름 접근(gameRead('meta.x')·gameSlot·progRead('x')·progSlot)으로 그 키를 다루면 표(GAME_SLOTS·PROG_SLOTS)의 make가 돌려주는 값 — 없으면 null
+const SLOT_CALL = /^(game|prog)(Slot|Read)$/;
+export function slotDefault(fns, featureFns, key) { for (const fk of featureFns) { const f = fns.get(fk); if (!f) continue; let table = null, slot = null;
+    walk(f.node, n => { if (table || n.type !== 'call_expression') return; const fn = n.childForFieldName('function')?.text || '', a = n.childForFieldName('arguments')?.namedChildren[0]; if (!SLOT_CALL.test(fn) || a?.type !== 'string') return; const g = fn.startsWith('game'), name = a.text.slice(1, -1); if ((g ? 'G.' : 'P().') + name === key) { table = g ? 'GAME_SLOTS' : 'PROG_SLOTS'; slot = name; } });
+    if (!table) continue; let root = f.node, mk = null; while (root.parent) root = root.parent;
+    walk(root, n => { if (mk || n.type !== 'variable_declarator' || n.childForFieldName('name')?.text !== table) return; for (const p of n.childForFieldName('value')?.namedChildren || []) { if (p.type !== 'pair' || p.childForFieldName('key')?.text.replace(/^['"]|['"]$/g, '') !== slot) continue; mk = (p.childForFieldName('value')?.namedChildren || []).find(q => q.type === 'pair' && q.childForFieldName('key')?.text === 'make')?.childForFieldName('value') || null; } });
+    if (!mk) return undefined; const body = FNT.has(mk.type) ? mk.childForFieldName('body') : null; return body && body.type !== 'statement_block' ? literal(body) : undefined; }
+  return null; }
 export function lazyDefault(fns, featureFns, key, sf) { const leaf = key.split('.').pop(); let kind = false; const see = v => { kind = v === undefined || !deepEmpty(v) ? 'value' : (kind || 'empty'); };
+  { const sd = slotDefault(fns, featureFns, key); if (sd !== null) see(sd); }
   // Object.assign(기본값…, 이 키) — 앞 인자 중 식(상수·호출)이나 비지 않은 리터럴이 있으면 쓸 만한 기본값
   const assignDefaults = (arg) => { const args = arg.parent; if (args?.type !== 'arguments' || !/^Object\.assign$/.test(args.parent?.childForFieldName('function')?.text || '')) return null; const before = args.namedChildren.filter(a => a.startIndex < arg.startIndex); if (!before.length) return null; return before.some(a => { const v = literal(a); return v === undefined || !deepEmpty(v); }) ? 'value' : 'empty'; };
   for (const fk of featureFns) { const f = fns.get(fk); if (!f) continue;

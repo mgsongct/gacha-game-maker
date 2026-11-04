@@ -1,5 +1,5 @@
 {
- "at": "2026-11-04T04:44:16.964Z",
+ "at": "2026-11-04T05:14:06.599Z",
  "ref": null,
  "sites": [
   {
@@ -2453,7 +2453,7 @@
      "no": [
       "「(지워진 인물)」"
      ],
-     "loc": "src/main/0450-relations-memory.js:11",
+     "loc": "src/main/0450-relations-memory.js:17",
      "seen": {
       "yes": 0,
       "no": 0
@@ -3207,7 +3207,7 @@
      "no": [
       "「(지워진 인물)」"
      ],
-     "loc": "src/main/0450-relations-memory.js:11",
+     "loc": "src/main/0450-relations-memory.js:17",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4086,7 +4086,7 @@
      "no": [
       "「(지워진 인물)」"
      ],
-     "loc": "src/main/0450-relations-memory.js:11",
+     "loc": "src/main/0450-relations-memory.js:17",
      "seen": {
       "yes": 0,
       "no": 0
@@ -6435,7 +6435,7 @@
       "「가 더 공개돼요)」"
      ],
      "no": [],
-     "loc": "src/main/0300-codex.js:20",
+     "loc": "src/main/0300-codex.js:24",
      "seen": {
       "yes": 0,
       "no": 0
@@ -6859,7 +6859,7 @@
       "「가 더 공개돼요)」"
      ],
      "no": [],
-     "loc": "src/main/0300-codex.js:20",
+     "loc": "src/main/0300-codex.js:24",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11857,7 +11857,7 @@
       "「이 게임 그림체」"
      ],
      "no": [],
-     "loc": "src/main/0020-ai-connect.js:385",
+     "loc": "src/main/0020-ai-connect.js:387",
      "seen": {
       "yes": 0,
       "no": 0

@@ -3,7 +3,7 @@
    먼저 설계해 두고, 장을 쓸 때 그 장에 필요한 것만(막 목표·심을 복선·지금 밝힐 반전·아직 숨길 것·분기 결과) AI에 넘겨요.
    G.world.plan = {logline,theme,ending,acts[{name,upto,goal}],twists[{id,truth,reveal,clues[{ch,hint}],who}],branches[{id,at,question,options[{label,result}]}],arcs[{name,start,change,end}],notes}
    분기: 대본에 "[분기: id]" 다음 줄의 선택지를 고르면 P().flags[id]=번호(1부터) → 다음 장을 쓸 때 반영. 문서: docs/research/story-design.md */
-function PLAN(){ const w=G.world; if(!w.plan||typeof w.plan!=='object') w.plan={}; const p=w.plan; for(const k of ['acts','twists','branches','arcs']) if(!Array.isArray(p[k])) p[k]=[]; return p; }
+function PLAN(){ return gameRead('world.plan'); } // 읽기 — 바꿀 때는 gameSlot('world.plan')
 function planHas(){ const p=G.world.plan; return !!(p&&(p.logline||(p.acts||[]).length||(p.twists||[]).length)); }
 function planActOf(n){ return PLAN().acts.find(a=>n<=(+a.upto||999))||PLAN().acts.at(-1)||null; }
 function storyFlag(id,n,label){ const p=P(); p.flags=p.flags||{}; p.flags[id]={n,label:String(label||'').slice(0,40),at:Date.now()}; mark('prog'); toast(`선택이 기록됐어요 — 이후 이야기에 반영돼요`); }
@@ -17,7 +17,7 @@ function planCheck(){ const p=PLAN(), main=G.chapters.filter(ch=>ch.kind==='main
   return out; }
 async function planAI(mode,rep,instruction){ const p=PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').length;
   const r=await aiJSON(planAIPrompt({mode,p,n,instruction}),rep,'complex');
-  if(!r) return false; const old=PLAN(), clean=planClean(r);
+  if(!r) return false; const old=gameSlot('world.plan'), clean=planClean(r);
   if(mode==='extend'){ old.acts.push(...clean.acts.filter(a=>+a.upto>(+(old.acts.at(-1)||{}).upto||0))); old.twists.push(...clean.twists.filter(t=>!old.twists.some(x=>x.id===t.id))); old.branches.push(...clean.branches.filter(b=>!old.branches.some(x=>x.id===b.id))); clean.arcs.forEach(a=>{ if(!old.arcs.some(x=>x.name===a.name)) old.arcs.push(a); }); }
   else G.world.plan=Object.assign(old,clean,{notes:old.notes||''});
   mark('world'); return true; }
@@ -43,15 +43,15 @@ function openPlan(){ const p=PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').l
   <label class="f" style="margin-top:8px">AI 추가 지시 (선택)</label><input class="in" id="pl_ins" placeholder="예: 3막에서 동료 한 명의 배신을 넣어 줘">
   <div class="row" style="margin-top:12px;flex-wrap:wrap;gap:6px"><button class="btn" data-act="plansave">저장</button><button class="btn ghost" data-act="planai" data-k="${planHas()?'improve':'new'}">${planHas()?'AI로 다듬기':'AI로 설계'}</button>${planHas()?'<button class="btn ghost" data-act="planai" data-k="extend">AI로 다음 막 잇기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>
   <p class="muted" style="font-size:.78rem;margin-top:8px">새 장(메인 스토리)을 만들 때 이 설계에서 그 장에 필요한 것만 AI에 넘겨요. 분기는 대본의 [분기: id] 다음 선택지로 기록되고, 이후 장에 반영돼요.</p>`); }
-function planRead(){ const p=PLAN(), lines=v=>String(v||'').split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(x=>x[0]); document.querySelectorAll('#modal [data-pl]').forEach(el=>{ const k=el.dataset.pl.split('.'), v=el.type==='checkbox'?el.checked:el.value;
+function planRead(){ const p=gameSlot('world.plan'), lines=v=>String(v||'').split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(x=>x[0]); document.querySelectorAll('#modal [data-pl]').forEach(el=>{ const k=el.dataset.pl.split('.'), v=el.type==='checkbox'?el.checked:el.value;
   if(k.length===1){ p[k[0]]=String(v).trim(); return; } const arr={a:'acts',t:'twists',b:'branches',r:'arcs'}[k[0]], o=p[arr][+k[1]]; if(!o) return;
   if(k[2]==='clues') o.clues=lines(v).map(([ch,hint])=>({ch:Math.max(1,+ch||1),hint:hint||''})).filter(c=>c.hint); else if(k[2]==='options') o.options=lines(v).map(([label,result])=>({label,result:result||''}));
   else if(['upto','reveal','at'].includes(k[2])) o[k[2]]=Math.max(1,+v||1); else o[k[2]]=typeof v==='boolean'?v:String(v).trim(); }); }
 document.addEventListener('click',async e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
   if(a==='planopen') openPlan();
   else if(a==='plansave'){ planRead(); mark('world'); toast('시나리오 설계를 저장했어요'); openPlan(); }
-  else if(a==='planadd'){ planRead(); const p=PLAN(), k=el.dataset.k, n=G.chapters.filter(ch=>ch.kind==='main').length; p[k].push(k==='acts'?{name:'',upto:n+4,goal:''}:k==='twists'?{id:'t'+uid().slice(0,4),truth:'',reveal:n+3,who:'',clues:[]}:k==='branches'?{id:'b'+uid().slice(0,4),at:n+1,question:'',options:[]}:{name:'',start:'',change:'',end:''}); openPlan(); }
-  else if(a==='plandel'){ planRead(); PLAN()[el.dataset.k].splice(+el.dataset.i,1); mark('world'); openPlan(); }
+  else if(a==='planadd'){ planRead(); const p=gameSlot('world.plan'), k=el.dataset.k, n=G.chapters.filter(ch=>ch.kind==='main').length; p[k].push(k==='acts'?{name:'',upto:n+4,goal:''}:k==='twists'?{id:'t'+uid().slice(0,4),truth:'',reveal:n+3,who:'',clues:[]}:k==='branches'?{id:'b'+uid().slice(0,4),at:n+1,question:'',options:[]}:{name:'',start:'',change:'',end:''}); openPlan(); }
+  else if(a==='plandel'){ planRead(); gameSlot('world.plan')[el.dataset.k].splice(+el.dataset.i,1); mark('world'); openPlan(); }
   else if(a==='planai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } planRead(); if(await planAI(el.dataset.k,uiProg(el),($('#pl_ins')||{}).value||'')){ toast('시나리오를 설계했어요'); openPlan(); } } });
 /* 시나리오는 게임이 구동될 때 AI가 처리(자동이 기본): 장을 쓰기 전에 설계가 없으면 처음부터, 설계된 막이 이번 장 앞에서 끝났으면 다음 막을 이어서 설계.
    사용자는 설정 → 시나리오 설계에서 직접 고치거나 AI에 추가 지시할 수 있어요. 구독 게임·글 AI 없음이면 하지 않음 */

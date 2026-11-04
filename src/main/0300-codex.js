@@ -2,7 +2,11 @@
 const CX_CATS=[['all','전체'],['world','세계'],['faction','세력'],['person','인물'],['place','장소'],['item','물건'],['term','용어'],['history','역사'],['enemy','적']];
 const CX_LABEL=Object.fromEntries(CX_CATS);
 let CXCAT='all';
-function cxStore(){ if(!Array.isArray(G.world.codex)) G.world.codex=[]; return G.world.codex; }
+function cxStore(){ return gameRead('world.codex'); } // 읽기 — 바꿀 때는 아래 기록 함수(cxPut·cxKeep·cxUpsert)
+/* 도감 기록 바꾸기(Model — 도감 칸 G.world.codex는 이 모듈만 씀): 넣기 · 조건에 맞는 것만 남기기 · 제목으로 고치거나 넣기 */
+function cxPut(x){ gameSlot('world.codex').push(x); return x; }
+function cxKeep(keep){ G.world.codex=cxStore().filter(keep); }
+function cxUpsert(title,body,cat){ const x=cxStore().find(e=>e.title===title); if(x){ x.body=body; return x; } return cxPut({cat:cat||'term',title,body}); }
 function cxNotes(){ if(!G.world.codexNotes||typeof G.world.codexNotes!=='object') G.world.codexNotes={}; return G.world.codexNotes; }
 function libSrc(kind,name){ const l=G.lib.find(x=>x.kind===kind&&x.name===name); return l?imgSrc(l):null; }
 function mainStages(){ const a=[]; G.chapters.filter(ch=>ch.kind==='main').forEach((ch,ci)=>ch.stages.forEach((s,si)=>a.push({id:s.id,code:(ci+1)+'-'+(si+1),title:s.title,ch}))); return a; }
@@ -84,7 +88,7 @@ async function cxDiscover(t){
   const r=await aiJSON(cxDiscoverPrompt({have,st}),t);
   if(!r||!Array.isArray(r.entries)) return 0;
   let n=0; r.entries.slice(0,8).forEach(x=>{ if(!x||!x.title||!x.body) return; const cat=CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term'; const sid=codeToStage(x.after);
-    cxStore().push({id:'cx'+uid(),cat,title:String(x.title).slice(0,40),body:String(x.body),unlock:sid?{type:'clear',value:sid}:{type:'start'},src:'ai',at:Date.now()}); n++; });
+    cxPut({id:'cx'+uid(),cat,title:String(x.title).slice(0,40),body:String(x.body),unlock:sid?{type:'clear',value:sid}:{type:'start'},src:'ai',at:Date.now()}); n++; });
   mark('world'); return n;
 }
 async function cxDeepen(key,t){
@@ -94,4 +98,4 @@ async function cxDeepen(key,t){
   const N=cxNotes(); (N[key]=N[key]||[]).push({text:String(r.text),at:mainStages().filter(s=>P().cleared[s.id]).map(s=>s.code).pop()||'시작 전'}); mark('world'); return true;
 }
 function cxFromChapter(r,ch){ if(!r||!Array.isArray(r.codex)) return; const last=ch.stages[ch.stages.length-1];
-  r.codex.slice(0,3).forEach(x=>{ if(!x||!x.title||!x.body) return; cxStore().push({id:'cx'+uid(),cat:CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term',title:String(x.title).slice(0,40),body:String(x.body),unlock:last?{type:'clear',value:last.id}:{type:'start'},src:'ai',at:Date.now()}); }); mark('world'); }
+  r.codex.slice(0,3).forEach(x=>{ if(!x||!x.title||!x.body) return; cxPut({id:'cx'+uid(),cat:CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term',title:String(x.title).slice(0,40),body:String(x.body),unlock:last?{type:'clear',value:last.id}:{type:'start'},src:'ai',at:Date.now()}); }); mark('world'); }

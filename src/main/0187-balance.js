@@ -3,7 +3,7 @@
          ② AI가 쓴 능력치는 범위만 맞춰서(체력 600~2000 등) 같은 희귀도끼리도 들쭉날쭉
    G.meta.balance: creep(manual|fixed|auto) baseGen per maxGen released · catchUp(off|boost|remaster) pct max lag · tol(허용 편차 %) autoNorm(생성 시 보정)
    문서: docs/research/balance.md */
-function BAL(){ const d={creep:'manual',baseGen:1,per:5,maxGen:5,released:0,catchUp:'off',pct:8,max:30,lag:1,tol:15,autoNorm:true}; const m=G.meta; if(!m.balance||typeof m.balance!=='object') m.balance={}; return Object.assign({},d,m.balance); }
+function BAL(){ const d={creep:'manual',baseGen:1,per:5,maxGen:5,released:0,catchUp:'off',pct:8,max:30,lag:1,tol:15,autoNorm:true}; return Object.assign({},d,gameRead('meta.balance')); } // 읽기(기본값 위에 바꾼 값) — 바꿀 때는 gameSlot('meta.balance')
 function balanceGeneration(){ const b=BAL(); if(b.creep==='fixed') return Math.max(1,Math.min(5,+b.baseGen||1)); if(b.creep==='auto') return Math.max(1,Math.min(+b.maxGen||5,(+b.baseGen||1)+Math.floor((+b.released||0)/Math.max(1,+b.per||5)))); return null; }
 function balanceOptions(){ const b=BAL(); return b.catchUp==='boost'?{genBoost:{cur:v2CurrentGeneration(),pct:+b.pct||0,max:+b.max||0}}:{}; }
 const balPower=s=>Math.round(s.hp/5+s.atk*3+s.def*2+s.spd); // 캐릭터 화면 전투력과 같은 식(성장 전 기본값)

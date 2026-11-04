@@ -31,17 +31,10 @@ function storyLinks(ids,ch,ev){ ids=new Set(ids); const stg=[]; G.chapters.forEa
   return {threads,codex,libs,chars,rels,src,ids:[...ids],born}; }
 function storyPurge(L,pick){ const P0=P();
   if(pick.threads){ const tid=new Set(L.threads.map(t=>t.id)); G.threads=G.threads.filter(t=>!tid.has(t.id)); tid.forEach(id=>{ delete P0.inbox[id]; mark('t:'+id); }); }
-  if(pick.codex){ const xs=new Set(L.codex); G.world.codex=cxStore().filter(x=>!xs.has(x)); mark('world'); }
+  if(pick.codex){ const xs=new Set(L.codex); cxKeep(x=>!xs.has(x)); mark('world'); }
   if(pick.libs){ const ls=new Set(L.libs); G.lib=G.lib.filter(l=>!ls.has(l)); L.libs.forEach(l=>mark('l:'+l.id)); }
-  if(pick.rels){ const gone=new Set(L.rels.filter(L.born).map(r=>r.id)); G.rels=RELS().filter(r=>!gone.has(r.id)); RELS().forEach(r=>{ if(r.hist) r.hist=r.hist.filter(h=>!L.src.includes(h.src)); }); mark('meta'); }
-  if(pick.chars){ const cs=new Set(L.chars.map(c=>c.id)); G.chars=G.chars.filter(c=>!cs.has(c.id)); G.banners.forEach(bn=>{ bn.pickup=(bn.pickup||[]).filter(x=>!cs.has(x)); if(bn.pool&&bn.pool.ids) bn.pool.ids=bn.pool.ids.filter(x=>!cs.has(x)); }); G.chapters.forEach(ch=>{ if(ch.recruits) ch.recruits=ch.recruits.filter(x=>!cs.has(x)); }); G.threads=G.threads.filter(t=>!cs.has(t.charId)); G.rels=RELS().filter(r=>!cs.has(r.a)&&!cs.has(r.b)); cs.forEach(id=>mark('c:'+id)); mark('meta'); }
-  relGC(); mark('prog'); }
-// 관계 청소: 없어진 인물·스테이지에서 생긴 자동 기록, 내용이 다 지워진 빈 기록을 지워요
-function relGC(){ const ok=x=>x===REL_ME||x.startsWith('x:')||!!relObj(x); let fixd=0;
-  RELS().forEach(r=>{ [['a','an'],['b','bn']].forEach(([k,n])=>{ if(ok(r[k])||!r[n]) return; const c=findSpeaker(r[n])||npcBy(r[n]); if(c){ r[k]=baseChar(c).id||c.id; fixd++; } }); if(!r.an||!r.bn) relNames(r); });
-  if(fixd){ const seen=new Map(); G.rels=RELS().filter(r=>{ if(r.a===r.b) return false; const k=[r.a,r.b].sort().join('|'); if(seen.has(k)){ const o=seen.get(k); o.hist=[...(o.hist||[]),...(r.hist||[])].slice(-12); return false; } seen.set(k,r); return true; }); mark('meta'); }
-  const n0=RELS().length;
-  G.rels=RELS().filter(r=>ok(r.a)&&ok(r.b)&&!(r.stage&&!stageById(r.stage))&&!(!r.sys&&!r.note&&!(r.hist||[]).length&&r.src)); if(RELS().length!==n0) mark('meta'); return n0-RELS().length; }
+  if(pick.chars){ const cs=new Set(L.chars.map(c=>c.id)); G.chars=G.chars.filter(c=>!cs.has(c.id)); G.banners.forEach(bn=>{ bn.pickup=(bn.pickup||[]).filter(x=>!cs.has(x)); if(bn.pool&&bn.pool.ids) bn.pool.ids=bn.pool.ids.filter(x=>!cs.has(x)); }); G.chapters.forEach(ch=>{ if(ch.recruits) ch.recruits=ch.recruits.filter(x=>!cs.has(x)); }); G.threads=G.threads.filter(t=>!cs.has(t.charId)); cs.forEach(id=>mark('c:'+id)); mark('meta'); }
+  relPurgeStory(L,pick); mark('prog'); }
 let SDEL=null;
 function openStoryDel(o){ // o: {title, ids, ch, ev, run:()=>void(실제 스토리 삭제)}
   const L=storyLinks(o.ids,o.ch,o.ev); SDEL={o,L};

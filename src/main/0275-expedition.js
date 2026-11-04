@@ -2,7 +2,7 @@
 /* 엔진: modules/app/030-expedition.js (GGMExpedition). 설정: G.meta.expedition(바꾼 값만) · 진행: P().exped
    combat 모드는 기존 파견(dispHTML·dispOffer) 그대로. 나머지 모드는 이 파일의 화면을 써요. 문서: docs/research/expedition.md */
 const EX_MODE_LABEL={combat:['전투형 원정','지역에 보내 자원을 가져와요 (칸코레·소녀전선류)'],idol:['방송 출연','방송국·스폰서 일정에 나가 보수와 인지도를 얻어요 (아이돌 육성류)'],streamer:['콘텐츠 방송','플랫폼을 골라 영상·라이브·숏폼을 올려 수익과 구독자를 모아요 (스트리머·버튜버류)'],business:['경영','파트에 배치해 일하게 하고, 전체 실적과 평판으로 수익이 나와요 (상점·기업 경영류)']};
-function exMeta(){ if(!G.meta.expedition||typeof G.meta.expedition!=='object') G.meta.expedition={mode:'combat'}; return G.meta.expedition; }
+function exMeta(){ return gameRead('meta.expedition'); } // 읽기 — 바꿀 때는 gameSlot('meta.expedition')
 function EXC(){ return GGMExpedition.config(exMeta()); }
 function exMode(){ return (G.meta.expedition&&G.meta.expedition.mode)||'combat'; }
 /* 원정 칸 형식 맞춤(빠진 하위 칸: 인지도·컨디션·일정·제안·연속·기록·경영, 기록 시작 시각) + 방송 출연 모드면 오늘의 출연 제안(보유 캐릭터마다 하루 한 번, 무작위라 만들어 저장) — 진행 칸 exped의 정의(0070 PROG_SLOTS)가 그리기 전에 부름 */

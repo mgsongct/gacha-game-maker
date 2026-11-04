@@ -31,6 +31,21 @@ function progRead(k){ const s=PROG_SLOTS[k], v=G.prog[k]; if((s.ok||progObj)(v)&
   const n=s.make(v); if(s.fill) s.fill(n,Object.assign({},G.prog)); return s.now?s.now(n):n; } /* 없거나 날이 바뀐 칸: 새로 만든 값에 형식 맞춤까지 — 저장하지 않음(진행 칸은 사본을 넘김) */
 /* 그리기 전·주기 타이머(Controller): 하루/주 단위 칸은 늘 있게, 있는 칸은 날이 바뀌었으면 새로·형식 맞춤 */
 function progTick(){ if(!G||!G.prog) return; for(const k in PROG_SLOTS){ const s=PROG_SLOTS[k], on=typeof s.tick==='function'?s.tick():s.tick; if(on||(G.prog[k]!==undefined&&(s.stale||s.fill))) progSlot(k); } } /* 맞춰 저장(progSlot) — 읽기(progRead)가 아님 */
+/* ===== 게임 칸 정의(G.meta·G.world·G의 설정·기록 칸 — 기본값·형식): 진행 칸(PROG_SLOTS)과 같은 꼴 — 정의 한곳(CLAUDE.md §0-2 상태·데이터)
+   읽기 gameRead(칸) = 상태 그대로(없으면 기본값을 돌려주기만 — 화면·조회는 이것), 쓰기 gameSlot(칸) = 맞춰 저장하고 돌려줌(바꾸는 쪽), 불러오기(fix)가 모든 칸을 맞춰 둠 ===== */
+const GAME_SLOTS={
+  'meta.expedition':{make:()=>({mode:'combat'})}, // 원정 모드(0275)
+  'meta.rules':{make:()=>({})}, // 게임 규칙(0185)
+  'meta.balance':{make:()=>({})}, // 밸런스 설정(0187 — 바꾼 값만)
+  'meta.storyMemory':{make:()=>({version:1,notes:''})}, // 스토리 기억(0530)
+  'rels':{make:()=>[],ok:Array.isArray}, // 인연(0450)
+  'world.codex':{make:()=>[],ok:Array.isArray}, // 도감 기록(0300)
+  'world.plan':{make:()=>({acts:[],twists:[],branches:[],arcs:[]}),ok:p=>progObj(p)&&['acts','twists','branches','arcs'].every(k=>Array.isArray(p[k]))} // 시나리오 설계(0465)
+};
+const gameAt=(path,g)=>{ const ks=path.split('.'), last=ks.pop(); let o=g; for(const k of ks) o=o[k]; return [o,last]; };
+function gameSlot(path,g=G){ const s=GAME_SLOTS[path], [o,k]=gameAt(path,g), v=o[k]; if(!(s.ok||progObj)(v)) o[k]=path==='world.plan'&&progObj(v)?Object.assign(s.make(),v,Object.fromEntries(['acts','twists','branches','arcs'].map(x=>[x,Array.isArray(v[x])?v[x]:[]]))):s.make(); return o[k]; }
+function gameRead(path){ const s=GAME_SLOTS[path], [o,k]=gameAt(path,G), v=o[k]; return (s.ok||progObj)(v)?v:s.make(); }
+function gameSlotsFix(g){ for(const k in GAME_SLOTS) gameSlot(k,g); }
 const PJKEY='starfall-projects';
 function PJ(){let d=null;try{d=JSON.parse(appStorage.getItem(PJKEY));}catch(e){} if(!d||!Array.isArray(d.list)){d={active:'main',list:[{id:'main',title:'낙성계약'}]};} return d;}
 function pjKey(id){return id==='main'?'starfall-contract-v1':'starfall-contract-v1-'+id;}
@@ -138,7 +153,7 @@ function fix(g){
   if(!(g.meta.curve>=3)){ g.chapters.filter(ch=>ch.kind==='main').forEach((ch,k)=>rebalanceChapter(ch,k)); g.meta.curve=3; g.__curveNew=true; }
   for(const c of g.chars)if(GGMCombat.migrateBaseStats(c))g.__curveNew=true;
   if(g.chars.some(c=>c.roleSpeedVersion!==1))g.__curveNew=true;g.chars.forEach(c=>v2Ensure(c)); g.meta.combatVersion=2;
-  g.ver=VER;
+  gameSlotsFix(g); g.ver=VER;
   try{ repairRefs(g); }catch(e){}
   if(naiBlocksGame(g))g.__curveNew=true;
   return g;

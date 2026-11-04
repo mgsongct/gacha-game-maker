@@ -205,6 +205,8 @@ async function geminiCall(url,hdr,prompt,tier,imgs,options={}){
   const text=((cand.content&&cand.content.parts)||[]).filter(x=>!x.thought).map(x=>x.text||'').join('');
   try{ return parseLoose(text); }catch(e){ throw {code:'invalid_json',message:cand.finishReason==='MAX_TOKENS'?'응답이 길이 제한에 걸렸어요':''}; }
 }
+/* 요청 단계 알림(Model → 듣는 쪽은 창 이벤트로 받음: ggm-ai {phase:start·ok·fail, prompt, tier·error} — 스토리 기억(0530)이 최근 요청을 기록) */
+function aiNotify(phase,prompt,extra){ dispatchEvent(new CustomEvent('ggm-ai',{detail:Object.assign({phase,prompt},extra)})); }
 async function aiOne(p,prompt,tier,imgs,options={}){
   v2CheckCancelled(options.signal);
   imgs=(imgs||[]).filter(x=>x&&x.data);
@@ -214,7 +216,7 @@ async function aiOne(p,prompt,tier,imgs,options={}){
   const max={quick:2000,default:8000,complex:16000}[tier];
   const cmax={quick:4000,default:16000,complex:32000}[tier];
   const P2=aiOneP2Text({prompt});
-  smRecord(P2,tier);
+  aiNotify('start',P2,{tier});
   const CC=imgs.length?[...imgs.map(i=>({type:'image',source:{type:'base64',media_type:i.mime,data:i.data}})),{type:'text',text:P2}]:P2;
   const OC=imgs.length?[...imgs.map(i=>({type:'image_url',image_url:{url:`data:${i.mime};base64,${i.data}`}})),{type:'text',text:P2}]:P2;
   if(p.type==='anthropic') return claudeMsg('https://api.anthropic.com/v1/messages',{'x-api-key':p.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},{model,max_tokens:cmax,messages:[{role:'user',content:CC}]},tier,options);
@@ -252,8 +254,8 @@ async function aiCall(prompt,tier,imgs,options={}){
   for(const p of order){
     const t0=Date.now(), mdl=(tier==='quick'&&p.quick)||p.model||(DEFM[defKey(p)]||[])[0]||'', base={who:p.name||AITYPE[p.type],model:mdl,tier,req:String(prompt).slice(0,600),reqLen:String(prompt).length}; AILAST='';
     const rs=()=>AILAST.length>1400?AILAST.slice(0,900)+'\n…(가운데 생략)…\n'+AILAST.slice(-400):AILAST;
-    try{ let r; try{ r=await aiOne(p,prompt,tier,imgs,options); }catch(e0){ current();if(options.managedRetry||options.signal?.aborted||!(e0&&e0.code==='invalid_json')) throw e0; aiLog(Object.assign({},base,{ok:false,ms:Date.now()-t0,err:'invalid_json · 형식을 강조해서 한 번 더 요청해요',res:rs(),resLen:AILAST.length})); r=await aiOne(p,prompt+JSON_STRICT,tier,imgs,options); } current();aiLog(Object.assign(base,{ok:true,ms:Date.now()-t0,res:rs(),resLen:AILAST.length}));if(String(prompt).includes('【스토리 참조:')&&smState().latestRequest){smState().latestRequest.status='응답 수신';mark('meta');} if(p!==act) toast(`${p.name}(으)로 대신 썼어요`); return r; }
-    catch(e){current();if(String(prompt).includes('【스토리 참조:')&&smState().latestRequest){smState().latestRequest.status='실패: '+String(e.message||e.code||e);mark('meta');}if(options.signal?.aborted)throw v2AbortError(); last=e; aiLog(Object.assign(base,{ok:false,ms:Date.now()-t0,err:`${(e&&e.code)||'오류'}${e&&e.code&&AIERR[e.code]?' ('+AIERR[e.code]+')':''}${e&&e.message?' · '+String(e.message).slice(0,300):''}`,res:rs(),resLen:AILAST.length})); if(imgs&&imgs.length&&!['no_ai','bad_key','refused'].includes(e&&e.code)){ try{ const r=await aiOne(p,prompt+'\n(첨부한 사진은 이 AI가 읽지 못했다. 사진 내용을 지어내지 않는다.)',tier,null,options);current();toast('이 AI는 사진을 읽지 못해서 글로만 답했어요'); return r; }catch(e2){ last=e2; } } }
+    try{ let r; try{ r=await aiOne(p,prompt,tier,imgs,options); }catch(e0){ current();if(options.managedRetry||options.signal?.aborted||!(e0&&e0.code==='invalid_json')) throw e0; aiLog(Object.assign({},base,{ok:false,ms:Date.now()-t0,err:'invalid_json · 형식을 강조해서 한 번 더 요청해요',res:rs(),resLen:AILAST.length})); r=await aiOne(p,prompt+JSON_STRICT,tier,imgs,options); } current();aiLog(Object.assign(base,{ok:true,ms:Date.now()-t0,res:rs(),resLen:AILAST.length}));aiNotify('ok',prompt); if(p!==act) toast(`${p.name}(으)로 대신 썼어요`); return r; }
+    catch(e){current();aiNotify('fail',prompt,{error:String(e.message||e.code||e)});if(options.signal?.aborted)throw v2AbortError(); last=e; aiLog(Object.assign(base,{ok:false,ms:Date.now()-t0,err:`${(e&&e.code)||'오류'}${e&&e.code&&AIERR[e.code]?' ('+AIERR[e.code]+')':''}${e&&e.message?' · '+String(e.message).slice(0,300):''}`,res:rs(),resLen:AILAST.length})); if(imgs&&imgs.length&&!['no_ai','bad_key','refused'].includes(e&&e.code)){ try{ const r=await aiOne(p,prompt+'\n(첨부한 사진은 이 AI가 읽지 못했다. 사진 내용을 지어내지 않는다.)',tier,null,options);current();toast('이 AI는 사진을 읽지 못해서 글로만 답했어요'); return r; }catch(e2){ last=e2; } } }
   }
   throw last;
 }

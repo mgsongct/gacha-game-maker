@@ -5,7 +5,7 @@
    applyMeta() → rulesApply()로 BEATS·GGMCombat 표에 반영, v2Options() → rulesOptions()로 전투·밸런스 검사(워커 포함)에 넘겨요.
    포지션: 전투 엔진의 기본형(base: atk·def·sup)을 하나 고르고, 그 위에 기능(t)을 얹어요. 캐릭터는 c.pos(포지션 id)와 c.role(=base)
    문서: docs/research/game-rules.md */
-function RULESM(){ if(!G.meta.rules||typeof G.meta.rules!=='object') G.meta.rules={}; return G.meta.rules; }
+function RULESM(){ return gameRead('meta.rules'); } // 읽기 — 바꿀 때는 gameSlot('meta.rules')
 const RULE_STATS=[['hp','체력'],['atk','공격'],['def','방어'],['spd','속도']];
 const POS_TRAITS=[['hp','체력 %'],['atk','공격 %'],['def','방어 %'],['spd','속도 %'],['dmg','주는 피해 %'],['taken','받는 피해 %'],['heal','회복량 %'],['crit','치명타 %p'],['sp','시작 SP'],['threat','위협도 %']];
 const REACT_TYPES=[['amp','피해 증폭(배율)'],['burst','폭발(공격력×값 추가 피해)'],['stun','기절(초)'],['vuln','취약(받는 피해 +값%)']];
@@ -29,7 +29,7 @@ function rulesBeats(){ const r=RULESM(), E=G.meta.elems.map(e=>e.n);
   if(Array.isArray(r.beatIdx)&&r.beatIdx.length===E.length){ const o={}; E.forEach((n,i)=>{ const j=+r.beatIdx[i]; if(j>=0&&j<E.length&&j!==i) o[n]=E[j]; }); return o; } // 예전 저장(이번 버전 전)
   const o={}; E.forEach((n,i)=>{ o[n]=E[(i+1)%E.length]; }); return o; }
 // 속성 이름이 바뀌면(게임 정의 편집 등) 이름으로 저장된 상성·상성표·반응·관계도 같이 바꿔요
-function rulesRename(map){ const r=RULESM(), f=n=>map[n]||n; if(r.beats){ const o={}; Object.entries(r.beats).forEach(([a,b])=>{ o[f(a)]=f(b); }); r.beats=o; }
+function rulesRename(map){ const r=gameSlot('meta.rules'), f=n=>map[n]||n; if(r.beats){ const o={}; Object.entries(r.beats).forEach(([a,b])=>{ o[f(a)]=f(b); }); r.beats=o; }
   if(r.grid){ const g={}; Object.entries(r.grid).forEach(([a,row])=>{ g[f(a)]={}; Object.entries(row||{}).forEach(([b,v])=>{ g[f(a)][f(b)]=v; }); }); r.grid=g; }
   (r.reactions||[]).forEach(x=>{ x.a=f(x.a); x.b=f(x.b); }); (r.rel||[]).forEach(x=>{ if(x.by==='elem'){ x.a=f(x.a); x.b=f(x.b); } }); }
 function rulesApply(){ const b=rulesBeats(); Object.keys(BEATS).forEach(k=>delete BEATS[k]); Object.assign(BEATS,b); GGMCombat.applyRules(RULESM()); }
@@ -91,7 +91,7 @@ function rulesRead(){ const R=RD; if(!R) return; document.querySelectorAll('#mod
   else if(p[0]==='rd') R.roleDesc[p[1]]=v; else if(p[0]==='rb'){ R.roleBase[p[1]]=R.roleBase[p[1]]||{}; if(v==='') delete R.roleBase[p[1]][p[2]]; else R.roleBase[p[1]][p[2]]=+v; }
   else if(p[0]==='rm'){ R.rarityMul[p[1]]=R.rarityMul[p[1]]||['','','']; R.rarityMul[p[1]][+p[2]]=v===''?'':+v; } else if(p[0]==='syn') R.synergy[p[1]]=v===''?'':+v;
   else if(p[0]==='l'){ const x=R.rel[+p[1]]; x[p[2]]=p[2]==='mul'?+v||1:v; } else R[p[0]]=v===''?'':+v; }); }
-function rulesSave(){ rulesRead(); const R=RD, m=G.meta, r=RULESM();
+function rulesSave(){ rulesRead(); const R=RD, m=G.meta, r=gameSlot('meta.rules');
   const names=R.elems.map(e=>String(e.n||'').trim().replace(/[<>"'&`.]/g,'').slice(0,4)); if(names.some(n=>!n)||new Set(names).size!==names.length){ toast('속성 이름이 비었거나 겹쳐요'); return false; }
   if(R.elems.length<2){ toast('속성은 2개 이상이어야 해요'); return false; }
   // 이름 바뀜·삭제 반영: 캐릭터·NPC·스테이지 적의 속성, 상성표·반응·관계
@@ -108,8 +108,7 @@ function rulesSave(){ rulesRead(); const R=RD, m=G.meta, r=RULESM();
   r.synergy={n:+R.synergy.n||0,atk:+R.synergy.atk||0,def:+R.synergy.def||0};
   const posId=n=>(m.positions.find(p=>p.name===n||p.id===n)||{}).id||n; r.rel=R.rel.map(x=>({by:x.by||'faction',a:x.by==='pos'?posId(x.a):x.by==='elem'?ren[x.a]||x.a:x.a,b:x.by==='pos'?posId(x.b):x.by==='elem'?ren[x.b]||x.b:x.b,mul:Math.max(0,+x.mul||1)})).filter(x=>x.a&&x.b);
   applyMeta(); mark('meta'); RD=null; return true; }
-function rulesCodex(){ const w=G.world; if(!Array.isArray(w.codex)) w.codex=[]; const o=rulesOptions(), m=G.meta, r=RULESM(), b=rulesBeats();
-  const up=(title,body)=>{ const x=w.codex.find(e=>e.title===title); if(x) x.body=body; else w.codex.push({cat:'term',title,body}); };
+function rulesCodex(){ const o=rulesOptions(), m=G.meta, r=RULESM(), b=rulesBeats(), up=(title,body)=>cxUpsert(title,body);
   up('[규칙] 속성 상성',`속성 ${m.elems.length}개. ${m.elems.map(e=>`${e.n}${e.d?`(${e.d})`:''}${b[e.n]?`은(는) ${b[e.n]}에 강하다`:''}`).join('. ')}. 유리하면 피해 ${rulesPct(o.elemAdv)}, 불리하면 ${rulesPct(o.elemDis)}.`);
   if(o.reactions.length) up('[규칙] 속성 반응',o.reactions.map(x=>`${x.a}+${x.b} 「${x.name}」: ${(REACT_TYPES.find(([k])=>k===x.type)||['',''])[1]} ${x.value||''}`).join('. '));
   up('[규칙] 포지션',POSITIONS().map(p=>`${p.name}(${ROLE[p.base]}형)${p.desc?': '+p.desc:''}${posTraitText(p.t)?' — '+posTraitText(p.t):''}`).join(' / '));
@@ -118,7 +117,7 @@ function rulesCodex(){ const w=G.world; if(!Array.isArray(w.codex)) w.codex=[]; 
   mark('world'); toast('도감에 규칙을 기록했어요'); }
 async function rulesAIData(rep){ const m=G.meta; return aiJSON(rulesAIDataPrompt({m}),rep,'quick'); }
 async function rulesAI(rep){ rulesRead(); const res=await rulesAIData(rep); if(!res||!RD) return; (res.elems||[]).forEach((d,i)=>{ if(d&&RD.elems[i]) RD.elems[i].d=String(d).slice(0,80); }); Object.entries(res.roles||{}).forEach(([k,d])=>{ if(d&&ROLE[k]) RD.roleDesc[k]=String(d).slice(0,80); }); openRules(true); toast('설명을 채웠어요. 저장을 눌러 주세요'); }
-async function rulesAIFill(){ const res=await rulesAIData(null); if(!res) return false; const r=RULESM(); r.roleDesc=r.roleDesc||{};
+async function rulesAIFill(){ const res=await rulesAIData(null); if(!res) return false; const r=gameSlot('meta.rules'); r.roleDesc=r.roleDesc||{};
   (res.elems||[]).forEach((d,i)=>{ if(d&&G.meta.elems[i]&&!G.meta.elems[i].d) G.meta.elems[i].d=String(d).slice(0,80); }); Object.entries(res.roles||{}).forEach(([k,d])=>{ if(d&&ROLE[k]&&!r.roleDesc[k]) r.roleDesc[k]=String(d).slice(0,80); }); mark('meta'); return true; }
 function rulesMissingDesc(){ return G.meta.elems.some(e=>!e.d)||Object.keys(ROLE).some(k=>!((G.meta.rules||{}).roleDesc||{})[k]); }
 function rulesNotInCodex(){ return !(G.world.codex||[]).some(x=>x.title==='[규칙] 속성 상성'); }

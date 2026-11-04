@@ -1,5 +1,9 @@
 // 함수 그래프: 선언·호출(콜스택)·복잡도(조건/분기)·가중치(호출 횟수)·병목(팬인×복잡도)·순환(SCC)·가장 깊은 호출 사슬, 중복 정의, 안 쓰는 함수
 import { walk } from './source.mjs';
+import { readFileSync, existsSync } from 'node:fs';
+
+/* 브라우저·JS 전역 이름(tools/browser-globals.json — node tools/globals.mjs가 크로미움에서 읽음): Date.now()·performance.now() 같은 전역 객체의 멤버 호출은 앱 표의 함수(X.now)가 아님 */
+const GJ = new URL('../browser-globals.json', import.meta.url), GLOBALS = new Set(existsSync(GJ) ? Object.values(JSON.parse(readFileSync(GJ, 'utf8'))).flat() : []);
 
 const CTRL = new Set(['if_statement', 'for_statement', 'for_in_statement', 'while_statement', 'do_statement', 'switch_case', 'catch_clause', 'ternary_expression']);
 const FN = new Set(['function_declaration', 'function_expression', 'arrow_function', 'method_definition', 'generator_function_declaration']);
@@ -57,7 +61,8 @@ export function buildGraph(units) {
         walk(v, pr => { if (pr.type !== 'pair') return; const k = pr.childForFieldName('key')?.text.replace(/^['"]|['"]$/g, ''), fv = pr.childForFieldName('value'); if (!k || BUILTIN.test(k) || !fv || !FN.has(fv.type)) return;
           const key = `${nm}.${k}`; let rec = fns.get(key); if (!rec) { rec = { key, name: key, unit: 'main', loc: mainT.loc(d), lines: 1, cc: 1, depth: 0, cases: null, node: d, calls: new Map(), async: new Set(), callers: new Set(), top: true, table: true }; fns.set(key, rec); if (!byProp.has(k)) byProp.set(k, []); byProp.get(k).push(rec); }
           walk(fv, x => { if (x.type !== 'call_expression') return; const f = x.childForFieldName('function'); if (f?.type !== 'identifier') return; const to = resolve(mainT, x, f.text); if (!to) return; rec.calls.set(to.key, (rec.calls.get(to.key) || 0) + 1); to.callers.add(rec.key); }); }); } }
-    if (byProp.size) walk(mainT.tree.rootNode, n => { if (n.type !== 'call_expression') return; const f = n.childForFieldName('function'); if (f?.type !== 'member_expression') return; const k = f.childForFieldName('property')?.text; if (!byProp.has(k)) return;
+    if (byProp.size) walk(mainT.tree.rootNode, n => { if (n.type !== 'call_expression') return; const f = n.childForFieldName('function'); if (f?.type !== 'member_expression') return; const k = f.childForFieldName('property')?.text; if (!byProp.has(k)) return; const recv = f.childForFieldName('object');
+      if (recv?.type === 'identifier' && GLOBALS.has(recv.text) && !fns.has(recv.text) && !byProp.get(k).some(t => t.key.startsWith(recv.text + '.'))) return; /* 전역 객체의 멤버 호출 */
       const o = owner(mainT, n); if (!o || o.f.table) return; for (const t of byProp.get(k)) { o.f.calls.set(t.key, (o.f.calls.get(t.key) || 0) + 1); t.callers.add(o.f.key); } }); }
   // main 최상위 이름 충돌(let/const 중복은 실행 시 SyntaxError)
   const mainU = units.find(u => u.name === 'main'), seen = new Map(); // main 한 스크립트가 없는 묶음(도구 코드 메타 점검)은 이름 충돌 검사 없음
@@ -87,6 +92,14 @@ export function cycles(fns, syncOnly = false) { let idx = 0; const st = [], on =
     for (const w of fns.get(v).calls.keys()) { if (syncOnly && !fns.get(v).async.has(w)) continue; if (!I.has(w)) { sc(w); L.set(v, Math.min(L.get(v), L.get(w))); } else if (on.has(w)) L.set(v, Math.min(L.get(v), I.get(w))); }
     if (L.get(v) === I.get(v)) { const c = []; let w; do { w = st.pop(); on.delete(w); c.push(w); } while (w !== v); if (c.length > 1) out.push(c); } };
   for (const k of fns.keys()) if (!I.has(k)) sc(k); return out.sort((a, b) => b.length - a.length); }
+// 조건 없이 자기를 부름(끝나지 않음 — 순환 찾기는 둘 이상만 봄): 본문 맨 위 문장(if·반복·조건식·&&·||·안쪽 함수 밖)에서 제 이름을 부름. 맨 위 return·throw 뒤는 안 봄
+const BRANCH = /^(if_statement|for_statement|for_in_statement|while_statement|do_statement|switch_statement|ternary_expression|function_expression|arrow_function|function_declaration|method_definition|class_body|catch_clause)$/;
+export function selfLoops(fns) { const out = [];
+  for (const f of fns.values()) { if (!f.top || !f.name) continue; const b = f.node.childForFieldName('body'); if (!b) continue; const sts = b.type === 'statement_block' ? b.namedChildren : [b]; let hit = null;
+    for (const st of sts) { walk(st, n => { if (hit || BRANCH.test(n.type) || (n.type === 'binary_expression' && /^(&&|\|\||\?\?)$/.test(n.child(1)?.text || ''))) return false; if (n.type === 'call_expression' && n.childForFieldName('function')?.text === f.name) hit = n; });
+      if (hit || /^(return_statement|throw_statement)$/.test(st.type)) break; }
+    if (hit) out.push({ fn: f.name, loc: f.loc }); }
+  return out; }
 // 가장 깊은 호출 사슬(순환은 한 덩어리로)
 export function deepest(fns, limit = 5) { const memo = new Map(), stack = new Set();
   const d = k => { if (memo.has(k)) return memo.get(k); if (stack.has(k)) return [k]; stack.add(k); let best = [];

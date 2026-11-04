@@ -200,3 +200,7 @@ function talkOnlyRule(n){ const k=storyCfg().talkOnly; if(!k||n<3) return pf('TA
 function enemyReuseHint(){ const L=[...new Set(G.lib.filter(l=>l.kind==='enemy'&&!l.alias&&!l.charId&&(l.prompt||l.img)).map(l=>l.name))].slice(-40); return L.length?pf('ENEMY_REUSE',{L:L.join(', ')}):''; }
 /* src/main/0530-story-memory.js에서 옮김 */
 function smNotes(side){if(side)return '';const notes=String(smState().notes||'');return notes?pf('SM_NOTES')+notes+'\n':'';}
+/* src/main/0530-story-memory.js에서 옮김 */
+function smFocused(c,text){return !!text&&[c.name,c.id].some(n=>n&&String(text).includes(n));}
+function smProfile(c,text){return String(c.profile||'').slice(0,text?(smFocused(c,text)?1000:150):80);}
+function smVoice(c,text){return smFocused(c,text)?(c.lines||[]).slice(0,3).map(x=>String(x).slice(0,150)).join(' / '):String(c.lines?.[0]||'').slice(0,40);}

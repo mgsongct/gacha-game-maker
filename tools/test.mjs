@@ -187,6 +187,22 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
 { const { freshReaderWrites } = await import('./lib/extra.mjs'), r19 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r19, 'src/main'), { recursive: true });
   writeFileSync(join(r19, 'src/main/010-r.js'), "let G={meta:{}};\nfunction rd(){ const c=G.meta.x; return c?c:{on:false}; }\nfunction bad(){ rd().on=true; progRead('mail').push(1); }\nfunction ok(){ G.meta.x=Object.assign(rd(),{on:true}); return rd().on; }\n");
   const u = await loadUnits(r19), g = buildGraph(u), W = freshReaderWrites(u, g.fns, mutations(u, g.fns).mut).map(x => x.fn).sort(); assert.deepEqual(W, ['progRead', 'rd'], '읽기 결과에 쓰기: ' + JSON.stringify(W)); rmSync(r19, { recursive: true, force: true }); }
+// 게임 칸 접근(gameSlot·gameRead — 0070 GAME_SLOTS): 상태 흐름이 G.<경로> 쓰기·읽기로 봄, 읽기 결과에 쓰면 그 읽기 호출 자리를 돌려주고 fix.mjs --rule D1이 같은 칸의 쓰기 접근으로 바꿈
+{ const { freshReaderWrites } = await import('./lib/extra.mjs'), { writerOf } = await import('./fix.mjs'), r21 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r21, 'src/main'), { recursive: true });
+  writeFileSync(join(r21, 'src/main/010-g.js'), "let G={meta:{}};\nfunction RD(){ return gameRead('meta.x'); }\nfunction put(v){ gameSlot('rels').push(v); }\nfunction edit(){ const r=RD(); r.a=1; }\nfunction view(){ return RD().a+gameRead('rels').length; }\n");
+  const u = await loadUnits(r21), g = buildGraph(u), sf = stateFlow(u, g.fns), K = k => sf.list.find(x => x.key === k), nm = s2 => [...s2].map(k => g.fns.get(k).name).sort().join();
+  assert.ok(nm(K('G.rels').w) === 'put' && nm(K('G.rels').r) === 'put,view' && nm(K('G.meta.x').w) === '' && nm(K('G.meta.x').r) === 'RD', '게임 칸 흐름: ' + JSON.stringify(sf.list.map(x => [x.key, nm(x.w), nm(x.r)])));
+  const W = freshReaderWrites(u, g.fns, mutations(u, g.fns).mut); assert.ok(W.length === 1 && W[0].fn === 'RD' && W[0].call.text === 'RD()', '읽기 호출 자리: ' + JSON.stringify(W));
+  assert.equal(writerOf(g.fns, 'RD')('()'), "gameSlot('meta.x')", 'D1 쓰기 접근'); assert.equal(writerOf(g.fns, 'progRead')("('mail')"), "progSlot('mail')", 'D1 진행 칸'); assert.equal(writerOf(g.fns, 'view'), null, 'D1 칸 하나를 읽기만 하는 함수가 아니면 손으로'); rmSync(r21, { recursive: true, force: true }); }
+// 조건 없이 자기를 부름(lib/graph.mjs selfLoops): 본문 맨 위에서 제 이름을 부르면 잡고, 조건·반복·&&·콜백 안이나 return 뒤는 안 잡음
+{ const { selfLoops } = await import('./lib/graph.mjs'), r22 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r22, 'src/main'), { recursive: true });
+  writeFileSync(join(r22, 'src/main/010-s.js'), "function bad(x){ bad(x); return x; }\nfunction bad2(){ return [bad2()]; }\nfunction ok(n){ if(n>0) ok(n-1); }\nfunction ok2(n){ return n&&ok2(n-1); }\nfunction ok3(){ setTimeout(()=>ok3(),1); }\nfunction ok4(n){ return n; ok4(n); }\nfunction ok5(t){ (t.kids||[]).forEach(k=>ok5(k)); }\n");
+  const S = selfLoops(buildGraph(await loadUnits(r22)).fns).map(x => x.fn).sort(); assert.deepEqual(S, ['bad', 'bad2'], '조건 없는 자기 호출: ' + JSON.stringify(S)); rmSync(r22, { recursive: true, force: true }); }
+// 함수를 담은 표의 멤버 호출(lib/graph.mjs): T.now()는 표 함수로 잇고, Date.now()·performance.now() 같은 전역 객체 멤버 호출은 잇지 않음
+{ const r23 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r23, 'src/main'), { recursive: true });
+  writeFileSync(join(r23, 'src/main/010-t.js'), "const T={now:s=>s+1};\nfunction a(){ return Date.now()+performance.now(); }\nfunction b(x){ return T.now(x); }\n");
+  const g = buildGraph(await loadUnits(r23)).fns, by = n => [...g.values()].find(f => f.name === n), cs = n => [...by(n).calls.keys()].map(k => g.get(k).name).join();
+  assert.ok(cs('a') === '' && cs('b') === 'T.now', '표 멤버 호출: ' + JSON.stringify({ a: cs('a'), b: cs('b') })); rmSync(r23, { recursive: true, force: true }); }
 // 요소 매개변수(lib/arch.mjs elementParams): 매개변수를 DOM 요소로 만지면 직접, 그런 자리로 넘기면 거쳐 감(호출 그래프 고정점), 그 밖은 아님
 { const { elementParams } = await import('./lib/arch.mjs'), r18 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r18, 'src/main'), { recursive: true });
   writeFileSync(join(r18, 'src/main/010-e.js'), "function work(p,btn){ btn.disabled=true; return p; }\nfunction pass(x,b){ return work(x,b||null); }\nfunction top2(q,c){ return pass(q,c); }\nfunction free(n,m){ return work(n,null)+m; }\n");
@@ -291,6 +307,12 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
     assert.ok(!rn.added.length && rn.moved.length === 1 && other.added.length === 1 && !less.added.length && more.added.length === 1, '래칫: 같은 파일·같은 복잡도의 해결+새로 생김은 이름 바꿈(옮김), 다른 파일이면 새로 생김'); }
   const g = { num: { 복잡도: 40 }, key: 'x|f', cat: '복잡한 함수', text: 'f' }, d2 = compare([g], [{ ...g, num: { 복잡도: 44 } }]); assert.ok(d2.worse.length === 1 && d2.worse[0].up.includes('복잡도'), '래칫: 같은 함수의 복잡도 증가는 나빠짐');
   rmSync(join(root, 'src/main/070-r.js')); writeFileSync(src, t0); }
+// 칸 정의 표 기본값(lib/wiring.mjs slotDefault): 기능 함수가 gameRead('meta.x')·progSlot('y')로 다루는 키의 기본값은 표(GAME_SLOTS·PROG_SLOTS)의 make — 빈 값이면 'empty'
+{ const { slotDefault, lazyDefault } = await import('./lib/wiring.mjs'), r24 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r24, 'src/main'), { recursive: true });
+  writeFileSync(join(r24, 'src/main/010-w.js'), "const GAME_SLOTS={'meta.x':{make:()=>({mode:'a'})},'rels':{make:()=>[]}};\nconst PROG_SLOTS={y:{make:()=>({n:0})}};\nfunction fx(){ return gameRead('meta.x'); }\nfunction fr(){ return gameRead('rels'); }\nfunction fy(){ return progSlot('y'); }\n");
+  const g = buildGraph(await loadUnits(r24)).fns, k = n => new Set([[...g.values()].find(f => f.name === n).key]);
+  assert.deepEqual([slotDefault(g, k('fx'), 'G.meta.x'), slotDefault(g, k('fr'), 'G.rels'), slotDefault(g, k('fy'), 'P().y'), slotDefault(g, k('fx'), 'G.meta.z')], [{ mode: 'a' }, [], { n: 0 }, null], '칸 정의 표 기본값');
+  assert.deepEqual([lazyDefault(g, k('fx'), 'G.meta.x'), lazyDefault(g, k('fr'), 'G.rels')], ['value', 'empty'], '지연 기본값 = 칸 정의 표'); rmSync(r24, { recursive: true, force: true }); }
 // 배선 점검: 생성기가 쓰는 키·스키마 world/키·지연 기본값(빈 값/쓸 만한 값)·엔티티 필드(컬렉션 콜백에 묶인 변수)를 생성물과 맞춤
 { const r3 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r3, 'src/main'), { recursive: true });
   writeFileSync(join(r3, 'src/main/010-w.js'), `let G={meta:{},world:{}};
