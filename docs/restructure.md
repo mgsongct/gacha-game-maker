@@ -43,7 +43,7 @@
 ## 3. 단계
 
 1. **모으기**: `node tools/restructure.mjs --apply` — 위 표대로 파일을 목표 모듈 폴더로 옮김(`git mv`, 폴더 안 파일 이름은 원래 이름이라 같은 모듈 안 순서 유지). 깨진 연관(문서·도구 설정의 옛 경로, 불러올 때 순서가 바뀌어 생기는 TDZ 등)은 고치지 않고 아래 4절 이슈로 기록(사용자 지시 U16).
-2. **해체·재구성**: 액션 분배기(`0510-actions/`)의 처리기 파일을 부르는 함수가 가장 많은 기능 모듈로(위 표 — `node tools/map.mjs --why <처리기>`의 「부르는 것의 모듈별 수」), `0180-ui-scroll.js`의 화면 함수를 그 기능 모듈로, 모듈 안을 책임·계층으로 다시 짬, 모듈마다 data 창구 하나(규칙 D3).
+2. **해체·재구성**(진행: 처리기 옮김 · UI 스크롤 해체 · 모듈마다 0-load·1-model·2-controller·3-view로 다시 짬 — `--dissolve`·`--layers`·`--merge-rest`): 액션 분배기(`0510-actions/`)의 처리기 파일을 부르는 함수가 가장 많은 기능 모듈로(위 표 — `node tools/map.mjs --why <처리기>`의 「부르는 것의 모듈별 수」), `0180-ui-scroll.js`의 화면 함수를 그 기능 모듈로, 모듈 안을 책임·계층으로 다시 짬, 모듈마다 data 창구 하나(규칙 D3).
 3. **복구**: 쌓인 이슈를 도구로 일괄 처리하고 빌드·정적 점검·규칙·브라우저 시험으로 확인.
 
 ## 4. 이슈·할 일(재구조화로 깨진 것 — 나중에 도구로 일괄 처리)
@@ -53,3 +53,5 @@
 | R1 | 1 모으기(2026-11-04) | 옛 src/main 경로를 가리키는 곳 237(파일 23: docs/data-model.md · docs/map.json · docs/map.md · docs/modules.md · docs/problems.md · docs/research/README.md · docs/research/balance.md · docs/research/character.md …) · 불러올 때 순서가 바뀌어 생길 수 있는 TDZ·정의 안 된 이름 | 경로: 옛 → 새 경로 바꾸기(이 도구의 옮김 목록) · TDZ·이름: `node tools/check.mjs` |
 | R2 | 1 모으기(2026-11-04) | 옛 src/main 경로를 가리키는 곳 38(파일 7: docs/customization.md · docs/map.json · docs/modules.md · docs/self-check.md · tools/baseline.json · tools/fix.mjs · tools/play/reports/combos.md) · 불러올 때 순서가 바뀌어 생길 수 있는 TDZ·정의 안 된 이름 | 경로: 옛 → 새 경로 바꾸기(이 도구의 옮김 목록) · TDZ·이름: `node tools/check.mjs` |
 | R3 | 2 처리기 옮김(2026-11-04) | 처리기 파일을 부르는 함수가 가장 많은 모듈로 통째 옮김 — 여러 기능의 case가 섞인 처리기는 case마다 제 기능 모듈로 나눠야 함: `0170-shell/020-navigation-and-tools.js`(캐릭터·그림·AI·대본·라이브 case) · `0260-new-game/040-story-and-authoring.js`(세계관·스토리 case) · `0170-shell/050-settings-and-audio.js`(AI·소리 case) · `0030-image/100-images-and-assets.js`(AI case) · `0190-economy/110-economy.js`(획득·원정 case) · `0170-shell/010-setup.js`(AI case) | case 나누기 도구(case가 부르는 함수의 모듈로 묶어 기능 모듈마다 처리기 하나 · 분배 표 갱신) |
+| R4 | 2 계층으로(2026-11-04) | 모듈마다 `0-load.js`(상수·상태·불러올 때 리스너 — 옛 조각을 순서대로 이음)·`1-model.js`·`2-controller.js`·`3-view.js`로 다시 짬(함수 1449). `0-load.js`의 상수·상태는 그 모듈의 data 창구(Model)로, 리스너는 Controller로 정리해야 함 · 섞인 함수(계층 섞임 L1)가 `2-controller.js`에 들어 있음 — 나눠야 함 | `node tools/rules.mjs`(L1·L2·L3·D3) · `node tools/map.mjs --split` |
+| R5 | 2 계층으로(2026-11-04) | 브라우저 시험·플레이 시험은 이 단계에서 돌리지 않음(사용자 지시 U15 — 재구조화 먼저, 도구로 나중에 복구) | `node build/test.mjs` · `node tools/play/*.mjs` |
