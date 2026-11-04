@@ -29,22 +29,22 @@
    "text": "v2CompileSlot (src/modules/combat/060-generation.js:28) 복잡도 100 · 64줄 · 중첩 4"
   },
   {
-   "key": "복잡한 함수|openChar",
-   "num": {
-    "복잡도": 94,
-    "줄": 93,
-    "중첩": 2
-   },
-   "text": "openChar (src/main/0230-modal.js:85) 복잡도 94 · 93줄 · 중첩 2"
-  },
-  {
    "key": "복잡한 함수|cutoutWhite",
    "num": {
     "복잡도": 91,
     "줄": 65,
     "중첩": 5
    },
-   "text": "cutoutWhite (src/main/0030-image/010-engine.js:389) 복잡도 91 · 65줄 · 중첩 5"
+   "text": "cutoutWhite (src/main/0030-image/010-engine.js:395) 복잡도 91 · 65줄 · 중첩 5"
+  },
+  {
+   "key": "복잡한 함수|charSheetShow",
+   "num": {
+    "복잡도": 90,
+    "줄": 92,
+    "중첩": 2
+   },
+   "text": "charSheetShow (src/main/0230-modal.js:99) 복잡도 90 · 92줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|apply",
@@ -76,11 +76,11 @@
   {
    "key": "복잡한 함수|fix",
    "num": {
-    "복잡도": 78,
+    "복잡도": 77,
     "줄": 75,
     "중첩": 4
    },
-   "text": "fix (src/main/0070-save.js:71) 복잡도 78 · 75줄 · 중첩 4"
+   "text": "fix (src/main/0070-save.js:88) 복잡도 77 · 75줄 · 중첩 4"
   },
   {
    "key": "복잡한 함수|damage",
@@ -107,7 +107,7 @@
     "줄": 62,
     "중첩": 4
    },
-   "text": "naiGenerate0 (src/main/0030-image/010-engine.js:521) 복잡도 68 · 62줄 · 중첩 4"
+   "text": "naiGenerate0 (src/main/0030-image/010-engine.js:527) 복잡도 68 · 62줄 · 중첩 4"
   },
   {
    "key": "복잡한 함수|studioHTML",
@@ -116,7 +116,7 @@
     "줄": 81,
     "중첩": 1
    },
-   "text": "studioHTML (src/main/0180-ui-scroll.js:361) 복잡도 68 · 81줄 · 중첩 1"
+   "text": "studioHTML (src/main/0180-ui-scroll.js:366) 복잡도 68 · 81줄 · 중첩 1"
   },
   {
    "key": "복잡한 함수|liveTick",
@@ -134,7 +134,7 @@
     "줄": 16,
     "중첩": 7
    },
-   "text": "stageBackup (src/main/0520-backup-storage.js:58) 복잡도 63 · 16줄 · 중첩 7"
+   "text": "stageBackup (src/main/0520-backup-storage.js:60) 복잡도 63 · 16줄 · 중첩 7"
   },
   {
    "key": "복잡한 함수|lobbyHTML",
@@ -143,16 +143,7 @@
     "줄": 43,
     "중첩": 0
    },
-   "text": "lobbyHTML (src/main/0180-ui-scroll.js:75) 복잡도 62 · 43줄 · 중첩 0"
-  },
-  {
-   "key": "복잡한 함수|fcSend",
-   "num": {
-    "복잡도": 61,
-    "줄": 24,
-    "중첩": 3
-   },
-   "text": "fcSend (src/main/0160-free-chat.js:35) 복잡도 61 · 24줄 · 중첩 3"
+   "text": "lobbyHTML (src/main/0180-ui-scroll.js:80) 복잡도 62 · 43줄 · 중첩 0"
   },
   {
    "key": "복잡한 함수|cast",
@@ -179,7 +170,7 @@
     "줄": 37,
     "중첩": 3
    },
-   "text": "v2EditorAction (src/modules/combat/050-bridge.js:144) 복잡도 56 · 37줄 · 중첩 3"
+   "text": "v2EditorAction (src/modules/combat/050-bridge.js:148) 복잡도 56 · 37줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|buildManualGameDraft",
@@ -197,7 +188,7 @@
     "줄": 35,
     "중첩": 2
    },
-   "text": "openNaiPrep (src/main/0030-image/010-engine.js:683) 복잡도 52 · 35줄 · 중첩 2"
+   "text": "openNaiPrep (src/main/0030-image/010-engine.js:689) 복잡도 52 · 35줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|contractHTML0",
@@ -206,16 +197,7 @@
     "줄": 38,
     "중첩": 1
    },
-   "text": "contractHTML0 (src/main/0180-ui-scroll.js:155) 복잡도 52 · 38줄 · 중첩 1"
-  },
-  {
-   "key": "복잡한 함수|bEnd",
-   "num": {
-    "복잡도": 49,
-    "줄": 29,
-    "중첩": 4
-   },
-   "text": "bEnd (src/main/0480-battle.js:93) 복잡도 49 · 29줄 · 중첩 4"
+   "text": "contractHTML0 (src/main/0180-ui-scroll.js:162) 복잡도 52 · 38줄 · 중첩 1"
   },
   {
    "key": "복잡한 함수|openLibItem",
@@ -224,16 +206,7 @@
     "줄": 35,
     "중첩": 1
    },
-   "text": "openLibItem (src/main/0240-growth-curve.js:130) 복잡도 45 · 35줄 · 중첩 1"
-  },
-  {
-   "key": "복잡한 함수|aiEventGen0",
-   "num": {
-    "복잡도": 45,
-    "줄": 28,
-    "중첩": 2
-   },
-   "text": "aiEventGen0 (src/main/0250-story-factory.js:126) 복잡도 45 · 28줄 · 중첩 2"
+   "text": "openLibItem (src/main/0240-growth-curve.js:131) 복잡도 45 · 35줄 · 중첩 1"
   },
   {
    "key": "복잡한 함수|motif",
@@ -251,7 +224,7 @@
     "줄": 25,
     "중첩": 3
    },
-   "text": "v2IconClick (src/modules/combat/050-bridge.js:318) 복잡도 44 · 25줄 · 중첩 3"
+   "text": "v2IconClick (src/modules/combat/050-bridge.js:322) 복잡도 44 · 25줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|regenApply",
@@ -260,7 +233,7 @@
     "줄": 15,
     "중첩": 3
    },
-   "text": "regenApply (src/main/0030-image/010-engine.js:87) 복잡도 43 · 15줄 · 중첩 3"
+   "text": "regenApply (src/main/0030-image/010-engine.js:89) 복잡도 43 · 15줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|renderSetup",
@@ -281,13 +254,22 @@
    "text": "step (src/modules/combat/030-core.js:831) 복잡도 43 · 29줄 · 중첩 6"
   },
   {
+   "key": "복잡한 함수|fcSend",
+   "num": {
+    "복잡도": 42,
+    "줄": 22,
+    "중첩": 2
+   },
+   "text": "fcSend (src/main/0100-messenger.js:141) 복잡도 42 · 22줄 · 중첩 2"
+  },
+  {
    "key": "복잡한 함수|aiOne",
    "num": {
     "복잡도": 41,
     "줄": 37,
     "중첩": 3
    },
-   "text": "aiOne (src/main/0020-ai-connect.js:208) 복잡도 41 · 37줄 · 중첩 3"
+   "text": "aiOne (src/main/0020-ai-connect.js:210) 복잡도 41 · 37줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|eraseColorData",
@@ -296,7 +278,7 @@
     "줄": 26,
     "중첩": 4
    },
-   "text": "eraseColorData (src/main/0030-image/010-engine.js:294) 복잡도 41 · 26줄 · 중첩 4"
+   "text": "eraseColorData (src/main/0030-image/010-engine.js:296) 복잡도 41 · 26줄 · 중첩 4"
   },
   {
    "key": "복잡한 함수|comfyGenerate",
@@ -305,7 +287,7 @@
     "줄": 27,
     "중첩": 2
    },
-   "text": "comfyGenerate (src/main/0030-image/010-engine.js:478) 복잡도 41 · 27줄 · 중첩 2"
+   "text": "comfyGenerate (src/main/0030-image/010-engine.js:484) 복잡도 41 · 27줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|value",
@@ -314,7 +296,7 @@
     "줄": 13,
     "중첩": 7
    },
-   "text": "value (src/main/0520-backup-storage.js:38) 복잡도 25 · 13줄 · 중첩 7"
+   "text": "value (src/main/0520-backup-storage.js:40) 복잡도 25 · 13줄 · 중첩 7"
   },
   {
    "key": "복잡한 함수|lkOp",
@@ -332,7 +314,7 @@
     "줄": 35,
     "중첩": 10
    },
-   "text": "v2DrainBattleEvents (src/modules/combat/050-bridge.js:222) 복잡도 22 · 35줄 · 중첩 10"
+   "text": "v2DrainBattleEvents (src/modules/combat/050-bridge.js:226) 복잡도 22 · 35줄 · 중첩 10"
   },
   {
    "key": "복잡한 함수|budget",
@@ -359,7 +341,7 @@
     "줄": 29,
     "중첩": 3
    },
-   "text": "(최상위)→$('#file').addEventListener @src/main/0080-storage-integration.js (src/main/0080-storage-integration.js:154) 복잡도 76 · 29줄 · 중첩 3"
+   "text": "(최상위)→$('#file').addEventListener @src/main/0080-storage-integration.js (src/main/0080-storage-integration.js:156) 복잡도 76 · 29줄 · 중첩 3"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener #2 @src/main/0455-persona.js",
@@ -404,7 +386,7 @@
     "줄": 16,
     "중첩": 13
    },
-   "text": "(최상위)→document.addEventListener @src/main/0185-game-rules.js (src/main/0185-game-rules.js:136) 복잡도 20 · 16줄 · 중첩 13"
+   "text": "(최상위)→document.addEventListener @src/main/0185-game-rules.js (src/main/0185-game-rules.js:135) 복잡도 20 · 16줄 · 중첩 13"
   },
   {
    "key": "복잡한 익명 콜백|main parseScript→).filter(Boolean).flatMap(splitTags).map @src/main/0460-script-engine.js",
@@ -431,7 +413,7 @@
     "줄": 6,
     "중첩": 7
    },
-   "text": "openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/0030-image/010-engine.js (src/main/0030-image/010-engine.js:794) 복잡도 15 · 6줄 · 중첩 7"
+   "text": "openMaskPainter→uerySelector('.mp-bar').addEventListener @src/main/0030-image/010-engine.js (src/main/0030-image/010-engine.js:806) 복잡도 15 · 6줄 · 중첩 7"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0445-factions.js",
@@ -440,7 +422,7 @@
     "줄": 7,
     "중첩": 7
    },
-   "text": "(최상위)→document.addEventListener @src/main/0445-factions.js (src/main/0445-factions.js:89) 복잡도 14 · 7줄 · 중첩 7"
+   "text": "(최상위)→document.addEventListener @src/main/0445-factions.js (src/main/0445-factions.js:97) 복잡도 14 · 7줄 · 중첩 7"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0275-expedition.js",
@@ -458,34 +440,16 @@
     "줄": 9,
     "중첩": 8
    },
-   "text": "(최상위)→document.addEventListener @src/main/0505-construct.js (src/main/0505-construct.js:145) 복잡도 12 · 9줄 · 중첩 8"
+   "text": "(최상위)→document.addEventListener @src/main/0505-construct.js (src/main/0505-construct.js:147) 복잡도 12 · 9줄 · 중첩 8"
   },
   {
    "key": "복잡한 분배기 case|handleImagesAndAssetsAction facego",
    "num": {
-    "복잡도": 25,
+    "복잡도": 24,
     "줄": 15,
     "중첩": 3
    },
-   "text": "handleImagesAndAssetsAction · facego (src/main/0510-actions/100-images-and-assets.js:74) 복잡도 25 · 15줄 · 중첩 3"
-  },
-  {
-   "key": "복잡한 분배기 case|handleNavigationAndToolsAction poke",
-   "num": {
-    "복잡도": 21,
-    "줄": 9,
-    "중첩": 1
-   },
-   "text": "handleNavigationAndToolsAction · poke (src/main/0510-actions/020-navigation-and-tools.js:26) 복잡도 21 · 9줄 · 중첩 1"
-  },
-  {
-   "key": "복잡한 분배기 case|handleImagesAndAssetsAction skinuse",
-   "num": {
-    "복잡도": 20,
-    "줄": 5,
-    "중첩": 3
-   },
-   "text": "handleImagesAndAssetsAction · skinuse (src/main/0510-actions/100-images-and-assets.js:57) 복잡도 20 · 5줄 · 중첩 3"
+   "text": "handleImagesAndAssetsAction · facego (src/main/0510-actions/100-images-and-assets.js:74) 복잡도 24 · 15줄 · 중첩 3"
   },
   {
    "key": "복잡한 분배기 case|handleCharactersAction upgo",
@@ -494,7 +458,7 @@
     "줄": 1,
     "중첩": 5
    },
-   "text": "handleCharactersAction · upgo (src/main/0510-actions/090-characters.js:25) 복잡도 10 · 1줄 · 중첩 5"
+   "text": "handleCharactersAction · upgo (src/main/0510-actions/090-characters.js:24) 복잡도 10 · 1줄 · 중첩 5"
   },
   {
    "key": "동기 순환|module:modules/combat/030-core.js#addStatus,module:modules/combat/030-core.js#apply,module:modules/combat/030-core.js#cast,module:modules/combat/030-core.js#damage,module:modules/combat/030-core.js#heal,module:modules/combat/030-core.js#hit@80347,module:modules/combat/030-core.js#proc,module:modules/combat/030-core.js#reactHit",
@@ -618,9 +582,9 @@
   {
    "key": "빈 catch|src/main/0080-storage-integration.js 저장소 대체",
    "num": {
-    "개수": 6
+    "개수": 5
    },
-   "text": "src/main/0080-storage-integration.js 저장소 대체 6개"
+   "text": "src/main/0080-storage-integration.js 저장소 대체 5개"
   },
   {
    "key": "빈 catch|src/main/0080-storage-integration.js 파싱 대체",
@@ -663,13 +627,6 @@
     "개수": 1
    },
    "text": "src/main/0130-gift.js 동기 대체 1개"
-  },
-  {
-   "key": "빈 catch|src/main/0160-free-chat.js 저장소 대체",
-   "num": {
-    "개수": 1
-   },
-   "text": "src/main/0160-free-chat.js 저장소 대체 1개"
   },
   {
    "key": "빈 catch|src/main/0180-ui-scroll.js 동기 대체",
@@ -1248,16 +1205,6 @@
    "text": "aiPickupStory (src/main/0290-season-rotation.js) — 참조 67%가 src/main/0510-actions/"
   },
   {
-   "key": "영역 침범 후보|src/main/0250-story-factory.js relGC",
-   "num": {},
-   "text": "relGC (src/main/0250-story-factory.js) — 참조 58%가 src/main/0450-relations-memory.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/0160-free-chat.js phPlay",
-   "num": {},
-   "text": "phPlay (src/main/0160-free-chat.js) — 참조 57%가 src/main/0100-messenger.js"
-  },
-  {
    "key": "영역 침범 후보|src/main/0180-ui-scroll.js contractHTML0",
    "num": {},
    "text": "contractHTML0 (src/main/0180-ui-scroll.js) — 참조 57%가 src/main/0500-gacha.js"
@@ -1268,25 +1215,18 @@
    "text": "dataImport (src/main/0525-data-folder.js) — 참조 50%가 src/main/0520-backup-storage.js"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0020-ai-connect.js P().avatar",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0020-ai-connect.js가 P().avatar(주인 src/main/0160-free-chat.js)를 씀 1곳"
-  },
-  {
    "key": "남의 상태 쓰기|src/main/0080-storage-integration.js P().avatar",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0080-storage-integration.js가 P().avatar(주인 src/main/0160-free-chat.js)를 씀 1곳"
+   "text": "src/main/0080-storage-integration.js가 P().avatar(주인 src/main/0160-player-profile.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0510-actions/ P().avatar",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/가 P().avatar(주인 src/main/0160-free-chat.js)를 씀 1곳"
+   "text": "src/main/0510-actions/가 P().avatar(주인 src/main/0160-player-profile.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0510-actions/ P().stam",
@@ -1308,13 +1248,6 @@
     "곳": 1
    },
    "text": "src/main/0090-growth.js가 P().dm(주인 src/main/0510-actions/)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0160-free-chat.js P().fchat",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0160-free-chat.js가 P().fchat(주인 src/main/0100-messenger.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0510-actions/ P().fchat",
@@ -1352,11 +1285,11 @@
    "text": "src/main/0510-actions/가 P().gifts(주인 src/main/0130-gift.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/ P().mail",
+   "key": "남의 상태 쓰기|src/main/0487-formation-sortie.js G.meta.rules",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/가 P().mail(주인 src/main/0220-mail.js)를 씀 1곳"
+   "text": "src/main/0487-formation-sortie.js가 G.meta.rules(주인 src/main/0185-game-rules.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0510-actions/ P().dboard",
@@ -1371,6 +1304,27 @@
     "곳": 1
    },
    "text": "src/main/0510-actions/가 P().cxSeen(주인 src/main/0300-codex.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0445-factions.js G.world.factions",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0445-factions.js가 G.world.factions(주인 src/main/0030-image/)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.world.factions",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0510-actions/가 G.world.factions(주인 src/main/0030-image/)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/0510-actions/ G.rels",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/0510-actions/가 G.rels(주인 src/main/0450-relations-memory.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0510-actions/ G.meta.elems",
@@ -1427,41 +1381,6 @@
     "곳": 1
    },
    "text": "src/main/0330-casting.js가 G.npcs(주인 src/main/0510-actions/)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0250-story-factory.js G.world.codex",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0250-story-factory.js가 G.world.codex(주인 src/main/0185-game-rules.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0300-codex.js G.world.codex",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0300-codex.js가 G.world.codex(주인 src/main/0185-game-rules.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/ G.world.codex",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/가 G.world.codex(주인 src/main/0185-game-rules.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0445-factions.js G.world.factions",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0445-factions.js가 G.world.factions(주인 src/main/0030-image/)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/ G.world.factions",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/가 G.world.factions(주인 src/main/0030-image/)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0190-shop.js P().gems",
@@ -1555,32 +1474,11 @@
    "text": "src/main/0488-stage-modes.js가 P().stars(주인 src/main/0480-battle.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0487-formation-sortie.js G.meta.rules",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0487-formation-sortie.js가 G.meta.rules(주인 src/main/0185-game-rules.js)를 씀 1곳"
-  },
-  {
    "key": "남의 상태 쓰기|src/main/0370-game-picker.js G.meta.artTags",
    "num": {
     "곳": 1
    },
    "text": "src/main/0370-game-picker.js가 G.meta.artTags(주인 src/main/0510-actions/)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0450-relations-memory.js G.rels",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0450-relations-memory.js가 G.rels(주인 src/main/0250-story-factory.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/ G.rels",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0510-actions/가 G.rels(주인 src/main/0250-story-factory.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0510-actions/ G.meta.story",
@@ -1625,20 +1523,6 @@
    "text": "src/main/0510-actions/가 P().pity(주인 src/main/0500-gacha.js)를 씀 1곳"
   },
   {
-   "key": "파편화 상태|P().avatar",
-   "num": {
-    "모듈": 4
-   },
-   "text": "P().avatar — 4개 모듈이 씀"
-  },
-  {
-   "key": "파편화 상태|G.world.codex",
-   "num": {
-    "모듈": 4
-   },
-   "text": "G.world.codex — 4개 모듈이 씀"
-  },
-  {
    "key": "파편화 상태|P().curBanner",
    "num": {
     "모듈": 4
@@ -1646,11 +1530,11 @@
    "text": "P().curBanner — 4개 모듈이 씀"
   },
   {
-   "key": "파편화 상태|P().fchat",
+   "key": "파편화 상태|P().avatar",
    "num": {
     "모듈": 3
    },
-   "text": "P().fchat — 3개 모듈이 씀"
+   "text": "P().avatar — 3개 모듈이 씀"
   },
   {
    "key": "파편화 상태|P().rogue",
@@ -1658,6 +1542,13 @@
     "모듈": 3
    },
    "text": "P().rogue — 3개 모듈이 씀"
+  },
+  {
+   "key": "파편화 상태|G.world.factions",
+   "num": {
+    "모듈": 3
+   },
+   "text": "G.world.factions — 3개 모듈이 씀"
   },
   {
    "key": "파편화 상태|G.lib",
@@ -1681,13 +1572,6 @@
    "text": "G.npcs — 3개 모듈이 씀"
   },
   {
-   "key": "파편화 상태|G.world.factions",
-   "num": {
-    "모듈": 3
-   },
-   "text": "G.world.factions — 3개 모듈이 씀"
-  },
-  {
    "key": "파편화 상태|P().gold",
    "num": {
     "모듈": 3
@@ -1709,13 +1593,6 @@
    "text": "G.banners — 3개 모듈이 씀"
   },
   {
-   "key": "파편화 상태|G.rels",
-   "num": {
-    "모듈": 3
-   },
-   "text": "G.rels — 3개 모듈이 씀"
-  },
-  {
    "key": "파편화 상태|P().prepAsked",
    "num": {
     "모듈": 3
@@ -1727,7 +1604,7 @@
    "num": {
     "묶음": 2
    },
-   "text": "src/main/0400-publish-subscribe.js — 묶음 7·7"
+   "text": "src/main/0400-publish-subscribe.js — 묶음 8·7"
   },
   {
    "key": "기능 섞임|src/main/0130-gift.js",
@@ -1737,25 +1614,18 @@
    "text": "src/main/0130-gift.js — 묶음 4·3·1"
   },
   {
-   "key": "기능 섞임|src/main/0470-title-opening.js",
-   "num": {
-    "묶음": 3
-   },
-   "text": "src/main/0470-title-opening.js — 묶음 5·3·1"
-  },
-  {
    "key": "기능 섞임|src/main/0480-battle.js",
    "num": {
     "묶음": 3
    },
-   "text": "src/main/0480-battle.js — 묶음 8·6·1"
+   "text": "src/main/0480-battle.js — 묶음 9·7·2"
   },
   {
-   "key": "기능 섞임|src/main/0160-free-chat.js",
+   "key": "기능 섞임|src/main/0260-new-game/",
    "num": {
     "묶음": 3
    },
-   "text": "src/main/0160-free-chat.js — 묶음 8·5·1"
+   "text": "src/main/0260-new-game/ — 묶음 30·17·3"
   },
   {
    "key": "기능 섞임|src/modules/combat/030-core.js",
@@ -1765,19 +1635,9 @@
    "text": "src/modules/combat/030-core.js — 묶음 88·38"
   },
   {
-   "key": "기능 분산|src/main/0030-image/ charCaption",
-   "num": {},
-   "text": "charCaption (src/main/0030-image/) — 연결 100%가 src/main/0015-prompt-studio/"
-  },
-  {
    "key": "기능 분산|src/main/0180-ui-scroll.js passHTML",
    "num": {},
    "text": "passHTML (src/main/0180-ui-scroll.js) — 연결 85%가 src/main/0090-growth.js"
-  },
-  {
-   "key": "기능 분산|src/main/0100-messenger.js phMode",
-   "num": {},
-   "text": "phMode (src/main/0100-messenger.js) — 연결 100%가 src/main/0160-free-chat.js"
   },
   {
    "key": "기능 분산|src/main/0090-growth.js passLv",
@@ -1797,7 +1657,7 @@
   {
    "key": "기능 분산|src/main/0180-ui-scroll.js readAp",
    "num": {},
-   "text": "readAp (src/main/0180-ui-scroll.js) — 연결 71%가 src/main/0210-setup.js"
+   "text": "readAp (src/main/0180-ui-scroll.js) — 연결 70%가 src/main/0210-setup.js"
   },
   {
    "key": "기능 분산|src/main/0120-abyss.js rgEnemies",
@@ -1812,7 +1672,7 @@
   {
    "key": "기능 분산|src/main/0530-story-memory.js storyWrapUp",
    "num": {},
-   "text": "storyWrapUp (src/main/0530-story-memory.js) — 연결 64%가 src/main/0250-story-factory.js"
+   "text": "storyWrapUp (src/main/0530-story-memory.js) — 연결 80%가 src/main/0250-story-factory.js"
   },
   {
    "key": "기능 분산|src/main/0250-story-factory.js bondNote",
@@ -1827,7 +1687,7 @@
   {
    "key": "기능 분산|src/main/0290-season-rotation.js baseChar",
    "num": {},
-   "text": "baseChar (src/main/0290-season-rotation.js) — 연결 60%가 src/main/0450-relations-memory.js"
+   "text": "baseChar (src/main/0290-season-rotation.js) — 연결 78%가 src/main/0450-relations-memory.js"
   },
   {
    "key": "기능 분산|src/main/0445-factions.js castOk",

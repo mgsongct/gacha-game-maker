@@ -14,7 +14,7 @@ const progObj=v=>!!v&&typeof v==='object';
 const PROG_SLOTS={
   stam:{make:()=>({v:STAM_MAX,at:Date.now()}), fill:(s,p)=>{ if(p.staminaCapVersion!==2){ stamRegen(s,120); p.staminaCapVersion=2; } }, now:s=>stamRegen(s,STAM_MAX)}, // 행동력 — 상한 120 시절 값은 그 상한으로 회복을 끝낸 뒤 새 상한으로
   dm:{make:()=>({date:today(),cnt:{login:1},got:{}}), stale:v=>v.date!==today(), tick:true}, // 일일 임무 — 날이 바뀌면 새로
-  raid:{make:raidNew, stale:r=>r.wk!==weekKey(), tick:true}, // 주간 레이드 — 주가 바뀌면 지난주 결과로 단계를 정해 새로
+  raid:{make:raidNew, stale:r=>r.wk!==weekKey(), fill:raidFill, tick:true}, // 주간 레이드 — 주가 바뀌면 지난주 결과로 단계를 정해 새로
   rogue:{make:()=>({run:null,best:0,day:'',n:0}), fill:r=>{ const x=r.run; if(x&&x.v===3){ x.v=2; x.c3=1; } }}, // 탐사 — 예전 3판 형식은 2판으로
   tower:{make:()=>({})}, gifts:{make:()=>({})}, fchat:{make:()=>({})}, cxSeen:{make:cxSeenNew,tick:true}, // 탑 · 선물 보관함 · 자유 대화 · 도감에서 본 항목
   sched:{make:()=>({day:today(),left:SCHED_N,done:[]}), stale:v=>v.day!==today(), tick:true}, // 오늘의 일정 — 날이 바뀌면 새로

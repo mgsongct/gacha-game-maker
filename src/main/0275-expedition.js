@@ -16,7 +16,7 @@ function exSetCond(id,v,at,rest){ progSlot('exped').cond[id]=Object.assign({v:Ma
 function exJobOf(id){ const J=progRead('exped').jobs; return Object.keys(J).find(k=>J[k].chars.includes(id))||null; }
 function exResting(id){ const st=progRead('exped').cond[id]; return !!(st&&st.rest&&st.rest>Date.now()); }
 // 전투에 못 나가는 캐릭터(일하는 중·쉬는 중·경영 배치). busyIds(0090)가 함께 써요
-function exBusyIds(){ if(exMode()==='combat'||!P().exped) return []; const s=progSlot('exped'); return [...Object.values(s.jobs).flatMap(j=>j.chars),...Object.values(s.biz.assign).flat(),...Object.keys(s.cond).filter(exResting)]; }
+function exBusyIds(){ if(exMode()==='combat'||!P().exped) return []; const s=progRead('exped'); return [...Object.values(s.jobs).flatMap(j=>j.chars),...Object.values(s.biz.assign).flat(),...Object.keys(s.cond).filter(exResting)]; }
 function exGive(gold,label){ if(seasonIs('train')) gold*=1.5; /* 훈련 시즌 보너스 — 전투형 파견(dispClaim)과 같게 */ const r={gold:Math.max(0,Math.round(gold))}; if(conOn()){ const ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2); ks.forEach(k=>{ r[k]=Math.max(10,Math.round(gold/20/10)*10); }); } giveReward(r); return r; }
 function exFameName(){ const m=exMode(); return m==='streamer'?EXC().streamer.fameName:EXC().idol.fameName; }
 

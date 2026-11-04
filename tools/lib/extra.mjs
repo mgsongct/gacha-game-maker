@@ -203,7 +203,7 @@ export { FRESH };
 const DEEP = /^\[\.\.\.|\.map\(|^clone\(|^structuredClone\(/;
 /* 늘 새 값을 만드는 함수(모든 return이 새 값 — scgNew·cleanChar0 같은 만들기, 상태를 쓰지 않음): 이 함수를 부른 값도 새 값 */
 export function freshFactories(fns, mut) { return new Set([...fns.values()].filter(f => f.top && !mut.has(f.key)).filter(f => { const rs = returnsOf(f); return rs.length && rs.every(x => FRESH.test(x.text)); }).map(f => f.name)); }
-export function freshReaderWrites(units, fns, mut) { const readers = new Set(['progRead', 'gameRead']), deep = new Set(), elemOf = new Set() /* 읽기 결과의 원소를 돌려주는 읽기(relPair = RELS().find …) */;
+export function freshReaderWrites(units, fns, mut, opt = {}) { const readers = new Set(['progRead', 'gameRead', ...(opt.readers || [])]) /* opt.readers: 읽기로 바꿔 보려는 쓰기 접근(fix.mjs --rule L2-read가 progSlot을 넣어 그 결과에 쓰는 자리를 찾음) */, deep = new Set(), elemOf = new Set() /* 읽기 결과의 원소를 돌려주는 읽기(relPair = RELS().find …) */;
   const fac = freshFactories(fns, mut), isFresh = x => FRESH.test(x.text) || (x.type === 'call_expression' && fac.has(x.childForFieldName('function')?.text));
   for (const f of fns.values()) { if (!f.top || mut.has(f.key)) continue; const root = x => x.text.split(/[.[(]/)[0], ps = new Set(); walk(f.node.childForFieldName('parameters') || f.node.childForFieldName('parameter') || { type: 'none' }, n => { if (n.type === 'identifier' && n.parent?.type !== 'member_expression') ps.add(n.text); }); const rs = returnsOf(f), sl = stateLocals(f, ps);
     /* 상태 = G·P()·그 지역 이름, 또는 매개변수로 받은 엔티티의 칸(c.scg — 캐릭터는 상태) */

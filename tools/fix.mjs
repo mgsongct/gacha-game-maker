@@ -8,6 +8,9 @@
 //   D1 읽기 결과에 쓰기: 쓰는 대상을 낸 읽기 호출(바로 부른 것·받은 지역 이름의 선언)을 같은 칸의 쓰기 접근으로 — progRead→progSlot, gameRead→gameSlot,
 //      return gameRead('칸')·progRead('칸')만 하는 읽기 함수 → 그 칸의 쓰기 접근, 읽기 함수가 제 주석에 「바꿀 때는 X」·「고칠 때는 X」로 적은 쓰기 함수 → X(같은 인자).
 //      둘 다 아닌 읽기 함수는 손으로(목록만)
+//   L2-read (L2 그리다가 바꿈의 원인 「읽기가 progSlot」): 그 끝 함수 안의 progSlot('칸') 중 읽기만 하는 자리를 progRead로 —
+//      D1 분석을 progSlot도 읽기로 보고 돌려 그 결과(받은 지역 이름 포함)에 쓰는 자리가 없고, 결과를 버리거나 돌려주거나 순수하지 않은 함수에 넘기지 않으며,
+//      칸에 now(읽을 때 복사해 맞춤)가 없을 때만. 원소에 쓰는 것은 괜찮음(읽기는 칸이 있으면 살아 있는 상태를 돌려줌)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +18,11 @@ import { loadUnits, walk } from './lib/source.mjs';
 import { buildGraph, unused, unusedVars } from './lib/graph.mjs';
 import { actions, mutations } from './lib/flow.mjs';
 import { freshReaderWrites } from './lib/extra.mjs';
+import { analyze } from './lib/analyze.mjs';
+import { buildMap } from './lib/map.mjs';
+import { stateFlow } from './lib/flow.mjs';
+import { runRules } from './lib/rules.mjs';
+import { existsSync } from 'node:fs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..'), APPLY = process.argv.includes('--apply');
 const extra = () => ['src/index.html', 'build/test.mjs'].map(f => readFileSync(join(ROOT, f), 'utf8')).join('\n');
@@ -53,9 +61,27 @@ async function ruleD1() { const units = await loadUnits(ROOT), { fns } = buildGr
   subs.forEach(x => console.log(`  ${x.at}  ${x.from} → ${x.to}`)); hand.forEach(w => console.log(`  손으로: ${w.loc} ${w.fn}() — ${w.text}`));
   if (APPLY) for (const f of files) { if (!f.subs.size) continue; let t = f.text; [...f.subs.values()].sort((x, y) => y.a - x.a).forEach(x => { t = t.slice(0, x.a) + x.to + t.slice(x.b); }); writeFileSync(join(ROOT, f.path), t); }
   console.log(APPLY ? `D1: ${subs.length}곳을 쓰기 접근으로 바꿨어요(손으로 ${hand.length}). node build/build.mjs 후 node tools/check.mjs --strict` : `D1 미리 보기: ${subs.length}곳 · 손으로 ${hand.length}. 바꾸려면 --apply`); }
+// L2-read: 읽기만 하는 progSlot → progRead
+const PURE_ARG = /^(Object\.(entries|keys|values)|Array\.isArray|JSON\.stringify|String|Number|Boolean)$/;
+async function ruleL2Read() { const A = await analyze(ROOT), html = existsSync(join(ROOT, 'www/index.html')) ? readFileSync(join(ROOT, 'www/index.html'), 'utf8') : '', RS = runRules({ A, M: buildMap(A.units, A.fns, stateFlow(A.units, A.fns), html) });
+  const ends = new Set(RS.find(r => r.id === 'L2').items.filter(x => x.cause === '읽기가 progSlot').map(x => x.end)), units = A.units, fns = A.fns;
+  const nowSlots = new Set(); walk(units.find(u => u.name === 'main').tree.rootNode, n => { if (n.type !== 'variable_declarator' || n.childForFieldName('name')?.text !== 'PROG_SLOTS') return; for (const p of n.childForFieldName('value')?.namedChildren || []) if (p.type === 'pair' && (p.childForFieldName('value')?.namedChildren || []).some(q => q.type === 'pair' && q.childForFieldName('key')?.text === 'now')) nowSlots.add(p.childForFieldName('key').text.replace(/['"]/g, '')); });
+  const W = new Set(freshReaderWrites(units, fns, mutations(units, fns).mut, { readers: ['progSlot'] }).filter(w => w.fn === 'progSlot').map(w => `${w.call.unit}:${w.call.start}`));
+  const byUnit = new Map(units.map(u => { let off = 0; return [u.name, u.files.map(f => { const text = readFileSync(join(ROOT, f.path), 'utf8'), r = { path: f.path, start: off, text, subs: new Map() }; off += text.length; return r; })]; })), keep = [];
+  for (const f of fns.values()) { if (!f.top || !ends.has(f.name)) continue; const u = units.find(x => x.name === f.unit), aliases = new Set();
+    walk(f.node, n => { if (n.type !== 'call_expression' || n.childForFieldName('function')?.text !== 'progSlot') return; const a = n.childForFieldName('arguments')?.namedChildren[0]; if (a?.type !== 'string') return; const slot = a.text.slice(1, -1), at = u.loc(n);
+      let top = n; while (top.parent && /^(member_expression|subscript_expression|parenthesized_expression)$/.test(top.parent.type) && top.parent.childForFieldName?.('object')?.id === top.id) top = top.parent;
+      const decl = top.parent?.type === 'variable_declarator' ? top.parent.childForFieldName('name')?.text : null, uses = [top]; if (decl) walk(f.node, m => { if (m.type === 'identifier' && m.text === decl && m.parent?.type !== 'variable_declarator') uses.push(m); });
+      const why = W.has(`${f.unit}:${n.startIndex}`) ? '결과에 씀' : nowSlots.has(slot) ? '칸에 now(읽을 때 복사)' : top.parent?.type === 'expression_statement' ? '결과를 버림(만들어 두기)' : uses.some(x => x.parent?.type === 'return_statement') ? '돌려줌' : uses.some(x => x.parent?.type === 'arguments' && !PURE_ARG.test(x.parent.parent?.childForFieldName('function')?.text || '')) ? '다른 함수에 넘김' : null;
+      if (why) { keep.push(`${at} ${f.name} progSlot('${slot}') — ${why}`); return; }
+      const fl = (byUnit.get(f.unit) || []).findLast(x => x.start <= n.startIndex), fn0 = n.childForFieldName('function'); fl.subs.set(fn0.startIndex - fl.start, { a: fn0.startIndex - fl.start, b: fn0.endIndex - fl.start, at, name: f.name }); }); }
+  const subs = [...byUnit.values()].flat().flatMap(fl => [...fl.subs.values()]); subs.forEach(x => console.log(`  ${x.at} ${x.name}: progSlot → progRead`)); keep.forEach(k => console.log('  그대로: ' + k));
+  if (APPLY) for (const fl of [...byUnit.values()].flat()) { if (!fl.subs.size) continue; let t = fl.text; [...fl.subs.values()].sort((x, y) => y.a - x.a).forEach(x => { t = t.slice(0, x.a) + 'progRead' + t.slice(x.b); }); writeFileSync(join(ROOT, fl.path), t); }
+  console.log(APPLY ? `L2-read: ${subs.length}곳을 progRead로(그대로 ${keep.length}). node build/build.mjs 후 node tools/check.mjs --strict` : `L2-read 미리 보기: ${subs.length}곳 · 그대로 ${keep.length}. 바꾸려면 --apply`); }
 const RULE = process.argv.includes('--rule') ? process.argv[process.argv.indexOf('--rule') + 1] : null, MAIN = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) /* 시험이 불러올 때는 돌지 않음 */;
-if (MAIN && RULE && RULE !== 'D1') { console.log(`기계적으로 고치는 규칙: D1 (받은 것: ${RULE})`); process.exit(1); }
-if (MAIN && RULE) { await ruleD1(); process.exit(0); }
+const FIXERS = { D1: ruleD1, 'L2-read': ruleL2Read };
+if (MAIN && RULE && !FIXERS[RULE]) { console.log(`기계적으로 고치는 규칙: ${Object.keys(FIXERS).join(' · ')} (받은 것: ${RULE})`); process.exit(1); }
+if (MAIN && RULE) { await FIXERS[RULE](); process.exit(0); }
 let total = 0;
 for (let round = 1; MAIN && round <= 8; round++) {
   const { cuts, skip, files } = await pass(); if (round === 1 && skip.length) skip.forEach(s => console.log('  건너뜀:', s));

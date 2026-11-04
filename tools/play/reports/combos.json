@@ -1,5 +1,5 @@
 {
- "at": "2026-11-04T05:53:27.929Z",
+ "at": "2026-11-04T08:24:28.280Z",
  "ref": null,
  "sites": [
   {
@@ -3598,6 +3598,109 @@
      ],
      "no": [],
      "loc": "src/main/0015-prompt-studio/030-builders.js:58",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    }
+   ]
+  },
+  {
+   "key": "0250-story-factory.js storyWrapUp",
+   "n": 4,
+   "situations": [
+    "idol-audition · 기본"
+   ],
+   "combos": {
+    "COMMON_RULES,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,REL_RULE,SM_WRAPUP,THREAD_DUP_RULE,THREAD_FMT": 4
+   },
+   "switches": [
+    {
+     "cond": "tone",
+     "vars": [
+      "tone"
+     ],
+     "yes": [
+      "TONE_RULE"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "(t&&!/^(정하지 ?않음|없음|모름|비밀)$/.test(t))",
+     "vars": [
+      "test"
+     ],
+     "yes": [
+      "PLAYER_GENDER_TEXT"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:40",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "k==='f'",
+     "vars": [],
+     "yes": [
+      "CAST_SEX_F"
+     ],
+     "no": [
+      "CAST_SEX_M",
+      "CAST_SEX_MIX"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "k==='m'",
+     "vars": [],
+     "yes": [
+      "CAST_SEX_M"
+     ],
+     "no": [
+      "CAST_SEX_MIX"
+     ],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "k==='mix'",
+     "vars": [
+      "mix"
+     ],
+     "yes": [
+      "CAST_SEX_MIX"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
+     "seen": {
+      "yes": 0,
+      "no": 0
+     }
+    },
+    {
+     "cond": "bio",
+     "vars": [
+      "bio"
+     ],
+     "yes": [
+      "PLAYER_BIO"
+     ],
+     "no": [],
+     "loc": "src/main/0015-prompt-studio/030-builders.js:39",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11343,109 +11446,6 @@
    "switches": []
   },
   {
-   "key": "0530-story-memory.js storyWrapUp",
-   "n": 4,
-   "situations": [
-    "idol-audition · 기본"
-   ],
-   "combos": {
-    "COMMON_RULES,JSON_ONLY_SUFFIX,PLAYER_GENDER_OPEN,REL_RULE,SM_WRAPUP,THREAD_DUP_RULE,THREAD_FMT": 4
-   },
-   "switches": [
-    {
-     "cond": "tone",
-     "vars": [
-      "tone"
-     ],
-     "yes": [
-      "TONE_RULE"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:193",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "(t&&!/^(정하지 ?않음|없음|모름|비밀)$/.test(t))",
-     "vars": [
-      "test"
-     ],
-     "yes": [
-      "PLAYER_GENDER_TEXT"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:40",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "k==='f'",
-     "vars": [],
-     "yes": [
-      "CAST_SEX_F"
-     ],
-     "no": [
-      "CAST_SEX_M",
-      "CAST_SEX_MIX"
-     ],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "k==='m'",
-     "vars": [],
-     "yes": [
-      "CAST_SEX_M"
-     ],
-     "no": [
-      "CAST_SEX_MIX"
-     ],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "k==='mix'",
-     "vars": [
-      "mix"
-     ],
-     "yes": [
-      "CAST_SEX_MIX"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:192",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    },
-    {
-     "cond": "bio",
-     "vars": [
-      "bio"
-     ],
-     "yes": [
-      "PLAYER_BIO"
-     ],
-     "no": [],
-     "loc": "src/main/0015-prompt-studio/030-builders.js:39",
-     "seen": {
-      "yes": 0,
-      "no": 0
-     }
-    }
-   ]
-  },
-  {
    "key": "0535-content-audit.js auditAIStage",
    "n": 1,
    "situations": [
@@ -12067,7 +12067,7 @@
    ]
   },
   {
-   "key": "0530-story-memory.js storyWrapUp",
+   "key": "0250-story-factory.js storyWrapUp",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」",

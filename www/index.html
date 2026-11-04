@@ -5382,6 +5382,8 @@ function smNotes(side){if(side)return '';const notes=String(smState().notes||'')
 function smFocused(c,text){return !!text&&[c.name,c.id].some(n=>n&&String(text).includes(n));}
 function smProfile(c,text){return String(c.profile||'').slice(0,text?(smFocused(c,text)?1000:150):80);}
 function smVoice(c,text){return smFocused(c,text)?(c.lines||[]).slice(0,3).map(x=>String(x).slice(0,150)).join(' / '):String(c.lines?.[0]||'').slice(0,40);}
+/* src/main/0530-story-memory.js에서 옮김 */
+function smRelationRows(rows){let used=0;const out=[];for(const r of rows){const line=relLine(r);if(used+line.length>SM_LIMITS.relations)continue;used+=line.length;out.push(line);}return out.join('\n');}
 /* =========================================================
    AI 연결: 여러 글 AI(Claude, Vertex, Gemini, OpenAI 호환) + NovelAI
    ========================================================= */
@@ -7714,7 +7716,7 @@ const progObj=v=>!!v&&typeof v==='object';
 const PROG_SLOTS={
   stam:{make:()=>({v:STAM_MAX,at:Date.now()}), fill:(s,p)=>{ if(p.staminaCapVersion!==2){ stamRegen(s,120); p.staminaCapVersion=2; } }, now:s=>stamRegen(s,STAM_MAX)}, // 행동력 — 상한 120 시절 값은 그 상한으로 회복을 끝낸 뒤 새 상한으로
   dm:{make:()=>({date:today(),cnt:{login:1},got:{}}), stale:v=>v.date!==today(), tick:true}, // 일일 임무 — 날이 바뀌면 새로
-  raid:{make:raidNew, stale:r=>r.wk!==weekKey(), tick:true}, // 주간 레이드 — 주가 바뀌면 지난주 결과로 단계를 정해 새로
+  raid:{make:raidNew, stale:r=>r.wk!==weekKey(), fill:raidFill, tick:true}, // 주간 레이드 — 주가 바뀌면 지난주 결과로 단계를 정해 새로
   rogue:{make:()=>({run:null,best:0,day:'',n:0}), fill:r=>{ const x=r.run; if(x&&x.v===3){ x.v=2; x.c3=1; } }}, // 탐사 — 예전 3판 형식은 2판으로
   tower:{make:()=>({})}, gifts:{make:()=>({})}, fchat:{make:()=>({})}, cxSeen:{make:cxSeenNew,tick:true}, // 탑 · 선물 보관함 · 자유 대화 · 도감에서 본 항목
   sched:{make:()=>({day:today(),left:SCHED_N,done:[]}), stale:v=>v.day!==today(), tick:true}, // 오늘의 일정 — 날이 바뀌면 새로
@@ -8212,12 +8214,12 @@ function phoneList(){
 }
 function phRooms(){ const m={};
   Object.entries(P().inbox).forEach(([id,s])=>{ const t=threadById(id), c=threadChar(t); if(!c) return; const r=m[c.id]||(m[c.id]={c,at:0,unread:false}); r.at=Math.max(r.at,s.at||0); if(!s.done){ r.unread=true; r.title=r.title||t.title; } });
-  Object.entries(progSlot('fchat')).forEach(([cid,f])=>{ const c=charById(cid); if(!c||!f.log.length) return; const r=m[cid]||(m[cid]={c,at:0,unread:false}); r.at=Math.max(r.at,f.at||0); if(f.unread) r.unread=true; });
+  Object.entries(progRead('fchat')).forEach(([cid,f])=>{ const c=charById(cid); if(!c||!f.log.length) return; const r=m[cid]||(m[cid]={c,at:0,unread:false}); r.at=Math.max(r.at,f.at||0); if(f.unread) r.unread=true; });
   return Object.values(m).map(r=>Object.assign(r,{last:roomLog(r.c.id).filter(l=>l.w!=='s').at(-1)})).sort((a,b)=>b.at-a.at); }
 function roomThreads(cid){ return Object.entries(P().inbox).map(([id,s])=>({t:threadById(id),s})).filter(x=>{ const c=threadChar(x.t); return c&&c.id===cid; }).sort((a,b)=>(a.s.t0||a.s.at||0)-(b.s.t0||b.s.at||0)); }
 function roomItems(cid){ const out=[];
   roomThreads(cid).forEach(({s})=>{ const n=s.log.length, base=s.t0||s.at||0; s.log.forEach((l,i)=>{ if(l.w==='s'&&l.t==='대화가 끝났어요') return; out.push({l,arr:s.log,k:l.at||(s.t0?base+i:base-(n-i))}); }); });
-  const f=progSlot('fchat')[cid]; if(f) f.log.forEach((l,i)=>out.push({l,arr:f.log,k:l.at||i,fc:true}));
+  const f=progRead('fchat')[cid]; if(f) f.log.forEach((l,i)=>out.push({l,arr:f.log,k:l.at||i,fc:true}));
   return out.sort((a,b)=>a.k-b.k); }
 function roomLog(cid){ return roomItems(cid).map(x=>x.l); }
 function roomDel(cid,items){ const f=progSlot('fchat')[cid]; items.forEach(x=>{ const i=x.arr.indexOf(x.l); if(i<0) return; x.arr.splice(i,1); if(x.fc&&f&&i<(f.sumTo||0)) f.sumTo--; }); if(f&&!f.log.length){ f.sum=''; f.sumTo=0; } mark('prog'); }
@@ -8387,10 +8389,13 @@ function progK(){ const main=G.chapters.filter(ch=>ch.kind==='main'); let k=0; m
 function hashN(s){ let h=0; for(const ch of String(s)) h=(h*31+ch.charCodeAt(0))|0; return Math.abs(h); }
 /* 주간 레이드 새로 만들기(주가 바뀌면): 지난주 결과로 단계 오르내림(처치 +1, 절반 못 깎음 −1, 1~6) — 진행 칸 raid의 정의(0070 PROG_SLOTS)가 부름 */
 function raidNew(r){ r=progObj(r)?r:null; const pr=r&&r.total?r.dmg/r.total:0; const lv=r?Math.max(1,Math.min(6,(r.lv||1)+(r.killed?1:pr<0.5?-1:0))):1; return {wk:weekKey(),lv,dmg:0,killed:false,got:[],tries:{},best:0}; }
-function raidBoss(){ const r=progSlot('raid'), pool=[], bgOf={}; G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(e.boss&&!pool.some(x=>x.name===e.name)){ pool.push(e); bgOf[e.name]=stageBg(s); } })));
+/* 이번 주 레이드 보스(순수 — 진행 칸 r을 읽기만): 총 체력은 칸에 정해 둔 값, 없으면 보스 체력의 30배 */
+function raidBossOf(r){ const pool=[], bgOf={}; G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(e.boss&&!pool.some(x=>x.name===e.name)){ pool.push(e); bgOf[e.name]=stageBg(s); } })));
   const src=pool.length?pool[hashN(r.wk)%pool.length]:{name:'거대 잔광',elem:ELEMS[0]}; const b=fitEnemy({name:src.name,elem:ELEMS[hashN(r.wk+'e')%ELEMS.length],hp:3000,atk:110,def:50,spd:95,boss:true,bg:bgOf[src.name]||''},enemyTarget(progK()+(r.lv-1)*0.6,6,true)*1.3);
-  if(r.total){ const k=r.total/30/b.hp; b.hp=Math.round(r.total/30); b.atk=Math.round(b.atk*Math.min(1.5,Math.max(0.7,k))); } else { r.total=b.hp*30; mark('prog'); }
-  if(r.killed&&r.dmg<r.total) r.killed=false; return Object.assign(b,{total:r.total}); }
+  const total=r.total||b.hp*30, k=total/30/b.hp; return {...b,hp:Math.round(total/30),atk:Math.round(b.atk*Math.min(1.5,Math.max(0.7,k))),total}; }
+function raidBoss(){ return raidBossOf(progRead('raid')); } // 읽기 — 칸 맞춤은 raidFill
+/* 레이드 칸 맞춤(PROG_SLOTS raid fill — progSlot·그리기 전 처리가 부름): 총 체력을 정해 두고, 총 체력보다 덜 깎았는데 처치로 남은 표시는 끔 */
+function raidFill(r){ let ch=false; if(!r.total){ r.total=raidBossOf(r).total; ch=true; } if(r.killed&&r.dmg<r.total){ r.killed=false; ch=true; } if(ch) mark('prog'); }
 function raidTriesLeft(){ const r=progRead('raid'); return Math.max(0,3-(r.tries[today()]||0)); }
 /* 레이드 끝(Controller): 정산 → 효과음 → 결과 */
 function raidEnd(win){ const R=raidSettle(win); sfx(R.killed?'승리':'확인'); return raidResultHTML(R); }
@@ -10714,6 +10719,9 @@ function cleanChar0(o){
     weapon:{id:'w_'+id,name:String(w.name||''),desc:String(w.desc||''),prompt:String(w.prompt||''),img:null},
     naiPrompt:allyTags(String(o.naiPrompt||'')),img:null,episodes:[],faces:[],skins:[],illust:{id:'il_'+id,kind:'illust',name:String(o.name||'')+' 일러스트',prompt:'',img:null},upper:{id:'up_'+id,kind:'upper',name:String(o.name||'')+' 상반신',prompt:'',img:null},pose:{id:'po_'+id,kind:'pose',name:String(o.name||'')+' 로비 포즈',prompt:'',img:null},lbbg:{id:'lg_'+id,kind:'lbbg',name:String(o.name||'')+' 로비 배경',prompt:'',img:null},lbcg:{id:'lb_'+id,kind:'lbcg',name:String(o.name||'')+' 돌파 CG',prompt:'',img:null}};
 }
+/* src/main/0530-story-memory.js에서 옮김 */
+function smPrevious(ch){const s=ch?.stages?.at(-1);return String(s?.post||s?.pre||'').slice(-SM_LIMITS.previous);}
+async function storyWrapUp(ch,nt,{followups=true}={}){const origin=G,pid=PJ().active;try{const memory=ch.memory?.locked?ch.memory:await smExtract(ch);ch.memory=memory;mark('ch:'+ch.id);if(!followups)return {summary:memory.text,relations:[],threads:[],memory};let extra=null;try{extra=await SAMPLE.json(storyWrapUpPrompt({nt,memory,ch}),{modelTier:'default'});}catch(e){toast('상세 기억은 저장했지만 관계·후속 대화 정리는 실패했어요.');}if(G!==origin||PJ().active!==pid||!G.chapters.includes(ch))return null;return {summary:memory.text,relations:extra?.relations||[],threads:extra?.threads||[],memory};}catch(e){toast('이야기 기억 정리 실패: '+(e.message||e)+'. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요.');return null;}}
 /* ===== 새 게임 초안 (작가 설정을 직접 자세히 적고 만들기) ===== */
 const DR2KEY='ggm-draft2';
 let DR2=null, DRTAB='theme';
@@ -11204,7 +11212,7 @@ function exSetCond(id,v,at,rest){ progSlot('exped').cond[id]=Object.assign({v:Ma
 function exJobOf(id){ const J=progRead('exped').jobs; return Object.keys(J).find(k=>J[k].chars.includes(id))||null; }
 function exResting(id){ const st=progRead('exped').cond[id]; return !!(st&&st.rest&&st.rest>Date.now()); }
 // 전투에 못 나가는 캐릭터(일하는 중·쉬는 중·경영 배치). busyIds(0090)가 함께 써요
-function exBusyIds(){ if(exMode()==='combat'||!P().exped) return []; const s=progSlot('exped'); return [...Object.values(s.jobs).flatMap(j=>j.chars),...Object.values(s.biz.assign).flat(),...Object.keys(s.cond).filter(exResting)]; }
+function exBusyIds(){ if(exMode()==='combat'||!P().exped) return []; const s=progRead('exped'); return [...Object.values(s.jobs).flatMap(j=>j.chars),...Object.values(s.biz.assign).flat(),...Object.keys(s.cond).filter(exResting)]; }
 function exGive(gold,label){ if(seasonIs('train')) gold*=1.5; /* 훈련 시즌 보너스 — 전투형 파견(dispClaim)과 같게 */ const r={gold:Math.max(0,Math.round(gold))}; if(conOn()){ const ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2); ks.forEach(k=>{ r[k]=Math.max(10,Math.round(gold/20/10)*10); }); } giveReward(r); return r; }
 function exFameName(){ const m=exMode(); return m==='streamer'?EXC().streamer.fameName:EXC().idol.fameName; }
 
@@ -14953,14 +14961,12 @@ var SM_LIMITS={plot:100000,summary:6000,older:600,recent:2,previous:6000,scene:6
 var SM_JOB=null;
 function smState(){return gameRead('meta.storyMemory');} // 읽기 — 바꿀 때는 gameSlot('meta.storyMemory')
 function smFingerprint(ch){return hash(JSON.stringify((ch.stages||[]).map(s=>[s.title,s.pre,s.post]))).toString(36);}
-function smPrevious(ch){const s=ch?.stages?.at(-1);return String(s?.post||s?.pre||'').slice(-SM_LIMITS.previous);}
 function smChunks(ch){const chunks=[];for(const [i,s]of (ch.stages||[]).entries()){const body='[스테이지 '+(i+1)+' '+s.title+']\n'+(s.pre||'')+'\n'+(s.post||'');for(let p=0;p<body.length;p+=SM_LIMITS.chunk)chunks.push(body.slice(p,p+SM_LIMITS.chunk));}return chunks;}
 async function smExtract(ch,{signal,onProgress=()=>{}}={}){const origin=G,pid=PJ().active,fp=smFingerprint(ch),parts=smChunks(ch);if(!parts.length)throw Error('정리할 대본이 없습니다.');const check=()=>{if(signal?.aborted)throw Error('중단했습니다. 기존 기억은 유지됩니다.');if(G!==origin||PJ().active!==pid||!G.chapters.includes(ch)||smFingerprint(ch)!==fp)throw Error('게임 또는 대본이 바뀌어 결과를 적용하지 않습니다.');};
  const request=async(prompt)=>{check();if(!SAMPLE)throw Error('글 AI를 먼저 연결해 주세요.');const result=await SAMPLE.json(prompt,{modelTier:'default',signal});check();if(!result||typeof result.text!=='string'||!result.text.trim()||result.text.length>6000)throw Error('기억 응답이 비었거나 6,000자를 초과했습니다. 다시 정리해 주세요.');return result;};
  let records=[];for(let i=0;i<parts.length;i++){onProgress('대본 읽는 중 '+(i+1)+'/'+parts.length);const r=await request(smExtractPrompt({i,parts}));records.push(r.text);}
  while(records.join('\n').length>24000){const next=[];let group=[],size=0;const batches=[];for(const r of records){if(size+r.length>12000&&group.length){batches.push(group);group=[];size=0;}group.push(r);size+=r.length;}if(group.length)batches.push(group);onProgress('전체 대본 기록을 합치는 중');for(const batch of batches){const r=await request(pf('SM_EXTRACT_MERGE')+batch.join('\n\n'));next.push(r.text);}if(next.join('\n').length>=records.join('\n').length)throw Error('중간 기록을 충분히 정리하지 못했습니다. 기존 기억은 유지됩니다.');records=next;}
  onProgress('사건·관계·인지·복선을 정리하는 중');const r=await request(smExtractPrompt2({ch,records}));if(String(r.brief||'').length>600||String(r.unresolved||'').length>1200)throw Error('짧은 기억 또는 미회수 기록이 범위를 초과했습니다.');return {version:1,text:r.text,brief:String(r.brief||''),unresolved:String(r.unresolved||''),fingerprint:fp,at:Date.now(),source:'ai',locked:false};}
-async function storyWrapUp(ch,nt,{followups=true}={}){const origin=G,pid=PJ().active;try{const memory=ch.memory?.locked?ch.memory:await smExtract(ch);ch.memory=memory;mark('ch:'+ch.id);if(!followups)return {summary:memory.text,relations:[],threads:[],memory};let extra=null;try{extra=await SAMPLE.json(storyWrapUpPrompt({nt,memory,ch}),{modelTier:'default'});}catch(e){toast('상세 기억은 저장했지만 관계·후속 대화 정리는 실패했어요.');}if(G!==origin||PJ().active!==pid||!G.chapters.includes(ch))return null;return {summary:memory.text,relations:extra?.relations||[],threads:extra?.threads||[],memory};}catch(e){toast('이야기 기억 정리 실패: '+(e.message||e)+'. 설정의 스토리 기억 관리에서 다시 정리할 수 있어요.');return null;}}
 /* 최근 스토리 요청 기록: AI 연결이 알리는 요청 단계(창 이벤트 ggm-ai — start·ok·fail)를 듣고 스토리 참조 요청만 기록(요청 준비 → 응답 수신·실패). AI 연결은 스토리 기억을 모름 */
 function smRecord({detail:d}){const prompt=String(d.prompt);if(!prompt.includes('【스토리 참조:'))return;if(d.phase==='start'){const label=(prompt.match(/【스토리 참조:([^】]+)】/)||[])[1]||'스토리';gameSlot('meta.storyMemory').latestRequest={at:Date.now(),label,tier:d.tier,characters:prompt.length,prompt,status:'요청 준비'};mark('meta');return;}
  if(!smState().latestRequest)return;gameSlot('meta.storyMemory').latestRequest.status=d.phase==='ok'?'응답 수신':'실패: '+d.error;mark('meta');}
@@ -14985,7 +14991,6 @@ document.addEventListener('click',async e=>{const el=e.target.closest('[data-sm]
  if(action==='undo'){const ch=G.chapters.find(x=>x.id===id);if(!ch?.memoryPrevious)return;const before=ch.memoryPrevious;if(!await appConfirm('이 장의 이전 기억으로 되돌릴까요? 대본은 바뀌지 않습니다.'))return;if(G!==origin||PJ().active!==pid||!G.chapters.includes(ch)||ch.memoryPrevious!==before)return;const now={memory:ch.memory||null,summary:ch.summary||''};ch.memory=before.memory;ch.summary=before.summary;ch.memoryPrevious=JSON.parse(JSON.stringify(now));mark('ch:'+ch.id);await flush();openStoryMemoryEditor(id);}
  }catch(err){toast(err.message||String(err));}});
 
-function smRelationRows(rows){let used=0;const out=[];for(const r of rows){const line=relLine(r);if(used+line.length>SM_LIMITS.relations)continue;used+=line.length;out.push(line);}return out.join('\n');}
 
 document.addEventListener('input',e=>{if(e.target.id==='ng_story'){const count=document.getElementById('story-char-count');if(count)count.textContent=e.target.value.length.toLocaleString()+' / 100,000자'+(e.target.value.length>100000?' · 초과했습니다. 저장 전에 줄여 주세요.':e.target.value.length>50000?' · 긴 원문입니다. AI 사용량과 응답 시간을 확인해 주세요.':'');}});
 

@@ -33,6 +33,7 @@
 | 0250-story-factory.js aiChapterGen0 | 2 | 1 | 1 | 30402~30413 | 54 | 0 | 16 | 38 |
 | 0250-story-factory.js aiEventGen0 | 1 | 1 | 1 | 25894~25894 | 49 | 0 | 10 | 39 |
 | 0250-story-factory.js ensureLibPrompts | 1 | 1 | 1 | 3705~3705 | 19 | 0 | 2 | 17 |
+| 0250-story-factory.js storyWrapUp | 4 | 1 | 1 | 1388~1388 | 6 | 0 | 0 | 6 |
 | 0250-story-factory.js writeStages | 12 | 1 | 6 | 8812~10947 | 37 | 1 | 12 | 24 |
 | 0260-new-game/010-draft.js drHarmony | 1 | 1 | 1 | 1113~1113 | 9 | 0 | 1 | 8 |
 | 0260-new-game/010-draft.js drPolishHero | 1 | 1 | 1 | 397~397 | 6 | 0 | 0 | 6 |
@@ -57,7 +58,6 @@
 | 0510-actions/110-economy.js handleEconomyAction | 1 | 1 | 1 | 687~687 | 7 | 0 | 0 | 7 |
 | 0510-actions/120-messenger.js handleMessengerAction | 1 | 1 | 1 | 8201~8201 | 28 | 0 | 7 | 21 |
 | 0530-story-memory.js smExtract | 25 | 1 | 2 | 351~1711 | 0 | 0 | 0 | 0 |
-| 0530-story-memory.js storyWrapUp | 4 | 1 | 1 | 1388~1388 | 6 | 0 | 0 | 6 |
 | 0535-content-audit.js auditAIStage | 1 | 1 | 1 | 8152~8152 | 25 | 0 | 5 | 20 |
 | 그림 0030-image/010-engine.js naiDraw | 7 | 2 | 1 | 833~1925 | 1 | 0 | 0 | 1 |
 
@@ -92,7 +92,7 @@
 | 형식 견본 뒤 글 | 0530-story-memory.js smExtract | 견본 뒤에 「[대본] [스테이지 3 값 127] 대본 226 대본 227 다른 설명이나 코드 블록 없이」 |
 | 형식 견본 뒤 글 | 0530-story-memory.js smExtract | 견본 뒤에 「[대본] [스테이지 4 값 162] 대본 228 대본 229 다른 설명이나 코드 블록 없이」 |
 | 형식 견본 뒤 글 | 0530-story-memory.js smExtract | 견본 뒤에 「기록 230 기록 231 기록 232 기록 233 다른 설명이나 코드 블록 없이 JSON만」 |
-| 형식 견본 뒤 글 | 0530-story-memory.js storyWrapUp | 견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」 |
+| 형식 견본 뒤 글 | 0250-story-factory.js storyWrapUp | 견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」 |
 | 형식 견본 뒤 글 | 0530-story-memory.js smExtract | 견본 뒤에 「[대본] [스테이지 1 값 262] 대본 427 대본 428 다른 설명이나 코드 블록 없이」 |
 | 형식 견본 뒤 글 | 0530-story-memory.js smExtract | 견본 뒤에 「[대본] [스테이지 2 값 297] 대본 429 대본 430 다른 설명이나 코드 블록 없이」 |
 | 형식 견본 뒤 글 | 0530-story-memory.js smExtract | 견본 뒤에 「[대본] [스테이지 3 값 332] 대본 431 대본 432 다른 설명이나 코드 블록 없이」 |
@@ -196,9 +196,9 @@
 | 0510-actions/090-characters.js handleCharactersAction#5 | src/main/0510-actions/090-characters.js:42 | 0 |
 | 0510-actions/100-images-and-assets.js handleImagesAndAssetsAction | src/main/0510-actions/100-images-and-assets.js:29 | 0 |
 | 0510-actions/100-images-and-assets.js handleImagesAndAssetsAction#2 | src/main/0510-actions/100-images-and-assets.js:92 | 25 |
-| 0530-story-memory.js smExtract#2 | src/main/0530-story-memory.js:11 | 0 |
-| 0530-story-memory.js smExtract#3 | src/main/0530-story-memory.js:12 | 0 |
-| 0530-story-memory.js smExtract#4 | src/main/0530-story-memory.js:13 | 0 |
+| 0530-story-memory.js smExtract#2 | src/main/0530-story-memory.js:10 | 0 |
+| 0530-story-memory.js smExtract#3 | src/main/0530-story-memory.js:11 | 0 |
+| 0530-story-memory.js smExtract#4 | src/main/0530-story-memory.js:12 | 0 |
 | 0535-content-audit.js auditAIFill | src/main/0535-content-audit.js:62 | 27 |
 | modules/combat/050-bridge.js v2GenerateSkills | src/modules/combat/050-bridge.js:296 | 4 |
 | modules/combat/050-bridge.js v2ConceptPrompt | src/modules/combat/050-bridge.js:369 | 0 |
@@ -241,6 +241,7 @@
 - 0250-story-factory.js aiChapterGen0: `deep`( 거짓 못 봄) · `deep`( 거짓 못 봄) · `deep`( 거짓 못 봄) · `deep`( 거짓 못 봄) · `deep`( 거짓 못 봄) · `deep`( 거짓 못 봄) · `tone`(참 못 봄) · `w.source`(참 못 봄)
 - 0250-story-factory.js aiEventGen0: `deep`( 거짓 못 봄) · `deep`( 거짓 못 봄) · `deep`( 거짓 못 봄) · `deep`( 거짓 못 봄) · `ncN`(참 못 봄) · `deep`( 거짓 못 봄) · `deep`( 거짓 못 봄) · `tone`(참 못 봄)
 - 0250-story-factory.js ensureLibPrompts: `w.source`(참 못 봄) · `side`() · `storyCfg().plot`(참 못 봄) · `bib`(참 못 봄) · `side`(참 못 봄 거짓 못 봄) · `side`( 거짓 못 봄) · `c.alt&&charById(c.alt)`(참 못 봄) · `G.chars.some(c=>c.alt&&!c.altCanon)`(참 못 봄)
+- 0250-story-factory.js storyWrapUp: `tone`(참 못 봄) · `(t&&!/^(정하지 ?않음|없음|모름|비밀)$/.test(t))`(참 못 봄) · `k==='f'`(참 못 봄 거짓 못 봄) · `k==='m'`(참 못 봄 거짓 못 봄) · `k==='mix'`(참 못 봄) · `bio`(참 못 봄)
 - 0250-story-factory.js writeStages: `o.plan`() · `prevTail`() · `s.story`(참 못 봄) · `s.mode`() · `i===n-1`() · `tone`(참 못 봄) · `w.source`(참 못 봄) · `side`()
 - 0260-new-game/010-draft.js drHarmony: `!d.tone`( 거짓 못 봄) · `dupTxt(d.kw,d.tone)`(참 못 봄) · `d.fan&&d.src`(참 못 봄) · `(d.setting.trim())`(참 못 봄) · `(d.story.trim())`(참 못 봄) · `(cs.length)`(참 못 봄) · `(hr.name||hr.call||hr.gender||hr.look||hr.bio)`() · `없으면: hr.call`( 거짓 못 봄)
 - 0260-new-game/010-draft.js drPolishHero: `L.length`(참 못 봄) · `(skip!=='setting'&&d.setting.trim())`(참 못 봄) · `(skip!=='story'&&d.story.trim())`(참 못 봄) · `(skip!=='hero'&&(hr.name||hr.call||hr.gender||hr.look||hr.bio))`(참 못 봄) · `x.startsWith('2차 창작')`(참 못 봄) · `d.fan&&d.src`(참 못 봄)
@@ -263,6 +264,5 @@
 - 0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction: `af`(참 못 봄) · `dup`(참 못 봄) · `tone`(참 못 봄) · `w.source`(참 못 봄) · `side`() · `storyCfg().plot`(참 못 봄) · `bib`(참 못 봄) · `side`(참 못 봄 거짓 못 봄)
 - 0510-actions/110-economy.js handleEconomyAction: `c`(참 못 봄) · `tone`(참 못 봄) · `(t&&!/^(정하지 ?않음|없음|모름|비밀)$/.test(t))`(참 못 봄) · `k==='f'`(참 못 봄 거짓 못 봄) · `k==='m'`(참 못 봄 거짓 못 봄) · `k==='mix'`(참 못 봄) · `bio`(참 못 봄)
 - 0510-actions/120-messenger.js handleMessengerAction: `hint`( 거짓 못 봄) · `없으면: roomLog(c.id).slice(-10).map(l=>l.w==='me'?playerName()+': '+l.t:`() · `tone`(참 못 봄) · `w.source`(참 못 봄) · `side`() · `storyCfg().plot`(참 못 봄) · `bib`(참 못 봄) · `side`(참 못 봄 거짓 못 봄)
-- 0530-story-memory.js storyWrapUp: `tone`(참 못 봄) · `(t&&!/^(정하지 ?않음|없음|모름|비밀)$/.test(t))`(참 못 봄) · `k==='f'`(참 못 봄 거짓 못 봄) · `k==='m'`(참 못 봄 거짓 못 봄) · `k==='mix'`(참 못 봄) · `bio`(참 못 봄)
 - 0535-content-audit.js auditAIStage: `tone`(참 못 봄) · `w.source`(참 못 봄) · `side`() · `storyCfg().plot`(참 못 봄) · `bib`(참 못 봄) · `side`(참 못 봄 거짓 못 봄) · `side`() · `c.alt&&charById(c.alt)`(참 못 봄)
 - 그림 0030-image/010-engine.js naiDraw: `(m&&String(m.artTags||'').trim())`(참 못 봄)
