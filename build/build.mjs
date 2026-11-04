@@ -40,6 +40,9 @@ const text = f => {
   return s;
 };
 
+// 빌드가 실제로 넣은 src 파일(템플릿 지시어가 가리킨 것) — 나머지는 index.html에 안 들어가는 파일(레거시 폐기물 후보 — unbuilt)
+export const USED = new Set();
+export function unbuilt(src) { USED.clear(); build(src); return tree(src).filter(f => !USED.has(f) && f !== join(src, 'index.html')).map(f => f.replace(src + '/', '')); }
 export function build(src) {
   const lines = readFileSync(join(src, 'index.html'), 'utf8').split('\n');
   let out = '';
@@ -53,9 +56,9 @@ export function build(src) {
       for (const f of files(p)) {
         const id = prefix + f.replace(/^\d+-/, '').replace(/\.js$/, '');
         if (!/^[a-z0-9-]+$/.test(id)) throw Error(`모듈 파일 이름은 영문 소문자·숫자·-만 써요: ${f}`);
-        out += `<script type="text/ggm-module" id="${id}">\n${text(join(p, f))}</script>\n`;
+        USED.add(join(p, f)); out += `<script type="text/ggm-module" id="${id}">\n${text(join(p, f))}</script>\n`;
       }
-    } else out += path.endsWith('/') ? tree(p).map(text).join('') : text(p);
+    } else { const fs = path.endsWith('/') ? tree(p) : [p]; fs.forEach(f => USED.add(f)); out += fs.map(text).join(''); }
   });
   return out;
 }
@@ -82,6 +85,7 @@ if (isMain) {
   }
   writeFileSync(outFile, html);
   console.log(`빌드: ${outFile} (${Buffer.byteLength(html).toLocaleString()} bytes, sha256 ${sha})`);
+  { const left = tree(src).filter(f => !USED.has(f) && f !== join(src, 'index.html')).map(f => f.replace(src + '/', '')); if (left.length) console.log(`index.html에 안 들어가는 src 파일 ${left.length}(레거시 폐기물 후보 — 지우거나 템플릿에 넣기): ${left.join(', ')}`); }
   const vf = join(ROOT, 'version.json');
   if (!process.argv.includes('--no-version') && existsSync(vf)) {
     const v = JSON.parse(readFileSync(vf, 'utf8')), built = (html.match(/var BUILT='([^']+)'/) || [])[1];
