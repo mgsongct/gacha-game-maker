@@ -788,6 +788,8 @@ try {
       await p3.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
       await p3.goto(`http://127.0.0.1:${port}/?pc=${key}`);
       await p3.waitForFunction(() => typeof PCS === 'function' && PCS() && typeof G === 'object', null, { timeout: 15000 });
+      /* 저장 정책(STORE_POLICY): 동기화 갈래(프롬프트 교훈)는 PC 서버로, 기기 갈래(화면 방향)는 이 기기에만, 연동 설정은 받는 기기의 이름을 지킴 */
+      await p3.evaluate(() => { appStorage.setItem('ggm-plessons', JSON.stringify([{ id: 'pl_t', lesson: '시험 교훈' }])); appStorage.setItem('ggm-orient', 'portrait'); appStorage.setItem('ggm-sync', JSON.stringify({ repo: 'me/repo', device: '첫 기기' })); });
       const gold = await p3.evaluate(async () => { P().gold += 777; mark('prog'); await flush(); return P().gold; });
       const prog = join(pcDir, 'data/main/prog.json');
       await until(() => JSON.parse(readFileSync(prog, 'utf8')).gold === gold, 30000, '자동 동기화(prog.json)');
@@ -795,13 +797,20 @@ try {
       assert.ok(JSON.parse(readFileSync(join(pcDir, 'data/index.json'), 'utf8')).list);
       const st = JSON.parse(readFileSync(join(pcDir, 'ggm-data/state.json'), 'utf8'));
       assert.ok(!('starfall-contract-v1' in st.ls) && st._dataGames.includes('main'), 'state.json에 게임 본문이 남아 있으면 안 돼요');
+      await until(() => 'ggm-plessons' in JSON.parse(readFileSync(join(pcDir, 'ggm-data/state.json'), 'utf8')).ls, 30000, '동기화 갈래 설정이 PC 서버로');
+      { const ls = JSON.parse(readFileSync(join(pcDir, 'ggm-data/state.json'), 'utf8')).ls; assert.ok(!('ggm-orient' in ls) && 'ggm-sync' in ls, '기기 갈래는 안 올라가고 비밀 갈래(연동 설정)는 PC 서버에는 올라감: ' + Object.keys(ls)); }
       // 빈 기기(새 브라우저 = 빈 IndexedDB)가 접속하면 서버 data 폴더의 게임을 받아 캐시로 씀
       const c4 = await b3.newContext(), p4 = await c4.newPage(); p4.on('pageerror', e => err3.push(String(e)));
       await p4.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
       await p4.goto(`http://127.0.0.1:${port}/?pc=${key}`);
+      await p4.evaluate(() => { try { appStorage.setItem('ggm-sync', JSON.stringify({ device: '둘째 기기' })); } catch (e) {} }).catch(() => 0);
       await until(() => p4.evaluate(() => typeof P === 'function' && P().gold).catch(() => 0).then(v => v === gold), 30000, '빈 기기에서 PC 게임 받기');
+      { const r = await p4.evaluate(() => ({ pl: appStorage.getItem('ggm-plessons'), or: appStorage.getItem('ggm-orient'), sy: JSON.parse(appStorage.getItem('ggm-sync') || '{}') }));
+        assert.ok(String(r.pl).includes('시험 교훈') && r.or == null && r.sy.repo === 'me/repo', '빈 기기: 동기화 갈래는 받고 기기 갈래는 안 받음: ' + JSON.stringify(r));
+        const m = await p4.evaluate(() => { appStorage.setItem('ggm-sync', JSON.stringify({ repo: 'me/repo', device: '둘째 기기' })); return JSON.parse(syMerge('ggm-sync', JSON.stringify({ repo: 'me/repo2', device: '첫 기기' }))); });
+        assert.ok(m.repo === 'me/repo2' && m.device === '둘째 기기', '연동 설정을 받을 때 이 기기 이름은 지킴(keep): ' + JSON.stringify(m)); }
       await b3.close(); assert.deepEqual(err3, [], '페이지 오류');
-      console.log('ok 6  PC 서버: 앱 저장 → data/main/*.json 자동 동기화, 빈 기기는 서버 data 폴더에서 받아 옴');
+      console.log('ok 6  PC 서버: 앱 저장 → data/main/*.json 자동 동기화, 빈 기기는 서버 data 폴더에서 받아 옴 · 저장 정책(동기화·비밀 갈래는 PC 서버로, 기기 갈래는 안 감)');
     } finally { proc.kill(); }
     // 33 배포본: 원본 배포 zip처럼 실행 파일만 든 gacha-game-maker-pc.zip을 빈 폴더에 풀고 start.sh로 켜면, 앱(www/)을 받는 곳(GitHub raw 자리에 로컬 서버)에서
     //    빌드된 www를 받아 띄우고 브라우저에서 그 빌드가 돈다(BUILT = version.json build, 서버 버전 = SERVER_VER)

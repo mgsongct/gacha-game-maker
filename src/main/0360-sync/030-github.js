@@ -46,7 +46,7 @@ async function syPull(){
  try{syBar('클라우드 확인 중…');await flush();const R=await syRemote(o);if(!R.state)throw Error('클라우드에 아직 올린 데이터가 없어요');const S=R.state;
   const idx=await syncStageMedia(S,async(k,h)=>{const sha=R.paths['sync/b/'+h];if(!sha)throw Error('클라우드 자료가 빠져 있습니다: '+k);const r=await gh(o,'/git/blobs/'+sha,{binary:true});if(r.bytes)return r.bytes;if(r.text){const b=JSON.parse(r.text);if(b.content)return b64ToBytes(b.content.replace(/\s/g,''));}throw Error('자료 응답이 비어 있습니다: '+k);},prefix);
   if(G!==source||PJ().active!==project)throw Error('작업 중 게임이 바뀌어 받기를 취소했습니다');await flush();window.__NOFLUSH=true;clearTimeout(flushT);
-  const w=await lsApply(S.ls,syMerge,prefix);committed=true;dirty.clear();saveSyIdx(idx);
+  const w=await lsApply(S.ls,prefix);committed=true;dirty.clear();saveSyIdx(idx);
   const o2=SY();o2.last=S.at;o2.lastDir='down';o2.localAt=w.at;saveSY(o2);toast('클라우드의 데이터를 받았어요. 다시 시작할게요');setTimeout(()=>reloadGame(),900);return true;
  }catch(e){PULLERR_QUOTA=e?.name==='QuotaExceededError';PULLERR='받기 실패. '+syErr(e);toast(PULLERR);if(committed){setTimeout(()=>reloadGame(),900);return true;}return false;}
  finally{if(!committed)window.__NOFLUSH=previous;await appStorage.discard(prefix).catch(()=>{});SYJOB=null;syBar('');}

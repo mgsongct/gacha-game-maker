@@ -17,9 +17,24 @@ function sha256js(m){ const K=[],H=[]; let n=2; const fr=x=>(x-Math.floor(x))*42
   return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join(''); }
 // 게임 목록(starfall-projects)은 한 번도 저장 안 됐을 수 있어요(샘플 게임만 쓴 기기). 받는 쪽은 목록이 꼭 있어야 해서 기본 목록을 채워 보내요
 function syLsValue(k){ const v=appStorage.getItem(k); return v==null&&k===PJKEY?JSON.stringify(PJ()):v; }
-function syLsKeys(withKeys){ const pj=PJ(); const keys=[PJKEY,SETUP_KEY,...pj.list.map(x=>pjKey(x.id))]; keys.push(NKEY,SKEY); if(withKeys) keys.push(PKEY); return keys; }
-function syStrip(k,v,withKeys){ if(withKeys||v==null) return v; try{ if(k===NKEY){ const o=JSON.parse(v); delete o.key; return JSON.stringify(o); } if(k===SKEY){ const o=JSON.parse(v); delete o.fishKey; delete o.elKey; return JSON.stringify(o); } }catch(e){} return v; }
-function syMerge(k,v){ if(v==null) return v; try{ if(k===NKEY){ const cur=JSON.parse(appStorage.getItem(NKEY)||'{}'), o=JSON.parse(v); if(!o.key&&cur.key) o.key=cur.key; return JSON.stringify(o); } if(k===SKEY){ const cur=JSON.parse(appStorage.getItem(SKEY)||'{}'), o=JSON.parse(v); ['fishKey','elKey'].forEach(x=>{ if(!o[x]&&cur[x]) o[x]=cur[x]; }); return JSON.stringify(o); } }catch(e){} return v; }
+/* 저장 정책(사용자 지시 — 브라우저 저장소는 캐시, 원본은 PC 서버의 파일: 게임은 data/, 그 밖의 설정은 ggm-data/state.json — 자동 동기화).
+   브라우저 저장소(appStorage·localStorage) 키마다 갈래를 한곳에서 정해요. 게임 저장(starfall-projects·starfall-contract-v1…)은 저장소가 따로 관리해요(GGMStorage.managed)
+   sync   — 사용자가 만든 내용·게임에 필요한 설정: PC 서버·GitHub 둘 다
+   secret — 비밀(API 키·토큰)이 든 설정: PC 서버에는 그대로, GitHub에는 [뺄 칸]을 빼고(null이면 보내지 않음). 받을 때 빠진 비밀은 이 기기 것을 지킴
+   keep   — 받을 때 이 기기 값을 지키는 칸(연동 설정의 기기 이름)
+   device — 이 기기에만 의미 있는 값 · cache — 다시 만들 수 있는 캐시·기록 (둘 다 동기화 안 함)
+   새 저장 키는 여기에 갈래를 정해요(tools/map.mjs가 갈래 없는 키·목록과 다른 동기화를 막아요) */
+const STORE_POLICY={
+  sync:['starfall-setup-done','ggm-plessons','ggm-packs','ggm-llmslot','ggm-shared-assets','ggm-drafts','ggm-draft2'],
+  secret:{'starfall-nai':['key'],'starfall-sound':['fishKey','elKey'],'starfall-ai-profiles':null,'ggm-sync':null,'ggm-pub':null},
+  keep:{'ggm-sync':['device']},
+  device:['ggm-devid','ggm-orient','ggm-desk','ggm-a2hs','ggm-pc','ggm-proxy','ggm-proxy-off','ggm-play','ggm-start','ggm-bkdest','ggm-ng-draft','ggm-sync-idx','ggm-sync-hold'],
+  cache:['starfall-live','starfall-live-html','ggm-pthumb','ggm-voice-ja','ggm-ailog','ggm-upd-notes','starfall-nai-tperr']
+};
+function syLsKeys(withKeys){ const pj=PJ(), sec=Object.entries(STORE_POLICY.secret).filter(([,f])=>withKeys||f).map(([k])=>k); return [PJKEY,...pj.list.map(x=>pjKey(x.id)),...STORE_POLICY.sync,...sec]; }
+function syStrip(k,v,withKeys){ const f=STORE_POLICY.secret[k]; if(withKeys||v==null||!f) return v; try{ const o=JSON.parse(v); f.forEach(x=>{ delete o[x]; }); return JSON.stringify(o); }catch(e){} return v; }
+/* 받을 때: 빠진 비밀(GitHub로 받은 설정)과 이 기기 값(keep)은 이 기기 것을 지켜요 */
+function syMerge(k,v){ if(v==null) return v; const f=[...(STORE_POLICY.secret[k]||[]),...(STORE_POLICY.keep[k]||[])]; if(!f.length) return v; try{ const cur=JSON.parse(appStorage.getItem(k)||'{}'), o=JSON.parse(v); f.forEach(x=>{ if((!o[x]||(STORE_POLICY.keep[k]||[]).includes(x))&&cur[x]) o[x]=cur[x]; }); return JSON.stringify(o); }catch(e){} return v; }
 let SYJOB=null;
 function syBar(t){ let el=$('#syBar'); if(!t){ if(el) el.remove(); return; } if(!el){ el=document.createElement('div'); el.id='syBar'; el.className='prepchip'; document.body.appendChild(el); } el.innerHTML=`<b>☁ ${esc(t)}</b>`; }
 function syErr(e){let message=e?.status===404?'저장소·브랜치를 찾지 못했습니다. 이름과 토큰 권한을 확인해 주세요.':e?.status===401||e?.status===403?'토큰 또는 저장소 쓰기 권한을 확인해 주세요.':AIERR[e?.code]||e?.message||'다시 시도해 주세요';if(e?.status)message=`HTTP ${e.status} · `+message;if(e?.endpoint)message+=' · 단계: '+e.endpoint;if(e?.details)message+=' · '+e.details;return ghSafeMessage(message).slice(0,1000);}

@@ -35,7 +35,7 @@ async function pcPull(src){
  try{syBar('PC에서 받는 중…');await flush();const S=src&&src.state||await pcApi('/api/store/state',{ok404:true});if(!S)throw Error('PC에 아직 저장된 게임이 없어요');
   const idx=await syncStageMedia(S,async(k,h)=>{let error;for(let t=0;t<3;t++){try{const r=await pcApi('/api/store/blob/'+h,{binary:true,timeout:60000});if(r?.bytes)return r.bytes;throw Error('빈 자료 응답');}catch(e){error=e;if(e?.code==='bad_key')throw e;if(t<2)await wait(1500*(t+1));}}throw error;},prefix);
   if(G!==source||PJ().active!==project)throw Error('작업 중 게임이 바뀌어 받기를 취소했습니다');await flush();window.__NOFLUSH=true;clearTimeout(flushT);
-  const w=await lsApply(S.ls,null,prefix);committed=true;dirty.clear();saveSyIdx(idx);
+  const w=await lsApply(S.ls,prefix);committed=true;dirty.clear();saveSyIdx(idx);
   const o=PCS();o.last=src&&src.restore?src.cur||Date.now():S.at;o.localAt=src&&src.restore?0:w.at;if(src&&src.restore)o.restored=1;setPCS(o);
   toast('PC의 게임을 받았어요. 다시 시작할게요');setTimeout(()=>reloadGame(),800);return true;
  }catch(e){PULLERR_QUOTA=e?.name==='QuotaExceededError';PULLERR='PC에서 받기 실패. '+syErr(e);toast(PULLERR);if(committed){setTimeout(()=>reloadGame(),800);return true;}return false;}

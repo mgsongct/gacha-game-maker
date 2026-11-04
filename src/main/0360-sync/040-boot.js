@@ -29,12 +29,12 @@ function openPullFail(mode,why){ const pc=mode==='pc';
     <div class="row" style="margin-top:12px"><button class="btn" data-act="${pc?'pcpullgo':'sypull'}">다시 받기</button>${pc?'<button class="btn ghost" data-act="pchist">PC 백업</button>':''}<button class="btn ghost" data-act="close">이 기기로 계속</button></div>`); }
 let PULLERR_QUOTA=false;
 // Remote game records and staged media become visible together, only after validation succeeds.
-async function lsApply(ls,mapv,prefix){
+async function lsApply(ls,prefix){
  if(!ls||typeof ls!=='object'||Array.isArray(ls))throw Error('받은 저장 목록이 올바르지 않습니다');
  const pj=JSON.parse(ls[PJKEY]||'null');
  if(!pj||!Array.isArray(pj.list)||typeof pj.active!=='string'||!pj.list.some(x=>x&&x.id===pj.active))throw Error('받은 게임 목록을 확인하지 못했습니다');
- const records={},prefs={},allowed=new Set([SETUP_KEY,NKEY,SKEY,PKEY]);
- for(const[k,raw]of Object.entries(ls)){if(!GGMStorage.managed(k)&&!allowed.has(k))continue;if(typeof raw!=='string')throw Error('받은 저장 항목 형식이 올바르지 않습니다');const v=mapv?mapv(k,raw):raw;if(v==null)continue;if(GGMStorage.managed(k)){if(k!==PJKEY&&!Array.isArray(JSON.parse(v)?.chars))throw Error('받은 게임 자료를 확인하지 못했습니다');records[k]=v;}else prefs[k]=v;}
+ const records={},prefs={},allowed=new Set([...STORE_POLICY.sync,...Object.keys(STORE_POLICY.secret)]); /* 받는 설정 = 저장 정책의 동기화·비밀 갈래 */
+ for(const[k,raw]of Object.entries(ls)){if(!GGMStorage.managed(k)&&!allowed.has(k))continue;if(typeof raw!=='string')throw Error('받은 저장 항목 형식이 올바르지 않습니다');const v=syMerge(k,raw);if(v==null)continue;if(GGMStorage.managed(k)){if(k!==PJKEY&&!Array.isArray(JSON.parse(v)?.chars))throw Error('받은 게임 자료를 확인하지 못했습니다');records[k]=v;}else prefs[k]=v;}
  const active=records[pjKey(pj.active)];if(!active)throw Error('선택한 게임의 저장 데이터가 빠져 있습니다');
  const old={};try{for(const[k,v]of Object.entries(prefs)){old[k]=appStorage.getItem(k);appStorage.setItem(k,v);}await appStorage.commitRecords(records,prefix||null);}
  catch(e){for(const[k,v]of Object.entries(old))try{v===null?appStorage.removeItem(k):appStorage.setItem(k,v);}catch(ignore){}throw e;}
