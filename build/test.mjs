@@ -697,6 +697,22 @@ try {
     o.noFail = !said.some(m => m.includes('작업을 완료하지 못했습니다')) || said.join(' / '); window.toast = toast0; if (!had0) delete P().owned[own0.id];
     return o; });
   assert.ok(Object.values(r26).every(v => v === true), JSON.stringify(r26)); assert.deepEqual(err26, [], '페이지 오류');
+  const r26m = await p26.evaluate(async () => {
+    /* 메신저 실시간 대화(나누기 전 동작 고정): 대화방 열기 → 안 읽음 0 · 직접 말 걸기 → 내 말 + 답장 2 기록·말풍선·입력 칸 비움·입력 중 표시 없음 · 스레드 재생 → 선택지 → 고르면 내 말·다음 말 → 끝나면 완료 */
+    const o = {}, own0 = G.chars[0]; P().owned[own0.id] = P().owned[own0.id] || { levelCapVersion: 1, transc: 0, growthCostVersion: 1, lv: 1, exp: 0, dup: 0, aff: 0, seen: [], wlv: 0, skin: '' };
+    { const S0 = SAMPLE, mc = own0, fch = progSlot('fchat'); SAMPLE = { json: async () => ({ replies: ['답장1', '답장2'] }) }; P().fcPhoto = false; fch[mc.id] = { log: [], sum: '', sumTo: 0, at: 0, unread: 2 };
+      Object.keys(P().inbox).forEach(k => { const th = threadById(k); if (th && th.charId === mc.id) delete P().inbox[k]; });
+      openRoom(mc.id); o.roomOpen = fcOf(mc.id).unread === 0 && !!$('#phChat');
+      $('#fcIn').value = '안녕'; await fcSend(); const fl = fcOf(mc.id).log;
+      o.fcSend = fl.length === 3 && fl[0].w === 'me' && fl[0].t === '안녕' && fl[2].t === '답장2' && $('#phChat').querySelectorAll('.msg').length >= 3 && !$('#phChat .typing') && $('#fcIn').value === '' || JSON.stringify(fl);
+      G.threads.push({ id: 'tt_msg', charId: mc.id, title: '시험 톡', script: `${mc.name}: 안녕\n선택: 응 | 아니\n${mc.name}: 좋아` }); P().inbox.tt_msg = { pos: 0, log: [], done: false, at: Date.now() };
+      openRoom(mc.id); const until = async f => { for (let i = 0; i < 60 && !f(); i++) await new Promise(r => setTimeout(r, 100)); return f(); };
+      const choice = await until(() => document.querySelector('#phIn [data-act="phpick"]')); if (choice) { choice.click(); }
+      const done = await until(() => P().inbox.tt_msg.done); const tl = P().inbox.tt_msg.log;
+      o.phPlay = !!choice && done && tl.length === 3 && tl[0].w === 'c' && tl[1].w === 'me' && tl[2].t === '좋아' || JSON.stringify(tl);
+      G.threads = G.threads.filter(t => t.id !== 'tt_msg'); delete P().inbox.tt_msg; SAMPLE = S0; closePhone(); }
+    return o; });
+  assert.ok(Object.values(r26m).every(v => v === true), JSON.stringify(r26m)); assert.deepEqual(err26, [], '페이지 오류');
   console.log('ok 26 정리 후 동작: 그림 지우기 대상·리롤 초안 함수, 조용한 오류 기록, 재화 단일 경로, 지운 액션이 분배 표에서 빠짐 · 진행 칸 정의(그리기는 상태 그대로, 그리기 전 처리가 하루 새로 만들기·출연 제안 저장) · 처리기에서 View로 뺀 case가 클릭 분배로 오류 없이 돎');
 
   // 27) 자기점검 보강(tools: HTML 주입·DOM id)으로 고친 것: 용어 T()는 HTML 안전, 대화 배지는 화면에 없는 #phBadge 대신 로비 아이콘을 바로 고침

@@ -167,8 +167,8 @@
 | 0030-image/010-engine.js regenRun | src/main/0030-image/010-engine.js:48 | 6 |
 | 0030-image/010-engine.js requestUltimateScene | src/main/0030-image/010-engine.js:118 | 7 |
 | 0030-image/010-engine.js illustrationScenePreparation | src/main/0030-image/010-engine.js:143 | 7 |
-| 0100-messenger.js fcSend | src/main/0100-messenger.js:130 | 41 |
-| 0100-messenger.js fcSummarize | src/main/0100-messenger.js:151 | 0 |
+| 0100-messenger.js fcSend | src/main/0100-messenger.js:152 | 41 |
+| 0100-messenger.js fcSummarize | src/main/0100-messenger.js:178 | 0 |
 | 0185-game-rules.js posAI | src/main/0185-game-rules.js:129 | 25 |
 | 0200-skin-shop.js skinAuto | src/main/0200-skin-shop.js:16 | 7 |
 | 0260-new-game/010-draft.js drPolish | src/main/0260-new-game/010-draft.js:148 | 9 |

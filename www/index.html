@@ -8218,7 +8218,10 @@ function bubbleHTML(l,c){
 function chatImgView(k){ const u=chatImgCache[k], ph=$('.phone'); if(!u||!ph) return; const old=$('.ph-menu'); if(old) old.remove();
   ph.insertAdjacentHTML('beforeend',`<div class="ph-menu ph-view" data-act="phmenuclose"><img src="${esc(u)}" alt="사진"><div class="row"><button class="btn sm" data-act="chatimgsave" data-k="${esc(k)}">저장</button><button class="btn sm ghost" data-act="phmenuclose">닫기</button></div></div>`); }
 async function chatImgB64(k){ try{ const b=await idbGetNS(k); if(!b) return undefined; const s=await shrink(b,1024); const bmp=await createImageBitmap(s), cv=document.createElement('canvas'); cv.width=bmp.width; cv.height=bmp.height; cv.getContext('2d').drawImage(bmp,0,0); const u=cv.toDataURL('image/jpeg',0.85); return [{mime:'image/jpeg',data:u.split(',')[1]}]; }catch(e){ return undefined; } }
-async function chatPhotoPick(f){ if(!f||!PH||!PH.fc) return; try{ const b=await shrink(f,1280), k='chat_'+uid(); await idbPut(IMGNS+k,b); chatImgCache[k]=URL.createObjectURL(b); PH.pendImg=k; phPendRender(); const i=$('#fcIn'); if(i){ i.placeholder='사진과 함께 보낼 말 (비워도 돼요)'; i.focus({preventScroll:true}); } }catch(e){ toast('사진을 불러오지 못했어요'); } }
+/* 갠톡 사진 고르기(Controller): 줄여 저장(Model) → 보낼 사진 표시(View) */
+async function chatPhotoPick(f){ if(!f||!PH||!PH.fc) return; try{ PH.pendImg=await chatImgStore(await shrink(f,1280)); phPendRender(); fcInputPhotoHint(); }catch(e){ toast('사진을 불러오지 못했어요'); } }
+/* 대화 사진 저장(Model): 그림 저장소에 넣고 열쇠를 돌려줌 */
+async function chatImgStore(b){ const k='chat_'+uid(); await idbPut(IMGNS+k,b); chatImgCache[k]=URL.createObjectURL(b); return k; }
 function phPendRender(){ const w=$('#phPend'); if(!w) return; const k=PH&&PH.pendImg; w.hidden=!k; w.innerHTML=k?`<img src="${esc(chatImgCache[k]||'')}" alt="보낼 사진"><span>이 사진을 보낼게요</span><button class="btn sm ghost" data-act="phpendx" aria-label="사진 빼기">✕</button>`:''; }
 (function(){ const i=document.createElement('input'); i.type='file'; i.id='chatfile'; i.accept='image/*'; i.hidden=true; document.body.appendChild(i);
   i.addEventListener('change',e=>{ const f=e.target.files[0]; e.target.value=''; chatPhotoPick(f); }); })();
@@ -8227,16 +8230,35 @@ function openRoom(cid,opt){
   const c=charById(cid); if(!c) return; const f=fcOf(cid); const token={}; opt=opt||{};
   const act=roomThreads(cid).find(x=>!x.s.done&&x.t);
   PH={fc:cid,tid:act?act.t.id:null,token,mode:'free',sel:!!opt.sel};
-  const it=roomItems(cid);
-  $('#phone').innerHTML=`<div class="phone"><div class="ph-top"><button data-act="${PH.sel?'phselend':'phback'}" aria-label="뒤로">‹</button><b>${PH.sel?'지울 메시지를 누르세요':esc(c.name)}</b>${PH.sel?`<button class="ph-done" data-act="phselend">완료</button>`:`<button data-act="phmenu" data-id="${esc(c.id)}" aria-label="메뉴">⋯</button>`}</div>
+  roomShow(c,roomItems(cid)); if(!PH.sel) phScroll(); fcRead(f);
+  if(PH.sel) return;
+  if(act){ act.s.t0=act.s.t0||Date.now(); phPlay(act.t,c,act.s,token); }
+  else fcInputFocus(50);
+}
+/* 대화방 화면(View) */
+function roomShow(c,it){ $('#phone').innerHTML=`<div class="phone"><div class="ph-top"><button data-act="${PH.sel?'phselend':'phback'}" aria-label="뒤로">‹</button><b>${PH.sel?'지울 메시지를 누르세요':esc(c.name)}</b>${PH.sel?`<button class="ph-done" data-act="phselend">완료</button>`:`<button data-act="phmenu" data-id="${esc(c.id)}" aria-label="메뉴">⋯</button>`}</div>
     <div class="ph-chat ${PH.sel?'selmode':''}" id="phChat">${it.length?it.map((x,i)=>PH.sel?`<div class="phsel" data-act="phdel" data-i="${i}">${bubbleHTML(x.l,c)}</div>`:bubbleHTML(x.l,c)).join(''):`<div class="sys empty">${esc(c.name)}와(과)의 대화방이에요. 오른쪽 위 ⋯ → 대화 추가로 새 대화를 받거나, 아래에서 바로 말을 걸어 보세요.</div>`}</div>
     <div class="ph-in" id="phIn" hidden></div>
     <div class="ph-pend" id="phPend" hidden></div><div class="ph-in fcin" id="phFree" ${PH.sel?'hidden':''}><button class="btn sm ghost ph-sw" data-act="phmode" data-v="pick" hidden aria-label="선택지 보기">선택지</button><button class="btn sm ghost ph-cam" data-act="fcphoto" aria-label="사진 보내기" ${SAMPLE?'':'disabled'}>📷</button><textarea id="fcIn" rows="1" maxlength="400" placeholder="${SAMPLE?'메시지 보내기':'글 AI를 등록하면 직접 말을 걸 수 있어요'}" ${SAMPLE?'':'disabled'}></textarea><button class="btn sm" data-act="fcsend" ${SAMPLE?'':'disabled'}>전송</button></div></div>`;
-  if(!PH.sel) phScroll(); f.unread=0; mark('prog');
-  if(PH.sel) return;
-  if(act){ act.s.t0=act.s.t0||Date.now(); phPlay(act.t,c,act.s,token); }
-  else setTimeout(()=>{ const i=$('#fcIn'); if(i&&!IS_NATIVE&&!i.disabled) i.focus({preventScroll:true}); },50);
 }
+/* 대화방을 읽음(Model) */
+function fcRead(f){ f.unread=0; mark('prog'); }
+/* 스레드 기록(Model): 말 하나 더하기 · 끝냄(인연 +10) */
+function thrLogAdd(s,entry){ entry.at=Date.now(); s.log.push(entry); s.at=entry.at; mark('prog'); }
+function thrDone(c,s){ s.done=true; s.at=Date.now(); mark('prog'); if(own(c.id)) addAff(c,10); }
+/* 메신저 화면 조각(View): 대화방 열림 · 입력 중 표시(지우는 함수를 돌려줌) · 말풍선 · 빈 방 안내 지우기 · 입력 칸(비우기·사진 안내·초점) · 자유 입력으로 · 선택지·내 말 단추 · 아래 칸 비우기 */
+function phOpen(){ return !!$('#phChat'); }
+function phTyping(c){ const ty=document.createElement('div'); ty.className='msg'; ty.innerHTML=`<div class="av sm">${art(c)}</div><div class="bub typing"><i></i><i></i><i></i></div>`; const ch=$('#phChat'); if(ch){ ch.appendChild(ty); phScroll(); } return ()=>ty.remove(); }
+function phBubble(m,c){ const ch=$('#phChat'); if(!ch) return; ch.insertAdjacentHTML('beforeend',bubbleHTML(m,c)); phScroll(); }
+function phEmptyClear(cid){ const el=$('#phChat'); if(el&&el.children.length===1&&el.querySelector('.sys')&&roomLog(cid).length===1) el.innerHTML=''; }
+function fcInputClear(inp,text){ inp.value=''; inp.style.height=''; [0,60,200].forEach(ms=>setTimeout(()=>{ const v=inp.value.trim(); if(v&&text.endsWith(v)&&v.length<=Math.max(2,text.length)) inp.value=''; },ms)); } /* 휴대폰 키보드가 늦게 되돌려 넣는 글도 지움 */
+function fcInputPhotoHint(on=true){ const i=$('#fcIn'); if(!i) return; i.placeholder=on?'사진과 함께 보낼 말 (비워도 돼요)':'메시지 보내기'; if(on) i.focus({preventScroll:true}); }
+function fcInputFocus(ms){ setTimeout(()=>{ const i=$('#fcIn'); if(i&&!IS_NATIVE&&!i.disabled) i.focus({preventScroll:true}); },ms); }
+function phFreeShow(){ phInClear(); phMode('free'); const sw=$('.ph-sw'); if(sw) sw.hidden=true; }
+function phInClear(){ const pi=$('#phIn'); if(pi) pi.innerHTML=''; }
+const PH_FREE_SW=`<button class="linkb ph-sw2" data-act="phmode" data-v="free">⌨ 직접 입력으로 전환</button>`;
+function phChoicesShow(t,opts){ $('#phIn').innerHTML=opts.map((o,i)=>`<button type="button" class="btn ghost block" data-act="phpick" data-tid="${esc(t.id)}" data-n="${i+1}">${esc(sub(o))}</button>`).join('')+PH_FREE_SW; phMode('pick'); }
+function phSayShow(t,text){ $('#phIn').innerHTML=`<button type="button" class="btn ghost block" data-act="phsay" data-tid="${esc(t.id)}">▶ ${esc(sub(text))}</button>`+PH_FREE_SW; phMode('pick'); }
 /* 메신저 부분 갱신(View): 알림 비우기 · 메뉴 닫기 · 내가 보낸 말 붙이기 · 다시 그려도 대화 스크롤 유지 */
 function notifClear(){ $('#notif').innerHTML=''; }
 function phMenuClose(){ $('.ph-menu')?.remove(); }
@@ -8259,35 +8281,40 @@ let FCBUSY=false;
 function fcOf(cid){ const f=progSlot('fchat'); return f[cid]||(f[cid]={log:[],sum:'',sumTo:0,at:0}); }
 function openFree(cid){ openRoom(cid); }
 async function fcSend(opt){
-  opt=opt||{}; if(FCBUSY||!PH||!PH.fc) return; const cid=PH.fc, c=charById(cid), inp=$('#fcIn'); if(!c||!inp) return; if(!opt.img&&PH.pendImg) opt.img=PH.pendImg; const text=inp.value.trim(); if(!text&&!opt.img) return; if(!opt.img&&PH.lastSend&&PH.lastSend.t===text&&Date.now()-PH.lastSend.at<2500){ inp.value=''; return; } PH.lastSend={t:text,at:Date.now()}; if(opt.img){ PH.pendImg=null; phPendRender(); inp.placeholder='메시지 보내기'; }
+  opt=opt||{}; if(FCBUSY||!PH||!PH.fc) return; const cid=PH.fc, c=charById(cid), inp=$('#fcIn'); if(!c||!inp) return; if(!opt.img&&PH.pendImg) opt.img=PH.pendImg; const text=inp.value.trim(); if(!text&&!opt.img) return; if(!opt.img&&PH.lastSend&&PH.lastSend.t===text&&Date.now()-PH.lastSend.at<2500){ inp.value=''; return; } PH.lastSend={t:text,at:Date.now()}; if(opt.img){ PH.pendImg=null; phPendRender(); fcInputPhotoHint(false); }
   if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; }
-  const f=fcOf(cid), token=PH.token, alive=()=>PH&&PH.token===token&&$('#phChat'); inp.value=''; inp.style.height=''; [0,60,200].forEach(ms=>setTimeout(()=>{ const v=inp.value.trim(); if(v&&text.endsWith(v)&&v.length<=Math.max(2,text.length)) inp.value=''; },ms));
-  if(PH.tid){ const th=threadById(PH.tid), s0=th&&P().inbox[PH.tid]; if(th&&s0&&!s0.done){ s0.done=true; s0.freed=true; s0.pos=parseScript(th.script).length; s0.at=Date.now(); if(own(c.id)) addAff(c,10); updateBadge(); } PH.tid=null; const pi=$('#phIn'); if(pi) pi.innerHTML=''; phMode('free'); const sw=$('.ph-sw'); if(sw) sw.hidden=true; }
-  const me={w:'me',t:text,at:Date.now()}; if(opt.img) me.img=opt.img; f.log.push(me); f.at=me.at; if(alive()){ const el=$('#phChat'); if(el.children.length===1&&el.querySelector('.sys')&&roomLog(cid).length===1) el.innerHTML=''; el.insertAdjacentHTML('beforeend',bubbleHTML(me,c)); phScroll(); } mark('prog');
-  FCBUSY=true; const ty=document.createElement('div'); ty.className='msg'; ty.innerHTML=`<div class="av sm">${art(c)}</div><div class="bub typing"><i></i><i></i><i></i></div>`; if(alive()){ $('#phChat').appendChild(ty); phScroll(); }
+  const f=fcOf(cid), token=PH.token, alive=()=>PH&&PH.token===token&&phOpen(); fcInputClear(inp,text);
+  if(PH.tid){ if(threadFree(c,PH.tid)) updateBadge(); PH.tid=null; phFreeShow(); }
+  const me={w:'me',t:text,at:Date.now()}; if(opt.img) me.img=opt.img; fcLogAdd(f,me); if(alive()){ phEmptyClear(cid); phBubble(me,c); }
+  FCBUSY=true; let tyOff=alive()?phTyping(c):()=>{};
   try{
     const o=own(c.id), lv=affLv(o), files=(c.files||[]).filter(x=>o&&o.dup>=(x.dup||0)).map(x=>x.text).filter(Boolean);
     const pool=typeof affLinePool==='function'?affLinePool(c).slice(0,8):(c.lines||[]).slice(0,6);
     const recent=fcSendRecentText({cid,c});
     const r=await aiJSON(fcSendPrompt({c,pool,lv,files,recent,text,f,opt}),null,'default',opt.img?await chatImgB64(opt.img):undefined);
-    ty.remove(); const pn=playerName(), reps=(r&&Array.isArray(r.replies)?r.replies:r&&r.reply?[r.reply]:[]).map(x=>String(x||'').trim()).map(x=>x.replace(new RegExp('^'+c.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*[:：]\\s*'),'')).filter(x=>x&&!new RegExp('^(나|'+pn.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'|'+T('player')+')\\s*[:：]').test(x)).slice(0,4);
+    tyOff(); const pn=playerName(), reps=(r&&Array.isArray(r.replies)?r.replies:r&&r.reply?[r.reply]:[]).map(x=>String(x||'').trim()).map(x=>x.replace(new RegExp('^'+c.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*[:：]\\s*'),'')).filter(x=>x&&!new RegExp('^(나|'+pn.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'|'+T('player')+')\\s*[:：]').test(x)).slice(0,4);
     if(!reps.length){ if(r) toast('답장을 받지 못했어요. 다시 보내 주세요'); return; }
     for(let i=0;i<reps.length;i++){
-      if(i){ const t2=document.createElement('div'); t2.className='msg'; t2.innerHTML=ty.innerHTML; if(alive()){ $('#phChat').appendChild(t2); phScroll(); } await wait(Math.min(1600,400+reps[i].length*30)); t2.remove(); }
-      const m={w:'c',t:reps[i],at:Date.now()}; f.log.push(m); f.at=m.at; if(alive()){ $('#phChat').insertAdjacentHTML('beforeend',bubbleHTML(m,c)); phScroll(); } else f.unread=(f.unread||0)+1;
+      if(i){ const off2=alive()?phTyping(c):()=>{}; await wait(Math.min(1600,400+reps[i].length*30)); off2(); }
+      const m={w:'c',t:reps[i],at:Date.now()}; fcLogAdd(f,m,!alive()); if(alive()) phBubble(m,c);
     }
-    const ptags=fcPhotoOn()&&r&&typeof r.photo==='string'?r.photo.trim():''; if(ptags) fcNpcPhoto(c,f,ptags,alive,ty);
-    if(f.log.length>400) { const cut=f.log.length-400; f.log.splice(0,cut); f.sumTo=Math.max(0,(f.sumTo||0)-cut); }
-    const p=P(), d=today(); if(!p.fcAff||p.fcAff.d!==d) p.fcAff={d,n:0}; const add=Math.max(0,Math.min(2,Math.round(+((r&&r.aff)||0)))); if(add&&o&&p.fcAff.n<20){ const a=Math.min(add,20-p.fcAff.n); p.fcAff.n+=a; addAff(c,a); }
-    mark('prog'); if(f.log.length-(f.sumTo||0)>70) fcSummarize(cid);
-  }finally{ FCBUSY=false; ty.remove(); }
+    const ptags=fcPhotoOn()&&r&&typeof r.photo==='string'?r.photo.trim():''; if(ptags) fcNpcPhoto(c,f,ptags,alive);
+    fcAfterReply(c,o,f,r); if(f.log.length-(f.sumTo||0)>70) fcSummarize(cid);
+  }finally{ FCBUSY=false; tyOff(); }
 }
+/* 갠톡 기록(Model): 말 하나 더하기(대화방을 안 보고 있으면 안 읽음) · 답장 뒤 정리(기록 400개까지, 하루 호감도 20까지) · 스레드를 자유 대화로 넘김(끝으로 하고 인연 +10 — 넘겼으면 true) */
+function fcLogAdd(f,m,unread){ f.log.push(m); f.at=m.at; if(unread) f.unread=(f.unread||0)+1; mark('prog'); }
+function fcAfterReply(c,o,f,r){ if(f.log.length>400) { const cut=f.log.length-400; f.log.splice(0,cut); f.sumTo=Math.max(0,(f.sumTo||0)-cut); }
+  const p=P(), d=today(); if(!p.fcAff||p.fcAff.d!==d) p.fcAff={d,n:0}; const add=Math.max(0,Math.min(2,Math.round(+((r&&r.aff)||0)))); if(add&&o&&p.fcAff.n<20){ const a=Math.min(add,20-p.fcAff.n); p.fcAff.n+=a; addAff(c,a); }
+  mark('prog'); }
+function threadFree(c,tid){ const th=threadById(tid), s0=th&&P().inbox[tid]; if(!th||!s0||s0.done) return false; s0.done=true; s0.freed=true; s0.pos=parseScript(th.script).length; s0.at=Date.now(); if(own(c.id)) addAff(c,10); return true; }
 function fcPhotoOn(){ return P().fcPhoto!==false&&imgReady(); }
-async function fcNpcPhoto(c,f,tags,alive,ty){
-  const t2=document.createElement('div'); t2.className='msg'; t2.innerHTML=`<div class="av sm">${art(c)}</div><div class="bub typing"><i></i><i></i><i></i></div>`; if(alive()){ $('#phChat').appendChild(t2); phScroll(); }
-  try{ const b=await naiDraw('illust',joinTags(c.naiPrompt,tags),{styleId:c.naiStyle,frame:'cowboy shot',pose:''}), k='chat_'+uid(); await idbPut(IMGNS+k,b); chatImgCache[k]=URL.createObjectURL(b);
-    const m={w:'p',t:'',img:k,at:Date.now()}; f.log.push(m); f.at=m.at; mark('prog'); if(alive()){ t2.remove(); $('#phChat').insertAdjacentHTML('beforeend',bubbleHTML(m,c)); phScroll(); } else f.unread=(f.unread||0)+1;
-  }catch(e){ }finally{ t2.remove(); } }
+/* 캐릭터가 사진을 보냄(Controller): 입력 중 표시 → 그림(서비스)·저장(Model) → 말풍선 */
+async function fcNpcPhoto(c,f,tags,alive){
+  const off=alive()?phTyping(c):()=>{};
+  try{ const k=await chatImgStore(await naiDraw('illust',joinTags(c.naiPrompt,tags),{styleId:c.naiStyle,frame:'cowboy shot',pose:''}));
+    const m={w:'p',t:'',img:k,at:Date.now()}; off(); fcLogAdd(f,m,!alive()); if(alive()) phBubble(m,c);
+  }catch(e){ quietErr(e,'0100-messenger.js:175'); }finally{ off(); } }
 async function fcSummarize(cid){
   const c=charById(cid), f=fcOf(cid); const end=f.log.length-24, part=f.log.slice(f.sumTo||0,end); if(part.length<20) return;
   try{ const r=await aiJSON(fcSummarizePrompt({c,f,part}),null,'quick'); if(r&&r.summary){ f.sum=String(r.summary).slice(0,1200); f.sumTo=end; mark('prog'); } }catch(e){ quietErr(e,'0100-messenger.js:151'); }
@@ -8300,15 +8327,13 @@ async function phPlay(t,c,s,token){
     if(!alive()) return;
     const L=lines[s.pos];
     if(L.cond&&L.cond!==s.pick){s.pos++;continue;}
-    if(L.type==='choice'){ $('#phIn').innerHTML=L.opts.map((o,i)=>`<button type="button" class="btn ghost block" data-act="phpick" data-tid="${esc(t.id)}" data-n="${i+1}">${esc(sub(o))}</button>`).join('')+`<button class="linkb ph-sw2" data-act="phmode" data-v="free">⌨ 직접 입력으로 전환</button>`; phMode('pick'); return; }
+    if(L.type==='choice'){ phChoicesShow(t,L.opts); return; }
     let entry=null;
     if(L.type==='say'){
       if(isMe(L.who)&&s.lastPick){ const nz=x=>sub(String(x||'')).replace(/[\s.,!?~…'"「」]/g,''), a=nz(L.text), b=nz(s.lastPick); if(a===b||(a.length>3&&b.length>3&&(a.includes(b)||b.includes(a)))){ s.pos++; s.lastPick=''; continue; } } // 고른 선택지를 대본이 한 번 더 말하면 건너뛰기
-      if(isMe(L.who)){ $('#phIn').innerHTML=`<button type="button" class="btn ghost block" data-act="phsay" data-tid="${esc(t.id)}">▶ ${esc(sub(L.text))}</button><button class="linkb ph-sw2" data-act="phmode" data-v="free">⌨ 직접 입력으로 전환</button>`; phMode('pick'); return; }
+      if(isMe(L.who)){ phSayShow(t,L.text); return; }
       else{
-        const ty=document.createElement('div'); ty.className='msg'; ty.innerHTML=`<div class="av sm">${art(c)}</div><div class="bub typing"><i></i><i></i><i></i></div>`;
-        $('#phChat').appendChild(ty); phScroll();
-        await wait(Math.min(1800,500+L.text.length*35)); ty.remove(); if(!alive()) return;
+        const off=phTyping(c); await wait(Math.min(1800,500+L.text.length*35)); off(); if(!alive()) return;
         entry={w:'c',t:sub(L.text)};
       }
     } else if(L.type==='cmd'&&L.cmd==='스티커'&&emoKey(L.arg)){ await wait(600); if(!alive()) return; entry={w:'k',t:emoKey(L.arg)}; } // 스티커(0462)
@@ -8316,12 +8341,11 @@ async function phPlay(t,c,s,token){
     else if(L.type==='nar'||L.type==='place'){ entry={w:'s',t:sub(L.text)}; }
     if(!alive()) return;
     s.pos++; if(entry) s.lastPick='';
-    if(entry){ entry.at=Date.now(); s.log.push(entry); s.at=entry.at; $('#phChat').insertAdjacentHTML('beforeend',bubbleHTML(entry,c)); phScroll(); mark('prog'); }
+    if(entry){ thrLogAdd(s,entry); phBubble(entry,c); }
   }
   if(!s.done){
-    s.done=true; s.at=Date.now();
-    mark('prog'); if(own(c.id)) addAff(c,10); updateBadge(); checkTriggers();
-    if(alive()){ $('#phIn').innerHTML=''; const nx=roomThreads(c.id).find(x=>!x.s.done&&x.t); if(nx){ PH.tid=nx.t.id; nx.s.t0=nx.s.t0||Date.now(); phMode('free'); phPlay(nx.t,c,nx.s,token); } else { PH.tid=null; phMode('free'); } }
+    thrDone(c,s); updateBadge(); checkTriggers();
+    if(alive()){ phInClear(); const nx=roomThreads(c.id).find(x=>!x.s.done&&x.t); if(nx){ PH.tid=nx.t.id; nx.s.t0=nx.s.t0||Date.now(); phMode('free'); phPlay(nx.t,c,nx.s,token); } else { PH.tid=null; phMode('free'); } }
   }
 }
 /* ===== 도전: 레이드(주간 보스) — 심연 탐사는 0120 ===== */
