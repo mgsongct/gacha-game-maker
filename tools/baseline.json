@@ -2197,349 +2197,454 @@
    "text": "src/modules/combat/050-bridge.js 1개"
   }
  ],
- "arch": [
+ "rules": [
   {
-   "key": "계층 섞임|src/main/0020-ai-connect.js",
+   "key": "규칙 L1|src/main/0420-app-update.js",
    "num": {
-    "함수": 1
+    "건": 1
    },
-   "text": "섞인 함수 0020-ai-connect 1"
+   "text": "L1 계층 섞임 main/0420-app-update.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0030-image/",
+   "key": "규칙 L1|src/main/0510-actions/020-navigation-and-tools.js",
    "num": {
-    "함수": 4
+    "건": 1
    },
-   "text": "섞인 함수 0030-image/ 4"
+   "text": "L1 계층 섞임 main/0510-actions/020-navigation-and-tools.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0060-util.js",
+   "key": "규칙 L1|src/main/0510-actions/040-story-and-authoring.js",
    "num": {
-    "함수": 1
+    "건": 1
    },
-   "text": "섞인 함수 0060-util 1"
+   "text": "L1 계층 섞임 main/0510-actions/040-story-and-authoring.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0100-messenger.js",
+   "key": "규칙 L1|src/main/0510-actions/050-settings-and-audio.js",
    "num": {
-    "함수": 5
+    "건": 1
    },
-   "text": "섞인 함수 0100-messenger 5"
+   "text": "L1 계층 섞임 main/0510-actions/050-settings-and-audio.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0120-abyss.js",
+   "key": "규칙 L1|src/main/0510-actions/090-characters.js",
    "num": {
-    "함수": 2
+    "건": 1
    },
-   "text": "섞인 함수 0120-abyss 2"
+   "text": "L1 계층 섞임 main/0510-actions/090-characters.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0160-player-profile.js",
+   "key": "규칙 L1|src/main/0510-actions/100-images-and-assets.js",
    "num": {
-    "함수": 1
+    "건": 1
    },
-   "text": "섞인 함수 0160-player-profile 1"
+   "text": "L1 계층 섞임 main/0510-actions/100-images-and-assets.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0180-ui-scroll.js",
+   "key": "규칙 L1|src/main/0510-actions/110-economy.js",
    "num": {
-    "함수": 1
+    "건": 1
    },
-   "text": "섞인 함수 0180-ui-scroll 1"
+   "text": "L1 계층 섞임 main/0510-actions/110-economy.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0230-modal.js",
+   "key": "규칙 L1|src/main/0510-actions/120-messenger.js",
    "num": {
-    "함수": 1
+    "건": 1
    },
-   "text": "섞인 함수 0230-modal 1"
+   "text": "L1 계층 섞임 main/0510-actions/120-messenger.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0250-story-factory.js",
+   "key": "규칙 L1|src/modules/combat/030-core.js",
    "num": {
-    "함수": 2
+    "건": 2
    },
-   "text": "섞인 함수 0250-story-factory 2"
+   "text": "L1 계층 섞임 modules/combat/030-core.js 2"
   },
   {
-   "key": "계층 섞임|src/main/0260-new-game/",
+   "key": "규칙 L1|src/modules/combat/050-bridge.js",
    "num": {
-    "함수": 4
+    "건": 3
    },
-   "text": "섞인 함수 0260-new-game/ 4"
+   "text": "L1 계층 섞임 modules/combat/050-bridge.js 3"
   },
   {
-   "key": "계층 섞임|src/main/0270-skin-proposal.js",
+   "key": "규칙 L1|src/modules/combat/070-equipment.js",
    "num": {
-    "함수": 1
+    "건": 1
    },
-   "text": "섞인 함수 0270-skin-proposal 1"
+   "text": "L1 계층 섞임 modules/combat/070-equipment.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0290-season-rotation.js",
+   "key": "규칙 L2|src/main/0010-rules.js",
    "num": {
-    "함수": 1
+    "건": 1
    },
-   "text": "섞인 함수 0290-season-rotation 1"
+   "text": "L2 그리다가 바꿈 main/0010-rules.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0300-codex.js",
+   "key": "규칙 L2|src/main/0015-prompt-studio/010-studio.js",
    "num": {
-    "함수": 2
+    "건": 1
    },
-   "text": "섞인 함수 0300-codex 2"
+   "text": "L2 그리다가 바꿈 main/0015-prompt-studio/010-studio.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0360-sync/",
+   "key": "규칙 L2|src/main/0020-ai-connect.js",
    "num": {
-    "함수": 2
+    "건": 4
    },
-   "text": "섞인 함수 0360-sync/ 2"
+   "text": "L2 그리다가 바꿈 main/0020-ai-connect.js 4"
   },
   {
-   "key": "계층 섞임|src/main/0400-publish-subscribe.js",
+   "key": "규칙 L2|src/main/0030-image/010-engine.js",
    "num": {
-    "함수": 3
+    "건": 4
    },
-   "text": "섞인 함수 0400-publish-subscribe 3"
+   "text": "L2 그리다가 바꿈 main/0030-image/010-engine.js 4"
   },
   {
-   "key": "계층 섞임|src/main/0410-desktop.js",
+   "key": "규칙 L2|src/main/0040-sound.js",
    "num": {
-    "함수": 1
+    "건": 1
    },
-   "text": "섞인 함수 0410-desktop 1"
+   "text": "L2 그리다가 바꿈 main/0040-sound.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0420-app-update.js",
+   "key": "규칙 L2|src/main/0080-storage-integration.js",
    "num": {
-    "함수": 4
+    "건": 1
    },
-   "text": "섞인 함수 0420-app-update 4"
+   "text": "L2 그리다가 바꿈 main/0080-storage-integration.js 1"
   },
   {
-   "key": "계층 섞임|src/main/0505-construct.js",
+   "key": "규칙 L2|src/main/0100-messenger.js",
    "num": {
-    "함수": 1
+    "건": 14
    },
-   "text": "섞인 함수 0505-construct 1"
+   "text": "L2 그리다가 바꿈 main/0100-messenger.js 14"
   },
   {
-   "key": "계층 섞임|src/main/0520-backup-storage.js",
+   "key": "규칙 L2|src/main/0120-abyss.js",
    "num": {
-    "함수": 2
+    "건": 5
    },
-   "text": "섞인 함수 0520-backup-storage 2"
+   "text": "L2 그리다가 바꿈 main/0120-abyss.js 5"
   },
   {
-   "key": "계층 섞임|src/main/0525-data-folder.js",
+   "key": "규칙 L2|src/main/0180-ui-scroll.js",
    "num": {
-    "함수": 1
+    "건": 9
    },
-   "text": "섞인 함수 0525-data-folder 1"
+   "text": "L2 그리다가 바꿈 main/0180-ui-scroll.js 9"
   },
   {
-   "key": "계층 섞임|src/main/0535-content-audit.js",
+   "key": "규칙 L2|src/main/0185-game-rules.js",
    "num": {
-    "함수": 1
+    "건": 5
    },
-   "text": "섞인 함수 0535-content-audit 1"
+   "text": "L2 그리다가 바꿈 main/0185-game-rules.js 5"
   },
   {
-   "key": "계층 방향|src/main/0020-ai-connect.js",
+   "key": "규칙 L2|src/main/0187-balance.js",
    "num": {
-    "위반": 7
+    "건": 2
    },
-   "text": "방향 위반 0020-ai-connect 7"
+   "text": "L2 그리다가 바꿈 main/0187-balance.js 2"
   },
   {
-   "key": "계층 방향|src/main/0030-image/",
+   "key": "규칙 L2|src/main/0210-setup.js",
    "num": {
-    "위반": 2
+    "건": 2
    },
-   "text": "방향 위반 0030-image/ 2"
+   "text": "L2 그리다가 바꿈 main/0210-setup.js 2"
   },
   {
-   "key": "계층 방향|src/main/0090-growth.js",
+   "key": "규칙 L2|src/main/0230-modal.js",
    "num": {
-    "위반": 2
+    "건": 3
    },
-   "text": "방향 위반 0090-growth 2"
+   "text": "L2 그리다가 바꿈 main/0230-modal.js 3"
   },
   {
-   "key": "계층 방향|src/main/0100-messenger.js",
+   "key": "규칙 L2|src/main/0240-growth-curve.js",
    "num": {
-    "위반": 6
+    "건": 1
    },
-   "text": "방향 위반 0100-messenger 6"
+   "text": "L2 그리다가 바꿈 main/0240-growth-curve.js 1"
   },
   {
-   "key": "계층 방향|src/main/0120-abyss.js",
+   "key": "규칙 L2|src/main/0250-story-factory.js",
    "num": {
-    "위반": 4
+    "건": 1
    },
-   "text": "방향 위반 0120-abyss 4"
+   "text": "L2 그리다가 바꿈 main/0250-story-factory.js 1"
   },
   {
-   "key": "계층 방향|src/main/0180-ui-scroll.js",
+   "key": "규칙 L2|src/main/0260-new-game/010-draft.js",
    "num": {
-    "위반": 3
+    "건": 1
    },
-   "text": "방향 위반 0180-ui-scroll 3"
+   "text": "L2 그리다가 바꿈 main/0260-new-game/010-draft.js 1"
   },
   {
-   "key": "계층 방향|src/main/0185-game-rules.js",
+   "key": "규칙 L2|src/main/0274-dispatch.js",
    "num": {
-    "위반": 1
+    "건": 1
    },
-   "text": "방향 위반 0185-game-rules 1"
+   "text": "L2 그리다가 바꿈 main/0274-dispatch.js 1"
   },
   {
-   "key": "계층 방향|src/main/0187-balance.js",
+   "key": "규칙 L2|src/main/0275-expedition.js",
    "num": {
-    "위반": 2
+    "건": 8
    },
-   "text": "방향 위반 0187-balance 2"
+   "text": "L2 그리다가 바꿈 main/0275-expedition.js 8"
   },
   {
-   "key": "계층 방향|src/main/0210-setup.js",
+   "key": "규칙 L2|src/main/0290-season-rotation.js",
    "num": {
-    "위반": 2
+    "건": 3
    },
-   "text": "방향 위반 0210-setup 2"
+   "text": "L2 그리다가 바꿈 main/0290-season-rotation.js 3"
   },
   {
-   "key": "계층 방향|src/main/0230-modal.js",
+   "key": "규칙 L2|src/main/0300-codex.js",
    "num": {
-    "위반": 1
+    "건": 3
    },
-   "text": "방향 위반 0230-modal 1"
+   "text": "L2 그리다가 바꿈 main/0300-codex.js 3"
   },
   {
-   "key": "계층 방향|src/main/0250-story-factory.js",
+   "key": "규칙 L2|src/main/0310-art-after-ai.js",
    "num": {
-    "위반": 1
+    "건": 1
    },
-   "text": "방향 위반 0250-story-factory 1"
+   "text": "L2 그리다가 바꿈 main/0310-art-after-ai.js 1"
   },
   {
-   "key": "계층 방향|src/main/0260-new-game/",
+   "key": "규칙 L2|src/main/0330-casting.js",
    "num": {
-    "위반": 3
+    "건": 1
    },
-   "text": "방향 위반 0260-new-game/ 3"
+   "text": "L2 그리다가 바꿈 main/0330-casting.js 1"
   },
   {
-   "key": "계층 방향|src/main/0290-season-rotation.js",
+   "key": "규칙 L2|src/main/0360-sync/020-pc-server.js",
    "num": {
-    "위반": 4
+    "건": 6
    },
-   "text": "방향 위반 0290-season-rotation 4"
+   "text": "L2 그리다가 바꿈 main/0360-sync/020-pc-server.js 6"
   },
   {
-   "key": "계층 방향|src/main/0300-codex.js",
+   "key": "규칙 L2|src/main/0360-sync/030-github.js",
    "num": {
-    "위반": 1
+    "건": 1
    },
-   "text": "방향 위반 0300-codex 1"
+   "text": "L2 그리다가 바꿈 main/0360-sync/030-github.js 1"
   },
   {
-   "key": "계층 방향|src/main/0330-casting.js",
+   "key": "규칙 L2|src/main/0360-sync/040-boot.js",
    "num": {
-    "위반": 1
+    "건": 7
    },
-   "text": "방향 위반 0330-casting 1"
+   "text": "L2 그리다가 바꿈 main/0360-sync/040-boot.js 7"
   },
   {
-   "key": "계층 방향|src/main/0360-sync/",
+   "key": "규칙 L2|src/main/0360-sync/050-single-device.js",
    "num": {
-    "위반": 13
+    "건": 4
    },
-   "text": "방향 위반 0360-sync/ 13"
+   "text": "L2 그리다가 바꿈 main/0360-sync/050-single-device.js 4"
   },
   {
-   "key": "계층 방향|src/main/0370-game-picker.js",
+   "key": "규칙 L2|src/main/0370-game-picker.js",
    "num": {
-    "위반": 1
+    "건": 2
    },
-   "text": "방향 위반 0370-game-picker 1"
+   "text": "L2 그리다가 바꿈 main/0370-game-picker.js 2"
   },
   {
-   "key": "계층 방향|src/main/0420-app-update.js",
+   "key": "규칙 L2|src/main/0400-publish-subscribe.js",
    "num": {
-    "위반": 2
+    "건": 1
    },
-   "text": "방향 위반 0420-app-update 2"
+   "text": "L2 그리다가 바꿈 main/0400-publish-subscribe.js 1"
   },
   {
-   "key": "계층 방향|src/main/0445-factions.js",
+   "key": "규칙 L2|src/main/0420-app-update.js",
    "num": {
-    "위반": 2
+    "건": 1
    },
-   "text": "방향 위반 0445-factions 2"
+   "text": "L2 그리다가 바꿈 main/0420-app-update.js 1"
   },
   {
-   "key": "계층 방향|src/main/0450-relations-memory.js",
+   "key": "규칙 L2|src/main/0445-factions.js",
    "num": {
-    "위반": 2
+    "건": 8
    },
-   "text": "방향 위반 0450-relations-memory 2"
+   "text": "L2 그리다가 바꿈 main/0445-factions.js 8"
   },
   {
-   "key": "계층 방향|src/main/0460-script-engine.js",
+   "key": "규칙 L2|src/main/0450-relations-memory.js",
    "num": {
-    "위반": 1
+    "건": 3
    },
-   "text": "방향 위반 0460-script-engine 1"
+   "text": "L2 그리다가 바꿈 main/0450-relations-memory.js 3"
   },
   {
-   "key": "계층 방향|src/main/0465-story-plan.js",
+   "key": "규칙 L2|src/main/0460-script-engine.js",
    "num": {
-    "위반": 1
+    "건": 2
    },
-   "text": "방향 위반 0465-story-plan 1"
+   "text": "L2 그리다가 바꿈 main/0460-script-engine.js 2"
   },
   {
-   "key": "계층 방향|src/main/0480-battle.js",
+   "key": "규칙 L2|src/main/0465-story-plan.js",
    "num": {
-    "위반": 1
+    "건": 3
    },
-   "text": "방향 위반 0480-battle 1"
+   "text": "L2 그리다가 바꿈 main/0465-story-plan.js 3"
   },
   {
-   "key": "계층 방향|src/main/0487-formation-sortie.js",
+   "key": "규칙 L2|src/main/0480-battle.js",
    "num": {
-    "위반": 1
+    "건": 3
    },
-   "text": "방향 위반 0487-formation-sortie 1"
+   "text": "L2 그리다가 바꿈 main/0480-battle.js 3"
   },
   {
-   "key": "계층 방향|src/main/0510-actions/",
+   "key": "규칙 L2|src/main/0487-formation-sortie.js",
    "num": {
-    "위반": 1
+    "건": 1
    },
-   "text": "방향 위반 0510-actions/ 1"
+   "text": "L2 그리다가 바꿈 main/0487-formation-sortie.js 1"
   },
   {
-   "key": "계층 방향|src/main/0520-backup-storage.js",
+   "key": "규칙 L2|src/main/0500-gacha.js",
    "num": {
-    "위반": 3
+    "건": 2
    },
-   "text": "방향 위반 0520-backup-storage 3"
+   "text": "L2 그리다가 바꿈 main/0500-gacha.js 2"
   },
   {
-   "key": "계층 방향|src/main/0530-story-memory.js",
+   "key": "규칙 L2|src/main/0505-construct.js",
    "num": {
-    "위반": 1
+    "건": 2
    },
-   "text": "방향 위반 0530-story-memory 1"
+   "text": "L2 그리다가 바꿈 main/0505-construct.js 2"
   },
   {
-   "key": "계층 방향|src/main/0537-live-fill.js",
+   "key": "규칙 L2|src/main/0510-actions/100-images-and-assets.js",
    "num": {
-    "위반": 1
+    "건": 2
    },
-   "text": "방향 위반 0537-live-fill 1"
+   "text": "L2 그리다가 바꿈 main/0510-actions/100-images-and-assets.js 2"
+  },
+  {
+   "key": "규칙 L2|src/main/0520-backup-storage.js",
+   "num": {
+    "건": 1
+   },
+   "text": "L2 그리다가 바꿈 main/0520-backup-storage.js 1"
+  },
+  {
+   "key": "규칙 L2|src/main/0530-story-memory.js",
+   "num": {
+    "건": 1
+   },
+   "text": "L2 그리다가 바꿈 main/0530-story-memory.js 1"
+  },
+  {
+   "key": "규칙 L2|src/modules/combat/050-bridge.js",
+   "num": {
+    "건": 7
+   },
+   "text": "L2 그리다가 바꿈 modules/combat/050-bridge.js 7"
+  },
+  {
+   "key": "규칙 L2|src/modules/combat/070-equipment.js",
+   "num": {
+    "건": 1
+   },
+   "text": "L2 그리다가 바꿈 modules/combat/070-equipment.js 1"
+  },
+  {
+   "key": "규칙 L3|src/main/0020-ai-connect.js",
+   "num": {
+    "건": 2
+   },
+   "text": "L3 처리가 화면을 부름 main/0020-ai-connect.js 2"
+  },
+  {
+   "key": "규칙 L3|src/main/0030-image/010-engine.js",
+   "num": {
+    "건": 1
+   },
+   "text": "L3 처리가 화면을 부름 main/0030-image/010-engine.js 1"
+  },
+  {
+   "key": "규칙 L3|src/main/0090-growth.js",
+   "num": {
+    "건": 2
+   },
+   "text": "L3 처리가 화면을 부름 main/0090-growth.js 2"
+  },
+  {
+   "key": "규칙 L3|src/main/0120-abyss.js",
+   "num": {
+    "건": 3
+   },
+   "text": "L3 처리가 화면을 부름 main/0120-abyss.js 3"
+  },
+  {
+   "key": "규칙 L3|src/main/0150-pickup-existing.js",
+   "num": {
+    "건": 1
+   },
+   "text": "L3 처리가 화면을 부름 main/0150-pickup-existing.js 1"
+  },
+  {
+   "key": "규칙 L3|src/main/0290-season-rotation.js",
+   "num": {
+    "건": 2
+   },
+   "text": "L3 처리가 화면을 부름 main/0290-season-rotation.js 2"
+  },
+  {
+   "key": "규칙 L3|src/main/0420-app-update.js",
+   "num": {
+    "건": 1
+   },
+   "text": "L3 처리가 화면을 부름 main/0420-app-update.js 1"
+  },
+  {
+   "key": "규칙 L3|src/main/0455-persona.js",
+   "num": {
+    "건": 1
+   },
+   "text": "L3 처리가 화면을 부름 main/0455-persona.js 1"
+  },
+  {
+   "key": "규칙 L3|src/modules/combat/030-core.js",
+   "num": {
+    "건": 5
+   },
+   "text": "L3 처리가 화면을 부름 modules/combat/030-core.js 5"
+  },
+  {
+   "key": "규칙 L3|src/modules/combat/050-bridge.js",
+   "num": {
+    "건": 3
+   },
+   "text": "L3 처리가 화면을 부름 modules/combat/050-bridge.js 3"
+  },
+  {
+   "key": "규칙 L3|src/boot/storage-boot.js",
+   "num": {
+    "건": 1
+   },
+   "text": "L3 처리가 화면을 부름 boot/storage-boot.js 1"
   }
  ]
 }

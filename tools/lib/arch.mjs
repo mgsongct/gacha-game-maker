@@ -1,63 +1,78 @@
-// 아키텍처 계층(MVC — 사용자 지시: UI 렌더 담당과 처리 담당이 나뉘는 계층) 판정: 함수마다 그 함수 자신이 하는 일(직접 신호)로
-//   View       — 화면을 만듦: HTML 마크업 글을 만들거나 DOM을 바꿈(innerHTML·classList·style·createElement·appendChild …)
-//   Controller — 동작·이벤트를 받아 처리 흐름을 이음: 액션 처리기(handle*Action), 또는 화면 갱신(render·toast·openModal·closeModal)을 부르며 상태를 바꾸거나 바꾸는 함수를 부름
-//   Model      — 상태·규칙·저장·외부 서비스: 게임 상태를 씀, 저장소·네트워크·AI·그림 서비스를 직접 씀, 또는 화면과 관계없는 계산·조회
-//   섞임       — 한 함수가 화면을 만들면서 상태를 쓰거나 저장·외부 서비스를 직접 씀(View와 Model이 한 함수에)
-// 방향 위반: View가 상태를 쓰는 함수를 부름(그리다가 상태를 바꿈 — 지연 생성 포함) · Model이 화면을 만드는 함수를 부름
+// 아키텍처 계층(MVC — CLAUDE.md §0-2) 판정 원칙 LAYER_DEF: 이 한곳의 정의를 모든 함수(SPA 전체 — main·modules·boot)에 같게 씀(규칙표 lib/rules.mjs가 이 정의를 보여 줌)
+export const LAYER_DEF = {
+  effects: '직접 효과만 봄 — 화면 바꿈(V: HTML 마크업 글·보이는 DOM 바꿈 — 내려받기 링크·캔버스 같은 임시 요소는 뺌) · 화면 읽기(I: DOM 찾기·값 읽기) · 상태 바꿈(S: 게임 상태 쓰기·브라우저 저장소 쓰기·네트워크 직접 호출). 앱 함수를 부르는 것은 효과가 아니라 호출 간선 — 단 외부와의 경계인 입출력 어댑터(ADAPTERS: 저장·AI·그림)는 그 자체가 S',
+  layer: 'V∧S → 섞임 · V → View · 어댑터 → Model · S∧(액션 처리기 ∨ 다시 그리게 함(갱신 통로 render·renderView·toast·openModal·closeModal 호출) ∨ I) → Controller(동작·입력을 받아 Model을 바꾸고 다시 그리게 함) · S → Model · 액션 처리기 → Controller · 효과 없음 → 호출로(고정점): 바꾸는 함수와 화면 함수를 함께 → Controller · 화면 함수만이나 I만 → View · 그 밖 → Model',
+  changes: '바꾸는 함수 = S가 있거나 바꾸는 함수를 부르는 View 아닌 함수(호출 그래프로 이어서)',
+  direction: 'L2 View가 바꾸는 함수를 부름(화면 갱신 요청 render·renderView만 뺌) · L3 Model이 화면 함수(View·섞임 — 갱신 통로 포함)를 부름',
+};
 import { walk } from './source.mjs';
 import { constLiterals } from './wiring.mjs';
 import { fullLabel } from './surface.mjs';
 import { mutations } from './flow.mjs';
 
 const MARKUP = /<\/?[a-zA-Z][\w-]*(\s|>|\/>)/;
-const DOM_WRITE = /^(innerHTML|outerHTML|textContent|innerText|className|hidden|scrollTop|scrollLeft|disabled|checked|selectedIndex)$/, DOM_CALL = /^(appendChild|insertAdjacentHTML|insertBefore|replaceChildren|removeChild|remove|setAttribute|removeAttribute|toggleAttribute|scrollIntoView|focus|blur|showModal|animate|createTextNode)$/;
-// 화면이 아닌 DOM 객체(그림 처리 canvas·이미지·소리·내려받기 링크·파일 고르기) — 만들어도 View가 아님
-const NONUI_EL = /^['"`](canvas|img|audio|video|a|input|script|link|source)['"`]$/;
+const DOM_WRITE = /^(innerHTML|outerHTML|textContent|innerText|className|hidden|scrollTop|scrollLeft|disabled|checked|selectedIndex|value|src|href|placeholder)$/, DOM_CALL = /^(appendChild|insertAdjacentHTML|insertBefore|replaceChildren|replaceWith|removeChild|remove|setAttribute|removeAttribute|toggleAttribute|scrollIntoView|focus|blur|showModal|animate|setProperty)$/;
+const DOM_READ = /^(querySelector|querySelectorAll|getElementById|getElementsByClassName|closest|matches|getBoundingClientRect|getAttribute|contains)$/;
+const NONUI_EL = /^['"`](canvas|img|audio|video|a|input|script|link|source)['"`]$/; // 화면이 아닌 임시 요소(그림 처리·소리·내려받기 링크·파일 고르기)
 const STYLE = /^(classList|style|dataset)$/;
-const TRIGGER = new Set(['render', 'renderView', 'toast', 'openModal', 'closeModal']); // 화면 갱신(render = 그리기 전 처리 + renderView)
-// 저장·외부 서비스(직접 쓰면 Model): 읽기(저장소·IndexedDB 읽기) · 쓰기(저장소 쓰기·IndexedDB 쓰기·저장 표시) · 서비스(네트워크·글 AI·그림 AI — 부작용·비용)
-const IO_READ = new Set(['idbGet', 'idbKeys', 'idbGetNS']), IO_WRITE = new Set(['idbPut', 'idbDel', 'storeImage', 'storeAudio', 'mark', 'markAll', 'flush', 'downloadBlob']), SERVICE = new Set(['fetch', 'aiOne', 'aiCall', 'aiJSON', 'naiDraw', 'naiGenerate']);
-const STORE = /^(appStorage|localStorage|sessionStorage)$/, STORE_W = /^(setItem|removeItem|clear|mediaWrite)$/;
-
-// 함수마다 직접 신호: markup · dom(바꿈) · trigger(화면 갱신 호출) · write(게임 상태 씀 — writers) · read(저장소 읽기) · store(저장소 쓰기·저장 표시) · service(네트워크·AI) · handler
+const CHANNEL = new Set(['render', 'renderView', 'toast', 'openModal', 'closeModal']); // 화면 갱신 통로(다시 그리게 함)
+const REFRESH = new Set(['render', 'renderView']); // 화면 갱신 요청 — View가 불러도 L2 아님
+const ADAPTERS = new Set(['idbPut', 'idbDel', 'storeImage', 'storeAudio', 'mark', 'markAll', 'flush', 'downloadBlob', 'aiOne', 'aiCall', 'aiJSON', 'naiDraw', 'naiGenerate']); // 입출력 어댑터(외부와의 경계 — Model)
+const STORE = /^(appStorage|localStorage|sessionStorage|indexedDB)$/, STORE_W = /^(setItem|removeItem|clear|mediaWrite|saveLive|deleteDatabase)$/, NET = new Set(['fetch']);
+const AMBIG = /^(hidden|disabled|checked|selectedIndex|value|src|href|placeholder)$/, DOM_Q = /\$\(|querySelector|getElementById|createElement|closest\(|\.target\b|children|firstElementChild|parentNode|parentElement/;
 const propOf = m => m?.type === 'member_expression' ? m.childForFieldName('property')?.text || '' : '';
-// 대입: DOM 속성 바꾸기(innerHTML·hidden …) 또는 el.style.x = … · el.classList… 
-//   hidden·disabled·checked·selectedIndex는 데이터 칸 이름으로도 쓰여서(예: 설정의 checked = 확인 시각) 대상이 함수 안에서 DOM이 아닌 값으로 만든 이름이면 뺌
-const AMBIG = /^(hidden|disabled|checked|selectedIndex)$/, DOM_Q = /\$\(|querySelector|getElementById|createElement|closest\(|\.target\b|children|firstElementChild|parentNode|parentElement/;
-function notElement(obj, f) { const root = (obj?.text || '').split(/[.[(]/)[0]; let init = null; walk(f.node, n => { if (init === null && n.type === 'variable_declarator' && n.childForFieldName('name')?.text === root) init = n.childForFieldName('value')?.text || ''; }); return init !== null && !DOM_Q.test(init); }
-function assignSig(n, s, f) { const l = n.childForFieldName('left'); if (l?.type !== 'member_expression') return; const p = propOf(l);
-  if ((DOM_WRITE.test(p) && !(AMBIG.test(p) && notElement(l.childForFieldName('object'), f))) || STYLE.test(propOf(l.childForFieldName('object')))) { s.dom = true; s.atV.push(n); } }
-// 이름 호출: 화면 갱신·저장소·서비스 기본 함수
-function nameSig(c, s) { if (TRIGGER.has(c.text)) s.trigger = true; if (IO_READ.has(c.text)) s.read = true; if (IO_WRITE.has(c.text)) { s.store = true; s.atM.push(c); } if (SERVICE.has(c.text)) { s.service = true; s.atM.push(c); } }
-// 멤버 호출: DOM 바꾸기(화면이 아닌 canvas·이미지 등 만들기는 뺌) · el.classList.add … · 저장소 읽기/쓰기
-function memberSig(n, c, s) { const p = propOf(c), o = c.childForFieldName('object'), arg = n.childForFieldName('arguments')?.namedChildren[0];
-  const dom0 = s.dom; s.dom = false; if (p === 'createElement') { if (!NONUI_EL.test(arg?.text || '')) s.dom = true; } else if (DOM_CALL.test(p) && !/^(appStorage|localStorage|sessionStorage|Object|Array|JSON|Math|Promise|URL|Set|Map)$/.test(o?.text || '')) s.dom = true;
-  if (STYLE.test(propOf(o)) && !/^(contains|item|getPropertyValue)$/.test(p)) s.dom = true; /* classList.contains 같은 읽기는 바꿈이 아님 */ if (s.dom) s.atV.push(n); s.dom = s.dom || dom0; if (STORE.test(o?.text || '')) { if (STORE_W.test(p)) { s.store = true; s.atM.push(n); } else s.read = true; } }
-/* atV·atM: View·Model 신호가 난 자리(노드) — 섞인 함수를 나눌 때 어느 줄이 화면이고 어느 줄이 처리인지(archMap mix) */
-function signals(f, writers) { const s = { markup: false, dom: false, trigger: false, write: writers.has(f.key), read: false, store: false, service: false, handler: /^handle\w+Action$/.test(f.name), atV: [], atM: [] };
+const rootName = x => (x?.text || '').split(/[.[(]/)[0];
+// hidden·value·src 같은 이름은 데이터 칸에도 쓰여서 — 대상이 함수 안에서 DOM이 아닌 값으로 만든 이름이면 뺌
+function notElement(obj, f) { const root = rootName(obj); let init = null; walk(f.node, n => { if (init === null && n.type === 'variable_declarator' && n.childForFieldName('name')?.text === root) init = n.childForFieldName('value')?.text || ''; }); return init !== null && !DOM_Q.test(init); }
+// 함수 안에서 임시 요소로 만든 이름(createElement('a') 등)
+function tempEls(f) { const out = new Set(); walk(f.node, n => { if (n.type !== 'variable_declarator') return; const v = n.childForFieldName('value'); if (v?.type === 'call_expression' && propOf(v.childForFieldName('function')) === 'createElement' && NONUI_EL.test(v.childForFieldName('arguments')?.namedChildren[0]?.text || '')) out.add(n.childForFieldName('name')?.text); }); return out; }
+function assignSig(n, s, f, tmp) { const l = n.childForFieldName('left'); if (l?.type !== 'member_expression') return; const p = propOf(l), o = l.childForFieldName('object'); if (tmp.has(rootName(o))) return;
+  if ((DOM_WRITE.test(p) && !(AMBIG.test(p) && notElement(o, f))) || (STYLE.test(propOf(o)) && !tmp.has(rootName(o)))) { s.dom = true; s.atV.push(n); } }
+function callSig(n, s, tmp) { const c = n.childForFieldName('function'), args = n.childForFieldName('arguments')?.namedChildren || [];
+  if (c?.type === 'identifier') { if (CHANNEL.has(c.text)) s.channel = true; if (NET.has(c.text)) { s.service = true; s.atM.push(c); } if (c.text === '$') s.read = true; return; }
+  if (c?.type !== 'member_expression') return; const p = propOf(c), o = c.childForFieldName('object');
+  if (STORE.test(o?.text || '')) { if (STORE_W.test(p)) { s.store = true; s.atM.push(n); } return; }
+  if (/^(Object|Array|JSON|Math|Promise|URL|Set|Map|String|Number|Date|navigator|console|crypto)$/.test(o?.text || '')) return;
+  if (DOM_READ.test(p) || (STYLE.test(propOf(o)) && /^(contains|item|getPropertyValue)$/.test(p))) { s.read = true; return; }
+  if (tmp.has(rootName(o)) || args.some(a => tmp.has(a.text))) return; /* 임시 요소 다루기 */
+  if (p === 'createElement' ? !NONUI_EL.test(args[0]?.text || '') : (DOM_CALL.test(p) || STYLE.test(propOf(o)))) { s.dom = true; s.atV.push(n); } }
+/* atV·atM: 화면 바꿈·상태 바꿈이 난 자리(노드) — 섞인 함수를 나눌 때(archMap mix) */
+// 없으면 만들어 쓰는 게터(get-or-create — 읽기처럼 쓰이는데 상태를 씀): 어떤 대입의 왼쪽 사슬을 그대로 돌려줌(return x.y / return m.k) — 또는 그 대입 왼쪽의 앞부분 이름을 돌려줌
+function lazyGetter(f) { const lhs = new Set(); let hit = false; walk(f.node, n => { if (n !== f.node && /function|arrow/.test(n.type)) return false; if (n.type === 'assignment_expression') { const l = n.childForFieldName('left'); if (l?.type === 'member_expression' || l?.type === 'subscript_expression') { lhs.add(l.text); let o = l.childForFieldName('object'); while (o) { lhs.add(o.text); o = o.childForFieldName?.('object'); } } } });
+  walk(f.node, n => { if (n !== f.node && /function|arrow/.test(n.type)) return false; if (n.type === 'return_statement') { const v = n.namedChildren[0]; if (v && lhs.has(v.text.replace(/^\((.*)\)$/, '$1'))) hit = true; } }); return hit; }
+function signals(f, writers) { const s = { markup: false, dom: false, read: false, channel: false, write: writers.has(f.key), store: false, service: false, adapter: ADAPTERS.has(f.name), handler: /^handle\w+Action$/.test(f.name), atV: [], atM: [] }, tmp = tempEls(f);
   walk(f.node, n => { const t = n.type;
     if (t === 'string' || t === 'template_string' || t === 'string_fragment') { if (MARKUP.test(n.text)) { s.markup = true; s.atV.push(n); } }
-    else if (t === 'assignment_expression' || t === 'augmented_assignment_expression') assignSig(n, s, f);
-    else if (t === 'call_expression') { const c = n.childForFieldName('function'); if (c?.type === 'identifier') nameSig(c, s); else if (c?.type === 'member_expression') memberSig(n, c, s); } });
-  return s; }
-// 계층: 직접 신호로 정함(부르는 함수의 계층은 방향 위반에서만 봄)
-function layerOf(s) { const view = s.markup || s.dom, model = s.write || s.store || s.service; /* 저장소 읽기만 하는 화면 함수는 View(따로 셈) */
-  if (view && model) return '섞임'; if (view) return 'View'; if (s.handler || s.trigger) return 'Controller'; return 'Model'; }
+    else if (t === 'assignment_expression' || t === 'augmented_assignment_expression') assignSig(n, s, f, tmp);
+    else if (t === 'call_expression') callSig(n, s, tmp);
+    else if (t === 'new_expression' && /^XMLHttpRequest$/.test(n.childForFieldName('constructor')?.text || '')) s.service = true; });
+  s.trigger = s.channel; s.lazy = s.write && lazyGetter(f); return s; }
+const V = s => s.markup || s.dom, S = s => s.write || s.store || s.service || s.adapter;
+// 직접 효과로 정하는 계층(효과 없으면 null — 호출로 정함)
+function layerOf(s) { if (V(s) && S(s) && !s.adapter) return '섞임'; if (V(s) && !s.adapter) return 'View'; if (s.adapter) return 'Model';
+  if (S(s)) return s.handler || s.channel || s.read ? 'Controller' : 'Model'; if (s.handler) return 'Controller'; return null; }
 
-// fns: buildGraph 함수 표 · writers: 게임 상태를 직접 쓰는 함수 키(lib/flow.mjs mutations + 연관 맵 data 쓰기)
-export function layers(fns, writers) { const top = [...fns.values()].filter(f => f.top && !f.table), sig = new Map(top.map(f => [f.key, signals(f, writers)])), out = new Map();
-  for (const f of top) { const s = sig.get(f.key); out.set(f.key, { layer: IO_WRITE.has(f.name) || SERVICE.has(f.name) ? 'Model' : layerOf(s), ...s }); } /* 저장·서비스 함수 자체는 입출력 어댑터(Model — 파일 내려받기의 임시 링크 같은 DOM은 화면이 아님) */
-  /* 직접 신호 없이 View 함수만 부르고 상태·저장·서비스를 바꾸는 함수는 부르지 않으면 View(화면 조각을 엮는 함수 — 예: 칩 여럿을 chipOn으로 켬) — 더 바뀌지 않을 때까지 */
-  const quiet = s => !(s.markup || s.dom || s.write || s.store || s.service || s.handler || s.trigger), changes = o => o && (o.write || o.store || o.service || o.layer === '섞임' || o.layer === 'Controller');
-  for (let more = true; more;) { more = false; for (const f of top) { const me = out.get(f.key); if (me.layer !== 'Model' || !quiet(me)) continue; const cs = [...f.calls.keys()].map(k => out.get(k)).filter(Boolean);
-    if (cs.some(o => o.layer === 'View') && !cs.some(changes)) { me.layer = 'View'; more = true; } } }
-  /* 직접 신호 없이 상태를 바꾸는 함수와 View 함수를 함께 부르면 Controller(정산한 뒤 결과를 그리게 하는 흐름 — 예: 전투 끝 bEnd) */
-  for (const f of top) { const me = out.get(f.key); if (me.layer !== 'Model' || !quiet(me)) continue; const cs = [...f.calls.keys()].map(k => out.get(k)).filter(Boolean);
-    if (cs.some(o => o.layer === 'View') && cs.some(o => o.write || o.store || o.service)) me.layer = 'Controller'; }
-  /* 방향 위반: View → 상태를 쓰거나 저장하는 함수(그리다가 바꿈) · Model → 화면을 만드는 함수 */
-  const bad = []; for (const f of top) { const me = out.get(f.key); for (const k of f.calls.keys()) { const o = out.get(k); if (!o) continue;
-    if (me.layer === 'View' && (o.write || o.store || o.service) && o.layer !== 'View' && !TRIGGER.has(fns.get(k)?.name)) bad.push({ fn: f.key, to: k, kind: 'View가 상태를 바꾸거나 저장·외부 서비스를 부르는 함수를 부름' }); /* 화면 갱신 통로(render 등)를 부르는 것은 갱신 요청이지 상태 변경이 아님 */
-    else if (me.layer === 'Model' && (o.layer === 'View' || o.layer === '섞임') && !me.handler) bad.push({ fn: f.key, to: k, kind: 'Model이 화면을 만드는 함수를 부름' }); } }
+// fns: buildGraph 함수 표 · writers: 게임 상태를 직접 쓰는 함수 키(연관 맵 data 쓰기) — LAYER_DEF대로
+export function layers(fns, writers) { const top = [...fns.values()].filter(f => f.top && !f.table), out = new Map();
+  for (const f of top) { const s = signals(f, writers); out.set(f.key, { ...s, layer: layerOf(s), quiet: layerOf(s) === null }); }
+  const calls = f => [...f.calls.keys()].map(k => out.get(k)).filter(Boolean), isView = o => o.layer === 'View' || o.layer === '섞임';
+  /* 바꾸는 함수(전이) */ const ch = new Set(top.filter(f => S(out.get(f.key))).map(f => f.key));
+  for (let more = true; more;) { more = false; for (const f of top) { if (ch.has(f.key) || out.get(f.key).layer === 'View') continue; if ([...f.calls.keys()].some(k => ch.has(k))) { ch.add(f.key); more = true; } } }
+  /* 효과 없는 함수: 호출로 — 화면 함수만이나 화면 읽기만 → View, 바꾸는 함수와 화면 함수를 함께 → Controller, 그 밖 → Model(더 바뀌지 않을 때까지) */
+  for (let more = true; more;) { more = false; for (const f of top) { const me = out.get(f.key); if (!me.quiet) continue; const cs = calls(f), view = cs.some(isView) || me.read, change = [...f.calls.keys()].some(k => ch.has(k));
+    const L = view && change ? 'Controller' : view ? 'View' : 'Model'; if (me.layer !== L) { me.layer = L; more = true; if (L === 'View') ch.delete(f.key); } } }
+  for (const [k, o] of out) o.changes = ch.has(k);
+  /* 바꾸는 까닭: 바꾸는 함수에서 직접 상태를 바꾸는 끝 함수까지 가장 짧은 호출 길(거꾸로 넓이 우선) — 같은 끝 함수로 묶어 원인 단위로 고치게 */
+  const via = new Map(); { const q = [...ch].filter(k => S(out.get(k))); q.forEach(k => via.set(k, null)); const callers = new Map(); for (const f of top) for (const k of f.calls.keys()) { if (!callers.has(k)) callers.set(k, []); callers.get(k).push(f.key); }
+    while (q.length) { const k = q.shift(); for (const c of callers.get(k) || []) if (ch.has(c) && !via.has(c)) { via.set(c, k); q.push(c); } } }
+  const endOf = k => { const path = []; for (let x = k, i = 0; x && i < 30; x = via.get(x), i++) path.push(x); return path; };
+  for (const [k, o] of out) if (o.changes) o.changePath = endOf(k);
+  /* 방향(LAYER_DEF.direction): L2 View → 바꾸는 함수(갱신 요청 render·renderView 뺌) · L3 Model → 화면 함수 */
+  /* 그 호출이 함수 안에 붙인 콜백(이벤트 처리·타이머) 안에서만 일어나나 */
+  const innerOnly = (f, nm) => { let top = 0, inner = 0; walk(f.node, n => { if (n.type !== 'call_expression' || n.childForFieldName('function')?.text !== nm) return; let p = n.parent, nested = false; while (p && p.id !== f.node.id) { if (/function|arrow/.test(p.type)) { nested = true; break; } p = p.parent; } nested ? inner++ : top++; }); return inner > 0 && top === 0; };
+  const bad = []; for (const f of top) { const me = out.get(f.key); for (const k of f.calls.keys()) { const o = out.get(k); if (!o) continue; const nm = fns.get(k)?.name;
+    if (me.layer === 'View' && o.changes && o.layer !== 'View' && !REFRESH.has(nm)) bad.push({ fn: f.key, to: k, kind: 'View가 상태를 바꾸는 함수를 부름(L2)', path: o.changePath, inner: innerOnly(f, nm) });
+    else if (me.layer === 'Model' && isView(o)) bad.push({ fn: f.key, to: k, kind: 'Model이 화면 함수를 부름(L3)' }); } }
   return { layer: out, bad }; }
 
 // 브라우저 저장소 키를 쓰는 함수: appStorage·localStorage·sessionStorage의 getItem·setItem·removeItem 첫 인자(문자열 또는 상수 이름) → 'store:키'

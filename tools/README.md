@@ -10,6 +10,7 @@ node tools/check.mjs            # 요약 + tools/out/report.md · flow.mmd · re
 node tools/check.mjs --strict   # 오류가 있거나 기준선보다 새로 생기거나 나빠진 항목이 있으면 exit 1 (CI)
 node tools/check.mjs --diff HEAD          # 이번 변경으로 새로 생김·나빠짐·해결 (git 기준 트리에 같은 분석을 돌려 비교 → out/diff.md)
 node tools/check.mjs --update-baseline    # 줄었을 때 기준선(tools/baseline.json) 낮추기 — 늘었으면 거부(코드를 고침)
+node tools/rules.mjs --strict            # 규칙 전수검사(아래) — 오류 규칙에 건이 있거나 래칫 규칙이 늘면 exit 1 (CI)
 node tools/check.mjs --rebase HEAD        # 도구를 고쳤을 때: 기준 커밋 코드를 지금 도구로 다시 재서 기준선을 세우고 지금 코드와 비교(새로 생김·나빠짐이면 exit 1)
 node tools/test.mjs             # 도구 자체 검사
 node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(기본은 미리 보기, 지운 뒤 생긴 것까지 되풀이)
@@ -62,7 +63,14 @@ node tools/fix.mjs [--apply]    # 안 쓰는 함수·변수·액션 case 정리(
 - 함수를 담은 최상위 표(`AUDIT_RULES`의 `fix.run`·`test` 등)는 속성별 의사 함수(`AUDIT_RULES.run`)로 그래프에 들어가요(`lib/graph.mjs`). 그 속성을 멤버로 호출하는 함수만 이어지고, 표를 참조만 하는 곳은 잇지 않아요
 - 한계: 동적 키 쓰기(`P()[k]=v`)는 못 따라가요(아무도 안 씀으로 나옴 — 도구 문제인지 코드 문제인지 따로 가림)
 
-## 연관 맵 (`node tools/map.mjs [--check] [--strict] [--update-baseline] [--rebase <커밋>] [--why <말>] [--game <폴더>] [--force]` → `docs/map.md`·`docs/map.json`)
+## 규칙 전수검사 (`node tools/rules.mjs [--strict] [--update-baseline] [--rebase <커밋>]` → `tools/out/rules.md`·`rules.json`)
+
+사용자 지시: 하나씩 고치지 말고 전수검사 — 도구는 자동화만이 아니라 하나의 원칙과 규칙으로 제어하는 것. 원칙(CLAUDE.md §0-2·§0-1)을 **규칙표 한곳**(`lib/rules.mjs` — 규칙마다 원칙 · 판정 · 고치는 법 하나 · 막는 정도)에 두고, SPA에 들어가는 코드 전체(src/main · src/modules · src/boot)에 한 번에 돌림. check.mjs의 분석(lib/analyze.mjs)과 연관 맵의 data 쓰기(lib/map.mjs)를 받아 규칙마다 건을 모음.
+- **계층 정의 `LAYER_DEF`**(`lib/arch.mjs` — 모든 계층 규칙이 이 하나로): 직접 효과만 봄(화면 바꿈 V · 화면 읽기 I · 상태 바꿈 S — 앱 함수 호출은 간선, 외부와의 경계인 입출력 어댑터는 S) → V∧S 섞임 · V View · S는 액션 처리기·다시 그리게 함(render·toast·openModal·closeModal)·화면 읽기가 있으면 Controller 아니면 Model · 효과 없으면 호출로(바꾸는 함수와 화면 함수를 함께 → Controller, 화면 함수만 → View). 바꾸는 함수 = S가 있거나 바꾸는 함수를 부르는(이어서) 함수. 방향: L2 View → 바꾸는 함수(render만 뺌) · L3 Model → 화면 함수
+- **규칙**: L1 계층 섞임 · L2 그리다가 바꿈(원인 4가지 — 처리 호출 · 읽기가 progSlot · 없으면 만들어 씀 · 상태 바꿈, 원인마다 고치는 법 하나, 끝 함수별 건수) · L3 처리가 화면을 부름 · L4 Model이 화면 요소를 받음 · D1 읽기 결과에 쓰기 · D2 저장 표시 없는 상태 쓰기 · S1 갈래 없는 저장 키 · N1 정의 안 된 이름 · N2 TDZ · E1 순수 모듈 참조 · P1 프롬프트가 스튜디오 밖 · X1 HTML에 이스케이프 없이
+- **막는 정도**: 오류(건이 있으면 실패) · 래칫(파일별 건수 — tools/baseline.json의 rules, 옮김은 합계로) · 보고. 판정(규칙)을 바꾸면 `--rebase <직전 커밋>`으로 그 커밋 코드를 새 규칙으로 재서 기준선 — 지금 코드로 올리지 않음
+
+## 연관 맵 (`node tools/map.mjs [--check] [--split] [--why <말>] [--game <폴더>] [--force]` → `docs/map.md`·`docs/map.json`)
 
 사용자 지시: 모듈 집합(`src/`) → 빌드 → `www/index.html`(생성기·실행기·편집기 — CLAUDE.md §0) → 생성·실행·편집 → data 게임 파일(`data/<게임id>/<종류>.json`)의 연결을 맵으로 두고, 연관 지점을 매번 다시 찾지 않고 맵을 따라감(`lib/map.mjs`).
 - **data 경로**: 상태 키(G·G.meta·G.world·P() — `lib/flow.mjs`) + 생성 중인 게임(ng.* — 생성기 어휘) + 엔티티 필드(캐릭터·장·스테이지·적·세력 …의 `[].필드`). 엔티티는 컬렉션 순회·찾기 함수·컬렉션에 넣는 생성 함수·목록 변수·대입, 호출 지점에서 매개변수로 전파, 종류를 모르는 매개변수는 그 엔티티에만 있는 필드를 둘 넘게 쓰면 그 종류(구조 판정 — 이름으로 짐작하지 않음)

@@ -191,6 +191,18 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
 { const { elementParams } = await import('./lib/arch.mjs'), r18 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r18, 'src/main'), { recursive: true });
   writeFileSync(join(r18, 'src/main/010-e.js'), "function work(p,btn){ btn.disabled=true; return p; }\nfunction pass(x,b){ return work(x,b||null); }\nfunction top2(q,c){ return pass(q,c); }\nfunction free(n,m){ return work(n,null)+m; }\n");
   const EP = elementParams(buildGraph(await loadUnits(r18)).fns).map(x => `${x.fn}(${x.param})${x.direct ? '*' : '→' + x.via}`).sort(); assert.deepEqual(EP, ['pass(b)→work', 'top2(c)→pass', 'work(btn)*'], '요소 매개변수: ' + JSON.stringify(EP)); rmSync(r18, { recursive: true, force: true }); }
+// 규칙 전수검사(lib/rules.mjs): 규칙표가 계층 정의(LAYER_DEF) 하나로 SPA 전체(main·modules)를 판정하고, 그리다가 바꿈(L2)을 끝 함수의 성질로 원인별로 나눔
+{ const { runRules } = await import('./lib/rules.mjs'), { analyze } = await import('./lib/analyze.mjs'), { buildMap } = await import('./lib/map.mjs'), r20 = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w20 = (p, x) => { mkdirSync(join(r20, p, '..'), { recursive: true }); writeFileSync(join(r20, p), x); };
+  w20('src/index.html', '<div id="app"></div>'); w20('www/index.html', '<html></html>');
+  w20('src/main/010-s.js', "let G={meta:{},prog:{}};\nfunction P(){ return G.prog; }\nfunction mark(k){ return k; }\nfunction progSlot(k){ const v=P()[k]||(P()[k]={}); mark('prog'); return v; }\nfunction readList(){ return progSlot('mail').list; }\nfunction cfg(){ if(!G.meta.cfg) G.meta.cfg={on:1}; return G.meta.cfg; }\nfunction saveIt(){ mark('meta'); }\nfunction listHTML(){ return '<p>'+readList()+cfg().on+'</p>'; }\nfunction badHTML(){ saveIt(); return '<b>x</b>'; }\nfunction act(){ G.meta.x=1; return listHTML(); }\n");
+  w20('src/modules/app/010-m.js', "function modMix(el){ el.innerHTML='<i>m</i>'; localStorage.setItem('k','v'); }\n");
+  const A = await analyze(r20), M = buildMap(A.units, A.fns, stateFlow(A.units, A.fns), ''), RS = runRules({ A, M }), R = id => RS.find(r => r.id === id);
+  const l2 = Object.fromEntries(R('L2').items.map(x => [x.what.split(' → ')[0] + '>' + x.end, x.cause]));
+  assert.ok(R('L1').items.some(x => x.what === 'modMix' && x.scope === 'modules'), '전수검사: 모듈 쪽 섞임도 잼 ' + JSON.stringify(R('L1').items));
+  assert.ok(l2['listHTML>progSlot'] === '읽기가 progSlot' || l2['listHTML>readList'] === '읽기가 progSlot' || Object.values(l2).includes('읽기가 progSlot'), 'L2 원인: 읽기가 progSlot ' + JSON.stringify(l2));
+  assert.ok(Object.values(l2).includes('없으면 만들어 씀') && Object.values(l2).includes('처리 호출'), 'L2 원인: 없으면 만들어 씀(cfg)·처리 호출(mark) ' + JSON.stringify(l2));
+  assert.ok(R('L3').items.some(x => x.what.startsWith('act →')), 'L3: Model이 화면 함수를 부름 ' + JSON.stringify(R('L3').items));
+  rmSync(r20, { recursive: true, force: true }); }
 // 식을 함수로 떼기(tools/extract.mjs): 지역 이름만 인자로, await·바깥 이름 쓰기가 든 식은 거부, 원래 함수 앞에 새 함수
 { const { findTarget, extractPlan, applyExtract } = await import('./extract.mjs'), r17 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r17, 'src/main'), { recursive: true });
   const src = "const TOP=1;\nfunction openX(id){ const c=find(id), n=2;\n  openModal(`<p>${c.name}${n}${TOP}</p>`);\n  openModal(`<b>${await0()}</b>`); }\nasync function bad(){ let k=0;\n  openModal(`${await one()}${k++}`); }\n";
