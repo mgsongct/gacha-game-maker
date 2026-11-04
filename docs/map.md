@@ -1,6 +1,6 @@
 # 연관 맵 — 모듈 → 빌드 → index.html(생성기·실행기·편집기) → data 게임 파일
 
-생성: `node tools/map.mjs` · 2026-11-04T02:28 · git a02b53d · 입력: src 128파일 · www/index.html 4f9893afe802 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
+생성: `node tools/map.mjs` · 2026-11-04T02:35 · git 4e3f20d · 입력: src 128파일 · www/index.html 4f9893afe802 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
 
 ## 읽는 법 — 거꾸로 따라가기
 
@@ -842,6 +842,7 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 
 ## 7. 최근 변화(증분 갱신 기록)
 
+- 2026-11-04T02:35 · git 4e3f20d
 - 2026-11-04T02:28 · git a02b53d · src 1: 0510-actions/040-story-and-authoring · index.html 다시 빌드
 - 2026-11-04T02:25 · git a02b53d
 - 2026-11-04T02:22 · git a02b53d · src 7: +src/main/0160-player-profile, −src/main/0160-free-chat, 0015-prompt-studio/020-requests, 0015-prompt-studio/030-builders, 0100-messenger, 0220-mail, 0510-actions/030-mail · index.html 다시 빌드
@@ -855,6 +856,3 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
   - meta.json › logoStyle:  −편집기:handleNavigationAndToolsAction
 - 2026-11-04T02:06 · git a02b53d
 - 2026-11-04T02:01 · git b36fbca
-- 2026-11-04T01:56 · git b36fbca · src 1: 0505-construct · index.html 다시 빌드
-  - meta.json › construct: +실행기:conSave −실행기:conMeta −편집기:conMeta
-  - meta.json › variants:  −실행기:VARIANTS −편집기:VARIANTS

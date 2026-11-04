@@ -67,3 +67,24 @@ export function localDefs(ref) { const name = ref.text; let scope = null;
     if ((n.type === 'assignment_expression' || n.type === 'augmented_assignment_expression') && n.childForFieldName('left')?.type === 'identifier' && n.childForFieldName('left').text === name) out.push(n.childForFieldName('right'));
     if (n.type === 'call_expression') { const f = n.childForFieldName('function'); if (f?.type === 'member_expression' && f.childForFieldName('object')?.text === name && /^(push|unshift)$/.test(f.childForFieldName('property')?.text || '')) out.push(...n.childForFieldName('arguments').namedChildren); } }); // 배열에 넣은 글
   return out; }
+// 정의 안 된 이름(ReferenceError 후보): 프로그램 하나를 두 번 훑어(① 범위마다 선언 모음 — var·function은 함수 범위로 끌어올림, let·const·class는 블록, 매개변수·catch·for 머리 ② 범위 사슬로 참조 풀기)
+//   어느 범위에도 묶이지 않은 참조 이름을 돌려줌(그 프로그램 맨 위 선언은 묶임 — 여러 스크립트가 나눠 쓰는 전역은 부르는 쪽이 따로 맞춤). typeof X는 없어도 안전해서 뺌
+const FN_ALL = new Set([...FN, 'generator_function_declaration', 'generator_function']), DECL_NAMED = new Set(['function_declaration', 'generator_function_declaration', 'class_declaration']), BLOCKS = new Set(['statement_block', 'switch_body', 'for_statement', 'class_body']);
+const declNames = n => n.namedChildren.filter(d => d.type === 'variable_declarator').flatMap(d => patternNames(d.childForFieldName('name')));
+// 노드 하나가 선언하는 이름을 범위에 넣고, 아래로 내려갈 때의 [함수 범위, 블록 범위]
+function declare(n, fs, bs, add) { const t = n.type, nm = n.childForFieldName('name');
+  if (DECL_NAMED.has(t) && nm) add(bs, [nm.text]);
+  if (FN_ALL.has(t)) { add(n, params(n)); if ((t === 'function_expression' || t === 'generator_function') && nm) add(n, [nm.text]); return [n, n]; }
+  if (t === 'class' && nm) { add(n, [nm.text]); return [fs, n]; }
+  if (BLOCKS.has(t)) return [fs, n];
+  if (t === 'catch_clause') { add(n, patternNames(n.childForFieldName('parameter'))); return [fs, n]; }
+  if (t === 'for_in_statement') { const k = n.childForFieldName('kind')?.text, names = patternNames(n.childForFieldName('left')); if (k === 'var') add(fs, names); else if (k) { add(n, names); return [fs, n]; } }
+  if (t === 'variable_declaration') add(fs, declNames(n)); else if (t === 'lexical_declaration') add(bs, declNames(n));
+  return [fs, bs]; }
+export function unboundRefs(root) { const decl = new Map(), add = (s, names) => { let x = decl.get(s.id); if (!x) decl.set(s.id, x = new Set()); for (const n of names) x.add(n); };
+  const p1 = (n, fs, bs) => { const [f2, b2] = declare(n, fs, bs, add); for (const c of n.namedChildren) p1(c, f2, b2); };
+  p1(root, root, root);
+  const out = [], stack = [], p2 = n => { const s = decl.get(n.id); if (s) stack.push(s); const t = n.type;
+    if ((t === 'identifier' || t === 'shorthand_property_identifier') && !(n.parent?.type === 'unary_expression' && n.parent.child(0)?.type === 'typeof') && n.text !== 'arguments') { let ok = false; for (let i = stack.length - 1; i >= 0 && !ok; i--) ok = stack[i].has(n.text); if (!ok) out.push(n); }
+    for (const c of n.namedChildren) p2(c); if (s) stack.pop(); };
+  p2(root); return { refs: out, top: decl.get(root.id) || new Set() }; }

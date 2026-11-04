@@ -10,6 +10,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { parse as sgParse, Lang } from '@ast-grep/napi';
+import { unboundRefs } from './scope.mjs';
 import { walk, tsInit } from './source.mjs';
 
 const FN = /^(function_declaration|function_expression|arrow_function|method_definition|generator_function_declaration)$/;
@@ -168,3 +169,15 @@ export function leadComments(src, at) { let a = at; for (;;) { const before = sr
     if (/^\s*\/\//.test(line)) { a = ls; continue; }
     if (/\*\/\s*$/.test(line)) { const st = before.lastIndexOf('/*', before.length - 1); if (st < 0 || (st > 0 && src[st - 1] !== '\n')) return a; const c = src.slice(st, before.length - 1); if (/^\/\* =====|에서 옮김 \*\/$/.test(c.trim()) || /\*\/[\s\S]*\S/.test(c.replace(/\*\/\s*$/, ''))) return a; a = st; continue; }
     return a; } }
+// 정의 안 된 이름(부르면 ReferenceError — 처리기를 나누거나 이름을 바꾸다 생기는 회귀): 스크립트마다 범위 사슬로 풀리지 않는 참조 중
+//   여러 스크립트의 맨 위 선언·전역에 붙인 이름(window·globalThis·self·root.X = …, Object.defineProperty(window, 매개변수 …)로 전역을 만드는 함수에 넘긴 글자 이름)·
+//   브라우저 전역(tools/browser-globals.json — node tools/globals.mjs가 크로미움에서 읽음)·typeof로 있는지 보는 이름(require·module) 어디에도 없는 것
+export function undefinedNames(units, globals) { const known = new Set([...(globals.window || []), ...(globals.worker || [])]), R = units.map(u => [u, unboundRefs(u.tree.rootNode)]), guarded = new Set(), definers = new Map();
+  for (const [u, r] of R) { r.top.forEach(x => known.add(x)); walk(u.tree.rootNode, n => {
+    if (n.type === 'assignment_expression') { const l = n.childForFieldName('left'); if (l?.type === 'member_expression' && /^(window|globalThis|self|root)$/.test(l.childForFieldName('object')?.text || '')) known.add(l.childForFieldName('property')?.text); }
+    if (n.type === 'call_expression' && n.childForFieldName('function')?.text === 'Object.defineProperty') { const [o, k] = n.childForFieldName('arguments')?.namedChildren || []; if (/^(window|globalThis|self)$/.test(o?.text || '') && k?.type === 'string') known.add(k.text.slice(1, -1)); }
+    if (n.type === 'unary_expression' && n.child(0)?.type === 'typeof' && n.childForFieldName('argument')?.type === 'identifier') guarded.add(n.childForFieldName('argument').text);
+    if (n.type === 'function_declaration') { const ps = n.childForFieldName('parameters')?.namedChildren.map(p => p.text) || [], def = n.childForFieldName('body')?.text.match(/Object\.defineProperty\((?:window|globalThis),\s*([A-Za-z_$][\w$]*)/); if (def && ps.includes(def[1])) definers.set(n.childForFieldName('name').text, ps.indexOf(def[1])); } }); }
+  for (const [u] of R) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression' || !definers.has(n.childForFieldName('function')?.text)) return; const a = n.childForFieldName('arguments')?.namedChildren[definers.get(n.childForFieldName('function').text)]; if (a?.type === 'string') known.add(a.text.slice(1, -1)); });
+  const out = new Map(); for (const [u, r] of R) for (const n of r.refs) { const x = n.text; if (x === 'await' || known.has(x) || guarded.has(x)) continue; const k = x + ' ' + u.loc(n); if (!out.has(k)) out.set(k, { name: x, loc: u.loc(n) }); }
+  return [...out.values()]; }

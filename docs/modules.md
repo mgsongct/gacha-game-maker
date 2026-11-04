@@ -11,6 +11,7 @@
 |---|---|---|
 | 분석한 코드 = 빌드된 SPA(`www/index.html`) 코드, 로컬 파일을 따로 불러오지 않음 | `tools/check.mjs`(`spaCheck`) · `node build/build.mjs --check` | 오류 |
 | 불러올 때 아직 없는 이름 없음(모듈 블록 → main 이름순 실행 — 코드를 옮길 때 생기기 쉬움) | `tools/check.mjs`(`tdzRefs`) | 오류 |
+| 정의 안 된 이름 없음(부르면 ReferenceError — 처리기를 나누거나 이름을 바꿀 때 생기기 쉬움, 브라우저 전역은 `tools/browser-globals.json`) | `tools/check.mjs`(`undefinedNames`) | 오류 |
 | 규칙 엔진(순수 모듈)은 DOM·앱 상태를 참조하지 않음 | `tools/check.mjs`(`pureModules`) | 오류 |
 | 프롬프트(LLM·그림)는 프롬프트 스튜디오 한 모듈(`src/main/0015-prompt-studio/`)에: 조각 등록(`pfDef`)은 스튜디오만, 지시문은 조각, 프롬프트 글·그림 태그는 스튜디오 밖에 없음(화면과 같이 쓰는 글 도구는 `tools/prompt-shared.json`에 이유와 함께) | `tools/check.mjs`(`tools/lib/prompts.mjs` 프롬프트 흐름) | 오류 |
 | 모듈 경계: 영역 침범 후보·남의 상태 쓰기·상태 파편화(3모듈 이상이 쓰는 키) | `tools/modules.mjs` · `tools/check.mjs` 래칫 | 늘면 실패 |

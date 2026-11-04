@@ -38351,8 +38351,8 @@
   }
  },
  "gamesN": 2,
- "at": "2026-11-04T02:28",
- "head": "a02b53d",
+ "at": "2026-11-04T02:35",
+ "head": "4e3f20d",
  "inputs": {
   "src": {
    "src/boot/durable-storage.js": "9e1fdc434852",
@@ -38489,9 +38489,33 @@
    "idol-audition": "a443d928bb99",
    "sky-knights": "c782aafba942"
   },
-  "tool": "58cfddae99a2"
+  "tool": "07816db5eaa9"
  },
  "changes": [
+  {
+   "at": "2026-11-04T02:35",
+   "head": "4e3f20d",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
   {
    "at": "2026-11-04T02:28",
    "head": "a02b53d",
@@ -39333,30 +39357,6 @@
      ]
     },
     "www": true,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": true
-   },
-   "fns": {
-    "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": []
-  },
-  {
-   "at": "2026-11-04T01:06",
-   "head": "d2b44df",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "www": false,
     "games": {
      "added": [],
      "removed": [],
