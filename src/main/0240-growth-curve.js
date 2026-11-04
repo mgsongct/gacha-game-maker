@@ -196,4 +196,8 @@ function openBannerFrom(b){ const real=G.banners; const bak=BD; BD=b; const orig
     <div class="row" style="margin-top:16px"><button class="btn" data-act="bnsave">저장</button>${b.id&&b.id!=='std'?'<button class="btn ghost" data-act="bndel">삭제</button>':''}</div>`);
 }
 function openFarmSquad(st){ openFormation(st,{kind:'farm',extra:`data-k="${st.farm.key}" data-lv="${st.farm.lv}"`},'farmstart'); }
-async function aiChapterGen(dir,n,cast,t){ const snap=artSnap(); const r=await aiChapterGen0(dir,n,cast,t); if(r) artAfterAI(snap,'새 이야기 「'+r.ch.title+'」'); return r; }
+async function aiChapterGen(dir,n,cast){ const snap=artSnap(); const r=await aiChapterGen0(dir,n,cast); if(r) artAfterAI(snap,'새 이야기 「'+r.ch.title+'」'); return r; }
+/* 세계관 편집 창에 AI가 낸 값 채우기(View) — 용어 바꾸기 제안(WTERMS)은 처리기가 먼저 담음 */
+function worldFormFill(r){ $('#w_name').value=r.name||''; $('#w_sum').value=r.summary||''; $('#w_lore').value=r.lore||''; $('#w_plot').value=r.plot||''; $('#w_fac').value=(r.factions||[]).map(f=>f.name+': '+f.desc).join('\n'); const tb=$('#w_terms'); if(tb&&WTERMS){ tb.hidden=false; tb.querySelector('span').textContent=Object.entries(WTERMS).filter(([k,v])=>v&&TERM_LABEL[k]).map(([k,v])=>TERM_LABEL[k]+': '+v).join(' · '); } }
+/* 대열에 넣은 대원 반응(View): 몸짓 · 한마디 말풍선 — 고른 한마디를 돌려줌(목소리는 처리기가) */
+function formJoinShow(c){ const slot=document.querySelector(`.fslot[data-id="${c.id}"]`); if(!slot) return ''; charReact(slot.querySelector('.fs-art'),7,'head'); const pool=(c.dupLines.length?c.dupLines:[]).concat(c.lines); const l=rand(pool); if(l){ const b=document.createElement('div'); b.className='fsay'; b.textContent=sub(l); slot.appendChild(b); setTimeout(()=>b.remove(),2600); } return l; }

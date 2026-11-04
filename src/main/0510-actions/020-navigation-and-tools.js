@@ -3,7 +3,7 @@ async function handleNavigationAndToolsAction(a,t,id,p,e){
 case 'prepopen': openPrep(false); break;
 case 'rebal': await v2RebalanceAll(t); break;
 case 'a2hs': openA2HS(); break;
-case 'cdart': { const run=RG().run; if(run) drawCardArts(run.deck,t); else if(RF&&rfIds().length) drawCardArts(rgDeck(rfIds()),t).then(()=>{ if(RF&&document.querySelector('.rf-tee')) openRgForm(); }); break; }
+case 'cdart': { const run=progSlot('rogue').run; if(run) drawCardArts(run.deck,uiProg(t)); else if(RF&&rfIds().length) drawCardArts(rgDeck(rfIds()),uiProg(t)).then(()=>{ if(RF&&document.querySelector('.rf-tee')) openRgForm(); }); break; }
 case 'bswipe': bannerStep(+t.dataset.d); break;
 case 'lktake': lkTake(t); break;
 case 'artgo': { const k=ART_ASK; ART_ASK=null; closeModal(); if(k) artRun(k); break; }
@@ -16,26 +16,23 @@ case 'prepgo': { const cats=[...document.querySelectorAll('[data-pc]')].filter(x
 case 'prepstop': if(PREPJOB){ PREPJOB.stop=true; prepChip(); toast('지금 그리는 것까지만 하고 멈출게요'); } break;
 case 'prepnever': P().prepNever=true; mark('prog'); closeModal(); toast('설정 → 그림 AI에서 언제든 열 수 있어요'); break;
 case 'opnext': opNext(); break;
-case 'pfdraw': playerDraw(t); break;
+case 'pfdraw': playerDraw(uiProg(t)); break;
 case 'pfsave': readPlayerForm(); refreshPlayerForm(); toast('저장했어요'); break;
-case 'go': tab=t.dataset.to; closeModal(); if(!$('#phone').hidden) closePhone(); render(); $('#view').scrollTop=0; break;
+case 'go': tab=t.dataset.to; closeModal(); if(!$('#phone').hidden) closePhone(); render(); viewTop(); break;
 case 'close': window.navBack(); break;
 case 'goback': window.navBack(); break;
-case 'lbhide': document.body.classList.add('lb-hidden'); toast('화면을 누르면 메뉴가 돌아와요'); break;
-case 'lbshow': document.body.classList.remove('lb-hidden'); break;
-case 'poke': { if(document.body.classList.contains('lb-hidden')){ document.body.classList.remove('lb-hidden'); break; } const c=charById(p.sec); if(!c||!own(c.id)) break;
+case 'lbhide': lobbyMenu(false); toast('화면을 누르면 메뉴가 돌아와요'); break;
+case 'lbshow': lobbyMenu(true); break;
+case 'poke': { if(lobbyMenuHidden()){ lobbyMenu(true); break; } const c=charById(p.sec); if(!c||!own(c.id)) break;
       const r=t.getBoundingClientRect(), fy=e.clientY?(e.clientY-r.top)/r.height:0.2, zone=fy<0.3?'head':fy<0.72?'body':'base';
       let pool=spoilFree(c,zone==='head'?c.touch?.head:zone==='body'?c.touch?.body:affLinePool(c)); if(!pool.length) pool=affLinePool(c);
       const face=touchFace(c,zone,affLv(own(c.id)));
       addAff(c,zone==='body'?1:2); bump('touch'); mark('prog');
-      const el=$('#bubble'), l=pickTouchLine(pool,el?.textContent);
-      if(el){ el.textContent=sub(l); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } lobbyEmote(t,l,zone); if(c.voiceId&&SND().voiceLobby) speak(c,l);
-      const st=t.querySelector('.lb-stage')||t; const old=st.querySelector('.lobby-art:not(.lobby-pose)'); if(old){ /* 레이어 그림(포즈)은 표정 그림이 없어서 그대로 둬요. 바꾸면 스탠딩으로 고정돼 버렸어요 */ const tmp=document.createElement('div'); tmp.innerHTML=P().lobbyMode==='stand'?art(c,'lobby-art react',{face}):lobbyCharacterArt(c,'lobby-art react',face); old.replaceWith(tmp.firstElementChild); clearTimeout(window._faceT); window._faceT=setTimeout(()=>{const cur=document.querySelector('.lobby-art'); if(cur&&tab==='lobby'){const t2=document.createElement('div');t2.innerHTML=P().lobbyMode==='stand'?art(c,'lobby-art'):lobbyCharacterArt(c);cur.replaceWith(t2.firstElementChild);}},3500); }
-      { const x=e.clientX||innerWidth/2, y=e.clientY||innerHeight/2, lv=affLv(own(c.id)); ripple(x,y,lv>=7); if(lv>=5&&zone!=='body') hearts(x,y,Math.min(5,lv-3)); setTimeout(()=>charReact(document.querySelector('.lobby .lobby-art,.lobby .lobby-ill'),lv,zone),10); } break; }
+      const l=pickTouchLine(pool,lobbyBubbleText()); lobbyPokeShow(t,e,c,l,zone,face); if(c.voiceId&&SND().voiceLobby) speak(c,l); break; }
 case 'lbbgdel': { if(playMode())break;const c=charById(id); if(!c?.lbbg||!(await appConfirm('로비 레이어의 배경만 지울까요?'))) break; await imgClear(c.lbbg); mark('c:'+c.id); openChar(c.id); render(); break; }
 case 'altnew': { if(!SAMPLE){ toast('이격을 만들려면 설정 → 글 AI를 먼저 등록해 주세요'); break; } closeModal(); openNewPickup({kind:'alt',base:id}); break; }
-case 'scggen': { const c=charById(id); if(!c) break; if(!String(c.naiPrompt||'').trim()){toast('먼저 설정 편집에서 NAI 스탠딩 프롬프트를 채워 주세요');break;} if(!imgReady()){toast(imgNeed());break;} if(!SAMPLE){toast('기술 컷인 장면을 구성하려면 설정 → 글 AI를 먼저 등록해 주세요.');break;} const o=scgOf(c); t.disabled=true; t.textContent='그리는 중…';
-      try{ const el=await generateUltimateCutin(c); await storeImage(o,el,''); o.prompt=el.__candidateConfig?.prompt||o.prompt; mark('c:'+c.id); toast('기술 컷인을 그렸어요'); openChar(c.id); }catch(err){ toast(naiErr(err,'기술 컷인 실패')); t.disabled=false; t.textContent='NAI로 기술 컷인'; } break; }
+case 'scggen': { const c=charById(id); if(!c) break; if(!String(c.naiPrompt||'').trim()){toast('먼저 설정 편집에서 NAI 스탠딩 프롬프트를 채워 주세요');break;} if(!imgReady()){toast(imgNeed());break;} if(!SAMPLE){toast('기술 컷인 장면을 구성하려면 설정 → 글 AI를 먼저 등록해 주세요.');break;} const o=scgOf(c), done=busy(t,'그리는 중…');
+      try{ const el=await generateUltimateCutin(c); await storeImage(o,el,''); o.prompt=el.__candidateConfig?.prompt||o.prompt; mark('c:'+c.id); toast('기술 컷인을 그렸어요'); openChar(c.id); }catch(err){ toast(naiErr(err,'기술 컷인 실패')); done(); } break; }
 case 'scgdel': { const c=charById(id); if(!c||!c.scg) break; if(!(await appConfirm('기술 컷인을 지울까요?'))) break; const o=c.scg;await imgClear(o); mark('c:'+c.id); openChar(id); break; }
 case 'scgtest': { const c=charById(id); if(c) skillCut(c,c.skill.name,true,document.body); break; }
 case 'ilgen': { const c=charById(id); if(!c) break; const k=t.dataset.k==='lbcg'?'lbcg':'illust'; if(!SAMPLE){toast('설정 → 글 AI를 먼저 등록해 주세요.');break;} const sc=$(k==='lbcg'?'#lb_scene':'#il_scene'); if(sc){ c[k].prompt=sc.value.trim();naiBlocksSave(c[k],'prompt',sc); mark('c:'+c.id); } if(!String(c.naiPrompt||'').trim()){toast('먼저 설정 편집에서 NAI 스탠딩 프롬프트를 채워 주세요');break;} openNaiPrep(k,c.id); break; }
@@ -48,7 +45,7 @@ case 'ailogclear': AILOG.length=0; try{ appStorage.removeItem('ggm-ailog'); }cat
 case 'artcopy': { const c=naiCfg(), el=c.styles.find(x=>x.id===c.styleId)||c.styles[0]||{tags:'',neg:''}; if(!String(el.tags||'').trim()&&!String(el.neg||'').trim()){ toast('설정의 그림 AI에 그림체가 비어 있어요'); break; } $('#mt_art').value=el.tags||''; $('#mt_artn').value=el.neg||''; toast(`「${el.name||'기본 그림체'}」 태그·네거티브를 넣었어요. 저장하면 이 게임에 고정돼요`); break; }
 case 'artclear': $('#mt_art').value=''; $('#mt_artn').value=''; toast('비웠어요. 저장하면 설정의 기본 그림체를 따라가요'); break;
 case 'pthumbset': uploadFor={kind:'pthumb',id:t.dataset.v}; $('#file').click(); break;
-case 'avdel': { const av=avatarObj(); if(!av||!av.img||!(await appConfirm('프로필 그림을 지울까요?'))) break; await imgClear(av); mark('prog'); refreshPlayerForm(); toast('프로필 그림을 지웠어요'); break; }
+case 'avdel': { const av=progSlot('avatar'); if(!av||!av.img||!(await appConfirm('프로필 그림을 지울까요?'))) break; await imgClear(av); mark('prog'); refreshPlayerForm(); toast('프로필 그림을 지웠어요'); break; }
 case 'pthumbdel': { const pid=t.dataset.v, up=userPacks(), mine=up.find(x=>x.id===pid); if(mine){ delete mine.thumb; saveUserPacks(up); } const m=pthumbs(); delete m[pid]; try{ appStorage.setItem(PTHUMB,JSON.stringify(m)); }catch(e){} if($('#modal [data-act="packuse"]')) openModal(packHTML()); else if($('#modal [data-act="naipreset"]')) openNaiSet(); toast('썸네일을 지웠어요'); break; }
 case 'addchar-open': openAddChar(); break;
 case 'addchar-hand': { NEWPU=false; window.__ADDOWN=$('#ac_how').value==='own'; closeModal(); openCharEdit(null); break; }
@@ -63,17 +60,17 @@ case 'mapedit': { const ch=G.chapters.find(x=>x.id===t.dataset.ch); if(!ch) brea
 case 'locked': toast('이전 작전을 먼저 클리어하세요'); break;
 case 'ghist': openHistory(); break;
 case 'vnnext': vnStep(); break;
-case 'vnpick': { e.stopPropagation(); if(!S||!S.choice) break; const n=+t.dataset.n,o=S.choice.opts[n-1]; S.pick=n; S.lastPick=o; S.choice=null; if(S.branch){ storyFlag(S.branch,n,o); S.branch=null; } $('#vnCh').innerHTML=''; vnShow({type:'say',who:T('player'),text:o}); break; }
-case 'vnauto': e.stopPropagation(); S.auto=!S.auto; t.classList.toggle('on',S.auto); if(S.auto&&!S.typing&&!S.choice) S.autoT=setTimeout(vnStep,700); else clearTimeout(S.autoT); break;
+case 'vnpick': { e.stopPropagation(); if(!S||!S.choice) break; const n=+t.dataset.n,o=S.choice.opts[n-1]; S.pick=n; S.lastPick=o; S.choice=null; if(S.branch){ storyFlag(S.branch,n,o); S.branch=null; } vnChoiceClear(); vnShow({type:'say',who:T('player'),text:o}); break; }
+case 'vnauto': e.stopPropagation(); S.auto=!S.auto; chipOn(t,S.auto); if(S.auto&&!S.typing&&!S.choice) S.autoT=setTimeout(vnStep,700); else clearTimeout(S.autoT); break;
 case 'vnskip': e.stopPropagation(); vnSkip(); break;
-case 'vnlog': e.stopPropagation(); openModal(`${head('대화 기록')}${S.log.map(L=>`<p style="margin:6px 0">${L.type==='say'?`<b>${esc(isMe(L.who)?playerName():L.who)}</b> ${esc(sub(L.text))}`:L.type==='place'?`<span class="muted">[${esc(L.text)}]</span>`:`<i class="muted">${esc(sub(L.text))}</i>`}</p>`).join('')}`); break;
+case 'vnlog': e.stopPropagation(); openVnLog(); break;
 case 'bquit': if(B?.ctx.kind==='practice'){v2StopPractice();break;}if(B&&(B.ctx.kind==='raid'||B.ctx.kind==='rogue')){ if((await appConfirm(B.ctx.kind==='raid'?'여기서 끝낼까요? 지금까지 준 피해는 기록돼요.':'후퇴하면 이번 탐사가 끝나요. 지금까지의 보상은 받아요.'))){ if(!B.over) bEnd(false); } break; }
       if((await quitConfirm())){clearInterval(B.timer);B=null;closeOv();render();} break;
 case 'skill': { const u=B&&B.allies[+t.dataset.i]; if(u&&u.hp>0&&!B.over){ SCUT_MAN=true; useSkill(u); SCUT_MAN=false; } bUpdate(); break; }
 case 'bretry': { const st=B.s,cx=B.ctx; B=null; startStage(st,cx); break; }
 case 'flip': revealCard(+t.dataset.i); break;
 case 'flipall': flipAll(); break;
-case 'gcskip': { GC.timers.forEach(clearTimeout); GC.skip=true; $('#gcSeal').classList.add('go'); $('#gcStreak').style.opacity=0; $('#gcStage').hidden=false; t.hidden=true; document.querySelectorAll('.pc').forEach((c,i)=>{c.classList.add('open');GC.open.add(i);}); break; }
+case 'gcskip': { GC.timers.forEach(clearTimeout); GC.skip=true; gachaSkipShow(t); break; }
 case 'closepull': { if(GC.open.size<GC.res.length){flipAll();break;}
       const best=GC.res.filter(x=>x.isNew).sort((a,b)=>b.c.rarity-a.c.rarity)[0]; GC.timers.forEach(clearTimeout); GC=null; closeOv(); render();
       if(best) toast(`${best.c.name}와(과) 계약했어요`); setTimeout(()=>checkTriggers(),800); break; }
@@ -83,7 +80,7 @@ case 'sdelgo': { if(!SDEL) break; const {o,L}=SDEL, pick={}; document.querySelec
       const n=['threads','codex','libs','rels','chars'].filter(k=>pick[k]).reduce((a,k)=>a+L[k].length,0); toast(`「${o.title}」을(를) 지웠어요${n?` · 연결된 것 ${n}개도 함께`:''}`); break; }
 case 'saveopening': G.opening.lines=lines($('#op_lines').value); G.opening.prologue=$('#op_pro').value; mark('opening'); closeModal(); toast('오프닝을 저장했어요'); break;
 case 'aiopening': { const hint=$('#op_hint').value.trim();
-      const r=await aiJSON(`${pf('OPENING_REWRITE',{RULES,ctx:ctx(),SCRIPT_FMT,hint:hint?'요청: '+hint:''})}\nJSON만 출력: {"lines":[],"prologue":"대본"}`,t,'complex');
+      const r=await aiJSON(aiopeningPrompt({hint}),uiProg(t),'complex');
       if(r&&$('#op_lines')){ $('#op_lines').value=strs(r.lines).join('\n'); $('#op_pro').value=nl(r.prologue); toast('입력칸을 채웠어요. 확인 후 저장하세요.'); } break; }
 case 'savelib': { const name=$('#li_name').value.trim(); if(!name){toast('이름을 입력해 주세요');break;}
       let l=id?libById(id):null; if(!l){l={id:'l'+uid(),kind:t.dataset.k,name,prompt:'',img:null};G.lib.push(l);}
@@ -91,11 +88,11 @@ case 'savelib': { const name=$('#li_name').value.trim(); if(!name){toast('이름
 case 'dellib': { const l=libById(id); if((await appConfirm('삭제할까요?'))){G.lib=G.lib.filter(x=>x.id!==id);mark('l:'+id);openLib(l.kind);render();} break; }
 case 'ailib': { const k=t.dataset.k,nm=$('#li_name').value.trim(),ds=$('#li_desc').value.trim();
       if(k==='cg'){ const ids=[0,1,2,3].map(i=>$('#cg_c'+i).value).filter(Boolean).map(charById).filter(Boolean);
-        const r=await aiJSON(`${pf('CG_ART',{summary:G.world.summary,nm,ds:ds?' ('+ds+')':'',name:ids.map(c=>c.name).join(', ')||'없음'})}\nJSON만 출력: {"prompt":"...","acts":["1번 인물 행동 태그","2번 ..."]}`,t,'quick');
+        const r=await aiJSON(ailibPrompt({nm,ds,ids}),uiProg(t),'quick');
         if(r&&$('#li_prompt')){ if(r.prompt)$('#li_prompt').value=String(r.prompt); strs(r.acts).forEach((a2,i)=>{const e2=$('#cg_a'+i); if(e2&&!e2.value.trim()) e2.value=a2;}); } break; }
-      if(k==='bgm'){ const r=await aiJSON(`${pf('BGM_PROMPT',{summary:G.world.summary,nm,ds:ds?' ('+ds+')':''})}\nJSON만 출력: {"prompt":"..."}`,t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
-      if(k==='enemy'){ const r=await aiJSON(`${pf('ENEMY_ART',{summary:G.world.summary,lore:G.world.lore,nm,ds:ds?' ('+ds+')':''})}\nJSON만 출력: {"prompt":"..."}`,t,'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
-      const r=await aiJSON(`${pf('LIB_ITEM_ART',{summary:G.world.summary,kind:k==='bg'?'배경':'소품',nm,ds:ds?' ('+ds+')':'',pf:k==='bg'?pf('LIB_ITEM_BG'):pf('LIB_ITEM_PROP')})}\nJSON만 출력: {"prompt":"..."}`,t,'quick');
+      if(k==='bgm'){ const r=await aiJSON(ailibPrompt2({nm,ds}),uiProg(t),'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
+      if(k==='enemy'){ const r=await aiJSON(ailibPrompt3({nm,ds}),uiProg(t),'quick'); if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
+      const r=await aiJSON(ailibPrompt4({k,nm,ds}),uiProg(t),'quick');
       if(r&&r.prompt&&$('#li_prompt')) $('#li_prompt').value=String(r.prompt); break; }
 case 'newpu': openNewPickup(); break;
 case 'newpu-hand': { NEWPU=$('#pu_lim').value==='limited'?'limited':'pickup'; window.__PUSTORY=!!($('#pu_story')&&$('#pu_story').checked); closeModal(); openCharEdit(null); break; }
@@ -129,12 +126,12 @@ case 'enh': case 'enhmax': case 'lb': case 'wup': { const c=charById(id); if(c&&
 case 'skvclear': { const c=charById(id), k=c&&(c.skins||[]).find(x=>x.id===t.dataset.s); if(!k) break; k.voiceId=''; k.voiceName=''; mark('c:'+c.id); skinRefresh(id); break; }
 case 'aiskin': { const c=charById(id),idea=$('#sk_idea').value.trim(),field=$('#sk_prompt'),project=PJ().active,old=field.value,original=c.naiPrompt;
       if(!idea){toast('의상 아이디어를 적어 주세요');break;}
-      const base=await naiSkinBase(c,t);
-      const r=await aiJSON(`${pf('OUTFIT_ART',{summary:G.world.summary,name:c.name,profile:c.profile,appearance:base.appearance,outfit:base.outfit,idea})}\nJSON만 출력: {"outfit":"","other":""}`,t,'quick');
+      const base=await naiSkinBase(c,uiProg(t));
+      const r=await aiJSON(aiskinPrompt({c,base,idea}),uiProg(t),'quick');
       if(r&&field.isConnected&&PJ().active===project&&charById(id)===c&&c.naiPrompt===original&&field.value===old){naiBlocksSeed(field,naiSkinParts(base,r));if(!$('#sk_name').value.trim())$('#sk_name').value=idea.slice(0,16);}break; }
-case 'skpredo': skinPropRead(); skinPropDraw(t); break;
+case 'skpredo': skinPropRead(); skinPropDraw(uiProg(t)); break;
 case 'skpcancel': if(SKPROP){ if(SKPROP.url) URL.revokeObjectURL(SKPROP.url); const cid=SKPROP.cid; SKPROP=null; openSkin(cid); } else closeModal(); break;
-case 'skpok': { skinPropRead(); const P0=SKPROP, c=P0&&charById(P0.cid); if(!c||!P0.blob) break; t.disabled=true;
+case 'skpok': { skinPropRead(); const P0=SKPROP, c=P0&&charById(P0.cid); if(!c||!P0.blob) break; busy(t);
       const k={id:'k'+uid(),name:P0.name,prompt:P0.prompt,naiBlocks:clone(P0.naiBlocks||{}),idea:P0.idea,scene:P0.scene||'',img:null,faces:[]}; c.skins.push(k); await storeImage(k,P0.blob,''); mark('c:'+c.id);
       const sel=Object.assign({},P0.sel); URL.revokeObjectURL(P0.url); SKPROP=null; toast(`${T('skin')} 「${k.name}」을(를) 만들었어요 · ${T('crew')} 화면의 외형에서 입힐 수 있어요`); openChar(c.id);
       skinMakeRest(c,k,sel); break; }
@@ -145,33 +142,32 @@ case 'bnsave': { const el=readBanner(); if(!el.id){el.id='b'+uid();G.banners.pus
 case 'bndel': if((await appConfirm('이 배너를 삭제할까요?'))){G.banners=G.banners.filter(bn=>bn.id!==BD.id);P().curBanner='';closeModal();render();} break;
 case 'dsauto': { const d0=dispList().find(x=>x.id===DSEL.id), busy=busyIds(); if(!d0) break; DSEL.ids=G.chars.filter(c=>own(c.id)&&!busy.has(c.id)).sort((a,b)=>own(a.id).lv-own(b.id).lv||charPower(a)-charPower(b)).slice(0,d0.need).map(c=>c.id); openDispSel(DSEL.id); break; }
 case 'dsclr': DSEL.ids=[]; openDispSel(DSEL.id); break;
-case 'pgetall': { const lv=passLv(), tot={}; let n=0; for(let l=1;l<=lv;l++){ if(P().pass.got.includes(l)) continue; P().pass.got.push(l); const r=passReward(l); giveReward(r); Object.entries(r).forEach(([k,v])=>{ if(typeof v==='number') tot[k]=(tot[k]||0)+v; }); n++; } const d=dm(); MISSIONS.forEach(m=>{ if(!d.got[m.k]&&(d.cnt[m.k]||0)>=m.goal){ d.got[m.k]=true; P().pass.xp+=m.xp; giveReward({gems:50}); tot.gems=(tot.gems||0)+50; n++; } }); if(!n){ toast('받을 보상이 없어요'); break; } mark('prog'); sfx('확인'); toast('모두 받았어요: '+rewardText(tot)); render(); break; }
+case 'pgetall': { const lv=passLv(), tot={}; let n=0; for(let l=1;l<=lv;l++){ if(P().pass.got.includes(l)) continue; P().pass.got.push(l); const r=passReward(l); giveReward(r); Object.entries(r).forEach(([k,v])=>{ if(typeof v==='number') tot[k]=(tot[k]||0)+v; }); n++; } const d=progSlot('dm'); MISSIONS.forEach(m=>{ if(!d.got[m.k]&&(d.cnt[m.k]||0)>=m.goal){ d.got[m.k]=true; P().pass.xp+=m.xp; giveReward({gems:50}); tot.gems=(tot.gems||0)+50; n++; } }); if(!n){ toast('받을 보상이 없어요'); break; } mark('prog'); sfx('확인'); toast('모두 받았어요: '+rewardText(tot)); render(); break; }
 case 'dsel': { const a=DSEL.ids, d0=dispList().find(x=>x.id===DSEL.id); if(a.includes(id)) a.splice(a.indexOf(id),1); else { if(d0&&a.length>=d0.need){ toast(`${d0.need}명까지만 보낼 수 있어요`); break; } a.push(id); } openDispSel(DSEL.id); break; }
-case 'mget': { const m=MISSIONS.find(x=>x.k===t.dataset.k), d=dm(); if(d.got[m.k]||(d.cnt[m.k]||0)<m.goal) break; d.got[m.k]=true; P().pass.xp+=m.xp; giveReward({gems:50}); sfx('확인'); render(); break; }
+case 'mget': { const m=MISSIONS.find(x=>x.k===t.dataset.k), d=progSlot('dm'); if(d.got[m.k]||(d.cnt[m.k]||0)<m.goal) break; d.got[m.k]=true; P().pass.xp+=m.xp; giveReward({gems:50}); sfx('확인'); render(); break; }
 case 'pget': { const l=+t.dataset.lv; if(l>passLv()||P().pass.got.includes(l)) break; P().pass.got.push(l); const r=passReward(l); giveReward(r); sfx('확인'); toast(`패스 ${l}단계: ${rewardText(r)}`); render(); break; }
-case 'logoprev': { const keep=G.meta.logoStyle; G.meta.logoStyle=$('#mt_logo').value; showTitle(); G.meta.logoStyle=keep; const t=$('.title'); if(t){ t.dataset.act='logoprevclose'; const tt=t.querySelector('.t-touch'); if(tt) tt.textContent='눌러서 설정으로 돌아가기'; }
-      $('#modal').hidden=true; break; }
-case 'logoprevclose': $('#ov').hidden=true; $('#ov').innerHTML=''; if($('#modal').innerHTML) $('#modal').hidden=false; sceneBgm(); break;
+case 'logoprev': logoPreview($('#mt_logo').value); break;
+case 'logoprevclose': logoPreviewClose(); break;
 case 'aievent-open': openAiEvent(); break;
 case 'aievent': await aiEvent(t); break;
 case 'sfxplay': { const l=libById(id); if(l) sfx(l.name); break; }
-case 'sfxgen': { const l=libById(id); t.disabled=true; try{ await elSfx(l); sfx(l.name); openLib('sfx'); }catch(err){ toast((AIERR[err&&err.code]||'효과음 생성 실패')+' '+((err&&err.message)||'')); if(t.isConnected) t.disabled=false; } break; }
-case 'sfxall': { const items=G.lib.filter(l=>l.kind==='sfx'&&!l.audio); if(!items.length){toast('모두 등록돼 있어요');break;} t.disabled=true; let n=0;
-      for(const l of items){ t.textContent=`만드는 중 ${n}/${items.length}`; try{ await elSfx(l); n++; }catch(err){ toast((AIERR[err&&err.code]||'중단')+' '+((err&&err.message)||'')); break; } }
+case 'sfxgen': { const l=libById(id), done=busy(t); try{ await elSfx(l); sfx(l.name); openLib('sfx'); }catch(err){ toast((AIERR[err&&err.code]||'효과음 생성 실패')+' '+((err&&err.message)||'')); done(); } break; }
+case 'sfxall': { const items=G.lib.filter(l=>l.kind==='sfx'&&!l.audio); if(!items.length){toast('모두 등록돼 있어요');break;} busy(t); let n=0;
+      for(const l of items){ say(t,`만드는 중 ${n}/${items.length}`); try{ await elSfx(l); n++; }catch(err){ toast((AIERR[err&&err.code]||'중단')+' '+((err&&err.message)||'')); break; } }
       toast(`효과음 ${n}개를 만들었어요`); openLib('sfx'); break; }
 case 'vtest': { const c=charById(id); await speak(c,c.intro||c.lines[0]||c.name); break; }
 case 'dsopen': openDesign(); break;
 case 'dssave': { G.meta.design=designRead(); mark('meta'); closeModal(); render(); toast('캐릭터 디자인 태그를 저장했어요. 새로 그리는 그림부터 적용돼요'); break; }
-case 'dsai': designAI(t); break;
+case 'dsai': designAI(uiProg(t)); break;
 case 'shareopen': openShare(); break;
 case 'sharego': { const img=$('#sh_img').checked, audio=$('#sh_aud').checked, gate=$('#sh_gate')?$('#sh_gate').checked:true; closeModal(); exportFile({share:true,img,audio,gate}); break; }
 case 'fbopen': openFeedback(); break;
 case 'fbissue': { const txt=feedbackText(); const url=`https://github.com/${updRepo(LV())}/issues/new?title=${encodeURIComponent('[피드백] '+(($('#fb_bad')&&$('#fb_bad').value.trim())||($('#fb_good')&&$('#fb_good').value.trim())||'의견').slice(0,40))}&body=${encodeURIComponent(txt)}`; openUrl(url); break; }
 case 'fbpost': { try{ await navigator.clipboard.writeText(feedbackText()); toast('피드백을 복사했어요. 게시글 댓글에 붙여 넣어 주세요'); }catch(err){ quietErr(err,'0510-actions/020-navigation-and-tools.js:170'); } openUrl(LV().feedback); break; }
-case 'fbstar': FB_STAR=+t.dataset.n; document.querySelectorAll('#fbStars .chip').forEach(b=>b.classList.toggle('on',+b.dataset.n===FB_STAR)); break;
+case 'fbstar': FB_STAR=+t.dataset.n; fbStarsShow(); break;
 case 'fbsend': { const txt=feedbackText(); await shareText(G.meta.title+' 피드백',txt); break; }
 case 'guidecopy': shareText(G.meta.title+' 테스트 안내',guideText()); break;
-case 'skbdraw': { const f=skinShopList().find(x=>x.k.id===id); if(!f) break; if(!imgReady()){ toast(imgNeed()); break; } if(document.querySelector('[data-skp]')) SKBUYSEL=skinSelRead(); t.disabled=true; t.textContent='그리는 중…';
+case 'skbdraw': { const f=skinShopList().find(x=>x.k.id===id); if(!f) break; if(!imgReady()){ toast(imgNeed()); break; } if(document.querySelector('[data-skp]')) SKBUYSEL=skinSelRead(); busy(t,'그리는 중…');
       try{ const target=skinPrimaryPart(f.c,f.k),el=await skinPartDraw(f.c,f.k,target===f.k?'stand':'upper','manual');await storeImage(target,el,''); mark('c:'+f.c.id); }catch(err){ toast(naiErr(err)); } openSkinBuy(id); break; }
 case 'skbbuy': { const f=skinShopList().find(x=>x.k.id===id); if(!f) break; const p=P(), pr=f.k.price||SKIN_PRICE, sel=skinSelRead(); SKBUYSEL=sel; p.skinOwn=p.skinOwn||{}; if(p.skinOwn[id]) break;if(!skinDisplayReady(f.c,f.k)){toast('현재 표시 방식에 맞는 스킨 그림을 먼저 생성해 주세요');break;}if(p.gems<pr){ toast(`${T('currency')}이 모자라요`); break; }
       pay({gems:pr}); p.skinOwn[id]=true; f.k.faces=f.k.faces||[]; mark('prog'); closeModal(); render(); buyFx(f.k.name,`${f.c.name}의 ${T('skin')}`+(own(f.c.id)?' · 외형에서 입힐 수 있어요':' · '+T('crew')+'를 얻으면 입힐 수 있어요')); skinMakeRest(f.c,f.k,Object.assign({},sel)); break; }

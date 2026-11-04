@@ -11,6 +11,7 @@
 //   <!--@modules dir id-prefix -->  폴더 안 파일마다 <script type="text/ggm-module" id="<id-prefix><이름>"> 블록 생성
 //                                  (파일명 앞 숫자- 와 .js 는 id에서 뺌: 020-catalog.js → ggm-combat-catalog)
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import vm from 'node:vm';
 import { join, dirname, resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -59,11 +60,19 @@ export function build(src) {
   return out;
 }
 
+// 구문 검사: 빌드한 HTML의 스크립트 블록(main·모듈·부트 — 일반 스크립트로 도는 것)마다 실제 JS 엔진으로 컴파일해 봄. tree-sitter 분석은 오류에 너그러워
+//   async 아닌 함수 속 await 같은 것을 놓치고, 그러면 앱이 아예 안 뜸. 오류 줄이 든 src 파일도 찾아 줌(src가 있으면)
+export function syntaxErrors(html, src) { const out = [], re = /<script([^>]*)>([\s\S]*?)<\/script>/g; let m;
+  while ((m = re.exec(html))) { const attrs = m[1], code = m[2], type = (attrs.match(/type="([^"]+)"/) || [])[1] || ''; if (/\bsrc=/.test(attrs) || (type && !/^(text\/javascript|text\/ggm-module|text\/ggm-main)$/.test(type)) || !code.trim()) continue;
+    try { new vm.Script(code, { filename: 'script' }); } catch (e) { const line = +((String(e.stack).match(/script:(\d+)/) || [])[1] || 0), text = (code.split('\n')[line - 1] || '').trim(), id = (attrs.match(/id="([^"]+)"/) || [])[1] || '(이름 없는 스크립트)';
+      const file = src && text ? tree(src).find(f => /\.js$/.test(f) && readFileSync(f, 'utf8').includes(text.slice(0, 120))) : null; out.push({ id, line, msg: e.message, file: file ? file.replace(ROOT + '/', '') : '', text: text.slice(0, 160) }); } }
+  return out; }
 const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) {
   const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
   const src = resolve(arg('--src', join(ROOT, 'src'))), outFile = resolve(arg('--out', join(ROOT, 'www/index.html')));
   const html = build(src), sha = createHash('sha256').update(html).digest('hex');
+  const se = syntaxErrors(html, src); if (se.length) { se.forEach(x => console.log(`구문 오류: ${x.id} ${x.line}줄${x.file ? ` (${x.file})` : ''} — ${x.msg}\n  ${x.text}`)); console.log('빌드하지 않았어요 — 구문 오류를 고치세요'); process.exit(1); }
   if (process.argv.includes('--zip')) { writeFileSync(join(ROOT, PC_ZIP), zipWrite(PC_FILES.map(f => ({ name: f, data: readFileSync(join(ROOT, 'pc', f)) })))); console.log(`배포본: ${PC_ZIP} ← pc/${PC_FILES.join(', pc/')}`); process.exit(0); }
   if (process.argv.includes('--check')) {
     const same = existsSync(outFile) && readFileSync(outFile, 'utf8') === html;

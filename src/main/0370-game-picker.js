@@ -35,4 +35,8 @@ function bootPrepRun(cats){
     if(ph==='done'){ const s=imgSrc(it.o); if(s) pv.innerHTML=`<img src="${esc(s)}" alt="">`; } };
   runPrep(cats,null,{fg:true,order:bootCats().map(x=>x[0]),step:upd,done:()=>{ if($('#bp_prev')) setTimeout(showTitle,700); }});
 }
-
+/* 시작 준비(첫 실행 때 그림 미리 그리기): 그릴 종류·필요한지 */
+const BOOT_CATS=[['char','스탠딩 (전신)',true],['upper','상반신 (스토리·프로필)',true],['illust','일러스트 (타이틀·로비·픽업)',true],['bg','배경',true],['icon','재화 아이콘',true],['prop','소품 (스토리에 나오는 물건)',true],['weapon','전용 무기',true],['enemy','적',false],['map','작전 지도',false],['cg','이벤트 CG',false],['scg','기술 컷인',false]];
+let BP=null;
+const bootCats=()=>BOOT_CATS;
+function bootPrepNeeded(){ const p=P(); return !playMode()&&!p.seenOpening&&!p.bootPrep&&imgReady()&&drawTodo(bootCats().map(x=>x[0])).length>0; }

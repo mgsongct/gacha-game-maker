@@ -1,11 +1,11 @@
 /* ===== 선물 ===== */
 const GIFTS=[['g_cake','달콤한 케이크','🍰',20],['g_tea','고급 찻잎','🍵',20],['g_flower','꽃다발','💐',25],['g_book','두꺼운 책','📖',25],['g_tool','공구 세트','🔧',25],['g_doll','봉제 인형','🧸',30],['g_perfume','향수','🧴',35],['g_music','음반','💿',30],['g_brooch','보석 브로치','💎',50],['g_letter','손편지','✉️',60]];
 const giftById=id=>GIFTS.find(g=>g[0]===id);
-function GI(){ const p=P(); if(!p.gifts||typeof p.gifts!=='object') p.gifts={}; return p.gifts; }
-function addGifts(n){ const inv=GI(), got=[]; for(let i=0;i<n;i++){ const w=GIFTS.map(g=>g[3]>=50?1:g[3]>=30?3:5), tot=w.reduce((a,b)=>a+b,0); let x=Math.random()*tot, k=0; while((x-=w[k])>0) k++; const id=GIFTS[k][0]; inv[id]=(inv[id]||0)+1; got.push(id); } mark('prog'); return got; }
+
+function addGifts(n){ const inv=progSlot('gifts'), got=[]; for(let i=0;i<n;i++){ const w=GIFTS.map(g=>g[3]>=50?1:g[3]>=30?3:5), tot=w.reduce((a,b)=>a+b,0); let x=Math.random()*tot, k=0; while((x-=w[k])>0) k++; const id=GIFTS[k][0]; inv[id]=(inv[id]||0)+1; got.push(id); } mark('prog'); return got; }
 function giftLikes(c){ const h=hashN(c.id+'likes'); const a=h%GIFTS.length, b=(Math.floor(h/7)+3)%GIFTS.length; return new Set([GIFTS[a][0],GIFTS[b===a?(b+1)%GIFTS.length:b][0]]); }
 function openGift(cid){
-  const c=charById(cid), inv=GI(), likes=giftLikes(c), seen=(P().giftSeen||{})[cid]||{};
+  const c=charById(cid), inv=progRead('gifts'), likes=giftLikes(c), seen=(P().giftSeen||{})[cid]||{};
   const items=GIFTS.filter(g=>inv[g[0]]>0);
   const full=affFull(own(c.id));
   openModal(`${head(`${esc(c.name)}에게 선물하기`,`<span class="muted">호감도 Lv.${affLv(own(c.id))}${full?' · <b style="color:var(--rose)">MAX</b>':''} · 좋아하는 선물은 효과가 2배예요</span>`)}

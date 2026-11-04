@@ -213,7 +213,7 @@ async function aiOne(p,prompt,tier,imgs,options={}){
   if(!model) throw {code:'model_not_found',message:'모델 이름이 비어 있어요'};
   const max={quick:2000,default:8000,complex:16000}[tier];
   const cmax={quick:4000,default:16000,complex:32000}[tier];
-  const P2=prompt+'\n\n다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰따옴표 대신 「」나 작은따옴표를 쓴다.';
+  const P2=aiOneP2Text({prompt});
   smRecord(P2,tier);
   const CC=imgs.length?[...imgs.map(i=>({type:'image',source:{type:'base64',media_type:i.mime,data:i.data}})),{type:'text',text:P2}]:P2;
   const OC=imgs.length?[...imgs.map(i=>({type:'image_url',image_url:{url:`data:${i.mime};base64,${i.data}`}})),{type:'text',text:P2}]:P2;
@@ -259,8 +259,6 @@ async function aiCall(prompt,tier,imgs,options={}){
 }
 
 /* NovelAI */
-const NAI_FRONT='straight-on, standing, looking at viewer, arms at sides';
-const NAI_POSES=[['정면 서기','straight-on, standing, looking at viewer, arms at sides'],['손 허리','standing, hand on own hip, looking at viewer'],['팔짱','standing, crossed arms, looking at viewer'],['무기 들기','standing, holding weapon, looking at viewer'],['손 흔들기','standing, waving, smile, looking at viewer'],['브이','standing, v, looking at viewer'],['뒤돌아보기','standing, looking back, from behind'],['한쪽 무릎','kneeling, on one knee, looking at viewer'],['앉기','sitting, looking at viewer'],['역동적','dynamic pose, action pose, looking at viewer'],['수줍게','standing, hands together, looking away, blush']];
 const NAI_ENDPOINT='https://image.novelai.net/ai/generate-image';
 const NAI_MODELS=[['nai-diffusion-5-full','V5 Full'],['nai-diffusion-5-curated','V5 Curated'],['nai-diffusion-4-5-full','V4.5 Full'],['nai-diffusion-4-5-curated','V4.5 Curated'],['nai-diffusion-4-full','V4 Full']];
 const NAI_SIZES=[[832,1216,'세로 832×1216'],[1216,832,'가로 1216×832'],[896,1152,'세로 896×1152'],[1152,896,'가로 1152×896'],[1024,1024,'정사각 1024×1024']];
@@ -272,20 +270,9 @@ const NAI_DEF={key:'',endpoint:NAI_ENDPOINT,model:'nai-diffusion-5-full',refMode
   ref:{type:'character',strength:1,fidelity:1},autoRef:'off',
   styles:[{id:'my_style',name:'내 그림체',tags:'',neg:''}],
   poses:NAI_POSES.map(([n,t])=>({n,t})),
-  parts:{char:{suffix:'simple background, white background',neg:'gradient background, cast shadow, drop shadow, floor'},enemy:{suffix:'full body, simple background, white background',neg:'text, gradient background, cast shadow, drop shadow, floor'},bg:{suffix:'no humans, scenery, detailed background',neg:'people, character, text'},prop:{suffix:'no humans, object focus, simple background, white background',neg:'people, character, text'},cg:{suffix:'detailed background, cinematic lighting',neg:'text, speech bubble, multiple views'},illust:{suffix:'detailed background, depth of field, cinematic lighting',neg:'simple background, white background, transparent background, multiple views, text'},lbcg:{suffix:'detailed background, cinematic lighting, dramatic angle, light particles, depth of field, masterpiece illustration',neg:'simple background, white background, transparent background, multiple views, text'},map:{suffix:'no humans, scenery, map, from above, top-down view, detailed, game map',neg:'people, character, text, watermark, frame'},icon:{suffix:'no humans, game item icon, single object, object focus, centered, simple background, white background',neg:'text, people, character, frame, border, multiple views'}},
-  neg:'lowres, artistic error, film grain, scan artifacts, worst quality, bad quality, jpeg artifacts, very displeasing, chromatic aberration, dithering, halftone, screentone, multiple views, logo, too many watermarks, negative space, blank page'};
-// 그림체 프리셋. 불러오면 설정 창의 칸이 채워지고, 저장을 눌러야 적용돼요.
-// 숫자로 끝나는 태그(fungi542 등)는 ' ::'처럼 띄어 써야 NovelAI가 가중치로 착각하지 않아요.
-const STYLE_PRESETS=[{id:'glossy',name:'닭장 그림체',by:'토스뱅킹',desc:'광택 있는 피부·의상, 진한 명암, 높은 밀도. V4.5·V5 권장',
-  tags:'0.5::freng::, 0.3::artist:ramanda::, 0.3::modare::, 0.8::ie (raarami)::, 0.3::yoneyama mai::, 0.3::mochizuki kei::, 0.3::fungi542 ::, 0.2::re0n::, 0.5::blue gk::, 0.8::artist:mx2j::, artist:thirty 8ight, 0.4::fantongjun::, 0.2::aoi nagisa (metalder)::, 1.2::taesi::, year 2025, -1::multiple views::, -1::flat color::, -1::monochrome::, -3::simple illustration::, 1.2::best quality, amazing quality, very aesthetic, highres, absurdres, no text, masterpiece, ultra-detailed::, ultra complexity, high complexity',
-  qtags:'',
-  neg:'logo, cartoon, flat color, spot color, watermark, too many watermarks, blank page, text-only page, reference, username, signature, artist:xinzoruo, artist:milkpanda, artist collaboration, variant set, large variant set, 4koma, 2koma, toon (style), oekaki, chibi, turnaround, film grain, dithering, halftone, screentones, dated, old, 1990s (style), mutation, deformed, distorted, disfigured, artistic error, distorted anatomy, anatomical structure error, asymmetrical face, unnatural hair, bad eyes, cloudy eyes, blank eyes, bad proportions, bad limb, bad hands, extra hands, bad hand structure, extra digits, fewer digits, bad legs, extra legs, amputee, distorted composition, bad perspective, multiple views, negative space, animation error, chromatic aberration, disorganized colors, scan artifacts, jpeg artifacts, vertical lines, vertical banding, worst quality, bad quality, lowres, blurry, upscaled, fewer details, unfinished, incomplete, amateur, cheesy, unsatisfactory, inadequate, deficient, subpar, poor, displeasing, very displeasing, bad illustration, bad portrait, limited palette, bad anatomy, monochrome, official style',
-  steps:23,scale:4.8,sampler:'k_euler_ancestral',cfgRescale:0.18},
-  {id:'thickline',name:'쫀득 그림체',by:'톡마햄',desc:'굵은 선화, 점 코, 높은 밀도와 배경 묘사. V4.5·V5 권장',
-  tags:'0.7::artist:rusellunt::, 0.55::artist:rehu_(astd5787)::, 0.55::artist:kakure_eria::, 0.55::artist:reagan_long::, 0.55::artist:hitobashira_(1746164306)::, 0.55::artist:ebora::, 0.6::artist:xipa::, 0.6::artist:sparrowl::, year 2025, year 2026, newest, -3::artist collaboration::, -2::simple illustration::, -2::monochrome, green theme, yellow theme::, -2::watercolor (medium), painterly, no lineart::, -2::official style, official art::, -2::flat color::, -1::dark areolae::, -1::breasts apart::, 1.5::high complexity::, masterpiece, best quality, very aesthetic, absurdres, expert shading, high detail, thick lineart, dot nose, detailed background',
-  qtags:'',
-  neg:'negative space, blank page, text, logo, watermark, too many watermarks, reference, signature, artist name, subtitles, captions, dated, chibi, artistic error, scan artifacts, jpeg artifacts, aliasing, film grain, heavy film grain, dithering, chromatic aberration, digital dissolve, halftone, screentone, artist:xinzoruo, artist:milkpanda, artist:kurukurumagical, artist collaboration, one-hour drawing challenge, 4koma, 2koma, mutated, mutation, deformed, distorted, disfigured, bad anatomy, unnatural hair, bad face, mob face, cloned face, distorted face, poorly drawn face, ugly, bad eyes, empty eyes, extra eyes, lazy eye, asymmetrical eyes, cross-eyed, bad proportions, wrong body proportions, unrealistic proportions, distorted body, long neck, wrong head size, bad limbs, missing limbs, extra limbs, amputee, bad arm, bad hands, malformed hands, poorly drawn hands, bad hand structure, extra digits, fewer digits, extra fingers, fused fingers, bad leg, extra leg, distorted composition, bad perspective, multiple views, disorganized colors, unrealistic colors, unfinished, incomplete, displeasing, very displeasing, unsatisfactory, inadequate, deficient, subpar, poor, blurry, lowres, duplicate, worst quality, bad quality, messy details, fewer details, bad portrait, bad illustration, awkward, bad posture, horse penis, ear blush, red ears, heart-shaped pupils',
-  steps:28,scale:5,sampler:'k_euler_ancestral',cfgRescale:0.4}];
+  parts:NAI_PARTS_DEF, // 종류별 덧붙임·제외 태그 기본값은 프롬프트 스튜디오(0015)
+  neg:NAI_NEG_DEF};
+// 그림체 프리셋(STYLE_PRESETS)은 프롬프트 스튜디오(0015) 조립 함수 파일로 — 그림 프롬프트 태그는 스튜디오 한곳에
 /* ===== 그림체 프리셋(내 프리셋): 태그·네거티브·품질·스텝·가이던스·리스케일·샘플러를 저장하고, 코드 한 줄(GGMPACK:…)로 공유해요.
    글 AI 지침(상단·중단·하단)은 설정 → 글 AI → 생성 지침에서 따로 정해요 ===== */
 const PACKKEY='ggm-packs', LLMKEY='ggm-llmslot';
@@ -344,12 +331,6 @@ function openPresetCode(kind,code){
 // 모든 글 AI 요청에 지침을 끼워요: 상단=맨 앞, 중단=출력 형식(JSON만 출력…) 바로 앞, 하단=맨 끝
 // 그림 태그 지침: AI가 NovelAI(그림) 태그를 쓰는 요청에만 출력 형식 바로 앞에 넣어요
 const TAG_REQ=/NovelAI|naiPrompt|Danbooru|영어 태그|장면 태그/;
-function llmWrap(pr){ const L=llmEff(); let s=String(pr);
-  { const isTag=TAG_REQ.test(s), pl=plInject(isTag); if(pl){ let i=s.lastIndexOf('JSON만 출력'); if(i<0) i=s.length; s=s.slice(0,i)+pl+s.slice(i); } } // 프롬프트 스튜디오(0025) 교훈·그림 가이드
-  if(L.tag&&TAG_REQ.test(s)){ let i=s.lastIndexOf('JSON만 출력'); if(i<0) i=s.length; s=s.slice(0,i)+pf('USER_TAG_GUIDE_HEAD')+'\n'+L.tag.trim()+'\n'+s.slice(i); }
-  if(!L.top&&!L.mid&&!L.bot) return s;
-  if(L.mid){ let i=s.lastIndexOf('JSON만 출력'); if(i<0){ const j=s.lastIndexOf('\n'); i=j>0?j+1:s.length; } s=s.slice(0,i)+'[제작자 지침]\n'+L.mid.trim()+'\n'+s.slice(i); }
-  return (L.top?'[제작자 지침]\n'+L.top.trim()+'\n\n':'')+s+(L.bot?'\n\n[제작자 지침]\n'+L.bot.trim():''); }
 const packCode=p=>'GGMPACK:'+btoa(unescape(encodeURIComponent(JSON.stringify(p))));
 function packFromCode(t){ const m=String(t||'').trim().match(/GGMPACK:([A-Za-z0-9+/=]+)/); if(!m) return null; try{ const o=JSON.parse(decodeURIComponent(escape(atob(m[1])))); return o&&typeof o==='object'?o:null; }catch(e){ return null; } }
 // All presets transport quality inside their positive style; qtags is legacy input only.
@@ -360,6 +341,8 @@ function packHTML(){ const up=userPacks();
   <h3 class="sec">기본 프리셋</h3>${STYLE_PRESETS.map(p=>`<div class="ep">${pthumbHTML(p.id)}<span class="t"><b>${esc(p.name)}</b><span class="muted">${esc(p.desc||'')}${p.by?' · '+esc(p.by):''}</span></span><button class="btn sm" data-act="packuse" data-v="${p.id}">적용</button><button class="btn sm ghost" data-act="pthumbset" data-v="${p.id}" title="썸네일">🖼</button>${pthumb(p.id)?`<button class="btn sm ghost" data-act="pthumbdel" data-v="${p.id}" title="썸네일 지우기">🗑</button>`:''}</div>`).join('')}
   <h3 class="sec">내 프리셋 ${up.length}</h3>${up.length?up.map(p=>`<div class="ep">${pthumbHTML(p.id)}<span class="t"><b>${esc(p.name)}</b><span class="muted">${esc(String(p.tags||'').slice(0,40))}${p.by?' · '+esc(p.by):''}</span></span><button class="btn sm" data-act="packuse" data-v="${p.id}">적용</button><button class="btn sm ghost" data-act="pthumbset" data-v="${p.id}" title="썸네일">🖼</button>${pthumb(p.id)?`<button class="btn sm ghost" data-act="pthumbdel" data-v="${p.id}" title="썸네일 지우기">🗑</button>`:''}<button class="btn sm ghost" data-act="packcopy" data-v="${p.id}">내보내기</button><button class="btn sm ghost" data-act="packdel" data-v="${p.id}">✕</button></div>`).join(''):'<p class="muted" style="margin:0">아직 없어요.</p>'}
   <div class="row" style="margin-top:12px"><button class="btn sm" data-act="packsave">지금 그림체를 프리셋으로 저장</button><button class="btn sm ghost" data-act="packimport">코드로 가져오기</button></div>`; }
+/* 지침 프리셋 고치기: 입력칸에 그 프리셋을 채움(View) */
+function llmPresetFormFill(x){ $('#llp_name').value=x.name||''; $('#llp_pos').value=x.pos||'top'; $('#llp_text').value=x.text||''; $('#llp_id').value=x.id; $('#llp_text').focus({preventScroll:true}); }
 function llmHTML(){ const L=llmSlots(); return `${head('글 AI 지침','<span class="muted">모든 글 AI 요청에 들어가요</span>')}
   <label class="f" for="llm_top">상단 <span class="muted" style="font-size:.75rem">맨 앞 · 역할, 문체, 세계관 전반 규칙</span></label><textarea class="in" id="llm_top" style="min-height:80px" placeholder="예: 너는 서브컬처 가챠 게임 전문 시나리오 작가다. 문장은 짧고 리듬감 있게.">${esc(L.top)}</textarea>
   <label class="f" for="llm_mid">중단 <span class="muted" style="font-size:.75rem">출력 형식 바로 앞 · 내용에 대한 요구</span></label><textarea class="in" id="llm_mid" style="min-height:80px" placeholder="예: 대사마다 캐릭터의 말버릇을 한 번 이상 살린다. 장면 묘사는 2문장 이내.">${esc(L.mid)}</textarea>
@@ -402,26 +385,9 @@ function joinTags(...parts){const seen=new Set(),out=[];parts.forEach(p=>tagList
 function naiStyle(c,id){const b=c.styles.find(x=>x.id===id)||c.styles.find(x=>x.id===c.styleId)||c.styles[0]||{id:'my_style',tags:'',neg:''};const m=(typeof G!=='undefined'&&G&&G.meta)?G.meta:null;if(m&&String(m.artTags||'').trim())return {id:b.id,name:'이 게임 그림체',tags:joinTags(String(m.artTags),c.legacyQualityTags),neg:String(m.artNeg||'')};return b;}
 const AGE_TAGS=/^(mature female|mature male|mature woman|mature man|milf|mature|adult woman|adult man|adult|older woman|old woman|aged up)$/i;
 function stripAge(s){ return tagList(s).filter(t=>!AGE_TAGS.test(tagKey(t))).join(', '); }
-function composeNai(kind,base,opt){
-  opt=opt||{}; const c=naiCfg(), part=c.parts[kind]||c.parts.prop, st=naiStyle(c,opt.styleId);
-  if(IMG_NOHUMAN[kind]){ const g=imgGuard(kind,base); if(g.removed.length){ base=g.out; plHit('img-person-'+kind,g.removed.join(', ')); } } // 그림 가드(0025): 배경·소품에 사람 태그가 섞이면 빼요
-  let body=tagList(base), suffix=part.suffix, frame='';
-  if(kind==='char'||ILK(kind)){ body=body.filter(t=>!COMPO_TAGS.test(tagKey(t))); frame=opt.frame||(ILK(kind)?'cowboy shot':'full body'); suffix=tagList(suffix).filter(t=>!FRAME_TAGS.test(tagKey(t))).join(', '); }
-  const pose=kind==='char'?(opt.pose!=null?opt.pose:NAI_FRONT):ILK(kind)?(opt.pose!=null?opt.pose:'looking at viewer'):kind==='enemy'?'straight-on':'';
-  let fneg='';
-  if(kind==='char'&&/^full body$/i.test(String(frame).trim())){ frame='1.3::full body::, standing'; fneg='feet out of frame, cowboy shot, upper body, portrait, close-up, cropped legs'; }
-  // 스탠딩은 눈높이 정면으로: 하이앵글·로우앵글·원근 왜곡을 막아요
-  if(kind==='char'){ frame=joinTags(frame,'eye level, straight-on'); fneg=joinTags(fneg,'from above, from below, high angle, low angle, dutch angle, fisheye, foreshortening, perspective, wide angle'); }
-  const human=kind==='char'||ILK(kind);
-  // 사람인데 엘프 귀가 나오지 않게: 프롬프트에 뾰족한 귀 종족 태그가 없으면 뾰족한 귀를 막아요
-  const pointy=/\b(elf|elves|elven|half-elf|pointy ears|elf ears|fairy|pixie|demon|devil|succubus|vampire|monster girl|goblin|orc)\b/i.test(String(base||''));
-  if((human||kind==='cg')&&!pointy) fneg=joinTags(fneg,'pointy ears, elf');
-  return {input:joinTags(st.tags,c.prefix,body.join(', '),pose,frame,suffix), neg:joinTags(c.neg,st.neg,part.neg,fneg,human?'child, loli':'')};
-}
 const CG_POS={left:{x:.3,y:.5},center:{x:.5,y:.5},right:{x:.7,y:.5}};
 const CG_POS_LABEL=[['auto','자동'],['left','왼쪽'],['center','가운데'],['right','오른쪽']];
 /* CG에 플레이어가 나오면 플레이어 외모 태그(프로필 그림을 그린 태그)를 써요 */
-function playerCast(){ const p=P(), g=p.gender==='m'?'1boy':p.gender==='f'?'1girl':'1other', tags=String((p.avatar&&p.avatar.prompt)||'').trim(); return {id:'__player',name:T('player'),naiPrompt:joinTags(tags||g,p.hideEyes?'hair over eyes, covered eyes':'')}; }
 function cgCast(l){return (l&&l.cast||[]).map(x=>({c:x.id==='__player'?playerCast():charById(x.id),pos:x.pos||'auto',act:x.act||''})).filter(x=>x.c);}
 // 캐릭터 디자인 통일: 이 게임의 가챠 캐릭터 그림에 공통 태그 + 세력별 태그를 붙여요(NPC·콜라보 게스트·스킨에는 안 붙고, 캐릭터마다 끌 수 있어요)
 function designTags(c){ if(!c||c.npc||c.noDesign||c.collab||typeof G==='undefined'||!G||!(G.chars||[]).includes(c)) return ''; const d=(G.meta&&G.meta.design)||{}; return joinTags(String(d.all||''),String(((d.fac||{})[c.faction])||'')); }
@@ -534,12 +500,11 @@ function naiBlocksOwner(e){
  if(id.startsWith('nai_p_'))return {o:naiCfg().parts[id.slice(6)],key:'suffix'};
  if(['wp_scene','il_scene','lb_scene','sc_scene','lbbg_scene'].includes(id)){const c=charById(e.closest('.cs-sheet')?.dataset.cid);return {o:id==='wp_scene'?c?.weapon:c?.[({il_scene:'illust',lb_scene:'lbcg',sc_scene:'scg',lbbg_scene:'lbbg'})[id]],key:'prompt'};}
  if(id==='v2-icon-prompt'&&typeof V2ICONS!=='undefined'){const p=V2ICONS?.preview;return {o:p&&{prompt:p.prompt,naiBlocks:{prompt:p.promptParts}},key:'prompt'};}
- if(id==='pf_nai')return {o:P().avatar,key:'prompt'};
+ if(id==='pf_nai')return {o:progRead('avatar'),key:'prompt'}; /* 플레이어 외형 칸: 진행 칸 avatar(그리기 전 처리가 늘 만들어 둠 — 0070 PROG_SLOTS tick) */
  if(id==='sk_prompt'&&document.getElementById('sk_char'))return {o:G.meta.shop?.self,key:'naiPrompt'};
  if(id==='rg_e_look')return {o:REGEN?.nc,key:'naiPrompt'};
  if(id==='li_prompt')return {o:libById(document.querySelector('[data-act=savelib]')?.dataset.id),key:'prompt'};
  if(e.dataset.skinPrompt){const c=charById(e.dataset.owner);return {o:c?.skins?.find(k=>k.id===e.dataset.skinPrompt),key:'prompt'};}
- if(e.dataset.candidateField==='prompt'&&typeof IMAGE_CANDIDATES!=='undefined'&&IMAGE_CANDIDATES?.config?.promptParts){e.dataset.naiBlocks=JSON.stringify(IMAGE_CANDIDATES.config.promptParts);}
  return null;
 }
 function naiBlocksEditable(e){
@@ -553,6 +518,7 @@ function naiBlocksEditable(e){
 }
 function naiBlocksMount(e){
  if(e._naiBlocksUI||!naiBlocksEditable(e))return;
+ if(e.dataset.candidateField==='prompt'&&typeof IMAGE_CANDIDATES!=='undefined'&&IMAGE_CANDIDATES?.config?.promptParts){e.dataset.naiBlocks=JSON.stringify(IMAGE_CANDIDATES.config.promptParts);} /* 후보 그림 프롬프트 칸은 후보 설정의 블록으로 시작 */
  const key=e.id||'nai-block-'+(++naiBlocksMount.serial),origin=e.value,owner=naiBlocksOwner(e);
  if(!e.id)e.id=key;
  if(owner?.o&&!e.dataset.naiBlocks){const saved=owner.o.naiBlocks?.[owner.key];if(saved?.combined===origin)e.dataset.naiBlocks=JSON.stringify(saved);}
@@ -585,15 +551,15 @@ function naiBlocksValidateSplit(text,r){
  if(!r||['appearance','outfit','other'].some(k=>typeof r[k]!=='string')||(r.style!=null&&typeof r.style!=='string')||normalize(text)!==normalize(naiBlocksJoin(r)))throw Error('AI가 태그를 누락하거나 바꿔서 적용하지 않았어요. 기존 입력은 유지했어요.');
  return naiBlocksUpgrade(r);
 }
-async function naiBlocksSeparate(text,btn){
- const r=await aiJSON('기존 NovelAI 영어 태그를 세 칸으로 분류하세요. 태그를 추가·삭제·번역·변형하지 마세요. 가중치 묶음도 그대로 보존하세요. appearance: 인원·머리·눈·체형·피부·종족. outfit: 옷·신발·착용 장식. other: 표정·자세·배경·효과·소품·무기 등 나머지. 원문: '+text+'\nJSON만 출력: {"appearance":"","outfit":"","other":""}',btn||null,'quick');
+async function naiBlocksSeparate(text,rep){
+ const r=await aiJSON(naiBlocksSeparatePrompt({text}),rep||null,'quick');
  return naiBlocksValidateSplit(text,r);
 }
-async function naiSkinBase(c,btn){
+async function naiSkinBase(c,rep){
  const saved=c.naiBlocks?.naiPrompt;
  if(saved?.combined===c.naiPrompt&&saved.method!=='rules')return naiBlocksOf(c);
  // A legacy mixed prompt needs semantic separation before replacing its outfit.
- return naiBlocksSeparate(c.naiPrompt,btn);
+ return naiBlocksSeparate(c.naiPrompt,rep);
 }
 function naiSkinParts(base,response){
  if(!String(base?.appearance||'').trim())throw Error('캐릭터 외형 블록이 비어 있어요. 외형 태그를 분류하거나 입력한 뒤 다시 생성해 주세요.');
@@ -602,3 +568,22 @@ function naiSkinParts(base,response){
  if(!outfit)throw Error('AI가 새 의상 정보를 비워서 반환했어요. 기존 스킨은 변경하지 않았어요.');
  return naiBlocksUpgrade({appearance:base.appearance,outfit,other:typeof response.other==='string'?response.other.trim():''});
 }
+/* 글 AI JSON 호출(aiJSON): 실패 문구·재시도 중 알림 줄이기 */
+function aiErrText(e){ const base=AIERR[e&&e.code]||'AI 호출에 실패했어요.'; const m=String((e&&e.message)||'').trim(); if(e&&e.code==='origin_block') return base+' '+m; return m?base+' (서버: '+m.slice(0,160)+')':base; }
+const AIERR={origin_block:'이 서비스가 브라우저에서 온 요청(Origin 헤더)을 막았어요(403).',el_nokey:'설정의 소리에서 ElevenLabs 키를 넣어 주세요.',fish_nokey:'설정의 소리에서 Fish Audio 키를 넣어 주세요.',no_ai:'설정의 글 AI에서 AI를 먼저 등록해 주세요.',model_not_found:'모델 이름이나 리전을 확인해 주세요.',sa_bad:'서비스 계정 JSON을 확인해 주세요. 파일 내용 전체를 붙여넣어야 해요.',bad_key:'키가 올바르지 않거나 권한이 없어요. 설정의 글 AI에서 확인해 주세요.',network:'인터넷 연결을 확인해 주세요.',low_credit:'API 크레딧이 부족해요. Claude Console에서 충전해 주세요.',not_granted:'AI 사용 권한이 꺼져 있어요. 앱의 권한 메뉴에서 켤 수 있어요.',rate_limited:'요청이 많아요. 잠시 후 다시 시도해 주세요.',refused:'AI가 이 요청은 쓰지 않았어요. 수위나 내용을 바꿔 다시 시도해 주세요.',invalid_json:'AI 응답을 읽지 못했어요. 다시 시도해 주세요.',cancelled:'취소했어요.'};
+let AI_QUIET=false,AI_QUIET_LAST=''; // 새 게임 단계 재시도 중에는 같은 오류 알림을 되풀이하지 않고 마지막 원인만 보여 줘요
+async function aiJSON(prompt,rep,tier,images){
+  if(!SAMPLE){toast('설정의 글 AI에서 AI를 먼저 등록해 주세요');return null;}
+  let loadingTimer;if(rep){rep('AI가 쓰는 중…');if(String(prompt).includes('skills')){let dots=0;loadingTimer=setInterval(()=>rep('캐릭터와 스킬 생성중'+'.'.repeat(dots++%3+1)),400);}} /* 진행 알림 rep — 처리기가 uiProg(단추)로 만들어 넘김 */
+  try{ const skillPrompt=aiJSONSkillPromptText({prompt}); const r=await SAMPLE.json(skillPrompt,{modelTier:tier||'default',cache:false,images});
+    // AI가 {"chars":[…]} 대신 배열 […]만 돌려주는 경우(Gemini 등): 요청한 형식의 첫 키로 감싸요
+    if(Array.isArray(r)){ const m=String(prompt).match(/JSON만 출력[^{\[]*\{\s*"([A-Za-z_]+)"\s*:\s*\[/); if(m) return {[m[1]]:r}; }
+    return r; }
+  catch(e){ if(!AI_QUIET) toast(aiErrText(e)); else AI_QUIET_LAST=aiErrText(e); return null; }
+  finally{clearInterval(loadingTimer); if(rep) rep.end(); }
+}
+/* 그림체(직접 입력): NovelAI 저장 설정 읽기·내 그림체 */
+const STYLE_EX='예: anime coloring, cel shading, vibrant colors  /  watercolor (medium), soft colors  /  1.2::artist:이름 ::';
+function naiSaved(){let sv={};try{sv=JSON.parse(appStorage.getItem(NKEY))||{};}catch(e){}return sv;}
+function setMyStyle(tags,neg){const sv=naiSaved();sv.styles=[{id:'my_style',name:'내 그림체',tags:String(tags||'').trim(),neg:String(neg||'').trim()}];sv.styleId='my_style';appStorage.setItem(NKEY,JSON.stringify(sv));}
+function myStyle(){return naiCfg().styles[0];}

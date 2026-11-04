@@ -1,6 +1,36 @@
 /* =========================================================
    저장
    ========================================================= */
+/* 진행(G.prog — data/<게임id>/prog.json) 정의 한곳(CLAUDE.md §0-2 상태 정의는 한곳): 새 게임의 처음 진행 · 칸마다 없을 때 만들기·형식 검사·하루/주 새로 만들기·형식 맞춤·지금 값 계산
+   쓰는 쪽(Model·Controller)은 progSlot(칸) — 정의대로 맞춰 저장하고 돌려줌. 그리는 쪽(View)은 progRead(칸) — 저장하지 않음(없거나 날이 바뀌었으면 새로 만든 값을 저장하지 않고 돌려주고, 행동력은 지금 회복분까지 계산한 복사본)
+   하루/주 새로 만들기·형식 맞춤을 저장하는 것은 Controller 지점(progTick — 그리기 전·주기 타이머). 기능 규칙(행동력 회복 stamRegen·레이드 단계 raidNew·파견 의뢰 채우기 dispBoardFill·원정 expedFill·건조 자원 cresFill)은 기능 모듈에 두고 여기서 부름
+   make(옛 값) 처음 값 · ok 형식 검사(기본: 객체) · stale 참이면 새로 만듦 · fill 형식 맞춤(예전 형식 바꾸기·빠진 하위 칸·하루치 준비) · now 지금 값 계산 · tick 그리기 전에 늘 있게(하루/주 단위 기능 — 함수면 그 조건일 때) */
+const DEFAULT_PROG = {gems:3600,pity:0,total:0,owned:{},cleared:{},squad:[],sec:null,daily:'',
+  settings:{ssr:4,sr:18,pity:150,rv:2,expRate:100,goldRate:100,gemRate:100,stamina:true},firstTen:true,adult:true,show19:true,history:[],savedAt:0,
+  gold:20000,mat:{exp:40,wmat:20,core:10,gearMat:0,transcMat:0},pities:{},tokens:{},disp:{},dm:{date:'',cnt:{},got:{}},pass:{xp:0,got:[]},farmClear:{},shopBuy:{},curBanner:'',curEvent:'',live:{on:{talk:true,event:true,rerun:true,rotate:true,pass:true,chapter:false,season:true,skin:true,fill:true},last:{},notices:[],seen:0,recentPU:[],seasons:{story:true,event:true,char:true,rerun:true,train:true},skillGeneration:1,season:null},
+  player:'',gender:'',inbox:{},seenOpening:false,lobbyBg:'',titleBg:'',titleChar:'',gachaBg:''};
+const P=()=>G.prog;
+const progObj=v=>!!v&&typeof v==='object';
+const PROG_SLOTS={
+  stam:{make:()=>({v:STAM_MAX,at:Date.now()}), fill:(s,p)=>{ if(p.staminaCapVersion!==2){ stamRegen(s,120); p.staminaCapVersion=2; } }, now:s=>stamRegen(s,STAM_MAX)}, // 행동력 — 상한 120 시절 값은 그 상한으로 회복을 끝낸 뒤 새 상한으로
+  dm:{make:()=>({date:today(),cnt:{login:1},got:{}}), stale:v=>v.date!==today(), tick:true}, // 일일 임무 — 날이 바뀌면 새로
+  raid:{make:raidNew, stale:r=>r.wk!==weekKey(), tick:true}, // 주간 레이드 — 주가 바뀌면 지난주 결과로 단계를 정해 새로
+  rogue:{make:()=>({run:null,best:0,day:'',n:0}), fill:r=>{ const x=r.run; if(x&&x.v===3){ x.v=2; x.c3=1; } }}, // 탐사 — 예전 3판 형식은 2판으로
+  tower:{make:()=>({})}, gifts:{make:()=>({})}, fchat:{make:()=>({})}, cxSeen:{make:cxSeenNew,tick:true}, // 탑 · 선물 보관함 · 자유 대화 · 도감에서 본 항목
+  sched:{make:()=>({day:today(),left:SCHED_N,done:[]}), stale:v=>v.day!==today(), tick:true}, // 오늘의 일정 — 날이 바뀌면 새로
+  avatar:{make:()=>({id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null}),tick:true}, // 프로필 그림
+  shop:{make:()=>({day:today(),buy:{}}), stale:v=>v.day!==today(), tick:true}, // 상점 일일 구매 — 날이 바뀌면 새로
+  mail:{make:()=>[], ok:Array.isArray}, // 우편함
+  dboard:{make:()=>({day:'',list:[],rr:0}), ok:b=>progObj(b)&&Array.isArray(b.list), fill:dispBoardFill, tick:true}, // 파견 게시판 — 날마다 의뢰 채우기
+  exped:{make:()=>({}), fill:expedFill, tick:expedOn}, // 원정 — 방송 출연 등 원정 모드면 늘 두고 오늘의 출연 제안을 그리기 전에 만듦
+  cres:{make:()=>({}), fill:cresFill}, // 건조/영입 자원
+  cbuild:{make:()=>({n:0,found:{},log:[],input:null})} // 건조/영입 기록
+};
+function progSlot(k){ const s=PROG_SLOTS[k], p=G.prog; let v=p[k]; if(!(s.ok||progObj)(v)||(s.stale&&s.stale(v))){ v=p[k]=s.make(v); mark('prog'); } if(s.fill) s.fill(v,p); if(s.now) s.now(v); return v; }
+function progRead(k){ const s=PROG_SLOTS[k], v=G.prog[k]; if((s.ok||progObj)(v)&&!(s.stale&&s.stale(v))) return s.now?s.now(clone(v)):v;
+  const n=s.make(v); if(s.fill) s.fill(n,Object.assign({},G.prog)); return s.now?s.now(n):n; } /* 없거나 날이 바뀐 칸: 새로 만든 값에 형식 맞춤까지 — 저장하지 않음(진행 칸은 사본을 넘김) */
+/* 그리기 전·주기 타이머(Controller): 하루/주 단위 칸은 늘 있게, 있는 칸은 날이 바뀌었으면 새로·형식 맞춤 */
+function progTick(){ if(!G||!G.prog) return; for(const k in PROG_SLOTS){ const s=PROG_SLOTS[k], on=typeof s.tick==='function'?s.tick():s.tick; if(on||(G.prog[k]!==undefined&&(s.stale||s.fill))) progSlot(k); } } /* 맞춰 저장(progSlot) — 읽기(progRead)가 아님 */
 const PJKEY='starfall-projects';
 function PJ(){let d=null;try{d=JSON.parse(appStorage.getItem(PJKEY));}catch(e){} if(!d||!Array.isArray(d.list)){d={active:'main',list:[{id:'main',title:'낙성계약'}]};} return d;}
 function pjKey(id){return id==='main'?'starfall-contract-v1':'starfall-contract-v1-'+id;}
@@ -96,7 +126,7 @@ function fix(g){
   [['gems','currency','blue crystal gem, faceted crystal, glowing, sparkle'],['gold','gold','gold coin, embossed star emblem, shiny metal'],['exp','expMat','glowing data chip, holographic record, blue light'],['wmat','wMat','mechanical parts, gears and bolts, metal'],['core','core','hexagonal energy core, pink glow, crystal inside'],['gearMat','gearMat','polished alloy ingot, metallic shine, gear emblem'],['transcMat','transcMat','radiant transcendence crystal, violet and gold glow']].forEach(([k,t,pr])=>{ if(!g.lib.some(l=>l.kind==='icon'&&l.key===k)) g.lib.push({id:'ic_'+k,kind:'icon',key:k,name:((g.meta.terms||{})[t]||t)+' 아이콘',prompt:pr,img:null}); });
   const pd=clone(DEFAULT_PROG); ['mat','dm','pass'].forEach(k=>{g.prog[k]=Object.assign(clone(pd[k]),g.prog[k]||{});});
   { const dl=clone(DEFAULT_PROG.live), l0=g.prog.live||{}; g.prog.live=Object.assign(dl,l0); g.prog.live.on=Object.assign(clone(DEFAULT_PROG.live.on),l0.on||{}); g.prog.live.seasons=Object.assign(clone(DEFAULT_PROG.live.seasons),l0.seasons||{}); g.prog.live.last=l0.last||{}; g.prog.live.notices=Array.isArray(l0.notices)?l0.notices:[]; g.prog.live.recentPU=Array.isArray(l0.recentPU)?l0.recentPU:[]; }
-  ['pities','tokens','disp','farmClear','shopBuy'].forEach(k=>{if(!g.prog[k]||typeof g.prog[k]!=='object')g.prog[k]={};});
+  ['pities','tokens','disp','farmClear','shopBuy'].forEach(k=>{if(!g.prog[k]||typeof g.prog[k]!=='object')g.prog[k]={};}); farmClearV2(g.prog);
   g.prog.shop=Object.assign({day:'',buy:{}},g.prog.shop||{}); g.prog.cash=Object.assign({first:{},month:{until:0,last:''},total:0},g.prog.cash||{}); g.prog.cash.first=g.prog.cash.first||{}; g.prog.cash.month=Object.assign({until:0,last:''},g.prog.cash.month||{});
   g.meta.shop=Object.assign(clone(DEFAULT_META.shop),g.meta.shop||{});
   if(g.prog.gold==null) g.prog.gold=20000;
@@ -122,12 +152,14 @@ function mark(...k){if(NEW_GAME_SOURCE&&G!==NEW_GAME_SOURCE)return;naiBlocksGame
 function flushNow(){if(dirty.size){clearTimeout(flushT);flush().catch(()=>{});}}
 addEventListener('pagehide',flushNow);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushNow();},true);
 function markAll(){mark('meta','world','prog','opening',...G.chars.map(c=>'c:'+c.id),...G.chapters.map(ch=>'ch:'+ch.id),...G.lib.map(l=>'l:'+l.id),...G.threads.map(t=>'t:'+t.id));}
+/* 저장 결과 알림(Model → 화면은 창 이벤트로 받음: ggm-saved · ggm-storage-error — 0080이 경고를 띄우고 지움) */
+function saveFailed(message){ dispatchEvent(new CustomEvent('ggm-storage-error',{detail:{message}})); }
 function flush(){
  if(window.__NOFLUSH)return appStorage.drain();
  const run=async()=>{if(!dirty.size)return appStorage.drain();const game=NEW_GAME_SOURCE||G,revision=saveRevision,keys=[...dirty],oldAt=game.prog.savedAt;const at=Date.now();
  try{const bases=new Set((game.chars||[]).filter(x=>!x.alt).map(x=>x.id)),snapshot=JSON.stringify({...game,chars:(game.chars||[]).map(c=>inheritStore(c,bases)),prog:{...game.prog,savedAt:at}});appStorage.setItem(LKEY,snapshot);await appStorage.drain();game.prog.savedAt=at;
  if(DB)for(const k of keys)await writeKey(k,game);
- if(revision===saveRevision)dirty.clear();const el=document.getElementById('save-warning');if(el)el.remove();
- }catch(e){game.prog.savedAt=oldAt;storageWarning(e.message||'기기에 저장하지 못했습니다');throw e;}};
+ if(revision===saveRevision)dirty.clear();dispatchEvent(new CustomEvent('ggm-saved'));
+ }catch(e){game.prog.savedAt=oldAt;saveFailed(e.message||'기기에 저장하지 못했습니다');throw e;}};
  saveTail=saveTail.catch(()=>{}).then(run);return saveTail;
 }

@@ -26,6 +26,7 @@ export function findings(J) {
   J.actions.deadHandlers.forEach(x => add('발신 없는 처리기', x.act, `${x.act}`));
   J.css.dead.forEach(x => add('안 쓰는 CSS 클래스', x.cls, `.${x.cls} (${x.loc})`));
   const MD = J.modules || {}; (MD.envy || []).forEach(e => add('영역 침범 후보', `${e.file} ${e.fn}`, `${e.fn} (${e.file}) — 참조 ${e.share}%가 ${e.to}`)); (MD.foreign || []).forEach(x => add('남의 상태 쓰기', `${x.file} ${x.key}`, `${x.file}가 ${x.key}(주인 ${x.owner})를 씀 ${x.n}곳`, { 곳: x.n })); (MD.scattered || []).forEach(x => add('파편화 상태', x.key, `${x.key} — ${x.files.length}개 모듈이 씀`, { 모듈: x.files.length }));
+  const NB = MD.natural || {}; (NB.overSplit || []).forEach(x => add('과잉 분할', [...x.mods].sort().join(' ↔ '), `${x.kind}: ${x.mods.join(' ↔ ')} — 사이 ${x.inter} · 안 ${x.intra.join('/')}`)); (NB.mixed || []).forEach(x => add('기능 섞임', x.mod, `${x.mod} — 묶음 ${x.parts.join('·')}`, { 묶음: x.parts.length })); (NB.displaced || []).forEach(x => add('기능 분산', `${x.mod} ${x.fn}`, `${x.fn} (${x.mod}) — 연결 ${x.share}%가 ${x.to}`)); // 자연 경계(모듈성 최대화) — 늘면 실패
   (J.promptAll || []).forEach(p => add('스튜디오 밖 LLM 프롬프트 글', p.key, `${p.key} ${p.chars}자 (${p.loc})`, { 글자: p.chars })); (J.promptImg || []).forEach(p => add('스튜디오 밖 이미지 프롬프트', p.key, `${p.key} ${p.chars}자 (${p.loc})`, { 글자: p.chars }));
   (J.inlinePrompts || []).forEach(p => add('스튜디오 밖 프롬프트 글', p.key, `${p.key} ${p.chars}자 (${p.loc})`, { 글자: p.chars })); // 늘면 나빠짐: 프롬프트는 스튜디오 조각(pfDef)으로
   const T = J.tools; if (T) { // 메타 점검(도구 코드)
@@ -45,8 +46,28 @@ export function compare(base, cur) {
     const up = Object.keys(f.num).filter(n => (+f.num[n] || 0) > (+b.num?.[n] || 0)), down = Object.keys(f.num).filter(n => (+f.num[n] || 0) < (+b.num?.[n] || 0));
     if (up.length) out.worse.push({ ...f, was: b.num, up }); else if (down.length) out.better.push({ ...f, was: b.num, down }); }
   for (const [k, f] of B) if (!C.has(k)) out.fixed.push(f);
-  return out;
+  return renamed(moved(out, base, cur));
 }
+// 이름 바꿈: 함수 이름이 정체인 범주(복잡한 함수)에서 같은 파일의 해결 + 새로 생김 짝 — 수치(복잡도·줄·중첩)가 같거나 줄었으면 같은 본문의 이름만 바뀐 것(옮김), 늘었으면 그대로 새로 생김
+const RENAMABLE = new Set(['복잡한 함수', '도구 복잡한 함수']), fileOf = f => (String(f.text || f.key).match(/(?:src|tools|build|pc|www)\/[\w./가-힣-]*?(?=:\d|$|\s|\))/) || [''])[0];
+function renamed(out) { const sig = f => `${String(f.key).split('|')[0]}|${fileOf(f)}|${JSON.stringify(f.num || {})}`;
+  const le = (a, f) => String(a.key).split('|')[0] === String(f.key).split('|')[0] && fileOf(a) === fileOf(f) && Object.keys(a.num || {}).every(k => (+a.num[k] || 0) <= (+f.num?.[k] || 0)); /* 같은 파일에서 수치가 같거나 줄었으면(이름을 바꾸며 조금 덜어 냄) */
+  for (const a of [...out.added]) { if (!RENAMABLE.has(String(a.key).split('|')[0])) continue; let i = out.fixed.findIndex(f => sig(f) === sig(a)); if (i < 0) i = out.fixed.findIndex(f => le(a, f)); if (i < 0) continue; out.fixed.splice(i, 1); out.added.splice(out.added.indexOf(a), 1); (out.moved ||= []).push(a); }
+  return out; }
+// 옮김: 코드를 다른 파일로 옮기면 키의 파일 경로만 바뀌어 같은 항목이 "해결 + 새로 생김"으로 갈림(줄 이동을 무시하듯 파일 이동도 가림).
+//   경로가 위치일 뿐인 범주만(빈 catch·이름 모호는 파일별 개수, 함수·상태 키 항목) — 경로를 뺀 정체(종류·함수 이름·상태 키)로 묶어
+//   그 정체의 합계(개수·복잡도 등, 수치 없으면 항목 수)가 기준보다 늘지 않았고 같은 정체가 기준 쪽에서 줄었으면 옮김(실패 아님, 따로 보고).
+//   모듈 자체가 정체인 범주(과잉 분할·기능 섞임)는 그대로. 계층 섞임·방향 위반의 모듈별 수도 위치일 뿐(함수를 기능 모듈로 모으면 모듈만 바뀜) — 합계로
+const MOVABLE = new Set(['규칙 L1', '규칙 L2', '규칙 L3', '규칙 S1', '계층 섞임', '계층 방향', '빈 catch', '도구 빈 catch', '이름 모호', '영역 침범 후보', '기능 분산', '남의 상태 쓰기', '복잡한 함수', '복잡한 익명 콜백', '복잡한 분배기 case', '도구 복잡한 함수', '도구 안 쓰는 함수']);
+const PATHS = /@?\s*(?:src|tools|build|pc|www)\/[\w./가-힣-]*/g;
+export const movedId = f => { const k = String(f.key), cat = k.split('|')[0]; return MOVABLE.has(cat) ? k.replace(PATHS, ' ').replace(/\s+/g, ' ').replace(/\|\s/, '|').trim() : null; };
+function moved(out, base, cur) { out.moved = [];
+  const sum = (L, id) => { const s = {}; let n = 0; for (const f of L) if (movedId(f) === id) { n++; for (const [k, v] of Object.entries(f.num || {})) s[k] = (s[k] || 0) + (+v || 0); } return { s, n }; };
+  for (const id of new Set([...out.added, ...out.worse].map(movedId).filter(Boolean))) { if (![...out.fixed, ...out.better].some(f => movedId(f) === id)) continue;
+    const b = sum(base, id), c = sum(cur, id), keys = Object.keys(c.s); if (keys.length ? !keys.every(k => c.s[k] <= (b.s[k] || 0)) : c.n > b.n) continue;
+    const other = f => movedId(f) !== id; out.moved.push(...[...out.added, ...out.worse].filter(f => !other(f)));
+    out.added = out.added.filter(other); out.worse = out.worse.filter(other); out.fixed = out.fixed.filter(other); out.better = out.better.filter(other); }
+  return out; }
 
 export const BASELINE = 'tools/baseline.json';
 export function readBaseline(ROOT, part = 'findings') { const p = join(ROOT, BASELINE); return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8'))[part] || null : null; }
@@ -64,7 +85,7 @@ export function refTree(ROOT, ref, OUT) {
 
 export function diffMd(d, title) {
   const row = f => `- ${f.text}${f.was ? ` (전: ${Object.entries(f.was).map(([k, v]) => `${k} ${v}`).join(' · ')})` : ''}`;
-  return [`## ${title}`, '', `새로 생김 ${d.added.length} · 나빠짐 ${d.worse.length} · 해결 ${d.fixed.length} · 좋아짐 ${d.better.length}`, '',
+  return [`## ${title}`, '', `새로 생김 ${d.added.length} · 나빠짐 ${d.worse.length} · 해결 ${d.fixed.length} · 좋아짐 ${d.better.length} · 옮김 ${(d.moved || []).length}`, '',
     '### 새로 생김', ...(d.added.length ? d.added.map(row) : ['없음']), '', '### 나빠짐', ...(d.worse.length ? d.worse.map(row) : ['없음']), '',
-    '### 해결', ...(d.fixed.length ? d.fixed.map(row) : ['없음']), '', '### 좋아짐', ...(d.better.length ? d.better.map(row) : ['없음']), ''].join('\n');
+    '### 해결', ...(d.fixed.length ? d.fixed.map(row) : ['없음']), '', '### 좋아짐', ...(d.better.length ? d.better.map(row) : ['없음']), '', '### 옮김(코드를 다른 파일로 — 같은 정체의 합계가 늘지 않음)', ...((d.moved || []).length ? d.moved.map(row) : ['없음']), ''].join('\n');
 }

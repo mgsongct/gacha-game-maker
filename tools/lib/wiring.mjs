@@ -46,7 +46,7 @@ export function entityProps(node) { const bind = new Map(), key = (scope, name) 
 export function allProps(units) { const s = new Set(); for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'member_expression') { const p = n.childForFieldName('property'); if (p) s.add(p.text); } else if (n.type === 'pair') { const k = n.childForFieldName('key'); if (k) s.add(k.text.replace(/^['"]|['"]$/g, '')); } }); return s; }
 
 // 생성 루트에서 부르는 함수들(동기·비동기 호출, 깊이 제한, 화면·저장·AI 통신 같은 기반 함수는 뺌)
-const INFRA = /^(render|toast|mark|flush|stat|wait|aiJSON|aiCall|aiOne|aiLog|llmWrap|http|claudeMsg|esc|T|clone|uid|nf|num|openModal|closeModal|closeOv|applyMeta|fix|defaults|ctx|\$|\$\$|rand|pick|sub|jo|quietErr|appStorage|commitRecords|imgSrc|art|head|pageHead)$/;
+export const INFRA = /^(render|toast|mark|flush|stat|wait|aiJSON|aiCall|aiOne|aiLog|llmWrap|http|claudeMsg|esc|T|clone|uid|nf|num|openModal|closeModal|closeOv|applyMeta|fix|defaults|ctx|\$|\$\$|rand|pick|sub|jo|quietErr|appStorage|commitRecords|imgSrc|art|head|pageHead)$/;
 export function closure(fns, roots, depth = 3) { const seen = new Map(); let q = roots.filter(r => fns.has(r)).map(r => [r, 0]);
   while (q.length) { const [k, d] = q.shift(); if (seen.has(k)) continue; seen.set(k, d); if (d >= depth) continue; for (const c of fns.get(k).calls.keys()) { const f = fns.get(c); if (f && f.top && !INFRA.test(f.name) && !seen.has(c)) q.push([c, d + 1]); } }
   return seen; }
@@ -83,7 +83,11 @@ export function lazyDefault(fns, featureFns, key, sf) { const leaf = key.split('
       if (par?.type === 'binary_expression' && /^(\|\||\?\?)$/.test(par.childForFieldName('operator')?.type || '') && par.childForFieldName('left')?.startIndex === n.startIndex) see(literal(par.childForFieldName('right')));
       else if (par?.type === 'assignment_expression' && par.childForFieldName('left')?.startIndex === n.startIndex) { // if(!x.k) x.k = 기본값 꼴(없을 때 채우는 지연 초기화)만
         let ifs = par.parent; while (ifs && ifs.type !== 'if_statement' && !FNT.has(ifs.type)) ifs = ifs.parent; const cond = ifs?.type === 'if_statement' ? ifs.childForFieldName('condition')?.text || '' : '';
-        if (new RegExp(`(!|typeof|isArray\\()[^&|]*\\b${leaf}\\b`).test(cond)) see(literal(par.childForFieldName('right'))); } }); }
+        if (new RegExp(`(!|typeof|isArray\\()[^&|]*\\b${leaf}\\b`).test(cond)) see(literal(par.childForFieldName('right'))); }
+      else if (par?.type === 'ternary_expression' && par.childForFieldName('consequence')?.startIndex === n.startIndex) { // 있으면 그 키, 없으면 기본값 — Array.isArray(x.k)?x.k:기본값() 꼴(읽을 때 기본값, 상태는 그대로)
+        const z = par.childForFieldName('alternative'); if (z && new RegExp(`\\b${leaf}\\b`).test(par.childForFieldName('condition')?.text || '')) see(literal(z)); }
+      else if (par?.type === 'variable_declarator' && par.childForFieldName('value')?.startIndex === n.startIndex) { // const L=G.meta.x; … L&&L.length?L:기본값() 꼴 — 지역 이름으로 받은 뒤 없으면 기본값
+        const L = par.childForFieldName('name')?.text; walk(f.node, m => { if (m.type !== 'ternary_expression' || !L) return; const c = m.childForFieldName('condition')?.text || '', y = m.childForFieldName('consequence')?.text, z = m.childForFieldName('alternative'); if (new RegExp(`\\b${L}\\b`).test(c) && y === L && z) see(literal(z)); }); } }); }
   return kind; }
 // 생성된 게임 값 꺼내기
 export function valueAt(game, path) { const [base, ...rest] = path.split('.'); let v = base === 'P()' ? game.prog : game; if (base === 'G' || base === 'P()') { for (const k of rest) { if (v == null) return undefined; v = v[k]; } return v; } return undefined; }

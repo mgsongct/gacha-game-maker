@@ -45,7 +45,10 @@ function openShare(){
     <p class="muted">작가 이름 태그로 그린 그림이나 실제 성우를 닮은 목소리는 아는 사람끼리만 돌려 보고, 공개 커뮤니티에 올리지 마세요.</p>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="sharego">만들어서 보내기</button></div>`);
 }
+/* 창을 다시 그려도 스크롤 자리 유지(View) */
+function modalKeep(open){ const sh=$('#modal .sheet'), y=sh?sh.scrollTop:0; open(); const sh2=$('#modal .sheet'); if(sh2) sh2.scrollTop=y; }
 let FB_STAR=0;
+function fbStarsShow(){ document.querySelectorAll('#fbStars .chip').forEach(b=>chipOn(b,+b.dataset.n===FB_STAR)); }
 function openFeedback(){
   FB_STAR=0;
   openModal(`${head('피드백 보내기')}
@@ -67,6 +70,12 @@ function guideText(){
   return `[${G.meta.title} 테스트 안내]\n개인적으로 만든 가챠 게임이에요. 해 보고 의견 부탁해요!\n공식 배포처: https://github.com/jjhk0803/gacha-game-maker (다른 곳에서 받은 파일은 쓰지 마세요)\n\n1. 같이 보낸 APK 파일을 눌러 설치해요. "출처를 알 수 없는 앱" 허용을 물으면 이번만 허용해요.\n2. 공유 팩(.ggmpack 또는 기존 .json)도 받았다면: 최신 버전으로 업데이트한 뒤 설정 → 데이터 → 공유 팩 불러오기 → "새 게임으로 추가".\n3. 새 ${T('crew')}·스토리 만들기, 그림, 음성 같은 AI 기능은 각자 키를 넣어야 써요. 없어도 기본 게임은 다 할 수 있어요. 키는 남에게 받지 말고 본인 것만 쓰세요.\n4. 다 해 봤으면 설정 → 공유와 피드백 → 피드백 보내기로 의견을 보내 주세요.\n\n※ 개인 테스트용이라 다른 곳에 올리거나 다시 퍼뜨리지는 말아 주세요.`;
 }
 let CS_TAB='equip';
+/* 캐릭터 창 부분 갱신(View): 탭 · 전신/상반신 · 누르기 반응(물결·하트·몸짓·표정·말풍선 — 보였으면 true) */
+function csTabShow(){ document.querySelectorAll('.cs-tabs button').forEach(b=>chipOn(b,b.dataset.k===CS_TAB)); document.querySelectorAll('[data-cs]').forEach(s=>s.hidden=s.dataset.cs!==CS_TAB); }
+function csFrameShow(t,full){ const a2=$('.cs-art'); if(a2){ a2.classList.toggle('up',!full); const cc=charById(a2.dataset.id); if(cc) a2.innerHTML=characterDetailArt(cc,!full); } t.textContent=full?'상반신':'전신'; }
+function csSayText(){ const sy=$('#csSay'); return sy?sy.textContent:undefined; }
+function csPokeShow(t,c,l,owned,lv,zone,x,y){ ripple(x,y,lv>=7); if(owned&&lv>=5&&zone==='head') hearts(x,y,Math.min(5,lv-3)); charReact(t.querySelector('.art'),lv,zone); faceSwap(c,t.querySelector('.art'),touchFace(c,zone,lv));
+  const sy=$('#csSay'); if(!l||!sy) return false; sy.textContent=sub(l); sy.hidden=false; sy.classList.remove('pop'); void sy.offsetWidth; sy.classList.add('pop'); clearTimeout(window._csT); window._csT=setTimeout(()=>{if(sy.isConnected)sy.hidden=true;},3200); return true; }
 function crewOrder(){return [...G.chars].sort((a,b)=>(own(b.id)?1:0)-(own(a.id)?1:0)||b.rarity-a.rarity||(a.ord||0)-(b.ord||0));}
 // Detail is an original-art viewer, independent of the gameplay standing preference.
 function characterDetailArt(c,upper=false){
@@ -82,7 +91,12 @@ function characterDetailPreviewTargets(root){
   img.setAttribute('aria-label',(img.alt||'캐릭터 이미지')+' 크게 보기');
  }
 }
-function openChar(id){
+/* 캐릭터 창 열기(Controller): 창을 그리고, 5돌파 CG를 처음 보면 본 것으로 하고 펼침 연출 */
+function openChar(id){ const c=charById(id); if(!c) return; charSheetShow(id); if(cgFirstSeen(c)) setTimeout(()=>lbReveal(c),500); }
+/* 5돌파 CG를 처음 봄(Model) — 처음이면 true */
+function cgFirstSeen(c){ const o=own(c.id); if(!(o&&o.dup>=5&&o.cgNew&&imgSrcRaw(c.lbcg))) return false; o.cgNew=false; mark('prog'); return true; }
+/* 캐릭터 창(View): 장비·스킬 · 스토리 · 외형 · 정보 탭 */
+function charSheetShow(id){
   const c=charById(id); if(!c) return; MBACK=null; const o=own(c.id),st=stats(c);
   const eps=[...c.episodes].sort((a,b)=>a.lv-b.lv), ths=G.threads.filter(t=>t.charId===c.id), cap=o?levelCap(o):20;
   const old=$('#modal .sheet.cs-sheet'), keep=old&&old.dataset.cid===id?old.scrollTop:0;
@@ -173,7 +187,6 @@ function openChar(id){
   </div>`,false,'cs-sheet');
   characterDetailPreviewTargets($('#modal'));
   const el=$('#modal .sheet'); if(el){ el.dataset.cid=id; if(old)el.scrollTop=keep; }
-  if(o&&o.dup>=5&&o.cgNew&&lbs){ o.cgNew=false; mark('prog'); setTimeout(()=>lbReveal(c),500); }
 }
 function openCharEdit(id){
   const c=id?charById(id):cleanChar({name:''});

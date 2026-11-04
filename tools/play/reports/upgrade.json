@@ -1,0 +1,196 @@
+[
+ {
+  "game": "idol-audition",
+  "title": "앙코르 시그널",
+  "rows": [
+   {
+    "what": "G.meta.variants",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.expedition",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.rules",
+    "worse": [],
+    "next": [
+     "c_spot 0→6"
+    ],
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "g_rules 1"
+    ],
+    "err": "글 AI 요청 2"
+   },
+   {
+    "what": "G.meta.positions",
+    "worse": [],
+    "next": [
+     "c_spot 0→6"
+    ],
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "g_pos 1"
+    ],
+    "err": "글 AI 요청 2"
+   },
+   {
+    "what": "G.meta.balance",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.persona",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "캐릭터.persona",
+    "worse": [],
+    "next": [
+     "c_spot 0→6"
+    ],
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "c_persona 6"
+    ],
+    "err": "글 AI 요청 7"
+   },
+   {
+    "what": "캐릭터.pfields",
+    "worse": [],
+    "next": [
+     "c_spot 0→6"
+    ],
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "c_pfields 6"
+    ],
+    "err": "글 AI 요청 7"
+   },
+   {
+    "what": "세력.stance",
+    "worse": [],
+    "next": [
+     "c_spot 0→6"
+    ],
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "w_stance 1"
+    ],
+    "err": "글 AI 요청 2"
+   },
+   {
+    "what": "캐릭터.debutLater",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   }
+  ],
+  "pageErrors": []
+ },
+ {
+  "game": "sky-knights",
+  "title": "게일 크레스트",
+  "rows": [
+   {
+    "what": "G.meta.variants",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.expedition",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.rules",
+    "worse": [],
+    "next": [
+     "c_spot 0→8"
+    ],
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "g_rules 1"
+    ],
+    "err": "글 AI 요청 2"
+   },
+   {
+    "what": "G.meta.positions",
+    "worse": [],
+    "next": [
+     "c_spot 0→8"
+    ],
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "g_pos 1"
+    ],
+    "err": "글 AI 요청 2"
+   },
+   {
+    "what": "G.meta.balance",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "G.meta.persona",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   },
+   {
+    "what": "캐릭터.persona",
+    "worse": [],
+    "next": [
+     "c_spot 0→8"
+    ],
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "c_persona 8"
+    ],
+    "err": "글 AI 요청 9"
+   },
+   {
+    "what": "캐릭터.pfields",
+    "worse": [],
+    "next": [
+     "c_spot 0→8"
+    ],
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "c_pfields 8"
+    ],
+    "err": "글 AI 요청 9"
+   },
+   {
+    "what": "세력.stance",
+    "worse": [],
+    "next": [
+     "c_spot 0→8"
+    ],
+    "res": "보완됨(자동)",
+    "notice": true,
+    "hit": [
+     "w_stance 1"
+    ],
+    "err": "글 AI 요청 2"
+   },
+   {
+    "what": "캐릭터.debutLater",
+    "res": "건너뜀",
+    "why": "원래 게임에도 비어 있음"
+   }
+  ],
+  "pageErrors": []
+ }
+]

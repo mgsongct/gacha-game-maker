@@ -3,7 +3,7 @@
 TiddlyWiki처럼 **배포물은 HTML 하나**이고, 개발은 파트·모듈 파일로 나눠서 합니다. `build/`는 Node 기본 모듈만 써서 의존성 설치(`npm install`)가 필요 없습니다(Node 18+).
 
 ```bash
-node build/build.mjs          # src/ → www/index.html, version.json의 build·sha256 맞춤
+node build/build.mjs          # src/ → www/index.html, version.json의 build·sha256 맞춤 (스크립트 블록마다 JS 구문 검사 — 오류면 빌드 안 함, 오류 줄의 src 파일 표시)
 ```
 
 ```bash
@@ -41,7 +41,8 @@ src/
 │ └ combat/010-catalog.js … 090-practice.js  → ggm-combat-catalog … (전투 v2)
 └ main/                 앱 본체 ggm-main. 파일 이름순으로 이어 붙여 <script> 하나가 됨
   ├ 0010-rules.js  0020-ai-connect.js  …  0500-gacha.js  0520-backup-storage.js  0525-data-folder.js  …  0570-modal-nav.js
-  └ 0510-actions/        클릭 액션: 010-setup.js … 120-messenger.js (handle*Action 하나씩), 130-dispatch.js(APP_ACTION_HANDLERS·전역 리스너), 140-share-export.js
+  ├ 0015-prompt-studio/ · 0030-image/ · 0260-new-game/ · 0360-sync/   폴더 모듈(한 기능을 여러 파일로 — 폴더 전체가 모듈 하나): 프롬프트 스튜디오 · 그림(엔진·화면·후보) · 새 게임(초안·만들기) · 동기화(공통·PC 서버·GitHub·시작 시 받기·한 기기 플레이)
+  └ 0510-actions/        클릭 액션: 010-setup.js … 120-messenger.js (handle*Action 하나씩), 130-dispatch.js(APP_ACTION_HANDLERS·전역 리스너)
 ```
 
 `main/` 파일과 원래 섹션의 대응은 [architecture.md §2 섹션 지도](architecture.md#ggm-main-섹션-지도)와 같습니다(파일 이름은 `build/split.mjs`의 `NAMES` 표).
@@ -70,7 +71,7 @@ src/
 
 | 하려는 것 | 방법 |
 |---|---|
-| 앱 본체 기능 추가 | `src/main/`에 새 파일. 번호로 위치 지정(예: `0545-my-feature.js`는 `0540-start.js`와 `0550-standalone-app.js` 사이). 번호를 10 단위로 띄워 둔 이유 |
+| 앱 본체 기능 추가 | 새 파일이 아니라 그 기능이 속한 모듈 안에(사용자 지시 — 모듈을 분류 없이 늘리지 않음). 속할 모듈은 연관 맵의 기능 표면(`docs/map.md` 2절: 메뉴 → 화면·패널·창 → 얽힌 모듈)과 모듈 판정(3절)에서 그 기능 단위의 고유 모듈. 새 모듈(`src/main/`의 번호 파일 — 예: `0545-my-feature.js`는 `0540-start.js`와 `0550-standalone-app.js` 사이, 번호를 10 단위로 띄워 둔 이유)은 도구가 새 기능 단위로 판정할 때만. 고친 뒤 `node tools/map.mjs --strict`(조각·흩어짐·슈퍼가 늘면 실패) |
 | 독립 모듈 추가 (먼저 실행, 자체 클릭 리스너 등) | `src/modules/app/020-my-module.js` → `id="ggm-app-my-module"`로 자동 등록·실행 |
 | 새 모듈 묶음 | `src/modules/<묶음>/` 폴더를 만들고 `src/index.html`에 `<!--@modules modules/<묶음>/ ggm-<묶음>- -->` 한 줄 추가 |
 | 기존 섹션 수정 | 해당 `src/main/*.js` 파일 수정 |

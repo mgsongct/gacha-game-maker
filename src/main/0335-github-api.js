@@ -1,21 +1,4 @@
-/* ===== PC·폰 연동 (내 GitHub 비공개 저장소) ===== */
-const SYKEY='ggm-sync', SYIDX='ggm-sync-idx';
-function SY(){ try{ return JSON.parse(appStorage.getItem(SYKEY))||{}; }catch(e){ return {}; } }
-function saveSY(o){ appStorage.setItem(SYKEY,JSON.stringify(o)); }
-function syIdx(){ try{ return JSON.parse(appStorage.getItem(SYIDX))||{}; }catch(e){ return {}; } }
-function saveSyIdx(o){ try{ appStorage.setItem(SYIDX,JSON.stringify(o)); }catch(e){} }
-function syDevice(){ const o=SY(); return o.device||(IS_NATIVE?'안드로이드 폰':IS_IOS?'아이폰':document.body.classList.contains('desk')?'PC':'브라우저'); }
-function syReady(){ const o=SY(); return !!(o.repo&&o.token); }
-function bytesToB64(u8){ let s=''; for(let i=0;i<u8.length;i+=0x8000) s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000)); return btoa(s); }
-async function shaHex(buf){ if(!(window.crypto&&crypto.subtle)) return sha256js(new Uint8Array(buf)); const h=await crypto.subtle.digest('SHA-256',buf); return [...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
-// http 주소(같은 와이파이의 PC 서버 등)에서는 브라우저가 crypto.subtle을 막아요 → 직접 계산
-function sha256js(m){ const K=[],H=[]; let n=2; const fr=x=>(x-Math.floor(x))*4294967296|0; for(let c=0;c<64;n++){ let p=1; for(let d=2;d*d<=n;d++) if(n%d===0){ p=0; break; } if(p){ if(c<8) H[c]=fr(Math.pow(n,1/2)); K[c++]=fr(Math.pow(n,1/3)); } }
-  const l=m.length, nb=((l+9+63)>>6)<<6, b=new Uint8Array(nb); b.set(m); b[l]=0x80; const dv=new DataView(b.buffer); dv.setUint32(nb-8,Math.floor(l/536870912)); dv.setUint32(nb-4,(l<<3)>>>0);
-  const w=new Int32Array(64), r=(x,k)=>(x>>>k)|(x<<(32-k));
-  for(let o=0;o<nb;o+=64){ for(let i=0;i<16;i++) w[i]=dv.getInt32(o+i*4); for(let i=16;i<64;i++){ const a=w[i-15], c=w[i-2]; w[i]=(w[i-16]+(r(a,7)^r(a,18)^(a>>>3))+w[i-7]+(r(c,17)^r(c,19)^(c>>>10)))|0; }
-    let [A,B2,C,D,E,F,G2,Hh]=H; for(let i=0;i<64;i++){ const t1=(Hh+(r(E,6)^r(E,11)^r(E,25))+((E&F)^(~E&G2))+K[i]+w[i])|0, t2=((r(A,2)^r(A,13)^r(A,22))+((A&B2)^(A&C)^(B2&C)))|0; Hh=G2; G2=F; F=E; E=(D+t1)|0; D=C; C=B2; B2=A; A=(t1+t2)|0; }
-    [A,B2,C,D,E,F,G2,Hh].forEach((v,i)=>{ H[i]=(H[i]+v)|0; }); }
-  return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join(''); }
+/* ===== GitHub API 클라이언트(동기화·게시가 같이 씀): 요청·오류 문구·브랜치·커밋·blob 올리기 ===== */
 function ghH(o,extra){ return Object.assign({Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',Authorization:'Bearer '+String(o.token||'').trim()},extra||{}); }
 async function gh(o,path,opt){ opt=opt||{}; const tries=opt.tries||0; let r; try{ r=await http('https://api.github.com/repos/'+o.repo.trim()+path,{method:opt.method||'GET',headers:ghH(o,Object.assign(opt.body?{'Content-Type':'application/json'}:{},opt.binary?{Accept:'application/vnd.github.raw+json'}:{})),body:opt.body,binary:!!opt.binary,timeout:opt.timeout||120000}); }catch(e){ if(tries<4){ await wait(2000*Math.pow(2,tries)); return gh(o,path,Object.assign({},opt,{tries:tries+1})); } throw e; }
   if(r.status>=500&&r.status<600&&tries<4){ await wait(2000*Math.pow(2,tries)); return gh(o,path,Object.assign({},opt,{tries:tries+1})); }
@@ -58,18 +41,3 @@ async function ghCommitFiles(o,base,entries,message){
 }
 async function ghCreateBlob(o,blob,label){if(blob.size>100*1048576)throw Error(label+': 파일 하나가 GitHub 전송 한도 100MiB를 넘습니다. 해당 자료를 줄여 주세요. 전체 게임의 합계 용량 제한은 아닙니다.');const result=await gh(o,'/git/blobs',{method:'POST',body:{content:bytesToB64(new Uint8Array(await blob.arrayBuffer())),encoding:'base64'},timeout:300000});ghSHA(result?.sha,label);return result;}
 async function ghUploadPool(items,task){let next=0,failure=null;await Promise.all(Array.from({length:Math.min(3,items.length)},async()=>{while(!failure&&next<items.length){const item=items[next++];try{await task(item);}catch(e){failure=failure||e;}}}));if(failure)throw failure;}
-
-// 게임 목록(starfall-projects)은 한 번도 저장 안 됐을 수 있어요(샘플 게임만 쓴 기기). 받는 쪽은 목록이 꼭 있어야 해서 기본 목록을 채워 보내요
-function syLsValue(k){ const v=appStorage.getItem(k); return v==null&&k===PJKEY?JSON.stringify(PJ()):v; }
-function syLsKeys(withKeys){ const pj=PJ(); const keys=[PJKEY,SETUP_KEY,...pj.list.map(x=>pjKey(x.id))]; keys.push(NKEY,SKEY); if(withKeys) keys.push(PKEY); return keys; }
-function syStrip(k,v,withKeys){ if(withKeys||v==null) return v; try{ if(k===NKEY){ const o=JSON.parse(v); delete o.key; return JSON.stringify(o); } if(k===SKEY){ const o=JSON.parse(v); delete o.fishKey; delete o.elKey; return JSON.stringify(o); } }catch(e){} return v; }
-function syMerge(k,v){ if(v==null) return v; try{ if(k===NKEY){ const cur=JSON.parse(appStorage.getItem(NKEY)||'{}'), o=JSON.parse(v); if(!o.key&&cur.key) o.key=cur.key; return JSON.stringify(o); } if(k===SKEY){ const cur=JSON.parse(appStorage.getItem(SKEY)||'{}'), o=JSON.parse(v); ['fishKey','elKey'].forEach(x=>{ if(!o[x]&&cur[x]) o[x]=cur[x]; }); return JSON.stringify(o); } }catch(e){} return v; }
-let SYJOB=null;
-function syBar(t){ let el=$('#syBar'); if(!t){ if(el) el.remove(); return; } if(!el){ el=document.createElement('div'); el.id='syBar'; el.className='prepchip'; document.body.appendChild(el); } el.innerHTML=`<b>☁ ${esc(t)}</b>`; }
-async function syRemote(o){ // -> {head,tree,paths,state}
-  const ref=await ghEnsureBranch(o);
-  const head=ref.object.sha, commit=await gh(o,'/git/commits/'+head), tree=await gh(o,'/git/trees/'+commit.tree.sha+'?recursive=1');
-  const paths={}; (tree.tree||[]).forEach(x=>{ if(x.type==='blob') paths[x.path]=x.sha; });
-  let state=null; if(paths['sync/state.json']){ const r=await gh(o,'/git/blobs/'+paths['sync/state.json'],{binary:true}); try{ let j=JSON.parse(r.bytes?new TextDecoder().decode(r.bytes):(r.text||'')); if(j&&j.encoding==='base64'&&j.content) j=JSON.parse(new TextDecoder().decode(b64ToBytes(j.content.replace(/\s/g,'')))); state=j; }catch(e){throw Error('GitHub의 기존 진행 정보를 해석하지 못했습니다. 덮어쓰지 않고 중단합니다.');} }
-  return {head,treeSha:commit.tree.sha,paths,state};
-}

@@ -45,5 +45,5 @@ mkdirSync(OUT, { recursive: true }); writeFileSync(join(OUT, 'names.md'), md); w
 const NF = Object.entries(perFile).map(([k, n]) => ({ key: `이름 모호|${k}`, num: { 개수: n }, text: `${k} ${n}개` })), NB = readBaseline(ROOT, 'names'), ND = NB ? compare(NB, NF) : null;
 if (arg('--update-baseline')) { if (ND && (ND.added.length || ND.worse.length) && !arg('--force')) { console.log('기준선을 올리는 갱신은 하지 않아요 — 이름을 고치세요'); process.exit(1); } writeBaseline(ROOT, NF, 'names'); }
 console.log(`이름 규칙: 바인딩 ${B.length} · 여러 종류에 쓰이는 이름 ${amb.length} · 모호한 이름 ${V.length}${arg('--apply') ? ` · 바꿈 ${applied} · 건너뜀 ${skipped.length}` : ''}`); console.log('보고서: ' + join(OUT, 'names.md'));
-if (ND) { console.log(`기준선 대비: 새로 생김 ${ND.added.length} · 나빠짐 ${ND.worse.length} · 해결 ${ND.fixed.length} · 좋아짐 ${ND.better.length}`); [...ND.added, ...ND.worse].forEach(f => console.log('  + ' + f.text)); }
+if (ND) { console.log(`기준선 대비: 새로 생김 ${ND.added.length} · 나빠짐 ${ND.worse.length} · 해결 ${ND.fixed.length} · 좋아짐 ${ND.better.length}${(ND.moved || []).length ? ` · 옮김 ${ND.moved.length}(합계 그대로)` : ''}`); [...ND.added, ...ND.worse].forEach(f => console.log('  + ' + f.text)); }
 if (arg('--strict') && ND && (ND.added.length || ND.worse.length) && !arg('--update-baseline')) process.exit(1);

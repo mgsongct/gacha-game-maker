@@ -1,12 +1,12 @@
 /* ===== 스킨 제안: 스탠딩을 먼저 보여 주고, 수락하면 나머지를 한꺼번에 만들어요 ===== */
 let SKPROP=null;
-async function skinPropDraw(btn){ const P0=SKPROP, c=P0&&charById(P0.cid); if(!c) return; if(!imgReady()){ toast(imgNeed()); return; }
-  if(btn){ btn.disabled=true; btn.textContent='그리는 중…'; }
+async function skinPropDraw(rep){ const P0=SKPROP, c=P0&&charById(P0.cid); if(!c) return; if(!imgReady()){ toast(imgNeed()); return; }
+  if(rep) rep('그리는 중…');
   try{ const src=imgSrc(c), ref=src&&P0.ref.on?await refImage(src):null;
     const b=await naiDraw('char',P0.prompt,Object.assign({candidateEligible:true,pose:P0.pose||undefined,styleId:c.naiStyle,frame:c.naiFrame},ref?{refs:[{image:ref,type:P0.ref.style?'character&style':'character',strength:P0.ref.str,fidelity:P0.ref.fid}]}:{}));
     const cfg=b.__candidateConfig;if(cfg?.promptParts&&cfg.promptParts.combined===cfg.prompt){P0.prompt=cfg.prompt;P0.naiBlocks={...P0.naiBlocks,prompt:cfg.promptParts};}
     if(P0.url) URL.revokeObjectURL(P0.url); P0.blob=b; P0.url=URL.createObjectURL(b); openSkinProp(); }
-  catch(err){ toast(naiErr(err)); if(btn&&btn.isConnected){ btn.disabled=false; btn.textContent=P0.url?'다시 그리기':'그리기'; } } }
+  catch(err){ toast(naiErr(err)); if(rep){ rep.end(); rep(P0.url?'다시 그리기':'그리기'); } } }
 function openSkinProp(){ const P0=SKPROP; if(!P0||!P0.url) return; const c=charById(P0.cid); if(!c) return; const sel=P0.sel||{upper:1,illust:1,lbcg:1,faces:0,lines:SAMPLE?1:0};
   openModal(`${head(`「${esc(P0.name)}」 제안`,`<span class="muted">${esc(c.name)}의 새 ${esc(T('skin'))} · 이 모습으로 만들까요?</span>`)}
     <div class="skp-img"><img src="${esc(P0.url)}" alt="${esc(P0.name)}"></div><p class="muted" style="text-align:center;font-size:.78rem;margin:4px 0 0">그림을 누르면 크게 봐요</p>
@@ -16,7 +16,7 @@ function openSkinProp(){ const P0=SKPROP; if(!P0||!P0.url) return; const c=charB
     <p class="muted" style="font-size:.78rem">수락하면 뒤에서 차례로 그려요(위쪽 막대에 진행이 보여요). 표정은 얼굴 범위를 칠한 뒤 전신·상반신 모두 얼굴만 다시 그려요.</p>
     <div class="row" style="margin-top:10px"><button class="btn" data-act="skpok">수락 · 이 모습으로 만들기</button><button class="btn ghost" data-act="skpredo">다시 그리기</button><button class="btn ghost" data-act="skpcancel">취소</button></div>`); }
 function skinPropRead(){ const P0=SKPROP; if(!P0) return; P0.sel={}; document.querySelectorAll('[data-skp]').forEach(i=>{ P0.sel[i.dataset.skp]=i.checked?1:0; }); const sc=$('#skp_scene'); if(sc){P0.scene=sc.value.trim();naiBlocksSave(P0,'scene',sc);} }
-async function skinLinesAI(c,k,btn){ const r=await aiJSON(`${pf('SKIN_LINES',{RULES,ctx:ctx(),crew:T('crew'),name:c.name,name2:k.name,skin:T('skin'),idea:String(k.idea||k.prompt||'').slice(0,200),lines:(c.lines||[]).slice(0,3).map(x=>'"'+x+'"').join(' / ')})}\nJSON만 출력: {"lines":["대사 6개"],"intro":"이 ${T('skin')}을 처음 입었을 때 한마디"}`,btn,'quick');
+async function skinLinesAI(c,k,rep){ const r=await aiJSON(skinLinesAIPrompt({c,k}),rep,'quick');
   if(r&&Array.isArray(r.lines)){ k.lines=r.lines.map(x=>String(x||'').trim()).filter(Boolean).slice(0,8); if(r.intro) k.intro=String(r.intro).slice(0,120); mark('c:'+c.id); return k.lines.length; } return 0; }
 function skinMakeRest(c,k,sel){ if(['upper','illust','lbcg','faces'].some(x=>sel[x])&&!imgReady()){ toast(imgNeed()); ['upper','illust','lbcg','faces'].forEach(x=>sel[x]=0); }
   if(c.useStanding===false&&!skinDisplayReady(c,k)&&imgReady())sel.upper=1;const go=()=>skinAcceptRun(c,k,sel);
@@ -51,32 +51,6 @@ async function skinAcceptRun(c,k,sel){ if(SKJOB){ toast('다른 '+T('skin')+'을
   if(!current())return;toast(`「${k.name}」 ${failed?'일부 생성 실패':'완성'}${done.length?' · '+done.join(', '):''}`); skinRefresh(c.id); render();
   // 상반신 표정은 상반신이 생긴 뒤 얼굴 범위를 한 번 더 칠해야 해요
   if(sel.faces&&k.upper&&imgSrc(k.upper)&&!k.faceMask?.up)openMaskPainter(imgSrc(k.upper),null,async url=>{ k.faceMask=Object.assign({},k.faceMask||{},{up:url}); mark('c:'+c.id); SKJOB={stop:false}; let n=0; try{ n=await skinFacesRun(c,k,'up'); } finally{ liveBar(null); SKJOB=null; } toast(`「${k.name}」 상반신 표정 ${n}장 완성`); skinRefresh(c.id); },{title:`「${k.name}」 상반신 얼굴 범위 (상반신 표정용)`}); }
-// 파견 게시판: 게임의 파견 목록은 이름·설명 견본이고, 실제 의뢰는 매일·완료할 때마다 새로 뽑아요. 보상은 시간×인원에 맞춰요.
-const DISP_FOCUS={gold:['크레딧',2500],exp:['경험',6],wmat:['교본',4],core:['코어',0.5]};
-function dispOffer(taken){ const pool=(G.dispatches&&G.dispatches.length?G.dispatches:[{name:'주변 정찰',desc:'근처 구역을 둘러보고 쓸 만한 물자를 모아 와요.'},{name:'물자 호송',desc:'보급품을 안전하게 옮겨요.'}]);
-  const free=pool.filter(t=>!(taken||[]).includes(t.name)), tpl=rand(free.length?free:pool), hours=rand([1,2,4,8,12]), need=hours<=2?rand([1,2]):hours<=4?rand([2,3]):rand([3,4]);
-  let focus=rand(['gold','gold','exp','exp','wmat','core']); if(focus==='core'&&hours<4) focus='exp';
-  const pts=Math.pow(hours,0.85)*(1+0.35*(need-1)), r={}; r[focus]=Math.max(1,Math.round(DISP_FOCUS[focus][1]*pts*(focus==='gold'?1:1)));
-  if(focus!=='gold') r.gold=Math.round(600*pts/100)*100; if(focus==='gold') r.gold=Math.round(r.gold/100)*100;
-  if(conOn()) Object.assign(r,conDispReward(hours,need)); // 건조/영입이 켜져 있으면 원정으로 건조 자원도 모아 와요
-  return {id:'o'+uid(),name:String(tpl.name||'파견'),desc:String(tpl.desc||''),hours,need,reward:r}; }
-function DBOARD(){ const p=P(); let b=p.dboard; if(!b||!Array.isArray(b.list)) b=p.dboard={day:'',list:[],rr:0};
-  // 예전 방식으로 보낸 파견은 그대로 이어서 보여 줘요
-  Object.keys(p.disp||{}).forEach(id=>{ if(!b.list.some(o=>o.id===id)){ const t=(G.dispatches||[]).find(x=>x.id===id)||{}, a=p.disp[id]; b.list.push({id,name:String(t.name||'파견'),desc:String(t.desc||''),hours:a.hours||t.hours||2,need:(a.chars||[]).length||t.need||2,reward:t.reward||{gold:2000}}); } });
-  if(b.day!==today()){ b.day=today(); b.rr=0; b.list=b.list.filter(o=>p.disp[o.id]); }
-  while(b.list.length<5) b.list.push(dispOffer(b.list.map(o=>o.name)));
-  return b; }
-function dispList(){ return DBOARD().list; }
-function dispClaim(d){ const id=d.id; const dr=Object.assign({},d.reward,{gift:d.hours>=4?2:1}); if(dr.gems){ dr.gold=(dr.gold||0)+dr.gems*100; delete dr.gems; } if(seasonIs('train')) Object.keys(dr).forEach(k=>{ if(typeof dr[k]==='number'&&k!=='gift') dr[k]=Math.round(dr[k]*1.5); }); Object.assign(dr,rateR(dr)); giveReward(dr); (P().disp[id].chars||[]).forEach(cid=>{const c=charById(cid);if(c)addAff(c,10);}); delete P().disp[id]; const b=DBOARD(), i=b.list.findIndex(o=>o.id===id); if(i>=0) b.list.splice(i,1,dispOffer(b.list.map(o=>o.name))); return dr; }
-function openDispSel(did){
-  const d=dispList().find(x=>x.id===did), busy=busyIds(), owned=G.chars.filter(c=>own(c.id)&&!busy.has(c.id));
-  DSEL=DSEL&&DSEL.id===did?DSEL:{id:did,ids:[]};
-  openModal(`${head(esc(d.name),`<span class="muted">${d.hours}시간 · ${d.need}명 필요 · ${rewardText(d.reward)}</span>`)}
-    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="dsauto">자동 선택 <small>(레벨 낮은 순)</small></button>${DSEL.ids.length?'<button class="btn sm ghost" data-act="dsclr">비우기</button>':''}</div>
-    <div class="froster">${owned.map(c=>{ const k=DSEL.ids.indexOf(c.id); return `<button class="fr r${c.rarity} ${k>=0?'on':''}" data-act="dsel" data-id="${c.id}" style="--ec:${ECOL[c.elem]}"><div class="fr-art">${art(c)}</div><span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${k>=0?`<em class="num">${k+1}</em>`:''}<b>${esc(c.name)}</b><span>Lv.${own(c.id).lv} · ${esc(ROLE[c.role]||'')}</span></button>`; }).join('')||'<p class="muted">보낼 수 있는 '+T('crew')+'이(가) 없어요</p>'}</div>
-    <div class="row" style="margin-top:14px"><button class="btn block" data-act="dispgo" ${DSEL.ids.length===d.need?'':'disabled'}>${DSEL.ids.length}/${d.need} 보내기</button></div>`);
-}
-let DSEL=null;
 function openAiEvent(){
   openModal(`${head('AI로 이벤트 만들기')}
     <label class="f" for="ae_d">이벤트 내용</label><textarea class="in" id="ae_d" placeholder="예: 여름 해변 축제. 바다에서 떠오른 잔광 해파리 소동. 수영복 차림의 카야와 이브가 주인공."></textarea>

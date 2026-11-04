@@ -10,6 +10,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { parse as sgParse, Lang } from '@ast-grep/napi';
+import { unboundRefs } from './scope.mjs';
 import { walk, tsInit } from './source.mjs';
 
 const FN = /^(function_declaration|function_expression|arrow_function|method_definition|generator_function_declaration)$/;
@@ -154,3 +155,40 @@ export function spaCheck(ROOT, units = []) { const out = [], f = join(ROOT, 'www
   for (const m of html.matchAll(/\bimport\s*\(\s*["'](\.{0,2}\/[^"']+)["']\s*\)/g)) out.push({ loc: 'www/index.html', text: `로컬 모듈을 동적으로 불러옴: ${m[1]}` });
   for (const u of units) if (!html.includes(u.text)) out.push({ loc: u.files[0]?.path || u.name, text: `분석한 코드(${u.name})가 빌드된 www/index.html에 그대로 없음 — node build/build.mjs로 다시 빌드하거나 분석 단위를 빌드 구조에 맞추세요` });
   return { errors: out, scripts: (html.match(/<script\b/gi) || []).length }; }
+// 불러올 때 아직 없는 이름(TDZ): 앱 코드는 모듈 블록(src/modules — 차례로) 다음 main(이름순으로 이은 한 스크립트)이 돎. 함수 밖(불러올 때 바로 계산되는 곳)에서
+//   뒤에 선언된 const·let·class를 읽으면 "Cannot access … before initialization"으로 앱이 뜨지 않음(코드를 다른 파일로 옮길 때 생기기 쉬움). 함수 본문은 나중에 돌므로 셈하지 않음
+export function tdzRefs(units) { const order = [...units.filter(u => u.name.startsWith('module:')), ...units.filter(u => u.name === 'main')], decl = new Map(), out = [];
+  order.forEach((u, ui) => { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type === 'lexical_declaration' || c.type === 'class_declaration') (c.type === 'class_declaration' ? [c.childForFieldName('name')] : c.namedChildren.filter(d => d.type === 'variable_declarator').map(d => d.childForFieldName('name'))).forEach(n => { if (n?.type === 'identifier' && !decl.has(n.text)) decl.set(n.text, { ui, at: c.startIndex, loc: u.loc(c) }); }); } });
+  const FN = /^(arrow_function|function_expression|function_declaration|generator_function_declaration|method_definition|class_body)$/;
+  order.forEach((u, ui) => { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type === 'function_declaration') continue;
+    const visit = n => { if (FN.test(n.type)) return; if (n.type === 'identifier' && !(n.parent?.type === 'variable_declarator' && n.parent.childForFieldName('name')?.id === n.id)) { const d = decl.get(n.text); if (d && (d.ui > ui || (d.ui === ui && d.at > n.startIndex))) out.push({ loc: u.loc(n), name: n.text, decl: d.loc }); } for (let j = 0; j < n.childCount; j++) visit(n.child(j)); };
+    visit(c); } });
+  return out; }
+// 선언 바로 위의 설명 주석(// 줄·한 줄 /* */·여러 줄 /* */)까지 같이 — 파일 머리말(/* =====)과 옮김 표식(…에서 옮김 */)은 남김
+export function leadComments(src, at) { let a = at; for (;;) { const before = src.slice(0, a); if (!before.endsWith('\n')) return a; const ls = before.lastIndexOf('\n', before.length - 2) + 1, line = before.slice(ls, -1);
+    if (/^\s*\/\//.test(line)) { a = ls; continue; }
+    if (/\*\/\s*$/.test(line)) { const st = before.lastIndexOf('/*', before.length - 1); if (st < 0 || (st > 0 && src[st - 1] !== '\n')) return a; const c = src.slice(st, before.length - 1); if (/^\/\* =====|에서 옮김 \*\/$/.test(c.trim()) || /\*\/[\s\S]*\S/.test(c.replace(/\*\/\s*$/, ''))) return a; a = st; continue; }
+    return a; } }
+// 정의 안 된 이름(부르면 ReferenceError — 처리기를 나누거나 이름을 바꾸다 생기는 회귀): 스크립트마다 범위 사슬로 풀리지 않는 참조 중
+//   여러 스크립트의 맨 위 선언·전역에 붙인 이름(window·globalThis·self·root.X = …, Object.defineProperty(window, 매개변수 …)로 전역을 만드는 함수에 넘긴 글자 이름)·
+//   브라우저 전역(tools/browser-globals.json — node tools/globals.mjs가 크로미움에서 읽음)·typeof로 있는지 보는 이름(require·module) 어디에도 없는 것
+export function undefinedNames(units, globals) { const known = new Set([...(globals.window || []), ...(globals.worker || [])]), R = units.map(u => [u, unboundRefs(u.tree.rootNode)]), guarded = new Set(), definers = new Map();
+  for (const [u, r] of R) { r.top.forEach(x => known.add(x)); walk(u.tree.rootNode, n => {
+    if (n.type === 'assignment_expression') { const l = n.childForFieldName('left'); if (l?.type === 'member_expression' && /^(window|globalThis|self|root)$/.test(l.childForFieldName('object')?.text || '')) known.add(l.childForFieldName('property')?.text); }
+    if (n.type === 'call_expression' && n.childForFieldName('function')?.text === 'Object.defineProperty') { const [o, k] = n.childForFieldName('arguments')?.namedChildren || []; if (/^(window|globalThis|self)$/.test(o?.text || '') && k?.type === 'string') known.add(k.text.slice(1, -1)); }
+    if (n.type === 'unary_expression' && n.child(0)?.type === 'typeof' && n.childForFieldName('argument')?.type === 'identifier') guarded.add(n.childForFieldName('argument').text);
+    if (n.type === 'function_declaration') { const ps = n.childForFieldName('parameters')?.namedChildren.map(p => p.text) || [], def = n.childForFieldName('body')?.text.match(/Object\.defineProperty\((?:window|globalThis),\s*([A-Za-z_$][\w$]*)/); if (def && ps.includes(def[1])) definers.set(n.childForFieldName('name').text, ps.indexOf(def[1])); } }); }
+  for (const [u] of R) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression' || !definers.has(n.childForFieldName('function')?.text)) return; const a = n.childForFieldName('arguments')?.namedChildren[definers.get(n.childForFieldName('function').text)]; if (a?.type === 'string') known.add(a.text.slice(1, -1)); });
+  const out = new Map(); for (const [u, r] of R) for (const n of r.refs) { const x = n.text; if (x === 'await' || known.has(x) || guarded.has(x)) continue; const k = x + ' ' + u.loc(n); if (!out.has(k)) out.set(k, { name: x, loc: u.loc(n) }); }
+  return [...out.values()]; }
+// 읽기 결과에 쓰기(쓴 것이 사라짐): 상태를 쓰지 않고 어떤 길에서는 새 값(객체·배열 글자·clone·Object.assign({}…))을 돌려주는 읽기 함수(예: progRead·conMeta·VARIANTS)의
+//   결과에 바로 대입·push·delete — 저장 칸이 없을 때는 새 값에 써서 사라짐. 바꿀 때는 progSlot·G.meta.x = … 처럼 상태에 씀
+const FRESH = /^(\{|\[|clone\(|structuredClone\(|Object\.assign\(\{\}|\[\.\.\.)/;
+export function freshReaderWrites(units, fns, mut) { const readers = new Set(['progRead']), ret = n => { const v = n.namedChildren[0]; if (!v) return false; const t = v.type === 'ternary_expression' ? [v.childForFieldName('consequence'), v.childForFieldName('alternative')] : [v]; return t.some(x => x && FRESH.test(x.text)); };
+  for (const f of fns.values()) { if (!f.top || f.unit !== 'main' || mut.has(f.key)) continue; let hit = false; walk(f.node, n => { if (n.type === 'return_statement' && ret(n)) hit = true; if (n !== f.node && /function|arrow/.test(n.type)) return false; }); if (hit) readers.add(f.name); }
+  const rootCall = t => { let x = t; while (x && (x.type === 'member_expression' || x.type === 'subscript_expression')) x = x.childForFieldName('object'); return x?.type === 'call_expression' && readers.has(x.childForFieldName('function')?.text) ? x.childForFieldName('function').text : null; };
+  const out = []; for (const u of units) { if (u.name !== 'main') continue; walk(u.tree.rootNode, n => { let t = null;
+    if (n.type === 'assignment_expression' || n.type === 'augmented_assignment_expression') t = n.childForFieldName('left'); else if (n.type === 'update_expression') t = n.childForFieldName('argument'); else if (n.type === 'unary_expression' && n.child(0)?.type === 'delete') t = n.childForFieldName('argument');
+    else if (n.type === 'call_expression') { const g = n.childForFieldName('function'); if (g?.type === 'member_expression' && /^(push|splice|unshift|pop|shift)$/.test(g.childForFieldName('property')?.text || '')) t = g.childForFieldName('object'); }
+    if (!t || (t.type !== 'member_expression' && t.type !== 'subscript_expression' && t.type !== 'call_expression')) return; const r = rootCall(t.type === 'call_expression' ? t : t); if (r) out.push({ fn: r, loc: u.loc(n), text: n.text.slice(0, 80) }); }); }
+  return out; }

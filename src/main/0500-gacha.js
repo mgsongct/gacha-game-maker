@@ -127,4 +127,7 @@ function flipAll(){
   const next=i=>{ if(!GC) return; if(i>=n){GC.auto=false;return;} if(GC.open.has(i)) return next(i+1); revealCard(i,()=>GC&&GC.timers.push(setTimeout(()=>next(i+1),110))); };
   next(0);
 }
-
+/* 가챠 연출 건너뛰기(View): 봉인·줄기 연출을 끝내고 카드를 모두 엶 */
+function gachaSkipShow(t){ $('#gcSeal').classList.add('go'); $('#gcStreak').style.opacity=0; $('#gcStage').hidden=false; t.hidden=true; document.querySelectorAll('.pc').forEach((c,i)=>{c.classList.add('open');GC.open.add(i);}); }
+/* 가챠 컷인 닫기(View) */
+function gachaCutHide(el){ el.remove(); }

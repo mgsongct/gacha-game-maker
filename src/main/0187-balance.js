@@ -17,6 +17,14 @@ function balNormalize(c,mode='edge'){ const e=balExpected(c), b=BAL(), tol=+b.to
   const k=Math.max(.2,(target-c.spd)/base); c.hp=Math.max(10,Math.round(c.hp*k/10)*10); c.atk=Math.max(1,Math.round(c.atk*k)); c.def=Math.max(0,Math.round(c.def*k)); c.skillBalance=null; return true; }
 // AS 리마스터: 세대를 현재 세대 - 허용 차이까지 올리고, 스킬 밸런스를 다시 검사하게 해요(전투 전에 자동으로 다시 맞춰짐)
 function balRemaster(c){ const b=BAL(), cur=v2CurrentGeneration(), want=Math.max(GGMCombat.generation(c),cur-Math.max(0,+b.lag)); if(want===GGMCombat.generation(c)) return false; c.generation=want; c.skillBalance=null; return true; }
+/* 구캐릭터 AS 리마스터(세대 맞추기·점검 c_genlag): 세대만 올리면 스킬 검사는 너무 강한 것만 약화해 예전 스킬이 새 세대에서도 그대로라,
+   글 AI가 있으면 저장된 설계 의도(c.skillPlan)와 지금 스킬의 이름·효과를 지키며 새 세대 예산으로 스킬을 다시 설계해요(이름은 그대로).
+   글 AI가 없거나 실패하면 세대 표시·스킬 재검사만. 세대를 올렸으면 true */
+async function balRemasterAI(c,onProgress){ const from=GGMCombat.generation(c), old=clone(v2Ensure(c)); if(!balRemaster(c)) return false; const to=GGMCombat.generation(c);
+  if(SAMPLE){ try{ const kit=await v2GenerateSkills(c,c.skillConcept||'',onProgress||(()=>{}),{remaster:{from,to,kit:old,plan:c.skillPlan}}); Object.keys(GGMCombat.SLOTS).forEach(s=>{ if(old[s]&&old[s].name&&kit[s]) kit[s].name=old[s].name; });
+      c.skills=kit; delete c.skillTuning; c.skillBalance=null; (c.skillDesignLog||=[]).push({kind:'success',text:`구캐릭터 리마스터: ${from}세대 → ${to}세대 예산으로 스킬을 다시 설계(이름·설계 의도 유지)`}); }
+    catch(e){ quietErr(e,'balRemasterAI'); (c.skillDesignLog||=[]).push({kind:'failure',text:'리마스터 스킬 재설계를 못 해 세대만 올리고 다시 검사했어요: '+String(e&&e.message||e).slice(0,80)}); } }
+  mark('c:'+c.id); await v2ReadyChars([c]); return true; }
 function balanceOnCreate(c){ const m=G.meta; if(!m.balance) m.balance={}; if(BAL().creep==='auto') m.balance.released=(+m.balance.released||0)+1; if(BAL().autoNorm) balNormalize(c,'edge'); }
 
 function balancePanel(){ const b=BAL(), R=balReport(), out=R.filter(x=>x.statOut).length, lag=R.filter(x=>x.genLag).length;
@@ -40,7 +48,7 @@ function openBalance(){ const b=BAL(), R=balReport(), num=(id,v,min,max,step)=>`
 function balSave(){ const v=id=>+(($('#'+id)||{}).value), m=G.meta; m.balance=Object.assign(m.balance||{},{creep:$('#bal_creep').value,baseGen:Math.max(1,Math.min(5,v('bal_base')||1)),per:Math.max(1,v('bal_per')||5),maxGen:Math.max(1,Math.min(5,v('bal_max')||5)),released:Math.max(0,v('bal_rel')||0),catchUp:$('#bal_as').value,pct:Math.max(0,v('bal_pct')||0),max:Math.max(0,v('bal_cap')||0),lag:Math.max(0,Math.min(4,v('bal_lag')||0)),tol:Math.max(1,v('bal_tol')||15),autoNorm:$('#bal_auto').checked}); mark('meta'); }
 async function balFix(kind){ const ids=[...document.querySelectorAll('[data-bal]:checked')].map(x=>x.dataset.bal), cs=ids.map(charById).filter(Boolean); if(!cs.length){ toast('캐릭터를 골라 주세요'); return; }
   const label={edge:'능력치 범위 안으로',center:'능력치 기준값으로',remaster:'세대 맞추기',skill:'스킬 밸런스 재검사'}[kind]; auditSnap(cs,label); let n=0;
-  for(const c of cs){ let ok=false; if(kind==='edge'||kind==='center') ok=balNormalize(c,kind); else if(kind==='remaster') ok=balRemaster(c); else if(kind==='skill'){ c.skillBalance=null; ok=true; } if(ok){ mark('c:'+c.id); n++; } }
+  for(const c of cs){ let ok=false; if(kind==='edge'||kind==='center') ok=balNormalize(c,kind); else if(kind==='remaster'){ syBar(`${c.name} 리마스터 중…`); ok=await balRemasterAI(c,m=>syBar(`${c.name}: ${m}`)); syBar(''); } else if(kind==='skill'){ c.skillBalance=null; ok=true; } if(ok){ mark('c:'+c.id); n++; } }
   if(kind==='skill'||kind==='remaster'){ syBar('스킬 밸런스 검사 중…'); try{ await v2ReadyChars(cs.filter(c=>!c.skillBalance)); }catch(e){ quietErr(e,'0187-balance.js:44'); } syBar(''); }
   toast(`${label}: ${n}명 (되돌리기 가능)`); openBalance(); }
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;

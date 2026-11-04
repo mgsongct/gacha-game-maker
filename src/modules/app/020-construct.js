@@ -50,6 +50,18 @@ function table(input,c,pool){
   for(const k of avail){const m=mem.filter(p=>p.rarity===k),U=m.reduce((a,p)=>a+up(p),0);for(const p of m)add(p,g.p*pr[k]/100*up(p)/U);}}
  const S=[...rows.values()].reduce((a,b)=>a+b,0);
  return {info,rows:[...rows].map(([id,v])=>({id,p:S>0?v/S*100:0})).sort((a,b)=>b.p-a.p)};}
+/* 나올 대원이 없는 투입(열린 분류에 지금 허용되는 희귀도의 대원이 없음 — 예: 최소 투입은 R만 나오는데 열린 분류에 SR만 있음)일 때
+   나올 수 있는 가장 적은 투입: 지금 투입을 각 분류의 개방 최소치까지 올리고 × 분류 총량·희귀도 개방 총량(SR·SSR)까지 고르게(단위 step) 올린 후보 중
+   확률표에 대원이 있고 총량이 가장 적은 것. 지금 투입으로 나오면 그대로(changed:false), 어떤 투입으로도 안 나오면 null
+   why: 지금 투입이 비는 까닭 — 열린 분류와 그 분류 대원의 희귀도, 지금 나오는 희귀도 */
+function suggest(input,c,pool){
+ const cfg=config(c),base=normalize(input,cfg),t0=table(base,cfg,pool);if(t0.rows.length)return {input:base,changed:false};
+ const i0=t0.info,why={open:i0.groups.filter(g=>g.open).map(g=>({name:g.name,rarity:[...new Set(pool.filter(p=>inGroup(p,g.match)).map(p=>+p.rarity))].sort()})),allowed:[1,2,3].filter(k=>k===1||i0.open[k])};
+ const up=(v,goal)=>{const r=v.slice(),tot=()=>r.reduce((a,b)=>a+b,0);for(let n=0;n<400&&tot()<goal;n++){const room=r.map((x,i)=>x<cfg.max?i:-1).filter(i=>i>=0);if(!room.length)break;const each=Math.max(cfg.step,Math.ceil((goal-tot())/room.length/cfg.step)*cfg.step);room.forEach(i=>{r[i]=Math.min(cfg.max,r[i]+each);});}return r;};
+ let best=null;
+ for(const g of [{min:[0,0,0,0]},...cfg.groups]){const v=base.map((x,i)=>clamp(Math.max(x,+(g.min||[])[i]||0),cfg.min,cfg.max));
+  for(const goal of [0,+g.total||0,cfg.sr.open,cfg.ssr.open]){const w=up(v,goal),tot=w.reduce((a,b)=>a+b,0);if(best&&tot>=best.total)continue;if(table(w,cfg,pool).rows.length)best={input:w,total:tot};}}
+ return best?{input:best.input,changed:true,why}:null;}
 function weighted(items,weight,rng){const w=items.map(weight),s=w.reduce((a,b)=>a+b,0);if(!(s>0))return items[Math.floor(rng()*items.length)];let x=rng()*s;for(let i=0;i<items.length;i++){x-=w[i];if(x<0)return items[i];}return items[items.length-1];}
 /* roll: pool = 건조로 나올 수 있는 캐릭터들 [{id,rarity,role,faction}], variants = 이번 투입으로 열린 바리에이션 후보 [{tpl, bases:[...]}] */
 function roll(input,c,pool,variants,rng=Math.random){
@@ -98,6 +110,6 @@ function variantsFrom(list,o={}){if(!Array.isArray(list))return [];const F=o.fac
  return list.filter(v=>v&&typeof v==='object').map(v=>({name:String(v.name||'').replace(/[<>"'&`]/g,'').trim().slice(0,12),prompt:String(v.prompt||'').replace(/[^\x20-\x7e]/g,'').replace(/\s+/g,' ').replace(/^[ ,]+|[ ,]+$/g,'').slice(0,200),brief:String(v.brief||'').slice(0,160),cond:v.cond&&typeof v.cond==='object'?v.cond:{}}))
   .filter(v=>v.name&&v.prompt&&!seen.has(v.name)&&seen.add(v.name)).slice(0,6).map((v,i)=>{const L=(x,ok)=>(Array.isArray(x)?x:[]).map(s=>String(s).trim()).filter(ok),c={factions:L(v.cond.factions,s=>F.includes(s)),roles:L(v.cond.roles,s=>R.includes(s)),elems:L(v.cond.elems,s=>E.includes(s))};
    Object.keys(c).forEach(k=>{if(!c[k].length)delete c[k];});const d=VARIANT_DEFAULTS[i%VARIANT_DEFAULTS.length];return {name:v.name,prompt:v.prompt,brief:v.brief,chance:d.chance,recipe:{min:d.recipe.min.slice()},rarity:'same',on:true,cond:c};});}
-const api={RES,DEFAULTS,VARIANT_DEFAULTS,variantsFrom,config,normalize,matches,rates,table,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
+const api={RES,DEFAULTS,VARIANT_DEFAULTS,variantsFrom,config,normalize,matches,rates,table,suggest,roll,condMatch,variantPrompt,designBrief,symbolColor,symbolItem};
 root.GGMConstruct=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

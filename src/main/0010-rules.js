@@ -1,21 +1,12 @@
 /* =========================================================
    규칙과 형식
    ========================================================= */
-function genderText(){ const t=String(P().genderTxt||'').trim(), lk=String(P().look||'').trim(), bio=String(P().bio||'').trim(), L=(lk?`플레이어(${T('player')})의 외모: ${lk}. `:'')+(bio?pf('PLAYER_BIO',{player:T('player'),bio}):'');
-  if(t&&!/^(정하지 ?않음|없음|모름|비밀)$/.test(t)) return pf('PLAYER_GENDER_TEXT',{player:T('player'),gender:t})+L;
-  return genderText0()+L; }
-function genderText0(){ const g=P().gender; return pf(g==='m'?'PLAYER_MALE':g==='f'?'PLAYER_FEMALE':'PLAYER_GENDER_OPEN',{player:T('player')}); }
-function callText(){ const n=String(P().player||'').trim(), t=T('player'); return pf(n&&n!==t?'CALL_NAME':'CALL_TERM',{crew:T('crew'),call:t,name:n}); }
 /* 등장인물 성별 구성: f=여성만, m=남성만, mix=혼성, ''=AI가 정함. 아군·NPC를 만드는 모든 요청에 들어가요 */
 const CAST_SEX={f:'여성만',m:'남성만',mix:'여성 + 남성 혼성'};
-function castRule(k){ k=k==null?((typeof G!=='undefined'&&G&&G.meta&&G.meta.castSex)||''):k; return k==='f'?pf('CAST_SEX_F'):k==='m'?pf('CAST_SEX_M'):k==='mix'?pf('CAST_SEX_MIX'):''; }
-function rulesText(){const tone=String((G.meta&&G.meta.tone)||'').trim();return genderText()+callText()+castRule()+pf('COMMON_RULES',{tone:tone?pf('TONE_RULE',{tone}):'',player:T('player'),currency:T('currency'),gacha:T('gacha'),ops:T('ops'),abyss:T('abyss'),crew:T('crew'),talk:T('talk'),elems:ELEMS.join(', ')+(elemLine()?` (${elemLine()})`:'')});}
 // 속성 상성 문장: 실제 상성표(rulesElemMat, 없으면 BEATS)에서 만들어요(예전엔 속성 3개를 가정해 4개 이상인 게임에 틀린 상성을 알렸음)
 function elemLine(){ const m=G&&G.meta&&Array.isArray(G.meta.elems)&&G.meta.elems.length?rulesElemMat():null; return ELEMS.map(elem=>{ const s=m&&m[elem]?Object.keys(m[elem]).filter(t=>t!==elem&&m[elem][t]>1):(BEATS[elem]?[BEATS[elem]]:[]); return s.length?jo(elem,'은','는')+' '+s.join('·')+'에 강함':''; }).filter(Boolean).join(', '); }
 // 받침에 맞는 조사: jo('열정','은','는') → '열정은', jo('캐스팅','으로','로') → '캐스팅으로'(ㄹ 받침이면 '로'). 한글이 아닌 끝 글자는 '을(를)'처럼 둘 다
 function jo(w,a,b){ w=String(w??''); const c=w.charCodeAt(w.length-1)-0xAC00, j=c>=0&&c<=11171?c%28:-1; if(j<0) return w+(a==='으로'?'(으)로':a+'('+b+')'); return w+((j>0&&!(a==='으로'&&j===8))?a:b); }
-// 이미 만든 이벤트 소재를 알려 줘서 같은 얘기를 또 하지 않게 해요
-function evPastHint(skip){ const L=(G.events||[]).filter(e=>e&&e.id!==skip).slice(-12).map(e=>`${e.title}${e.desc?'('+String(e.desc).slice(0,40)+')':''}`); return L.length?pf('EV_PAST',{list:L.join(' / ')}):''; }
 Object.defineProperty(window,'RULES',{get:rulesText});
 const ROLE = {atk:'공격',def:'방어',sup:'지원'};
 const ROLE_EN={atk:'ASSAULT',def:'GUARD',sup:'SUPPORT'};

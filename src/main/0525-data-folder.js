@@ -58,12 +58,14 @@ async function dataSaveBlob(blob,name){
  if(IS_NATIVE&&CAP&&CAP.Filesystem){const FS=CAP.Filesystem,path='가챠게임메이커/'+name;try{if(FS.requestPermissions)await FS.requestPermissions();}catch(e){ quietErr(e,'0525-data-folder.js:58'); }
   await FS.writeFile({path,data:String(await blobToData(blob)).split(',')[1],directory:'DOCUMENTS',recursive:true});return 'Documents/'+path;}
  if(window.showSaveFilePicker){try{const h=await showSaveFilePicker({suggestedName:name,types:[{description:'데이터 폴더 zip',accept:{'application/zip':['.zip']}}]}),w=await h.createWritable();await w.write(blob);await w.close();return h.name;}catch(e){if(e?.name==='AbortError')return null;}}
- const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);return name;}
+ downloadBlob(blob,name);return name;}
+/* 데이터 폴더 내보내기 완료 창 내용(View) */
+function dataExportDoneHTML(where,gid){ return `${head('데이터 폴더 내보내기 완료')}<p>${esc(where)}</p><p class="muted">압축을 풀면 data/${esc(gid)}/ 안에 종류별 JSON(chars.json, chapters.json, world.json …)과 media 폴더가 있어요.</p><button class="btn" data-act="close">확인</button>`; }
 async function dataExport(){
  if(BACKUP_BUSY)return;BACKUP_BUSY=true;backupBusyOverlay(true);
  try{await flush();await appStorage.drain();const gid=PJ().active,game=JSON.parse(JSON.stringify(G)),blob=await dataExportZip(game,gid),
   name='ggm-data-'+String(game.meta?.title||gid).replace(/[^\w가-힣-]+/g,'_').slice(0,30)+'-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.zip',where=await dataSaveBlob(blob,name);
-  syBar('');if(where)openModal(`${head('데이터 폴더 내보내기 완료')}<p>${esc(where)}</p><p class="muted">압축을 풀면 data/${esc(gid)}/ 안에 종류별 JSON(chars.json, chapters.json, world.json …)과 media 폴더가 있어요.</p><button class="btn" data-act="close">확인</button>`);}
+  syBar('');if(where)openModal(dataExportDoneHTML(where,gid));}
  catch(e){syBar('');toast('내보내기 실패: '+(e.message||e));}finally{BACKUP_BUSY=false;backupBusyOverlay(false);}}
 async function dataImport(file){
  if(BACKUP_BUSY)return;if(!appStorage.durable){toast('이 환경은 안전한 가져오기를 지원하지 않습니다.');return;}

@@ -3,6 +3,28 @@
 모든 모듈은 **같은 전역 스코프**를 공유합니다(ES 모듈·번들러 없음). "모듈"은 섹션 단위 묶음이고, 서로 전역 함수·전역 변수로 직접 호출합니다.
 예외로 전투 v2 코어는 `GGMCombat` 등 네임스페이스 객체를 `globalThis`에 내보냅니다.
 
+## 0-0. 구조 원칙과 검증 (어디에 무엇을 두나 — 어긋나면 도구가 막음)
+
+원안 `index.html` 한 파일을 개발 편의·혼돈 방지를 위해 모듈로 나눴어요(CLAUDE.md §0-1). 잘못된 위치에 코드를 두거나 파편화가 생기지 않게, 원칙마다 잡는 도구와 막는 정도를 둡니다. CI(`.github/workflows/check.yml`)가 모두 돌려요.
+
+| 원칙 | 잡는 도구 | 막는 정도 |
+|---|---|---|
+| 분석한 코드 = 빌드된 SPA(`www/index.html`) 코드, 로컬 파일을 따로 불러오지 않음 | `tools/check.mjs`(`spaCheck`) · `node build/build.mjs --check` | 오류 |
+| 불러올 때 아직 없는 이름 없음(모듈 블록 → main 이름순 실행 — 코드를 옮길 때 생기기 쉬움) | `tools/check.mjs`(`tdzRefs`) | 오류 |
+| 정의 안 된 이름 없음(부르면 ReferenceError — 처리기를 나누거나 이름을 바꿀 때 생기기 쉬움, 브라우저 전역은 `tools/browser-globals.json`) | `tools/check.mjs`(`undefinedNames`) | 오류 |
+| 규칙 엔진(순수 모듈)은 DOM·앱 상태를 참조하지 않음 | `tools/check.mjs`(`pureModules`) | 오류 |
+| 프롬프트(LLM·그림)는 프롬프트 스튜디오 한 모듈(`src/main/0015-prompt-studio/`)에: 조각 등록(`pfDef`)은 스튜디오만, 지시문은 조각, 프롬프트 글·그림 태그는 스튜디오 밖에 없음(화면과 같이 쓰는 글 도구는 `tools/prompt-shared.json`에 이유와 함께) | `tools/check.mjs`(`tools/lib/prompts.mjs` 프롬프트 흐름) | 오류 |
+| 모듈 경계: 영역 침범 후보·남의 상태 쓰기·상태 파편화(3모듈 이상이 쓰는 키) | `tools/modules.mjs` · `tools/check.mjs` 래칫 | 늘면 실패 |
+| 자연 경계(함수 그래프 모듈성 최대화): 과잉 분할(서로 강하게 묶인 모듈·위성 모듈 — 지금 0)·기능 섞임(순서를 바꿔 묶어도 과반에서 나오는 것)·기능 분산(다른 한 모듈의 일을 하는 함수). 한 기능이 여러 파일이면 폴더 모듈(폴더 전체가 모듈 하나: `0015-prompt-studio/`·`0030-image/`·`0260-new-game/`·`0360-sync/`·`0510-actions/`) | `tools/modules.mjs` · `tools/check.mjs` 래칫 | 늘면 실패 |
+| 기능 영역(이 문서 절마다 적은 파일): 영역 함수가 영역 밖에·영역 상태를 밖에서 씀 | `tools/modules.mjs` | 보고 |
+| 포크 기능이 생성기 ↔ 기능 ↔ 생성물로 이어짐 | `tools/wiring.mjs --strict` | 늘면 실패 |
+| 상황별 실제 프롬프트 조합에 깨짐·과잉·과소 없음, 코드를 옮겨도 보낸 프롬프트(글·그림)가 같음 | `node tools/play/combos.mjs [--ref <git>]` | 보고 · --ref는 다르면 실패 |
+| 연관 맵이 지금 코드와 맞음(모듈 → 빌드 → index.html 생성기·실행기·편집기 → data 게임 파일, `docs/map.md`) | `node tools/map.mjs --check` | 낡으면 실패 |
+| 지금 빌드로 생성한 게임을 플레이할 때 기능이 이어짐(가챠·장 진행·세력·관계·파견·원정·건조) | `node tools/play/link.mjs` | 실패 있으면 실패 |
+| 예전 빌드로 만든·빠진 데 있는 게임을 지금 앱이 감지·보완(불러오기 이전·점검 규칙·자동 채움·기본값) | `node tools/wiring.mjs`(정적 표 — 경로 없음이 늘면 실패) · `node tools/play/upgrade.mjs`(동적 — 놓침이 있으면 실패) | 늘면 실패 · 보고 |
+
+새 기능은 새 파일이 아니라 그 기능이 속한 모듈 안에(`docs/build.md` §4 — 속할 곳은 `docs/map.md` 2·3절의 기능 표면·모듈 판정), 그 기능의 절을 이 문서에 두고 파일을 적어요. 코드를 다른 파일로 옮길 때는 `tools/move.mjs`(선언을 설명 주석째 원문 그대로, 불러올 때 아직 없는 이름이 생기면 되돌림)·`tools/prompts-move.mjs`(프롬프트 — 원문 그대로, 지역 값·화면 입력은 인자로)처럼 뜻이 같게 옮기고 위 도구로 확인해요.
+
 ## 0. 연계 지도
 
 ```
@@ -36,6 +58,8 @@
 - 데스크톱: `applyDesk()`가 가운데 세로 레이아웃 + 키보드(1~5 탭, Space/Enter, Esc).
 
 ## 2. 액션 디스패치
+
+처리기(`handle*Action`)는 **Controller**(CLAUDE.md §0-2): 입력을 읽고 Model을 부르고 다시 그리게 할 뿐, 창 HTML·DOM은 직접 만지지 않아요 — 그 기능 모듈의 View 함수(예: 우편 `openMailView`, 로비 `lobbyPokeShow`, 초안 `drTabShow`)나 공용 View 도우미를 불러요. 화면에 들어가기 전 처리는 `render`의 표 `SCREEN_ENTER`(0180 — 로비 우편·현금, 심연·도전 `rogueTick`, 공지 `noticeSeen`, 도감 `cxBadgeSync`)에서 — 그리기(`…HTML`)는 상태를 바꾸지 않아요. 파일 내려받기는 `downloadBlob`(0520) 하나. 작업(Model — AI·그림·저장·게시 등)은 단추·칸 요소를 받지 않아요: 처리기가 `uiProg(단추[, 진행 글 칸])`(0060)으로 만든 진행 알림 `rep`를 넘기고, 작업은 `rep&&rep('…')`·`rep.end()`만 불러요(`aiJSON(prompt, rep, …)`도 같음). 공용 View 도우미: `busy(t,글)`(버튼 처리 중 표시 — 되돌리는 함수를 돌려줌) · `say(칸,글)` · `chipOn(칩,켜짐)`·`chipIsOn` · `switchFlip(스위치)`(0060-util) · `modalKeep(다시 그리기)`(창 스크롤 유지 — 0230-modal). 처리기 시험: 브라우저 시험 26(실제 클릭 분배).
 
 ```js
 // 클릭 위임 (이벤트 섹션 끝)
@@ -71,6 +95,8 @@ document.addEventListener('click', async e => {
 
 ## 3. AI 연결 (글 AI)
 
+파일: `src/main/0020-ai-connect.js`(글 AI·NovelAI 설정·`aiJSON`·그림체 직접 입력 — 공용 기반)
+
 ```
 aiJSON(prompt, btn, tier, images)       // UI용: 버튼 로딩 표시, 오류 토스트, 스킬 규칙 자동 첨부
  └ SAMPLE.json  (setupAI()가 프로필 있으면 만듦; 없으면 null → "AI 등록" 안내)
@@ -98,6 +124,8 @@ aiJSON(prompt, btn, tier, images)       // UI용: 버튼 로딩 표시, 오류 �
 - 일괄 처리: `runPrep(cats, filter)` / `artAfterAI()` — AI가 새로 만든 캐릭터·배경·적의 그림을 이어서 생성.
 - 결과는 IndexedDB `img` 스토어에 저장, 객체의 `img` 필드는 키 참조. 표시용 URL은 `imgSrc(obj)`(`loadIdbImages()`가 Blob URL 캐시).
 - `IMAGE_CANDIDATES_MODULE`: 후보 여러 장 중 고르기·미리보기.
+
+파일: 그림 폴더 모듈 `src/main/0030-image/` — 010-engine(앞부분 `CHARACTER_REGEN_MODULE` 캐릭터 다시 만들기, 그림 엔진 `naiDraw`·`naiGenerate`·ComfyUI·컷 도구, NovelAI 설정·준비·생성·일괄 화면, 표정·의상 그리기 `openFaces`·`faceDrawOne`·`openMaskPainter`·`openSkin`) · 020-candidates(`IMAGE_CANDIDATES_MODULE` 후보 고르기·미리보기)
 
 ## 5. 소리
 
@@ -127,7 +155,11 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - 진입: `startBattle(chId, stId)` → `startStage(stage, ctx)` (`ctx.kind`: `main|event|farm|raid|rogue|practice` …) → 편성 확인 → `v2PrepareStage` → 전투 화면.
 - 속성 상성: `BEATS`(meta.elems 순환: 0→1→2→0), 역할 `atk/def/sup`.
 
+파일: 전투 화면·진행(`startBattle`·`bUpdate`·`bCheck`·`bEnd`) `src/main/0480-battle.js` · 보스 패턴·훈련 `src/main/0490-boss-patterns.js` · 엔진↔화면 다리(이벤트 연출 `v2DrainBattleEvents`, 표시 `pop`·`blog`) `src/modules/combat/050-bridge.js`
+
 ## 7. 대본 엔진 (VN)
+
+파일: `src/main/0460-script-engine.js`
 
 스토리·에피소드·오프닝·이벤트·톡이 공유하는 **텍스트 대본 형식**. AI도 이 형식으로 씁니다.
 
@@ -148,16 +180,18 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8. 가챠(계약)
 
+파일: `src/main/0500-gacha.js` · 픽업 `src/main/0140-pickup-new.js` `src/main/0150-pickup-existing.js`
+
 - `pull(n)` → 비용 `n*COST(120)` 차감 → `rollOne(guarSR, forceSSR, banner)` n회 → `mark('prog')` → **`await flush()` 후** 연출 `playGacha(res)`. (저장 성공 전엔 결과를 보여 주지 않음)
 - `rollOne`: 소프트 천장 확률 `softRate()`, 천장 `settings.pity`, 10연 마지막 SR 보장, 픽업 확률 `banner.rate`, 픽업 실패 시 다음 SSR 확정(`guar`), 모집 포인트(`spark`, `SPARK` 포인트로 교환). 중복은 `dup`(돌파, 최대 5) + `REFUND` 환급.
 - `bannerPool(b)`: `pool.mode`(all/factions/ids)로 후보 결정.
 
 ## 8-1. 건조/영입 · 원정 · 바리에이션
 
-- 엔진 `GGMConstruct`(`src/modules/app/020-construct.js`, 순수): `rates`(분류 개방·비중, 희귀도 캡) → `table`(캐릭터별 확률) → `roll`. `condMatch`(바리에이션 적용 조건), `variantPrompt`/`designBrief`(디자인 프롬프트), `variantsFrom`(새 게임이 만든 바리에이션 기본형 정리)
+- 엔진 `GGMConstruct`(`src/modules/app/020-construct.js`, 순수): `rates`(분류 개방·비중, 희귀도 캡) → `table`(캐릭터별 확률) → `roll`. `suggest`(나올 대원이 없는 투입이면 나올 수 있는 가장 적은 투입과 그 까닭 — 첫 건조 빈손 방지). `condMatch`(바리에이션 적용 조건), `variantPrompt`/`designBrief`(디자인 프롬프트), `variantsFrom`(새 게임이 만든 바리에이션 기본형 정리)
 - 생성기 연결 `src/main/0505-construct.js`: 세계관 단계 스키마 `CON_TERMS_SCHEMA`·`VARIANT_SCHEMA`, `variantsFromAI`(엔진 정리 + id)
-- 화면·상태 `src/main/0505-construct.js`: `constructHTML`(탭 `construct`, 계약 화면 위 진입), `conBuild`, `conBuy`, `conDispReward`(파견 보상에 자원), `conMakeVariant`(AI `aiAltChar` 또는 규칙), 설정 `openConSet`
-- 이격 상속 `src/main/0065-inherit.js`: `mark()`에서 `inheritOnMark`, `fix()`에서 `inheritAll`, `flush()`에서 `inheritStore`
+- 화면·상태 `src/main/0505-construct.js`: `constructHTML`(탭 `construct`, 계약 화면 위 진입 — 처음 기본 투입 `conDefaultInput`, 빈 투입 안내 `conEmptyWhy`), `conBuild`(빈 투입이면 맞춘 투입으로, 자원이 모자라면 캐시 상점 ₩0 보충 `cashTopUp`), `conBuy`, `conDispReward`(파견 보상에 자원), `conMakeVariant`(AI `aiAltChar` 또는 규칙), 설정 `openConSet`
+- 이격 상속 `src/main/0065-inherit.js`: 이격 data는 `c.alt`(원본 id)·`c.over`(원본과 다른 항목만)·`c.cvar`(바리에이션 기본형 id), `mark()`에서 `inheritOnMark`, `fix()`에서 `inheritAll`, `flush()`에서 `inheritStore`
 - 설계·수치: [research/construction.md](research/construction.md), [research/variants.md](research/variants.md)
 
 ## 8-2. 원정 모드
@@ -169,20 +203,20 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8-2-1. 게임 규칙 (상성·능력치)
 
-- `src/main/0185-game-rules.js`: 생성기 연결(반응 스키마 `REACT_SCHEMA`, `elemName`·`reactClean`), `G.meta.rules` 편집(`openRules`), `rulesApply`(applyMeta에서 BEATS·`GGMCombat.applyRules`), `rulesOptions`(v2Options로 전투·밸런스 검사에 전달), 캐릭터 화면 `rulesCharHTML`, 도감 `rulesCodex`
+- `src/main/0185-game-rules.js`: 생성기 연결(반응 스키마 `REACT_SCHEMA`, `elemName`·`reactClean`), `G.meta.rules` 편집(`openRules`), `rulesApply`(applyMeta에서 BEATS·`GGMCombat.applyRules`), `rulesOptions`(v2Options로 전투·밸런스 검사에 전달), 포지션 `posValid`(기본형 셋이 다 있어야 받음 — 새 게임 생성도 씀)·`posSpread`(기본형이 같은 포지션에 고루 배정)·`posAI`(점검 `g_pos` — 포지션 없는 예전 게임에 세계관 맞춤 포지션 설계, 실행 중 자동 채움), 캐릭터 화면 `rulesCharHTML`, 도감 `rulesCodex`
 - 전투 엔진: `damage()`의 속성 배율 = `sim.elemAdv/elemDis × relMul`, `create()`에서 `synergy()`. 역할 기본 능력치·속도·희귀도 배율은 `CHARACTER_BASE_STATS`·`ROLE_SPEED`·`RARITY_STAT_MUL` 표(기본값 `RULE_DEFAULTS`)
 - 설계: [research/game-rules.md](research/game-rules.md)
 
 ## 8-2-2. 밸런스 관리
 
-- `src/main/0187-balance.js`: `BAL()`(G.meta.balance), `balanceGeneration`(v2CurrentGeneration이 먼저 물어봄), `balanceOptions`(전투 보정 → rulesOptions → v2Options), `balInfo/balNormalize/balRemaster`, 생성 시 `balanceOnCreate`(cleanChar)
+- `src/main/0187-balance.js`: `BAL()`(G.meta.balance), `balanceGeneration`(v2CurrentGeneration이 먼저 물어봄), `balanceOptions`(전투 보정 → rulesOptions → v2Options), `balInfo/balNormalize/balRemaster`, 구캐릭터 AS AI 리마스터 `balRemasterAI`(저장된 스킬 설계 의도 `c.skillPlan`·이름을 지키며 새 세대 예산으로 다시 설계 — 세대 맞추기·점검 `c_genlag`), 생성 시 `balanceOnCreate`(cleanChar)
 - 엔진 `genBoost`: 세대 차이당 보정(아군만)
 - 설계: [research/balance.md](research/balance.md)
 
 ## 8-2-3. 캐릭터 개성·인연 톡·메모리얼
 
 - `src/main/0455-persona.js`: `c.persona`·`c.pfields`·`c.memorial`, `personaReview`(검수 점수), `personaAI`(채우기·다듬기), `personaAIReview`, `talkAffGen`(aff 트리거 톡), `memorialGen`, `memoOn`(로비 대사 → `affLinePool0`), 캐릭터 정보 탭 `personaHTML`
-- 생성기 연결: 프로필 틀 `PROFILE_TPLS`·스키마 `PROFILE_TPL_SCHEMA`
+- 생성기 연결: 프로필 틀 `PROFILE_TPLS`·스키마 `PROFILE_TPL_SCHEMA`. 점검 `c_persona`·`c_persona_weak`·`c_pfields`(프로필 항목만 빔 → 개성 채우기)
 - `personaBrief`가 `ctx()`에 들어가 모든 AI 생성이 말투를 지킴. 새 캐릭터 스키마(`charSchema`)에 persona·pfields
 - 설계: [research/character.md](research/character.md)
 
@@ -194,11 +228,13 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8-2-5. 프롬프트 스튜디오
 
-- `src/main/0025-prompt-studio.js`: 조각 등록 `pfDef(id,label,get)` → `window[id]` 게터 → `promptFrag(id)`(게임별 덮어쓰기·덧붙이기 `G.meta.prompts`). 글 AI 지시문은 모두 이 파일의 「조각 모음」 한곳에 있어요(조각 184개 — 공통 형식·세계관·규칙·세력·등장·스토리·연출·생성기·공통 규칙·AI 컨텍스트·그림·화면 동작 등 묶음, 끝은 「조각 모음 끝」 표식). 수치·이름이 들어가는 조각은 `{이름}` 자리를 두고 호출 지점이 `pf('ID',{이름:값})`으로 채움(덮어쓴 글도 같은 자리). 고칠 때는 여기서, 게임별로는 스튜디오 화면(덮어쓰기·덧붙이기·AI 다듬기)에서
-- 도구가 다른 파일의 `pfDef`(오류)와 스튜디오 밖 지시문(늘면 실패)을 잡음(`tools/lib/prompts.mjs`)
+파일: `src/main/0015-prompt-studio/` (폴더 모듈 — AI 연결(0020)보다 먼저 돌아 그림 설정 기본값이 스튜디오의 태그를 씀)
+- `010-studio.js`: 조각 등록 `pfDef(id,label,get)` → `window[id]` 게터 → `promptFrag(id)`(게임별 덮어쓰기·덧붙이기 `G.meta.prompts`), `pf('ID',{이름:값})`(조각의 `{이름}` 자리 채움). 글 AI 지시문은 모두 「조각 모음」 한곳(끝은 「조각 모음 끝」 표식) — 연결 층 끝 지시(`JSON_ONLY_SUFFIX`)·새 게임·이벤트·픽업·그림·스킬·장비 설계 지시 포함. 교훈·그림 점검·AI 기록·스튜디오 화면
+- `020-requests.js` 요청 조립: 기능 파일이 글 AI·그림 AI에 보내는 요청 글(머리말·답 형식 견본·조건부 지시)을 만드는 함수(`buildNewGameDraftPrompt`·`aiChapterGen0Prompt`·`personaAIPrompt`·`ainaiPrompt` …). 기능 파일은 데이터(지역 값·화면 입력 값)만 넘김 — `tools/prompts-move.mjs --req`로 원문 그대로 옮김
+- `030-builders.js` 조립 함수: 여러 요청이 같이 쓰는 프롬프트 글 — AI 컨텍스트 `ctx`·`factionCtx`·`castLockCtx`·`castPlanData`·`relCtx`·`planCtx`·`drCtx`, 답 형식 견본 `charSchema`·`stageSchema`·`modeSchema()`·`*_SCHEMA`, 연결 층 `llmWrap`(지침·교훈 끼우기), 그림 `composeNai`·`composeCG`·`NAI_POSES`·`NAI_FRONT`·`FACE_TAGS`·그림 설정 기본 태그(`NAI_PARTS_DEF`·`NAI_NEG_DEF`·`COMFY_TAGS_DEF`)·그림체 프리셋 `STYLE_PRESETS`, 스킬 설계 `v2SlotPrompt`·`v2PalettePrompt`·`v2DesignContext`
+- 화면과 같이 쓰는 글 도구(도감 항목·스킬 설명·대본 해석·관계 한 줄 등)는 제 기능 파일에 두고 `tools/prompt-shared.json`에 이유와 함께 적음
+- 도구(오류로 막음): 다른 모듈의 `pfDef`, 스튜디오 조각이 아닌 지시문, 스튜디오 모듈 밖 프롬프트 글(LLM·그림), 목록에 있는데 코드에 없는 공용 글 도구(`tools/lib/prompts.mjs`·`tools/lib/analyze.mjs`). 상황별 실제 프롬프트 조합·깨짐·과잉·과소는 `node tools/play/combos.mjs`
 - 그림 가드 `imgGuard(kind,tags)`: `composeNai`가 배경·소품·지도·아이콘에서 사람 태그를 빼고 `no humans` 머리말을 붙임
-- 교훈 `plList/plHit/plAdd`(appStorage `ggm-plessons`) → `llmWrap`이 `plInject`로 끼움. 점검 규칙 `l_imgperson`
-- 설계: [research/prompts.md](research/prompts.md)
 
 ## 8-2-6. 전장 규칙 · 시련의 탑 · 일정
 
@@ -221,7 +257,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 8-2-9. 세력 · 적 도감 · 등장/영입
 
-- `src/main/0445-factions.js`: `factions()`(kind·rel·stance 정리), `stanceAt`·`stanceApply`(장 생성 `stance`), `factionCtx`·`castLockCtx`(ctx), 생성기 연결 `factionMatch`·`castPlanData`, `factionReview`·`factionAI`, `monsterNames`·`isMonsterLike`·`monsterFromGen`(addNewChars·addNpcs)·`charToMonster`, `castLock/castOk`(bannerPool·conPool), `metInStory`·`firstSpeak`, 화면 `openWorldDesign`
+- `src/main/0445-factions.js`: `factions()`(kind·rel·stance 정리), `stanceAt`·`stanceApply`(장 생성 `stance`), 예전 게임 보완 `stanceAI`(점검 `w_stance`·실행 중 자동 채움), `factionCtx`·`castLockCtx`(ctx), 생성기 연결 `factionMatch`·`castPlanData`, `factionReview`·`factionAI`, `monsterNames`·`isMonsterLike`·`monsterFromGen`(addNewChars·addNpcs)·`charToMonster`, `castLock/castOk`(bannerPool·conPool), `metInStory`·`firstSpeak`, 화면 `openWorldDesign`
 - 점검 `w_faction`·`c_monster`·`c_debut` · 설계: [research/factions-cast.md](research/factions-cast.md)
 
 ## 8-2-10. 스테이지 양식(회담·콘테스트)
@@ -238,18 +274,25 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 9. 성장 · 경제 · 콘텐츠
 
+파일: `src/main/0090-growth.js` `src/main/0240-growth-curve.js` `src/main/0190-shop.js` 레이드 `src/main/0110-challenge-raid.js` · 심연 탐사(런·던전·카드 전투) `src/main/0120-abyss.js` · 라이브 운영 `src/main/0280-live-ops.js` `src/main/0290-season-rotation.js`
+
 - 성장(성장·성장 곡선 섹션): 레벨(최대 120, 71~ 초월승급), 돌파, 스킬 강화, 전용 무기, 호감도(`addAff`, 레벨별 대사·에피소드 해금). 비용 공식은 `GGMCombat.growthCost/limitBreakCost` 등.
-- 일일/주간 카운터: `dm()` / `bump(key)`(미션·패스 진행).
-- 상점: 보급 상점(일일), 캐시 상점(전부 무료 재화), 이벤트 상점, 자동 스킨 상점.
-- 파견(`dispatches`), 재료 던전(`meta.farms`), 레이드, 심연 탐사(로그라이크·카드 전투, `RG()`).
+- 일일/주간 카운터: 진행 칸 `dm` / `bump(key)`(미션·패스 진행).
+- **진행 칸 정의(G.prog)** — 한곳 `src/main/0070-save.js` 머리(`DEFAULT_PROG` · `PROG_SLOTS`: 칸마다 만들기 `make` · 형식 `ok` · 날/주 바뀜 `stale` · 형식 보정 `fill` · 매번 맞춤 `now` · 그리기 전 갱신 `tick`). 기능 규칙은 제 모듈 함수로 이 표에 걸어요(`stamRegen` 0090 · `raidNew` 0110 · `dispBoardFill` 0274 · `expedFill`·`expedOn` 0275 · `cresFill` 0505). 접근(CLAUDE.md §0-2 계층): Model·Controller는 `progSlot(칸)`(맞춰 저장하고 돌려줌), View는 `progRead(칸)`(상태 그대로 — 없거나 지난 칸은 새 값을 만들어 보여 주기만), `progTick()`은 그리기 전(`render`)·30초 타이머·부팅에서 날 바뀐 칸 등을 저장. 새 진행 칸은 이 표에 넣어요(기능 파일에 접근 함수를 따로 두지 않음).
+- 상점: 보급 상점(일일), 캐시 상점(전부 무료 재화 — 자원 보급 `CASH_RES`: 건조 자원·성장 재료 ₩0, 모자라면 멈추지 않고 ₩0 보충 `cashTopUp` — `src/main/0190-shop.js` — 화면 `cashHTML`도 같은 파일), 이벤트 상점, 자동 스킨 상점.
+- 파견(`dispatches`), 재료 던전(`meta.farms`), 레이드, 심연 탐사(로그라이크·카드 전투, 진행 칸 `rogue`).
 - **라이브 운영** `liveTick()`: 켤 때·화면 복귀 때 주기(`LIVE_CYC`)마다 AI로 새 톡/이벤트/챕터/픽업/스킨을 자동 생성, 시즌 로테이션(`SEASONS`). 구독 게임은 자동 생성 안 함.
 
 ## 10. 메신저(등대톡) · 갠톡
+
+파일: `src/main/0100-messenger.js`(등대톡 스레드·갠톡 자유 채팅) · 플레이어 프로필 `src/main/0160-player-profile.js`
 
 - `threads[]`의 대본을 `trigger` 조건(스테이지 클리어 등)에 따라 `prog.inbox`로 배달, `openPhone(tid)`.
 - 갠톡: 캐릭터와 AI 자유 채팅. 결과는 스토리 기억에 반영될 수 있음.
 
 ## 11. 스토리 공장 · 새 게임 · 기억
+
+파일: 스토리 공장(집필·새 대원 만들기 `cleanChar`·`sysStats`) `src/main/0250-story-factory.js` · 새 게임 `src/main/0260-new-game/`(010-draft 초안 화면 · 020-build 만들기 `buildNewGameDraft`·`newGame`·그림 유지 리롤) `src/main/0330-casting.js` · 관계·기억 `src/main/0450-relations-memory.js` `src/main/0530-story-memory.js` · 도감 `src/main/0300-codex.js`
 
 - 새 게임 초안(`openDraft`)·장르 마법사(`showSetup`): 세계관 → 캐릭터 → 오프닝(배경·소품·음악·배너 포함) → 1장 순서로 AI 다단계 생성(`buildNewGameDraft`, 단계별 `ngStep`이 최대 3회 시도·초안에 저장해 이어 쓰기). 1장은 이후 장과 달리 한 번의 호출로 대본까지 씀. 생성 중에는 `NEW_GAME_SOURCE`가 설정되어 저장·탭 이동이 막힘. 계측과 개선 안건은 [research/generation-pipeline.md](research/generation-pipeline.md).
 - 스토리 공장: 챕터 구성 → 스테이지마다 집필 → 요약·관계(`rels`)·톡 생성.
@@ -257,6 +300,8 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 - 캐스팅: 오프닝 전 캐릭터 그림을 확정.
 
 ## 12. 동기화 · 백업 · 공유
+
+파일: 동기화 `src/main/0360-sync/`(010-common 공통: 설정·저장 키·합치기·진행 막대 · 020-pc-server · 030-github PC·폰 연동 · 040-boot 시작 시 받기 · 050-single-device 한 기기 플레이) · GitHub API 클라이언트 `src/main/0335-github-api.js`(동기화·게시가 같이 씀) · 게시·구독 `src/main/0400-publish-subscribe.js` · 백업·공유 팩·백업 파일 내보내기 `src/main/0520-backup-storage.js` · 데이터 폴더 `src/main/0525-data-folder.js`
 
 | 기능 | 함수 | 저장소 |
 |---|---|---|
@@ -269,6 +314,8 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 | 시작 시 자동 받기 | `bootSync()` | PC 또는 GitHub |
 
 ## 13. 앱 업데이트
+
+파일: `src/main/0420-app-update.js`(업데이트 채널·확인·안내·적용·설정 — `UPDATE_GUIDANCE_MODULE` 포함)
 
 ```
 version.json(GitHub raw, RELEASE_REPO/main) ─▶ build > APP_BUILD ?

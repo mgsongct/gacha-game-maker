@@ -25,8 +25,11 @@ export function reachable(units, fns, html = '', deadActs = new Set()) {
   return seen;
 }
 // 글에서 코드 이름 뽑기: `…` 안 이름, 낙타 표기(소문자로 시작·대문자 섞임), 대문자 상수(_ 포함 4자 이상), 상태 키, src 파일 이름(0465-story-plan)
-export function claimNames(text) { const out = new Set(), add = s => { s = s.replace(/\(\)$/, '').replace(/[.,:;]+$/, ''); if (s.length >= 4 && /^(?:[A-Za-z_$][\w$]*|P\(\))(?:\.[A-Za-z_$][\w$]*)*$|^0\d{3}-[a-z-]+$/.test(s)) out.add(s); };
-  for (const m of text.matchAll(/`([^`\n]{2,60})`/g)) for (const w of m[1].split(/[\s/·,+]+/)) if (/^[A-Za-z_$][\w$.()]*$/.test(w)) add(w);
+// 코드 이름이 아닌 것은 뺌: 링크 주소·맨 주소(외부 문서의 경로 조각), 경로(/가 든 것), 브라우저 전역 API(navigator.storage.persist 등 — 앱 코드가 아님)
+const WEB_API = /^(navigator|document|window|console|Math|JSON|Object|Array|Promise|URL|crypto|location|history|indexedDB|caches)\./;
+export function claimNames(text) { const out = new Set(), add = s => { s = s.replace(/\(\)$/, '').replace(/[.,:;]+$/, ''); if (s.length >= 4 && !WEB_API.test(s) && /^(?:[A-Za-z_$][\w$]*|P\(\))(?:\.[A-Za-z_$][\w$]*)*$|^0\d{3}-[a-z-]+$/.test(s)) out.add(s); };
+  text = String(text).replace(/\]\([^)\s]*\)/g, ']').replace(/https?:\/\/\S+/g, ' ');
+  for (const m of text.matchAll(/`([^`\n]{2,60})`/g)) for (const w of m[1].split(/[\s·,+]+/)) if (!w.includes('/') && /^[A-Za-z_$][\w$.()]*$/.test(w)) add(w);
   for (const m of text.matchAll(/\b([a-z][a-z0-9]*[A-Z][A-Za-z0-9]*)\b/g)) add(m[1]);
   for (const m of text.matchAll(/\b([A-Z][A-Z0-9]*_[A-Z0-9_]+)\b/g)) add(m[1]);
   for (const m of text.matchAll(/\b((?:G\.meta|G\.world|P\(\))\.\w+)/g)) add(m[1]);

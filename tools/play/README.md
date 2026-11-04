@@ -17,11 +17,24 @@ node tools/play/qa.mjs <게임 폴더>                  # 그 폴더의 게임(p
 node tools/play/shots.mjs <게임 폴더>               # 새 플레이어로 화면 플레이·캡처 → shots/
 node tools/play/regress.mjs [--ref <git 기준>] [게임 폴더…]   # 같은 응답을 기준 빌드와 지금 빌드에 넣어 새 게임 생성 결과 비교 → reports/regress.md
 node tools/play/faults.mjs [시나리오…]              # 생성기 실패 주입 → reports/faults.md
+node tools/play/link.mjs [--saved]                  # 플레이 연계: 지금 빌드로 게임 생성(기록된 응답) → 새 플레이어로 가챠·장 진행·세력·관계·파견·원정·건조 연계 → reports/link.md
+node tools/play/upgrade.mjs                         # 구버전·미비 게임 감지·보완: 포크 기능 데이터를 하나씩 뺀 예전 게임을 지금 빌드에 불러와 점검 알림·감지·자동 보완·보완 뒤 새 문제 확인 → reports/upgrade.md(먼저 node tools/wiring.mjs)
+node tools/play/combos.mjs [--ref <git>] [--quick]   # 프롬프트 조합 검증: 흐름(요청 지점)×상황(설정·상태·새 게임 입력)마다 실제로 조합된 프롬프트를 받아 깨짐·과잉·과소 검사 → reports/combos.md
 node tools/play/prompts.mjs <게임 폴더…>            # 생성 프롬프트 점검(스튜디오 조각 비율·되풀이·충돌·샘플 이름) → reports/prompts.md
 node tools/play/prompts.mjs --regress <게임 폴더…>  # 같은 점검을 회귀 재생이 지금 빌드로 보낸 프롬프트(regress/prompts)에 → reports/prompts-regress.md
 node tools/play/test.mjs                           # 도구 자체 검사(fixtures/mini)
 node tools/play/rekind.mjs <게임 폴더> [--dry]       # kind 규칙이 바뀌었을 때 prompts/·responses/ 이름 옮기기
 ```
+
+## 프롬프트 조합 검증 (`combos.mjs`)
+
+- **흐름**: 글 AI 요청 지점(정적 — `tools/lib/combos.mjs`·`tools/lib/prompts.mjs` promptFlow). 받는 호출(aiJSON·aiCall·SAMPLE.json, 받은 프롬프트를 넘기는 감싸기 — 넘겨받은 글 AI의 `s.json(p)`까지)마다 프롬프트 인자 식과, 그 식이 쓰는 지역 변수 값·부르는 함수가 돌려주는 식·글 상수를 따라감. 연결 층(aiCall·aiJSON이 모든 요청에 덧붙이는 글)은 따로.
+- **가능한 조합**: 지점마다 쓰는 스튜디오 조각과 갈래(삼항·`&&`·`||`·`if`로 조각·글이 들고 남) — 조합 수 = 2^갈래. 갈래마다 두 쪽의 표지(조각 id·코드 글 덩어리)를 둠.
+- **상황**: 게임(tools/play/games의 저장 게임) × 상황(마지막 스테이지 형식·이야기 빠르기·플레이어 플롯·파견 방식·출연 성별·2차 창작·개성 시트·세력 — 한 번에 하나씩) + 새 게임 입력(자동·직접 플롯/2차 창작/주인공·초안 대원/NPC·여성만/빠르게). 흐름 진입은 앱이 부르는 방식대로(`FLOWS` 표), 화면 동작(분배기 case)은 그 case가 읽는 입력 칸·dataset을 만들어 자동으로 누름.
+- **가짜 글 AI**: 새 게임은 기록된 응답(kind), 나머지는 프롬프트의 형식 견본(`JSON만 출력:` 뒤)을 그대로 답함. 보낸 프롬프트는 스택의 함수 이름으로 지점에 붙임. 시각·난수 고정(기준 비교용).
+- **검사**: 깨짐(안 채운 `{자리}`·undefined/NaN/[object Object]·빈 머리말·형식 표식 여러 개·견본 안 닫힘) · 과잉(같은 줄·같은 조각 되풀이, 충돌 지시 — `lib/conflicts.mjs`, 답에 온 키를 코드가 읽지 않음 — 실행 중 게터로 잼) · 과소(JSON 답인데 형식 표식·견본 없음). 정보: 견본 뒤 글, 코드가 읽을 수 있는데 요구하지 않은 키(정적 추정).
+- **갈래 관찰**: 갈래의 두 쪽이 실제 프롬프트에 나왔는지 — 못 본 쪽은 검증 안 된 조합. 실행으로 안 닿은 지점도 표로.
+- **`--ref <git>`**: 같은 상황·흐름을 그 커밋 빌드에서도 돌려 프롬프트를 바이트 단위로 비교(프롬프트 코드를 옮기거나 고친 뒤 뜻이 같은지 — 다르면 종료 코드 1). 지점마다 견본 프롬프트·요청별 기록은 `tools/out/combos/`(git에서 뺌).
 
 ## 게임 폴더
 

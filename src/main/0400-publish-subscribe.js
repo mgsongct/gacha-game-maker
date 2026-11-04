@@ -24,9 +24,15 @@ function pubContent(){ const game=JSON.parse(JSON.stringify(G)); delete game.pro
   delete game.meta.subscr; if(game.meta.pub) game.meta.pub={slug:game.meta.pub.slug,ver:game.meta.pub.ver};
   return game; }
 let PUBJOB=null;
+/* 게임 게시 완료 창 내용(View) */
+function pubDoneHTML(ver,o,dir,need){ return `${head('게시했어요',`<span class="muted">「${esc(G.meta.title)}」 v${ver}</span>`)}
+      <p style="margin:0 0 6px">이 주소를 받은 사람은 설정 → 게임 → 🔗 게임 구독에 넣으면 이 게임을 받고, 다음 게시부터 자동으로 업데이트를 받아요.</p>
+      <textarea class="in" id="pub_addr" readonly style="min-height:56px">${esc(subAddr(o.repo,o.branch,dir))}</textarea>
+      <p class="muted" style="font-size:.78rem;margin:4px 0 0">새 그림 ${need.length}장을 올렸어요. GitHub가 파일을 퍼뜨리는 데 몇 분 걸릴 수 있어요. 저장소는 꼭 공개(Public)로 두세요.</p>
+      <div class="row" style="margin-top:10px"><button class="btn" data-act="pubcopy">주소 복사</button><button class="btn ghost" data-act="close">닫기</button></div>`; }
 async function pubUpload(notes,btn){ const P0=PUB(); if(!P0.token||!/^[\w.-]+\/[\w.-]+$/.test(String(P0.repo||'').trim())){ toast('토큰과 저장소(주인/이름)를 넣어 주세요'); return; } if(PUBJOB){ toast('이미 게시하는 중이에요'); return; }
-  const o={token:P0.token,repo:P0.repo.trim(),branch:P0.branch||'main'}, M=pubMeta(), dir='games/'+M.slug, lbl=btn&&btn.textContent; PUBJOB=true; if(btn) btn.disabled=true;
-  const st=m=>{ syBar(m); if(btn&&btn.isConnected) btn.textContent=m; };
+  const o={token:P0.token,repo:P0.repo.trim(),branch:P0.branch||'main'}, M=pubMeta(), dir='games/'+M.slug, done=btn?busy(btn):()=>{}; PUBJOB=true;
+  const st=m=>{ syBar(m); if(btn&&btn.isConnected) say(btn,m); };
   try{ st('저장소 확인 중…'); await flush();
     const ref=await ghEnsureBranch(o);
     let hd=ref.object.sha; const cm0=await gh(o,'/git/commits/'+hd), tree0=await gh(o,'/git/trees/'+cm0.tree.sha+'?recursive=1'), have=new Set((tree0.tree||[]).filter(x=>x.type==='blob').map(x=>x.path));
@@ -43,13 +49,9 @@ async function pubUpload(notes,btn){ const P0=PUB(); if(!P0.token||!/^[\w.-]+\/[
     entries.push({path:dir+'/game.json',mode:'100644',type:'blob',sha:gb.sha},{path:dir+'/manifest.json',mode:'100644',type:'blob',sha:mb.sha});
     await ghCommitFiles(o,{head:hd,treeSha:cm0.tree.sha},entries,`${G.meta.title} v${ver}`);
     M.ver=ver; M.at=man.at; M.repo=o.repo; M.branch=o.branch; mark('meta');
-    openModal(`${head('게시했어요',`<span class="muted">「${esc(G.meta.title)}」 v${ver}</span>`)}
-      <p style="margin:0 0 6px">이 주소를 받은 사람은 설정 → 게임 → 🔗 게임 구독에 넣으면 이 게임을 받고, 다음 게시부터 자동으로 업데이트를 받아요.</p>
-      <textarea class="in" id="pub_addr" readonly style="min-height:56px">${esc(subAddr(o.repo,o.branch,dir))}</textarea>
-      <p class="muted" style="font-size:.78rem;margin:4px 0 0">새 그림 ${need.length}장을 올렸어요. GitHub가 파일을 퍼뜨리는 데 몇 분 걸릴 수 있어요. 저장소는 꼭 공개(Public)로 두세요.</p>
-      <div class="row" style="margin-top:10px"><button class="btn" data-act="pubcopy">주소 복사</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
+    openModal(pubDoneHTML(ver,o,dir,need)); }
   catch(e){ toast('게시 실패. '+syErr(e)); }
-  finally{ PUBJOB=null; syBar(''); if(btn&&btn.isConnected){ btn.disabled=false; if(lbl) btn.textContent=lbl; } } }
+  finally{ PUBJOB=null; syBar(''); done(); } }
 function openPub(){ const P0=PUB(), M=G.meta.pub||{}, dir=M.slug?'games/'+M.slug:'';
   openModal(`${head('🌐 게임 게시',`<span class="muted">다른 사람이 구독하고 업데이트를 받아요</span>`)}
     <p class="muted" style="margin:0 0 8px;font-size:.82rem">내 GitHub <b>공개</b> 저장소에 이 게임을 올려요. 진행 상황·API 키·음성은 올라가지 않아요. 새 장·이벤트를 만든 뒤 다시 게시하면 구독한 사람에게 업데이트가 가요(그 사람의 진행·보유 캐릭터는 그대로).</p>
@@ -73,8 +75,8 @@ async function subPullImages(base,game,ns,had,st,prefix){
   if(prefix)await appStorage.stage(prefix+x.id,{key:x.id,blob});else await idbPut(ns+x.id,blob);x.img={idb:true};
  }return imap;
 }
-async function subscribe(addr,btn){const base=subParse(addr);if(!base){toast('게임 구독 주소를 읽지 못했습니다');return;}
- const prefix='subscribe-'+uid()+'::',source=G,project=PJ().active,lbl=btn?.textContent,st=m=>{syBar(m);if(btn?.isConnected)btn.textContent=m;};if(btn)btn.disabled=true;
+async function subscribe(addr,rep){const base=subParse(addr);if(!base){toast('게임 구독 주소를 읽지 못했습니다');return;}
+ const prefix='subscribe-'+uid()+'::',source=G,project=PJ().active,st=m=>{syBar(m);if(rep)rep(m);};
  try{st('게임 정보 받는 중…');const man=JSON.parse(await subGet(base,'manifest.json'));if(man?.kind!=='pub')throw Error('게임 구독 주소가 아닙니다');
   const dup=PJ().list.find(x=>x.sub===base);if(dup&&!(await appConfirm(`「${man.title}」은(는) 이미 구독 중이에요. 하나 더 추가할까요?`)))return;
   const game=JSON.parse(await subGet(base,'game.json'));if(!Array.isArray(game?.chars))throw Error('캐릭터 자료가 올바르지 않습니다');const id2='g'+uid(),ns=id2+'::';const imap=await subPullImages(base,game,ns,null,st,prefix);delete game.images;
@@ -83,7 +85,7 @@ async function subscribe(addr,btn){const base=subParse(addr);if(!base){toast('�
   if(G!==source||PJ().active!==project)throw Error('작업 중 게임이 바뀌어 구독 적용을 취소했습니다');await flush();const pj=PJ();pj.list.push({id:id2,title:man.title||'구독 게임',sub:base});pj.active=id2;
   await appStorage.commitImport(prefix,pjKey(id2),JSON.stringify(game),ns,{[PJKEY]:JSON.stringify(pj)});toast('구독 게임을 저장했어요. 다시 시작할게요');setTimeout(()=>reloadGame(),900);
  }catch(e){toast('구독 실패. '+(e.message||e));}
- finally{await appStorage.discard(prefix).catch(()=>{});syBar('');if(btn?.isConnected){btn.disabled=false;btn.textContent=lbl;}}
+ finally{await appStorage.discard(prefix).catch(()=>{});syBar('');if(rep)rep.end();}
 }
 let SUBCHK=null;
 async function subCheck(manual){ const S=G.meta.subscr; if(!S||!S.base) { if(manual) toast('구독한 게임이 아니에요'); return null; }
@@ -96,7 +98,7 @@ async function subCheck(manual){ const S=G.meta.subscr; if(!S||!S.base) { if(man
       <div class="row" style="margin-top:12px"><button class="btn" data-act="subapply">지금 받기</button><button class="btn ghost" data-act="subskip" data-v="${man.ver}">나중에</button></div>`);
     return man; }
   catch(e){ if(manual) toast('업데이트 확인 실패. '+((e&&e.message)||'')); return null; } }
-async function subApply(btn){const S=G.meta.subscr;if(!S)return;const prefix='sub-update-'+uid()+'::',source=G,project=PJ().active,lbl=btn?.textContent,st=m=>{syBar(m);if(btn?.isConnected)btn.textContent=m;};if(btn)btn.disabled=true;
+async function subApply(rep){const S=G.meta.subscr;if(!S)return;const prefix='sub-update-'+uid()+'::',source=G,project=PJ().active,st=m=>{syBar(m);if(rep)rep(m);};
  try{st('새 버전 받는 중…');const man=SUBCHK?.ver?SUBCHK:JSON.parse(await subGet(S.base,'manifest.json'));const game=JSON.parse(await subGet(S.base,'game.json'));if(!Array.isArray(game?.chars))throw Error('캐릭터 자료가 올바르지 않습니다');
   const imap=await subPullImages(S.base,game,IMGNS,S.imgs||{},st,prefix);delete game.images;if(G!==source||PJ().active!==project)throw Error('작업 중 게임이 바뀌어 업데이트를 취소했습니다');await flush();
   game.prog=clone(source.prog);game.meta=game.meta||{};game.meta.subscr=Object.assign({},S,{ver:man.ver,at:Date.now(),imgs:imap,notes:man.notes||'',skip:0});delete game.meta.pub;
@@ -104,75 +106,5 @@ async function subApply(btn){const S=G.meta.subscr;if(!S)return;const prefix='su
   await appStorage.commitImport(prefix,LKEY,JSON.stringify(next),IMGNS,{[PJKEY]:JSON.stringify(pj)});
   const oldKeys=[...source.chars.map(c=>'c:'+c.id),...source.chapters.map(ch=>'ch:'+ch.id),...source.lib.map(l=>'l:'+l.id),...source.threads.map(x=>'t:'+x.id)];G=next;dirty.clear();clearTimeout(flushT);for(const id of Object.keys(imgCache)){try{URL.revokeObjectURL(imgCache[id]);}catch(e){}delete imgCache[id];}mark(...oldKeys);markAll();await flush();applyMeta();await loadIdbImages();closeModal();sendMail({from:next.meta.title||'만든 사람',title:`v${man.ver} 업데이트를 받았어요`,body:man.notes||'새 버전으로 바뀌었어요.',days:14});toast(`v${man.ver}(으)로 업데이트했어요`);render();checkTriggers&&checkTriggers();
  }catch(e){toast('업데이트 실패. '+(e.message||e)+' 다시 시도해 주세요');}
- finally{await appStorage.discard(prefix).catch(()=>{});syBar('');if(btn?.isConnected){btn.disabled=false;btn.textContent=lbl;}}
-}
-async function syPush(force){
-  const o=SY(); if(!syReady()){ openSync(); return; } if(SYJOB){ toast('동기화 중이에요'); return; }
-  SYJOB='push'; try{
-    syBar('클라우드 확인 중…'); await flush();
-    const R=await syRemote(o);
-    if(!force&&R.state&&R.state.at>(o.last||0)&&R.state.device!==syDevice()){ syBar(''); SYJOB=null;
-      openModal(`${head('다른 기기에 더 새 데이터가 있어요')}<p><b>${esc(R.state.device||'다른 기기')}</b>에서 ${esc(new Date(R.state.at).toLocaleString())}에 올린 데이터가 있어요. 그대로 올리면 그 데이터를 덮어써요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="sypull">그 데이터 받기</button><button class="btn ghost" data-act="sypushf">그래도 올리기</button></div>`); return; }
-    const idx=syIdx(), keys=await idbKeys(), bin={}, types={};
-    let i=0; for(const k of keys){ i++; if(i%10===0) syBar(`그림 확인 ${i}/${keys.length}`);
-      const b=await idbGet(k); if(!b||!(b instanceof Blob)) continue; types[k]=b.type||'';
-      const ent=idx[k]; if(ent&&ent.size===b.size&&ent.hash){ bin[k]=ent.hash; continue; }
-      const h=await shaHex(await b.arrayBuffer()); idx[k]={hash:h,size:b.size}; bin[k]=h; }
-    saveSyIdx(idx);
-    const need=[...new Set(Object.values(bin))].filter(h=>!R.paths['sync/b/'+h]); let entries=[];
-    const byHash={}; Object.entries(bin).forEach(([k,h])=>{ byHash[h]=byHash[h]||k; });
-    const br=o.branch||'main'; let hd=R.head, baseTree=R.treeSha, committing=null, done=0, nextAt=0;
-    const pace=async()=>{ const now=Date.now(), t=Math.max(now,nextAt); nextAt=t+850; if(t>now) await wait(t-now); };
-    const commitPart=async(part,msg)=>{const committed=await ghCommitFiles({...o,branch:br},{head:hd,treeSha:baseTree},part,msg);hd=committed.head;baseTree=committed.treeSha;};
-    const flushPart=async()=>{ if(committing) return committing; if(!entries.length) return; const part=entries; entries=[]; committing=commitPart(part,`sync 그림 ${done}/${need.length}`).catch(e=>{ entries=part.concat(entries); throw e; }).finally(()=>{ committing=null; }); return committing; };
-    await ghUploadPool(need,async h=>{const b=await idbGet(byHash[h]);if(!b)throw Error('올릴 자료 파일을 찾지 못했습니다');await pace();const r=await ghCreateBlob(o,b,`자료 ${done+1}/${need.length}`);entries.push({path:'sync/b/'+h,mode:'100644',type:'blob',sha:r.sha});done++;syBar(`자료 올리는 중 ${done}/${need.length}`);if(entries.length>=40)await flushPart();});if(committing)await committing;
-    const withKeys=!!o.keys; let ls={}; syLsKeys(withKeys).forEach(k=>{ const v=syLsValue(k); if(v!=null) ls[k]=syStrip(k,v,withKeys); }); ls=lsHoldMerge(ls,R.state&&R.state.ls);
-    const state={v:1,at:Date.now(),device:syDevice(),devId:devId(),build:APP_BUILD,ls,bin,types};
-    syBar('게임 진행 저장하는 중…');
-    const sb=await ghCreateBlob(o,new Blob([JSON.stringify(state)]),'진행 정보');
-    entries.push({path:'sync/state.json',mode:'100644',type:'blob',sha:sb.sha});
-    await commitPart(entries,`sync ${state.device} ${new Date(state.at).toISOString()}`); entries=[];
-    const o2=SY(); o2.last=state.at; o2.lastDir='up'; o2.localAt=G.prog.savedAt||Date.now(); saveSY(o2);
-    toast(`클라우드에 올렸어요${need.length?' · 새 파일 '+need.length+'개':''}`); return true;
-  }catch(e){ toast('올리기 실패. '+syErr(e)+' 중간까지 올린 그림은 저장돼 있어서, 다시 누르면 이어서 올려요.'); }
-  finally{ SYJOB=null; syBar(''); if(tab==='studio') render(); }
-}
-async function syPull(){
- const o=SY();if(!syReady()){openSync();return false;}if(SYJOB){toast('동기화 중이에요');return false;}
- SYJOB='pull';PULLERR='';PULLERR_QUOTA=false;const prefix='sync-gh-'+uid()+'::',source=G,project=PJ().active,previous=window.__NOFLUSH;let committed=false;
- try{syBar('클라우드 확인 중…');await flush();const R=await syRemote(o);if(!R.state)throw Error('클라우드에 아직 올린 데이터가 없어요');const S=R.state;
-  const idx=await syncStageMedia(S,async(k,h)=>{const sha=R.paths['sync/b/'+h];if(!sha)throw Error('클라우드 자료가 빠져 있습니다: '+k);const r=await gh(o,'/git/blobs/'+sha,{binary:true});if(r.bytes)return r.bytes;if(r.text){const b=JSON.parse(r.text);if(b.content)return b64ToBytes(b.content.replace(/\s/g,''));}throw Error('자료 응답이 비어 있습니다: '+k);},prefix);
-  if(G!==source||PJ().active!==project)throw Error('작업 중 게임이 바뀌어 받기를 취소했습니다');await flush();window.__NOFLUSH=true;clearTimeout(flushT);
-  const w=await lsApply(S.ls,syMerge,prefix);committed=true;dirty.clear();saveSyIdx(idx);
-  const o2=SY();o2.last=S.at;o2.lastDir='down';o2.localAt=w.at;saveSY(o2);toast('클라우드의 데이터를 받았어요. 다시 시작할게요');setTimeout(()=>reloadGame(),900);return true;
- }catch(e){PULLERR_QUOTA=e?.name==='QuotaExceededError';PULLERR='받기 실패. '+syErr(e);toast(PULLERR);if(committed){setTimeout(()=>reloadGame(),900);return true;}return false;}
- finally{if(!committed)window.__NOFLUSH=previous;await appStorage.discard(prefix).catch(()=>{});SYJOB=null;syBar('');}
-}
-function syErr(e){let message=e?.status===404?'저장소·브랜치를 찾지 못했습니다. 이름과 토큰 권한을 확인해 주세요.':e?.status===401||e?.status===403?'토큰 또는 저장소 쓰기 권한을 확인해 주세요.':AIERR[e?.code]||e?.message||'다시 시도해 주세요';if(e?.status)message=`HTTP ${e.status} · `+message;if(e?.endpoint)message+=' · 단계: '+e.endpoint;if(e?.details)message+=' · '+e.details;return ghSafeMessage(message).slice(0,1000);}
-
-async function syCheckOnStart(){
-  const o=SY(); if(!syReady()||o.auto===false) return; if(window.__BOOTSYNC){ setTimeout(syCheckOnStart,1500); return; }
-  try{ const R=await syRemote(o); const S=R.state; if(!S||S.at<=(o.last||0)||S.device===syDevice()) return;
-    const localChanged=(G.prog.savedAt||0)>(o.localAt||0)+5000&&o.last;
-    const show=()=>{ if(!$('#modal').hidden||!$('#ov').hidden) return setTimeout(show,2500);
-      openModal(`${head('다른 기기의 새 데이터가 있어요')}<p><b>${esc(S.device||'다른 기기')}</b> · ${esc(new Date(S.at).toLocaleString())}</p>${localChanged?'<p style="color:var(--rose)">이 기기에도 아직 올리지 않은 진행이 있어요. 받으면 이 기기의 진행은 덮어써져요.</p>':''}<div class="row" style="margin-top:12px"><button class="btn" data-act="sypull">받기</button><button class="btn ghost" data-act="close">나중에</button></div>`); };
-    show(); }catch(e){ quietErr(e,'0400-publish-subscribe.js:159'); }
-}
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'&&!LKMODE()){ const o=SY(); if(syReady()&&o.autoUp&&!SYJOB&&(G.prog.savedAt||0)>(o.localAt||0)+5000) syPush(false); } });
-function openSync(){
-  const o=SY();
-  openModal(`${head('PC·폰 연동',`<span class="muted">내 GitHub 비공개 저장소에 게임을 올리고 받아요</span>`)}
-    <ol class="a2hs"><li><button class="linkb" data-act="sylink" data-url="https://github.com/new?name=ggm-save&visibility=private">GitHub에서 비공개 저장소 만들기</button> (이름 예: ggm-save, <b>Private</b>)</li>
-    <li><button class="linkb" data-act="sylink" data-url="https://github.com/settings/personal-access-tokens/new">토큰 만들기</button> → Repository access: <b>Only select repositories</b>에서 그 저장소만 → Permissions의 <b>Contents: Read and write</b> → 만들기</li>
-    <li>아래에 <b>아이디/저장소이름</b>과 토큰을 넣고, 다른 기기에도 똑같이 넣어요.</li></ol>
-    <label class="f" for="sy_repo">저장소</label><input class="in" id="sy_repo" value="${esc(o.repo||'')}" placeholder="내아이디/ggm-save">
-    <label class="f" for="sy_tok">토큰</label><input class="in" id="sy_tok" type="password" autocomplete="off" value="${esc(o.token||'')}" placeholder="github_pat_...">
-    <label class="f" for="sy_dev">이 기기 이름</label><input class="in" id="sy_dev" value="${esc(syDevice())}">
-    <label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="sy_auto" ${o.auto!==false?'checked':''}><span>켤 때 다른 기기의 새 데이터가 있으면 알려 주기</span></label>
-    <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="sy_up" ${o.autoUp?'checked':''}><span>앱을 나갈 때 자동으로 올리기</span></label>
-    <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="sy_lock" ${o.lock!==false?'checked':''}><span>한 번에 한 기기만 (다른 기기에서 하면 여기는 멈추고, 나갈 때 자동으로 올려요)</span></label>
-    <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="sy_keys" ${o.keys?'checked':''}><span>AI·그림·목소리 키도 같이 옮기기 <span class="muted" style="font-size:.8rem">(비공개 저장소일 때만 켜세요)</span></span></label>
-    <p class="muted" style="margin:8px 0 0;font-size:.82rem">게임 진행, 만든 게임들, 그림·음악·목소리가 올라가요. 그림은 바뀐 것만 올려서 두 번째부터는 빨라요. 토큰은 이 기기에만 저장돼요.</p>
-    <div class="row" style="margin-top:14px"><button class="btn" data-act="sysave">저장하고 연결 확인</button></div>
-    ${syReady()?`<div class="row" style="margin-top:8px"><button class="btn sm" data-act="sypush">지금 올리기</button><button class="btn sm ghost" data-act="sypull">받기</button><button class="btn sm ghost" data-act="syoff">연동 해제</button></div>`:''}`);
+ finally{await appStorage.discard(prefix).catch(()=>{});syBar('');if(rep)rep.end();}
 }

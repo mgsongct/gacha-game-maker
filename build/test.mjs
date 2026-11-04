@@ -102,7 +102,10 @@ try {
 
   let chromium; try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch (e) {}
   if (!chromium) { console.log('skip 4  playwright 없음: 브라우저 실행 검사 생략'); process.exit(0); }
-  const www = join(tmp, 'www'); cpSync(join(ROOT, 'www'), www, { recursive: true }); writeFileSync(join(www, 'index.html'), html);
+  // 브라우저 검사는 실제 제품(www/index.html — GGM_HTML=경로로 다른 index.html, 예: 배포본이 받은 main의 것)으로 돎. 4번의 모듈 추가 시험만 시험용 빌드(test-hello.html)
+  const www = join(tmp, 'www'), PRODUCT = process.env.GGM_HTML ? resolve(process.env.GGM_HTML) : join(ROOT, 'www/index.html'); cpSync(join(ROOT, 'www'), www, { recursive: true });
+  writeFileSync(join(www, 'index.html'), readFileSync(PRODUCT)); writeFileSync(join(www, 'test-hello.html'), html);
+  console.log(`브라우저 검사 대상: ${PRODUCT === join(ROOT, 'www/index.html') ? 'www/index.html' : PRODUCT} (BUILT ${(readFileSync(PRODUCT, 'utf8').match(/var BUILT='([^']+)'/) || [])[1]}${!process.env.GGM_HTML || readFileSync(PRODUCT, 'utf8') === build(join(ROOT, 'src')) ? ' — src 빌드와 같음' : ' — src 빌드와 다름'})`);
   const type = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.webmanifest': 'application/json', '.png': 'image/png' };
   const server = createServer((q, r) => { try { const p = join(www, decodeURIComponent(new URL(q.url, 'http://x').pathname).replace(/\/$/, '/index.html')); r.writeHead(200, { 'content-type': type[extname(p)] || 'application/octet-stream' }); r.end(readFileSync(p)); } catch (e) { r.writeHead(404); r.end(); } });
   await new Promise(ok => server.listen(0, ok));
@@ -111,7 +114,7 @@ try {
   const page = await browser.newPage(), errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); // 외부(폰트·AI) 차단
-  await page.goto(`http://127.0.0.1:${server.address().port}/`);
+  await page.goto(`http://127.0.0.1:${server.address().port}/test-hello.html`);
   await page.waitForFunction(() => window.__HELLO_MAIN__, null, { timeout: 15000 });
   const got = await page.evaluate(() => ({ m: window.__HELLO_MODULE__, main: window.__HELLO_MAIN__, ed: window.__EDITED__, view: document.querySelector('#view').innerHTML.length }));
   assert.deepEqual(errors, [], '페이지 오류');
@@ -157,17 +160,17 @@ try {
   const r8 = await p8.evaluate(async () => {
     const out = {}; tab = 'studio'; STTAB = 'game'; render(); out.panel = !!document.querySelector('[data-act="contoggle"]');
     openConSet(); document.querySelector('#con_on').checked = true; const fac = document.querySelector('[data-vi="0"] [data-vf="factions"]'); fac.value = G.chars[0].faction; await conSave();
-    out.on = conOn(); out.start = { ...CRES() }; out.cond = VARIANTS()[0].cond.factions;
-    P().gems = 10000; conBuy('res1'); out.bought = CRES().res1 - out.start.res1; out.gems = P().gems;
+    out.on = conOn(); out.start = { ...progSlot('cres') }; out.cond = VARIANTS()[0].cond.factions;
+    P().gems = 10000; conBuy('res1'); out.bought = progSlot('cres').res1 - out.start.res1; out.gems = P().gems;
     out.disp = Object.keys(dispOffer([]).reward).filter(k => /^res/.test(k)).length;
-    const base = G.chars[0]; if (!own(base.id)) grantOwned(base, 't'); conMeta().recipes = []; // 레시피 편향 없이
+    const base = G.chars[0]; if (!own(base.id)) grantOwned(base, 't'); G.meta.construct = Object.assign(conMeta(), { recipes: [] }); // 레시피 편향 없이 (conMeta()는 읽기 — 쓸 때는 G.meta.construct에)
     tab = 'construct'; render(); out.page = !!document.querySelector('[data-act="conbuild"]');
     Math.random = (() => { let s = 42; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
-    const before = CRES().res2; [30, 30, 30, 30].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild(); out.spent = before - CRES().res2; out.n1 = CBUILD().n;
-    VARIANTS().forEach(t => { t.chance = t.id === 'v_swim' ? 100 : 0; }); CRES().res1 += 1000; CRES().res4 += 1000;
+    const before = progSlot('cres').res2; [30, 30, 30, 30].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild(); out.spent = before - progSlot('cres').res2; out.n1 = progSlot('cbuild').n;
+    VARIANTS().forEach(t => { t.chance = t.id === 'v_swim' ? 100 : 0; }); progSlot('cres').res1 += 1000; progSlot('cres').res4 += 1000;
     [400, 100, 100, 400].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild();
     const v = G.chars.find(x => x.cvar === 'v_swim'), vb = v && charById(v.alt); out.variant = v && { base: vb && vb.name, baseOwned: !!(vb && own(vb.id)), name: v.name, owned: !!own(v.id), prompt: v.naiPrompt, inGacha: bannerPool(G.banners[0]).includes(v) };
-    out.found = !!CBUILD().found['v:v_swim']; out.log = CBUILD().log.length;
+    out.found = !!progSlot('cbuild').found['v:v_swim']; out.log = progSlot('cbuild').log.length;
     if (v) { vb.profile = String(vb.profile || '') + ' 상속확인'; mark('c:' + vb.id); const v2 = charById(v.id); out.inherit = String(v2.profile).endsWith(' 상속확인') && !('profile' in (v2.over || {})); } // 규칙 경로 이격은 기본 캐릭터 프로필을 물려받음
     // 분류 이름은 게임의 역할 이름으로
     const r0 = ROLE.atk; ROLE.atk = '돌격'; out.groupName = CON().groups.find(g => g.id === 'g_atk').name; out.groupStored = !JSON.stringify(G.meta.construct || {}).includes('돌격'); ROLE.atk = r0;
@@ -221,18 +224,18 @@ try {
   await p11.waitForFunction(() => typeof exSave === 'function' && typeof G === 'object', null, { timeout: 15000 });
   const r11 = await p11.evaluate(async () => {
     const o = {}, setMode = async m => { openExSet(); document.querySelector(`[name=ex_mode][value=${m}]`).checked = true; appConfirm = async () => true; await exSave(); };
-    const c = G.chars.filter(x => !x.alt)[0]; if (!own(c.id)) grantOwned(c, 't'); const id = c.id, back = (jid, h) => { EXS().jobs[jid].start -= h * 3600e3; };
+    const c = G.chars.filter(x => !x.alt)[0]; if (!own(c.id)) grantOwned(c, 't'); const id = c.id, back = (jid, h) => { progSlot('exped').jobs[jid].start -= h * 3600e3; };
     await setMode('idol'); tab = 'disp'; render(); o.idolPage = !!document.querySelector('[data-act="exjob"]');
     const off = exOffers(id); o.assigned = off.offers.length === 1 && !off.choice; const g0 = P().gold, c0 = exCond(id);
-    const dm0 = (dm().cnt || {}).dispatch || 0; exStart(id, off.offers[0]); o.busy = busyIds().has(id); o.mission = ((dm().cnt || {}).dispatch || 0) === dm0 + 1; /* 일일 미션 "파견"이 다른 방식에서도 오름 */ o.condDrop = c0 - (EXS().cond[id].v); const jid = Object.keys(EXS().jobs)[0]; back(jid, 10); o.badge = dispDone() >= 1; exClaim(jid);
-    o.gold = P().gold > g0; o.fame = EXS().fame[id] > 0; exRest(id, 4); o.resting = exResting(id) && busyIds().has(id);
-    EXS().fame[id] = 5000; delete EXS().offers[id]; EXS().cond[id] = { v: 90, at: Date.now() }; const top = exOffers(id); o.top = top.choice && top.offers.length > 1; render(); o.topPage = document.querySelectorAll('[data-act="exjob"]').length > 1;
+    const dm0 = (progSlot('dm').cnt || {}).dispatch || 0; exStart(id, off.offers[0]); o.busy = busyIds().has(id); o.mission = ((progSlot('dm').cnt || {}).dispatch || 0) === dm0 + 1; /* 일일 미션 "파견"이 다른 방식에서도 오름 */ o.condDrop = c0 - (progSlot('exped').cond[id].v); const jid = Object.keys(progSlot('exped').jobs)[0]; back(jid, 10); o.badge = dispDone() >= 1; exClaim(jid);
+    o.gold = P().gold > g0; o.fame = progSlot('exped').fame[id] > 0; exRest(id, 4); o.resting = exResting(id) && busyIds().has(id);
+    progSlot('exped').fame[id] = 5000; delete progSlot('exped').offers[id]; progSlot('exped').cond[id] = { v: 90, at: Date.now() }; const top = exOffers(id); o.top = top.choice && top.offers.length > 1; render(); o.topPage = document.querySelectorAll('[data-act="exjob"]').length > 1;
     await setMode('streamer'); render(); o.streamPage = !!document.querySelector('[data-act="exstream"]');
-    exStart(id, EXC().streamer.platforms.find(p => p.kind === 'vod')); const j2 = Object.keys(EXS().jobs)[0]; back(j2, 10); exClaim(j2); o.lib = EXS().lib.length;
-    EXS().libAt -= 24 * 3600e3; EXS().lib.forEach(v => { v.at -= 24 * 3600e3; }); const g1 = P().gold; exLibSettle(); o.libGold = P().gold > g1;
+    exStart(id, EXC().streamer.platforms.find(p => p.kind === 'vod')); const j2 = Object.keys(progSlot('exped').jobs)[0]; back(j2, 10); exClaim(j2); o.lib = progSlot('exped').lib.length;
+    progSlot('exped').libAt -= 24 * 3600e3; progSlot('exped').lib.forEach(v => { v.at -= 24 * 3600e3; }); const g1 = P().gold; exLibSettle(); o.libGold = P().gold > g1;
     await setMode('business'); render(); o.bizPage = !!document.querySelector('[data-exassign]');
-    exAssign('floor', 0, id); o.bizBusy = busyIds().has(id); EXS().biz.at -= 5 * 3600e3; EXS().cond[id].at -= 5 * 3600e3; EXS().biz.rep = 500; const g2 = P().gold, rep0 = EXS().biz.rep;
-    exBizSettle(true); o.bizGold = P().gold > g2; o.repMoved = EXS().biz.rep !== rep0; o.bizCond = exCond(id) < 100;
+    exAssign('floor', 0, id); o.bizBusy = busyIds().has(id); progSlot('exped').biz.at -= 5 * 3600e3; progSlot('exped').cond[id].at -= 5 * 3600e3; progSlot('exped').biz.rep = 500; const g2 = P().gold, rep0 = progSlot('exped').biz.rep;
+    exBizSettle(true); o.bizGold = P().gold > g2; o.repMoved = progSlot('exped').biz.rep !== rep0; o.bizCond = exCond(id) < 100;
     P().disp = { dz: { chars: [id], start: Date.now(), hours: 2 } }; appConfirm = async () => true; await setMode('idol'); o.dispCleared = !Object.keys(P().disp).length; // 방식을 바꾸면 전투형 파견도 끝남
     await setMode('combat'); render(); o.combatPage = !!document.querySelector('[data-act="dispset"],[data-act="dispredo"]'); o.freed = !busyIds().has(id);
     return o; });
@@ -314,10 +317,14 @@ try {
     const kit = GGMCombat.normalize(GGMCombat.generationDefaults({ role: 'atk' })), u = (c, gen) => ({ name: 'u', role: 'atk', elem: G.meta.elems[0].n, hp: 1000, atk: 100, def: 50, spd: 100, kit, baseKit: kit, ready: {}, c: { ...c, generation: gen } });
     const sim = GGMCombat.create([u(old, 1), u(old, 3)], [{ ...u(old, 3), c: null }], { ...op, seed: 2 }); o.boost = sim.allies[0].maxhp === 1200 && sim.allies[1].maxhp === 1000;
     G.meta.balance = Object.assign(G.meta.balance, { catchUp: 'remaster', lag: 1 }); o.lagDetect = auditScan().some(gr => gr.rule.id === 'c_genlag' && gr.items.includes(old)); o.remaster = balRemaster(old) && old.generation === 2 && !old.skillBalance;
+    /* 구캐릭터 AS AI 리마스터: 저장된 설계 의도(skillPlan)·스킬 이름을 지키며 새 세대 예산으로 다시 설계 — 가짜 글 AI는 프롬프트의 형식 견본을 이름만 바꿔 답함(이름은 코드가 지킴) */
+    const o2 = { ...clone(old), id: 'oldgen2', name: '구캐' }; G.chars.push(o2); o2.generation = 1; /* cleanChar(mkc)는 다음 틱에 AI 스킬 설계를 예약해 가짜 AI로 덮어씀 — 이미 있던 캐릭터처럼 복사 */ o2.skills = GGMCombat.normalize(GGMCombat.generationDefaults(o2)); o2.skills.passive.name = '별빛 맹세'; o2.skills.active.name = '유성 베기'; o2.skills.ultimate.name = '낙성'; o2.skillPlan = { kit: '별 모티프 연계' }; o2.skillBalance = null;
+    const rps = [], rpOf = () => rps.find(p => /구캐릭터 리마스터/.test(p)) || ''; SAMPLE = { json: async p => { rps.push(p); /* 앞서 만든 캐릭터들의 예약된 스킬 설계도 이 가짜 AI로 돌 수 있어 모아서 봄 */ const j = JSON.parse(p.match(/JSON만 출력:\s*(\{[\s\S]*\})\s*$/)[1]); j.designPlan = '새 세대 의도'; for (const x of Object.values(j.skills)) x.name = '바뀐 이름'; return j; } };
+    o.aiRemaster = (await balRemasterAI(o2)) && o2.generation === 2 && ['별빛 맹세', '유성 베기', '낙성'].join() === ['passive', 'active', 'ultimate'].map(s => o2.skills[s].name).join() && /별 모티프 연계/.test(rpOf()) && /1세대 예산/.test(rpOf()) && /2세대 예산/.test(rpOf()) && /유성 베기/.test(rpOf()) && o2.skillPlan.kit === '새 세대 의도' && !!o2.skillBalance && (o2.skillDesignLog || []).some(x => /리마스터/.test(x.text)) && /스킬 설계 의도/.test(v2SkillSummary(o2));
     tab = 'studio'; STTAB = 'game'; render(); o.panel = !!document.querySelector('[data-act="balopen"]'); openBalance(); o.modal = !!document.querySelector('#bal_creep') && document.querySelectorAll('[data-bal]').length >= 8; closeModal();
     return o; });
   assert.ok(Object.values(r14).every(v => v === true), JSON.stringify(r14)); assert.deepEqual(err14, [], '페이지 오류');
-  console.log('ok 14 밸런스: 능력치 편차 점검·보수(성향 유지·기준값)·생성 시 자동 보정, 세대 고정·자동 상승, 구캐릭터 AS 전투 보정(엔진)·리마스터, 점검 규칙, 되돌리기');
+  console.log('ok 14 밸런스: 능력치 편차 점검·보수(성향 유지·기준값)·생성 시 자동 보정, 세대 고정·자동 상승, 구캐릭터 AS 전투 보정(엔진)·리마스터(AI — 설계 의도·이름 유지, 새 세대 예산), 점검 규칙, 되돌리기');
 
   // 15) 캐릭터 개성·매력: 개성 시트·프로필 템플릿·검수(빠짐·흔함·겹침·말투), AI 채우기·다듬기, 인연 톡(호감도 해금), 메모리얼(로비 대사), 상속, 점검 규칙
   const p15 = await browser.newPage(), err15 = []; p15.on('pageerror', e => err15.push(String(e)));
@@ -420,7 +427,7 @@ try {
     const e0 = ELEMS[0], et = towerById('e:' + e0); towerGo('e:' + e0); await wait(50); o.restrict = !!FORM && [...document.querySelectorAll('.froster [data-act="fpick"]')].every(b => charById(b.dataset.id).elem === e0); closeModal();
     const gems = P().gems; tab = 'challenge'; render(); o.page = !!document.querySelector('[data-act="towergo"][data-v="all"]');
     towerGo('all'); await wait(50); document.querySelector('[data-act="towerstart"]').click(); await wait(50); o.tower = B && B.ctx.kind === 'tower' && B.ctx.floor === 1;
-    bEnd(true); o.towerWin = TOWER().all.best === 1 && P().gems > gems && document.querySelector('.result').innerHTML.includes('1층 돌파'); document.querySelector('.result [data-act="bdone"]').click(); o.closed = !B;
+    bEnd(true); o.towerWin = progSlot('tower').all.best === 1 && P().gems > gems && document.querySelector('.result').innerHTML.includes('1층 돌파'); document.querySelector('.result [data-act="bdone"]').click(); o.closed = !B;
     return o; });
   assert.ok(Object.values(r18).every(v => v === true), JSON.stringify(r18)); assert.deepEqual(err18, [], '페이지 오류');
   console.log('ok 18 전투 개선·탑: 전장 규칙(능력치·시간 제한)·별 조건·편성 화면 안내, 집중 지시, 새 장 규칙(AI 지정·자동)·예전 스테이지 점검, 시련의 탑(제한 탑·보스층·첫 돌파 보상)');
@@ -438,8 +445,8 @@ try {
     o.tpl = spotTemplate(G.chars[1], spots()[1]).startsWith('[배경: 옥상 정원]') && parseScript(spotTemplate(G.chars[1], spots()[1])).some(l => l.type === 'choice');
     tab = 'sched'; render(); o.page = !!document.querySelector(`[data-act="scvisit"][data-c="${c.id}"]`); const aff = own(c.id).aff || 0, gold = P().gold;
     document.querySelector(`[data-act="scvisit"][data-c="${c.id}"]`).click(); for (let i = 0; i < 30 && S; i++) { document.querySelector('#vn') && document.querySelector('#vn').click(); const pk = document.querySelector('[data-act="vnpick"]'); if (pk) pk.click(); await wait(40); }
-    o.visit = !S && (own(c.id).aff || 0) === aff + 30 && P().gold > gold && SCHED().left === 2 && SCHED().done.includes(cafe.id);
-    schedVisit(cafe.id, c.id); o.once = !S && SCHED().left === 2; tab = 'lobby'; render(); o.lobby = !!document.querySelector('[data-act="go"][data-to="sched"]');
+    o.visit = !S && (own(c.id).aff || 0) === aff + 30 && P().gold > gold && progSlot('sched').left === 2 && progSlot('sched').done.includes(cafe.id);
+    schedVisit(cafe.id, c.id); o.once = !S && progSlot('sched').left === 2; tab = 'lobby'; render(); o.lobby = !!document.querySelector('[data-act="go"][data-to="sched"]');
     return o; });
   assert.ok(Object.values(r19).every(v => v === true), JSON.stringify(r19)); assert.deepEqual(err19, [], '페이지 오류');
   console.log('ok 19 일정: 장소(자동·AI)·좋아하는 장소(호감도 1.5배)·하루 3번·보상, 장면(AI·기본 대본), 점검 규칙(장소·장면), 로비 진입');
@@ -511,7 +518,7 @@ try {
     const sera = charById('sera'); o.charRange = ['melee', 'ranged', 'support'].includes(charRange(sera)) && (sera.range = 'melee', charRange(sera) === 'melee') && rowWarn(sera, 3, 4).includes('후열 근접') && (delete sera.range, true);
     o.opts = v2Options().formation === true; G.meta.rules = Object.assign({}, G.meta.rules, { formation: false }); o.optOff = v2Options().formation === false; G.meta.rules.formation = true;
     G.chars.slice(0, 5).forEach(c => { if (!own(c.id)) grantOwned(c, 't'); }); const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages.find(x => !x.story && x.enemies.length); P().cleared[s.id] = true;
-    P().squad = G.chars.filter(c => own(c.id) && c.role !== 'sup').slice(0, 3).map(c => c.id); const stam0 = stam().v;
+    P().squad = G.chars.filter(c => own(c.id) && c.role !== 'sup').slice(0, 3).map(c => c.id); const stam0 = progSlot('stam').v;
     startBattle(ch.id, s.id); for (let i = 0; i < 50 && !SORTIE(); i++) await wait(100); await wait(100);
     o.begin = !!SORTIE() && SORTIE().node === 'n1' && !!document.querySelector('.so-map') && !B;
     document.querySelector('[data-act="sogo"]').click(); for (let i = 0; i < 60 && !B; i++) await wait(100);
@@ -525,7 +532,7 @@ try {
     o.carry = B && B.ctx.node !== 'x' && Math.abs(B.allies.find(u => u.c.id === hurt).hp / B.allies.find(u => u.c.id === hurt).maxhp - .2) < .02 && B.s.enemies.length === 3;
     bEnd(true); document.querySelector('[data-act="somap"]').click(); await wait(50); document.querySelector('[data-act="sonext"][data-v="n3"]').click(); await wait(30); document.querySelector('[data-act="sogo"]').click(); for (let i = 0; i < 60 && !B; i++) await wait(100);
     o.boss = B && B.ctx.boss && B.s === s; bEnd(true); o.cleared = !SORTIE() && !!document.querySelector('.rs-stars'); document.querySelector('.result [data-act="bdone"]').click(); await wait(50);
-    o.stam = stam().v === stam0 - stamCost('main');
+    o.stam = progSlot('stam').v === stam0 - stamCost('main');
     startBattle(ch.id, s.id); for (let i = 0; i < 50 && !SORTIE(); i++) await wait(100); await wait(50); const g0 = P().gold; document.querySelector('[data-act="soretreat"]').click(); o.retreat = !SORTIE() && P().gold === g0;
     const st = buildStages([{ title: 'a', enemies: [{ name: 'x' }], route: { n1: '항구 전초', a: '정면 부두', b: '뒷골목', fork: '안개 낀 갈림길', boss: '선창 본대' } }], { max: 3, reward: () => 1, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
     const R = routeOf(st[0]); o.route = R.nodes[0].name === '항구 전초' && R.nodes[1].name === '정면 부두' && R.fork === '안개 낀 갈림길' && stageSchema(false).includes('"route"');
@@ -587,7 +594,7 @@ try {
       return {}; } };
     let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [k, v] of Object.entries(recs)) if (/"chapters"/.test(v)) saved = JSON.parse(v); return orig(recs); };
     window.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
-    await buildNewGameDraft(btn, { mode: 'auto', auto: '등불섬 판타지', n: 6, con: true }, PJ().active);
+    await buildNewGameDraft(uiProg(btn, '#ng_stat'), { mode: 'auto', auto: '등불섬 판타지', n: 6, con: true }, PJ().active);
     const g = saved; o.built = !!g && g.meta.title === '심연등불';
     if (!g) return o;
     const F = g.world.factions; o.factions = F.length >= 3 && F.find(f => f.name === '검은 조류').kind === 'hostile' && F.find(f => f.name === '검은 조류').stance.some(s => s.ch === 3 && s.s === 'ally') && F.find(f => f.name === '심해의 것').weakness === '불' && !!F.find(f => f.name === '등불단').rel['검은 조류'];
@@ -667,9 +674,46 @@ try {
     const n0 = QUIET.length; quietErr(new Error('테스트 오류'), 'test:1'); o.quiet = QUIET.length === n0 + 1 && QUIET[0].msg === '테스트 오류';
     P().gems = 1000; pay({ gems: 300 }); giveReward({ gems: 50 }); o.gems = P().gems === 750;
     o.registry = !['gateyes', 'cheat', 'reset', 'naiall', 'styopen'].some(k => APP_ACTION_HANDLERS[k]) && !!APP_ACTION_HANDLERS.imgx && !!APP_ACTION_HANDLERS.pjreroll;
+    /* 진행 칸 정의(0070 PROG_SLOTS — CLAUDE.md §0-2): 그리기(renderView)는 상태를 바꾸지 않고, 그리기 전 처리(render → progTick)가 날이 바뀐 칸을 새로 만들어 저장 · 원정 방송 출연이면 오늘의 출연 제안을 그리기 전에 저장 */
+    P().dm = { date: '2000-01-01', cnt: { battle: 9 }, got: {} }; const before = JSON.stringify(P().dm); tab = 'lobby'; renderView(); o.viewPure = JSON.stringify(P().dm) === before && progRead('dm').date === today() && P().dm.date === '2000-01-01';
+    render(); o.tickSaves = P().dm.date === today() && !P().dm.cnt.battle;
+    const mode0 = G.meta.expedition; G.meta.expedition = Object.assign({}, mode0 || {}, { mode: 'idol' }); delete P().exped; const own0 = G.chars[0]; const had0 = P().owned[own0.id]; P().owned[own0.id] = had0 || { levelCapVersion: 1, transc: 0, growthCostVersion: 1, lv: 1, exp: 0, dup: 0, aff: 0, seen: [], wlv: 0, skin: '' }; render();
+    o.expedTick = !!(P().exped && own0 && P().exped.offers[own0.id] && P().exped.offers[own0.id].day === today()); G.meta.expedition = mode0;
+    /* 액션 처리기(Controller)에서 화면 조작을 기능 모듈 View로 뺀 case가 실제 클릭 분배로 오류 없이 돎(처리 중 예외는 분배기가 '작업을 완료하지 못했습니다'로 알림) */
+    const said = [], toast0 = window.toast; window.toast = m => { said.push(String(m)); toast0(m); };
+    const act = async (a, data = {}, inner = '') => { const b = document.createElement('button'); b.dataset.act = a; Object.assign(b.dataset, data); b.innerHTML = inner; document.body.appendChild(b); b.click(); await new Promise(r => setTimeout(r, 40)); b.remove(); };
+    P().owned[own0.id] = P().owned[own0.id] || { levelCapVersion: 1, transc: 0, growthCostVersion: 1, lv: 1, exp: 0, dup: 0, aff: 0, seen: [], wlv: 0, skin: '' }; P().sec = own0.id; tab = 'lobby'; render();
+    await act('lbhide'); const hid = document.body.classList.contains('lb-hidden'); await act('lbshow'); o.lobbyMenu = hid && !document.body.classList.contains('lb-hidden');
+    const aff0 = P().owned[own0.id].aff; await act('poke', {}, '<div class="lb-stage"></div>'); await act('evspoke', { id: own0.id }, '<div class="art"></div>'); o.poke = P().owned[own0.id].aff > aff0;
+    openChar(own0.id); await act('cstab', { k: 'info' }); o.csTab = CS_TAB === 'info'; await act('cspoke', { id: own0.id }, '<div class="art"></div>'); await act('csframe'); P().csFull = !P().csFull; closeModal();
+    openFeedback(); await act('fbstar', { n: '3' }); o.fbStar = FB_STAR === 3 && !!document.querySelector('#fbStars .chip.on'); closeModal();
+    P().mail = [{ id: 'mt1', title: '시험 우편', from: '운영', body: '본문', at: Date.now(), reward: {} }]; await act('mailview', { id: 'mt1' }); o.mailView = P().mail[0].read === true && document.querySelector('#modal').textContent.includes('시험 우편'); closeModal();
+    openModal('<select id="mt_logo"><option value="star">s</option></select>'); await act('logoprev'); const prev = !!document.querySelector('#ov .title[data-act="logoprevclose"]') && $('#modal').hidden; await act('logoprevclose'); o.logoPrev = prev && $('#ov').hidden && !$('#modal').hidden; closeModal();
+    await act('go', { to: 'shop' }); o.go = tab === 'shop';
+    /* 화면에 들어가기 전 처리(SCREEN_ENTER): 공지를 그리기만 하면 읽음이 안 바뀌고, render(들어가기)에서 바뀜 · 훈련 화면은 상태를 안 바꿈 */
+    P().live.seen = 0; tab = 'notice'; renderView(); const nv = P().live.seen === 0; render(); o.noticeEnter = nv && P().live.seen > 0; const fv = JSON.stringify(P().farmClear); tab = 'farm'; renderView(); o.farmView = JSON.stringify(P().farmClear) === fv; tab = 'codex'; render(); o.codex = !!document.querySelector('#view .cx-card, #view [data-act]');
+    /* 저장 결과는 창 이벤트로(Model은 화면을 부르지 않음): 실패 알림 → 경고·다시 시도 단추(액션), 저장됨 알림 → 경고 지움 */
+    saveFailed('시험 저장 실패'); o.saveWarn = !!document.querySelector('#save-warning [data-act="saveretry"]') && document.getElementById('save-warning').textContent.includes('시험 저장 실패'); dispatchEvent(new CustomEvent('ggm-saved')); o.saveClear = !document.getElementById('save-warning');
+    o.noFail = !said.some(m => m.includes('작업을 완료하지 못했습니다')) || said.join(' / '); window.toast = toast0; if (!had0) delete P().owned[own0.id];
     return o; });
   assert.ok(Object.values(r26).every(v => v === true), JSON.stringify(r26)); assert.deepEqual(err26, [], '페이지 오류');
-  console.log('ok 26 정리 후 동작: 그림 지우기 대상·리롤 초안 함수, 조용한 오류 기록, 재화 단일 경로, 지운 액션이 분배 표에서 빠짐');
+  const r26m = await p26.evaluate(async () => {
+    /* 메신저 실시간 대화(나누기 전 동작 고정): 대화방 열기 → 안 읽음 0 · 직접 말 걸기 → 내 말 + 답장 2 기록·말풍선·입력 칸 비움·입력 중 표시 없음 · 스레드 재생 → 선택지 → 고르면 내 말·다음 말 → 끝나면 완료 */
+    const o = {}, own0 = G.chars[0]; P().owned[own0.id] = P().owned[own0.id] || { levelCapVersion: 1, transc: 0, growthCostVersion: 1, lv: 1, exp: 0, dup: 0, aff: 0, seen: [], wlv: 0, skin: '' };
+    { const S0 = SAMPLE, mc = own0, fch = progSlot('fchat'); SAMPLE = { json: async () => ({ replies: ['답장1', '답장2'] }) }; P().fcPhoto = false; fch[mc.id] = { log: [], sum: '', sumTo: 0, at: 0, unread: 2 };
+      Object.keys(P().inbox).forEach(k => { const th = threadById(k); if (th && th.charId === mc.id) delete P().inbox[k]; });
+      openRoom(mc.id); o.roomOpen = fcOf(mc.id).unread === 0 && !!$('#phChat');
+      $('#fcIn').value = '안녕'; await fcSend(); const fl = fcOf(mc.id).log;
+      o.fcSend = fl.length === 3 && fl[0].w === 'me' && fl[0].t === '안녕' && fl[2].t === '답장2' && $('#phChat').querySelectorAll('.msg').length >= 3 && !$('#phChat .typing') && $('#fcIn').value === '' || JSON.stringify(fl);
+      G.threads.push({ id: 'tt_msg', charId: mc.id, title: '시험 톡', script: `${mc.name}: 안녕\n선택: 응 | 아니\n${mc.name}: 좋아` }); P().inbox.tt_msg = { pos: 0, log: [], done: false, at: Date.now() };
+      openRoom(mc.id); const until = async f => { for (let i = 0; i < 60 && !f(); i++) await new Promise(r => setTimeout(r, 100)); return f(); };
+      const choice = await until(() => document.querySelector('#phIn [data-act="phpick"]')); if (choice) { choice.click(); }
+      const done = await until(() => P().inbox.tt_msg.done); const tl = P().inbox.tt_msg.log;
+      o.phPlay = !!choice && done && tl.length === 3 && tl[0].w === 'c' && tl[1].w === 'me' && tl[2].t === '좋아' || JSON.stringify(tl);
+      G.threads = G.threads.filter(t => t.id !== 'tt_msg'); delete P().inbox.tt_msg; SAMPLE = S0; closePhone(); }
+    return o; });
+  assert.ok(Object.values(r26m).every(v => v === true), JSON.stringify(r26m)); assert.deepEqual(err26, [], '페이지 오류');
+  console.log('ok 26 정리 후 동작: 그림 지우기 대상·리롤 초안 함수, 조용한 오류 기록, 재화 단일 경로, 지운 액션이 분배 표에서 빠짐 · 진행 칸 정의(그리기는 상태 그대로, 그리기 전 처리가 하루 새로 만들기·출연 제안 저장) · 처리기에서 View로 뺀 case가 클릭 분배로 오류 없이 돎');
 
   // 27) 자기점검 보강(tools: HTML 주입·DOM id)으로 고친 것: 용어 T()는 HTML 안전, 대화 배지는 화면에 없는 #phBadge 대신 로비 아이콘을 바로 고침
   const p27 = await browser.newPage(), err27 = []; p27.on('pageerror', e => err27.push(String(e)));
@@ -781,6 +825,8 @@ try {
       await p3.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
       await p3.goto(`http://127.0.0.1:${port}/?pc=${key}`);
       await p3.waitForFunction(() => typeof PCS === 'function' && PCS() && typeof G === 'object', null, { timeout: 15000 });
+      /* 저장 정책(STORE_POLICY): 동기화 갈래(프롬프트 교훈)는 PC 서버로, 기기 갈래(화면 방향)는 이 기기에만, 연동 설정은 받는 기기의 이름을 지킴 */
+      await p3.evaluate(() => { appStorage.setItem('ggm-plessons', JSON.stringify([{ id: 'pl_t', lesson: '시험 교훈' }])); appStorage.setItem('ggm-orient', 'portrait'); appStorage.setItem('ggm-sync', JSON.stringify({ repo: 'me/repo', device: '첫 기기' })); });
       const gold = await p3.evaluate(async () => { P().gold += 777; mark('prog'); await flush(); return P().gold; });
       const prog = join(pcDir, 'data/main/prog.json');
       await until(() => JSON.parse(readFileSync(prog, 'utf8')).gold === gold, 30000, '자동 동기화(prog.json)');
@@ -788,20 +834,26 @@ try {
       assert.ok(JSON.parse(readFileSync(join(pcDir, 'data/index.json'), 'utf8')).list);
       const st = JSON.parse(readFileSync(join(pcDir, 'ggm-data/state.json'), 'utf8'));
       assert.ok(!('starfall-contract-v1' in st.ls) && st._dataGames.includes('main'), 'state.json에 게임 본문이 남아 있으면 안 돼요');
+      await until(() => 'ggm-plessons' in JSON.parse(readFileSync(join(pcDir, 'ggm-data/state.json'), 'utf8')).ls, 30000, '동기화 갈래 설정이 PC 서버로');
+      { const ls = JSON.parse(readFileSync(join(pcDir, 'ggm-data/state.json'), 'utf8')).ls; assert.ok(!('ggm-orient' in ls) && 'ggm-sync' in ls, '기기 갈래는 안 올라가고 비밀 갈래(연동 설정)는 PC 서버에는 올라감: ' + Object.keys(ls)); }
       // 빈 기기(새 브라우저 = 빈 IndexedDB)가 접속하면 서버 data 폴더의 게임을 받아 캐시로 씀
       const c4 = await b3.newContext(), p4 = await c4.newPage(); p4.on('pageerror', e => err3.push(String(e)));
       await p4.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
       await p4.goto(`http://127.0.0.1:${port}/?pc=${key}`);
       await until(() => p4.evaluate(() => typeof P === 'function' && P().gold).catch(() => 0).then(v => v === gold), 30000, '빈 기기에서 PC 게임 받기');
+      { const r = await p4.evaluate(() => ({ pl: appStorage.getItem('ggm-plessons'), or: appStorage.getItem('ggm-orient'), sy: JSON.parse(appStorage.getItem('ggm-sync') || '{}') }));
+        assert.ok(String(r.pl).includes('시험 교훈') && r.or == null && r.sy.repo === 'me/repo', '빈 기기: 동기화 갈래는 받고 기기 갈래는 안 받음: ' + JSON.stringify(r));
+        const m = await p4.evaluate(() => { appStorage.setItem('ggm-sync', JSON.stringify({ repo: 'me/repo', device: '둘째 기기' })); return JSON.parse(syMerge('ggm-sync', JSON.stringify({ repo: 'me/repo2', device: '첫 기기' }))); });
+        assert.ok(m.repo === 'me/repo2' && m.device === '둘째 기기', '연동 설정을 받을 때 이 기기 이름은 지킴(keep): ' + JSON.stringify(m)); }
       await b3.close(); assert.deepEqual(err3, [], '페이지 오류');
-      console.log('ok 6  PC 서버: 앱 저장 → data/main/*.json 자동 동기화, 빈 기기는 서버 data 폴더에서 받아 옴');
+      console.log('ok 6  PC 서버: 앱 저장 → data/main/*.json 자동 동기화, 빈 기기는 서버 data 폴더에서 받아 옴 · 저장 정책(동기화·비밀 갈래는 PC 서버로, 기기 갈래는 안 감)');
     } finally { proc.kill(); }
     // 33 배포본: 원본 배포 zip처럼 실행 파일만 든 gacha-game-maker-pc.zip을 빈 폴더에 풀고 start.sh로 켜면, 앱(www/)을 받는 곳(GitHub raw 자리에 로컬 서버)에서
     //    빌드된 www를 받아 띄우고 브라우저에서 그 빌드가 돈다(BUILT = version.json build, 서버 버전 = SERVER_VER)
     const dist = join(tmp, 'dist'), z = zipRead(readFileSync(join(ROOT, 'gacha-game-maker-pc.zip'))); mkdirSync(dist); for (const [n, b] of z) writeFileSync(join(dist, n), b);
     const raw = createServer((q, r) => { try { const f = decodeURIComponent(new URL(q.url, 'http://x').pathname).split('/www/')[1]; r.writeHead(200); r.end(readFileSync(join(ROOT, 'www', f))); } catch (e) { r.writeHead(404); r.end(); } });
     await new Promise(ok => raw.listen(0, ok)); const port2 = 20000 + Math.floor(Math.random() * 20000), out = [];
-    const proc2 = spawn('sh', ['start.sh', '--no-tunnel'], { cwd: dist, env: { ...process.env, GGM_PORT: String(port2), GGM_RAW: `http://127.0.0.1:${raw.address().port}`, BROWSER: 'true' } }); proc2.stdout.on('data', d => out.push(String(d)));
+    const proc2 = spawn('sh', ['start.sh', '--no-tunnel'], { cwd: dist, detached: true, env: { ...process.env, GGM_PORT: String(port2), GGM_RAW: `http://127.0.0.1:${raw.address().port}`, BROWSER: 'true' } }); proc2.stdout.on('data', d => out.push(String(d))); // 프로세스 그룹: start.sh 아래 python까지 끔
     try {
       const until = async (fn, ms, what) => { const t = Date.now(); for (;;) { try { const v = await fn(); if (v) return v; } catch (e) { out.push(String(e)); } if (Date.now() - t > ms) throw Error('시간 초과: ' + what + '\n' + out.join('')); await new Promise(r => setTimeout(r, 300)); } };
       const hello = await until(async () => { const r = await fetch(`http://127.0.0.1:${port2}/api/hello`); return r.ok && r.json(); }, 20000, '배포본 서버 시작'), V = JSON.parse(readFileSync(join(ROOT, 'version.json'), 'utf8'));
@@ -812,7 +864,7 @@ try {
       await p4.waitForFunction(() => typeof G === 'object' && typeof APP_BUILD === 'string', null, { timeout: 20000 }); const built = await p4.evaluate(() => APP_BUILD); await b4.close();
       assert.equal(built, V.build, '배포본에서 도는 앱 = version.json의 빌드'); assert.deepEqual(err4, [], '페이지 오류');
       console.log('ok 33 배포본: gacha-game-maker-pc.zip(실행 파일만)을 빈 폴더에 풀고 start.sh로 켜면 빌드된 www를 받아 띄움(앱 빌드 = version.json, 서버 버전 = SERVER_VER)');
-    } finally { proc2.kill(); raw.close(); }
+    } finally { try { process.kill(-proc2.pid, 'SIGTERM'); } catch (e) { if (e.code !== 'ESRCH') throw e; } /* 이미 다 꺼졌으면 ESRCH */ proc2.stdout.destroy(); raw.close(); }
   }
 } finally { rmSync(tmp, { recursive: true, force: true }); }
 // 커버리지(CDP 정밀 커버리지): 페이지가 다시 불러오거나 이동하면 이전 문서의 실행 기록이 사라지므로, 이동을 시작할 때마다 먼저 받아 둠

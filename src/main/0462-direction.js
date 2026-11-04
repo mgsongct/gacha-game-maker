@@ -57,7 +57,7 @@ function lobbyEmote(el,line,zone){ if(dirMode()==='off'||!el) return; const k=au
 /* AI 연출 입히기: 대사·나레이션은 그대로 두고 표정|감정|동작 태그와 [효과]만 더해요. 바뀐 글이 있으면 버려요 */
 function dirStrip(t){ return parseScript(t).filter(L=>L.type==='say'||L.type==='nar'||L.type==='choice').map(L=>L.type==='choice'?L.opts.join('|'):(L.who||'')+':'+L.text).join('\n'); }
 function dirCount(t){ return parseScript(t).filter(L=>(L.type==='say'&&L.dir&&(L.dir.emo||L.dir.motion))||(L.type==='cmd'&&(L.cmd==='연출'||(L.cmd==='효과'&&!/흔들림|플래시|암전/.test(L.arg))))).length; }
-async function directScript(text,btn){ const src=String(text||''); if(!src.trim()) return null;
-  const r=await aiJSON(`${pf('DIRECT_SCRIPT',{RULES,DIRECTION_GUIDE,src})}\n\nJSON만 출력: {"script":"연출을 더한 대본 전체"}`,btn,'complex');
+async function directScript(text,rep){ const src=String(text||''); if(!src.trim()) return null;
+  const r=await aiJSON(directScriptPrompt({src}),rep,'complex');
   const out=r&&nl(r.script); if(!out) return null; if(dirStrip(out)!==dirStrip(src)) return null; return out; }
 async function directStage(s){ let ok=false; for(const k of ['pre','post']){ if(!s[k]) continue; const o=await directScript(s[k]); if(o){ s[k]=o; ok=true; } } if(ok){ s.dirV=1; auditMarkObj(s); } return ok; }

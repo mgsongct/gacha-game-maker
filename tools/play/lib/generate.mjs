@@ -34,7 +34,7 @@ export async function runGenerate({ phase, responses = {}, input = null, game = 
         let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [, v] of Object.entries(recs)) if (/"chapters"/.test(v)) { saved = JSON.parse(v); result.commitAtCall = log.length; } return orig(recs); };
         window.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
         const stat = []; const mo = new MutationObserver(() => { const s = document.getElementById('ng_stat'); if (s && s.textContent && stat.at(-1) !== s.textContent) stat.push(s.textContent); }); mo.observe(document.body, { subtree: true, childList: true, characterData: true });
-        const t0 = performance.now(); try { await newGame(btn, input); } /* 실제 진입점(NEW_GAME_SOURCE를 켜고 끝나면 원래 게임으로) */ catch (e) { result.thrown = String(e && (e.message || e.code) || e); }
+        const t0 = performance.now(); try { await newGame(uiProg(btn, '#ng_stat'), input); } /* 실제 진입점(NEW_GAME_SOURCE를 켜고 끝나면 원래 게임으로) */ catch (e) { result.thrown = String(e && (e.message || e.code) || e); }
         result.ms = Math.round(performance.now() - t0); await settle(settleMs); mo.disconnect(); result.stat = stat; result.game = saved;
         result.draftKept = !!appStorage.getItem('ggm-ng-draft');
       } else if (phase === 'import') { // 앱의 데이터 폴더 zip 내보내기·가져오기 경로 그대로(확인 창은 "예")

@@ -28,11 +28,14 @@ const AUDIT_RULES=[
  {id:'c_statband',scope:'char',kind:'upgrade',since:3,label:'능력치가 희귀도·기본형 기준에서 많이 벗어났어요(AI 생성 편차)',test:c=>!c.alt&&balInfo(c).statOut,fix:{mode:'auto',run:c=>{ balNormalize(c,'edge'); }}},
  {id:'c_genlag',scope:'char',kind:'upgrade',since:3,label:'출시 세대가 현재보다 많이 뒤처졌어요(구캐릭터 AS)',test:c=>!c.alt&&balInfo(c).genLag,fix:{mode:'skills-remaster'}},
  {id:'c_persona',scope:'char',kind:'missing',since:4,label:'개성 시트(성격·말투·반전 매력)가 없거나 비었어요',test:c=>!c.alt&&!((c.persona||{}).traits||[]).length,fix:{mode:'ai-persona',k:'fill'}},
+ {id:'c_pfields',scope:'char',kind:'missing',since:9,label:'프로필 항목(생일·신장 등 게임의 프로필 틀)이 비었어요',test:c=>!c.alt&&((c.persona||{}).traits||[]).length>0&&!Object.keys(c.pfields||{}).length,fix:{mode:'ai-persona',k:'fill'}},
  {id:'c_persona_weak',scope:'char',kind:'upgrade',since:4,label:'개성 검수 점수가 낮아요(매력·차별성 부족)',test:c=>!c.alt&&((c.persona||{}).traits||[]).length>0&&personaReview(c).score<55,fix:{mode:'ai-persona',k:'improve'}},
  {id:'c_afftalk',scope:'char',kind:'missing',since:4,label:'호감도에 따라 열리는 인연 톡이 없어요',test:c=>!c.alt&&!affThreads(c).length,fix:{mode:'ai-afftalk'}},
  {id:'c_memorial',scope:'char',kind:'missing',since:4,label:'메모리얼(높은 호감도 특별 장면·로비 대사)이 없어요',test:c=>!c.alt&&!(c.memorial&&c.memorial.script),fix:{mode:'ai-memo'}},
  {id:'g_rules',scope:'game',kind:'upgrade',since:3,label:'속성·역할 설명이 없어요(게임 규칙·도감에 표시돼요)',test:()=>rulesMissingDesc(),fix:{mode:'ai-rules'}},
+ {id:'g_pos',scope:'game',kind:'upgrade',since:9,label:'세계관에 맞춘 포지션이 없어요(기본 공격·방어·지원으로 돌아가요 — AI로 설계해 캐릭터에 배정)',test:()=>!(Array.isArray(G.meta.positions)&&G.meta.positions.length),fix:{mode:'ai-run',run:()=>posAI()}},
  {id:'g_codex',scope:'game',kind:'upgrade',since:3,label:'도감에 게임 규칙(상성·역할)이 기록되지 않았어요',test:()=>rulesNotInCodex(),fix:{mode:'auto',run:()=>{ rulesCodex(); }}},
+ {id:'w_stance',scope:'game',kind:'upgrade',since:10,label:'세력과 플레이어의 관계 변화(장별 태도)가 없어요(세력 종류 기본값으로만 돌아요 — 이미 쓴 장 이야기로 채워요)',test:()=>G.chapters.some(ch=>ch.kind==='main')&&factions().some(f=>f.kind!=='monster')&&factions().filter(f=>f.kind!=='monster').every(f=>!(f.stance||[]).length),fix:{mode:'ai-run',run:()=>stanceAI()}},
  {id:'w_faction',scope:'game',kind:'upgrade',since:8,label:'세력·몬스터 설정이 얕아요(종류·목적·관계·정체가 비어 있음)',test:()=>factionReview().score<70,fix:{mode:'ai-run',run:()=>factionAI()}},
  {id:'c_monster',scope:'char',kind:'missing',since:1,label:'몬스터로 보이는 캐릭터예요(톡·일정·인연 대상이 되면 안 돼요 → 적으로 전환)',test:c=>!c.monster&&!c.alt&&isMonsterLike(c),fix:{mode:'auto',run:c=>charToMonster(c)}},
  {id:'c_debut',scope:'char',kind:'upgrade',since:8,label:'스토리 중간에 처음 나오는데 처음부터 뽑을 수 있는 캐릭터예요(첫 등장 스테이지 전엔 잠그기)',test:c=>!c.debut&&!own(c.id)&&!c.alt&&!c.monster&&!!firstSpeak(c)&&firstSpeak(c).k>0,fix:{mode:'auto',run:c=>{ const f=firstSpeak(c); if(f){ c.debut=f.s.id; delete c.debutLater; } }}},
@@ -43,7 +46,7 @@ const AUDIT_RULES=[
  {id:'c_spot',scope:'char',kind:'upgrade',since:5,label:'일정 장소에서 만날 때의 장면이 없어요(기본 장면으로 나와요)',test:c=>!c.alt&&!c.npc&&spots().length>0&&spots().some(s=>!(c.spotTalk||{})[s.id]),fix:{mode:'ai-run',run:c=>spotTalkAI(c)}},
  {id:'l_imgperson',scope:'lib',kind:'missing',since:1,label:'배경·소품 그림 프롬프트에 사람 태그가 섞여 있어요(사람 그림이 돼요)',test:l=>!!IMG_NOHUMAN[l.kind]&&!!l.prompt&&imgGuard(l.kind,l.prompt).removed.length>0,fix:{mode:'auto',run:l=>{ plHit('img-person-'+l.kind,l.prompt); l.prompt=imgGuard(l.kind,l.prompt).out; }}},
  {id:'l_img',scope:'lib',kind:'missing',since:1,label:'배경·소품·CG·적 그림이 아직 없어요',test:l=>drawTodo(['bg','prop','cg','enemy']).some(it=>it.o===l),fix:{mode:'image'}}];
-function auditVer(){ return Math.max(...AUDIT_RULES.map(r=>r.since)); }
+function auditVer(){ return Math.max(...AUDIT_RULES.map(r=>r.since)); } // 점검 판: 9 = 프로필 항목·포지션 보완, 10 = 세력 장별 태도 보완(생성 규칙은 그대로라 auditGenVer는 8)
 function auditTargets(scope){ if(scope==='char') return G.chars; if(scope==='lib') return G.lib; if(scope==='game') return [G.meta]; if(scope==='stage') return G.chapters.filter(ch=>ch.kind==='main'||ch.kind==='event').flatMap(ch=>ch.stages||[]); return []; }
 function auditName(r,o){ if(r.scope==='game') return G.meta.title||'게임'; if(r.scope==='stage'){ const ch=G.chapters.find(c=>(c.stages||[]).includes(o)); return `${ch?ch.title+' · ':''}${o.title||o.id}`; } return o.name||o.id; }
 function auditScan(only){ const out=[]; for(const r of AUDIT_RULES){ const items=auditTargets(r.scope).filter(o=>(!only||only(o,r))&&(()=>{ try{ return r.test(o); }catch(e){ return false; } })()); if(items.length) out.push({rule:r,items}); } return out; }
@@ -56,7 +59,7 @@ function auditMarkObj(o){ if(o===G.meta){ mark('meta','world'); return; } if(G.c
 
 async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(instruction 없음) 또는 지정 변환(instruction 있음)
   const schema='{'+fields.map(f=>AUDIT_FIELDS[f][1]).join(',')+'}', cur=fields.map(f=>`${AUDIT_FIELDS[f][0]}: ${JSON.stringify(c[f]??'')}`).join('\n');
-  const r=await aiJSON(`${RULES}\n${ctx()}\n\n${T('crew')} 「${c.name}」(${ROLE[c.role]||''}, ${c.faction||'무소속'}). 프로필: ${String(c.profile||'').slice(0,400)}\n지금 값:\n${cur}\n\n${instruction?pf('AUDIT_CONVERT',{instruction}):pf('AUDIT_FILL')}${fields.includes('naiPrompt')?' '+NAI_CHAR:''}\nJSON만 출력: ${schema}`,null,'default');
+  const r=await aiJSON(auditAIFillPrompt({c,cur,instruction,fields,schema}),null,'default');
   if(!r) return false;
   for(const f of fields){ const v=r[f]; if(v==null) continue;
     if(f==='touch'&&typeof v==='object') c.touch={head:auditStrs(v.head).slice(0,8),body:auditStrs(v.body).slice(0,8),pet:auditStrs(v.pet).slice(0,8)};
@@ -65,7 +68,7 @@ async function auditAIFill(c,fields,instruction){ // 빠진 항목 채우기(ins
     else if(f==='naiPrompt') c.naiPrompt=stripAge(tagList(String(v)).filter(t=>!MINOR_TAGS.test(tagKey(t))).join(', '));
     else c[f]=String(v).trim(); }
   mark('c:'+c.id); return true; }
-async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(`${pf('AUDIT_STAGE',{RULES,ctx:ctx(),SCRIPT_FMT,title:ch?ch.title:'',title2:s.title||''})}\nJSON만 출력: {"pre":"대본"}`,null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
+async function auditAIStage(s){ const ch=G.chapters.find(c=>(c.stages||[]).includes(s)); const r=await aiJSON(auditAIStagePrompt({ch,s}),null,'default'); if(!r||!r.pre) return false; s.pre=String(r.pre); auditMarkObj(s); return true; }
 
 // 한 항목 고치기 — 점검 화면의 일괄 고치기(auditFix)와 실행 중 자동 채움(liveFill, 0537)이 같이 씀. 고쳤으면 true
 // 규칙 고치기 중 글 AI로 더 잘 채울 수 있는 것(fix.ai — 일정 장소는 AI가 좋아하는 것 태그까지 붙여 "좋아하는 장소 ♥"가 맞음)은 AI가 있으면 AI로, 없거나 실패하면 규칙으로
@@ -81,7 +84,7 @@ async function auditFixOne(rule,o){ const m=rule.fix.mode;
   if(m==='ai-run') return !!(await rule.fix.run(o));
   if(m==='weapon'){ await fixWeaponPrompts([o]); auditMarkObj(o); return true; }
   if(m==='skills'){ v2Ensure(o); await v2ReadyChars([o]); auditMarkObj(o); return true; }
-  if(m==='skills-remaster'&&balRemaster(o)){ await v2ReadyChars([o]); auditMarkObj(o); return true; }
+  if(m==='skills-remaster'&&await balRemasterAI(o)){ auditMarkObj(o); return true; }
   return false; }
 async function auditFix(rule,items){
   if(AUDIT_JOB){ toast('점검 작업이 진행 중이에요'); return; } const m=rule.fix.mode;
@@ -102,10 +105,8 @@ async function auditConvert(chars,fields,instruction){
 
 /* 화면 */
 let AUDIT_FOCUS=null; // 캐릭터 하나만 볼 때 id
-function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen=auditVer(); mark('meta'); }
-  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기','ai-rules':'AI로 설명 채우기','ai-persona':'AI로 개성 채우기·다듬기','ai-afftalk':'AI로 인연 톡 만들기','ai-memo':'AI로 메모리얼 만들기','skills-remaster':'세대 맞추기(AS)',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
-  const chars=focus?G.chars.filter(c=>c.id===focus):G.chars;
-  openModal(`${head(focus?`${charById(focus)?.name||''} 점검`:'콘텐츠 점검·업그레이드',`<span class="muted">생성 규칙 v${auditGenVer()} · ${focus?'':`구버전 생성물 ${old}명`}</span>`)}
+/* 콘텐츠 점검·업그레이드 창 내용(View) */
+function auditHTML(focus,old,res,kinds,how,chars){ return `${head(focus?`${charById(focus)?.name||''} 점검`:'콘텐츠 점검·업그레이드',`<span class="muted">생성 규칙 v${auditGenVer()} · ${focus?'':`구버전 생성물 ${old}명`}</span>`)}
     <p class="muted" style="font-size:.82rem;margin:0 0 8px">생성 기능이 좋아졌거나 예전에 만든 콘텐츠에 빠진 게 있으면 여기에서 찾아 고쳐요. 고치기 전 상태는 마지막 작업 한 번까지 되돌릴 수 있어요.</p>
     ${AUDIT_UNDO?`<div class="panel" style="padding:8px 10px"><span class="muted">마지막 작업: ${esc(AUDIT_UNDO.label)} (${AUDIT_UNDO.items.length}개)</span> <button class="btn sm ghost" data-act="audundo">되돌리기</button></div>`:''}
     ${res.length?res.map(({rule:r,items},gi)=>`<details class="panel" style="margin:6px 0" ${gi<3?'open':''}><summary><span class="badge">${kinds[r.kind]}</span> <b>${esc(r.label)}</b> <span class="muted">${items.length}개</span></summary>
@@ -116,7 +117,11 @@ function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen
       <label class="f">항목</label><div class="row" style="flex-wrap:wrap">${Object.entries(AUDIT_FIELDS).map(([k,[l]])=>`<label style="display:inline-flex;gap:4px"><input type="checkbox" data-audf="${k}">${esc(l)}</label>`).join('')}</div>
       <label class="f" for="aud_ins">지시</label><textarea class="in" id="aud_ins" rows="2" placeholder="예: 대사를 모두 반말로 / 프로필에 출신지와 좋아하는 음식 추가 / 외모 태그를 겨울 분위기로"></textarea>
       <div class="row" style="margin-top:6px"><button class="btn sm" data-act="audconv">지정 변환 시작</button></div></details>
-    <div class="row" style="margin-top:12px">${AUDIT_JOB?'<button class="btn ghost" data-act="audstop">작업 멈추기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>`); }
+    <div class="row" style="margin-top:12px">${AUDIT_JOB?'<button class="btn ghost" data-act="audstop">작업 멈추기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>`; }
+function openAudit(focus){ AUDIT_FOCUS=focus||null; if(!focus){ G.meta.auditSeen=auditVer(); mark('meta'); }
+  const only=focus?(o=>o.id===focus):null, res=auditScan(only), old=G.chars.filter(c=>!c.alt&&(+c.genVer||0)<auditGenVer()&&!DEFAULT_CHARS.some(d=>d.id===c.id)).length, kinds={missing:'빠짐',upgrade:'구버전·업그레이드'}, how={auto:'자동 변환',ai:'AI로 채우기','ai-stage':'AI로 쓰기','ai-rules':'AI로 설명 채우기','ai-persona':'AI로 개성 채우기·다듬기','ai-afftalk':'AI로 인연 톡 만들기','ai-memo':'AI로 메모리얼 만들기','skills-remaster':'세대 맞추기(AS)',weapon:'AI로 고치기',skills:'다시 맞추기',image:'그림 그리기',open:'다시 만들기 열기'};
+  const chars=focus?G.chars.filter(c=>c.id===focus):G.chars;
+  openModal(auditHTML(focus,old,res,kinds,how,chars)); }
 function auditPanel(){ const n=auditScan().reduce((a,x)=>a+x.items.length,0), fresh=(+G.meta.auditSeen||0)<auditVer();
   return `<div class="panel pm-hide"><h3>콘텐츠 점검·업그레이드 ${fresh?'<span class="badge">생성 기능 향상</span>':''}</h3><p class="muted" style="margin:0 0 10px">${n?`고칠 수 있는 항목 ${n}개. `:''}빠진 대사·그림·태그, 구버전 생성물을 찾아 자동·AI로 고치거나, 고른 캐릭터를 지시대로 바꿔요.</p><button class="btn sm" data-act="audopen">점검 열기</button></div>`; }
 function auditNotice(){ try{ if((+G.meta.auditSeen||0)>=auditVer()||!P().seenOpening) return; const n=auditScan().reduce((a,x)=>a+x.items.length,0); if(n) toast(`생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 ${n}개를 업그레이드할 수 있어요`); }catch(e){} }

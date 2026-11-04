@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { loadUnits } from './lib/source.mjs';
+import { loadUnits, walk } from './lib/source.mjs';
 import { buildGraph, unused, unusedVars, cycles, deepest } from './lib/graph.mjs';
 import { actions, mutations, stateFlow } from './lib/flow.mjs';
 import { parseErrors, dupBodies, repeatedStrings, sgRules, commentedCode } from './lib/quality.mjs';
@@ -16,8 +16,11 @@ import { stageClosures } from './lib/lifecycle.mjs';
 import { bindings, violations, renameEdits } from './lib/names.mjs';
 import { inlinePrompts, pureModules, imperative, fragmentFiles } from './lib/prompts.mjs';
 import { moveLiteral, slotName } from './prompts-move.mjs';
-import { moduleMap } from './lib/modules.mjs';
+import { moduleMap, louvain } from './lib/modules.mjs';
 import { reachable, claimNames } from './lib/history.mjs';
+import { surfaceOf, placeOf, surfaceMap } from './lib/surface.mjs';
+import { archMap } from './lib/arch.mjs';
+import { moduleOf } from './lib/scope.mjs';
 
 const root = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w = (p, s) => { mkdirSync(join(root, p, '..'), { recursive: true }); writeFileSync(join(root, p), s); };
 w('src/index.html', '<script>\n<!--@ main/ -->\n</script>\n');
@@ -152,6 +155,83 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   assert.ok(imperative('처음 만난다)') && imperative('보스전이다.') && !imperative('저장했어요.') && imperative('BURST 생성 금지.') && !imperative('JSON만 출력: {}'), '해라체 판별(…금지도 지시, JSON만 출력은 표식)');
   writeFileSync(join(r7, 'src/main/020-q.js'), "pfDef('B','다른 곳',()=>'흩어진 조각은 안 된다.');\n"); const FF = fragmentFiles(await loadUnits(r7));
   assert.ok(FF.home === 'src/main/010-p.js' && FF.stray.length === 1 && FF.stray[0].file === 'src/main/020-q.js', '조각이 두 파일에 흩어지면 잡음: ' + JSON.stringify(FF)); rmSync(r7, { recursive: true, force: true }); }
+// 프롬프트 흐름 보강: 글로 쓰는 지역 변수(const FAN=…)·연결 층 덧붙임(받은 프롬프트에 붙이는 글)·넘겨받은 글 AI(s.json(p) — 안쪽 콜백)·돌려주는 식만(부수 글 뺌)·출력 자리만(비교값 뺌)
+{ const r8 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r8, 'src/main'), { recursive: true });
+  writeFileSync(join(r8, 'src/main/010-a.js'), [
+    "async function aiCall(prompt){ const P2=prompt+'\\n\\n다른 설명 없이 JSON만 출력한다.'; return http(P2); }",
+    "async function aiJSON(p){ return aiCall(p); }",
+    "async function gen(src){ const FAN=src?`원작 「${src}」을 따른다.`:''; return aiJSON(`${FAN}\\n${helper()}${isMe('나')?'':''}\\nJSON만 출력: {\"a\":1}`); }",
+    "function helper(){ toast('저장하지 못했다.'); return '이름을 짓는다.'; }",
+    "function isMe(n){ return n==='나는 아니다'; }",
+    "async function req(s,prompt){ return Promise.resolve().then(()=>s.json(prompt,{})); }",
+    "async function skill(){ return req(SAMPLE,'세 스킬을 설계한다.'); }",
+    "async function res(){ const r=await fetch('x'); return r.json(); }"].join('\n'));
+  const U8 = await loadUnits(r8), got = inlinePrompts(U8).map(p => `${p.site.split(' ')[1]}:${p.head}`).sort();
+  assert.deepEqual(got, ['aiCall:\\n\\n다른 설명 없이 JSON만 출력한다.', 'gen:원작 「」을 따른다.', 'helper:이름을 짓는다.', 'skill:세 스킬을 설계한다.'], '프롬프트 흐름 보강: ' + JSON.stringify(got)); rmSync(r8, { recursive: true, force: true }); }
+// 자연 경계(모듈성 최대화): 두 덩어리가 다리 하나로 이어지면 두 묶음 — 찾은 경계의 Q가 한 덩어리로 볼 때보다 큼 · 이름 범위: 지역 이름만 넘기고 콜백 인자는 안 셈, 바깥 이름에 쓰기·await 잡음
+{ const { louvain, modularity } = await import('./lib/modules.mjs'), adj = new Map(), e = (a, b) => { for (const [x, y] of [[a, b], [b, a]]) { if (!adj.has(x)) adj.set(x, new Map()); adj.get(x).set(y, 1); } };
+  ['a', 'b', 'c', 'd'].forEach((x, i, A) => A.slice(i + 1).forEach(y => e(x, y))); ['p', 'q', 'r', 's'].forEach((x, i, A) => A.slice(i + 1).forEach(y => e(x, y))); e('d', 'p');
+  for (const sd of [1, 2, 3]) { const c2 = louvain(adj, sd); assert.ok(new Set(c2.values()).size === 2 && c2.get('a') === c2.get('d') && c2.get('a') !== c2.get('p'), '묶기: 노드 순서를 바꿔도 같은 경계(seed)'); }
+  const c = louvain(adj), parts = new Set(c.values()); assert.ok(parts.size === 2 && c.get('a') === c.get('d') && c.get('p') === c.get('s') && c.get('a') !== c.get('p') && modularity(adj, c) > modularity(adj, new Map([...adj.keys()].map(k => [k, 0]))), '모듈성 묶기: ' + JSON.stringify([...c]));
+  const { freeNames } = await import('./lib/scope.mjs'), r9 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r9, 'src/main'), { recursive: true });
+  writeFileSync(join(r9, 'src/main/010-a.js'), "function top(){}\nasync function f(a,c){ const d=1; let n=0; const X=`${a}${c.map(y=>y+d)}${top()}${G.x}`; const W=`${n++}`; const A=`${await top()}`; }\n");
+  const U9 = await loadUnits(r9), decl = nm => { let hit = null; walk(U9[0].tree.rootNode, n => { if (n.type === 'variable_declarator' && n.childForFieldName('name')?.text === nm) hit = n.childForFieldName('value'); }); return hit; };
+  const X = freeNames(decl('X')), W = freeNames(decl('W')), A = freeNames(decl('A'));
+  assert.ok(X.locals.sort().join() === 'a,c,d' && X.globals.sort().join() === 'G,top' && !X.writes.length && W.writes.join() === 'n' && A.hasAwait, '이름 범위: ' + JSON.stringify({ X, W: W.writes, A: A.hasAwait })); rmSync(r9, { recursive: true, force: true }); }
+// 정의 안 된 이름(부르면 ReferenceError): 처리기 매개변수 이름을 잘못 쓴 것은 잡고, 지역(매개변수·let·for…of·catch·안쪽 함수 이름)·다른 스크립트 맨 위·window.X=·defineProperty·전역을 만드는 함수에 넘긴 이름·typeof로 보는 이름·브라우저 전역은 안 잡음
+{ const { undefinedNames } = await import('./lib/extra.mjs'), r16 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r16, 'src/main'), { recursive: true }); mkdirSync(join(r16, 'src/modules/app'), { recursive: true });
+  writeFileSync(join(r16, 'src/main/010-a.js'), "function defG(id,v){ Object.defineProperty(window,id,{get:()=>v}); }\ndefG('PFX',1); Object.defineProperty(window,'RULESX',{get:()=>2}); window.SHELLX=3;\nasync function handleXAction(a,t,id,p,el){ switch(a){ case 'x': { const y=e.clientY; return y; } case 'y': { for(const q of [1]) document.title=String(q+PFX+RULESX+SHELLX+FROMMOD); try{ nope(); }catch(err){ return err; } } } }\nfunction inner(){ const f=function g(n){ return n?g(n-1):0; }; return f(1)+(typeof module!=='undefined'&&module.exports?1:0); }\nclass K { m(){ return K; } }\n");
+  writeFileSync(join(r16, 'src/modules/app/010-m.js'), "const FROMMOD=1;\n");
+  const U = undefinedNames(await loadUnits(r16), { window: ['document', 'window', 'Object', 'String'] }).map(x => x.name).sort(); assert.deepEqual(U, ['e', 'nope'], '정의 안 된 이름: ' + JSON.stringify(U)); rmSync(r16, { recursive: true, force: true }); }
+// 읽기 결과에 쓰기(lib/extra.mjs freshReaderWrites): 없으면 새 값을 돌려주는 읽기 함수·progRead의 결과에 쓰면 잡고, 상태에 다시 넣는 꼴은 안 잡음
+{ const { freshReaderWrites } = await import('./lib/extra.mjs'), r19 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r19, 'src/main'), { recursive: true });
+  writeFileSync(join(r19, 'src/main/010-r.js'), "let G={meta:{}};\nfunction rd(){ const c=G.meta.x; return c?c:{on:false}; }\nfunction bad(){ rd().on=true; progRead('mail').push(1); }\nfunction ok(){ G.meta.x=Object.assign(rd(),{on:true}); return rd().on; }\n");
+  const u = await loadUnits(r19), g = buildGraph(u), W = freshReaderWrites(u, g.fns, mutations(u, g.fns).mut).map(x => x.fn).sort(); assert.deepEqual(W, ['progRead', 'rd'], '읽기 결과에 쓰기: ' + JSON.stringify(W)); rmSync(r19, { recursive: true, force: true }); }
+// 요소 매개변수(lib/arch.mjs elementParams): 매개변수를 DOM 요소로 만지면 직접, 그런 자리로 넘기면 거쳐 감(호출 그래프 고정점), 그 밖은 아님
+{ const { elementParams } = await import('./lib/arch.mjs'), r18 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r18, 'src/main'), { recursive: true });
+  writeFileSync(join(r18, 'src/main/010-e.js'), "function work(p,btn){ btn.disabled=true; return p; }\nfunction pass(x,b){ return work(x,b||null); }\nfunction top2(q,c){ return pass(q,c); }\nfunction free(n,m){ return work(n,null)+m; }\n");
+  const EP = elementParams(buildGraph(await loadUnits(r18)).fns).map(x => `${x.fn}(${x.param})${x.direct ? '*' : '→' + x.via}`).sort(); assert.deepEqual(EP, ['pass(b)→work', 'top2(c)→pass', 'work(btn)*'], '요소 매개변수: ' + JSON.stringify(EP)); rmSync(r18, { recursive: true, force: true }); }
+// 규칙 전수검사(lib/rules.mjs): 규칙표가 계층 정의(LAYER_DEF) 하나로 SPA 전체(main·modules)를 판정하고, 그리다가 바꿈(L2)을 끝 함수의 성질로 원인별로 나눔
+{ const { runRules } = await import('./lib/rules.mjs'), { analyze } = await import('./lib/analyze.mjs'), { buildMap } = await import('./lib/map.mjs'), r20 = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w20 = (p, x) => { mkdirSync(join(r20, p, '..'), { recursive: true }); writeFileSync(join(r20, p), x); };
+  w20('src/index.html', '<div id="app"></div>'); w20('www/index.html', '<html></html>');
+  w20('src/main/010-s.js', "let G={meta:{},prog:{}};\nfunction P(){ return G.prog; }\nfunction mark(k){ return k; }\nfunction progSlot(k){ const v=P()[k]||(P()[k]={}); mark('prog'); return v; }\nfunction readList(){ return progSlot('mail').list; }\nfunction cfg(){ if(!G.meta.cfg) G.meta.cfg={on:1}; return G.meta.cfg; }\nfunction saveIt(){ mark('meta'); }\nfunction listHTML(){ return '<p>'+readList()+cfg().on+'</p>'; }\nfunction badHTML(){ saveIt(); return '<b>x</b>'; }\nfunction act(){ G.meta.x=1; return listHTML(); }\n");
+  w20('src/modules/app/010-m.js', "function modMix(el){ el.innerHTML='<i>m</i>'; localStorage.setItem('k','v'); }\n");
+  const A = await analyze(r20), M = buildMap(A.units, A.fns, stateFlow(A.units, A.fns), ''), RS = runRules({ A, M }), R = id => RS.find(r => r.id === id);
+  const l2 = Object.fromEntries(R('L2').items.map(x => [x.what.split(' → ')[0] + '>' + x.end, x.cause]));
+  assert.ok(R('L1').items.some(x => x.what === 'modMix' && x.scope === 'modules'), '전수검사: 모듈 쪽 섞임도 잼 ' + JSON.stringify(R('L1').items));
+  assert.ok(l2['listHTML>progSlot'] === '읽기가 progSlot' || l2['listHTML>readList'] === '읽기가 progSlot' || Object.values(l2).includes('읽기가 progSlot'), 'L2 원인: 읽기가 progSlot ' + JSON.stringify(l2));
+  assert.ok(Object.values(l2).includes('없으면 만들어 씀') && Object.values(l2).includes('처리 호출'), 'L2 원인: 없으면 만들어 씀(cfg)·처리 호출(mark) ' + JSON.stringify(l2));
+  assert.ok(R('L3').items.some(x => x.what.startsWith('act →')), 'L3: Model이 화면 함수를 부름 ' + JSON.stringify(R('L3').items));
+  rmSync(r20, { recursive: true, force: true }); }
+// 식을 함수로 떼기(tools/extract.mjs): 지역 이름만 인자로, await·바깥 이름 쓰기가 든 식은 거부, 원래 함수 앞에 새 함수
+{ const { findTarget, extractPlan, applyExtract } = await import('./extract.mjs'), r17 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r17, 'src/main'), { recursive: true });
+  const src = "const TOP=1;\nfunction openX(id){ const c=find(id), n=2;\n  openModal(`<p>${c.name}${n}${TOP}</p>`);\n  openModal(`<b>${await0()}</b>`); }\nasync function bad(){ let k=0;\n  openModal(`${await one()}${k++}`); }\n";
+  writeFileSync(join(r17, 'src/main/010-x.js'), src); const u = await loadUnits(r17), T = findTarget(u, 'src/main/010-x.js:3', 'openModal', 0), P = extractPlan(T.node), B = findTarget(u, 'src/main/010-x.js:6', 'openModal', 0);
+  const R = applyExtract(src, { exprText: T.node.text, topText: T.top.text, name: 'xHTML', params: P.params, doc: 'x 창(View)', sameFile: true });
+  assert.ok(P.ok && P.params.join() === 'c,n' && !extractPlan(B.node).ok && R.src.includes('openModal(xHTML(c,n));') && R.src.indexOf('function xHTML(c,n){ return `<p>${c.name}${n}${TOP}</p>`; }') < R.src.indexOf('function openX'), '식 떼기: ' + JSON.stringify(P) + R.src);
+  rmSync(r17, { recursive: true, force: true }); }
+// 불러올 때 아직 없는 이름(TDZ): 함수 밖에서 뒤에 선언될 const를 읽으면 잡고, 함수 안(나중에 돎)·앞에 선언된 이름은 안 잡음
+{ const { leadComments } = await import('./lib/extra.mjs'), at = s => s.indexOf('function f'); /* 옮기기 도구: 선언 위 설명 주석까지(머리말·옮김 표식·같은 줄 코드 뒤 주석은 남김) */
+  const s1 = '/* ===== 머리말 ===== */\n/* 설명 하나 */\n// 설명 둘\nfunction f(){}', s2 = '/* ===== 머리말 ===== */\nfunction f(){}', s3 = 'x();\n/* 여러\n   줄 */\nfunction f(){}', s4 = 'g(); /* 끝 */\nfunction f(){}', s5 = '/* a.js에서 옮김 */\nfunction f(){}';
+  assert.ok(s1.slice(leadComments(s1, at(s1))).startsWith('/* 설명 하나') && leadComments(s2, at(s2)) === at(s2) && s3.slice(leadComments(s3, at(s3))).startsWith('/* 여러') && leadComments(s4, at(s4)) === at(s4) && leadComments(s5, at(s5)) === at(s5), '옮기기: 설명 주석 같이'); }
+{ const { tdzRefs } = await import('./lib/extra.mjs'), r10 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r10, 'src/main'), { recursive: true });
+  writeFileSync(join(r10, 'src/main/010-a.js'), "const A = { tags: B, ok: OK };\nconst OK = 1;\nfunction later(){ return B; }\nconst C = () => B;\n"); writeFileSync(join(r10, 'src/main/020-b.js'), "const B = 'x';\nconst D = A.ok + OK;\n");
+  const T = tdzRefs(await loadUnits(r10)).map(x => x.name).sort(); assert.deepEqual(T, ['B', 'OK'], 'TDZ: ' + JSON.stringify(T)); rmSync(r10, { recursive: true, force: true }); }
+// 프롬프트 조립 함수(조각을 고르고 잇는 함수)가 스튜디오 밖이면 잡음 · 조각을 데이터와 바로 보내는 요청 지점은 안 잡음 · 불러올 때 조각 읽기 잡음
+{ const { promptBuilders, fragmentFiles: FF2 } = await import('./lib/prompts.mjs'), r11 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r11, 'src/main/0015-s'), { recursive: true });
+  writeFileSync(join(r11, 'src/main/0015-s/010-a.js'), "pfDef('A','a',()=>'가');\npfDef('B','b',()=>'나');\nfunction inStudio(){ return pf('A'); }\n");
+  writeFileSync(join(r11, 'src/main/020-f.js'), "function rule(k){ return k?pf('A'):pf('B'); }\nasync function go(k){ await aiJSON(`${rule(k)}${inStudio()}`); await aiJSON(pf('B',{x:1})); }\nconst EARLY=pf('A');\n");
+  const U11 = await loadUnits(r11), PB = promptBuilders(U11, { home: FF2(U11).home }); assert.ok(PB.builders.map(x => x.fn).join() === 'rule' && PB.loadTime.length === 1 && /EARLY|pf\('A'\)/.test(PB.loadTime[0].text), '조립 함수: ' + JSON.stringify(PB)); rmSync(r11, { recursive: true, force: true }); }
+// 프롬프트 글 검사(조합 도구): 깨짐 · 과잉 · 과소
+{ const C = await import('./lib/combos.mjs'), codes = (t, o) => C.checkPrompt(t, o).map(f => f.kind + ':' + f.code).sort();
+  assert.deepEqual(codes('세계관: {name}\n이름 undefined\n배경 목록:\n\nJSON만 출력: {"a":1}', { sink: 'aiJSON' }), ['깨짐:값 없음', '깨짐:빈 머리말', '깨짐:안 채운 자리'], '깨짐');
+  assert.deepEqual(codes('이 줄은 서른 글자가 넘는 같은 지시문입니다 반복됩니다.\n이 줄은 서른 글자가 넘는 같은 지시문입니다 반복됩니다.\n쓴다', { sink: 'aiJSON' }), ['과소:형식 지시 없음', '과잉:같은 줄 되풀이'], '과잉·과소');
+  assert.deepEqual(codes('JSON만 출력: {"a":1}\nJSON만 출력: {"a":1,"b":2}\n\n다른 설명 없이 JSON만 출력한다.', { sink: 'aiJSON', used: ['a'], got: ['a', 'b'], strip: ['\n\n다른 설명 없이 JSON만 출력한다.'] }), ['과잉:읽지 않는 키 요구', '깨짐:표식 여러 개'], '표식(쌍점)만 셈 · 받고 버린 키 · 연결 층 덧붙임은 뺌');
+  const sc = C.schemaOf('규칙\nJSON만 출력: {"hp":800~3000(방어형),"r":1~3 정수,"x":[{"n":""}],"y":[...]} 끝\n\nJSON만 출력한다.');
+  assert.ok(sc.keys.join() === 'hp,r,x,y' && sc.tail.startsWith('끝') && JSON.stringify(C.lenientJSON(sc.body)) === '{"hp":800,"r":1,"x":[{"n":""}],"y":[]}', '형식 견본 읽기: ' + JSON.stringify(sc));
+  { const f = C.fakeAnswer(C.lenientJSON('{"positions":[{"name":"이름","base":"atk|def|sup"}],"pf":{"생일":""},"t":["",""]}')), g = new Function('return ' + C.fakeAnswer.toString())(); /* 브라우저로 넘겨도 같게 */
+    assert.ok(f.positions.map(p => p.base).join() === 'atk,def,sup' && new Set(f.positions.map(p => p.name)).size === 3 && f.pf['생일'] && f.t.length === 2 && f.t[0] !== f.t[1] && JSON.stringify(g({ a: [{ b: 'x|y' }] })) === '{"a":[{"b":"x"},{"b":"y"}]}' && g({ r: 'focus' }).r === 'focus', '가짜 AI 답: 고르기 견본은 하나씩, 객체 하나짜리 목록은 가짓수만큼, 빈 글은 채우고 서로 다르게'); }
+  const cm = C.composition('앞 공통 규칙은 이렇게 길게 적는다 정말로. 이름 세라 끝', { A: '공통 규칙은 이렇게 길게 적는다 정말로. 이름 {n} 끝', B: '없는 조각의 기본 글은 여기에 있다 길게' }); assert.deepEqual(cm.used, ['A'], '조각 구성(자리로 나눈 덩어리)'); }
 // 지시문 옮기기(prompts-move): 템플릿은 원문 그대로 조각으로 — ${식}은 이름 붙은 자리(T('x')→x, a.b→b, 겹치면 번호), "JSON만 출력" 표식·스키마는 호출 지점에 남김, 문자열은 통째로
 { const a = moveLiteral("`세계관: ${w.name}\\n이 장면을 써라. ${T('crew')}와 ${c.name}가 나온다.\\nJSON만 출력: {\"a\":1}`", 'X'), b = moveLiteral("'채워라. 이미 있는 값은 살린다'", 'Y'), u = new Map();
   assert.ok(a.frag === '세계관: {name}\\n이 장면을 써라. {crew}와 {name2}가 나온다.' && a.call === "pf('X',{name:w.name,crew:T('crew'),name2:c.name})" && a.keep === '\\nJSON만 출력: {"a":1}', '템플릿 옮기기: ' + JSON.stringify(a));
@@ -166,6 +246,29 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   assert.ok(MM.envy.some(e => e.fn === 'misplaced' && e.to === 'src/main/020-b.js') && !MM.envy.some(e => e.fn === 'aOwn'), '다른 모듈 일을 하는 함수: ' + JSON.stringify(MM.envy));
   assert.ok(MM.scattered.some(x => x.key === 'G.meta.box' && x.owner === 'src/main/010-a.js' && x.files.length === 3) && MM.foreign.filter(x => x.key === 'G.meta.box').length === 2, '파편화·남의 상태 쓰기: ' + JSON.stringify(MM.scattered));
   assert.ok(MM.mods.find(m => m.file === 'src/main/010-a.js').title === '가', '모듈 제목'); rmSync(r8, { recursive: true, force: true }); }
+// 점검 규칙 읽기(구버전 감지·보완 커버리지): 규칙 test·fix가 읽는 엔티티 필드 — 게임 단위 규칙의 목록 콜백 안 필드(factions().every(f=>f.stance))도
+{ const r12 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r12, 'src/main'), { recursive: true }); const { auditRules } = await import('./lib/upgrade.mjs');
+  writeFileSync(join(r12, 'src/main/010-a.js'), "function factions(){ return G.world.factions; }\nfunction stanceAI(){ return 1; }\nconst AUDIT_RULES=[\n {id:'w_stance',scope:'game',since:10,test:()=>factions().every(f=>!(f.stance||[]).length),fix:{mode:'ai-run',run:()=>stanceAI()}},\n {id:'c_pf',scope:'char',since:9,test:c=>!c.alt&&!Object.keys(c.pfields||{}).length,fix:{mode:'ai-persona'}}];\n");
+  const U = await loadUnits(r12), g = buildGraph(U).fns, R = auditRules(U, g, stateFlow(U, g)), by = id => R.find(x => x.id === id) || {};
+  assert.ok(by('w_stance').fields.includes('stance') && by('w_stance').since === 10 && by('c_pf').fields.includes('pfields') && by('c_pf').scope === 'char', '점검 규칙 읽기: ' + JSON.stringify(R)); rmSync(r12, { recursive: true, force: true }); }
+// 빌드 구문 검사: 스크립트 블록을 실제 JS로 컴파일 — async 아닌 함수 속 await(tree-sitter는 이름으로 읽어 놓침)를 잡고, json 같은 데이터 블록은 건너뜀
+{ const { syntaxErrors } = await import('../build/build.mjs'), bad = syntaxErrors('<script type="text/ggm-main" id="ggm-main">\nfunction a(){ const r = await b(); }\n</script><script type="application/json">{x</script><script>let ok = 1;</script>');
+  assert.ok(bad.length === 1 && bad[0].id === 'ggm-main' && bad[0].line === 2 && /await/.test(bad[0].msg), '빌드 구문 검사: ' + JSON.stringify(bad)); }
+// 연관 맵: data 경로마다 만드는 함수와 역할(생성기·실행기·편집기) — 컬렉션에 넣는 생성 함수가 돌려주는 객체의 키, 컬렉션을 담은 변수를 도는 반복,
+//   찾기 함수 결과, 매개변수의 구조 판정(캐릭터에만 있는 필드를 둘 넘게 씀), 진행 파일은 실행기·콘텐츠는 편집기, 맵 차이와 게임 값 찾기
+{ const r13 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r13, 'src/main'), { recursive: true }); const { buildMap, mapDiff, valuesAt } = await import('./lib/map.mjs');
+  writeFileSync(join(r13, 'src/main/005-d.js'), "const DATA_TYPES=['meta','world','chars','prog'];\n");
+  writeFileSync(join(r13, 'src/main/010-a.js'), "function charById(id){ return G.chars.find(c=>c.id===id); }\nfunction cleanChar(o){ const c={name:o.name,skills:[]}; return c; }\nfunction newGame(){ G.chars.push(cleanChar({name:'a'})); G.meta.construct={on:true}; }\nfunction liveTick(){ const L=G.chars.filter(c=>!c.alt); for(const c of L){ c.persona={}; } }\nfunction remaster(c){ c.generation=2; c.skills.push(1); if(c.rarity>2) c.persona=null; }\nfunction audit(rule,o){ remaster(o); }\nfunction handleEditAction(a,t,id){ const c=charById(id); c.rarity=3; audit(null,{}); }\nfunction handlePlayAction(a,t,id){ P().cres=1; buildIt(id); }\nfunction RES(){ const p=P(); if(!p.res) p.res={}; return p.res; }\nfunction buildIt(id){ const r=RES(); r.a-=1; const c=charById(id); c.won=1; }\n");
+  const U = await loadUnits(r13), g = buildGraph(U).fns, M = buildMap(U, g, stateFlow(U, g)), W = (k, r) => (M.data[k]?.writers[r] || []);
+  assert.ok(W('chars.json › [].skills', '생성기').includes('cleanChar') && W('chars.json › [].persona', '실행기').includes('liveTick') && W('meta.json › construct', '생성기').includes('newGame') && W('prog.json › cres', '실행기').includes('handlePlayAction') && W('chars.json › [].rarity', '편집기').includes('handleEditAction') && W('prog.json › res', '실행기').includes('buildIt') && W('chars.json › [].won', '실행기').includes('buildIt') && !W('chars.json › [].won', '편집기').length && W('chars.json › [].generation', '편집기').includes('remaster'), '연관 맵: ' + JSON.stringify(Object.fromEntries(Object.entries(M.data).map(([k, d]) => [k, d.writers]))));
+  const M2 = { ...M, fns: { ...M.fns, probe: { name: 'probe', file: 'x' } }, data: { ...M.data, 'chars.json › [].x': { writers: { 편집기: ['probe'] } } } }, df = mapDiff(M, M2);
+  assert.ok(df.fns.added.join() === 'probe' && df.data.some(d => d.path === 'chars.json › [].x' && d.added.join() === '편집기:probe') && valuesAt({ chars: [{ skills: [1] }, { skills: [] }], meta: { construct: { on: true } } }, 'chars.json', '[].skills').length === 1 && valuesAt({ meta: {} }, 'meta.json', 'construct').length === 0, '맵 차이·게임 값 찾기');
+  rmSync(r13, { recursive: true, force: true }); }
+// 공용 기반 모듈은 파일 단위로 셈: 두 파일을 폴더 모듈 하나로 묶어도 판정이 그대로(모듈 단위로 세면 "부르는 모듈 수"가 줄어 공용에서 빠졌음)
+{ const r11 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r11, 'src/main'), { recursive: true });
+  writeFileSync(join(r11, 'src/main/005-u.js'), 'function u(){ return 1; }\n'); writeFileSync(join(r11, 'src/main/010-x.js'), 'function x(){ return u(); }\n'); writeFileSync(join(r11, 'src/main/020-y.js'), 'function y(){ return u(); }\n'); writeFileSync(join(r11, 'src/main/030-z.js'), 'function z(){ return 3; }\n');
+  const U = await loadUnits(r11), g = buildGraph(U).fns, sf = stateFlow(U, g), M1 = moduleMap(U, g, sf), M2 = moduleMap(U, g, sf, { modOf: f => /0[12]0-/.test(f) ? 'src/main/xy/' : f });
+  assert.ok(M1.infra.includes('src/main/005-u.js') && M2.infra.includes('src/main/005-u.js'), '공용 기반: 폴더로 묶어도 같음 ' + JSON.stringify([M1.infra, M2.infra])); rmSync(r11, { recursive: true, force: true }); }
 // 개발 내역 검증: 진입점에서 닿는 함수(최상위 문장·값으로 넘김 포함), 보내는 쪽 없는 액션의 case는 따라가지 않음, 글 속 코드 이름 뽑기
 { const r9 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r9, 'src/main'), { recursive: true });
   writeFileSync(join(r9, 'src/main/010-h.js'), "function used(){ return 1; } function viaTable(){ return 2; } function dead(){ return 3; } function onlyDeadAct(){ return 4; }\nfunction handleXAction(a){ switch(a){ case 'live': used(); break; case 'gone': onlyDeadAct(); break; } }\nconst TBL={k:viaTable};\ndocument.addEventListener('click',e=>handleXAction(e.target.dataset.act));\n");
@@ -178,20 +281,73 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   writeFileSync(src, '\n\n\n' + t0); const d0 = compare(f0, findings((await analyze(root)).J)); assert.ok(!d0.added.length && !d0.worse.length && !d0.fixed.length, '래칫: 줄만 밀리면 그대로 ' + JSON.stringify(d0.added.concat(d0.worse, d0.fixed).map(f => f.key)));
   w('src/main/070-r.js', 'function quiet(x){ try{ x(); }catch(e){} return 1; }\n'); const d1 = compare(f0, findings((await analyze(root)).J));
   assert.ok(d1.added.some(f => f.cat === '빈 catch' && f.key.includes('070-r.js')), '래칫: 새 빈 catch는 새로 생김 ' + JSON.stringify(d1.added.map(f => f.key)));
+  { /* 파일 이동: 위치만 나타내는 범주는 경로를 뺀 정체로 짝 — 합계가 늘지 않으면 옮김, 늘면 새로 생김. 모듈이 정체인 범주(과잉 분할)는 짝짓지 않음 */
+    const e = (key, n) => ({ key, num: n == null ? {} : { 개수: n }, text: key }), m1 = compare([e('빈 catch|src/main/0250-a.js 파싱 대체', 2), e('빈 catch|src/main/0450-b.js 파싱 대체', 1)], [e('빈 catch|src/main/0260-x/020-b.js 파싱 대체', 3)]);
+    const m2 = compare([e('빈 catch|src/main/a.js 파싱 대체', 2)], [e('빈 catch|src/main/b.js 파싱 대체', 3)]), m3 = compare([e('영역 침범 후보|src/main/a.js f')], [e('영역 침범 후보|src/main/0360-sync/ f')]), m4 = compare([e('과잉 분할|src/main/a.js ↔ src/main/b.js')], [e('과잉 분할|src/main/c.js ↔ src/main/d.js')]);
+    assert.ok(!m1.added.length && !m1.fixed.length && m1.moved.length === 1 && m2.added.length === 1 && m2.fixed.length === 1 && !m3.added.length && m3.moved.length === 1 && m4.added.length === 1 && m4.fixed.length === 1, '래칫: 파일 이동은 옮김 ' + JSON.stringify([m1, m2, m4].map(d => [d.added.length, d.fixed.length, d.moved.length]))); }
+  { const e = (m, n) => ({ key: `계층 섞임|src/main/${m}`, num: { 함수: n }, text: m }), mv = compare([e('a.js', 3)], [e('a.js', 1), e('b.js', 2)]), up = compare([e('a.js', 3)], [e('a.js', 1), e('b.js', 3)]);
+    assert.ok(!mv.added.length && mv.moved.length === 1 && up.added.length === 1, '래칫: 섞인 함수를 다른 모듈로 옮기면(합계 그대로) 옮김, 합계가 늘면 새로 생김: ' + JSON.stringify([mv, up].map(d => [d.added.length, d.moved.length]))); }
+  { const cf = (n, f, c) => ({ key: `복잡한 함수|${n}`, num: { 복잡도: c, 줄: 9, 중첩: 2 }, text: `${n} (${f}:3) 복잡도 ${c}` }), rn = compare([cf('openA', 'src/main/a.js', 40)], [cf('showA', 'src/main/a.js', 40)]), other = compare([cf('openA', 'src/main/a.js', 40)], [cf('showA', 'src/main/b.js', 40)]), less = compare([cf('openA', 'src/main/a.js', 40)], [cf('showA', 'src/main/a.js', 38)]), more = compare([cf('openA', 'src/main/a.js', 40)], [cf('showA', 'src/main/a.js', 41)]);
+    assert.ok(!rn.added.length && rn.moved.length === 1 && other.added.length === 1 && !less.added.length && more.added.length === 1, '래칫: 같은 파일·같은 복잡도의 해결+새로 생김은 이름 바꿈(옮김), 다른 파일이면 새로 생김'); }
   const g = { num: { 복잡도: 40 }, key: 'x|f', cat: '복잡한 함수', text: 'f' }, d2 = compare([g], [{ ...g, num: { 복잡도: 44 } }]); assert.ok(d2.worse.length === 1 && d2.worse[0].up.includes('복잡도'), '래칫: 같은 함수의 복잡도 증가는 나빠짐');
   rmSync(join(root, 'src/main/070-r.js')); writeFileSync(src, t0); }
 // 배선 점검: 생성기가 쓰는 키·스키마 world/키·지연 기본값(빈 값/쓸 만한 값)·엔티티 필드(컬렉션 콜백에 묶인 변수)를 생성물과 맞춤
 { const r3 = mkdtempSync(join(tmpdir(), 'ggm-tools-')); mkdirSync(join(r3, 'src/main'), { recursive: true });
   writeFileSync(join(r3, 'src/main/010-w.js'), `let G={meta:{},world:{}};
 function buildNewGameDraft(){ const ng={meta:{},world:{}}; ng.meta.made=1; ng.world=Object.assign({},a.world); const p='JSON만 출력: {"world":{"lore":"","story":""}}'; return p; }
-function featA(){ return [G.meta.made, G.meta.never, G.world.lore, G.world.plot2, (G.meta.list||[]).length, Object.assign({on:true},G.meta.cfg).on, G.chars.map(c=>c.zzNew), G.chars.map(c=>c.zzMade)]; }
+function featA(){ return [G.meta.made, G.meta.never, G.world.lore, G.world.plot2, (G.meta.list||[]).length, Object.assign({on:true},G.meta.cfg).on, (Array.isArray(G.meta.vlist)?G.meta.vlist:[{id:'v1'}]).length, G.chars.map(c=>c.zzNew), G.chars.map(c=>c.zzMade)]; }
 `);
   const u3 = await loadUnits(r3), g3 = buildGraph(u3), W = wiringReport({ fns: g3.fns, sf: stateFlow(u3, g3.fns), features: [{ id: 'a', title: 'a', fns: new Set(['featA']) }], stages: stageClosures(u3, g3.fns), genRoots: ['buildNewGameDraft'], defaults: {}, upstreamProps: new Set(),
     games: [{ name: 'g', game: { meta: { made: 1 }, world: { lore: '설정' }, chars: [{ zzMade: 'x' }] } }] }), F = W.features[0], fl = Object.fromEntries(F.flags.map(x => [x.key, x.sev]));
   assert.ok(schemaKeys('{"world":{"lore":""}}').has('world/lore'), '스키마 키: 부모/키');
   assert.equal(fl['G.meta.made'], undefined, '생성기가 쓰고 생성물에 있음 → 문제 아님'); assert.equal(fl['G.world.lore'], undefined, 'world 스키마 키 → 생성기가 만듦');
-  assert.equal(fl['G.meta.never'], 'P0', '아무도 안 만들고 기본값도 없음 → P0'); assert.equal(fl['G.meta.list'], 'P0', '빈 지연 기본값(||[]) → P0'); assert.equal(fl['G.meta.cfg'], 'P1', '쓸 만한 지연 기본값(Object.assign({on:true},…)) → P1');
+  assert.equal(fl['G.meta.never'], 'P0', '아무도 안 만들고 기본값도 없음 → P0'); assert.equal(fl['G.meta.list'], 'P0', '빈 지연 기본값(||[]) → P0'); assert.equal(fl['G.meta.cfg'], 'P1', '쓸 만한 지연 기본값(Object.assign({on:true},…)) → P1'); assert.equal(fl['G.meta.vlist'], 'P1', '읽을 때 기본값(Array.isArray(x)?x:기본값) → 쓸 만한 기본값 P1');
   assert.equal(fl.zzNew, 'P1', '캐릭터 콜백에서 읽는 새 필드가 어디에도 없음 → P1'); assert.equal(fl.zzMade, undefined, '생성물에 있는 필드는 통과: ' + JSON.stringify(fl));
   rmSync(r3, { recursive: true, force: true }); }
+// index.html 기능 표면(lib/surface.mjs): 탭·경로표·설정 하위 화면의 패널·창·동작 처리기에서 기능 단위를 뽑고, 함수 자리·모듈 판정(조각·슈퍼)
+{ const r14 = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w14 = (p, x) => { mkdirSync(join(r14, p, '..'), { recursive: true }); writeFileSync(join(r14, p), x); };
+  const html = '<nav class="tabs"><button class="tab" data-tab="home"><b>로비</b></button><button class="tab" data-tab="shop"><b>상점</b></button><button class="tab" data-tab="studio"><b>설정</b></button></nav>';
+  w14('src/index.html', html);
+  w14('src/main/010-core.js', "let tab='home', STTAB='game';\nfunction render(){ const nav={gacha:'home',home:'home',shop:'shop',studio:'studio'}[tab]||tab; const F={home:homeHTML,shop:shopHTML,studio:studioHTML,gacha:gachaHTML}; return nav+(F[tab]||homeHTML)(); }\nfunction openModal(h){ return h; }\nconst head=t=>`<h2>${t}</h2>`;\nfunction pageHead(ko){ return ko; }\n");
+  w14('src/main/020-home.js', "function homeHTML(){ return pageHead('로비')+'<button data-act=\"go\" data-to=\"gacha\">g</button>'; }\n");
+  w14('src/main/030-shop.js', "function shopHTML(){ return pageHead('상점')+'<button data-act=\"buy\">b</button>'+shopBanner(); }\nfunction buyItem(){ const p=shopPrice()+shopTax(); openReceipt(p); return p+bothUse(); }\nfunction shopPrice(){ return 1; }\nfunction shopList(){ return [shopPrice()]; }\nfunction shopRow(){ return shopList().length; }\nfunction openReceipt(p){ openModal(head('영수증')+p+receiptLine()); }\nfunction receiptLine(){ return shopRow(); }\n");
+  w14('src/main/040-gacha.js', "function gachaHTML(){ return pageHead('뽑기')+'<button data-act=\"pull\">p</button>'+gachaBanner(); }\nfunction pullOne(){ return rollRate()+gachaPity()+bothUse(); }\nfunction rollRate(){ return gachaRate2(); }\nfunction gachaOdds(){ return rollRate(); }\nfunction gachaLog(){ return gachaOdds(); }\n");
+  w14('src/main/050-fragment.js', "function shopTax(){ return 0.1; }\n");
+  w14('src/main/060-mixed.js', "function shopBanner(){ return shopSale()+shopSign(); }\nfunction shopSale(){ return 2; }\nfunction shopSign(){ return 3; }\nfunction gachaBanner(){ return gachaPity()+gachaSign(); }\nfunction gachaPity(){ return 4; }\nfunction gachaRate2(){ return 5; }\nfunction gachaSign(){ return 6; }\nfunction bothUse(){ return 7; }\n");
+  w14('src/main/070-studio.js', "function studioHTML(){ const ST=[['game','게임','g'],['img','그림','i'],['data','데이터','d']]; const SEC={game:`<div class=\"panel\"><h3>규칙</h3><button data-act=\"rules\">r</button></div><div class=\"panel\"><h3>밸런스</h3><button data-act=\"bal\">b</button></div>`, img:`${imgPanel()}`, data:`<p>${dataInfo()}</p>`}; return ST.length+(SEC[STTAB]||''); }\nfunction imgPanel(){ return '<div class=\"panel\"><h3>그림 설정</h3></div>'; }\nfunction dataInfo(){ return 'd'; }\nfunction editRules(){ return 1; }\nfunction editBal(){ return 2; }\n");
+  w14('src/main/080-actions.js', "function handleAction(a){ switch(a){ case 'buy': buyItem(); break; case 'pull': pullOne(); break; case 'rules': editRules(); break; case 'bal': editBal(); break; } }\ndocument.addEventListener('click',e=>handleAction(e.target.dataset.act));\n");
+  const u14 = await loadUnits(r14), g14 = buildGraph(u14), S = surfaceOf(u14, g14.fns, html), F = S.feats;
+  assert.deepEqual(S.tabs.map(t => t.label), ['로비', '상점', '설정'], '기능 표면: 아래 탭 이름');
+  assert.ok(F.get('gacha')?.menu === 'home' && F.get('gacha').label === '뽑기' && F.get('shop').label === '상점', '경로표·경로 → 탭 표·pageHead 이름: ' + JSON.stringify([...F.values()].map(f => [f.key, f.menu, f.label])));
+  assert.ok(['studio.game.1', 'studio.game.2'].every(k => F.get(k)?.kind === 'panel') && F.get('studio.game.1').label === '규칙' && F.get('studio.img.1')?.label === '그림 설정' && F.get('studio.data')?.kind === 'screen', '설정 하위 화면: 글 속 패널 덩어리·패널 함수·하위 화면 하나: ' + [...F.keys()].join(','));
+  assert.equal(F.get('창:openReceipt')?.unit, 'shop', '한 화면만 여는 창은 그 화면 단위');
+  const pl = k => placeOf(S, k); assert.ok(pl('buyItem').unit === 'shop' && pl('pullOne').unit === 'gacha' && pl('editRules').unit === 'studio.game.1' && pl('receiptLine').unit === 'shop', '함수 자리 = 가장 가까운 기능 단위(동작 처리기·창 안 포함): ' + ['buyItem', 'pullOne', 'editRules', 'receiptLine'].map(k => JSON.stringify(pl(k))).join(' '));
+  assert.equal(pl('bothUse').kind, '여러 메뉴', '두 메뉴가 같은 거리로 쓰는 함수 = 공용');
+  const SM = surfaceMap(u14, g14.fns, S); assert.ok(SM.feats.shop?.n >= 3 && SM.feats.shop.mods[0][0] === 'src/main/030-shop.js', '화면 단위 요약: 그 단위에서만 닿는 함수가 있는 모듈: ' + JSON.stringify(SM.feats.shop));
+  rmSync(r14, { recursive: true, force: true }); }
+// 아키텍처(lib/arch.mjs — CLAUDE.md §0-2): 함수마다 계층(View·Controller·Model·섞임)·방향 위반, Model·Controller를 같은 데이터·호출로 묶은 기능, 모듈 판정(슈퍼·조각·고유), 저장 정책(갈래 없는 키·세션·낡은 표)
+{ const r15 = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w15 = (p, x) => { mkdirSync(join(r15, p, '..'), { recursive: true }); writeFileSync(join(r15, p), x); };
+  w15('src/index.html', '<div id="app"></div>');
+  w15('src/main/010-core.js', "let G={shop:{},rates:{},misc:{}};\nfunction render(){ document.body.innerHTML=''; }\nfunction openModal(h){ document.body.insertAdjacentHTML('beforeend',h); }\n");
+  w15('src/main/020-shop.js', "function shopHTML(){ return '<div>'+shopPrice()+'</div>'; }\nfunction buyItem(){ G.shop.sold=1; shopStock(); render(); }\nfunction shopPrice(){ return G.shop.price||1; }\nfunction shopStock(){ G.shop.stock=shopPrice()-1; }\nfunction shopLog(){ G.shop.log=[shopPrice()]; }\n");
+  w15('src/main/030-gacha.js', "function gachaHTML(){ return '<p>'+rollRate()+'</p>'; }\nfunction pullOne(){ G.rates.n=1; pityAdd(); render(); }\nfunction rollRate(){ return G.rates.ssr||3; }\nfunction pityAdd(){ G.rates.pity=rollRate()+1; }\nfunction gachaLog(){ G.rates.log=[rollRate()]; }\n");
+  w15('src/main/040-mixed.js', "function shopTax(){ G.shop.tax=shopPrice(); return 1; }\nfunction shopFee(){ G.shop.fee=shopTax(); }\nfunction shopCut(){ G.shop.cut=shopTax()+shopPrice(); }\nfunction gachaBonus(){ G.rates.bonus=rollRate(); return 1; }\nfunction gachaBoost(){ G.rates.boost=gachaBonus(); }\nfunction gachaLuck(){ G.rates.luck=gachaBonus()+rollRate(); }\n");
+  w15('src/main/050-frag.js', "function shopDiscount(){ G.shop.disc=shopPrice()*0.9; }\n");
+  w15('src/main/060-bad.js', "function mixedFn(){ G.misc.bad=1; return '<b>'+shopPrice()+'</b>'; }\nfunction viewWrite(){ pityAdd(); return '<i>x</i>'; }\nfunction modelCallsView(){ G.misc.cv=1; return shopHTML(); }\nfunction chipsShow(){ return [1,2].map(()=>shopHTML()).join(''); }\nfunction notView(){ pityAdd(); G.misc.nv=1; return shopHTML(); }\nfunction settleShow(){ pityAdd(); return shopHTML(); }\nfunction lvCheck(){ const o=lvOf(); o.checked=1; o.hidden=true; G.misc.lv=1; }\nfunction lvOf(){ return {}; }\nfunction downloadBlob(b,n){ const a=document.createElement('a'); document.body.appendChild(a); a.click(); }\nasync function handleBadAction(a){ switch(a){ case 'x': G.misc.h=1; break; case 'y': document.body.innerHTML='<p>y</p>'; break; } }\n");
+  w15('src/main/070-store.js', "const STORE_POLICY={sync:['k-sync'],secret:{'k-sec':['key']},keep:{},device:['k-dev'],cache:[],legacy:[]};\nfunction st(){ appStorage.setItem('k-sync','1'); appStorage.setItem('k-dev','1'); appStorage.setItem('k-what','1'); sessionStorage.setItem('k-ses','1'); }\n");
+  const u15 = await loadUnits(r15), g15 = buildGraph(u15), sf15 = stateFlow(u15, g15.fns), writers = new Set(mutations(u15, g15.fns).mut.keys()), keyUse = new Map();
+  for (const k of sf15.list) { for (const f of k.w) { if (!keyUse.has(f)) keyUse.set(f, new Map()); keyUse.get(f).set(k.key, 'w'); } for (const f of k.r) { if (!keyUse.has(f)) keyUse.set(f, new Map()); if (!keyUse.get(f).has(k.key)) keyUse.get(f).set(k.key, 'r'); } }
+  const A = archMap(u15, g15.fns, { writers, keyUse, sf: surfaceOf(u15, g15.fns, ''), louvain, layer: null, modOf: moduleOf }), ly = n => A.fnLayer[n]?.layer, vd = m => A.verdicts.find(v => v.mod === 'src/main/' + m);
+  assert.deepEqual(['shopHTML', 'buyItem', 'shopStock', 'shopPrice', 'mixedFn'].map(ly), ['View', 'Controller', 'Model', 'Model', '섞임'], '계층: 마크업 = View · 상태를 바꾸고 다시 그림 = Controller · 상태 씀·계산 = Model · 마크업 + 상태 씀 = 섞임');
+  assert.deepEqual(['chipsShow', 'settleShow', 'notView'].map(ly), ['View', 'Controller', 'Model'], '직접 신호 없이 View 함수만 엮으면 View · 상태를 바꾸는 함수와 View 함수를 함께 부르면 Controller · 스스로 상태를 쓰며 화면 함수를 부르면 Model(방향 위반)');
+  assert.deepEqual(['lvCheck', 'downloadBlob'].map(ly), ['Model', 'Model'], '데이터 칸 이름(checked·hidden)이 DOM이 아닌 값이면 화면 바꿈 아님 · 파일 내려받기 같은 입출력 함수는 Model(어댑터)');
+  const mx = A.fnLayer.mixedFn.mix, hx = A.fnLayer.handleBadAction; assert.equal(mx?.kind, '정산+결과', '섞인 꼴: 결과 HTML을 돌려주며 상태를 씀 = 정산+결과'); assert.ok(mx && mx.view.length && mx.model.length && hx.layer === '섞임' && hx.mix.cases.map(c => c.act).join() === 'y', '섞인 함수 나눌 자리: View 줄·Model 줄, 처리기는 화면을 만지는 case만: ' + JSON.stringify([mx, hx.mix]));
+  const bad = A.bad.map(b => `${b.fn}→${b.to}`); assert.ok(bad.includes('viewWrite→pityAdd') && bad.includes('modelCallsView→shopHTML'), '방향 위반: View가 상태를 바꾸는 함수를 부름 · Model이 화면 함수를 부름: ' + bad);
+  assert.ok(A.fnLayer.buyItem.feat && A.fnLayer.buyItem.feat === A.fnLayer.shopLog.feat && A.fnLayer.pullOne.feat === A.fnLayer.gachaLog.feat && A.fnLayer.buyItem.feat !== A.fnLayer.pullOne.feat, '기능 = 같은 데이터·호출로 묶은 Model·Controller(상점·뽑기 둘): ' + JSON.stringify(A.fnLayer));
+  assert.ok(vd('040-mixed.js').kind === '슈퍼' && vd('040-mixed.js').split.length === 2, '관계없는 두 기능을 담은 모듈 = 슈퍼(발산적 변경): ' + JSON.stringify(vd('040-mixed.js')));
+  assert.ok(vd('050-frag.js').kind === '조각' && vd('050-frag.js').to === 'src/main/020-shop.js', '조각 → 그 기능 함수가 많은 모듈로(게으른 모듈): ' + JSON.stringify(vd('050-frag.js')));
+  assert.equal(vd('020-shop.js').kind, '고유', '한 기능 중심 모듈 = 고유'); assert.ok(vd('060-bad.js').mixed.includes('mixedFn') && vd('060-bad.js').bad >= 2, '모듈마다 섞인 함수·방향 위반 수');
+  const K = Object.fromEntries(A.store.keys.map(k => [k.key, k.kind])); assert.deepEqual([K['k-sync'], K['k-dev'], K['k-what'], K['k-ses']], ['sync', 'device', null, 'session'], '저장 정책: 표의 갈래 · 갈래 없는 키(null) · sessionStorage = 세션'); assert.deepEqual(A.store.stale, ['k-sec'], '표에만 있고 코드가 안 쓰는 키');
+  rmSync(r15, { recursive: true, force: true }); }
 rmSync(root, { recursive: true, force: true });
-console.log('ok tools: 개발 내역 검증(닿는 함수·보내는 쪽 없는 액션·글 속 코드 이름) · 모듈 경계(영역 침범·남의 상태 쓰기·파편화) · 지시문 옮기기(원문 그대로·자리 이름·표식 남김) · 프롬프트 조각 한곳(흩어짐 오류) · 프롬프트 스튜디오 밖 프롬프트 글(글 AI 호출 흐름·해라체) · 순수 모듈 경계 · 분석 코드 = 빌드된 SPA · 주석 속 코드 · 함수를 담은 표(멤버 호출 연결) · 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');
+console.log('ok tools: 아키텍처(계층 View·Controller·Model·섞임·방향 위반 · 같은 데이터로 묶은 기능 · 슈퍼·조각·고유 · 저장 정책 갈래) · index.html 기능 표면(탭·경로표·하위 화면 패널·창·동작 → 화면 단위·함수 자리) · 연관 맵(data 경로·역할·생성 함수·목록 변수·구조 판정·차이·게임 값) · 스튜디오 밖 조립 함수·불러올 때 조각 읽기 · 불러올 때 아직 없는 이름(TDZ) · 자연 경계(모듈성 묶기)·이름 범위(지역 이름·쓰기·await) · 프롬프트 흐름 보강(지역 변수·연결 층·넘겨받은 글 AI·돌려주는 식·출력 자리) · 프롬프트 글 검사(깨짐·과잉·과소·견본 읽기·조각 구성) · 개발 내역 검증(닿는 함수·보내는 쪽 없는 액션·글 속 코드 이름) · 모듈 경계(영역 침범·남의 상태 쓰기·파편화) · 지시문 옮기기(원문 그대로·자리 이름·표식 남김) · 프롬프트 조각 한곳(흩어짐 오류) · 프롬프트 스튜디오 밖 프롬프트 글(글 AI 호출 흐름·해라체) · 순수 모듈 경계 · 분석 코드 = 빌드된 SPA · 주석 속 코드 · 함수를 담은 표(멤버 호출 연결) · 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');
