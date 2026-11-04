@@ -1671,11 +1671,14 @@
    "path": "[].age",
    "writers": {
     "실행기": [
+     "AltCharGen.apply",
      "fix"
     ],
     "기타": [
-     "AltCharGen.apply",
      "conMakeVariant"
+    ],
+    "편집기": [
+     "AltCharGen.apply"
     ]
    },
    "readers": [
@@ -1693,8 +1696,13 @@
    "path": "[].alt",
    "writers": {
     "기타": [
-     "AltCharGen.apply",
      "conMakeVariant"
+    ],
+    "실행기": [
+     "AltCharGen.apply"
+    ],
+    "편집기": [
+     "AltCharGen.apply"
     ]
    },
    "readers": [
@@ -1748,8 +1756,13 @@
    "path": "[].altCanon",
    "writers": {
     "기타": [
-     "AltCharGen.apply",
      "conMakeVariant"
+    ],
+    "실행기": [
+     "AltCharGen.apply"
+    ],
+    "편집기": [
+     "AltCharGen.apply"
     ]
    },
    "readers": [
@@ -1824,7 +1837,10 @@
    "file": "chars.json",
    "path": "[].collab",
    "writers": {
-    "기타": [
+    "실행기": [
+     "PickupCharGen.apply"
+    ],
+    "편집기": [
      "PickupCharGen.apply"
     ]
    },
@@ -2127,14 +2143,16 @@
    "path": "[].faction",
    "writers": {
     "편집기": [
+     "AltCharGen.apply",
+     "PickupCharGen.apply",
      "regenApply"
     ],
     "실행기": [
+     "AltCharGen.apply",
+     "PickupCharGen.apply",
      "fix"
     ],
     "기타": [
-     "AltCharGen.apply",
-     "PickupCharGen.apply",
      "conMakeVariant",
      "fwRead"
     ]
@@ -2591,9 +2609,10 @@
    "path": "[].lines",
    "writers": {
     "실행기": [
+     "AltCharGen.apply",
      "fix"
     ],
-    "기타": [
+    "편집기": [
      "AltCharGen.apply"
     ]
    },
@@ -2833,8 +2852,13 @@
    "path": "[].naiStyle",
    "writers": {
     "기타": [
-     "AltCharGen.apply",
      "conMakeVariant"
+    ],
+    "실행기": [
+     "AltCharGen.apply"
+    ],
+    "편집기": [
+     "AltCharGen.apply"
     ]
    },
    "readers": [
@@ -2856,13 +2880,17 @@
    "path": "[].name",
    "writers": {
     "편집기": [
+     "AltCharGen.apply",
+     "PickupCharGen.apply",
      "regenApply"
     ],
     "기타": [
-     "AltCharGen.apply",
      "DraftHarmonyGen.edit",
-     "PickupCharGen.apply",
      "conMakeVariant"
+    ],
+    "실행기": [
+     "AltCharGen.apply",
+     "PickupCharGen.apply"
     ]
    },
    "readers": [
@@ -3073,8 +3101,13 @@
    "file": "chars.json",
    "path": "[].pos",
    "writers": {
+    "생성기": [
+     "posSpread"
+    ],
+    "실행기": [
+     "posSpread"
+    ],
     "기타": [
-     "posSpread",
      "rulesSave"
     ]
    },
@@ -3277,12 +3310,16 @@
    "path": "[].rarity",
    "writers": {
     "실행기": [
+     "AltCharGen.apply",
+     "PickupCharGen.apply",
      "fix"
     ],
     "기타": [
-     "AltCharGen.apply",
-     "PickupCharGen.apply",
      "conMakeVariant"
+    ],
+    "편집기": [
+     "AltCharGen.apply",
+     "PickupCharGen.apply"
     ]
    },
    "readers": [
@@ -4203,14 +4240,17 @@
    "path": "[].voiceId",
    "writers": {
     "편집기": [
+     "AltCharGen.apply",
      "handleSettingsAndAudioAction",
      "pubContent",
      "shareDefinition"
     ],
     "기타": [
-     "AltCharGen.apply",
      "applySharedArchive",
      "conMakeVariant"
+    ],
+    "실행기": [
+     "AltCharGen.apply"
     ]
    },
    "readers": [
@@ -5976,6 +6016,22 @@
    "prompts": [],
    "games": 2
   },
+  "meta.json › spots": {
+   "file": "meta.json",
+   "path": "spots",
+   "writers": {
+    "생성기": [
+     "spotsAuto"
+    ],
+    "실행기": [
+     "spotsAuto"
+    ]
+   },
+   "readers": [],
+   "audits": [],
+   "prompts": [],
+   "games": 0
+  },
   "meta.json › story": {
    "file": "meta.json",
    "path": "story",
@@ -7101,7 +7157,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "naiStyle": {
    "name": "naiStyle",
@@ -7167,7 +7223,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "fcSend": {
    "name": "fcSend",
@@ -7189,7 +7245,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "factionBonus": {
    "name": "factionBonus",
@@ -7200,7 +7256,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "teamPower": {
    "name": "teamPower",
@@ -7211,7 +7267,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "cxFromChapter": {
    "name": "cxFromChapter",
@@ -7222,7 +7278,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "stageCast": {
    "name": "stageCast",
@@ -7266,7 +7322,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F06"
+   "feat": "F07"
   },
   "cardArtHTML": {
    "name": "cardArtHTML",
@@ -7277,7 +7333,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F08"
+   "feat": "F09"
   },
   "drTabHTML": {
    "name": "drTabHTML",
@@ -7310,7 +7366,7 @@
    "prompts": [],
    "place": "배경.불러오기",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "bannerStep": {
    "name": "bannerStep",
@@ -7321,7 +7377,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "rotatePickups": {
    "name": "rotatePickups",
@@ -7332,7 +7388,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "aiPickupStory": {
    "name": "aiPickupStory",
@@ -7343,7 +7399,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "seasonStart": {
    "name": "seasonStart",
@@ -7354,7 +7410,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "puxGo": {
    "name": "puxGo",
@@ -7365,7 +7421,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F04"
+   "feat": "F02"
   },
   "addPickupFor": {
    "name": "addPickupFor",
@@ -7376,7 +7432,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "bnOpen": {
    "name": "bnOpen",
@@ -7387,7 +7443,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "curBanner": {
    "name": "curBanner",
@@ -7398,7 +7454,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "pityGet": {
    "name": "pityGet",
@@ -7409,7 +7465,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "rollOne": {
    "name": "rollOne",
@@ -7420,7 +7476,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "conStartNew": {
    "name": "conStartNew",
@@ -7431,7 +7487,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "conVariantOf": {
    "name": "conVariantOf",
@@ -7442,7 +7498,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "conPool": {
    "name": "conPool",
@@ -7453,7 +7509,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "puStoryBg": {
    "name": "puStoryBg",
@@ -7464,7 +7520,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F04"
+   "feat": "F02"
   },
   "gateCheck": {
    "name": "gateCheck",
@@ -7475,7 +7531,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "evHost": {
    "name": "evHost",
@@ -7486,7 +7542,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "renameEverywhere": {
    "name": "renameEverywhere",
@@ -7497,7 +7553,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "handleNavigationAndToolsAction": {
    "name": "handleNavigationAndToolsAction",
@@ -7581,7 +7637,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F02"
+   "feat": "F03"
   },
   "contractHTML0": {
    "name": "contractHTML0",
@@ -7592,7 +7648,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F04"
+   "feat": "F02"
   },
   "openSpark": {
    "name": "openSpark",
@@ -7603,7 +7659,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F02"
+   "feat": "F03"
   },
   "openHistory": {
    "name": "openHistory",
@@ -7625,7 +7681,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F02"
+   "feat": "F03"
   },
   "constructHTML": {
    "name": "constructHTML",
@@ -7636,7 +7692,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F02"
+   "feat": "F03"
   },
   "openConSet": {
    "name": "openConSet",
@@ -7647,7 +7703,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F02"
+   "feat": "F03"
   },
   "openBanner": {
    "name": "openBanner",
@@ -7691,7 +7747,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F10"
+   "feat": "F06"
   },
   "openBgmAll": {
    "name": "openBgmAll",
@@ -7746,7 +7802,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F08"
+   "feat": "F17"
   },
   "openLib": {
    "name": "openLib",
@@ -7768,7 +7824,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F10"
+   "feat": "F14"
   },
   "enemyReuseHint": {
    "name": "enemyReuseHint",
@@ -7779,7 +7835,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "charCGs": {
    "name": "charCGs",
@@ -7790,7 +7846,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "regenParseCharacter": {
    "name": "regenParseCharacter",
@@ -7812,7 +7868,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F01"
+   "feat": "F09"
   },
   "libTarget": {
    "name": "libTarget",
@@ -7834,7 +7890,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F03"
+   "feat": "F06"
   },
   "shAdopt": {
    "name": "shAdopt",
@@ -7845,7 +7901,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F10"
+   "feat": "F06"
   },
   "libUsage": {
    "name": "libUsage",
@@ -7856,7 +7912,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F10"
+   "feat": "F23"
   },
   "libDupes": {
    "name": "libDupes",
@@ -7867,7 +7923,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F10"
+   "feat": "F06"
   },
   "sfx": {
    "name": "sfx",
@@ -7922,7 +7978,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F05"
+   "feat": "F17"
   },
   "backupImport": {
    "name": "backupImport",
@@ -7933,7 +7989,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F05"
+   "feat": "F17"
   },
   "addCGs": {
    "name": "addCGs",
@@ -7944,7 +8000,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "drawTodo": {
    "name": "drawTodo",
@@ -7955,7 +8011,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "chMapLib": {
    "name": "chMapLib",
@@ -7966,7 +8022,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "iconLib": {
    "name": "iconLib",
@@ -7977,7 +8033,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "addLib": {
    "name": "addLib",
@@ -7988,7 +8044,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "ensureLibPrompts": {
    "name": "ensureLibPrompts",
@@ -8010,7 +8066,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "monsterFromGen": {
    "name": "monsterFromGen",
@@ -8021,7 +8077,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "subscribe": {
    "name": "subscribe",
@@ -8032,7 +8088,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "modeClear": {
    "name": "modeClear",
@@ -8065,7 +8121,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "nodeStage": {
    "name": "nodeStage",
@@ -8076,7 +8132,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "sortieParts": {
    "name": "sortieParts",
@@ -8087,7 +8143,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "debateDraw": {
    "name": "debateDraw",
@@ -8098,7 +8154,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F07"
+   "feat": "F06"
   },
   "contestStart": {
    "name": "contestStart",
@@ -8120,7 +8176,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F16"
+   "feat": "F15"
   },
   "sortieChoices": {
    "name": "sortieChoices",
@@ -8142,7 +8198,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "rgDeck": {
    "name": "rgDeck",
@@ -8153,7 +8209,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F09"
+   "feat": "F10"
   },
   "cardName": {
    "name": "cardName",
@@ -8164,7 +8220,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F09"
+   "feat": "F10"
   },
   "cardType": {
    "name": "cardType",
@@ -8175,7 +8231,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F09"
+   "feat": "F10"
   },
   "rgUnits": {
    "name": "rgUnits",
@@ -8186,7 +8242,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "rfAuto": {
    "name": "rfAuto",
@@ -8197,7 +8253,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "rgEnemies": {
    "name": "rgEnemies",
@@ -8208,7 +8264,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "towerPool": {
    "name": "towerPool",
@@ -8219,7 +8275,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "handleCombatAndFormationAction": {
    "name": "handleCombatAndFormationAction",
@@ -8230,7 +8286,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F09"
+   "feat": "F10"
   },
   "towerGo": {
    "name": "towerGo",
@@ -8241,7 +8297,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F16"
+   "feat": "F15"
   },
   "cardHTML": {
    "name": "cardHTML",
@@ -8252,7 +8308,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F09"
+   "feat": "F10"
   },
   "dgHTML": {
    "name": "dgHTML",
@@ -8263,7 +8319,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F09"
+   "feat": "F10"
   },
   "rgRunHTML2": {
    "name": "rgRunHTML2",
@@ -8274,7 +8330,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F09"
+   "feat": "F10"
   },
   "openRgForm": {
    "name": "openRgForm",
@@ -8285,7 +8341,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F02"
+   "feat": "F03"
   },
   "challengeHTML": {
    "name": "challengeHTML",
@@ -8296,7 +8352,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F15"
+   "feat": "F02"
   },
   "towerHTML": {
    "name": "towerHTML",
@@ -8307,7 +8363,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F16"
+   "feat": "F15"
   },
   "designAIPrompt": {
    "name": "designAIPrompt",
@@ -8318,7 +8374,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "aiChapterGen0Prompt": {
    "name": "aiChapterGen0Prompt",
@@ -8329,7 +8385,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "factionCtx": {
    "name": "factionCtx",
@@ -8340,7 +8396,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "naiBlocksGame": {
    "name": "naiBlocksGame",
@@ -8351,7 +8407,7 @@
    "prompts": [],
    "place": "배경.불러오기",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "weaponRenameOk": {
    "name": "weaponRenameOk",
@@ -8362,7 +8418,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "charImgItems": {
    "name": "charImgItems",
@@ -8373,7 +8429,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "fixWeaponPrompts": {
    "name": "fixWeaponPrompts",
@@ -8384,7 +8440,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F17"
+   "feat": "F08"
   },
   "castChars": {
    "name": "castChars",
@@ -8395,7 +8451,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F01"
+   "feat": "F09"
   },
   "regenApply": {
    "name": "regenApply",
@@ -8406,7 +8462,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "handleImagesAndAssetsAction": {
    "name": "handleImagesAndAssetsAction",
@@ -8450,7 +8506,7 @@
    "prompts": [],
    "place": "배경.불러오기",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "replaceAll": {
    "name": "replaceAll",
@@ -8461,7 +8517,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "imgSrc": {
    "name": "imgSrc",
@@ -8483,7 +8539,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F17"
   },
   "applySharedArchive": {
    "name": "applySharedArchive",
@@ -8494,7 +8550,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F17"
   },
   "inheritApply": {
    "name": "inheritApply",
@@ -8516,7 +8572,7 @@
    "prompts": [],
    "place": "배경.불러오기",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "inheritStore": {
    "name": "inheritStore",
@@ -8560,7 +8616,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "personaReview": {
    "name": "personaReview",
@@ -8571,7 +8627,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F10"
+   "feat": null
   },
   "personaSave": {
    "name": "personaSave",
@@ -8582,7 +8638,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F10"
+   "feat": "F21"
   },
   "handleCharactersAction": {
    "name": "handleCharactersAction",
@@ -8635,7 +8691,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F08"
+   "feat": "F09"
   },
   "bannerPool": {
    "name": "bannerPool",
@@ -8646,7 +8702,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "conTargets": {
    "name": "conTargets",
@@ -8657,7 +8713,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "conMakeVariant": {
    "name": "conMakeVariant",
@@ -8668,7 +8724,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "scgFixAll": {
    "name": "scgFixAll",
@@ -8679,7 +8735,7 @@
    "prompts": [],
    "place": "배경.불러오기",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "handleSettingsAndAudioAction": {
    "name": "handleSettingsAndAudioAction",
@@ -8690,7 +8746,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "섞임",
-   "feat": "F05",
+   "feat": "F04",
    "mix": {
     "view": [
      1016
@@ -8720,7 +8776,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F10"
+   "feat": "F21"
   },
   "balRemasterAI": {
    "name": "balRemasterAI",
@@ -8731,7 +8787,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "effPower": {
    "name": "effPower",
@@ -8742,7 +8798,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "autoSquad": {
    "name": "autoSquad",
@@ -8753,7 +8809,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F15"
+   "feat": "F18"
   },
   "rulesRecalc": {
    "name": "rulesRecalc",
@@ -8775,7 +8831,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F08"
+   "feat": "F09"
   },
   "nameTaken": {
    "name": "nameTaken",
@@ -8786,7 +8842,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "addNewChars": {
    "name": "addNewChars",
@@ -8797,7 +8853,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "skillResume": {
    "name": "skillResume",
@@ -8808,7 +8864,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "cleanChar0": {
    "name": "cleanChar0",
@@ -8819,7 +8875,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F10"
+   "feat": "F21"
   },
   "cleanChar": {
    "name": "cleanChar",
@@ -8830,7 +8886,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Controller",
-   "feat": "F10"
+   "feat": "F21"
   },
   "artReuse": {
    "name": "artReuse",
@@ -8841,7 +8897,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "expedFill": {
    "name": "expedFill",
@@ -8852,7 +8908,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F15"
+   "feat": "F18"
   },
   "debutResolve": {
    "name": "debutResolve",
@@ -8863,7 +8919,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "relObj": {
    "name": "relObj",
@@ -8896,7 +8952,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "fwRead": {
    "name": "fwRead",
@@ -8907,7 +8963,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F02"
+   "feat": "F03"
   },
   "pubContent": {
    "name": "pubContent",
@@ -8929,7 +8985,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F18"
+   "feat": "F05"
   },
   "findSpeaker": {
    "name": "findSpeaker",
@@ -8940,7 +8996,7 @@
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "npcBy": {
    "name": "npcBy",
@@ -8951,7 +9007,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "naiBlocksOwner": {
    "name": "naiBlocksOwner",
@@ -8962,7 +9018,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F06"
+   "feat": "F07"
   },
   "openImgLib": {
    "name": "openImgLib",
@@ -8973,7 +9029,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F08"
+   "feat": "F09"
   },
   "openDesign": {
    "name": "openDesign",
@@ -8984,7 +9040,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F02"
+   "feat": "F03"
   },
   "openFaces": {
    "name": "openFaces",
@@ -9006,7 +9062,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F20"
+   "feat": "F22"
   },
   "npcRefresh": {
    "name": "npcRefresh",
@@ -9061,7 +9117,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F16"
+   "feat": "F15"
   },
   "lobbyHTML": {
    "name": "lobbyHTML",
@@ -9072,7 +9128,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F04"
+   "feat": "F02"
   },
   "openPersona": {
    "name": "openPersona",
@@ -9083,7 +9139,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F10"
+   "feat": "F08"
   },
   "personaPanel": {
    "name": "personaPanel",
@@ -9094,7 +9150,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F10"
+   "feat": null
   },
   "openPersonaAll": {
    "name": "openPersonaAll",
@@ -9105,7 +9161,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F10"
+   "feat": "F08"
   },
   "openModeStage": {
    "name": "openModeStage",
@@ -9127,7 +9183,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F07"
+   "feat": "F06"
   },
   "openNewPickup": {
    "name": "openNewPickup",
@@ -9149,7 +9205,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F04"
+   "feat": "F02"
   },
   "crewHTML": {
    "name": "crewHTML",
@@ -9160,7 +9216,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F15"
+   "feat": "F18"
   },
   "renderVoice": {
    "name": "renderVoice",
@@ -9171,7 +9227,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F05"
+   "feat": "F04"
   },
   "lbReveal": {
    "name": "lbReveal",
@@ -9182,7 +9238,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "View",
-   "feat": "F04"
+   "feat": "F02"
   },
   "openCharEdit": {
    "name": "openCharEdit",
@@ -9193,7 +9249,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F14"
+   "feat": "F16"
   },
   "openFormation": {
    "name": "openFormation",
@@ -9204,7 +9260,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F02"
+   "feat": "F03"
   },
   "openLibItem": {
    "name": "openLibItem",
@@ -9215,7 +9271,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F06"
+   "feat": "F07"
   },
   "openRel": {
    "name": "openRel",
@@ -9237,7 +9293,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F04"
+   "feat": "F02"
   },
   "farmHTML": {
    "name": "farmHTML",
@@ -9248,7 +9304,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F02"
+   "feat": "F13"
   },
   "limitBreak": {
    "name": "limitBreak",
@@ -9259,7 +9315,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F19"
+   "feat": "F20"
   },
   "newBonds": {
    "name": "newBonds",
@@ -9279,9 +9335,9 @@
    "line": 2080,
    "www": 9962,
    "prompts": [],
-   "place": "닿지 않음",
+   "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "PersonaGen.context": {
    "name": "context",
@@ -9290,9 +9346,9 @@
    "line": 2091,
    "www": 9973,
    "prompts": [],
-   "place": "닿지 않음",
+   "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F10"
+   "feat": "F08"
   },
   "PersonaGen.apply": {
    "name": "apply",
@@ -9301,9 +9357,9 @@
    "line": 2094,
    "www": 9976,
    "prompts": [],
-   "place": "닿지 않음",
+   "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F10"
+   "feat": "F21"
   },
   "PickupCharGen.apply": {
    "name": "apply",
@@ -9312,9 +9368,9 @@
    "line": 2140,
    "www": 10022,
    "prompts": [],
-   "place": "닿지 않음",
+   "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "AltCharGen.apply": {
    "name": "apply",
@@ -9323,9 +9379,9 @@
    "line": 2147,
    "www": 10029,
    "prompts": [],
-   "place": "닿지 않음",
+   "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "handleEconomyAction": {
    "name": "handleEconomyAction",
@@ -9336,7 +9392,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F01"
+   "feat": "F02"
   },
   "evShopHTML": {
    "name": "evShopHTML",
@@ -9347,7 +9403,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F04"
+   "feat": "F02"
   },
   "openShk": {
    "name": "openShk",
@@ -9358,7 +9414,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F01"
+   "feat": "F02"
   },
   "ngWorldExtras": {
    "name": "ngWorldExtras",
@@ -9369,7 +9425,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "dispBoardFill": {
    "name": "dispBoardFill",
@@ -9380,7 +9436,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F15"
+   "feat": "F02"
   },
   "exStart": {
    "name": "exStart",
@@ -9391,7 +9447,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F15"
+   "feat": "F18"
   },
   "exClaim": {
    "name": "exClaim",
@@ -9402,7 +9458,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F15"
+   "feat": "F18"
   },
   "dispHTML": {
    "name": "dispHTML",
@@ -9435,7 +9491,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F15"
+   "feat": "F18"
   },
   "spotsAIPrompt": {
    "name": "spotsAIPrompt",
@@ -9446,7 +9502,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F42"
+   "feat": "F23"
   },
   "dailyTalksPrompt": {
    "name": "dailyTalksPrompt",
@@ -9455,7 +9511,7 @@
    "line": 15,
    "www": 10495,
    "prompts": [],
-   "place": "닿지 않음",
+   "place": "배경.실행 중 AI",
    "layer": "Model",
    "feat": "F11"
   },
@@ -9468,7 +9524,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Controller",
-   "feat": "F04"
+   "feat": "F02"
   },
   "spotsAuto": {
    "name": "spotsAuto",
@@ -9490,7 +9546,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F10"
+   "feat": "F15"
   },
   "auditTargets": {
    "name": "auditTargets",
@@ -9501,7 +9557,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F17"
+   "feat": "F08"
   },
   "auditName": {
    "name": "auditName",
@@ -9523,7 +9579,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F17"
+   "feat": "F08"
   },
   "schedVisit": {
    "name": "schedVisit",
@@ -9534,7 +9590,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F10"
+   "feat": "F13"
   },
   "ngFinish": {
    "name": "ngFinish",
@@ -9545,7 +9601,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "openRegen": {
    "name": "openRegen",
@@ -9556,7 +9612,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F31"
+   "feat": "F02"
   },
   "openAudit": {
    "name": "openAudit",
@@ -9567,7 +9623,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F17"
+   "feat": "F08"
   },
   "auditHTML": {
    "name": "auditHTML",
@@ -9578,7 +9634,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F17"
+   "feat": "F08"
   },
   "auditFix": {
    "name": "auditFix",
@@ -9589,7 +9645,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F17"
+   "feat": "F08"
   },
   "phRooms": {
    "name": "phRooms",
@@ -9611,7 +9667,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F06"
   },
   "handleMessengerAction": {
    "name": "handleMessengerAction",
@@ -9622,7 +9678,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "섞임",
-   "feat": "F01",
+   "feat": "F14",
    "mix": {
     "view": [
      51,
@@ -9652,7 +9708,7 @@
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "personaHTML": {
    "name": "personaHTML",
@@ -9663,7 +9719,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "View",
-   "feat": "F10"
+   "feat": "F02"
   },
   "phAddView": {
    "name": "phAddView",
@@ -9674,7 +9730,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F01"
+   "feat": "F14"
   },
   "phMenu": {
    "name": "phMenu",
@@ -9685,7 +9741,7 @@
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F01"
+   "feat": "F14"
   },
   "charSheetShow": {
    "name": "charSheetShow",
@@ -9716,9 +9772,9 @@
    "line": 291,
    "www": 11160,
    "prompts": [],
-   "place": "닿지 않음",
+   "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "prune": {
    "name": "prune",
@@ -9727,9 +9783,9 @@
    "line": 299,
    "www": 11168,
    "prompts": [],
-   "place": "닿지 않음",
+   "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F02"
   },
   "buildNewGameDraftPrompt2": {
    "name": "buildNewGameDraftPrompt2",
@@ -9740,7 +9796,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "buildNewGameDraftPrompt3": {
    "name": "buildNewGameDraftPrompt3",
@@ -9751,7 +9807,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "npcRule": {
    "name": "npcRule",
@@ -9762,7 +9818,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "presetQualityParts": {
    "name": "presetQualityParts",
@@ -9773,7 +9829,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "variantsFromAI": {
    "name": "variantsFromAI",
@@ -9784,7 +9840,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "storySayNorms": {
    "name": "storySayNorms",
@@ -9795,7 +9851,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "ngCharsPost": {
    "name": "ngCharsPost",
@@ -9806,7 +9862,7 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "relRef": {
    "name": "relRef",
@@ -9839,14 +9895,14 @@
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "DraftHarmonyGen.edit": {
    "name": "edit",
    "file": "src/main/10-newgame.js",
    "module": "src/main/10-newgame.js",
-   "line": 257,
-   "www": 11436,
+   "line": 273,
+   "www": 11452,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -9856,8 +9912,8 @@
    "name": "imgAuditScan",
    "file": "src/main/10-promptstudio.js",
    "module": "src/main/10-promptstudio.js",
-   "line": 18,
-   "www": 11555,
+   "line": 297,
+   "www": 11850,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -9867,8 +9923,8 @@
    "name": "composeNai",
    "file": "src/main/10-promptstudio.js",
    "module": "src/main/10-promptstudio.js",
-   "line": 37,
-   "www": 11574,
+   "line": 316,
+   "www": 11869,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -9879,29 +9935,29 @@
    "file": "src/main/10-rules.js",
    "module": "src/main/10-rules.js",
    "line": 81,
-   "www": 11691,
+   "www": 11986,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "rulesSave": {
    "name": "rulesSave",
    "file": "src/main/10-rules.js",
    "module": "src/main/10-rules.js",
    "line": 85,
-   "www": 11695,
+   "www": 11990,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F14"
+   "feat": "F16"
   },
   "fcSendPrompt": {
    "name": "fcSendPrompt",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 7,
-   "www": 11831,
+   "www": 12126,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -9912,18 +9968,18 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 12,
-   "www": 11836,
+   "www": 12131,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": null
   },
   "storyMemo": {
    "name": "storyMemo",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 40,
-   "www": 11864,
+   "www": 12159,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
@@ -9934,7 +9990,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 51,
-   "www": 11875,
+   "www": 12170,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
@@ -9945,51 +10001,51 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 54,
-   "www": 11878,
+   "www": 12173,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F11"
   },
   "evPastHint": {
    "name": "evPastHint",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 59,
-   "www": 11883,
+   "www": 12178,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "enemyNames": {
    "name": "enemyNames",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 65,
-   "www": 11889,
+   "www": 12184,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "syncEnemies": {
    "name": "syncEnemies",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 67,
-   "www": 11891,
+   "www": 12186,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "seenText": {
    "name": "seenText",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 79,
-   "www": 11903,
+   "www": 12198,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10000,7 +10056,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 83,
-   "www": 11907,
+   "www": 12202,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -10011,29 +10067,29 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 95,
-   "www": 11919,
+   "www": 12214,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "liveTick": {
    "name": "liveTick",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 101,
-   "www": 11925,
+   "www": 12220,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "recruitCheck": {
    "name": "recruitCheck",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 146,
-   "www": 11970,
+   "www": 12265,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10044,62 +10100,62 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 149,
-   "www": 11973,
+   "www": 12268,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "nextStage": {
    "name": "nextStage",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 153,
-   "www": 11977,
+   "www": 12272,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "ensureChMap": {
    "name": "ensureChMap",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 155,
-   "www": 11979,
+   "www": 12274,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "rebalanceChapter": {
    "name": "rebalanceChapter",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 167,
-   "www": 11991,
+   "www": 12286,
    "prompts": [],
    "place": "배경.불러오기",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "readChForm": {
    "name": "readChForm",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 174,
-   "www": 11998,
+   "www": 12293,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F14"
+   "feat": "F15"
   },
   "relSrcOf": {
    "name": "relSrcOf",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 182,
-   "www": 12006,
+   "www": 12301,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10110,7 +10166,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 184,
-   "www": 12008,
+   "www": 12303,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10121,29 +10177,29 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 200,
-   "www": 12024,
+   "www": 12319,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F08"
   },
   "scanScriptAssets": {
    "name": "scanScriptAssets",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 209,
-   "www": 12033,
+   "www": 12328,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "evLoreSet": {
    "name": "evLoreSet",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 214,
-   "www": 12038,
+   "www": 12333,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10154,84 +10210,84 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 220,
-   "www": 12044,
+   "www": 12339,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F15"
   },
   "planCheck": {
    "name": "planCheck",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 233,
-   "www": 12057,
+   "www": 12352,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "smFingerprint": {
    "name": "smFingerprint",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 258,
-   "www": 12082,
+   "www": 12377,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F19"
+   "feat": "F20"
   },
   "aiChapterGen0": {
    "name": "aiChapterGen0",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 273,
-   "www": 12097,
+   "www": 12392,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Controller",
-   "feat": "F07"
+   "feat": "F06"
   },
   "aiEventGen0": {
    "name": "aiEventGen0",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 306,
-   "www": 12130,
+   "www": 12425,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Controller",
-   "feat": "F07"
+   "feat": "F06"
   },
   "drLen": {
    "name": "drLen",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 350,
-   "www": 12174,
+   "www": 12469,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "buildNewGameDraft": {
    "name": "buildNewGameDraft",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 356,
-   "www": 12180,
+   "www": 12475,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "handleStoryAndAuthoringAction": {
    "name": "handleStoryAndAuthoringAction",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 446,
-   "www": 12270,
+   "www": 12565,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "섞임",
@@ -10270,18 +10326,18 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 613,
-   "www": 12437,
+   "www": 12732,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "relFromScripts": {
    "name": "relFromScripts",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 622,
-   "www": 12446,
+   "www": 12741,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -10292,51 +10348,51 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 644,
-   "www": 12468,
+   "www": 12763,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F16"
+   "feat": "F15"
   },
   "openAiEvent": {
    "name": "openAiEvent",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 655,
-   "www": 12479,
+   "www": 12774,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F07"
+   "feat": "F06"
   },
   "opsListHTML": {
    "name": "opsListHTML",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 674,
-   "www": 12498,
+   "www": 12793,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F08"
+   "feat": "F09"
   },
   "opsHTML": {
    "name": "opsHTML",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 682,
-   "www": 12506,
+   "www": 12801,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F08"
+   "feat": "F09"
   },
   "bgOptions": {
    "name": "bgOptions",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 705,
-   "www": 12529,
+   "www": 12824,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10347,7 +10403,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 710,
-   "www": 12534,
+   "www": 12829,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10358,7 +10414,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 712,
-   "www": 12536,
+   "www": 12831,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10369,7 +10425,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 726,
-   "www": 12550,
+   "www": 12845,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10380,7 +10436,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 734,
-   "www": 12558,
+   "www": 12853,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10391,7 +10447,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 746,
-   "www": 12570,
+   "www": 12865,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10402,7 +10458,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 753,
-   "www": 12577,
+   "www": 12872,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10413,7 +10469,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 778,
-   "www": 12602,
+   "www": 12897,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10424,7 +10480,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 784,
-   "www": 12608,
+   "www": 12903,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10435,7 +10491,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 793,
-   "www": 12617,
+   "www": 12912,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10446,29 +10502,29 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 810,
-   "www": 12634,
+   "www": 12929,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F07"
+   "feat": "F06"
   },
   "openStoryMemory": {
    "name": "openStoryMemory",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 825,
-   "www": 12649,
+   "www": 12944,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F12"
+   "feat": "F02"
   },
   "openStoryMemoryEditor": {
    "name": "openStoryMemoryEditor",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 827,
-   "www": 12651,
+   "www": 12946,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10479,18 +10535,18 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 829,
-   "www": 12653,
+   "www": 12948,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F19"
+   "feat": "F20"
   },
   "eventsHTML": {
    "name": "eventsHTML",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 879,
-   "www": 12703,
+   "www": 12998,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10501,7 +10557,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 887,
-   "www": 12711,
+   "www": 13006,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10512,7 +10568,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 936,
-   "www": 12760,
+   "www": 13055,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10523,7 +10579,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 963,
-   "www": 12787,
+   "www": 13082,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10534,7 +10590,7 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 979,
-   "www": 12803,
+   "www": 13098,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -10545,40 +10601,40 @@
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 983,
-   "www": 12807,
+   "www": 13102,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F16"
+   "feat": "F15"
   },
   "StageAuditGen.context": {
    "name": "context",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 994,
-   "www": 12818,
+   "www": 13113,
    "prompts": [],
-   "place": "닿지 않음",
+   "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": null
+   "feat": "F08"
   },
   "PlanGen.context": {
    "name": "context",
    "file": "src/main/10-story.js",
    "module": "src/main/10-story.js",
    "line": 1002,
-   "www": 12826,
+   "www": 13121,
    "prompts": [],
-   "place": "닿지 않음",
+   "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "naiGenerate0": {
    "name": "naiGenerate0",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 177,
-   "www": 13010,
+   "www": 13305,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -10589,150 +10645,150 @@
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 240,
-   "www": 13073,
+   "www": 13368,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F05"
+   "feat": "F17"
   },
   "markAll": {
    "name": "markAll",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 271,
-   "www": 13104,
+   "www": 13399,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F09"
   },
   "backupMedia": {
    "name": "backupMedia",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 288,
-   "www": 13121,
+   "www": 13416,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F08"
+   "feat": "F17"
   },
   "storyTalkLines": {
    "name": "storyTalkLines",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 413,
-   "www": 13246,
+   "www": 13541,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "buildManualGameDraft": {
    "name": "buildManualGameDraft",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 416,
-   "www": 13249,
+   "www": 13544,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "rerollDraft": {
    "name": "rerollDraft",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 613,
-   "www": 13446,
+   "www": 13741,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": null
+   "feat": "F09"
   },
   "openSound": {
    "name": "openSound",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 808,
-   "www": 13641,
+   "www": 13936,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F05"
+   "feat": "F04"
   },
   "cardTxt": {
    "name": "cardTxt",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 947,
-   "www": 13780,
+   "www": 14075,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F09"
+   "feat": "F10"
   },
   "studioHTML": {
    "name": "studioHTML",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 983,
-   "www": 13816,
+   "www": 14111,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F05"
+   "feat": "F02"
   },
   "applyDesk": {
    "name": "applyDesk",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 1068,
-   "www": 13901,
+   "www": 14196,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F27"
+   "feat": "F29"
   },
   "pubUpload": {
    "name": "pubUpload",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 1153,
-   "www": 13986,
+   "www": 14281,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F03"
+   "feat": "F05"
   },
   "startStage": {
    "name": "startStage",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 1359,
-   "www": 14192,
+   "www": 14487,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F16"
+   "feat": "F15"
   },
   "subApply": {
    "name": "subApply",
    "file": "src/main/10-system.js",
    "module": "src/main/10-system.js",
    "line": 1514,
-   "www": 14347,
+   "www": 14642,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
-   "feat": "F08"
+   "feat": "F09"
   },
   "ctx": {
    "name": "ctx",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
    "line": 50,
-   "www": 14460,
+   "www": 14755,
    "prompts": [],
    "place": "공용 기반",
    "layer": "Model",
@@ -10742,30 +10798,30 @@
    "name": "designFacs",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 89,
-   "www": 14499,
+   "line": 74,
+   "www": 14779,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "stageById": {
    "name": "stageById",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 96,
-   "www": 14506,
+   "line": 81,
+   "www": 14786,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "libSrc": {
    "name": "libSrc",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 113,
-   "www": 14523,
+   "line": 98,
+   "www": 14803,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10775,8 +10831,8 @@
    "name": "mainStages",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 115,
-   "www": 14525,
+   "line": 100,
+   "www": 14805,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -10786,8 +10842,8 @@
    "name": "cxSeenText",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 121,
-   "www": 14531,
+   "line": 106,
+   "www": 14811,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10797,8 +10853,8 @@
    "name": "cxUnlocked",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 124,
-   "www": 14534,
+   "line": 109,
+   "www": 14814,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10808,8 +10864,8 @@
    "name": "cxEntries",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 128,
-   "www": 14538,
+   "line": 113,
+   "www": 14818,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10819,85 +10875,85 @@
    "name": "factionMissing",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 163,
-   "www": 14573,
+   "line": 148,
+   "www": 14853,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "factionFixed": {
    "name": "factionFixed",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 167,
-   "www": 14577,
+   "line": 152,
+   "www": 14857,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "mainNow": {
    "name": "mainNow",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 179,
-   "www": 14589,
+   "line": 164,
+   "www": 14869,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "monsterNames": {
    "name": "monsterNames",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 183,
-   "www": 14593,
+   "line": 168,
+   "www": 14873,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "metInStory": {
    "name": "metInStory",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 188,
-   "www": 14598,
+   "line": 173,
+   "www": 14878,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "castLock": {
    "name": "castLock",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 191,
-   "www": 14601,
+   "line": 176,
+   "www": 14881,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "factionReview": {
    "name": "factionReview",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 195,
-   "www": 14605,
+   "line": 180,
+   "www": 14885,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "charToMonster": {
    "name": "charToMonster",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 213,
-   "www": 14623,
+   "line": 198,
+   "www": 14903,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10907,19 +10963,19 @@
    "name": "bestiaryApply",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 216,
-   "www": 14626,
+   "line": 201,
+   "www": 14906,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F07"
+   "feat": "F06"
   },
   "relPurgeStory": {
    "name": "relPurgeStory",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 227,
-   "www": 14637,
+   "line": 212,
+   "www": 14917,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -10929,8 +10985,8 @@
    "name": "memCatchUp",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 230,
-   "www": 14640,
+   "line": 215,
+   "www": 14920,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
@@ -10940,8 +10996,8 @@
    "name": "openWorld",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 241,
-   "www": 14651,
+   "line": 226,
+   "www": 14931,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10951,30 +11007,30 @@
    "name": "openWorldDesign",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 306,
-   "www": 14716,
+   "line": 291,
+   "www": 14996,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F02"
+   "feat": "F03"
   },
   "StanceGen.context": {
    "name": "context",
    "file": "src/main/10-world.js",
    "module": "src/main/10-world.js",
-   "line": 351,
-   "www": 14761,
+   "line": 336,
+   "www": 15041,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F02"
+   "feat": "F03"
   },
   "openSkinProp": {
    "name": "openSkinProp",
    "file": "src/main/80-misc.js",
    "module": "src/main/80-misc.js",
    "line": 225,
-   "www": 15014,
+   "www": 15294,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -10985,18 +11041,18 @@
    "file": "src/main/80-misc.js",
    "module": "src/main/80-misc.js",
    "line": 248,
-   "www": 15037,
+   "www": 15317,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
-   "feat": "F19"
+   "feat": "F20"
   },
   "charById": {
    "name": "charById",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 32,
-   "www": 15082,
+   "line": 34,
+   "www": 15364,
    "prompts": [],
    "place": "공용 기반",
    "layer": "Model",
@@ -11006,41 +11062,41 @@
    "name": "libById",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 33,
-   "www": 15083,
+   "line": 35,
+   "www": 15365,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "playerName": {
    "name": "playerName",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 34,
-   "www": 15084,
+   "line": 36,
+   "www": 15366,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F04"
+   "feat": "F02"
   },
   "isMe": {
    "name": "isMe",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 36,
-   "www": 15086,
+   "line": 38,
+   "www": 15368,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "castById": {
    "name": "castById",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 523,
-   "www": 15573,
+   "line": 187,
+   "www": 15517,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -11050,8 +11106,8 @@
    "name": "P",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1034,
-   "www": 16084,
+   "line": 375,
+   "www": 15705,
    "prompts": [],
    "place": "공용 기반",
    "layer": "Model",
@@ -11061,8 +11117,8 @@
    "name": "expR",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1159,
-   "www": 16209,
+   "line": 439,
+   "www": 15769,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -11072,41 +11128,41 @@
    "name": "passLv",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1165,
-   "www": 16215,
+   "line": 444,
+   "www": 15774,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F30"
+   "feat": "F32"
   },
   "dispDone": {
    "name": "dispDone",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1166,
-   "www": 16216,
+   "line": 445,
+   "www": 15775,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F15"
+   "feat": "F18"
   },
   "busyIds": {
    "name": "busyIds",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1167,
-   "www": 16217,
+   "line": 446,
+   "www": 15776,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
-   "feat": "F15"
+   "feat": "F18"
   },
   "skinHave": {
    "name": "skinHave",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1196,
-   "www": 16246,
+   "line": 454,
+   "www": 15784,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -11116,41 +11172,41 @@
    "name": "affThreads",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1211,
-   "www": 16261,
+   "line": 469,
+   "www": 15799,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F10"
+   "feat": "F08"
   },
   "threadById": {
    "name": "threadById",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1229,
-   "www": 16279,
+   "line": 472,
+   "www": 15802,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F01"
+   "feat": "F14"
   },
   "threadChar": {
    "name": "threadChar",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1230,
-   "www": 16280,
+   "line": 473,
+   "www": 15803,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
-   "feat": "F01"
+   "feat": "F14"
   },
   "baseChar": {
    "name": "baseChar",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1361,
-   "www": 16411,
+   "line": 578,
+   "www": 15908,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -11160,12 +11216,12 @@
    "name": "altsOf",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1362,
-   "www": 16412,
+   "line": 579,
+   "www": 15909,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
-   "feat": "F06"
+   "feat": "F07"
   },
   "module:modules/combat/030-core.js#generation": {
    "name": "generation",
@@ -11619,24 +11675,24 @@
    "name": "AUDIT_RULES.test",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1371,
-   "www": 16421,
+   "line": 1590,
+   "www": 16920,
    "prompts": []
   },
   "AUDIT_RULES.run": {
    "name": "AUDIT_RULES.run",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1371,
-   "www": 16421,
+   "line": 1590,
+   "www": 16920,
    "prompts": []
   },
   "AUDIT_RULES.ai": {
    "name": "AUDIT_RULES.ai",
    "file": "src/main/90-load.js",
    "module": "src/main/90-load.js",
-   "line": 1371,
-   "www": 16421,
+   "line": 1590,
+   "www": 16920,
    "prompts": []
   }
  },
@@ -11678,8 +11734,8 @@
     {
      "file": "src/boot/storage-boot.js",
      "www": [
-      18625,
-      18659
+      18841,
+      18875
      ]
     }
    ],
@@ -11721,20 +11777,20 @@
      61
     ],
     [
+     "src/main/10-newgame.js",
+     33
+    ],
+    [
      "src/main/80-misc.js",
      29
     ],
     [
-     "src/main/10-newgame.js",
-     22
-    ],
-    [
      "src/main/10-messenger.js",
-     18
+     23
     ],
     [
      "src/main/10-world.js",
-     16
+     17
     ]
    ]
   },
@@ -11994,10 +12050,10 @@
    ],
    "fns": 315,
    "roles": {
-    "실행기": 50,
-    "기타": 42,
-    "편집기": 33,
-    "생성기": 15
+    "실행기": 64,
+    "기타": 28,
+    "편집기": 46,
+    "생성기": 16
    },
    "writes": [
     "banners.json › [].pickup",
@@ -12104,16 +12160,16 @@
      26
     ],
     [
+     "src/main/10-newgame.js",
+     15
+    ],
+    [
      "src/main/10-challenge.js",
      15
     ],
     [
      "src/main/10-liveops.js",
      13
-    ],
-    [
-     "src/main/10-rules.js",
-     11
     ]
    ]
   },
@@ -12236,10 +12292,12 @@
    ],
    "fns": 88,
    "roles": {
-    "생성기": 1
+    "생성기": 2,
+    "실행기": 1
    },
    "writes": [
-    "meta.json › auditSeen"
+    "meta.json › auditSeen",
+    "meta.json › spots"
    ],
    "reads": 22,
    "neighbors": [
@@ -12342,11 +12400,11 @@
      "file": "src/main/10-newgame.js",
      "www": [
       11180,
-      11454
+      11470
      ]
     }
    ],
-   "fns": 90,
+   "fns": 91,
    "roles": {
     "기타": 1
    },
@@ -12357,7 +12415,7 @@
    "neighbors": [
     [
      "src/main/00-core.js",
-     64
+     65
     ],
     [
      "src/main/90-load.js",
@@ -12394,8 +12452,8 @@
     {
      "file": "src/main/10-player.js",
      "www": [
-      11455,
-      11537
+      11471,
+      11553
      ]
     }
    ],
@@ -12443,12 +12501,12 @@
     {
      "file": "src/main/10-promptstudio.js",
      "www": [
-      11538,
-      11610
+      11554,
+      11905
      ]
     }
    ],
-   "fns": 15,
+   "fns": 16,
    "roles": {},
    "writes": [],
    "reads": 8,
@@ -12463,7 +12521,11 @@
     ],
     [
      "src/main/10-system.js",
-     3
+     5
+    ],
+    [
+     "src/main/10-battle.js",
+     1
     ],
     [
      "src/main/10-characters.js",
@@ -12476,8 +12538,8 @@
     {
      "file": "src/main/10-rules.js",
      "www": [
-      11611,
-      11824
+      11906,
+      12119
      ]
     }
    ],
@@ -12523,8 +12585,8 @@
     {
      "file": "src/main/10-story.js",
      "www": [
-      11825,
-      12833
+      12120,
+      13128
      ]
     }
    ],
@@ -12650,8 +12712,8 @@
     {
      "file": "src/main/10-system.js",
      "www": [
-      12834,
-      14410
+      13129,
+      14705
      ]
     }
    ],
@@ -12742,12 +12804,12 @@
     {
      "file": "src/main/10-world.js",
      "www": [
-      14411,
-      14789
+      14706,
+      15069
      ]
     }
    ],
-   "fns": 101,
+   "fns": 100,
    "roles": {
     "생성기": 1,
     "실행기": 1
@@ -12759,7 +12821,7 @@
    "neighbors": [
     [
      "src/main/00-core.js",
-     58
+     57
     ],
     [
      "src/main/90-load.js",
@@ -12796,8 +12858,8 @@
     {
      "file": "src/main/80-misc.js",
      "www": [
-      14790,
-      15050
+      15070,
+      15330
      ]
     }
    ],
@@ -12815,15 +12877,15 @@
      21
     ],
     [
+     "src/main/10-characters.js",
+     7
+    ],
+    [
      "src/main/10-system.js",
      5
     ],
     [
      "src/main/10-world.js",
-     2
-    ],
-    [
-     "src/main/10-characters.js",
      2
     ],
     [
@@ -12837,8 +12899,8 @@
     {
      "file": "src/main/90-load.js",
      "www": [
-      15051,
-      16963
+      15331,
+      17179
      ]
     }
    ],
@@ -12849,35 +12911,35 @@
    "neighbors": [
     [
      "src/main/10-system.js",
-     10
+     11
     ],
     [
      "src/main/00-core.js",
-     4
-    ],
-    [
-     "src/main/10-story.js",
-     2
-    ],
-    [
-     "src/main/10-economy.js",
-     2
-    ],
-    [
-     "src/main/10-expedition.js",
-     1
+     11
     ],
     [
      "src/main/10-characters.js",
-     1
+     6
     ],
     [
-     "src/main/10-challenge.js",
-     1
+     "src/main/10-world.js",
+     6
     ],
     [
-     "src/main/10-battle.js",
-     1
+     "src/main/10-story.js",
+     5
+    ],
+    [
+     "src/main/10-liveops.js",
+     5
+    ],
+    [
+     "src/main/10-rules.js",
+     5
+    ],
+    [
+     "src/main/10-promptstudio.js",
+     3
     ]
    ]
   },
@@ -12886,8 +12948,8 @@
     {
      "file": "src/main/95-start.js",
      "www": [
-      16964,
-      17006
+      17180,
+      17222
      ]
     }
    ],
@@ -12902,8 +12964,8 @@
     {
      "file": "src/main/99-aliases.js",
      "www": [
-      17007,
-      18622
+      17223,
+      18838
      ]
     }
    ],
@@ -13402,19 +13464,19 @@
     "label": "새 게임 생성",
     "kind": "background",
     "menu": "배경",
-    "n": 224,
+    "n": 233,
     "mods": [
      [
       "src/main/10-newgame.js",
-      53
-     ],
-     [
-      "src/main/90-load.js",
-      32
+      57
      ],
      [
       "src/main/10-characters.js",
-      30
+      36
+     ],
+     [
+      "src/main/90-load.js",
+      31
      ],
      [
       "src/main/00-core.js",
@@ -13479,43 +13541,43 @@
     "label": "실행 중 AI",
     "kind": "background",
     "menu": "배경",
-    "n": 156,
+    "n": 209,
     "mods": [
      [
+      "src/main/10-characters.js",
+      50
+     ],
+     [
       "src/main/10-story.js",
-      29
+      39
      ],
      [
       "src/main/10-liveops.js",
-      26
+      32
      ],
      [
       "src/main/00-core.js",
-      25
-     ],
-     [
-      "src/main/10-characters.js",
-      23
+      27
      ],
      [
       "src/main/10-art.js",
       13
      ],
      [
+      "src/main/10-messenger.js",
+      10
+     ],
+     [
       "src/main/10-world.js",
-      9
+      10
+     ],
+     [
+      "src/main/90-load.js",
+      8
      ],
      [
       "src/main/10-acquire.js",
       7
-     ],
-     [
-      "src/main/90-load.js",
-      7
-     ],
-     [
-      "src/main/10-messenger.js",
-      4
      ],
      [
       "src/main/80-misc.js",
@@ -13617,7 +13679,7 @@
      "chars.json › [].skins",
      "chars.json › [].weapon"
     ],
-    "fns": 265,
+    "fns": 231,
     "mods": [
      [
       "src/main/10-characters.js",
@@ -13625,43 +13687,35 @@
      ],
      [
       "src/main/00-core.js",
-      47
-     ],
-     [
-      "src/main/10-messenger.js",
-      25
+      46
      ],
      [
       "src/main/10-art.js",
-      24
+      20
      ],
      [
-      "src/main/90-load.js",
-      20
+      "src/main/10-newgame.js",
+      15
      ],
      [
       "src/main/80-misc.js",
       14
      ],
      [
+      "src/main/90-load.js",
+      13
+     ],
+     [
       "src/main/10-acquire.js",
-      12
-     ],
-     [
-      "src/main/10-newgame.js",
-      11
-     ],
-     [
-      "src/main/10-system.js",
-      11
+      13
      ],
      [
       "src/main/10-world.js",
-      11
+      10
      ],
      [
-      "src/main/10-economy.js",
-      7
+      "src/main/10-system.js",
+      9
      ],
      [
       "src/main/10-story.js",
@@ -13676,6 +13730,14 @@
       4
      ],
      [
+      "src/main/10-messenger.js",
+      4
+     ],
+     [
+      "src/main/10-economy.js",
+      4
+     ],
+     [
       "src/main/10-challenge.js",
       3
      ],
@@ -13691,11 +13753,11 @@
     "views": [
      [
       "새 게임 생성",
-      44
+      47
      ],
      [
       "실행 중 AI",
-      16
+      13
      ],
      [
       "불러오기",
@@ -13703,190 +13765,86 @@
      ]
     ],
     "layers": {
-     "Model": 129,
-     "Controller": 26,
-     "View": 106,
-     "섞임": 4
+     "Model": 120,
+     "Controller": 24,
+     "View": 84,
+     "섞임": 3
     }
    },
    "F02": {
-    "label": "chars.json › [].faction",
-    "data": [
-     "chars.json › [].faction",
-     "chars.json › [].name",
-     "chars.json › [].rarity"
-    ],
-    "fns": 90,
-    "mods": [
-     [
-      "src/main/10-world.js",
-      27
-     ],
-     [
-      "src/main/10-acquire.js",
-      24
-     ],
-     [
-      "src/main/10-characters.js",
-      23
-     ],
-     [
-      "src/main/90-load.js",
-      5
-     ],
-     [
-      "src/main/00-core.js",
-      5
-     ],
-     [
-      "src/main/10-challenge.js",
-      3
-     ],
-     [
-      "src/main/10-rules.js",
-      1
-     ],
-     [
-      "src/main/10-art.js",
-      1
-     ],
-     [
-      "src/main/10-economy.js",
-      1
-     ]
-    ],
-    "views": [
-     [
-      "새 게임 생성",
-      10
-     ],
-     [
-      "실행 중 AI",
-      7
-     ]
-    ],
-    "layers": {
-     "Model": 63,
-     "Controller": 4,
-     "View": 23
-    }
-   },
-   "F03": {
-    "label": "저장소 ggm-sync",
-    "data": [
-     "저장소 ggm-sync",
-     "lib.json › [].alias",
-     "lib.json › [].prompt"
-    ],
-    "fns": 90,
-    "mods": [
-     [
-      "src/main/10-system.js",
-      82
-     ],
-     [
-      "src/main/00-core.js",
-      3
-     ],
-     [
-      "src/main/10-art.js",
-      2
-     ],
-     [
-      "src/main/10-story.js",
-      2
-     ],
-     [
-      "src/main/10-acquire.js",
-      1
-     ]
-    ],
-    "views": [
-     [
-      "새 게임 생성",
-      4
-     ],
-     [
-      "실행 중 AI",
-      1
-     ]
-    ],
-    "layers": {
-     "Model": 54,
-     "Controller": 12,
-     "View": 24
-    }
-   },
-   "F04": {
     "label": "banners.json › [].active",
     "data": [
      "banners.json › [].active",
      "banners.json › [].bg",
      "banners.json › [].desc"
     ],
-    "fns": 88,
+    "fns": 122,
     "mods": [
+     [
+      "src/main/10-liveops.js",
+      23
+     ],
      [
       "src/main/10-acquire.js",
       21
-     ],
-     [
-      "src/main/10-liveops.js",
-      20
      ],
      [
       "src/main/10-characters.js",
       13
      ],
      [
+      "src/main/10-economy.js",
+      12
+     ],
+     [
       "src/main/00-core.js",
-      8
+      11
      ],
      [
       "src/main/10-story.js",
-      5
-     ],
-     [
-      "src/main/10-economy.js",
-      5
-     ],
-     [
-      "src/main/10-messenger.js",
-      4
+      10
      ],
      [
       "src/main/90-load.js",
-      3
+      9
+     ],
+     [
+      "src/main/10-messenger.js",
+      8
      ],
      [
       "src/main/10-system.js",
-      3
-     ],
-     [
-      "src/main/10-player.js",
-      2
-     ],
-     [
-      "src/main/80-misc.js",
-      2
+      6
      ],
      [
       "src/main/10-challenge.js",
-      1
+      3
+     ],
+     [
+      "src/main/10-art.js",
+      2
      ],
      [
       "src/main/10-expedition.js",
+      2
+     ],
+     [
+      "src/main/10-player.js",
+      1
+     ],
+     [
+      "src/main/80-misc.js",
       1
      ]
     ],
     "views": [
      [
       "실행 중 AI",
-      35
+      45
      ],
      [
       "새 게임 생성",
-      3
+      5
      ],
      [
       "앱 시작",
@@ -13894,39 +13852,109 @@
      ]
     ],
     "layers": {
-     "Model": 61,
-     "Controller": 7,
-     "View": 20
+     "Model": 75,
+     "Controller": 15,
+     "View": 32
     }
    },
-   "F05": {
+   "F03": {
+    "label": "chars.json › [].faction",
+    "data": [
+     "chars.json › [].faction",
+     "chars.json › [].name",
+     "chars.json › [].rarity"
+    ],
+    "fns": 97,
+    "mods": [
+     [
+      "src/main/10-world.js",
+      31
+     ],
+     [
+      "src/main/10-characters.js",
+      24
+     ],
+     [
+      "src/main/10-acquire.js",
+      24
+     ],
+     [
+      "src/main/00-core.js",
+      7
+     ],
+     [
+      "src/main/90-load.js",
+      5
+     ],
+     [
+      "src/main/10-challenge.js",
+      3
+     ],
+     [
+      "src/main/10-rules.js",
+      1
+     ],
+     [
+      "src/main/10-art.js",
+      1
+     ],
+     [
+      "src/main/10-economy.js",
+      1
+     ]
+    ],
+    "views": [
+     [
+      "실행 중 AI",
+      15
+     ],
+     [
+      "새 게임 생성",
+      10
+     ]
+    ],
+    "layers": {
+     "Model": 71,
+     "Controller": 4,
+     "View": 22
+    }
+   },
+   "F04": {
     "label": "저장소 starfall-nai",
     "data": [
      "저장소 starfall-nai",
      "저장소 starfall-sound",
      "저장소 starfall-ai-profiles"
     ],
-    "fns": 86,
+    "fns": 95,
     "mods": [
      [
       "src/main/10-system.js",
-      31
+      27
      ],
      [
       "src/main/00-core.js",
-      15
+      17
      ],
      [
       "src/main/10-characters.js",
       13
      ],
      [
+      "src/main/10-liveops.js",
+      11
+     ],
+     [
       "src/main/10-art.js",
-      13
+      10
      ],
      [
       "src/main/80-misc.js",
       4
+     ],
+     [
+      "src/main/10-promptstudio.js",
+      3
      ],
      [
       "src/main/10-story.js",
@@ -13952,145 +13980,105 @@
     "views": [
      [
       "새 게임 생성",
-      9
-     ],
-     [
-      "실행 중 AI",
-      1
+      10
      ]
     ],
     "layers": {
-     "Model": 60,
-     "View": 24,
-     "Controller": 1,
-     "섞임": 1
+     "Model": 63,
+     "View": 28,
+     "섞임": 2,
+     "Controller": 2
     }
    },
-   "F06": {
-    "label": "banners.json",
+   "F05": {
+    "label": "저장소 ggm-sync",
     "data": [
-     "banners.json",
-     "chapters.json",
-     "chars.json"
+     "저장소 ggm-sync",
+     "chars.json › [].upper",
+     "저장소 ggm-a2hs"
     ],
-    "fns": 86,
+    "fns": 89,
     "mods": [
      [
-      "src/main/10-newgame.js",
-      25
-     ],
-     [
-      "src/main/10-story.js",
-      14
+      "src/main/10-system.js",
+      81
      ],
      [
       "src/main/00-core.js",
-      13
-     ],
-     [
-      "src/main/90-load.js",
-      10
-     ],
-     [
-      "src/main/10-art.js",
-      7
-     ],
-     [
-      "src/main/10-rules.js",
-      4
-     ],
-     [
-      "src/main/10-system.js",
-      4
-     ],
-     [
-      "src/main/10-characters.js",
       3
      ],
      [
-      "src/main/10-liveops.js",
+      "src/main/10-story.js",
       2
-     ],
-     [
-      "src/main/80-misc.js",
-      1
      ],
      [
       "src/main/10-acquire.js",
       1
      ],
      [
-      "src/main/10-expedition.js",
+      "src/main/10-art.js",
       1
      ],
      [
-      "src/main/10-messenger.js",
+      "src/main/10-characters.js",
       1
      ]
     ],
     "views": [
      [
       "새 게임 생성",
-      45
-     ],
-     [
-      "실행 중 AI",
       4
-     ],
-     [
-      "불러오기",
-      2
      ]
     ],
     "layers": {
-     "Model": 61,
-     "Controller": 3,
-     "View": 22
+     "Model": 53,
+     "Controller": 13,
+     "View": 23
     }
    },
-   "F07": {
-    "label": "chapters.json › [].stages[].enemies[].atk",
+   "F06": {
+    "label": "chars.json › [].debut",
     "data": [
-     "chapters.json › [].stages[].enemies[].atk",
-     "chapters.json › [].stages[].enemies[].def",
-     "chapters.json › [].stages[].enemies[].hp"
+     "chars.json › [].debut",
+     "chars.json › [].debutLater",
+     "lib.json › [].alias"
     ],
-    "fns": 84,
+    "fns": 88,
     "mods": [
      [
       "src/main/10-story.js",
-      23
+      21
      ],
      [
       "src/main/10-characters.js",
-      15
+      16
+     ],
+     [
+      "src/main/10-art.js",
+      11
      ],
      [
       "src/main/10-newgame.js",
-      12
+      11
      ],
      [
       "src/main/00-core.js",
-      9
-     ],
-     [
-      "src/main/10-system.js",
-      7
+      10
      ],
      [
       "src/main/90-load.js",
       6
      ],
      [
-      "src/main/10-art.js",
-      4
+      "src/main/10-system.js",
+      5
      ],
      [
       "src/main/10-messenger.js",
       3
      ],
      [
-      "src/main/10-liveops.js",
+      "src/main/10-world.js",
       2
      ],
      [
@@ -14098,18 +14086,18 @@
       2
      ],
      [
-      "src/main/10-world.js",
+      "src/main/10-liveops.js",
       1
      ]
     ],
     "views": [
      [
       "실행 중 AI",
-      43
+      52
      ],
      [
       "새 게임 생성",
-      22
+      20
      ],
      [
       "불러오기",
@@ -14118,34 +14106,174 @@
     ],
     "layers": {
      "Model": 75,
-     "Controller": 3,
-     "View": 6
+     "Controller": 4,
+     "View": 9
+    }
+   },
+   "F07": {
+    "label": "banners.json",
+    "data": [
+     "banners.json",
+     "chapters.json",
+     "chars.json"
+    ],
+    "fns": 80,
+    "mods": [
+     [
+      "src/main/10-newgame.js",
+      26
+     ],
+     [
+      "src/main/10-story.js",
+      14
+     ],
+     [
+      "src/main/00-core.js",
+      11
+     ],
+     [
+      "src/main/90-load.js",
+      11
+     ],
+     [
+      "src/main/10-art.js",
+      6
+     ],
+     [
+      "src/main/10-system.js",
+      4
+     ],
+     [
+      "src/main/10-characters.js",
+      3
+     ],
+     [
+      "src/main/10-liveops.js",
+      2
+     ],
+     [
+      "src/main/10-acquire.js",
+      1
+     ],
+     [
+      "src/main/10-expedition.js",
+      1
+     ],
+     [
+      "src/main/10-rules.js",
+      1
+     ]
+    ],
+    "views": [
+     [
+      "새 게임 생성",
+      44
+     ],
+     [
+      "불러오기",
+      2
+     ],
+     [
+      "실행 중 AI",
+      2
+     ]
+    ],
+    "layers": {
+     "Model": 57,
+     "Controller": 1,
+     "View": 22
     }
    },
    "F08": {
+    "label": "chapters.json › [].stages[].post",
+    "data": [
+     "chapters.json › [].stages[].post",
+     "chapters.json › [].stages[].pre",
+     "chars.json › [].weapon"
+    ],
+    "fns": 76,
+    "mods": [
+     [
+      "src/main/10-characters.js",
+      31
+     ],
+     [
+      "src/main/10-liveops.js",
+      12
+     ],
+     [
+      "src/main/10-story.js",
+      8
+     ],
+     [
+      "src/main/10-system.js",
+      7
+     ],
+     [
+      "src/main/10-rules.js",
+      6
+     ],
+     [
+      "src/main/00-core.js",
+      5
+     ],
+     [
+      "src/main/80-misc.js",
+      2
+     ],
+     [
+      "src/main/90-load.js",
+      2
+     ],
+     [
+      "src/main/10-art.js",
+      2
+     ],
+     [
+      "src/main/10-promptstudio.js",
+      1
+     ]
+    ],
+    "views": [
+     [
+      "실행 중 AI",
+      37
+     ],
+     [
+      "새 게임 생성",
+      15
+     ]
+    ],
+    "layers": {
+     "Model": 60,
+     "Controller": 9,
+     "View": 7
+    }
+   },
+   "F09": {
     "label": "chars.json › [].skillBalance",
     "data": [
      "chars.json › [].skillBalance",
      "chars.json › [].skills",
      "chars.json › [].weapon"
     ],
-    "fns": 80,
+    "fns": 72,
     "mods": [
      [
       "src/main/10-characters.js",
-      28
-     ],
-     [
-      "src/main/10-system.js",
-      12
-     ],
-     [
-      "src/main/00-core.js",
-      10
+      29
      ],
      [
       "src/main/10-art.js",
       10
+     ],
+     [
+      "src/main/00-core.js",
+      8
+     ],
+     [
+      "src/main/10-system.js",
+      7
      ],
      [
       "src/main/10-story.js",
@@ -14156,11 +14284,11 @@
       5
      ],
      [
-      "src/main/90-load.js",
-      4
+      "src/main/10-acquire.js",
+      2
      ],
      [
-      "src/main/10-acquire.js",
+      "src/main/90-load.js",
       2
      ],
      [
@@ -14183,7 +14311,7 @@
      ],
      [
       "실행 중 AI",
-      10
+      9
      ],
      [
       "새 게임 생성",
@@ -14191,15 +14319,15 @@
      ]
     ],
     "layers": {
-     "Model": 52,
-     "Controller": 7,
-     "View": 21
+     "Model": 48,
+     "Controller": 5,
+     "View": 19
     }
    },
-   "F09": {
+   "F10": {
     "label": "cardCost",
     "data": [],
-    "fns": 70,
+    "fns": 71,
     "mods": [
      [
       "src/main/10-challenge.js",
@@ -14214,6 +14342,10 @@
       6
      ],
      [
+      "src/main/10-characters.js",
+      1
+     ],
+     [
       "src/main/10-player.js",
       1
      ],
@@ -14224,63 +14356,9 @@
     ],
     "views": [],
     "layers": {
-     "Model": 35,
+     "Model": 36,
      "Controller": 10,
      "View": 25
-    }
-   },
-   "F10": {
-    "label": "chars.json › [].persona",
-    "data": [
-     "chars.json › [].persona",
-     "chars.json › [].pfields",
-     "chars.json › [].pos"
-    ],
-    "fns": 63,
-    "mods": [
-     [
-      "src/main/10-characters.js",
-      28
-     ],
-     [
-      "src/main/10-rules.js",
-      10
-     ],
-     [
-      "src/main/10-art.js",
-      9
-     ],
-     [
-      "src/main/10-liveops.js",
-      8
-     ],
-     [
-      "src/main/90-load.js",
-      5
-     ],
-     [
-      "src/main/10-system.js",
-      2
-     ],
-     [
-      "src/main/10-messenger.js",
-      1
-     ]
-    ],
-    "views": [
-     [
-      "새 게임 생성",
-      18
-     ],
-     [
-      "실행 중 AI",
-      3
-     ]
-    ],
-    "layers": {
-     "Model": 44,
-     "Controller": 5,
-     "View": 14
     }
    },
    "F11": {
@@ -14290,19 +14368,19 @@
      "banners.json › [].pickup",
      "banners.json › [].pool"
     ],
-    "fns": 62,
+    "fns": 63,
     "mods": [
      [
       "src/main/10-story.js",
-      21
-     ],
-     [
-      "src/main/10-world.js",
-      12
+      23
      ],
      [
       "src/main/00-core.js",
-      11
+      12
+     ],
+     [
+      "src/main/10-world.js",
+      10
      ],
      [
       "src/main/10-characters.js",
@@ -14344,7 +14422,7 @@
      ],
      [
       "실행 중 AI",
-      13
+      17
      ],
      [
       "앱 시작",
@@ -14352,7 +14430,7 @@
      ]
     ],
     "layers": {
-     "Model": 43,
+     "Model": 44,
      "View": 18,
      "섞임": 1
     }
@@ -14360,15 +14438,15 @@
    "F12": {
     "label": "새 게임 생성",
     "data": [],
-    "fns": 60,
+    "fns": 62,
     "mods": [
      [
       "src/main/10-world.js",
-      33
+      38
      ],
      [
       "src/main/10-story.js",
-      16
+      13
      ],
      [
       "src/main/10-characters.js",
@@ -14410,15 +14488,15 @@
      ]
     ],
     "layers": {
-     "Model": 45,
+     "Model": 48,
      "Controller": 1,
-     "View": 14
+     "View": 13
     }
    },
    "F13": {
     "label": "새 게임 생성",
     "data": [],
-    "fns": 54,
+    "fns": 58,
     "mods": [
      [
       "src/main/10-battle.js",
@@ -14429,16 +14507,16 @@
       9
      ],
      [
+      "src/main/10-characters.js",
+      8
+     ],
+     [
       "src/main/00-core.js",
       7
      ],
      [
       "src/main/10-challenge.js",
       7
-     ],
-     [
-      "src/main/10-characters.js",
-      5
      ],
      [
       "src/main/90-load.js",
@@ -14459,6 +14537,10 @@
      [
       "src/main/10-acquire.js",
       1
+     ],
+     [
+      "src/main/10-liveops.js",
+      1
      ]
     ],
     "views": [
@@ -14468,134 +14550,78 @@
      ]
     ],
     "layers": {
-     "Model": 29,
-     "Controller": 14,
-     "View": 11
+     "Model": 31,
+     "Controller": 15,
+     "View": 12
     }
    },
    "F14": {
-    "label": "chapters.json › [].stages[].combatBalance",
+    "label": "threads.json › [].added",
     "data": [
-     "chapters.json › [].stages[].combatBalance",
-     "chapters.json › [].stages[].enemies",
-     "chapters.json › [].stages[].enemies[].elem"
+     "threads.json › [].added",
+     "threads.json › [].charId",
+     "threads.json › [].id"
     ],
-    "fns": 47,
+    "fns": 46,
     "mods": [
      [
-      "src/main/10-rules.js",
-      23
+      "src/main/10-messenger.js",
+      29
      ],
      [
-      "src/main/10-characters.js",
-      5
-     ],
-     [
-      "src/main/10-player.js",
-      3
+      "src/main/10-art.js",
+      4
      ],
      [
       "src/main/00-core.js",
       3
      ],
      [
-      "src/main/10-story.js",
+      "src/main/10-characters.js",
       3
-     ],
-     [
-      "src/main/10-world.js",
-      2
-     ],
-     [
-      "src/main/10-newgame.js",
-      2
-     ],
-     [
-      "src/main/90-load.js",
-      2
      ],
      [
       "src/main/10-system.js",
       2
      ],
      [
-      "src/main/10-art.js",
-      1
+      "src/main/80-misc.js",
+      2
      ],
      [
-      "src/main/10-battle.js",
+      "src/main/90-load.js",
+      2
+     ],
+     [
+      "src/main/10-player.js",
       1
      ]
     ],
     "views": [
      [
-      "새 게임 생성",
-      12
-     ],
-     [
-      "불러오기",
-      5
-     ]
-    ],
-    "layers": {
-     "Model": 33,
-     "Controller": 2,
-     "View": 12
-    }
-   },
-   "F15": {
-    "label": "EXC",
-    "data": [],
-    "fns": 44,
-    "mods": [
-     [
-      "src/main/10-expedition.js",
-      29
-     ],
-     [
-      "src/main/90-load.js",
-      4
-     ],
-     [
-      "src/main/10-characters.js",
+      "실행 중 AI",
       3
      ],
      [
-      "src/main/10-economy.js",
+      "새 게임 생성",
       2
-     ],
-     [
-      "src/main/10-liveops.js",
-      2
-     ],
-     [
-      "src/main/10-challenge.js",
-      2
-     ],
-     [
-      "src/main/10-story.js",
-      1
-     ],
-     [
-      "src/main/10-messenger.js",
-      1
      ]
     ],
-    "views": [],
     "layers": {
-     "Model": 27,
-     "Controller": 9,
-     "View": 8
+     "Model": 21,
+     "Controller": 2,
+     "View": 22,
+     "섞임": 1
     }
    },
-   "F16": {
+   "F15": {
     "label": "chapters.json › [].stages[].enemies",
     "data": [
      "chapters.json › [].stages[].enemies",
-     "chapters.json › [].stages[].field",
-     "chapters.json › [].stages[].goal"
+     "chapters.json › [].stages[].combatBalance",
+     "chapters.json › [].stages[].enemies[].atk"
     ],
-    "fns": 43,
+    "fns": 44,
     "mods": [
      [
       "src/main/10-challenge.js",
@@ -14607,18 +14633,18 @@
      ],
      [
       "src/main/10-story.js",
-      7
+      8
      ],
      [
       "src/main/10-newgame.js",
       4
      ],
      [
-      "src/main/10-economy.js",
-      4
+      "src/main/10-characters.js",
+      3
      ],
      [
-      "src/main/10-characters.js",
+      "src/main/10-economy.js",
       3
      ],
      [
@@ -14628,6 +14654,10 @@
      [
       "src/main/10-system.js",
       2
+     ],
+     [
+      "src/main/10-liveops.js",
+      1
      ]
     ],
     "views": [
@@ -14638,32 +14668,107 @@
      [
       "불러오기",
       6
+     ],
+     [
+      "실행 중 AI",
+      1
      ]
     ],
     "layers": {
-     "Model": 31,
-     "Controller": 5,
-     "View": 7
+     "Model": 32,
+     "Controller": 6,
+     "View": 6
     }
    },
-   "F17": {
-    "label": "chars.json › [].weapon",
+   "F16": {
+    "label": "chapters.json › [].stages[].enemies[].elem",
     "data": [
-     "chars.json › [].weapon",
-     "저장소 ggm-plessons"
+     "chapters.json › [].stages[].enemies[].elem",
+     "chars.json › [].pos",
+     "chars.json › [].role"
     ],
-    "fns": 39,
+    "fns": 42,
     "mods": [
      [
-      "src/main/10-liveops.js",
-      12
+      "src/main/10-rules.js",
+      22
      ],
      [
       "src/main/10-characters.js",
-      8
+      3
      ],
      [
-      "src/main/10-promptstudio.js",
+      "src/main/10-player.js",
+      3
+     ],
+     [
+      "src/main/00-core.js",
+      3
+     ],
+     [
+      "src/main/10-world.js",
+      2
+     ],
+     [
+      "src/main/90-load.js",
+      2
+     ],
+     [
+      "src/main/10-story.js",
+      2
+     ],
+     [
+      "src/main/10-system.js",
+      2
+     ],
+     [
+      "src/main/10-newgame.js",
+      1
+     ],
+     [
+      "src/main/10-art.js",
+      1
+     ],
+     [
+      "src/main/10-battle.js",
+      1
+     ]
+    ],
+    "views": [
+     [
+      "새 게임 생성",
+      10
+     ],
+     [
+      "불러오기",
+      5
+     ],
+     [
+      "실행 중 AI",
+      3
+     ]
+    ],
+    "layers": {
+     "Model": 30,
+     "Controller": 1,
+     "View": 11
+    }
+   },
+   "F17": {
+    "label": "chars.json › [].voiceId",
+    "data": [
+     "chars.json › [].voiceId",
+     "chars.json › [].voiceName",
+     "저장소 ggm-backup-staging"
+    ],
+    "fns": 38,
+    "mods": [
+     [
+      "src/main/10-system.js",
+      24
+     ],
+     [
+      "src/main/10-art.js",
       5
      ],
      [
@@ -14671,12 +14776,70 @@
       4
      ],
      [
-      "src/main/10-rules.js",
-      4
+      "src/main/10-characters.js",
+      3
      ],
      [
-      "src/main/10-story.js",
-      2
+      "src/main/95-start.js",
+      1
+     ],
+     [
+      "src/main/90-load.js",
+      1
+     ]
+    ],
+    "views": [],
+    "layers": {
+     "Model": 22,
+     "Controller": 5,
+     "View": 11
+    }
+   },
+   "F18": {
+    "label": "EXC",
+    "data": [],
+    "fns": 35,
+    "mods": [
+     [
+      "src/main/10-expedition.js",
+      28
+     ],
+     [
+      "src/main/10-characters.js",
+      3
+     ],
+     [
+      "src/main/90-load.js",
+      3
+     ],
+     [
+      "src/main/10-economy.js",
+      1
+     ]
+    ],
+    "views": [],
+    "layers": {
+     "Model": 23,
+     "Controller": 5,
+     "View": 7
+    }
+   },
+   "F19": {
+    "label": "새 게임 생성",
+    "data": [],
+    "fns": 31,
+    "mods": [
+     [
+      "src/main/10-newgame.js",
+      17
+     ],
+     [
+      "src/main/10-characters.js",
+      9
+     ],
+     [
+      "src/main/00-core.js",
+      3
      ],
      [
       "src/main/80-misc.js",
@@ -14685,93 +14848,26 @@
      [
       "src/main/90-load.js",
       1
-     ],
-     [
-      "src/main/10-system.js",
-      1
-     ],
-     [
-      "src/main/10-art.js",
-      1
      ]
     ],
     "views": [
-     [
-      "실행 중 AI",
-      15
-     ],
      [
       "새 게임 생성",
-      7
-     ]
-    ],
-    "layers": {
-     "Model": 29,
-     "Controller": 7,
-     "View": 3
-    }
-   },
-   "F18": {
-    "label": "저장소 ggm-upd-notes",
-    "data": [
-     "저장소 ggm-upd-notes",
-     "chars.json › [].upper",
-     "저장소 starfall-live"
-    ],
-    "fns": 29,
-    "mods": [
-     [
-      "src/main/10-liveops.js",
-      13
-     ],
-     [
-      "src/main/00-core.js",
-      7
-     ],
-     [
-      "src/main/10-story.js",
-      2
-     ],
-     [
-      "src/main/10-system.js",
-      2
-     ],
-     [
-      "src/main/10-economy.js",
-      2
-     ],
-     [
-      "src/main/10-acquire.js",
-      1
-     ],
-     [
-      "src/main/10-art.js",
-      1
-     ],
-     [
-      "src/main/10-characters.js",
-      1
-     ]
-    ],
-    "views": [
-     [
-      "실행 중 AI",
       3
      ]
     ],
     "layers": {
-     "Model": 13,
-     "Controller": 6,
-     "섞임": 1,
-     "View": 9
+     "Model": 25,
+     "Controller": 4,
+     "View": 2
     }
    },
-   "F19": {
+   "F20": {
     "label": "저장소 ggm-voice-ja",
     "data": [
      "저장소 ggm-voice-ja"
     ],
-    "fns": 25,
+    "fns": 28,
     "mods": [
      [
       "src/main/10-system.js",
@@ -14783,7 +14879,7 @@
      ],
      [
       "src/main/10-story.js",
-      3
+      6
      ],
      [
       "src/main/90-load.js",
@@ -14809,19 +14905,61 @@
      ],
      [
       "실행 중 AI",
-      3
+      6
      ]
     ],
     "layers": {
-     "Model": 15,
+     "Model": 18,
      "View": 9,
      "Controller": 1
     }
    },
-   "F20": {
+   "F21": {
+    "label": "chars.json › [].persona",
+    "data": [
+     "chars.json › [].persona",
+     "chars.json › [].pfields",
+     "chars.json › [].pos"
+    ],
+    "fns": 27,
+    "mods": [
+     [
+      "src/main/10-characters.js",
+      12
+     ],
+     [
+      "src/main/10-rules.js",
+      10
+     ],
+     [
+      "src/main/90-load.js",
+      3
+     ],
+     [
+      "src/main/80-misc.js",
+      2
+     ]
+    ],
+    "views": [
+     [
+      "새 게임 생성",
+      12
+     ],
+     [
+      "실행 중 AI",
+      1
+     ]
+    ],
+    "layers": {
+     "Model": 21,
+     "Controller": 4,
+     "View": 2
+    }
+   },
+   "F22": {
     "label": "실행 중 AI",
     "data": [],
-    "fns": 24,
+    "fns": 26,
     "mods": [
      [
       "src/main/10-characters.js",
@@ -14829,7 +14967,7 @@
      ],
      [
       "src/main/10-liveops.js",
-      6
+      8
      ],
      [
       "src/main/00-core.js",
@@ -14843,7 +14981,7 @@
     "views": [
      [
       "실행 중 AI",
-      14
+      19
      ],
      [
       "새 게임 생성",
@@ -14851,29 +14989,53 @@
      ]
     ],
     "layers": {
-     "Model": 17,
+     "Model": 19,
      "View": 7
     }
    },
-   "F21": {
-    "label": "새 게임 생성",
+   "F23": {
+    "label": "apply",
     "data": [],
-    "fns": 18,
+    "fns": 14,
     "mods": [
      [
-      "src/main/10-newgame.js",
-      9
+      "src/main/10-liveops.js",
+      13
      ],
      [
-      "src/main/10-characters.js",
-      7
-     ],
-     [
-      "src/main/00-core.js",
+      "src/main/10-art.js",
       1
+     ]
+    ],
+    "views": [],
+    "layers": {
+     "Model": 13,
+     "View": 1
+    }
+   },
+   "F24": {
+    "label": "새 게임 생성",
+    "data": [],
+    "fns": 10,
+    "mods": [
+     [
+      "src/main/10-promptstudio.js",
+      5
+     ],
+     [
+      "src/main/10-system.js",
+      2
      ],
      [
       "src/main/90-load.js",
+      1
+     ],
+     [
+      "src/main/10-newgame.js",
+      1
+     ],
+     [
+      "src/main/10-battle.js",
       1
      ]
     ],
@@ -14884,11 +15046,11 @@
      ]
     ],
     "layers": {
-     "Model": 17,
-     "Controller": 1
+     "Model": 7,
+     "View": 3
     }
    },
-   "F22": {
+   "F25": {
     "label": "저장소 ggm-packs",
     "data": [
      "저장소 ggm-packs"
@@ -14919,27 +15081,7 @@
      "View": 3
     }
    },
-   "F23": {
-    "label": "pfDef",
-    "data": [],
-    "fns": 6,
-    "mods": [
-     [
-      "src/main/10-promptstudio.js",
-      4
-     ],
-     [
-      "src/main/10-system.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 3,
-     "View": 3
-    }
-   },
-   "F24": {
+   "F26": {
     "label": "regenFields",
     "data": [],
     "fns": 6,
@@ -14963,7 +15105,7 @@
      "View": 3
     }
    },
-   "F25": {
+   "F27": {
     "label": "v2DesignContext",
     "data": [],
     "fns": 5,
@@ -14982,7 +15124,7 @@
      "Model": 5
     }
    },
-   "F26": {
+   "F28": {
     "label": "titleLines",
     "data": [],
     "fns": 4,
@@ -15002,7 +15144,7 @@
      "View": 2
     }
    },
-   "F27": {
+   "F29": {
     "label": "applyOrient",
     "data": [],
     "fns": 3,
@@ -15018,7 +15160,7 @@
      "View": 1
     }
    },
-   "F28": {
+   "F30": {
     "label": "mailClean",
     "data": [],
     "fns": 3,
@@ -15037,7 +15179,7 @@
      "Model": 3
     }
    },
-   "F29": {
+   "F31": {
     "label": "새 게임 생성",
     "data": [],
     "fns": 3,
@@ -15058,7 +15200,7 @@
      "Controller": 1
     }
    },
-   "F30": {
+   "F32": {
     "label": "passClaimable",
     "data": [],
     "fns": 3,
@@ -15082,31 +15224,7 @@
      "View": 1
     }
    },
-   "F31": {
-    "label": "regenCancel",
-    "data": [],
-    "fns": 3,
-    "mods": [
-     [
-      "src/main/00-core.js",
-      1
-     ],
-     [
-      "src/main/80-misc.js",
-      1
-     ],
-     [
-      "src/main/10-liveops.js",
-      1
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2,
-     "View": 1
-    }
-   },
-   "F32": {
+   "F33": {
     "label": "smFocused",
     "data": [],
     "fns": 3,
@@ -15121,229 +15239,7 @@
      "Model": 3
     }
    },
-   "F33": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-system.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
    "F34": {
-    "label": "context",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-newgame.js",
-      1
-     ],
-     [
-      "src/main/80-misc.js",
-      1
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F35": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-newgame.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F36": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-liveops.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F37": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-characters.js",
-      1
-     ],
-     [
-      "src/main/80-misc.js",
-      1
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F38": {
-    "label": "context",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-characters.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F39": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-story.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F40": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-characters.js",
-      1
-     ],
-     [
-      "src/main/80-misc.js",
-      1
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F41": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-liveops.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F42": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-liveops.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F43": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-story.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F44": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-world.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F45": {
-    "label": "context",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-characters.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F46": {
-    "label": "prompt",
-    "data": [],
-    "fns": 2,
-    "mods": [
-     [
-      "src/main/10-characters.js",
-      2
-     ]
-    ],
-    "views": [],
-    "layers": {
-     "Model": 2
-    }
-   },
-   "F47": {
     "label": "bossPatText",
     "data": [],
     "fns": 2,
@@ -15362,7 +15258,7 @@
      "Model": 2
     }
    },
-   "F48": {
+   "F35": {
     "label": "crc32",
     "data": [],
     "fns": 2,
@@ -15377,8 +15273,8 @@
      "Model": 2
     }
    },
-   "F49": {
-    "label": "drPolish",
+   "F36": {
+    "label": "regenCancel",
     "data": [],
     "fns": 2,
     "mods": [
@@ -15387,17 +15283,16 @@
       1
      ],
      [
-      "src/main/10-characters.js",
+      "src/main/80-misc.js",
       1
      ]
     ],
     "views": [],
     "layers": {
-     "Controller": 1,
-     "Model": 1
+     "Model": 2
     }
    },
-   "F50": {
+   "F37": {
     "label": "regenRunPrompt",
     "data": [],
     "fns": 2,
@@ -15438,65 +15333,70 @@
     "feats": [
      [
       "F01",
-      47
+      46
      ],
      [
-      "F05",
-      15
-     ],
-     [
-      "F06",
-      13
+      "F04",
+      17
      ],
      [
       "F11",
+      12
+     ],
+     [
+      "F02",
       11
      ],
      [
-      "F08",
-      10
+      "F07",
+      11
      ],
      [
-      "F07",
-      9
+      "F06",
+      10
      ]
     ],
     "kind": "흩어짐",
     "spread": [
      {
       "feat": "F01",
-      "n": 47,
+      "n": 46,
       "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F05",
-      "n": 15,
-      "to": "src/main/10-system.js"
-     },
-     {
-      "feat": "F06",
-      "n": 13,
-      "to": "src/main/10-newgame.js"
-     },
-     {
-      "feat": "F11",
-      "n": 11,
-      "to": "src/main/10-story.js"
-     },
-     {
-      "feat": "F08",
-      "n": 10,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F07",
-      "n": 9,
-      "to": "src/main/10-story.js"
      },
      {
       "feat": "F04",
+      "n": 17,
+      "to": "src/main/10-system.js"
+     },
+     {
+      "feat": "F11",
+      "n": 12,
+      "to": "src/main/10-story.js"
+     },
+     {
+      "feat": "F02",
+      "n": 11,
+      "to": "src/main/10-liveops.js"
+     },
+     {
+      "feat": "F07",
+      "n": 11,
+      "to": "src/main/10-newgame.js"
+     },
+     {
+      "feat": "F06",
+      "n": 10,
+      "to": "src/main/10-story.js"
+     },
+     {
+      "feat": "F09",
       "n": 8,
-      "to": "src/main/10-acquire.js"
+      "to": "src/main/10-characters.js"
+     },
+     {
+      "feat": "F03",
+      "n": 7,
+      "to": "src/main/10-world.js"
      },
      {
       "feat": "F13",
@@ -15504,29 +15404,24 @@
       "to": "src/main/10-battle.js"
      },
      {
-      "feat": "F18",
-      "n": 7,
-      "to": "src/main/10-liveops.js"
-     },
-     {
-      "feat": "F09",
+      "feat": "F10",
       "n": 6,
       "to": "src/main/10-challenge.js"
      },
      {
-      "feat": "F20",
+      "feat": "F22",
       "n": 5,
       "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F02",
+      "feat": "F08",
       "n": 5,
-      "to": "src/main/10-world.js"
+      "to": "src/main/10-characters.js"
      },
      {
       "feat": "F17",
       "n": 4,
-      "to": "src/main/10-liveops.js"
+      "to": "src/main/10-system.js"
      },
      {
       "feat": "F12",
@@ -15534,57 +15429,57 @@
       "to": "src/main/10-world.js"
      },
      {
-      "feat": "F03",
+      "feat": "F05",
       "n": 3,
       "to": "src/main/10-system.js"
      },
      {
       "feat": "F14",
       "n": 3,
+      "to": "src/main/10-messenger.js"
+     },
+     {
+      "feat": "F16",
+      "n": 3,
       "to": "src/main/10-rules.js"
      },
      {
-      "feat": "F22",
+      "feat": "F19",
+      "n": 3,
+      "to": "src/main/10-newgame.js"
+     },
+     {
+      "feat": "F25",
       "n": 2,
       "to": "src/main/10-art.js"
      },
      {
-      "feat": "F19",
+      "feat": "F20",
       "n": 2,
       "to": "src/main/10-system.js"
      },
      {
-      "feat": "F16",
+      "feat": "F15",
       "n": 2,
       "to": "src/main/10-challenge.js"
      },
      {
-      "feat": "F24",
+      "feat": "F26",
       "n": 2,
       "to": "src/main/10-liveops.js"
      },
      {
-      "feat": "F25",
+      "feat": "F27",
       "n": 1,
       "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F31",
+      "feat": "F36",
       "n": 1,
       "to": null
      },
      {
-      "feat": "F21",
-      "n": 1,
-      "to": "src/main/10-newgame.js"
-     },
-     {
-      "feat": "F49",
-      "n": 1,
-      "to": null
-     },
-     {
-      "feat": "F47",
+      "feat": "F34",
       "n": 1,
       "to": null
      }
@@ -15612,41 +15507,41 @@
     ],
     "feats": [
      [
-      "F02",
+      "F03",
       24
      ],
      [
-      "F04",
+      "F02",
       21
      ],
      [
       "F01",
-      12
+      13
      ],
      [
-      "F05",
+      "F04",
       2
      ],
      [
-      "F08",
+      "F09",
       2
      ],
      [
-      "F06",
+      "F07",
       1
      ]
     ],
     "kind": "슈퍼",
     "split": [
      {
-      "feat": "F02",
+      "feat": "F03",
       "n": 24,
       "to": "src/main/10-world.js"
      },
      {
-      "feat": "F04",
+      "feat": "F02",
       "n": 21,
-      "to": null
+      "to": "src/main/10-liveops.js"
      }
     ]
    },
@@ -15671,78 +15566,93 @@
     "feats": [
      [
       "F01",
-      24
-     ],
-     [
-      "F05",
-      13
-     ],
-     [
-      "F08",
-      10
-     ],
-     [
-      "F10",
-      9
+      20
      ],
      [
       "F06",
-      7
+      11
      ],
      [
-      "F22",
-      4
+      "F04",
+      10
+     ],
+     [
+      "F09",
+      10
+     ],
+     [
+      "F07",
+      6
+     ],
+     [
+      "F17",
+      5
      ]
     ],
     "kind": "흩어짐",
     "spread": [
      {
       "feat": "F01",
-      "n": 24,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F05",
-      "n": 13,
-      "to": "src/main/10-system.js"
-     },
-     {
-      "feat": "F08",
-      "n": 10,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F10",
-      "n": 9,
+      "n": 20,
       "to": "src/main/10-characters.js"
      },
      {
       "feat": "F06",
-      "n": 7,
+      "n": 11,
+      "to": "src/main/10-story.js"
+     },
+     {
+      "feat": "F04",
+      "n": 10,
+      "to": "src/main/10-system.js"
+     },
+     {
+      "feat": "F09",
+      "n": 10,
+      "to": "src/main/10-characters.js"
+     },
+     {
+      "feat": "F07",
+      "n": 6,
       "to": "src/main/10-newgame.js"
      },
      {
-      "feat": "F22",
+      "feat": "F17",
+      "n": 5,
+      "to": "src/main/10-system.js"
+     },
+     {
+      "feat": "F25",
       "n": 4,
       "to": null
      },
      {
-      "feat": "F07",
-      "n": 4,
-      "to": "src/main/10-story.js"
-     },
-     {
-      "feat": "F03",
-      "n": 2,
-      "to": "src/main/10-system.js"
-     },
-     {
       "feat": "F14",
+      "n": 4,
+      "to": "src/main/10-messenger.js"
+     },
+     {
+      "feat": "F08",
+      "n": 2,
+      "to": "src/main/10-characters.js"
+     },
+     {
+      "feat": "F02",
+      "n": 2,
+      "to": "src/main/10-liveops.js"
+     },
+     {
+      "feat": "F16",
       "n": 1,
       "to": "src/main/10-rules.js"
      },
      {
-      "feat": "F17",
+      "feat": "F05",
+      "n": 1,
+      "to": "src/main/10-system.js"
+     },
+     {
+      "feat": "F23",
       "n": 1,
       "to": "src/main/10-liveops.js"
      },
@@ -15752,14 +15662,9 @@
       "to": "src/main/10-world.js"
      },
      {
-      "feat": "F02",
+      "feat": "F03",
       "n": 1,
       "to": "src/main/10-world.js"
-     },
-     {
-      "feat": "F18",
-      "n": 1,
-      "to": "src/main/10-liveops.js"
      }
     ]
    },
@@ -15780,15 +15685,19 @@
       14
      ],
      [
-      "F16",
+      "F15",
       9
      ],
      [
-      "F07",
+      "F06",
       2
      ],
      [
-      "F14",
+      "F24",
+      1
+     ],
+     [
+      "F16",
       1
      ]
     ],
@@ -15800,7 +15709,7 @@
       "to": null
      },
      {
-      "feat": "F16",
+      "feat": "F15",
       "n": 9,
       "to": "src/main/10-challenge.js"
      }
@@ -15821,11 +15730,11 @@
     ],
     "feats": [
      [
-      "F09",
+      "F10",
       54
      ],
      [
-      "F16",
+      "F15",
       12
      ],
      [
@@ -15833,28 +15742,28 @@
       7
      ],
      [
-      "F01",
-      3
-     ],
-     [
       "F02",
       3
      ],
      [
-      "F15",
-      2
+      "F01",
+      3
+     ],
+     [
+      "F03",
+      3
      ]
     ],
     "kind": "고유",
-    "feat": "F09"
+    "feat": "F10"
    },
    {
     "mod": "src/main/10-characters.js",
     "n": 315,
     "layers": {
-     "Model": 204,
+     "Model": 202,
      "섞임": 3,
-     "Controller": 18,
+     "Controller": 20,
      "View": 90
     },
     "mixed": [
@@ -15877,23 +15786,23 @@
       62
      ],
      [
-      "F10",
-      28
+      "F08",
+      31
      ],
      [
-      "F08",
-      28
+      "F09",
+      29
+     ],
+     [
+      "F03",
+      24
+     ],
+     [
+      "F06",
+      16
      ],
      [
       "F02",
-      23
-     ],
-     [
-      "F07",
-      15
-     ],
-     [
-      "F04",
       13
      ]
     ],
@@ -15905,52 +15814,57 @@
       "to": null
      },
      {
-      "feat": "F10",
-      "n": 28,
-      "to": null
-     },
-     {
       "feat": "F08",
-      "n": 28,
+      "n": 31,
       "to": null
      },
      {
-      "feat": "F02",
-      "n": 23,
+      "feat": "F09",
+      "n": 29,
+      "to": null
+     },
+     {
+      "feat": "F03",
+      "n": 24,
       "to": "src/main/10-world.js"
      },
      {
-      "feat": "F07",
-      "n": 15,
+      "feat": "F06",
+      "n": 16,
       "to": "src/main/10-story.js"
+     },
+     {
+      "feat": "F02",
+      "n": 13,
+      "to": "src/main/10-liveops.js"
      },
      {
       "feat": "F04",
       "n": 13,
-      "to": "src/main/10-acquire.js"
-     },
-     {
-      "feat": "F05",
-      "n": 13,
       "to": "src/main/10-system.js"
      },
      {
-      "feat": "F20",
+      "feat": "F21",
+      "n": 12,
+      "to": null
+     },
+     {
+      "feat": "F22",
       "n": 11,
       "to": null
      },
      {
-      "feat": "F17",
-      "n": 8,
-      "to": "src/main/10-liveops.js"
-     },
-     {
-      "feat": "F21",
-      "n": 7,
+      "feat": "F19",
+      "n": 9,
       "to": "src/main/10-newgame.js"
      },
      {
-      "feat": "F19",
+      "feat": "F13",
+      "n": 8,
+      "to": "src/main/10-battle.js"
+     },
+     {
+      "feat": "F20",
       "n": 7,
       "to": "src/main/10-system.js"
      },
@@ -15960,27 +15874,27 @@
       "to": "src/main/10-story.js"
      },
      {
-      "feat": "F14",
-      "n": 5,
-      "to": "src/main/10-rules.js"
-     },
-     {
-      "feat": "F13",
-      "n": 5,
-      "to": "src/main/10-battle.js"
-     },
-     {
-      "feat": "F25",
+      "feat": "F27",
       "n": 4,
       "to": null
      },
      {
-      "feat": "F16",
+      "feat": "F17",
+      "n": 3,
+      "to": "src/main/10-system.js"
+     },
+     {
+      "feat": "F15",
       "n": 3,
       "to": "src/main/10-challenge.js"
      },
      {
-      "feat": "F15",
+      "feat": "F16",
+      "n": 3,
+      "to": "src/main/10-rules.js"
+     },
+     {
+      "feat": "F18",
       "n": 3,
       "to": "src/main/10-expedition.js"
      },
@@ -15990,54 +15904,34 @@
       "to": "src/main/10-world.js"
      },
      {
-      "feat": "F06",
+      "feat": "F07",
       "n": 3,
       "to": "src/main/10-newgame.js"
      },
      {
-      "feat": "F46",
-      "n": 2,
-      "to": null
+      "feat": "F14",
+      "n": 3,
+      "to": "src/main/10-messenger.js"
      },
      {
-      "feat": "F45",
-      "n": 2,
-      "to": null
-     },
-     {
-      "feat": "F38",
-      "n": 2,
-      "to": null
-     },
-     {
-      "feat": "F30",
+      "feat": "F32",
       "n": 1,
       "to": null
      },
      {
-      "feat": "F49",
+      "feat": "F10",
       "n": 1,
-      "to": "src/main/00-core.js"
+      "to": "src/main/10-challenge.js"
      },
      {
-      "feat": "F18",
+      "feat": "F05",
       "n": 1,
-      "to": "src/main/10-liveops.js"
+      "to": "src/main/10-system.js"
      },
      {
-      "feat": "F22",
+      "feat": "F25",
       "n": 1,
       "to": "src/main/10-art.js"
-     },
-     {
-      "feat": "F37",
-      "n": 1,
-      "to": null
-     },
-     {
-      "feat": "F40",
-      "n": 1,
-      "to": null
      }
     ]
    },
@@ -16061,86 +15955,41 @@
     ],
     "feats": [
      [
+      "F02",
+      12
+     ],
+     [
       "F13",
       9
      ],
      [
+      "F09",
+      5
+     ],
+     [
       "F01",
-      7
-     ],
-     [
-      "F04",
-      5
-     ],
-     [
-      "F08",
-      5
-     ],
-     [
-      "F16",
       4
      ],
      [
       "F15",
-      2
+      3
+     ],
+     [
+      "F20",
+      1
      ]
     ],
-    "kind": "흩어짐",
-    "spread": [
+    "kind": "슈퍼",
+    "split": [
+     {
+      "feat": "F02",
+      "n": 12,
+      "to": "src/main/10-liveops.js"
+     },
      {
       "feat": "F13",
       "n": 9,
       "to": "src/main/10-battle.js"
-     },
-     {
-      "feat": "F01",
-      "n": 7,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F04",
-      "n": 5,
-      "to": "src/main/10-acquire.js"
-     },
-     {
-      "feat": "F08",
-      "n": 5,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F16",
-      "n": 4,
-      "to": "src/main/10-challenge.js"
-     },
-     {
-      "feat": "F15",
-      "n": 2,
-      "to": "src/main/10-expedition.js"
-     },
-     {
-      "feat": "F18",
-      "n": 2,
-      "to": "src/main/10-liveops.js"
-     },
-     {
-      "feat": "F19",
-      "n": 1,
-      "to": "src/main/10-system.js"
-     },
-     {
-      "feat": "F02",
-      "n": 1,
-      "to": "src/main/10-world.js"
-     },
-     {
-      "feat": "F28",
-      "n": 1,
-      "to": "src/main/90-load.js"
-     },
-     {
-      "feat": "F30",
-      "n": 1,
-      "to": "src/main/10-characters.js"
      }
     ]
    },
@@ -16157,8 +16006,8 @@
     "badEx": [],
     "feats": [
      [
-      "F15",
-      29
+      "F18",
+      28
      ],
      [
       "F01",
@@ -16169,16 +16018,16 @@
       2
      ],
      [
-      "F06",
-      1
+      "F02",
+      2
      ],
      [
-      "F04",
+      "F07",
       1
      ]
     ],
     "kind": "고유",
-    "feat": "F15"
+    "feat": "F18"
    },
    {
     "mod": "src/main/10-liveops.js",
@@ -16199,75 +16048,60 @@
     ],
     "feats": [
      [
-      "F04",
-      20
+      "F02",
+      23
      ],
      [
-      "F18",
+      "F23",
       13
      ],
      [
-      "F17",
+      "F08",
       12
      ],
      [
-      "F10",
+      "F04",
+      11
+     ],
+     [
+      "F22",
       8
      ],
      [
-      "F20",
-      6
-     ],
-     [
-      "F24",
+      "F26",
       3
      ]
     ],
     "kind": "흩어짐",
     "spread": [
      {
-      "feat": "F04",
-      "n": 20,
-      "to": "src/main/10-acquire.js"
+      "feat": "F02",
+      "n": 23,
+      "to": null
      },
      {
-      "feat": "F18",
+      "feat": "F23",
       "n": 13,
       "to": null
      },
      {
-      "feat": "F17",
+      "feat": "F08",
       "n": 12,
-      "to": null
+      "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F10",
+      "feat": "F04",
+      "n": 11,
+      "to": "src/main/10-system.js"
+     },
+     {
+      "feat": "F22",
       "n": 8,
       "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F20",
-      "n": 6,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F24",
+      "feat": "F26",
       "n": 3,
-      "to": null
-     },
-     {
-      "feat": "F36",
-      "n": 2,
-      "to": null
-     },
-     {
-      "feat": "F42",
-      "n": 2,
-      "to": null
-     },
-     {
-      "feat": "F41",
-      "n": 2,
       "to": null
      },
      {
@@ -16278,17 +16112,7 @@
      {
       "feat": "F07",
       "n": 2,
-      "to": "src/main/10-story.js"
-     },
-     {
-      "feat": "F06",
-      "n": 2,
       "to": "src/main/10-newgame.js"
-     },
-     {
-      "feat": "F15",
-      "n": 2,
-      "to": "src/main/10-expedition.js"
      },
      {
       "feat": "F01",
@@ -16296,12 +16120,22 @@
       "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F31",
+      "feat": "F06",
       "n": 1,
-      "to": "src/main/00-core.js"
+      "to": "src/main/10-story.js"
      },
      {
-      "feat": "F08",
+      "feat": "F15",
+      "n": 1,
+      "to": "src/main/10-challenge.js"
+     },
+     {
+      "feat": "F13",
+      "n": 1,
+      "to": "src/main/10-battle.js"
+     },
+     {
+      "feat": "F09",
       "n": 1,
       "to": "src/main/10-characters.js"
      }
@@ -16325,41 +16159,34 @@
     ],
     "feats": [
      [
-      "F01",
-      25
+      "F14",
+      29
      ],
      [
-      "F04",
+      "F02",
+      8
+     ],
+     [
+      "F01",
       4
      ],
      [
-      "F07",
+      "F06",
       3
      ],
      [
       "F11",
       2
-     ],
-     [
-      "F15",
-      1
-     ],
-     [
-      "F10",
-      1
      ]
     ],
-    "kind": "조각",
-    "feat": "F01",
-    "to": "src/main/10-characters.js",
-    "n0": 25,
-    "n1": 62
+    "kind": "고유",
+    "feat": "F14"
    },
    {
     "mod": "src/main/10-newgame.js",
-    "n": 90,
+    "n": 91,
     "layers": {
-     "Model": 79,
+     "Model": 80,
      "Controller": 5,
      "View": 6
     },
@@ -16368,85 +16195,40 @@
     "badEx": [],
     "feats": [
      [
-      "F06",
-      25
+      "F07",
+      26
      ],
      [
-      "F07",
-      12
+      "F19",
+      17
      ],
      [
       "F01",
+      15
+     ],
+     [
+      "F06",
       11
      ],
      [
-      "F21",
-      9
-     ],
-     [
-      "F16",
+      "F15",
       4
      ],
      [
-      "F29",
+      "F31",
       3
      ]
     ],
-    "kind": "흩어짐",
-    "spread": [
-     {
-      "feat": "F06",
-      "n": 25,
-      "to": null
-     },
+    "kind": "슈퍼",
+    "split": [
      {
       "feat": "F07",
-      "n": 12,
-      "to": "src/main/10-story.js"
-     },
-     {
-      "feat": "F01",
-      "n": 11,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F21",
-      "n": 9,
+      "n": 26,
       "to": null
      },
      {
-      "feat": "F16",
-      "n": 4,
-      "to": "src/main/10-challenge.js"
-     },
-     {
-      "feat": "F29",
-      "n": 3,
-      "to": null
-     },
-     {
-      "feat": "F11",
-      "n": 3,
-      "to": "src/main/10-story.js"
-     },
-     {
-      "feat": "F35",
-      "n": 2,
-      "to": null
-     },
-     {
-      "feat": "F14",
-      "n": 2,
-      "to": "src/main/10-rules.js"
-     },
-     {
-      "feat": "F08",
-      "n": 1,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F34",
-      "n": 1,
+      "feat": "F19",
+      "n": 17,
       "to": null
      }
     ]
@@ -16468,7 +16250,7 @@
       4
      ],
      [
-      "F14",
+      "F16",
       3
      ],
      [
@@ -16476,11 +16258,15 @@
       2
      ],
      [
-      "F05",
-      2
+      "F02",
+      1
      ],
      [
-      "F09",
+      "F14",
+      1
+     ],
+     [
+      "F10",
       1
      ]
     ],
@@ -16492,7 +16278,7 @@
       "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F14",
+      "feat": "F16",
       "n": 3,
       "to": "src/main/10-rules.js"
      }
@@ -16500,9 +16286,9 @@
    },
    {
     "mod": "src/main/10-promptstudio.js",
-    "n": 15,
+    "n": 16,
     "layers": {
-     "Model": 12,
+     "Model": 13,
      "View": 3
     },
     "mixed": [],
@@ -16512,36 +16298,23 @@
     ],
     "feats": [
      [
-      "F17",
+      "F24",
       5
-     ],
-     [
-      "F23",
-      4
      ],
      [
       "F01",
       4
+     ],
+     [
+      "F04",
+      3
+     ],
+     [
+      "F08",
+      1
      ]
     ],
-    "kind": "슈퍼",
-    "split": [
-     {
-      "feat": "F17",
-      "n": 5,
-      "to": "src/main/10-liveops.js"
-     },
-     {
-      "feat": "F23",
-      "n": 4,
-      "to": null
-     },
-     {
-      "feat": "F01",
-      "n": 4,
-      "to": "src/main/10-characters.js"
-     }
-    ]
+    "kind": "층"
    },
    {
     "mod": "src/main/10-rules.js",
@@ -16560,39 +16333,39 @@
     ],
     "feats": [
      [
-      "F14",
-      23
+      "F16",
+      22
      ],
      [
-      "F10",
+      "F21",
       10
      ],
      [
-      "F17",
-      4
-     ],
-     [
-      "F06",
-      4
+      "F08",
+      6
      ],
      [
       "F12",
       1
      ],
      [
-      "F02",
+      "F03",
+      1
+     ],
+     [
+      "F07",
       1
      ]
     ],
     "kind": "슈퍼",
     "split": [
      {
-      "feat": "F14",
-      "n": 23,
+      "feat": "F16",
+      "n": 22,
       "to": null
      },
      {
-      "feat": "F10",
+      "feat": "F21",
       "n": 10,
       "to": "src/main/10-characters.js"
      }
@@ -16621,66 +16394,76 @@
     ],
     "feats": [
      [
-      "F07",
+      "F11",
       23
      ],
      [
-      "F11",
+      "F06",
       21
      ],
      [
-      "F12",
-      16
-     ],
-     [
-      "F06",
+      "F07",
       14
      ],
      [
-      "F16",
-      7
+      "F12",
+      13
+     ],
+     [
+      "F02",
+      10
      ],
      [
       "F08",
-      6
+      8
      ]
     ],
     "kind": "흩어짐",
     "spread": [
      {
-      "feat": "F07",
+      "feat": "F11",
       "n": 23,
       "to": null
      },
      {
-      "feat": "F11",
+      "feat": "F06",
       "n": 21,
       "to": null
      },
      {
-      "feat": "F12",
-      "n": 16,
-      "to": "src/main/10-world.js"
-     },
-     {
-      "feat": "F06",
+      "feat": "F07",
       "n": 14,
       "to": "src/main/10-newgame.js"
      },
      {
-      "feat": "F16",
-      "n": 7,
-      "to": "src/main/10-challenge.js"
+      "feat": "F12",
+      "n": 13,
+      "to": "src/main/10-world.js"
+     },
+     {
+      "feat": "F02",
+      "n": 10,
+      "to": "src/main/10-liveops.js"
      },
      {
       "feat": "F08",
+      "n": 8,
+      "to": "src/main/10-characters.js"
+     },
+     {
+      "feat": "F15",
+      "n": 8,
+      "to": "src/main/10-challenge.js"
+     },
+     {
+      "feat": "F09",
       "n": 6,
       "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F04",
-      "n": 5,
-      "to": "src/main/10-acquire.js"
+      "feat": "F20",
+      "n": 6,
+      "to": "src/main/10-system.js"
      },
      {
       "feat": "F01",
@@ -16688,12 +16471,7 @@
       "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F14",
-      "n": 3,
-      "to": "src/main/10-rules.js"
-     },
-     {
-      "feat": "F05",
+      "feat": "F04",
       "n": 3,
       "to": "src/main/10-system.js"
      },
@@ -16703,47 +16481,22 @@
       "to": "src/main/10-battle.js"
      },
      {
-      "feat": "F19",
-      "n": 3,
-      "to": "src/main/10-system.js"
+      "feat": "F16",
+      "n": 2,
+      "to": "src/main/10-rules.js"
      },
      {
-      "feat": "F39",
+      "feat": "F28",
       "n": 2,
       "to": null
      },
      {
-      "feat": "F43",
-      "n": 2,
-      "to": null
-     },
-     {
-      "feat": "F17",
-      "n": 2,
-      "to": "src/main/10-liveops.js"
-     },
-     {
-      "feat": "F18",
-      "n": 2,
-      "to": "src/main/10-liveops.js"
-     },
-     {
-      "feat": "F26",
-      "n": 2,
-      "to": null
-     },
-     {
-      "feat": "F03",
+      "feat": "F05",
       "n": 2,
       "to": "src/main/10-system.js"
      },
      {
-      "feat": "F15",
-      "n": 1,
-      "to": "src/main/10-expedition.js"
-     },
-     {
-      "feat": "F09",
+      "feat": "F10",
       "n": 1,
       "to": "src/main/10-challenge.js"
      }
@@ -16769,79 +16522,89 @@
     ],
     "feats": [
      [
-      "F03",
-      82
-     ],
-     [
       "F05",
-      31
+      81
      ],
      [
-      "F08",
-      12
+      "F04",
+      27
      ],
      [
-      "F01",
-      11
+      "F17",
+      24
      ],
      [
-      "F19",
+      "F20",
       9
      ],
      [
-      "F09",
+      "F01",
+      9
+     ],
+     [
+      "F10",
       8
      ]
     ],
     "kind": "흩어짐",
     "spread": [
      {
-      "feat": "F03",
-      "n": 82,
-      "to": null
-     },
-     {
       "feat": "F05",
-      "n": 31,
+      "n": 81,
       "to": null
      },
      {
-      "feat": "F08",
-      "n": 12,
-      "to": "src/main/10-characters.js"
+      "feat": "F04",
+      "n": 27,
+      "to": null
      },
      {
-      "feat": "F01",
-      "n": 11,
-      "to": "src/main/10-characters.js"
+      "feat": "F17",
+      "n": 24,
+      "to": null
      },
      {
-      "feat": "F19",
+      "feat": "F20",
       "n": 9,
       "to": null
      },
      {
-      "feat": "F09",
+      "feat": "F01",
+      "n": 9,
+      "to": "src/main/10-characters.js"
+     },
+     {
+      "feat": "F10",
       "n": 8,
       "to": "src/main/10-challenge.js"
      },
      {
-      "feat": "F07",
+      "feat": "F08",
       "n": 7,
-      "to": "src/main/10-story.js"
+      "to": "src/main/10-characters.js"
+     },
+     {
+      "feat": "F09",
+      "n": 7,
+      "to": "src/main/10-characters.js"
+     },
+     {
+      "feat": "F02",
+      "n": 6,
+      "to": "src/main/10-liveops.js"
      },
      {
       "feat": "F06",
+      "n": 5,
+      "to": "src/main/10-story.js"
+     },
+     {
+      "feat": "F07",
       "n": 4,
       "to": "src/main/10-newgame.js"
      },
      {
-      "feat": "F04",
-      "n": 3,
-      "to": "src/main/10-acquire.js"
-     },
-     {
-      "feat": "F27",
+      "feat": "F29",
       "n": 3,
       "to": null
      },
@@ -16851,44 +16614,29 @@
       "to": "src/main/10-battle.js"
      },
      {
-      "feat": "F23",
-      "n": 2,
-      "to": "src/main/10-promptstudio.js"
-     },
-     {
-      "feat": "F33",
+      "feat": "F24",
       "n": 2,
       "to": null
      },
      {
-      "feat": "F48",
+      "feat": "F35",
       "n": 2,
       "to": null
      },
      {
-      "feat": "F16",
+      "feat": "F15",
       "n": 2,
       "to": "src/main/10-challenge.js"
      },
      {
-      "feat": "F18",
-      "n": 2,
-      "to": "src/main/10-liveops.js"
-     },
-     {
-      "feat": "F10",
-      "n": 2,
-      "to": "src/main/10-characters.js"
-     },
-     {
       "feat": "F14",
       "n": 2,
-      "to": "src/main/10-rules.js"
+      "to": "src/main/10-messenger.js"
      },
      {
-      "feat": "F17",
-      "n": 1,
-      "to": "src/main/10-liveops.js"
+      "feat": "F16",
+      "n": 2,
+      "to": "src/main/10-rules.js"
      },
      {
       "feat": "F11",
@@ -16899,9 +16647,9 @@
    },
    {
     "mod": "src/main/10-world.js",
-    "n": 101,
+    "n": 100,
     "layers": {
-     "Model": 92,
+     "Model": 91,
      "View": 8,
      "Controller": 1
     },
@@ -16911,26 +16659,26 @@
     "feats": [
      [
       "F12",
-      33
+      38
      ],
      [
-      "F02",
-      27
-     ],
-     [
-      "F11",
-      12
+      "F03",
+      31
      ],
      [
       "F01",
-      11
+      10
      ],
      [
-      "F50",
+      "F11",
+      10
+     ],
+     [
+      "F37",
       2
      ],
      [
-      "F14",
+      "F16",
       2
      ]
     ],
@@ -16938,12 +16686,12 @@
     "split": [
      {
       "feat": "F12",
-      "n": 33,
+      "n": 38,
       "to": null
      },
      {
-      "feat": "F02",
-      "n": 27,
+      "feat": "F03",
+      "n": 31,
       "to": null
      }
     ]
@@ -16964,23 +16712,23 @@
       14
      ],
      [
-      "F05",
+      "F04",
       4
      ],
      [
-      "F32",
+      "F33",
       3
      ],
      [
+      "F08",
+      2
+     ],
+     [
+      "F21",
+      2
+     ],
+     [
       "F11",
-      2
-     ],
-     [
-      "F04",
-      2
-     ],
-     [
-      "F20",
       2
      ]
     ],
@@ -16992,14 +16740,24 @@
       "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F05",
+      "feat": "F04",
       "n": 4,
       "to": "src/main/10-system.js"
      },
      {
-      "feat": "F32",
+      "feat": "F33",
       "n": 3,
       "to": null
+     },
+     {
+      "feat": "F08",
+      "n": 2,
+      "to": "src/main/10-characters.js"
+     },
+     {
+      "feat": "F21",
+      "n": 2,
+      "to": "src/main/10-characters.js"
      },
      {
       "feat": "F11",
@@ -17007,52 +16765,37 @@
       "to": "src/main/10-story.js"
      },
      {
-      "feat": "F04",
+      "feat": "F14",
       "n": 2,
-      "to": "src/main/10-acquire.js"
+      "to": "src/main/10-messenger.js"
      },
      {
-      "feat": "F20",
+      "feat": "F22",
       "n": 2,
       "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F34",
+      "feat": "F19",
       "n": 1,
       "to": "src/main/10-newgame.js"
      },
      {
-      "feat": "F40",
-      "n": 1,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F06",
-      "n": 1,
-      "to": "src/main/10-newgame.js"
-     },
-     {
-      "feat": "F37",
-      "n": 1,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F31",
+      "feat": "F36",
       "n": 1,
       "to": "src/main/00-core.js"
      },
      {
-      "feat": "F17",
+      "feat": "F26",
       "n": 1,
       "to": "src/main/10-liveops.js"
      },
      {
-      "feat": "F24",
+      "feat": "F02",
       "n": 1,
       "to": "src/main/10-liveops.js"
      },
      {
-      "feat": "F19",
+      "feat": "F20",
       "n": 1,
       "to": "src/main/10-system.js"
      }
@@ -17072,70 +16815,60 @@
     "feats": [
      [
       "F01",
-      20
-     ],
-     [
-      "F06",
-      10
+      13
      ],
      [
       "F07",
-      6
-     ],
-     [
-      "F10",
-      5
+      11
      ],
      [
       "F02",
+      9
+     ],
+     [
+      "F06",
+      6
+     ],
+     [
+      "F03",
       5
      ],
      [
-      "F15",
-      4
+      "F21",
+      3
      ]
     ],
     "kind": "흩어짐",
     "spread": [
      {
       "feat": "F01",
-      "n": 20,
+      "n": 13,
       "to": "src/main/10-characters.js"
      },
      {
-      "feat": "F06",
-      "n": 10,
+      "feat": "F07",
+      "n": 11,
       "to": "src/main/10-newgame.js"
      },
      {
-      "feat": "F07",
+      "feat": "F02",
+      "n": 9,
+      "to": "src/main/10-liveops.js"
+     },
+     {
+      "feat": "F06",
       "n": 6,
       "to": "src/main/10-story.js"
      },
      {
-      "feat": "F10",
-      "n": 5,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F02",
+      "feat": "F03",
       "n": 5,
       "to": "src/main/10-world.js"
      },
      {
-      "feat": "F15",
-      "n": 4,
-      "to": "src/main/10-expedition.js"
-     },
-     {
-      "feat": "F08",
-      "n": 4,
-      "to": "src/main/10-characters.js"
-     },
-     {
-      "feat": "F04",
+      "feat": "F21",
       "n": 3,
-      "to": "src/main/10-acquire.js"
+      "to": "src/main/10-characters.js"
      },
      {
       "feat": "F13",
@@ -17143,12 +16876,17 @@
       "to": "src/main/10-battle.js"
      },
      {
-      "feat": "F05",
+      "feat": "F18",
+      "n": 3,
+      "to": "src/main/10-expedition.js"
+     },
+     {
+      "feat": "F04",
       "n": 2,
       "to": "src/main/10-system.js"
      },
      {
-      "feat": "F19",
+      "feat": "F20",
       "n": 2,
       "to": "src/main/10-system.js"
      },
@@ -17158,24 +16896,49 @@
       "to": "src/main/10-world.js"
      },
      {
+      "feat": "F08",
+      "n": 2,
+      "to": "src/main/10-characters.js"
+     },
+     {
       "feat": "F14",
+      "n": 2,
+      "to": "src/main/10-messenger.js"
+     },
+     {
+      "feat": "F09",
+      "n": 2,
+      "to": "src/main/10-characters.js"
+     },
+     {
+      "feat": "F16",
       "n": 2,
       "to": "src/main/10-rules.js"
      },
      {
-      "feat": "F28",
+      "feat": "F30",
       "n": 2,
       "to": null
      },
      {
-      "feat": "F26",
+      "feat": "F28",
       "n": 2,
       "to": "src/main/10-story.js"
      },
      {
-      "feat": "F30",
+      "feat": "F17",
+      "n": 1,
+      "to": "src/main/10-system.js"
+     },
+     {
+      "feat": "F32",
       "n": 1,
       "to": "src/main/10-characters.js"
+     },
+     {
+      "feat": "F24",
+      "n": 1,
+      "to": "src/main/10-system.js"
      },
      {
       "feat": "F11",
@@ -17183,12 +16946,7 @@
       "to": "src/main/10-story.js"
      },
      {
-      "feat": "F17",
-      "n": 1,
-      "to": "src/main/10-liveops.js"
-     },
-     {
-      "feat": "F21",
+      "feat": "F19",
       "n": 1,
       "to": "src/main/10-newgame.js"
      }
@@ -17203,9 +16961,17 @@
     "mixed": [],
     "bad": 0,
     "badEx": [],
-    "feats": [],
-    "kind": "기반",
-    "feat": null
+    "feats": [
+     [
+      "F17",
+      1
+     ]
+    ],
+    "kind": "조각",
+    "feat": "F17",
+    "to": "src/main/10-system.js",
+    "n0": 1,
+    "n1": 24
    }
   ],
   "bad": [
@@ -18302,55 +18068,42 @@
   },
   "homes": {
    "F01": "src/main/10-characters.js",
-   "F02": "src/main/10-world.js",
-   "F03": "src/main/10-system.js",
-   "F04": "src/main/10-acquire.js",
+   "F02": "src/main/10-liveops.js",
+   "F03": "src/main/10-world.js",
+   "F04": "src/main/10-system.js",
    "F05": "src/main/10-system.js",
-   "F06": "src/main/10-newgame.js",
-   "F07": "src/main/10-story.js",
+   "F06": "src/main/10-story.js",
+   "F07": "src/main/10-newgame.js",
    "F08": "src/main/10-characters.js",
-   "F09": "src/main/10-challenge.js",
-   "F10": "src/main/10-characters.js",
+   "F09": "src/main/10-characters.js",
+   "F10": "src/main/10-challenge.js",
    "F11": "src/main/10-story.js",
    "F12": "src/main/10-world.js",
    "F13": "src/main/10-battle.js",
-   "F14": "src/main/10-rules.js",
-   "F15": "src/main/10-expedition.js",
-   "F16": "src/main/10-challenge.js",
-   "F17": "src/main/10-liveops.js",
-   "F18": "src/main/10-liveops.js",
-   "F19": "src/main/10-system.js",
-   "F20": "src/main/10-characters.js",
-   "F21": "src/main/10-newgame.js",
-   "F22": "src/main/10-art.js",
-   "F23": "src/main/10-promptstudio.js",
-   "F24": "src/main/10-liveops.js",
-   "F25": "src/main/10-characters.js",
-   "F26": "src/main/10-story.js",
-   "F27": "src/main/10-system.js",
-   "F28": "src/main/90-load.js",
-   "F29": "src/main/10-newgame.js",
-   "F30": "src/main/10-characters.js",
-   "F31": "src/main/00-core.js",
-   "F32": "src/main/80-misc.js",
-   "F33": "src/main/10-system.js",
-   "F34": "src/main/10-newgame.js",
-   "F35": "src/main/10-newgame.js",
-   "F36": "src/main/10-liveops.js",
-   "F37": "src/main/10-characters.js",
-   "F38": "src/main/10-characters.js",
-   "F39": "src/main/10-story.js",
-   "F40": "src/main/10-characters.js",
-   "F41": "src/main/10-liveops.js",
-   "F42": "src/main/10-liveops.js",
-   "F43": "src/main/10-story.js",
-   "F44": "src/main/10-world.js",
-   "F45": "src/main/10-characters.js",
-   "F46": "src/main/10-characters.js",
-   "F47": "src/main/00-core.js",
-   "F48": "src/main/10-system.js",
-   "F49": "src/main/00-core.js",
-   "F50": "src/main/10-world.js"
+   "F14": "src/main/10-messenger.js",
+   "F15": "src/main/10-challenge.js",
+   "F16": "src/main/10-rules.js",
+   "F17": "src/main/10-system.js",
+   "F18": "src/main/10-expedition.js",
+   "F19": "src/main/10-newgame.js",
+   "F20": "src/main/10-system.js",
+   "F21": "src/main/10-characters.js",
+   "F22": "src/main/10-characters.js",
+   "F23": "src/main/10-liveops.js",
+   "F24": "src/main/10-system.js",
+   "F25": "src/main/10-art.js",
+   "F26": "src/main/10-liveops.js",
+   "F27": "src/main/10-characters.js",
+   "F28": "src/main/10-story.js",
+   "F29": "src/main/10-system.js",
+   "F30": "src/main/90-load.js",
+   "F31": "src/main/10-newgame.js",
+   "F32": "src/main/10-characters.js",
+   "F33": "src/main/80-misc.js",
+   "F34": "src/main/00-core.js",
+   "F35": "src/main/10-system.js",
+   "F36": "src/main/00-core.js",
+   "F37": "src/main/10-world.js"
   },
   "mixed": {
    "checkUpdatePrivate": {
@@ -18570,35 +18323,35 @@
   }
  },
  "gamesN": 2,
- "at": "2026-11-04T10:26",
- "head": "fdc3c3b",
+ "at": "2026-11-04T14:49",
+ "head": "ef1621f",
  "inputs": {
   "src": {
    "src/boot/durable-storage.js": "9e1fdc434852",
    "src/boot/head.js": "0fef8146af15",
    "src/boot/storage-boot.js": "c656f98ac50e",
    "src/index.html": "185912fd6a1f",
-   "src/main/00-core.js": "def224a82808",
-   "src/main/10-acquire.js": "af4c0316994f",
-   "src/main/10-art.js": "cde200346c12",
-   "src/main/10-battle.js": "f435971a7bc4",
-   "src/main/10-challenge.js": "98e7743f7197",
-   "src/main/10-characters.js": "c22fc9f60912",
-   "src/main/10-economy.js": "ad7308701824",
-   "src/main/10-expedition.js": "18556333e131",
-   "src/main/10-liveops.js": "439145dcdbd2",
-   "src/main/10-messenger.js": "6c5858bc2c72",
-   "src/main/10-newgame.js": "8c3a395fcc71",
-   "src/main/10-player.js": "3a108fa31f8d",
-   "src/main/10-promptstudio.js": "a23a860237e9",
-   "src/main/10-rules.js": "6863ff1b0a8c",
-   "src/main/10-story.js": "3fbfd556df69",
-   "src/main/10-system.js": "38c00c14ebe1",
-   "src/main/10-world.js": "a4981760a16a",
-   "src/main/80-misc.js": "aab97b860f66",
-   "src/main/90-load.js": "06effca64264",
+   "src/main/00-core.js": "f8b19009cfa3",
+   "src/main/10-acquire.js": "95b86faa7e47",
+   "src/main/10-art.js": "ad3add982d5e",
+   "src/main/10-battle.js": "ef872204fb57",
+   "src/main/10-challenge.js": "8102011984fd",
+   "src/main/10-characters.js": "353601b5e2c1",
+   "src/main/10-economy.js": "c5ab88617184",
+   "src/main/10-expedition.js": "1122044517ce",
+   "src/main/10-liveops.js": "e5fa196c3bed",
+   "src/main/10-messenger.js": "6cf318eb6aa0",
+   "src/main/10-newgame.js": "2ebb51956255",
+   "src/main/10-player.js": "0d0027fc271b",
+   "src/main/10-promptstudio.js": "334f96da6585",
+   "src/main/10-rules.js": "87215479a2cd",
+   "src/main/10-story.js": "0321138490f8",
+   "src/main/10-system.js": "1ca630cae7ee",
+   "src/main/10-world.js": "585f4abe97d1",
+   "src/main/80-misc.js": "ccde4bcffc2a",
+   "src/main/90-load.js": "dcf7f2fdda0e",
    "src/main/95-start.js": "add9fe9e8181",
-   "src/main/99-aliases.js": "ab4d551b848d",
+   "src/main/99-aliases.js": "da9ae0c00f3c",
    "src/modules/app/010-confirm.js": "c1808ba912d6",
    "src/modules/app/020-construct.js": "55945e1504c5",
    "src/modules/app/030-expedition.js": "5861db6b5430",
@@ -18632,14 +18385,240 @@
    "src/style/0190-formation-sortie.css": "7673b215d35f",
    "src/style/0200-stage-modes.css": "4b0337d1ad04"
   },
-  "www": "282761f377b5",
+  "www": "cccb7118a6d7",
   "games": {
    "idol-audition": "a443d928bb99",
    "sky-knights": "c782aafba942"
   },
-  "tool": "a6439a2a4a79"
+  "tool": "e9027b12f522"
  },
  "changes": [
+  {
+   "at": "2026-11-04T14:49",
+   "head": "ef1621f",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": [
+      "src/main/00-core.js",
+      "src/main/10-newgame.js",
+      "src/main/10-world.js",
+      "src/main/99-aliases.js"
+     ]
+    },
+    "www": true,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": false
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-04T14:45",
+   "head": "ef1621f",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": [
+      "src/main/00-core.js",
+      "src/main/10-acquire.js",
+      "src/main/10-art.js",
+      "src/main/10-battle.js",
+      "src/main/10-challenge.js",
+      "src/main/10-characters.js",
+      "src/main/10-economy.js",
+      "src/main/10-expedition.js",
+      "src/main/10-liveops.js",
+      "src/main/10-messenger.js",
+      "src/main/10-player.js",
+      "src/main/10-promptstudio.js",
+      "src/main/10-rules.js",
+      "src/main/10-story.js",
+      "src/main/10-system.js",
+      "src/main/10-world.js",
+      "src/main/80-misc.js",
+      "src/main/90-load.js"
+     ]
+    },
+    "www": true,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-04T14:13",
+   "head": "ef1621f",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": [
+      "src/main/90-load.js"
+     ]
+    },
+    "www": true,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": [
+    {
+     "path": "chars.json › [].age",
+     "added": [
+      "실행기:AltCharGen.apply",
+      "편집기:AltCharGen.apply"
+     ],
+     "removed": [
+      "기타:AltCharGen.apply"
+     ]
+    },
+    {
+     "path": "chars.json › [].alt",
+     "added": [
+      "실행기:AltCharGen.apply",
+      "편집기:AltCharGen.apply"
+     ],
+     "removed": [
+      "기타:AltCharGen.apply"
+     ]
+    },
+    {
+     "path": "chars.json › [].altCanon",
+     "added": [
+      "실행기:AltCharGen.apply",
+      "편집기:AltCharGen.apply"
+     ],
+     "removed": [
+      "기타:AltCharGen.apply"
+     ]
+    },
+    {
+     "path": "chars.json › [].collab",
+     "added": [
+      "실행기:PickupCharGen.apply",
+      "편집기:PickupCharGen.apply"
+     ],
+     "removed": [
+      "기타:PickupCharGen.apply"
+     ]
+    },
+    {
+     "path": "chars.json › [].faction",
+     "added": [
+      "편집기:AltCharGen.apply",
+      "편집기:PickupCharGen.apply",
+      "실행기:AltCharGen.apply",
+      "실행기:PickupCharGen.apply"
+     ],
+     "removed": [
+      "기타:AltCharGen.apply",
+      "기타:PickupCharGen.apply"
+     ]
+    },
+    {
+     "path": "chars.json › [].lines",
+     "added": [
+      "실행기:AltCharGen.apply",
+      "편집기:AltCharGen.apply"
+     ],
+     "removed": [
+      "기타:AltCharGen.apply"
+     ]
+    },
+    {
+     "path": "chars.json › [].naiStyle",
+     "added": [
+      "실행기:AltCharGen.apply",
+      "편집기:AltCharGen.apply"
+     ],
+     "removed": [
+      "기타:AltCharGen.apply"
+     ]
+    },
+    {
+     "path": "chars.json › [].name",
+     "added": [
+      "편집기:AltCharGen.apply",
+      "편집기:PickupCharGen.apply",
+      "실행기:AltCharGen.apply",
+      "실행기:PickupCharGen.apply"
+     ],
+     "removed": [
+      "기타:AltCharGen.apply",
+      "기타:PickupCharGen.apply"
+     ]
+    },
+    {
+     "path": "chars.json › [].pos",
+     "added": [
+      "생성기:posSpread",
+      "실행기:posSpread"
+     ],
+     "removed": [
+      "기타:posSpread"
+     ]
+    },
+    {
+     "path": "chars.json › [].rarity",
+     "added": [
+      "실행기:AltCharGen.apply",
+      "실행기:PickupCharGen.apply",
+      "편집기:AltCharGen.apply",
+      "편집기:PickupCharGen.apply"
+     ],
+     "removed": [
+      "기타:AltCharGen.apply",
+      "기타:PickupCharGen.apply"
+     ]
+    },
+    {
+     "path": "chars.json › [].voiceId",
+     "added": [
+      "편집기:AltCharGen.apply",
+      "실행기:AltCharGen.apply"
+     ],
+     "removed": [
+      "기타:AltCharGen.apply"
+     ]
+    },
+    {
+     "path": "meta.json › spots",
+     "added": [
+      "생성기:spotsAuto",
+      "실행기:spotsAuto"
+     ],
+     "removed": []
+    }
+   ]
+  },
   {
    "at": "2026-11-04T10:26",
    "head": "fdc3c3b",
@@ -26107,99 +26086,6 @@
    },
    "fns": {
     "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": []
-  },
-  {
-   "at": "2026-11-04T03:38",
-   "head": "5b06d05",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "www": false,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": true
-   },
-   "fns": {
-    "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": []
-  },
-  {
-   "at": "2026-11-04T03:31",
-   "head": "dda89e7",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": [
-      "src/main/0030-image/010-engine.js",
-      "src/main/0260-new-game/010-draft.js",
-      "src/main/0400-publish-subscribe.js",
-      "src/main/0520-backup-storage.js",
-      "src/main/0525-data-folder.js",
-      "src/main/0550-standalone-app.js"
-     ]
-    },
-    "www": true,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": true
-   },
-   "fns": {
-    "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": []
-  },
-  {
-   "at": "2026-11-04T03:28",
-   "head": "dda89e7",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": [
-      "src/main/0030-image/010-engine.js",
-      "src/main/0360-sync/020-pc-server.js",
-      "src/main/0360-sync/030-github.js",
-      "src/main/0400-publish-subscribe.js",
-      "src/main/0410-desktop.js",
-      "src/main/0420-app-update.js",
-      "src/main/0505-construct.js",
-      "src/main/0520-backup-storage.js",
-      "src/main/0525-data-folder.js",
-      "src/main/0535-content-audit.js"
-     ]
-    },
-    "www": true,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": false
-   },
-   "fns": {
-    "added": [
-     "pubDoneHTML",
-     "auditHTML"
-    ],
     "removed": [],
     "moved": []
    },

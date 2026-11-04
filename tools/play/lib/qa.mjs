@@ -4,7 +4,7 @@ import { withPage } from './page.mjs';
 export async function runQA(game, input) { const { out, errors } = await withPage(page => page.evaluate(async ({ game, input }) => {
   const R = { findings: [] }, F = (sev, area, msg) => R.findings.push({ sev, area, msg });
   let seed = 12345; const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-  closeModal(); closeOv(); G = fix(JSON.parse(game)); applyMeta(); window.reloadGame = () => {};
+  closeModal(); closeOv(); G = fix(JSON.parse(game)); applyMeta(); SystemView.reloadGame = () => {};
   const main = G.chapters.filter(c => c.kind === 'main'), chars = G.chars.filter(c => !c.alt), npcs = G.npcs || [], elems = new Set((G.meta.elems || []).map(e => e.n));
   const cnt = (a, f) => a.reduce((m, x) => { const k = f(x); m[k] = (m[k] || 0) + 1; return m; }, {}), L = r => Array.isArray(r) ? r : (r && r.issues) || [];
   // ① 구성

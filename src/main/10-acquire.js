@@ -449,46 +449,46 @@ class AcquireView {
     const KR={std:'상시 모집',pickup:'신규 '+System.T('crew')+' 등장!',pool:'소속 모집',event:'기간 한정!'};
     const rows=[3,2,1].map(r=>{const n=pool.filter(c=>c.rarity===r).length;return `<tr><td><span class="badge r${r}c">${RL[r]}</span> ${n}명</td><td style="text-align:right">${rOf(r)}%</td></tr>`;}).join('');
     return `<div class="bsel" style="margin-top:6px">${bs.map(x=>`<button class="${x.id===bn.id?'on':''}" data-act="bsel" data-id="${x.id}">${esc(x.name)}${x.until&&x.until>Date.now()?` <small class="b-dd">D-${Math.max(0,Math.ceil((x.until-Date.now())/864e5))}</small>`:''}</button>`).join('')}<button data-act="newpu" title="신규 픽업 만들기">✦ 신규</button><button data-act="puexist" title="기존 ${esc(System.T('crew'))} 픽업">★ 픽업</button><button data-act="bnew" title="배너 직접 만들기">＋</button></div>
-    ${(bn.storyFail||(bn.type==='pickup'&&(bn.newAt||bn.pin)))&&!bn.eventId&&!PUBUSY.has(bn.id)&&(bn.pickup||[])[0]&&SAMPLE?`<div class="panel" style="margin:6px 0;display:flex;gap:8px;align-items:center;justify-content:space-between"><span class="muted" style="font-size:.85rem">${bn.storyFail?'이 배너의 픽업 스토리를 만들다 멈췄어요.':'이 배너에는 아직 픽업 스토리가 없어요.'}</span><button class="btn sm" data-act="pustoryretry" data-id="${esc(bn.pickup[0])}" data-b="${esc(bn.id)}">${bn.storyFail?'이어서 만들기':'픽업 스토리 만들기'}</button></div>`:''}
-    <section class="pk-hero ${esc(bn.type||'')} ${window.__BSLIDE||''}" data-swipe="banner">${bs.length>1?`<button class="pk-nav l" data-act="bswipe" data-d="-1" aria-label="이전 배너">‹</button><button class="pk-nav r" data-act="bswipe" data-d="1" aria-label="다음 배너">›</button><div class="pk-dots">${bs.map(x=>`<i class="${x.id===bn.id?'on':''}"></i>`).join('')}</div>`:''}
-      <div class="pk-bg" style="${bn.bg?ArtView.bgStyle(bn.bg):ArtView.bgStyle(P().gachaBg||'낙성 분화구')}"></div>
-      ${hero&&(hill||Characters.imgSrc(hero))?`<div class="pk-ghost">${hill?`<img src="${esc(hill)}" alt="">`:CoreView.art(hero)}</div>`:''}
-      <div class="pk-diag"></div>
-      <div class="pk-art ${hill?'ill':''}">${hill?`<img src="${esc(hill)}" alt="${esc(hero.name)}" draggable="false">`:hero?CoreView.art(hero):''}</div>
-      ${show.length>1?`<div class="pk-subs">${show.slice(1).map(c=>`<button class="s" data-act="char" data-id="${c.id}" aria-label="${esc(c.name)}">${CoreView.art(c)}</button>`).join('')}</div>`:''}
-      <div class="pk-title">
-        <div class="pk-logo">${esc(G.meta.title)}<small>${esc(G.meta.sub)}</small></div>
-        <h1 class="pk-big">${BIG[bn.type]||'PICK<span>✦</span>UP'}</h1>
-        <div class="pk-rec">RECRUITMENT</div>
-        <div class="pk-kr">${esc(bn.name||KR[bn.type]||'')}</div>
-        ${bn.desc?`<p>${esc(bn.desc)}</p>`:''}
-      </div>
-      ${hero?`<button class="pk-name" data-act="char" data-id="${hero.id}"><span class="cs-rar r${hero.rarity}">${RL[hero.rarity]}</span><b>${esc(hero.name)}</b><i>${esc((hero.faction||ROLE_EN[hero.role]||'').toUpperCase())}</i></button>`:''}
-    </section>
-    <div class="panel pk-pity"><div style="display:flex;justify-content:space-between"><span>SSR 확정까지</span><b>${left}회</b></div><div class="bar" style="margin-top:6px"><i style="width:${pity/s.pity*100}%"></i></div>
-      ${pity>=Math.floor(s.pity*0.75)?`<p class="soft">🔥 확률 상승 중 · 지금 SSR ${Acquire.softRate(s,pity+1).toFixed(1)}%</p>`:`<p class="muted" style="margin:6px 0 0;font-size:.75rem">${Math.floor(s.pity*0.75)}회부터 SSR 확률이 점점 올라가요</p>`}
-      ${ups.length&&Acquire.guarGet(bn)?`<p class="soft gold">★ 다음 SSR은 확률 업 ${esc(System.T('crew'))} 확정</p>`:''}${Acquire.pityKey(bn)==='pickup'?`<p class="muted" style="margin:4px 0 0;font-size:.72rem">천장·확정은 다음 픽업 배너로 이어져요</p>`:''}
-      <div class="sparkrow"><span>모집 포인트</span><div class="bar"><i style="width:${Math.min(100,((P().spark||{})[bn.id]||0)/SPARK*100)}%"></i></div><b>${(P().spark||{})[bn.id]||0}/${SPARK}</b><button class="btn sm ${((P().spark||{})[bn.id]||0)>=SPARK?'':'ghost'}" data-act="sparkopen" data-id="${bn.id}">교환</button></div>${P().firstTen?'<p class="muted" style="margin:8px 0 0">첫 10회는 SSR 1명 확정</p>':''}${ups.length?`<p class="muted" style="margin:8px 0 0">확률 업: ${ups.map(c=>esc(c.name)).join(', ')} · 같은 등급이 나오면 ${bn.rate}% 확률</p>`:''}</div>
-    <div class="pullrow"><button class="btn ghost" data-act="pull" data-n="1">1회<small>◆ ${COST}</small></button><button class="btn" data-act="pull" data-n="10">10회<small>◆ ${nf(COST*10)}${pool.some(c=>c.rarity>=2)?' · SR 이상 1명 보장':''}</small></button></div>
-    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="go" data-to="cash">◆ ${esc(System.T('currency'))} 충전</button></div>
-  
-    <div class="panel"><h3>확률 정보</h3><table style="width:100%;font-size:.9rem">${rows}</table>
-      <p class="muted" style="margin:8px 0 0;font-size:.78rem">· ${Math.floor(s.pity*0.75)}회부터 SSR 확률이 조금씩 올라가고 ${s.pity}회째에 확정이에요.${ups.length?`<br>· SSR이 확률 업 ${esc(System.T('crew'))}이(가) 아니었으면 다음 SSR은 확률 업 확정이에요.`:''}<br>· 1회마다 모집 포인트 1, ${SPARK}포인트로 원하는 ${esc(System.T('crew'))} 교환.</p>
-      <div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="bedit" data-id="${bn.id}">배너 편집</button><button class="btn sm ghost" data-act="ghist">${esc(System.T('gacha'))} 기록</button></div></div>`;
+  ${(bn.storyFail||(bn.type==='pickup'&&(bn.newAt||bn.pin)))&&!bn.eventId&&!PUBUSY.has(bn.id)&&(bn.pickup||[])[0]&&SAMPLE?`<div class="panel" style="margin:6px 0;display:flex;gap:8px;align-items:center;justify-content:space-between"><span class="muted" style="font-size:.85rem">${bn.storyFail?'이 배너의 픽업 스토리를 만들다 멈췄어요.':'이 배너에는 아직 픽업 스토리가 없어요.'}</span><button class="btn sm" data-act="pustoryretry" data-id="${esc(bn.pickup[0])}" data-b="${esc(bn.id)}">${bn.storyFail?'이어서 만들기':'픽업 스토리 만들기'}</button></div>`:''}
+  <section class="pk-hero ${esc(bn.type||'')} ${window.__BSLIDE||''}" data-swipe="banner">${bs.length>1?`<button class="pk-nav l" data-act="bswipe" data-d="-1" aria-label="이전 배너">‹</button><button class="pk-nav r" data-act="bswipe" data-d="1" aria-label="다음 배너">›</button><div class="pk-dots">${bs.map(x=>`<i class="${x.id===bn.id?'on':''}"></i>`).join('')}</div>`:''}
+    <div class="pk-bg" style="${bn.bg?ArtView.bgStyle(bn.bg):ArtView.bgStyle(P().gachaBg||'낙성 분화구')}"></div>
+    ${hero&&(hill||Characters.imgSrc(hero))?`<div class="pk-ghost">${hill?`<img src="${esc(hill)}" alt="">`:CoreView.art(hero)}</div>`:''}
+    <div class="pk-diag"></div>
+    <div class="pk-art ${hill?'ill':''}">${hill?`<img src="${esc(hill)}" alt="${esc(hero.name)}" draggable="false">`:hero?CoreView.art(hero):''}</div>
+    ${show.length>1?`<div class="pk-subs">${show.slice(1).map(c=>`<button class="s" data-act="char" data-id="${c.id}" aria-label="${esc(c.name)}">${CoreView.art(c)}</button>`).join('')}</div>`:''}
+    <div class="pk-title">
+      <div class="pk-logo">${esc(G.meta.title)}<small>${esc(G.meta.sub)}</small></div>
+      <h1 class="pk-big">${BIG[bn.type]||'PICK<span>✦</span>UP'}</h1>
+      <div class="pk-rec">RECRUITMENT</div>
+      <div class="pk-kr">${esc(bn.name||KR[bn.type]||'')}</div>
+      ${bn.desc?`<p>${esc(bn.desc)}</p>`:''}
+    </div>
+    ${hero?`<button class="pk-name" data-act="char" data-id="${hero.id}"><span class="cs-rar r${hero.rarity}">${RL[hero.rarity]}</span><b>${esc(hero.name)}</b><i>${esc((hero.faction||ROLE_EN[hero.role]||'').toUpperCase())}</i></button>`:''}
+  </section>
+  <div class="panel pk-pity"><div style="display:flex;justify-content:space-between"><span>SSR 확정까지</span><b>${left}회</b></div><div class="bar" style="margin-top:6px"><i style="width:${pity/s.pity*100}%"></i></div>
+    ${pity>=Math.floor(s.pity*0.75)?`<p class="soft">🔥 확률 상승 중 · 지금 SSR ${Acquire.softRate(s,pity+1).toFixed(1)}%</p>`:`<p class="muted" style="margin:6px 0 0;font-size:.75rem">${Math.floor(s.pity*0.75)}회부터 SSR 확률이 점점 올라가요</p>`}
+    ${ups.length&&Acquire.guarGet(bn)?`<p class="soft gold">★ 다음 SSR은 확률 업 ${esc(System.T('crew'))} 확정</p>`:''}${Acquire.pityKey(bn)==='pickup'?`<p class="muted" style="margin:4px 0 0;font-size:.72rem">천장·확정은 다음 픽업 배너로 이어져요</p>`:''}
+    <div class="sparkrow"><span>모집 포인트</span><div class="bar"><i style="width:${Math.min(100,((P().spark||{})[bn.id]||0)/SPARK*100)}%"></i></div><b>${(P().spark||{})[bn.id]||0}/${SPARK}</b><button class="btn sm ${((P().spark||{})[bn.id]||0)>=SPARK?'':'ghost'}" data-act="sparkopen" data-id="${bn.id}">교환</button></div>${P().firstTen?'<p class="muted" style="margin:8px 0 0">첫 10회는 SSR 1명 확정</p>':''}${ups.length?`<p class="muted" style="margin:8px 0 0">확률 업: ${ups.map(c=>esc(c.name)).join(', ')} · 같은 등급이 나오면 ${bn.rate}% 확률</p>`:''}</div>
+  <div class="pullrow"><button class="btn ghost" data-act="pull" data-n="1">1회<small>◆ ${COST}</small></button><button class="btn" data-act="pull" data-n="10">10회<small>◆ ${nf(COST*10)}${pool.some(c=>c.rarity>=2)?' · SR 이상 1명 보장':''}</small></button></div>
+  <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="go" data-to="cash">◆ ${esc(System.T('currency'))} 충전</button></div>
+
+  <div class="panel"><h3>확률 정보</h3><table style="width:100%;font-size:.9rem">${rows}</table>
+    <p class="muted" style="margin:8px 0 0;font-size:.78rem">· ${Math.floor(s.pity*0.75)}회부터 SSR 확률이 조금씩 올라가고 ${s.pity}회째에 확정이에요.${ups.length?`<br>· SSR이 확률 업 ${esc(System.T('crew'))}이(가) 아니었으면 다음 SSR은 확률 업 확정이에요.`:''}<br>· 1회마다 모집 포인트 1, ${SPARK}포인트로 원하는 ${esc(System.T('crew'))} 교환.</p>
+    <div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="bedit" data-id="${bn.id}">배너 편집</button><button class="btn sm ghost" data-act="ghist">${esc(System.T('gacha'))} 기록</button></div></div>`;
   }
 
   static openSpark(bid){
     const b=G.banners.find(bn=>bn.id===bid)||Acquire.curBanner(); if(!b) return; const p=P(), pts=(p.spark||{})[b.id]||0;
     const ups=(b.pickup||[]).map(charById).filter(c=>c&&Acquire.castOk(c)), list=ups.length?ups:Characters.bannerPool(b).filter(c=>c.rarity===3&&Acquire.castOk(c)); // 모집 포인트 교환도 잠긴 캐릭터는 빼요
     CoreView.openModal(`${head('모집 포인트 교환',`<span class="muted">${esc(b.name)} · ${pts}/${SPARK}</span>`)}
-      <p class="muted" style="margin:0 0 10px">이 배너에서 1회 뽑을 때마다 1포인트가 쌓여요. ${SPARK}포인트로 원하는 ${esc(System.T('crew'))}을(를) 바로 데려올 수 있어요. 이미 있으면 ${esc(System.T('limit'))} +1이 돼요.</p>
-      <div class="spk">${list.map(c=>`<button class="spk-c r${c.rarity}" data-act="sparkgo" data-id="${c.id}" data-b="${b.id}" ${pts>=SPARK?'':'disabled'}><div class="sa">${CoreView.art(c)}</div><b>${esc(c.name)}</b><span>${Characters.own(c.id)?System.T('limit')+' '+Characters.own(c.id).dup+'/5':'미보유'}</span></button>`).join('')||'<p class="muted">교환할 수 있는 '+esc(System.T('crew'))+'이(가) 없어요.</p>'}</div>`);
+    <p class="muted" style="margin:0 0 10px">이 배너에서 1회 뽑을 때마다 1포인트가 쌓여요. ${SPARK}포인트로 원하는 ${esc(System.T('crew'))}을(를) 바로 데려올 수 있어요. 이미 있으면 ${esc(System.T('limit'))} +1이 돼요.</p>
+    <div class="spk">${list.map(c=>`<button class="spk-c r${c.rarity}" data-act="sparkgo" data-id="${c.id}" data-b="${b.id}" ${pts>=SPARK?'':'disabled'}><div class="sa">${CoreView.art(c)}</div><b>${esc(c.name)}</b><span>${Characters.own(c.id)?System.T('limit')+' '+Characters.own(c.id).dup+'/5':'미보유'}</span></button>`).join('')||'<p class="muted">교환할 수 있는 '+esc(System.T('crew'))+'이(가) 없어요.</p>'}</div>`);
   }
 
   static openHistory(){
     const h=(P().hist2||[]); const cnt=[3,2,1].map(r=>h.filter(x=>(charById(x.id)||{}).rarity===r).length);
     CoreView.openModal(`${head(System.T('gacha')+' 기록',`<span class="muted">최근 ${h.length}회 · SSR ${cnt[0]} · SR ${cnt[1]} · R ${cnt[2]}</span>`)}
-      <div class="ghist">${h.map(x=>{const c=charById(x.id); if(!c) return ''; const d=new Date(x.at); return `<div class="gh r${c.rarity}"><span class="badge r${c.rarity}c">${RL[c.rarity]}</span><b>${esc(c.name)}${x.n?'<em>NEW</em>':''}</b><span class="muted">${esc(x.b||'')}</span><small>${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</small></div>`;}).join('')||'<p class="muted">아직 기록이 없어요.</p>'}</div>`);
+    <div class="ghist">${h.map(x=>{const c=charById(x.id); if(!c) return ''; const d=new Date(x.at); return `<div class="gh r${c.rarity}"><span class="badge r${c.rarity}c">${RL[c.rarity]}</span><b>${esc(c.name)}${x.n?'<em>NEW</em>':''}</b><span class="muted">${esc(x.b||'')}</span><small>${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</small></div>`;}).join('')||'<p class="muted">아직 기록이 없어요.</p>'}</div>`);
   }
 
     /* 가챠 연출 건너뛰기(View): 봉인·줄기 연출을 끝내고 카드를 모두 엶 */
@@ -506,11 +506,11 @@ static conDecodeHTML(res){ return `<div class="decode"><div class="dc-ring"></di
   static conInfoHTML(input){
     const cfg=Acquire.CON(), t=GGMConstruct.table(input,cfg,Acquire.conPool()), i=t.info, B=Core.progRead('cbuild'), vs=AcquireView.conVariantChoices(i.input).filter(v=>v.bases.length), pct=v=>(Math.round(v*10)/10)+'%', sg=t.rows.length?null:GGMConstruct.suggest(input,cfg,Acquire.conPool());
     return `<p style="margin:0 0 6px">총 <b>${nf(i.total)}</b> · 희귀도 캡: SR ${i.open[2]?`<b>개방 ${pct(i.rarity[2])}</b>`:`잠김 <span class="muted">(총 ${nf(cfg.sr.open)}↑)</span>`} · SSR ${i.open[3]?`<b>개방 ${pct(i.rarity[3])}</b>`:`잠김 <span class="muted">(총 ${nf(cfg.ssr.open)}↑)</span>`}</p>
-      <div style="font-size:.85rem;margin:0 0 6px">${i.groups.map(g=>`<div style="display:flex;justify-content:space-between;gap:8px;${g.open?'':'opacity:.55'}"><span>${g.open?'🔓':'🔒'} <b>${esc(g.name)}</b> <span class="muted">${esc(Acquire.conNeedText(g.need))}</span></span><b>${g.open?pct(g.p):'—'}</b></div>`).join('')}</div>
-      ${sg&&sg.changed?`<p style="margin:4px 0 6px;color:#ffb347">⚠ ${esc(Acquire.conEmptyWhy(sg.why))}. <button class="btn sm" data-act="conpreset" data-v="${esc(sg.input.join(','))}">나올 수 있게 맞추기 (${esc(sg.input.join(' / '))})</button></p>`:''}
-      ${t.rows.length?`<details><summary class="muted" style="font-size:.82rem">이번 투입의 확률 테이블 (${t.rows.length}명)</summary><div style="font-size:.8rem;columns:2;margin-top:4px">${t.rows.map(r=>{ const c=charById(r.id); return c?`<div>${RL[c.rarity]} ${esc(c.name)} <b>${pct(r.p)}</b></div>`:''; }).join('')}</div></details>`:`<p class="muted" style="margin:0">열린 분류에 나올 ${esc(System.T('crew'))}이(가) 없어요. 다른 분류를 열어 보세요.</p>`}
-      ${i.recipes.length?`<p style="margin:6px 0 0">특수 레시피: ${i.recipes.map(x=>B.found[x.id]?`<b>${esc(x.name)}</b>`:'<b>??? (미발견)</b>').join(', ')}</p>`:''}
-      ${vs.length?`<p style="margin:4px 0 0">✦ 바리에이션 기회: ${vs.map(v=>`${esc(v.tpl.name)} ${pct(+v.tpl.chance||0)} (${v.bases.length}명)`).join(', ')}</p>`:''}`; }
+    <div style="font-size:.85rem;margin:0 0 6px">${i.groups.map(g=>`<div style="display:flex;justify-content:space-between;gap:8px;${g.open?'':'opacity:.55'}"><span>${g.open?'🔓':'🔒'} <b>${esc(g.name)}</b> <span class="muted">${esc(Acquire.conNeedText(g.need))}</span></span><b>${g.open?pct(g.p):'—'}</b></div>`).join('')}</div>
+    ${sg&&sg.changed?`<p style="margin:4px 0 6px;color:#ffb347">⚠ ${esc(Acquire.conEmptyWhy(sg.why))}. <button class="btn sm" data-act="conpreset" data-v="${esc(sg.input.join(','))}">나올 수 있게 맞추기 (${esc(sg.input.join(' / '))})</button></p>`:''}
+    ${t.rows.length?`<details><summary class="muted" style="font-size:.82rem">이번 투입의 확률 테이블 (${t.rows.length}명)</summary><div style="font-size:.8rem;columns:2;margin-top:4px">${t.rows.map(r=>{ const c=charById(r.id); return c?`<div>${RL[c.rarity]} ${esc(c.name)} <b>${pct(r.p)}</b></div>`:''; }).join('')}</div></details>`:`<p class="muted" style="margin:0">열린 분류에 나올 ${esc(System.T('crew'))}이(가) 없어요. 다른 분류를 열어 보세요.</p>`}
+    ${i.recipes.length?`<p style="margin:6px 0 0">특수 레시피: ${i.recipes.map(x=>B.found[x.id]?`<b>${esc(x.name)}</b>`:'<b>??? (미발견)</b>').join(', ')}</p>`:''}
+    ${vs.length?`<p style="margin:4px 0 0">✦ 바리에이션 기회: ${vs.map(v=>`${esc(v.tpl.name)} ${pct(+v.tpl.chance||0)} (${v.bases.length}명)`).join(', ')}</p>`:''}`; }
 
   static conEntryHTML(){ if(!Acquire.conOn()) return ''; return `<div class="panel" style="margin-bottom:10px;display:flex;gap:10px;align-items:center;justify-content:space-between"><div><b>${esc(System.T('construct'))}</b><div class="muted" style="font-size:.8rem">${CON_RES.map(k=>esc(System.T(k))).join('·')}을(를) 넣어 ${esc(System.T('crew'))}·바리에이션 영입</div></div><button class="btn sm" data-act="go" data-to="construct">열기</button></div>`; }
 
@@ -519,47 +519,47 @@ static conDecodeHTML(res){ return `<div class="decode"><div class="dc-ring"></di
     const cfg=Acquire.CON(), B=Core.progRead('cbuild'), input=GGMConstruct.normalize(B.input||Acquire.conDefaultInput(),cfg), found=(cfg.recipes||[]).filter(x=>B.found[x.id]), vfound=Characters.VARIANTS().filter(t=>B.found['v:'+t.id]);
     const presets=[['최소',[cfg.min,cfg.min,cfg.min,cfg.min]],['균형',[300,300,300,300]],['고급',[999,999,999,999]],...cfg.groups.filter(g=>B.found['g:'+g.id]).map(g=>[g.name+' 개방',(g.min||[]).map((v,i)=>Math.max(v,cfg.min))]),...found.map(x=>[x.name,x.min]),...vfound.map(t=>['✦'+t.name,t.recipe.min])];
     return `${pageHead(System.T('construct'),'CONSTRUCT','contract')}${AcquireView.conResBar()}
-    <div class="panel" style="margin-top:10px"><h3>자원 투입 <span class="muted" style="font-size:.8rem">(${cfg.min}~${cfg.max})</span></h3>
-      ${CON_RES.map((k,i)=>`<label class="f" for="con_${i}">${conResIcon(k)} ${esc(System.T(k))}</label><div class="row" style="gap:8px;align-items:center"><input type="range" id="con_r${i}" data-con="${i}" min="${cfg.min}" max="${cfg.max}" step="${cfg.step}" value="${input[i]}" style="flex:1"><input class="in" type="number" id="con_${i}" data-con="${i}" min="${cfg.min}" max="${cfg.max}" value="${input[i]}" style="width:90px"></div>`).join('')}
-      <div class="row" style="margin-top:8px;flex-wrap:wrap">${presets.map(([n,v])=>`<button class="btn sm ghost" data-act="conpreset" data-v="${esc(v.join(','))}">${esc(n)}</button>`).join('')}</div>
-      <div id="conInfo" class="panel" style="margin-top:10px">${AcquireView.conInfoHTML(input)}</div>
-      <div class="row" style="margin-top:10px"><button class="btn" data-act="conbuild">${esc(System.T('construct'))} 시작</button></div></div>
-    <div class="panel"><h3>자원 보급 <span class="muted" style="font-size:.8rem">${conGem()}${nf(cfg.buy.gems)} → +${nf(cfg.buy.amt)}</span></h3><div class="row" style="flex-wrap:wrap">${CON_RES.map(k=>`<button class="btn sm ghost" data-act="conbuy" data-k="${k}">${conResIcon(k)} ${esc(System.T(k))} +${nf(cfg.buy.amt)}</button>`).join('')}</div><p class="muted" style="margin:8px 0 0;font-size:.8rem">${esc(System.T('dispatch'))}을(를) 보내면 건조 자원을 모아 와요.</p></div>
-    <div class="panel"><h3>레시피 노트</h3>${found.length||vfound.length?`<ul style="margin:0;padding-left:18px">${found.map(x=>`<li><b>${esc(x.name)}</b> — ${x.min.join(' / ')} 이상</li>`).join('')}${vfound.map(t=>`<li>✦ <b>${esc(t.name)}</b> — ${t.recipe.min.join(' / ')} 이상 · ${esc(t.prompt)}</li>`).join('')}</ul>`:`<p class="muted" style="margin:0">아직 발견한 레시피가 없어요. 자원 비율을 바꿔 보세요.${(cfg.recipes||[]).length?' 힌트: '+cfg.recipes.map(x=>esc(x.hint||'')).filter(Boolean).join(' / '):''}</p>`}</div>
-    <div class="panel"><h3>최근 기록</h3>${B.log.length?B.log.slice(0,10).map(l=>{ const c=charById(l.id); return c?`<div class="muted" style="font-size:.85rem">${esc(new Date(l.at).toLocaleString())} · ${l.input.join('/')} → <b>${esc(c.name)}</b> ${RL[c.rarity]}${l.v?' ✦':''}</div>`:''; }).join(''):'<p class="muted" style="margin:0">아직 없어요.</p>'}</div>`; }
+  <div class="panel" style="margin-top:10px"><h3>자원 투입 <span class="muted" style="font-size:.8rem">(${cfg.min}~${cfg.max})</span></h3>
+    ${CON_RES.map((k,i)=>`<label class="f" for="con_${i}">${conResIcon(k)} ${esc(System.T(k))}</label><div class="row" style="gap:8px;align-items:center"><input type="range" id="con_r${i}" data-con="${i}" min="${cfg.min}" max="${cfg.max}" step="${cfg.step}" value="${input[i]}" style="flex:1"><input class="in" type="number" id="con_${i}" data-con="${i}" min="${cfg.min}" max="${cfg.max}" value="${input[i]}" style="width:90px"></div>`).join('')}
+    <div class="row" style="margin-top:8px;flex-wrap:wrap">${presets.map(([n,v])=>`<button class="btn sm ghost" data-act="conpreset" data-v="${esc(v.join(','))}">${esc(n)}</button>`).join('')}</div>
+    <div id="conInfo" class="panel" style="margin-top:10px">${AcquireView.conInfoHTML(input)}</div>
+    <div class="row" style="margin-top:10px"><button class="btn" data-act="conbuild">${esc(System.T('construct'))} 시작</button></div></div>
+  <div class="panel"><h3>자원 보급 <span class="muted" style="font-size:.8rem">${conGem()}${nf(cfg.buy.gems)} → +${nf(cfg.buy.amt)}</span></h3><div class="row" style="flex-wrap:wrap">${CON_RES.map(k=>`<button class="btn sm ghost" data-act="conbuy" data-k="${k}">${conResIcon(k)} ${esc(System.T(k))} +${nf(cfg.buy.amt)}</button>`).join('')}</div><p class="muted" style="margin:8px 0 0;font-size:.8rem">${esc(System.T('dispatch'))}을(를) 보내면 건조 자원을 모아 와요.</p></div>
+  <div class="panel"><h3>레시피 노트</h3>${found.length||vfound.length?`<ul style="margin:0;padding-left:18px">${found.map(x=>`<li><b>${esc(x.name)}</b> — ${x.min.join(' / ')} 이상</li>`).join('')}${vfound.map(t=>`<li>✦ <b>${esc(t.name)}</b> — ${t.recipe.min.join(' / ')} 이상 · ${esc(t.prompt)}</li>`).join('')}</ul>`:`<p class="muted" style="margin:0">아직 발견한 레시피가 없어요. 자원 비율을 바꿔 보세요.${(cfg.recipes||[]).length?' 힌트: '+cfg.recipes.map(x=>esc(x.hint||'')).filter(Boolean).join(' / '):''}</p>`}</div>
+  <div class="panel"><h3>최근 기록</h3>${B.log.length?B.log.slice(0,10).map(l=>{ const c=charById(l.id); return c?`<div class="muted" style="font-size:.85rem">${esc(new Date(l.at).toLocaleString())} · ${l.input.join('/')} → <b>${esc(c.name)}</b> ${RL[c.rarity]}${l.v?' ✦':''}</div>`:''; }).join(''):'<p class="muted" style="margin:0">아직 없어요.</p>'}</div>`; }
 
     /* 설정: 게임 탭의 패널 + 상세 설정 창 */
 static conSettingsPanel(){ const on=Acquire.conOn(), V=Characters.VARIANTS();
     return `<div class="panel pm-hide"><h3>${esc(System.T('construct'))} (자원 투입식) ${on?'<span class="badge">켜짐</span>':''}</h3><p class="muted" style="margin:0 0 10px">${CON_RES.map(k=>esc(System.T(k))).join('·')} 4종을 넣어 ${esc(System.T('crew'))}을(를) 영입해요. 투입량으로 등급이 열리고, 비율로 역할 확률이 기울고, 레시피로 ${esc(System.T('gacha'))}에서 얻은 ${esc(System.T('crew'))}의 바리에이션(${V.filter(t=>t.on!==false).map(t=>esc(t.name)).join('·')||'없음'})이 열려요. 자원은 ${esc(System.T('currency'))}으로 사거나 ${esc(System.T('dispatch'))}으로 모아요.</p>
-      <div class="row"><button class="btn sm" data-act="contoggle">${on?'끄기':'켜기'}</button><button class="btn sm ghost" data-act="conset">상세 설정 · 바리에이션</button>${on?'<button class="btn sm ghost" data-act="go" data-to="construct">열기</button>':''}</div></div>`; }
+    <div class="row"><button class="btn sm" data-act="contoggle">${on?'끄기':'켜기'}</button><button class="btn sm ghost" data-act="conset">상세 설정 · 바리에이션</button>${on?'<button class="btn sm ghost" data-act="go" data-to="construct">열기</button>':''}</div></div>`; }
 
   static conVariantRow(t,i){ const c=t.cond||{}, st=(c.stats||[])[0]||{}, n=Characters.conTargets(t);
     return `<details class="panel" data-vi="${i}" style="margin:8px 0"><summary><b>${esc(t.name)}</b> <span class="muted">· ${t.on===false?'꺼짐':'켜짐'} · ${+t.chance||0}% · 적용 ${n.length}명</span></summary>
-    <label style="display:flex;gap:8px;margin:8px 0"><input type="checkbox" data-vf="on" ${t.on!==false?'checked':''}> 사용</label>
-    <div class="g2"><div><label class="f">이름(기본형)</label><input class="in" data-vf="name" value="${esc(t.name)}"></div><div><label class="f">확률 % (레시피가 맞고 대상이 있을 때)</label><input class="in" type="number" data-vf="chance" min="0" max="100" value="${+t.chance||0}"></div></div>
-    <label class="f">의상 기본형 태그 (NovelAI 영어 태그)</label><input class="in" data-vf="prompt" value="${esc(t.prompt||'')}">
-    <label class="f">디자인 추가 지시 (AI용, 선택)</label><input class="in" data-vf="brief" value="${esc(t.brief||'')}">
-    <label class="f">레시피: 최소 투입 (${CON_RES.map(k=>esc(System.T(k))).join(' / ')})</label><input class="in" data-vf="recipe" value="${esc((t.recipe&&t.recipe.min||[]).join(','))}">
-    <label class="f">등급</label><select class="in" data-vf="rarity">${[['same','원래 캐릭터와 같게'],['1','R'],['2','SR'],['3','SSR']].map(([v,l])=>`<option value="${v}" ${String(t.rarity||'same')===v?'selected':''}>${l}</option>`).join('')}</select>
-    <h4 style="margin:10px 0 4px">적용 조건 <span class="muted" style="font-size:.8rem">(비우면 조건 없음 · 보유한 ${esc(System.T('crew'))} 중 맞는 캐릭터에 자동 적용)</span></h4>
-    <div class="g2"><div><label class="f">소속(쉼표)</label><input class="in" data-vf="factions" value="${esc((c.factions||[]).join(','))}" placeholder="${esc(World.factions().map(f=>f.name).join(','))}"></div>
-    <div><label class="f">역할</label><div class="row">${Object.keys(ROLE).map(r=>`<label style="display:flex;gap:4px"><input type="checkbox" data-vrole="${r}" ${(c.roles||[]).includes(r)?'checked':''}>${esc(ROLE[r])}</label>`).join('')}</div></div>
-    <div><label class="f">속성(쉼표)</label><input class="in" data-vf="elems" value="${esc((c.elems||[]).join(','))}" placeholder="${esc(ELEMS.join(','))}"></div>
-    <div><label class="f">능력치</label><div class="row"><select class="in" data-vf="stk"><option value="">없음</option>${CON_STATS.map(([k,l])=>`<option value="${k}" ${st.k===k?'selected':''}>${l}</option>`).join('')}</select><select class="in" data-vf="stop">${['>=','<=','>','<'].map(o=>`<option ${st.op===o?'selected':''}>${o}</option>`).join('')}</select><input class="in" type="number" data-vf="stv" value="${st.v!=null?+st.v:''}" style="width:80px"></div></div>
-    <div><label class="f">최소 레벨 · ${esc(System.T('limit'))} · 호감도</label><div class="row"><input class="in" type="number" data-vf="lv" value="${c.lv||''}" placeholder="Lv"><input class="in" type="number" data-vf="dup" value="${c.dup||''}" placeholder="${esc(System.T('limit'))}"><input class="in" type="number" data-vf="aff" value="${c.aff||''}" placeholder="호감도"></div></div>
-    <div><label class="f">업적: 클리어한 스테이지 id(쉼표)</label><input class="in" data-vf="cleared" value="${esc((c.cleared||[]).join(','))}" placeholder="s11,s12"></div></div>
-    <p class="muted" style="margin:8px 0 0;font-size:.8rem">지금 적용 대상: ${n.map(b=>esc(b.name)).join(', ')||'없음'}${n[0]?`<br>예시 이미지 프롬프트(${esc(n[0].name)}): <code style="overflow-wrap:anywhere">${esc(GGMConstruct.variantPrompt(n[0],t))}</code>`:''}</p>
-    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="convdel" data-i="${i}">이 바리에이션 삭제</button></div></details>`; }
+  <label style="display:flex;gap:8px;margin:8px 0"><input type="checkbox" data-vf="on" ${t.on!==false?'checked':''}> 사용</label>
+  <div class="g2"><div><label class="f">이름(기본형)</label><input class="in" data-vf="name" value="${esc(t.name)}"></div><div><label class="f">확률 % (레시피가 맞고 대상이 있을 때)</label><input class="in" type="number" data-vf="chance" min="0" max="100" value="${+t.chance||0}"></div></div>
+  <label class="f">의상 기본형 태그 (NovelAI 영어 태그)</label><input class="in" data-vf="prompt" value="${esc(t.prompt||'')}">
+  <label class="f">디자인 추가 지시 (AI용, 선택)</label><input class="in" data-vf="brief" value="${esc(t.brief||'')}">
+  <label class="f">레시피: 최소 투입 (${CON_RES.map(k=>esc(System.T(k))).join(' / ')})</label><input class="in" data-vf="recipe" value="${esc((t.recipe&&t.recipe.min||[]).join(','))}">
+  <label class="f">등급</label><select class="in" data-vf="rarity">${[['same','원래 캐릭터와 같게'],['1','R'],['2','SR'],['3','SSR']].map(([v,l])=>`<option value="${v}" ${String(t.rarity||'same')===v?'selected':''}>${l}</option>`).join('')}</select>
+  <h4 style="margin:10px 0 4px">적용 조건 <span class="muted" style="font-size:.8rem">(비우면 조건 없음 · 보유한 ${esc(System.T('crew'))} 중 맞는 캐릭터에 자동 적용)</span></h4>
+  <div class="g2"><div><label class="f">소속(쉼표)</label><input class="in" data-vf="factions" value="${esc((c.factions||[]).join(','))}" placeholder="${esc(World.factions().map(f=>f.name).join(','))}"></div>
+  <div><label class="f">역할</label><div class="row">${Object.keys(ROLE).map(r=>`<label style="display:flex;gap:4px"><input type="checkbox" data-vrole="${r}" ${(c.roles||[]).includes(r)?'checked':''}>${esc(ROLE[r])}</label>`).join('')}</div></div>
+  <div><label class="f">속성(쉼표)</label><input class="in" data-vf="elems" value="${esc((c.elems||[]).join(','))}" placeholder="${esc(ELEMS.join(','))}"></div>
+  <div><label class="f">능력치</label><div class="row"><select class="in" data-vf="stk"><option value="">없음</option>${CON_STATS.map(([k,l])=>`<option value="${k}" ${st.k===k?'selected':''}>${l}</option>`).join('')}</select><select class="in" data-vf="stop">${['>=','<=','>','<'].map(o=>`<option ${st.op===o?'selected':''}>${o}</option>`).join('')}</select><input class="in" type="number" data-vf="stv" value="${st.v!=null?+st.v:''}" style="width:80px"></div></div>
+  <div><label class="f">최소 레벨 · ${esc(System.T('limit'))} · 호감도</label><div class="row"><input class="in" type="number" data-vf="lv" value="${c.lv||''}" placeholder="Lv"><input class="in" type="number" data-vf="dup" value="${c.dup||''}" placeholder="${esc(System.T('limit'))}"><input class="in" type="number" data-vf="aff" value="${c.aff||''}" placeholder="호감도"></div></div>
+  <div><label class="f">업적: 클리어한 스테이지 id(쉼표)</label><input class="in" data-vf="cleared" value="${esc((c.cleared||[]).join(','))}" placeholder="s11,s12"></div></div>
+  <p class="muted" style="margin:8px 0 0;font-size:.8rem">지금 적용 대상: ${n.map(b=>esc(b.name)).join(', ')||'없음'}${n[0]?`<br>예시 이미지 프롬프트(${esc(n[0].name)}): <code style="overflow-wrap:anywhere">${esc(GGMConstruct.variantPrompt(n[0],t))}</code>`:''}</p>
+  <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="convdel" data-i="${i}">이 바리에이션 삭제</button></div></details>`; }
 
   static openConSet(){ CONV=clone(Characters.VARIANTS()); const m=Acquire.conMeta(), cfg=Acquire.CON(), adv={min:cfg.min,max:cfg.max,step:cfg.step,start:cfg.start,sr:cfg.sr,ssr:cfg.ssr,groups:cfg.groups,recipes:cfg.recipes};
     CoreView.openModal(`${head(System.T('construct')+' 설정')}
-      <label style="display:flex;gap:8px"><input type="checkbox" id="con_on" ${m.on?'checked':''}> <b>${esc(System.T('construct'))} 사용</b></label>
-      <p class="muted" style="font-size:.8rem;margin:4px 0 10px">자원 이름과 메뉴 이름은 게임 정의 편집 → 용어에서 바꿔요. 켜면 ${esc(System.T('gacha'))}에서 바리에이션이 빠지고 ${esc(System.T('construct'))}으로만 열려요.</p>
-      <div class="g2"><div><label class="f" for="con_bg">구매 가격 (${esc(System.T('currency'))})</label><input class="in" type="number" id="con_bg" min="1" value="${cfg.buy.gems}"></div><div><label class="f" for="con_ba">구매량</label><input class="in" type="number" id="con_ba" min="1" value="${cfg.buy.amt}"></div></div>
-      <h3 class="sec" style="margin-top:14px">바리에이션 (공통 설정)</h3><p class="muted" style="font-size:.8rem;margin:0">기본형을 정하고 적용 조건을 걸면, 조건에 맞는 캐릭터마다 그 캐릭터의 특징·상징 컬러·상징 아이템(무기)을 반영해 디자인돼요.</p>
-      <div id="con_vars">${CONV.map(AcquireView.conVariantRow).join('')}</div><button class="btn sm ghost" data-act="convadd">+ 바리에이션 추가</button>
-      <details style="margin-top:12px"><summary>고급 설정 (확률 테이블 JSON)</summary><p class="muted" style="font-size:.8rem">sr/ssr.open: 희귀도 캡이 열리는 총 투입량 · base/grow: 확률(%) · groups: 분류 [{id,name,match:{role|faction|elem},min:[4],max:[4],total,share:{자원번호:[최소비율,최대비율]},weight:{base,res:[4]},maxRarity}] · recipes: 특수 레시피 [{id,name,min:[4],effect:{type:role|faction|char,value,up}}]</p><textarea class="in" id="con_adv" rows="10" style="font-family:monospace;font-size:.78rem">${esc(JSON.stringify(adv,null,1))}</textarea></details>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="consave">저장</button><button class="btn ghost" data-act="close">취소</button></div>`); }
+    <label style="display:flex;gap:8px"><input type="checkbox" id="con_on" ${m.on?'checked':''}> <b>${esc(System.T('construct'))} 사용</b></label>
+    <p class="muted" style="font-size:.8rem;margin:4px 0 10px">자원 이름과 메뉴 이름은 게임 정의 편집 → 용어에서 바꿔요. 켜면 ${esc(System.T('gacha'))}에서 바리에이션이 빠지고 ${esc(System.T('construct'))}으로만 열려요.</p>
+    <div class="g2"><div><label class="f" for="con_bg">구매 가격 (${esc(System.T('currency'))})</label><input class="in" type="number" id="con_bg" min="1" value="${cfg.buy.gems}"></div><div><label class="f" for="con_ba">구매량</label><input class="in" type="number" id="con_ba" min="1" value="${cfg.buy.amt}"></div></div>
+    <h3 class="sec" style="margin-top:14px">바리에이션 (공통 설정)</h3><p class="muted" style="font-size:.8rem;margin:0">기본형을 정하고 적용 조건을 걸면, 조건에 맞는 캐릭터마다 그 캐릭터의 특징·상징 컬러·상징 아이템(무기)을 반영해 디자인돼요.</p>
+    <div id="con_vars">${CONV.map(AcquireView.conVariantRow).join('')}</div><button class="btn sm ghost" data-act="convadd">+ 바리에이션 추가</button>
+    <details style="margin-top:12px"><summary>고급 설정 (확률 테이블 JSON)</summary><p class="muted" style="font-size:.8rem">sr/ssr.open: 희귀도 캡이 열리는 총 투입량 · base/grow: 확률(%) · groups: 분류 [{id,name,match:{role|faction|elem},min:[4],max:[4],total,share:{자원번호:[최소비율,최대비율]},weight:{base,res:[4]},maxRarity}] · recipes: 특수 레시피 [{id,name,min:[4],effect:{type:role|faction|char,value,up}}]</p><textarea class="in" id="con_adv" rows="10" style="font-family:monospace;font-size:.78rem">${esc(JSON.stringify(adv,null,1))}</textarea></details>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="consave">저장</button><button class="btn ghost" data-act="close">취소</button></div>`); }
 
   static conReadVariants(){ return [...document.querySelectorAll('#con_vars [data-vi]')].map(d=>{ const f=k=>d.querySelector(`[data-vf="${k}"]`), v=k=>String(f(k)?.value||'').trim(), list=k=>v(k).split(',').map(s=>s.trim()).filter(Boolean), old=(CONV||[])[+d.dataset.vi]||{};
     const nums=v('recipe').split(',').map(x=>Math.max(0,+x||0)); while(nums.length<4) nums.push(0);
@@ -579,48 +579,48 @@ static conSettingsPanel(){ const on=Acquire.conOn(), V=Characters.VARIANTS();
   static openFeedback(){
     FB_STAR=0;
     CoreView.openModal(`${head('피드백 보내기')}
-      <p class="muted" style="margin:0 0 8px">써서 보내기를 누르면 카톡 같은 앱으로 보낼 수 있어요. 버전과 기기 정보가 자동으로 붙어요(키나 개인 정보는 안 붙어요).</p>
-      <label class="f">전체 점수</label><div class="chips" id="fbStars">${[1,2,3,4,5].map(n=>`<button class="chip" data-act="fbstar" data-n="${n}">${'★'.repeat(n)}</button>`).join('')}</div>
-      <label class="f" for="fb_name">이름 (선택)</label><input class="in" id="fb_name" maxlength="20">
-      <label class="f" for="fb_good">재미있던 점</label><textarea class="in" id="fb_good"></textarea>
-      <label class="f" for="fb_bad">불편했던 점, 버그 (어느 화면에서 무엇을 했을 때)</label><textarea class="in" id="fb_bad"></textarea>
-      <label class="f" for="fb_want">있었으면 하는 것</label><textarea class="in" id="fb_want"></textarea>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="fbsend">복사·공유하기</button><button class="btn ghost" data-act="fbissue">GitHub 이슈로</button>${Core.LV().feedback?'<button class="btn ghost" data-act="fbpost">게시글 열기</button>':''}</div>
-      <p class="muted" style="margin:6px 0 0">복사해서 배포 게시글 댓글에 붙여 넣거나, GitHub 계정이 있으면 이슈로 남길 수 있어요.</p>`);
+    <p class="muted" style="margin:0 0 8px">써서 보내기를 누르면 카톡 같은 앱으로 보낼 수 있어요. 버전과 기기 정보가 자동으로 붙어요(키나 개인 정보는 안 붙어요).</p>
+    <label class="f">전체 점수</label><div class="chips" id="fbStars">${[1,2,3,4,5].map(n=>`<button class="chip" data-act="fbstar" data-n="${n}">${'★'.repeat(n)}</button>`).join('')}</div>
+    <label class="f" for="fb_name">이름 (선택)</label><input class="in" id="fb_name" maxlength="20">
+    <label class="f" for="fb_good">재미있던 점</label><textarea class="in" id="fb_good"></textarea>
+    <label class="f" for="fb_bad">불편했던 점, 버그 (어느 화면에서 무엇을 했을 때)</label><textarea class="in" id="fb_bad"></textarea>
+    <label class="f" for="fb_want">있었으면 하는 것</label><textarea class="in" id="fb_want"></textarea>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="fbsend">복사·공유하기</button><button class="btn ghost" data-act="fbissue">GitHub 이슈로</button>${Core.LV().feedback?'<button class="btn ghost" data-act="fbpost">게시글 열기</button>':''}</div>
+    <p class="muted" style="margin:6px 0 0">복사해서 배포 게시글 댓글에 붙여 넣거나, GitHub 계정이 있으면 이슈로 남길 수 있어요.</p>`);
   }
 
   static openBanner(id){
     const b=BD=id?clone(G.banners.find(bn=>bn.id===id)):{id:'',name:'새 배너',type:'pickup',desc:'',pool:{mode:'all',factions:[],ids:[]},pickup:[],rate:50,active:true,bg:''};
     const facs=[...new Set(G.chars.map(c=>c.faction).filter(Boolean))];
     CoreView.openModal(`${head(id?'배너 편집':'배너 만들기')}
-      <label class="f" for="bn_name">이름</label><input class="in" id="bn_name" value="${esc(b.name)}">
-      <label class="f" for="bn_desc">설명</label><input class="in" id="bn_desc" value="${esc(b.desc)}">
-      <div class="g2"><div><label class="f" for="bn_type">종류</label><select class="in" id="bn_type">${CoreView.opt([['std','상시'],['pickup','확률 업'],['pool','소속 한정'],['event','이벤트']],b.type)}</select></div>
-      <div><label class="f" for="bn_bg">배경</label><select class="in" id="bn_bg">${StoryView.bgOptions(b.bg,'기본')}</select></div></div>
-      <div class="g2"><div><label class="f" for="bn_mode">등장 대상</label><select class="in" id="bn_mode">${CoreView.opt([['all','전체'],['faction','소속으로 고르기'],['list','직접 고르기']],b.pool.mode)}</select></div>
-      <div><label class="f" for="bn_rate">확률 업 비중 (%)</label><input class="in" id="bn_rate" type="number" value="${b.rate}"></div></div>
-      ${b.pool.mode==='faction'?`<label class="f">소속</label><div class="chips">${facs.map(f=>`<button class="chip ${b.pool.factions.includes(f)?'on':''}" data-act="bnfac" data-v="${esc(f)}">${esc(f)}</button>`).join('')||'<span class="muted">소속이 정해진 '+System.T('crew')+'이(가) 없어요</span>'}</div>`:''}
-      ${b.pool.mode==='list'?`<label class="f">등장 ${System.T('crew')}</label><div class="chips">${G.chars.map(c=>`<button class="chip ${b.pool.ids.includes(c.id)?'on':''}" data-act="bnid" data-v="${c.id}">${esc(c.name)}</button>`).join('')}</div>`:''}
-      <label class="f">확률 업 ${System.T('crew')}</label><div class="chips">${G.chars.map(c=>`<button class="chip ${b.pickup.includes(c.id)?'on':''}" data-act="bnup" data-v="${c.id}">${RL[c.rarity]} ${esc(c.name)}</button>`).join('')}</div>
-      <label class="f" for="bn_act">상태</label><select class="in" id="bn_act">${CoreView.opt([['1','열림'],['0','닫힘']],b.active!==false?'1':'0')}</select>
-      <div class="row" style="margin-top:16px"><button class="btn" data-act="bnsave">저장</button>${id&&id!=='std'?'<button class="btn ghost" data-act="bndel">삭제</button>':''}</div>`);
+    <label class="f" for="bn_name">이름</label><input class="in" id="bn_name" value="${esc(b.name)}">
+    <label class="f" for="bn_desc">설명</label><input class="in" id="bn_desc" value="${esc(b.desc)}">
+    <div class="g2"><div><label class="f" for="bn_type">종류</label><select class="in" id="bn_type">${CoreView.opt([['std','상시'],['pickup','확률 업'],['pool','소속 한정'],['event','이벤트']],b.type)}</select></div>
+    <div><label class="f" for="bn_bg">배경</label><select class="in" id="bn_bg">${StoryView.bgOptions(b.bg,'기본')}</select></div></div>
+    <div class="g2"><div><label class="f" for="bn_mode">등장 대상</label><select class="in" id="bn_mode">${CoreView.opt([['all','전체'],['faction','소속으로 고르기'],['list','직접 고르기']],b.pool.mode)}</select></div>
+    <div><label class="f" for="bn_rate">확률 업 비중 (%)</label><input class="in" id="bn_rate" type="number" value="${b.rate}"></div></div>
+    ${b.pool.mode==='faction'?`<label class="f">소속</label><div class="chips">${facs.map(f=>`<button class="chip ${b.pool.factions.includes(f)?'on':''}" data-act="bnfac" data-v="${esc(f)}">${esc(f)}</button>`).join('')||'<span class="muted">소속이 정해진 '+System.T('crew')+'이(가) 없어요</span>'}</div>`:''}
+    ${b.pool.mode==='list'?`<label class="f">등장 ${System.T('crew')}</label><div class="chips">${G.chars.map(c=>`<button class="chip ${b.pool.ids.includes(c.id)?'on':''}" data-act="bnid" data-v="${c.id}">${esc(c.name)}</button>`).join('')}</div>`:''}
+    <label class="f">확률 업 ${System.T('crew')}</label><div class="chips">${G.chars.map(c=>`<button class="chip ${b.pickup.includes(c.id)?'on':''}" data-act="bnup" data-v="${c.id}">${RL[c.rarity]} ${esc(c.name)}</button>`).join('')}</div>
+    <label class="f" for="bn_act">상태</label><select class="in" id="bn_act">${CoreView.opt([['1','열림'],['0','닫힘']],b.active!==false?'1':'0')}</select>
+    <div class="row" style="margin-top:16px"><button class="btn" data-act="bnsave">저장</button>${id&&id!=='std'?'<button class="btn ghost" data-act="bndel">삭제</button>':''}</div>`);
   }
 
   static openBannerFrom(b){ const real=G.banners; const bak=BD; BD=b; const orig=G.banners.find(bn=>bn.id===b.id); const saved=JSON.stringify(b);
     // render from draft
     const facs=[...new Set(G.chars.map(c=>c.faction).filter(Boolean))];
     CoreView.openModal(`${head(b.id?'배너 편집':'배너 만들기')}
-      <label class="f" for="bn_name">이름</label><input class="in" id="bn_name" value="${esc(b.name)}">
-      <label class="f" for="bn_desc">설명</label><input class="in" id="bn_desc" value="${esc(b.desc)}">
-      <div class="g2"><div><label class="f" for="bn_type">종류</label><select class="in" id="bn_type">${CoreView.opt([['std','상시'],['pickup','확률 업'],['pool','소속 한정'],['event','이벤트']],b.type)}</select></div>
-      <div><label class="f" for="bn_bg">배경</label><select class="in" id="bn_bg">${StoryView.bgOptions(b.bg,'기본')}</select></div></div>
-      <div class="g2"><div><label class="f" for="bn_mode">등장 대상</label><select class="in" id="bn_mode">${CoreView.opt([['all','전체'],['faction','소속으로 고르기'],['list','직접 고르기']],b.pool.mode)}</select></div>
-      <div><label class="f" for="bn_rate">확률 업 비중 (%)</label><input class="in" id="bn_rate" type="number" value="${b.rate}"></div></div>
-      ${b.pool.mode==='faction'?`<label class="f">소속</label><div class="chips">${facs.map(f=>`<button class="chip ${b.pool.factions.includes(f)?'on':''}" data-act="bnfac" data-v="${esc(f)}">${esc(f)}</button>`).join('')}</div>`:''}
-      ${b.pool.mode==='list'?`<label class="f">등장 ${System.T('crew')}</label><div class="chips">${G.chars.map(c=>`<button class="chip ${b.pool.ids.includes(c.id)?'on':''}" data-act="bnid" data-v="${c.id}">${esc(c.name)}</button>`).join('')}</div>`:''}
-      <label class="f">확률 업 ${System.T('crew')}</label><div class="chips">${G.chars.map(c=>`<button class="chip ${b.pickup.includes(c.id)?'on':''}" data-act="bnup" data-v="${c.id}">${RL[c.rarity]} ${esc(c.name)}</button>`).join('')}</div>
-      <label class="f" for="bn_act">상태</label><select class="in" id="bn_act">${CoreView.opt([['1','열림'],['0','닫힘']],b.active!==false?'1':'0')}</select>
-      <div class="row" style="margin-top:16px"><button class="btn" data-act="bnsave">저장</button>${b.id&&b.id!=='std'?'<button class="btn ghost" data-act="bndel">삭제</button>':''}</div>`);
+    <label class="f" for="bn_name">이름</label><input class="in" id="bn_name" value="${esc(b.name)}">
+    <label class="f" for="bn_desc">설명</label><input class="in" id="bn_desc" value="${esc(b.desc)}">
+    <div class="g2"><div><label class="f" for="bn_type">종류</label><select class="in" id="bn_type">${CoreView.opt([['std','상시'],['pickup','확률 업'],['pool','소속 한정'],['event','이벤트']],b.type)}</select></div>
+    <div><label class="f" for="bn_bg">배경</label><select class="in" id="bn_bg">${StoryView.bgOptions(b.bg,'기본')}</select></div></div>
+    <div class="g2"><div><label class="f" for="bn_mode">등장 대상</label><select class="in" id="bn_mode">${CoreView.opt([['all','전체'],['faction','소속으로 고르기'],['list','직접 고르기']],b.pool.mode)}</select></div>
+    <div><label class="f" for="bn_rate">확률 업 비중 (%)</label><input class="in" id="bn_rate" type="number" value="${b.rate}"></div></div>
+    ${b.pool.mode==='faction'?`<label class="f">소속</label><div class="chips">${facs.map(f=>`<button class="chip ${b.pool.factions.includes(f)?'on':''}" data-act="bnfac" data-v="${esc(f)}">${esc(f)}</button>`).join('')}</div>`:''}
+    ${b.pool.mode==='list'?`<label class="f">등장 ${System.T('crew')}</label><div class="chips">${G.chars.map(c=>`<button class="chip ${b.pool.ids.includes(c.id)?'on':''}" data-act="bnid" data-v="${c.id}">${esc(c.name)}</button>`).join('')}</div>`:''}
+    <label class="f">확률 업 ${System.T('crew')}</label><div class="chips">${G.chars.map(c=>`<button class="chip ${b.pickup.includes(c.id)?'on':''}" data-act="bnup" data-v="${c.id}">${RL[c.rarity]} ${esc(c.name)}</button>`).join('')}</div>
+    <label class="f" for="bn_act">상태</label><select class="in" id="bn_act">${CoreView.opt([['1','열림'],['0','닫힘']],b.active!==false?'1':'0')}</select>
+    <div class="row" style="margin-top:16px"><button class="btn" data-act="bnsave">저장</button>${b.id&&b.id!=='std'?'<button class="btn ghost" data-act="bndel">삭제</button>':''}</div>`);
   }
 
     /* 대본 선택지 지우기 · 대화 기록 창(View) */

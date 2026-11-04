@@ -35,13 +35,13 @@ static drPolishPrompt({what,k,cur}){ return `${Core.pf('DR_POLISH',{what,pf:k===
 
     /* src/main/0455-persona.js */
 static personaAIPrompt({c,mode,others,opt,cfg}){ return `${RULES}\n${World.ctx()}\n\n${System.T('crew')} 「${c.name}」(${RL[c.rarity]}, ${c.faction||'무소속'}, ${c.elem}, ${(Core.posOf(c)||{}).name||ROLE[c.role]})의 개성 시트를 ${mode==='improve'?Core.pf('PERSONA_IMPROVE'):Core.pf('PERSONA_FILL')}.
-  프로필: ${String(c.profile||'').slice(0,500)}
-  지금 개성: ${JSON.stringify(c.persona||{})}
-  지금 대사: ${(c.lines||[]).slice(0,6).join(' / ')}
-  다른 ${System.T('crew')}(말투·성격이 겹치지 않게): ${others||'없음'}
-  ${opt.instruction?'추가 지시: '+opt.instruction+'\n':''}규칙: 핵심 성격 3개는 서로 다른 축(겉모습·속마음·행동 습관). 반전 매력은 겉과 반대되는 의외의 면(약점이 드러나는 순간). 1인칭·어미·말버릇은 짧고 다른 캐릭터와 겹치지 않게. 대표 대사는 그 캐릭터만 할 법한 한 줄.
-  ${opt.lines?'lines는 이 말투로 다시 쓴 평소 대사 5개. affLines는 호감도 3·5·8에서 나올 대사.':''}
-  JSON만 출력: {"persona":{"traits":["","",""],"self":"","call":"","ending":"","quirk":"","catch":"","gap":"","flaw":"","want":"","fear":"","likes":[""],"dislikes":[""],"hobby":"","motif":""},"pfields":{${cfg.tpl.map(k=>`"${k}":""`).join(',')}}${opt.lines?',"lines":["5개"],"affLines":{"3":[""],"5":[""],"8":[""]}':''}}`; }
+프로필: ${String(c.profile||'').slice(0,500)}
+지금 개성: ${JSON.stringify(c.persona||{})}
+지금 대사: ${(c.lines||[]).slice(0,6).join(' / ')}
+다른 ${System.T('crew')}(말투·성격이 겹치지 않게): ${others||'없음'}
+${opt.instruction?'추가 지시: '+opt.instruction+'\n':''}규칙: 핵심 성격 3개는 서로 다른 축(겉모습·속마음·행동 습관). 반전 매력은 겉과 반대되는 의외의 면(약점이 드러나는 순간). 1인칭·어미·말버릇은 짧고 다른 캐릭터와 겹치지 않게. 대표 대사는 그 캐릭터만 할 법한 한 줄.
+${opt.lines?'lines는 이 말투로 다시 쓴 평소 대사 5개. affLines는 호감도 3·5·8에서 나올 대사.':''}
+JSON만 출력: {"persona":{"traits":["","",""],"self":"","call":"","ending":"","quirk":"","catch":"","gap":"","flaw":"","want":"","fear":"","likes":[""],"dislikes":[""],"hobby":"","motif":""},"pfields":{${cfg.tpl.map(k=>`"${k}":""`).join(',')}}${opt.lines?',"lines":["5개"],"affLines":{"3":[""],"5":[""],"8":[""]}':''}}`; }
 
   static talkAffGenPrompt({c,levels}){ return `${Core.pf('AFF_TALK',{RULES,ctx:World.ctx(),crew:System.T('crew'),name:c.name,talk:System.T('talk'),levels:levels.join(', '),personaBrief:Characters.personaBrief(c),profile:String(c.profile||'').slice(0,300),THREAD_FMT})}JSON만 출력: {"threads":[{"lv":${levels[0]},"title":"알림에 뜰 짧은 제목","script":"대화"}]}`; }
 
@@ -1313,8 +1313,8 @@ static naiBlocksOwner(e){
   static openAp(){
     const d=APD;
     CoreView.openModal(`${head(d.id?'AI 편집':'AI 추가')}
-      ${CoreView.apForm(d)}
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="apsave">저장</button><button class="btn ghost" data-act="aptest">연결 테스트</button>${d.id?`<button class="btn ghost" data-act="apdel">삭제</button>`:''}</div>`);
+    ${CoreView.apForm(d)}
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="apsave">저장</button><button class="btn ghost" data-act="aptest">연결 테스트</button>${d.id?`<button class="btn ghost" data-act="apdel">삭제</button>`:''}</div>`);
   }
 
   static regenReadPreview(R){const read=id=>document.getElementById(id)?.value.trim();if(!R.edit)return;const nc=R.nc;
@@ -1334,11 +1334,11 @@ static regenButtonsLock(on){ document.querySelectorAll('[data-act=regenapply],[d
 
   static openDesign(){ const d=G.meta.design||{}, facs=World.designFacs();
     CoreView.openModal(`${head('캐릭터 디자인 통일','<span class="muted">이 게임의 가챠 캐릭터 그림에 붙는 태그</span>')}
-      <p class="muted" style="margin:0 0 8px">스탠딩·상반신·일러스트·돌파 CG·스토리 CG·기술 컷인을 그릴 때 캐릭터 외형 프롬프트 뒤에 붙여요. 제복·상징 색·소재·문장(엠블럼)처럼 다 같이 공유할 디자인을 영어 태그로 적어요. 머리·눈·체형은 캐릭터마다 다르니 넣지 않는 게 좋아요. 바꾼 뒤 새로 그리는 그림부터 적용돼요.</p>
-      <label class="f" for="ds_all">공통 (모든 가챠 캐릭터)</label><textarea class="in" id="ds_all" style="min-height:60px" placeholder="예: academy uniform, white and navy color scheme, gold trim, school crest">${esc(d.all||'')}</textarea>
-      ${facs.length?`<h3 class="sec">세력별</h3>${facs.map((f,i)=>`<label class="f" for="ds_f${i}">${esc(f)} <span class="muted">· ${G.chars.filter(c=>c.faction===f&&!c.collab).length}명</span></label><textarea class="in" id="ds_f${i}" data-fac="${esc(f)}" style="min-height:50px" placeholder="예: crimson cape, silver rose emblem">${esc(((d.fac||{})[f])||'')}</textarea>`).join('')}`:'<p class="muted">세력이 정해진 캐릭터가 없어서 공통 태그만 쓸 수 있어요.</p>'}
-      <p class="muted" style="margin:8px 0 0;font-size:.78rem">스킨(의상)·NPC·다른 세계에서 온 콜라보 캐릭터에는 붙지 않아요. 캐릭터 한 명만 빼려면 그 캐릭터 편집에서 '공통 디자인 태그 쓰지 않기'를 켜요.</p>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="dssave">저장</button>${SAMPLE?'<button class="btn ghost" data-act="dsai">✦ AI로 제안 받기</button>':''}</div>`); }
+    <p class="muted" style="margin:0 0 8px">스탠딩·상반신·일러스트·돌파 CG·스토리 CG·기술 컷인을 그릴 때 캐릭터 외형 프롬프트 뒤에 붙여요. 제복·상징 색·소재·문장(엠블럼)처럼 다 같이 공유할 디자인을 영어 태그로 적어요. 머리·눈·체형은 캐릭터마다 다르니 넣지 않는 게 좋아요. 바꾼 뒤 새로 그리는 그림부터 적용돼요.</p>
+    <label class="f" for="ds_all">공통 (모든 가챠 캐릭터)</label><textarea class="in" id="ds_all" style="min-height:60px" placeholder="예: academy uniform, white and navy color scheme, gold trim, school crest">${esc(d.all||'')}</textarea>
+    ${facs.length?`<h3 class="sec">세력별</h3>${facs.map((f,i)=>`<label class="f" for="ds_f${i}">${esc(f)} <span class="muted">· ${G.chars.filter(c=>c.faction===f&&!c.collab).length}명</span></label><textarea class="in" id="ds_f${i}" data-fac="${esc(f)}" style="min-height:50px" placeholder="예: crimson cape, silver rose emblem">${esc(((d.fac||{})[f])||'')}</textarea>`).join('')}`:'<p class="muted">세력이 정해진 캐릭터가 없어서 공통 태그만 쓸 수 있어요.</p>'}
+    <p class="muted" style="margin:8px 0 0;font-size:.78rem">스킨(의상)·NPC·다른 세계에서 온 콜라보 캐릭터에는 붙지 않아요. 캐릭터 한 명만 빼려면 그 캐릭터 편집에서 '공통 디자인 태그 쓰지 않기'를 켜요.</p>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="dssave">저장</button>${SAMPLE?'<button class="btn ghost" data-act="dsai">✦ AI로 제안 받기</button>':''}</div>`); }
 
   static cutPush(){const j=CUTJOB,x=Characters.cutCtx(); if(!x) return; j.undo.push(x.getImageData(0,0,j.W,j.H)); if(j.undo.length>10) j.undo.shift(); const el=$('#ct_undo'); if(el) el.disabled=false; j.changed=true; const sv=$('#ct_save'); if(sv) sv.disabled=false;}
 
@@ -1424,30 +1424,30 @@ static cutZoomShow(t,j){ const view=$('#cutPrev'), z=j.zoom, fx=j.cx>=0?j.cx/j.W
     const o=Core.naiTarget(kind,id); const src=o&&Characters.imgSrc(o); if(!src){CoreView.toast('먼저 이미지를 등록해 주세요');return;}
     const c=Characters.cutCfg(); CUTJOB={kind,id,src,undo:[],zoom:1,cx:-1,cy:-1,opt:null,changed:false};
     CoreView.openModal(`${head('배경 지우기',`<span class="muted">${esc(o.name)}</span>`)}
-      <div class="cutbox"><div class="cutview" id="cutPrev"><canvas id="cutCv"></canvas><div class="cut-cur" id="cutCur" hidden></div></div><canvas class="cut-loupe" id="cutLoupe" width="150" height="150" hidden></canvas></div>
-      <div class="cuttools">
-        <select class="in" id="ct_pmode"><option value="wand">스포이드: 이어진 영역</option><option value="all">스포이드: 같은 색 전부</option><option value="brush">지우개 브러시</option><option value="restore">복원 브러시</option></select>
-        <button class="btn ghost" data-act="cutzoom" id="ct_zoom">확대 ×1</button><button class="btn ghost" data-act="cutundo" id="ct_undo" disabled>되돌리기</button>
-      </div>
-      <div class="cutpad">
-        <div class="pad"><button class="btn ghost" data-act="cutnudge" data-dx="0" data-dy="-1" aria-label="위">▲</button><button class="btn ghost" data-act="cutnudge" data-dx="-1" data-dy="0" aria-label="왼쪽">◀</button><button class="btn ghost" data-act="cutnudge" data-dx="1" data-dy="0" aria-label="오른쪽">▶</button><button class="btn ghost" data-act="cutnudge" data-dx="0" data-dy="1" aria-label="아래">▼</button></div>
-        <button class="btn cutgo" data-act="cuthere"><span class="cutsw" id="ct_sw"></span>커서 위치 지우기</button>
-      </div>
-      <div class="slider" id="ct_pt"><label for="ct_ptol"><span>스포이드 범위</span><b id="ct_ptolv">24</b></label><input id="ct_ptol" type="range" min="2" max="80" value="24"></div>
-      <div class="slider" id="ct_bs" hidden><label for="ct_brush"><span>브러시 크기</span><b id="ct_brushv">10</b></label><input id="ct_brush" type="range" min="2" max="60" value="10"></div>
-      <label class="f"><input type="checkbox" id="ct_quick"> 손을 떼면 바로 지우기 (스포이드)</label>
-      <p class="muted cutpick-hint" id="ct_hint">그림을 누른 채 움직이면 손가락 위쪽에 커서가 생겨요. 왼쪽 위 돋보기로 확인하고 화살표로 한 칸씩 맞춘 뒤 '커서 위치 지우기'를 누르세요. 브러시는 문지르는 대로 지우고, 복원 브러시는 원본으로 되돌려요.</p>
-      <details class="cutauto"><summary>자동으로 흰 배경 한 번에 지우기</summary>
-        <div class="slider"><label for="ct_tol"><span>배경 허용 범위</span><b id="ct_tolv">${c.tol}</b></label><input id="ct_tol" type="range" min="6" max="90" value="${c.tol}"></div>
-        <div class="slider"><label for="ct_soft"><span>가장자리 부드럽게</span><b id="ct_softv">${c.soft}</b></label><input id="ct_soft" type="range" min="4" max="70" value="${c.soft}"></div>
-        <div class="row"><label class="f"><input type="checkbox" id="ct_shadow" ${c.shadow?'checked':''}> 발밑 그림자 지우기</label></div>
-        <div class="row"><label class="f"><input type="checkbox" id="ct_holes" ${c.holes?'checked':''}> 막힌 배경도 지우기 (흰 옷이 지워지면 끄세요)</label></div>
-        <div class="row"><label class="f"><input type="checkbox" id="ct_spk" ${c.despeck?'checked':''}> 떠 있는 작은 점 지우기</label></div>
-        <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="cutrun">자동 지우기 (원본 기준)</button></div>
-        <label class="f"><input type="checkbox" id="ct_def" checked> 이 설정을 자동 배경 제거 기본값으로</label>
-      </details>
-      <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="cutnai">NovelAI로 배경 제거 (Anlas 소모)</button></div>
-      <div class="cutsave"><button class="btn block" data-act="cutsave" disabled id="ct_save">이걸로 저장</button></div>`);
+    <div class="cutbox"><div class="cutview" id="cutPrev"><canvas id="cutCv"></canvas><div class="cut-cur" id="cutCur" hidden></div></div><canvas class="cut-loupe" id="cutLoupe" width="150" height="150" hidden></canvas></div>
+    <div class="cuttools">
+      <select class="in" id="ct_pmode"><option value="wand">스포이드: 이어진 영역</option><option value="all">스포이드: 같은 색 전부</option><option value="brush">지우개 브러시</option><option value="restore">복원 브러시</option></select>
+      <button class="btn ghost" data-act="cutzoom" id="ct_zoom">확대 ×1</button><button class="btn ghost" data-act="cutundo" id="ct_undo" disabled>되돌리기</button>
+    </div>
+    <div class="cutpad">
+      <div class="pad"><button class="btn ghost" data-act="cutnudge" data-dx="0" data-dy="-1" aria-label="위">▲</button><button class="btn ghost" data-act="cutnudge" data-dx="-1" data-dy="0" aria-label="왼쪽">◀</button><button class="btn ghost" data-act="cutnudge" data-dx="1" data-dy="0" aria-label="오른쪽">▶</button><button class="btn ghost" data-act="cutnudge" data-dx="0" data-dy="1" aria-label="아래">▼</button></div>
+      <button class="btn cutgo" data-act="cuthere"><span class="cutsw" id="ct_sw"></span>커서 위치 지우기</button>
+    </div>
+    <div class="slider" id="ct_pt"><label for="ct_ptol"><span>스포이드 범위</span><b id="ct_ptolv">24</b></label><input id="ct_ptol" type="range" min="2" max="80" value="24"></div>
+    <div class="slider" id="ct_bs" hidden><label for="ct_brush"><span>브러시 크기</span><b id="ct_brushv">10</b></label><input id="ct_brush" type="range" min="2" max="60" value="10"></div>
+    <label class="f"><input type="checkbox" id="ct_quick"> 손을 떼면 바로 지우기 (스포이드)</label>
+    <p class="muted cutpick-hint" id="ct_hint">그림을 누른 채 움직이면 손가락 위쪽에 커서가 생겨요. 왼쪽 위 돋보기로 확인하고 화살표로 한 칸씩 맞춘 뒤 '커서 위치 지우기'를 누르세요. 브러시는 문지르는 대로 지우고, 복원 브러시는 원본으로 되돌려요.</p>
+    <details class="cutauto"><summary>자동으로 흰 배경 한 번에 지우기</summary>
+      <div class="slider"><label for="ct_tol"><span>배경 허용 범위</span><b id="ct_tolv">${c.tol}</b></label><input id="ct_tol" type="range" min="6" max="90" value="${c.tol}"></div>
+      <div class="slider"><label for="ct_soft"><span>가장자리 부드럽게</span><b id="ct_softv">${c.soft}</b></label><input id="ct_soft" type="range" min="4" max="70" value="${c.soft}"></div>
+      <div class="row"><label class="f"><input type="checkbox" id="ct_shadow" ${c.shadow?'checked':''}> 발밑 그림자 지우기</label></div>
+      <div class="row"><label class="f"><input type="checkbox" id="ct_holes" ${c.holes?'checked':''}> 막힌 배경도 지우기 (흰 옷이 지워지면 끄세요)</label></div>
+      <div class="row"><label class="f"><input type="checkbox" id="ct_spk" ${c.despeck?'checked':''}> 떠 있는 작은 점 지우기</label></div>
+      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="cutrun">자동 지우기 (원본 기준)</button></div>
+      <label class="f"><input type="checkbox" id="ct_def" checked> 이 설정을 자동 배경 제거 기본값으로</label>
+    </details>
+    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="cutnai">NovelAI로 배경 제거 (Anlas 소모)</button></div>
+    <div class="cutsave"><button class="btn block" data-act="cutsave" disabled id="ct_save">이걸로 저장</button></div>`);
     (async()=>{ try{ const im=await Characters.loadImg(src), j=CUTJOB; if(!j||!$('#cutCv')) return; j.W=im.naturalWidth||im.width; j.H=im.naturalHeight||im.height;
         j.cv=$('#cutCv'); j.cv.width=j.W; j.cv.height=j.H; j.cv.getContext('2d',{willReadFrequently:true}).drawImage(im,0,0);
         j.orig=document.createElement('canvas'); j.orig.width=j.W; j.orig.height=j.H; j.orig.getContext('2d').drawImage(im,0,0); CharactersView.cutBind(); }catch(e){ CoreView.toast('이미지를 불러오지 못했어요'); } })();
@@ -1458,7 +1458,7 @@ static cutZoomShow(t,j){ const view=$('#cutPrev'), z=j.zoom, fx=j.cx>=0?j.cx/j.W
     if(prev){ try{ const pm=await Characters.loadImg(prev); mx.drawImage(pm,0,0,W,H); }catch(e){ Core.quietErr(e,'0030-image/010-engine.js:774'); } }
     const d=document.createElement('div'); d.className='mpaint';
     d.innerHTML=`<div class="mp-bar"><b>${esc(po.title||'얼굴 범위 칠하기')}</b><button type="button" data-m="brush" class="on">✎ 칠하기</button><button type="button" data-m="erase">⌫ 지우개</button><label>크기 <input type="range" min="8" max="120" value="40"></label><button type="button" data-m="auto">얼굴 자동</button><button type="button" data-m="clear">비우기</button><span class="mp-sp"></span><button type="button" data-m="cancel">취소</button><button type="button" data-m="save" class="ok">저장</button></div>
-      <div class="mp-stage"><canvas></canvas></div><p class="mp-tip">바꾸고 싶은 얼굴 부분(눈·눈썹·입)을 빨갛게 칠해 주세요. 머리카락·옷은 칠하지 않는 게 좋아요. 한 번 저장하면 모든 표정에 같이 써요.</p>`;
+    <div class="mp-stage"><canvas></canvas></div><p class="mp-tip">바꾸고 싶은 얼굴 부분(눈·눈썹·입)을 빨갛게 칠해 주세요. 머리카락·옷은 칠하지 않는 게 좋아요. 한 번 저장하면 모든 표정에 같이 써요.</p>`;
     document.body.appendChild(d);
     const cv=d.querySelector('canvas'), x=cv.getContext('2d'), stage=d.querySelector('.mp-stage');
     const fit=()=>{ const sw=stage.clientWidth-16, sh=stage.clientHeight-16, s=Math.min(sw/W,sh/H); cv.width=Math.round(W*s); cv.height=Math.round(H*s); draw(); };
@@ -1492,23 +1492,23 @@ static openFaceView(c,f){ CoreView.openModal(`${head(esc(c.name)+' · '+esc(f.na
     FACEOPT=FACEOPT||{m:'inpaint',body:'both',model:/^nai-diffusion-5/.test(cm)?cm:'nai-diffusion-5-full',ref:false,lv:1};
     const thumb=(o,l)=>`<span>${o&&Art.imgSrcRaw(o)?`<img src="${esc(Art.imgSrcRaw(o))}" alt="">`:'<i class="fc-empty">없음</i>'}${l}</span>`;
     CoreView.openModal(`${head(`${esc(c.name)} 표정`,`<span class="muted">${F===c?'기본 모습':esc(System.T('skin'))+' 「'+esc(F.name)+'」'}</span>`)}
-      ${(c.skins||[]).length?`<div class="chips" style="margin:0 0 8px"><button class="chip ${F===c?'on':''}" data-act="facetgt" data-id="${esc(id)}" data-s="">기본</button>${c.skins.map(k=>`<button class="chip ${F===k?'on':''}" data-act="facetgt" data-id="${esc(id)}" data-s="${k.id}">${esc(System.T('skin'))}: ${esc(k.name)}</button>`).join('')}</div>`:''}
-      <div class="fc-grid">${names.map(nm=>{ const f=F.faces.find(x=>x.name===nm); return `<div class="fc-it"><div class="fc-two">${thumb(f,'전신')}${thumb(f&&f.up,'상반신')}</div><b>${esc(nm)}</b><div class="row"><button class="btn sm ghost" data-act="faceup" data-id="${esc(id)}" data-v="${esc(nm)}">전신 ${f&&Characters.imgSrc(f)?'바꾸기':'넣기'}</button><button class="btn sm ghost" data-act="faceup" data-id="${esc(id)}" data-v="${esc(nm)}" data-b="up">상반신 ${f&&f.up&&Characters.imgSrc(f.up)?'바꾸기':'넣기'}</button>${f?`<button class="btn sm ghost" data-act="facedel" data-id="${esc(id)}" data-v="${esc(nm)}">✕</button>`:''}</div></div>`; }).join('')}</div>
-      <div class="row" style="margin-top:8px"><input class="in" id="fc_new" placeholder="새 표정 이름 (예: 삐짐)" style="flex:1"><button class="btn sm" data-act="faceupnew" data-id="${esc(id)}">이 이름으로 넣기</button><button class="btn sm ghost" data-act="faceupmany" data-id="${esc(id)}">여러 장 넣기</button></div>
-      <h4 class="sec">NovelAI로 만들기</h4>
-      ${Art.imgSrcRaw(F)?'':`<p class="muted">먼저 ${F===c?'기본':'이 '+esc(System.T('skin'))+'의'} 스탠딩이 있어야 해요.</p>`}
-      <div class="row" style="margin:0 0 6px"><button class="btn sm ghost" data-act="facebasic">기본 6종 고르기 (${FACE_BASIC.join('·')})</button></div>
-      <div class="chips">${FACE_PRESETS.map(([ko])=>`<button class="chip ${FACESEL.has(ko)?'on':''}" data-act="facesel" data-v="${ko}" data-id="${id}">${ko}${F.faces.some(f=>f.name===ko&&Characters.imgSrc(f))?' ✓':''}</button>`).join('')}</div>
-      <div class="g2"><div><label class="f" for="fc_m">만드는 방법</label><select class="in" id="fc_m">${CoreView.opt([['inpaint','얼굴만 다시 그리기 (인페인팅 · 추천)'],['raw','감정을 넣어 새로 그리기 (V5 전용, 같은 시드)'],['i2i','스탠딩을 바탕으로 다시 그리기 (img2img)'],['emo','NAI 표정 변환 (변화가 약할 수 있음)']],FACEOPT.m)}</select></div>
-        <div><label class="f" for="fc_body">그릴 그림</label><select class="in" id="fc_body">${CoreView.opt([['both','전신 + 상반신'],['full','전신만'],['up','상반신만']],FACEOPT.body)}</select></div></div>
-      <div class="g2"><div><label class="f" for="fc_model">그림 모델</label><select class="in" id="fc_model">${CoreView.opt(NAI_MODELS.filter(m=>/^nai-diffusion-(5|4-5)/.test(m[0])),FACEOPT.model)}</select></div>
-        <div><label class="f" for="fc_lv">변화 강도</label><select class="in" id="fc_lv">${CoreView.opt([[0,'강하게'],[1,'조금 강하게'],[2,'보통'],[3,'약하게']],FACEOPT.lv)}</select></div></div>
-      <label class="f" style="margin-top:6px"><input type="checkbox" id="fc_ref" ${FACEOPT.ref?'checked':''}> 캐릭터 레퍼런스도 함께 (얼굴을 더 똑같이 · V4.5로 그려져요)</label>
-      <div class="optbox" style="margin-top:6px"><b style="font-size:.85rem">얼굴 범위 (인페인팅용)</b> <span class="muted" style="font-size:.76rem">한 번 칠해 두면 모든 표정에 같이 써요</span>
-        <div class="row" style="margin-top:6px"><button class="btn sm ${mk.full?'':'ghost'}" data-act="facemask" data-id="${esc(id)}" data-b="full" ${Art.imgSrcRaw(F)?'':'disabled'}>${mk.full?'✓ ':''}전신에 칠하기</button><button class="btn sm ${mk.up?'':'ghost'}" data-act="facemask" data-id="${esc(id)}" data-b="up" ${up?'':'disabled'}>${mk.up?'✓ ':''}상반신에 칠하기</button>${up?'':'<span class="muted" style="font-size:.74rem">상반신 그림이 없어요</span>'}</div></div>
-      <label class="f" for="fc_x">추가 프롬프트 (선택)</label><input class="in" id="fc_x" placeholder="예: blush, teary eyes">
-      <p class="muted" id="fc_stat"></p>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="facego" data-id="${id}">선택한 표정 만들기</button></div>`);
+    ${(c.skins||[]).length?`<div class="chips" style="margin:0 0 8px"><button class="chip ${F===c?'on':''}" data-act="facetgt" data-id="${esc(id)}" data-s="">기본</button>${c.skins.map(k=>`<button class="chip ${F===k?'on':''}" data-act="facetgt" data-id="${esc(id)}" data-s="${k.id}">${esc(System.T('skin'))}: ${esc(k.name)}</button>`).join('')}</div>`:''}
+    <div class="fc-grid">${names.map(nm=>{ const f=F.faces.find(x=>x.name===nm); return `<div class="fc-it"><div class="fc-two">${thumb(f,'전신')}${thumb(f&&f.up,'상반신')}</div><b>${esc(nm)}</b><div class="row"><button class="btn sm ghost" data-act="faceup" data-id="${esc(id)}" data-v="${esc(nm)}">전신 ${f&&Characters.imgSrc(f)?'바꾸기':'넣기'}</button><button class="btn sm ghost" data-act="faceup" data-id="${esc(id)}" data-v="${esc(nm)}" data-b="up">상반신 ${f&&f.up&&Characters.imgSrc(f.up)?'바꾸기':'넣기'}</button>${f?`<button class="btn sm ghost" data-act="facedel" data-id="${esc(id)}" data-v="${esc(nm)}">✕</button>`:''}</div></div>`; }).join('')}</div>
+    <div class="row" style="margin-top:8px"><input class="in" id="fc_new" placeholder="새 표정 이름 (예: 삐짐)" style="flex:1"><button class="btn sm" data-act="faceupnew" data-id="${esc(id)}">이 이름으로 넣기</button><button class="btn sm ghost" data-act="faceupmany" data-id="${esc(id)}">여러 장 넣기</button></div>
+    <h4 class="sec">NovelAI로 만들기</h4>
+    ${Art.imgSrcRaw(F)?'':`<p class="muted">먼저 ${F===c?'기본':'이 '+esc(System.T('skin'))+'의'} 스탠딩이 있어야 해요.</p>`}
+    <div class="row" style="margin:0 0 6px"><button class="btn sm ghost" data-act="facebasic">기본 6종 고르기 (${FACE_BASIC.join('·')})</button></div>
+    <div class="chips">${FACE_PRESETS.map(([ko])=>`<button class="chip ${FACESEL.has(ko)?'on':''}" data-act="facesel" data-v="${ko}" data-id="${id}">${ko}${F.faces.some(f=>f.name===ko&&Characters.imgSrc(f))?' ✓':''}</button>`).join('')}</div>
+    <div class="g2"><div><label class="f" for="fc_m">만드는 방법</label><select class="in" id="fc_m">${CoreView.opt([['inpaint','얼굴만 다시 그리기 (인페인팅 · 추천)'],['raw','감정을 넣어 새로 그리기 (V5 전용, 같은 시드)'],['i2i','스탠딩을 바탕으로 다시 그리기 (img2img)'],['emo','NAI 표정 변환 (변화가 약할 수 있음)']],FACEOPT.m)}</select></div>
+      <div><label class="f" for="fc_body">그릴 그림</label><select class="in" id="fc_body">${CoreView.opt([['both','전신 + 상반신'],['full','전신만'],['up','상반신만']],FACEOPT.body)}</select></div></div>
+    <div class="g2"><div><label class="f" for="fc_model">그림 모델</label><select class="in" id="fc_model">${CoreView.opt(NAI_MODELS.filter(m=>/^nai-diffusion-(5|4-5)/.test(m[0])),FACEOPT.model)}</select></div>
+      <div><label class="f" for="fc_lv">변화 강도</label><select class="in" id="fc_lv">${CoreView.opt([[0,'강하게'],[1,'조금 강하게'],[2,'보통'],[3,'약하게']],FACEOPT.lv)}</select></div></div>
+    <label class="f" style="margin-top:6px"><input type="checkbox" id="fc_ref" ${FACEOPT.ref?'checked':''}> 캐릭터 레퍼런스도 함께 (얼굴을 더 똑같이 · V4.5로 그려져요)</label>
+    <div class="optbox" style="margin-top:6px"><b style="font-size:.85rem">얼굴 범위 (인페인팅용)</b> <span class="muted" style="font-size:.76rem">한 번 칠해 두면 모든 표정에 같이 써요</span>
+      <div class="row" style="margin-top:6px"><button class="btn sm ${mk.full?'':'ghost'}" data-act="facemask" data-id="${esc(id)}" data-b="full" ${Art.imgSrcRaw(F)?'':'disabled'}>${mk.full?'✓ ':''}전신에 칠하기</button><button class="btn sm ${mk.up?'':'ghost'}" data-act="facemask" data-id="${esc(id)}" data-b="up" ${up?'':'disabled'}>${mk.up?'✓ ':''}상반신에 칠하기</button>${up?'':'<span class="muted" style="font-size:.74rem">상반신 그림이 없어요</span>'}</div></div>
+    <label class="f" for="fc_x">추가 프롬프트 (선택)</label><input class="in" id="fc_x" placeholder="예: blush, teary eyes">
+    <p class="muted" id="fc_stat"></p>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="facego" data-id="${id}">선택한 표정 만들기</button></div>`);
   }
 
   static faceOptRead(){ if(!$('#fc_m')) return; FACEOPT={m:$('#fc_m').value,body:$('#fc_body').value,model:$('#fc_model').value,ref:$('#fc_ref').checked,lv:+$('#fc_lv').value}; }
@@ -1516,17 +1516,17 @@ static openFaceView(c,f){ CoreView.openModal(`${head(esc(c.name)+' · '+esc(f.na
   static openSkin(id){
     const c=charById(id); MBACK=()=>CharactersCtl.openChar(id);
     CoreView.openModal(`${head(`${esc(c.name)} ${System.T('skin')} 만들기`)}
-      <p class="muted">기본은 설정의 모델(V5 Full 권장)로 투명 배경 스탠딩을 그려요. 얼굴을 원본과 더 똑같이 맞추고 싶으면 아래에서 캐릭터 레퍼런스를 켜세요(V4.5로 그려지고 흰 배경을 지워요).</p>
-      <label class="f" for="sk_name">${System.T('skin')} 이름</label><input class="in" id="sk_name" placeholder="예: 축제 유카타">
-      <label class="f" for="sk_idea">의상 아이디어</label><input class="in" id="sk_idea" placeholder="예: 남색 유카타, 머리에 꽃장식, 손에 종이 등불">
-      <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aiskin" data-id="${id}">AI로 프롬프트 쓰기</button></div>
-      <label class="f" for="sk_prompt">NAI 프롬프트</label><textarea class="in" id="sk_prompt" placeholder="1girl, solo, ..." data-nai-blocks="${esc(JSON.stringify({...Characters.naiBlocksOf(c),outfit:'',combined:LiveOps.naiBlocksJoin({...Characters.naiBlocksOf(c),outfit:''})}))}">${esc(LiveOps.naiBlocksJoin({...Characters.naiBlocksOf(c),outfit:''}))}</textarea>
-      <label class="f" for="sk_pose">자세</label><select class="in" id="sk_pose">${Core.naiCfg().poses.map(p=>`<option value="${esc(p.t)}" ${p.t===(c.naiPose||NAI_FRONT)?'selected':''}>${esc(p.n)}</option>`).join('')}</select>
-      <div class="optbox"><label class="f"><input type="checkbox" id="sk_ref" ${Characters.imgSrc(c)?'':'disabled'}> 지금 스탠딩을 캐릭터 레퍼런스로 (선택)</label>
-      <div class="g2"><div><label class="f" for="sk_fid">충실도</label><select class="in" id="sk_fid">${CoreView.opt([[1,'1.0 (원본에 가깝게)'],[0.8,'0.8'],[0.6,'0.6']],1)}</select></div><div></div></div>
-      <div class="g2"><div><label class="f" for="sk_str">레퍼런스 강도</label><select class="in" id="sk_str">${CoreView.opt([[1,'강하게 (얼굴 유지)'],[0.8,'보통'],[0.6,'약하게']],1)}</select></div><div><label class="f" for="sk_style">그림체도 따라가기</label><select class="in" id="sk_style">${CoreView.opt([['1','예'],['0','아니요']],'1')}</select></div></div></div>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="skingo" data-id="${id}">그리기</button></div>
-      ${(c.skins||[]).length?`<h3 class="sec">만든 ${System.T('skin')}</h3><p class="muted" style="margin:0 0 6px;font-size:.8rem">${System.T('skin')}마다 스탠딩·상반신·일러스트·돌파 CG를 따로 둘 수 있어요. ${System.T('skin')}을 입히면 있는 그림은 ${System.T('skin')} 것을, 로비 일러스트·돌파 CG가 없으면 스킨의 상반신이나 스탠딩을 써요. 스탠딩 사용이 꺼져 있으면 이 스킨의 상반신이 필요해요.</p>${c.skins.map(k=>CoreView.skinCard(c,k)).join('')}`:''}`);
+    <p class="muted">기본은 설정의 모델(V5 Full 권장)로 투명 배경 스탠딩을 그려요. 얼굴을 원본과 더 똑같이 맞추고 싶으면 아래에서 캐릭터 레퍼런스를 켜세요(V4.5로 그려지고 흰 배경을 지워요).</p>
+    <label class="f" for="sk_name">${System.T('skin')} 이름</label><input class="in" id="sk_name" placeholder="예: 축제 유카타">
+    <label class="f" for="sk_idea">의상 아이디어</label><input class="in" id="sk_idea" placeholder="예: 남색 유카타, 머리에 꽃장식, 손에 종이 등불">
+    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aiskin" data-id="${id}">AI로 프롬프트 쓰기</button></div>
+    <label class="f" for="sk_prompt">NAI 프롬프트</label><textarea class="in" id="sk_prompt" placeholder="1girl, solo, ..." data-nai-blocks="${esc(JSON.stringify({...Characters.naiBlocksOf(c),outfit:'',combined:LiveOps.naiBlocksJoin({...Characters.naiBlocksOf(c),outfit:''})}))}">${esc(LiveOps.naiBlocksJoin({...Characters.naiBlocksOf(c),outfit:''}))}</textarea>
+    <label class="f" for="sk_pose">자세</label><select class="in" id="sk_pose">${Core.naiCfg().poses.map(p=>`<option value="${esc(p.t)}" ${p.t===(c.naiPose||NAI_FRONT)?'selected':''}>${esc(p.n)}</option>`).join('')}</select>
+    <div class="optbox"><label class="f"><input type="checkbox" id="sk_ref" ${Characters.imgSrc(c)?'':'disabled'}> 지금 스탠딩을 캐릭터 레퍼런스로 (선택)</label>
+    <div class="g2"><div><label class="f" for="sk_fid">충실도</label><select class="in" id="sk_fid">${CoreView.opt([[1,'1.0 (원본에 가깝게)'],[0.8,'0.8'],[0.6,'0.6']],1)}</select></div><div></div></div>
+    <div class="g2"><div><label class="f" for="sk_str">레퍼런스 강도</label><select class="in" id="sk_str">${CoreView.opt([[1,'강하게 (얼굴 유지)'],[0.8,'보통'],[0.6,'약하게']],1)}</select></div><div><label class="f" for="sk_style">그림체도 따라가기</label><select class="in" id="sk_style">${CoreView.opt([['1','예'],['0','아니요']],'1')}</select></div></div></div>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="skingo" data-id="${id}">그리기</button></div>
+    ${(c.skins||[]).length?`<h3 class="sec">만든 ${System.T('skin')}</h3><p class="muted" style="margin:0 0 6px;font-size:.8rem">${System.T('skin')}마다 스탠딩·상반신·일러스트·돌파 CG를 따로 둘 수 있어요. ${System.T('skin')}을 입히면 있는 그림은 ${System.T('skin')} 것을, 로비 일러스트·돌파 CG가 없으면 스킨의 상반신이나 스탠딩을 써요. 스탠딩 사용이 꺼져 있으면 이 스킨의 상반신이 필요해요.</p>${c.skins.map(k=>CoreView.skinCard(c,k)).join('')}`:''}`);
   }
 
   static imageCandidates(generate,initial={}){
@@ -1583,32 +1583,32 @@ static openFaceView(c,f){ CoreView.openModal(`${head(esc(c.name)+' · '+esc(f.na
 
   static npcCardHTML(n){ const st=Characters.imgSrc(n), up=n.upper&&Characters.imgSrc(n.upper), busy=NPCBUSY.has(n.id);
     return `<div class="npc-card" id="npc_${n.id}"><div class="npc-imgs"><div>${st?`<img src="${esc(st)}" alt="">`:'<span>스탠딩 없음</span>'}<i>스탠딩</i></div><div>${up?`<img src="${esc(up)}" alt="">`:'<span>상반신 없음</span>'}<i>상반신</i></div></div>
-      <div class="npc-f"><div class="g2"><div><label class="f">이름</label><input class="in" data-nf="name" value="${esc(n.name)}" maxlength="20"></div><div><label class="f">역할</label><input class="in" data-nf="role" value="${esc(n.role||'')}" placeholder="예: 정보상"></div></div>
-      <label class="f">설정 <span class="muted" style="font-size:.76rem">(성격·과거·누구와 어떤 사이인지, 짧게 · 스토리를 쓸 때 AI가 참고해요)</span></label><textarea class="in" data-nf="profile" style="min-height:56px" maxlength="600" placeholder="예: 항구 뒷골목의 정보상. 돈만 밝히는 척하지만 카야에게는 빚이 있어서 공짜로 정보를 준다.">${esc(n.profile||'')}</textarea>
-      <label class="f">말투</label><input class="in" data-nf="speech" value="${esc(n.speech||'')}" maxlength="80" placeholder="예: 느긋한 반말, '~라구'를 붙임">
-      <label class="f">외모 (한국어 메모)</label><input class="in" data-nf="look" value="${esc(n.look||'')}" placeholder="예: 은발 단발, 검은 정장, 안경">
-      <label class="f">외형 프롬프트 (그림 AI 영어 태그)</label><textarea class="in" data-nf="naiPrompt" style="min-height:70px" placeholder="1girl, solo, short silver hair, glasses, black suit">${esc(n.naiPrompt||'')}</textarea>
-      <div class="row" style="margin-top:6px"><button class="btn sm" data-act="npcsave" data-id="${n.id}">저장</button>${SAMPLE?`<button class="btn sm ghost" data-act="npctags" data-id="${n.id}">✦ 외모로 태그 쓰기</button>`:''}</div>
-      <div class="row" style="margin-top:6px">${Core.imgReady()?`<button class="btn sm" data-act="npcdraw" data-k="char" data-id="${n.id}" ${busy?'disabled':''}>${busy?'그리는 중…':st?'스탠딩 다시 그리기':'스탠딩 그리기'}</button><button class="btn sm ghost" data-act="npcdraw" data-k="upper" data-id="${n.id}" ${busy?'disabled':''}>${up?'상반신 다시 그리기':'상반신 그리기'}</button>`:''}<button class="btn sm ghost" data-act="upload" data-k="npc" data-id="${n.id}">스탠딩 올리기</button><button class="btn sm ghost" data-act="upload" data-k="npcup" data-id="${n.id}">상반신 올리기</button>${n.img?XBTN('npc',n.id,'','스탠딩 지우기'):''}${n.upper&&n.upper.img?XBTN('npcup',n.id,'','상반신 지우기'):''}<button class="btn sm ghost" data-act="npcdel" data-id="${n.id}">삭제</button></div></div></div>`; }
+    <div class="npc-f"><div class="g2"><div><label class="f">이름</label><input class="in" data-nf="name" value="${esc(n.name)}" maxlength="20"></div><div><label class="f">역할</label><input class="in" data-nf="role" value="${esc(n.role||'')}" placeholder="예: 정보상"></div></div>
+    <label class="f">설정 <span class="muted" style="font-size:.76rem">(성격·과거·누구와 어떤 사이인지, 짧게 · 스토리를 쓸 때 AI가 참고해요)</span></label><textarea class="in" data-nf="profile" style="min-height:56px" maxlength="600" placeholder="예: 항구 뒷골목의 정보상. 돈만 밝히는 척하지만 카야에게는 빚이 있어서 공짜로 정보를 준다.">${esc(n.profile||'')}</textarea>
+    <label class="f">말투</label><input class="in" data-nf="speech" value="${esc(n.speech||'')}" maxlength="80" placeholder="예: 느긋한 반말, '~라구'를 붙임">
+    <label class="f">외모 (한국어 메모)</label><input class="in" data-nf="look" value="${esc(n.look||'')}" placeholder="예: 은발 단발, 검은 정장, 안경">
+    <label class="f">외형 프롬프트 (그림 AI 영어 태그)</label><textarea class="in" data-nf="naiPrompt" style="min-height:70px" placeholder="1girl, solo, short silver hair, glasses, black suit">${esc(n.naiPrompt||'')}</textarea>
+    <div class="row" style="margin-top:6px"><button class="btn sm" data-act="npcsave" data-id="${n.id}">저장</button>${SAMPLE?`<button class="btn sm ghost" data-act="npctags" data-id="${n.id}">✦ 외모로 태그 쓰기</button>`:''}</div>
+    <div class="row" style="margin-top:6px">${Core.imgReady()?`<button class="btn sm" data-act="npcdraw" data-k="char" data-id="${n.id}" ${busy?'disabled':''}>${busy?'그리는 중…':st?'스탠딩 다시 그리기':'스탠딩 그리기'}</button><button class="btn sm ghost" data-act="npcdraw" data-k="upper" data-id="${n.id}" ${busy?'disabled':''}>${up?'상반신 다시 그리기':'상반신 그리기'}</button>`:''}<button class="btn sm ghost" data-act="upload" data-k="npc" data-id="${n.id}">스탠딩 올리기</button><button class="btn sm ghost" data-act="upload" data-k="npcup" data-id="${n.id}">상반신 올리기</button>${n.img?XBTN('npc',n.id,'','스탠딩 지우기'):''}${n.upper&&n.upper.img?XBTN('npcup',n.id,'','상반신 지우기'):''}<button class="btn sm ghost" data-act="npcdel" data-id="${n.id}">삭제</button></div></div></div>`; }
 
   static openNpcs(){ const L=G.npcs||[]; CoreView.openModal(`${head('NPC',`<span class="muted">${L.length}명 · 스토리 조연</span>`)}
-      <p class="muted" style="margin:0 0 10px;font-size:.82rem">외형 프롬프트를 고치고 '저장'한 뒤 다시 그리면 새 모습으로 바뀌어요. 스토리 대본에 같은 이름으로 나오면 그 그림이 떠요.</p>
-      ${L.map(CharactersView.npcCardHTML).join('')||'<p class="muted">아직 NPC가 없어요.</p>'}
-      <div class="row" style="margin-top:10px"><input class="in" id="npc_new" placeholder="새 NPC 이름" maxlength="20" style="flex:1"><button class="btn sm" data-act="npcadd">추가</button></div>
-      ${SAMPLE?`<button class="btn sm ghost block" style="margin-top:8px" data-act="npcscan">✦ 스토리에 자주 나온 인물을 NPC로 추가 (그림 프롬프트까지)</button>`:''}`); }
+    <p class="muted" style="margin:0 0 10px;font-size:.82rem">외형 프롬프트를 고치고 '저장'한 뒤 다시 그리면 새 모습으로 바뀌어요. 스토리 대본에 같은 이름으로 나오면 그 그림이 떠요.</p>
+    ${L.map(CharactersView.npcCardHTML).join('')||'<p class="muted">아직 NPC가 없어요.</p>'}
+    <div class="row" style="margin-top:10px"><input class="in" id="npc_new" placeholder="새 NPC 이름" maxlength="20" style="flex:1"><button class="btn sm" data-act="npcadd">추가</button></div>
+    ${SAMPLE?`<button class="btn sm ghost block" style="margin-top:8px" data-act="npcscan">✦ 스토리에 자주 나온 인물을 NPC로 추가 (그림 프롬프트까지)</button>`:''}`); }
 
   static npcRefresh(id){ const n=(G.npcs||[]).find(x=>x.id===id), el=document.getElementById('npc_'+id); if(n&&el){ const t=document.createElement('div'); t.innerHTML=CharactersView.npcCardHTML(n); el.replaceWith(t.firstElementChild); } }
 
   static openCastFaces(){ const cs=Characters.castChars().filter(c=>!c.npc&&Characters.imgSrc(c)); if(!cs.length){ CoreView.toast('먼저 전신을 그려 주세요'); return; } if(!CFSEL) CFSEL={faces:new Set(FACE_BASIC.filter(x=>x!=='평온')),chars:new Set(cs.map(c=>c.id)),body:'both'};
     const names=[...new Set([...FACE_BASIC,...FACE_PRESETS.map(p=>p[0])])];
     CoreView.openModal(`${head('표정 한꺼번에 만들기','<span class="muted">얼굴만 다시 그리기(인페인팅)</span>')}
-      <p class="muted" style="margin:0 0 8px">캐릭터마다 얼굴 범위를 한 번씩 칠하면(이미 칠했으면 건너뜀), 고른 표정을 모두 차례로 그려요. 얼굴 범위는 한 번 칠하면 모든 표정에 같이 써요.</p>
-      <label class="f">표정</label><div class="chips">${names.map(n=>`<button class="chip ${CFSEL.faces.has(n)?'on':''}" data-act="cfsel" data-k="f" data-v="${esc(n)}">${esc(n)}</button>`).join('')}</div>
-      <label class="f">캐릭터</label><div class="chips">${cs.map(c=>{ const nf=(c.faces||[]).filter(f=>Characters.imgSrc(f)).length; return `<button class="chip ${CFSEL.chars.has(c.id)?'on':''}" data-act="cfsel" data-k="c" data-v="${c.id}">${esc(c.name)}${nf?' · '+nf:''}</button>`; }).join('')}</div>
-      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="cfall" data-k="c" data-v="1">캐릭터 모두 고르기</button><button class="btn sm ghost" data-act="cfall" data-k="c" data-v="0">모두 빼기</button></div>
-      <label class="f" style="margin-top:8px"><input type="checkbox" id="cf_skip" ${CFSEL.skip!==false?'checked':''}> 이미 그린 표정은 건너뛰기</label>
-      <label class="f" for="cf_body">그릴 그림</label><select class="in" id="cf_body">${CoreView.opt([['both','전신 + 상반신'],['full','전신만'],['up','상반신만']],CFSEL.body)}</select>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="cfgo">얼굴 범위 칠하고 시작</button></div>`); }
+    <p class="muted" style="margin:0 0 8px">캐릭터마다 얼굴 범위를 한 번씩 칠하면(이미 칠했으면 건너뜀), 고른 표정을 모두 차례로 그려요. 얼굴 범위는 한 번 칠하면 모든 표정에 같이 써요.</p>
+    <label class="f">표정</label><div class="chips">${names.map(n=>`<button class="chip ${CFSEL.faces.has(n)?'on':''}" data-act="cfsel" data-k="f" data-v="${esc(n)}">${esc(n)}</button>`).join('')}</div>
+    <label class="f">캐릭터</label><div class="chips">${cs.map(c=>{ const nf=(c.faces||[]).filter(f=>Characters.imgSrc(f)).length; return `<button class="chip ${CFSEL.chars.has(c.id)?'on':''}" data-act="cfsel" data-k="c" data-v="${c.id}">${esc(c.name)}${nf?' · '+nf:''}</button>`; }).join('')}</div>
+    <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="cfall" data-k="c" data-v="1">캐릭터 모두 고르기</button><button class="btn sm ghost" data-act="cfall" data-k="c" data-v="0">모두 빼기</button></div>
+    <label class="f" style="margin-top:8px"><input type="checkbox" id="cf_skip" ${CFSEL.skip!==false?'checked':''}> 이미 그린 표정은 건너뛰기</label>
+    <label class="f" for="cf_body">그릴 그림</label><select class="in" id="cf_body">${CoreView.opt([['both','전신 + 상반신'],['full','전신만'],['up','상반신만']],CFSEL.body)}</select>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="cfgo">얼굴 범위 칠하고 시작</button></div>`); }
 
   static castFacesGo(){ CFSEL.body=$('#cf_body')?$('#cf_body').value:'both'; CFSEL.skip=$('#cf_skip')?$('#cf_skip').checked:true; if(!CAST) CAST={q:[],busy:null}; /* 게임 중(유닛 탭)에도 같은 줄로 그려요 */ const faces=[...CFSEL.faces], cs=Characters.castChars().filter(c=>CFSEL.chars.has(c.id)&&!c.npc&&Characters.imgSrc(c));
     if(!faces.length||!cs.length){ CoreView.toast('표정과 캐릭터를 하나 이상 골라 주세요'); return; } CoreView.closeModal();
@@ -1658,8 +1658,8 @@ static imgTarget(k,id,t){ const re=f=>()=>{ Challenge.render(); f&&f(); };
     const items=GIFTS.filter(g=>inv[g[0]]>0);
     const full=Characters.affFull(Characters.own(c.id));
     CoreView.openModal(`${head(`${esc(c.name)}에게 선물하기`,`<span class="muted">호감도 Lv.${Core.affLv(Characters.own(c.id))}${full?' · <b style="color:var(--rose)">MAX</b>':''} · 좋아하는 선물은 효과가 2배예요</span>`)}
-      ${full?`<p class="gf-full">♥ 호감도가 가득 찼어요. 선물을 더 줘도 오르지 않으니 다른 ${esc(System.T('crew'))}에게 주세요.</p>`:''}
-      ${items.length?`<div class="gf-grid">${items.map(g=>`<button class="gf-it" data-act="giftgive" data-id="${esc(cid)}" data-v="${g[0]}" ${full?'disabled':''}><em>${g[2]}</em><b>${esc(g[1])}</b><span>×${inv[g[0]]} · +${g[3]}${seen[g[0]]===2?' <i class="gf-like">♥ 좋아해요</i>':seen[g[0]]===1?' <i class="gf-meh">무난</i>':''}</span></button>`).join('')}</div>`
+    ${full?`<p class="gf-full">♥ 호감도가 가득 찼어요. 선물을 더 줘도 오르지 않으니 다른 ${esc(System.T('crew'))}에게 주세요.</p>`:''}
+    ${items.length?`<div class="gf-grid">${items.map(g=>`<button class="gf-it" data-act="giftgive" data-id="${esc(cid)}" data-v="${g[0]}" ${full?'disabled':''}><em>${g[2]}</em><b>${esc(g[1])}</b><span>×${inv[g[0]]} · +${g[3]}${seen[g[0]]===2?' <i class="gf-like">♥ 좋아해요</i>':seen[g[0]]===1?' <i class="gf-meh">무난</i>':''}</span></button>`).join('')}</div>`
         :`<p class="muted">가진 선물이 없어요. 상점의 '선물 꾸러미', 일일 보급, 파견, 도전 보상에서 얻을 수 있어요.</p><div class="row"><button class="btn sm" data-act="go" data-to="shop">상점 가기</button></div>`}`);
   }
 
@@ -1672,61 +1672,61 @@ static imgTarget(k,id,t){ const re=f=>()=>{ Challenge.render(); f&&f(); };
     const ico=(act,to,ic,label,badge,hot)=>`<button class="lb-ico ${hot?'hot':''}" data-act="${act}" ${to?`data-to="${to}"`:''}><span class="ic">${ICO[ic]}</span><b>${esc(label)}</b>${badge?`<em>${badge}</em>`:''}</button>`;
     const newN=p.live.notices.filter(n=>n.at>p.live.seen).length;
     return `<div class="lobby ${ill?'ill':''} ${layer?'layer':''} lbsz-${esc(p.lbSize||'fit')}">${layer?`<div class="lb-far" style="${has&&c.lbbg&&Characters.imgSrc(c.lbbg)?`background-image:url('${esc(Characters.imgSrc(c.lbbg))}')`:ArtView.bgStyle(p.lobbyBg||'새벽등대 사무소')}"></div>`:''}
-      <div class="lb-stage" ${has?'data-act="poke" role="button" tabindex="0"':'data-act="lbshow"'} style="${ill?'background:#000':layer?'background:transparent':ArtView.bgStyle(p.lobbyBg||'새벽등대 사무소')}">
-        ${ill?`<img class="lobby-ill" src="${esc(ill)}" alt="${esc(c.name)}" draggable="false">`:pose?`<img class="art lobby-art lobby-pose" src="${esc(pose)}" alt="${esc(c.name)}" draggable="false">`:has?(layer?CharactersView.lobbyCharacterArt(c):CoreView.art(c,'lobby-art')):''}<div class="lb-shade"></div>
+    <div class="lb-stage" ${has?'data-act="poke" role="button" tabindex="0"':'data-act="lbshow"'} style="${ill?'background:#000':layer?'background:transparent':ArtView.bgStyle(p.lobbyBg||'새벽등대 사무소')}">
+      ${ill?`<img class="lobby-ill" src="${esc(ill)}" alt="${esc(c.name)}" draggable="false">`:pose?`<img class="art lobby-art lobby-pose" src="${esc(pose)}" alt="${esc(c.name)}" draggable="false">`:has?(layer?CharactersView.lobbyCharacterArt(c):CoreView.art(c,'lobby-art')):''}<div class="lb-shade"></div>
+    </div>
+    <div class="lb-ui">
+      ${bn?`<button class="lb-banner" data-act="go" data-to="contract" data-swipe="banner"><span class="bgl" style="${bn.bg?ArtView.bgStyle(bn.bg):ArtView.bgStyle(p.gachaBg||'낙성 분화구')}"></span><span class="bt"><i>${TYPE[bn.type]||'RECRUIT'}</i><b>${esc(bn.name)}</b><span>${bup?esc(bup.name)+' 확률 업':esc(System.T('gacha'))}</span></span><span class="bf">${bup?noSkin(()=>CoreView.art(bup))():''}</span></button>`:''}
+      <div class="lb-tr"><button class="lb-pass" data-act="go" data-to="pass"><i>SEASON PASS</i><b>Lv.${passLv()}</b>${Characters.passClaimable()?'<em></em>':''}</button>${CharactersView.seasonChip()}</div>
+      <div class="lb-left">
+        ${ico('phone','','talk',System.T('talk'),Characters.unread()||'')}
+        ${evs.length?ico('go','event','event',System.T('event'),evs.length):''}
+        ${ico('go','notice','notice','공지',newN||'')}
+        ${ico('go','codex','book','도감',Characters.cxNewFast()||'')}
+        ${p.daily!==today()?ico('daily','','gift','일일 보급','!',true):''}
       </div>
-      <div class="lb-ui">
-        ${bn?`<button class="lb-banner" data-act="go" data-to="contract" data-swipe="banner"><span class="bgl" style="${bn.bg?ArtView.bgStyle(bn.bg):ArtView.bgStyle(p.gachaBg||'낙성 분화구')}"></span><span class="bt"><i>${TYPE[bn.type]||'RECRUIT'}</i><b>${esc(bn.name)}</b><span>${bup?esc(bup.name)+' 확률 업':esc(System.T('gacha'))}</span></span><span class="bf">${bup?noSkin(()=>CoreView.art(bup))():''}</span></button>`:''}
-        <div class="lb-tr"><button class="lb-pass" data-act="go" data-to="pass"><i>SEASON PASS</i><b>Lv.${passLv()}</b>${Characters.passClaimable()?'<em></em>':''}</button>${CharactersView.seasonChip()}</div>
-        <div class="lb-left">
-          ${ico('phone','','talk',System.T('talk'),Characters.unread()||'')}
-          ${evs.length?ico('go','event','event',System.T('event'),evs.length):''}
-          ${ico('go','notice','notice','공지',newN||'')}
-          ${ico('go','codex','book','도감',Characters.cxNewFast()||'')}
-          ${p.daily!==today()?ico('daily','','gift','일일 보급','!',true):''}
-        </div>
-        <div class="lb-right">
-          ${ico('mailopen','','mail','우편함',Economy.mailCount()||'',Economy.mailCount()>0)}
-          ${ico('go','disp','disp',System.T('dispatch'),dispDone()||'')}
-          ${ico('go','sched','talk','일정',G.chars.some(c=>Characters.own(c.id))&&Core.progRead('sched').left?Core.progRead('sched').left:'')}
-          ${ico('go','farm','farm',System.T('farm'),'')}
-          ${ico('go','challenge','raid','도전',Core.progRead('rogue').run?'!':(Challenge.raidTriesLeft()&&!Core.progRead('raid').killed?Challenge.raidTriesLeft():''))}
-          ${ill||has?ico('lbhide','','eye','숨기기',''):''}
-        </div>
-        <div class="lb-foot">
-        ${has?`<div class="bubble" id="bubble">${esc(sub(rand(Characters.affLinePool(c))||'…'))}</div>`:''}
-        <div class="lb-id">${has?`<i>${esc(G.meta.sub)}</i><b>${esc(c.name)}</b><span>${esc(c.faction||ROLE[c.role])} · 호감도 Lv.${Core.affLv(Characters.own(c.id))}</span>`:`<i>${esc(G.meta.sub)}</i><b>${esc(G.meta.title)}</b><span>첫 ${System.T('gacha')}로 ${System.T('crew')}을(를) 만나세요</span>`}</div>
-        <div class="lb-bottom">
-          <div class="lb-shops">
-            <button class="lb-shop cash" data-act="go" data-to="cash">${ICO.gem}<span><i>CASH SHOP</i><b>캐시 상점</b></span></button>
-            <button class="lb-shop" data-act="go" data-to="shop">${ICO.shop}<span><i>SUPPLY SHOP</i><b>상점</b></span></button>
-          </div>
-          <button class="lb-sortie" data-act="go" data-to="ops"><i>COMBAT</i><b>${esc(System.T('ops'))} 출격</b><span>${nx?esc(nx.code+' '+nx.s.title):'모든 '+esc(System.T('ops'))+' 완료'}</span></button>
-        </div></div>
+      <div class="lb-right">
+        ${ico('mailopen','','mail','우편함',Economy.mailCount()||'',Economy.mailCount()>0)}
+        ${ico('go','disp','disp',System.T('dispatch'),dispDone()||'')}
+        ${ico('go','sched','talk','일정',G.chars.some(c=>Characters.own(c.id))&&Core.progRead('sched').left?Core.progRead('sched').left:'')}
+        ${ico('go','farm','farm',System.T('farm'),'')}
+        ${ico('go','challenge','raid','도전',Core.progRead('rogue').run?'!':(Challenge.raidTriesLeft()&&!Core.progRead('raid').killed?Challenge.raidTriesLeft():''))}
+        ${ill||has?ico('lbhide','','eye','숨기기',''):''}
       </div>
-    </div>`;
+      <div class="lb-foot">
+      ${has?`<div class="bubble" id="bubble">${esc(sub(rand(Characters.affLinePool(c))||'…'))}</div>`:''}
+      <div class="lb-id">${has?`<i>${esc(G.meta.sub)}</i><b>${esc(c.name)}</b><span>${esc(c.faction||ROLE[c.role])} · 호감도 Lv.${Core.affLv(Characters.own(c.id))}</span>`:`<i>${esc(G.meta.sub)}</i><b>${esc(G.meta.title)}</b><span>첫 ${System.T('gacha')}로 ${System.T('crew')}을(를) 만나세요</span>`}</div>
+      <div class="lb-bottom">
+        <div class="lb-shops">
+          <button class="lb-shop cash" data-act="go" data-to="cash">${ICO.gem}<span><i>CASH SHOP</i><b>캐시 상점</b></span></button>
+          <button class="lb-shop" data-act="go" data-to="shop">${ICO.shop}<span><i>SUPPLY SHOP</i><b>상점</b></span></button>
+        </div>
+        <button class="lb-sortie" data-act="go" data-to="ops"><i>COMBAT</i><b>${esc(System.T('ops'))} 출격</b><span>${nx?esc(nx.code+' '+nx.s.title):'모든 '+esc(System.T('ops'))+' 완료'}</span></button>
+      </div></div>
+    </div>
+  </div>`;
   }
 
   static openPersona(cid){ const c=charById(cid); if(!c) return; const p=c.persona||{}, cfg=Characters.PERSONA_CFG(), f=c.pfields||{}, keys=[...new Set([...cfg.tpl,...Object.keys(f)])];
     CoreView.openModal(`${head(`${c.name} 개성 편집`)}<p class="muted" style="font-size:.8rem;margin:0 0 6px">목록 항목은 쉼표로 나눠요. 비운 칸은 지워져요.</p>
-    ${PERSONA_FIELDS.map(([k,l,t])=>`<label class="f">${esc(l)}</label><input class="in" data-ps="${k}" value="${esc(t==='list'?(p[k]||[]).join(', '):p[k]||'')}">`).join('')}
-    <h3 class="sec" style="margin-top:12px">프로필</h3><div class="g2">${keys.map(k=>`<div><label class="f">${esc(k)}</label><input class="in" data-pf="${esc(k)}" value="${esc(f[k]||'')}"></div>`).join('')}</div>
-    <label class="f" style="margin-top:8px">추가 항목 (이름=값, 줄마다)</label><textarea class="in" id="ps_extra" rows="2" placeholder="별명=○○"></textarea>
-    <div class="row" style="margin-top:12px"><button class="btn" data-act="pssave" data-id="${c.id}">저장</button><button class="btn ghost" data-act="close">취소</button></div>`); }
+  ${PERSONA_FIELDS.map(([k,l,t])=>`<label class="f">${esc(l)}</label><input class="in" data-ps="${k}" value="${esc(t==='list'?(p[k]||[]).join(', '):p[k]||'')}">`).join('')}
+  <h3 class="sec" style="margin-top:12px">프로필</h3><div class="g2">${keys.map(k=>`<div><label class="f">${esc(k)}</label><input class="in" data-pf="${esc(k)}" value="${esc(f[k]||'')}"></div>`).join('')}</div>
+  <label class="f" style="margin-top:8px">추가 항목 (이름=값, 줄마다)</label><textarea class="in" id="ps_extra" rows="2" placeholder="별명=○○"></textarea>
+  <div class="row" style="margin-top:12px"><button class="btn" data-act="pssave" data-id="${c.id}">저장</button><button class="btn ghost" data-act="close">취소</button></div>`); }
 
   static personaPanel(){ const L=G.chars.filter(c=>!c.alt).map(c=>({c,r:Characters.personaReview(c)})), avg=L.length?Math.round(L.reduce((a,x)=>a+x.r.score,0)/L.length):0, low=L.filter(x=>x.r.score<55).length;
     return `<div class="panel pm-hide"><h3>캐릭터 개성·매력 ${low?`<span class="badge">약함 ${low}</span>`:''}</h3><p class="muted" style="margin:0 0 6px">개성 평균 ${avg}점. 개성 시트(성격·말투·반전 매력·결점…), 프로필 템플릿, 검수, 인연 톡·메모리얼을 관리해요.</p><button class="btn sm" data-act="psopen">개성 검수·설정</button></div>`; }
 
   static openPersonaAll(){ const cfg=Characters.PERSONA_CFG(), L=G.chars.filter(c=>!c.alt).map(c=>({c,r:Characters.personaReview(c)})).sort((a,b)=>a.r.score-b.r.score), cur=Object.entries(PROFILE_TPLS).find(([,v])=>v.join()===cfg.tpl.join());
     CoreView.openModal(`${head('캐릭터 개성 검수·설정')}
-    <h3 class="sec">프로필 템플릿</h3><select class="in" id="ps_tpl">${[['basic','기본 (생일·신장·출신·특기)'],['org','소속 조직 (소속·직책 …)'],['operator','작전 요원 (코드네임·전투 경력·임상 소견 …)'],['fantasy','판타지 (종족·계약 …)'],['idol','아이돌 (소속사·데뷔·담당·팬덤 …)'],['streamer','스트리머 (활동명·플랫폼·구독자 애칭 …)'],['custom','직접 입력']].map(([k,l])=>`<option value="${k}" ${(cur?cur[0]:'custom')===k?'selected':''}>${l}</option>`).join('')}</select>
-    <label class="f">항목 (쉼표)</label><input class="in" id="ps_tplf" value="${esc(cfg.tpl.join(', '))}">
-    <div class="g2"><div><label class="f">인연 톡 호감도 단계 (쉼표)</label><input class="in" id="ps_aff" value="${esc(cfg.affLv.join(', '))}"></div><div><label class="f">메모리얼 호감도</label><input class="in" type="number" id="ps_memo" min="1" max="10" value="${cfg.memoLv}"></div></div>
-    <div class="row" style="margin:8px 0"><button class="btn sm" data-act="pscfg">설정 저장</button></div>
-    <h3 class="sec">검수 결과 <span class="muted" style="font-size:.8rem">(낮은 순)</span></h3>
-    <div style="max-height:280px;overflow:auto;font-size:.82rem">${L.map(({c,r})=>`<label style="display:flex;gap:6px;align-items:flex-start;padding:3px 0;border-bottom:1px solid var(--line)"><input type="checkbox" data-psc="${c.id}" ${r.score<55?'checked':''}><b style="min-width:70px">${esc(c.name)}</b><span class="badge">${r.grade} ${r.score}</span><span class="muted">${esc(r.issues.slice(0,3).map(x=>x.msg).join(' · '))}${r.issues.length>3?' …':''}</span></label>`).join('')}</div>
-    <div class="row" style="margin-top:8px;flex-wrap:wrap;gap:6px"><button class="btn sm" data-act="psbatch" data-k="fill">선택: AI로 개성 채우기</button><button class="btn sm ghost" data-act="psbatch" data-k="improve">선택: AI로 다듬기(+대사)</button><button class="btn sm ghost" data-act="psbatch" data-k="talk">선택: 인연 톡 만들기</button><button class="btn sm ghost" data-act="psbatch" data-k="memo">선택: 메모리얼 만들기</button>${PS_JOB?'<button class="btn sm ghost" data-act="psstop">멈추기</button>':''}${typeof AUDIT_UNDO!=='undefined'&&AUDIT_UNDO?`<button class="btn sm ghost" data-act="psundo">되돌리기: ${esc(AUDIT_UNDO.label)}</button>`:''}</div>
-    <div class="row" style="margin-top:12px"><button class="btn ghost" data-act="close">닫기</button></div>`); }
+  <h3 class="sec">프로필 템플릿</h3><select class="in" id="ps_tpl">${[['basic','기본 (생일·신장·출신·특기)'],['org','소속 조직 (소속·직책 …)'],['operator','작전 요원 (코드네임·전투 경력·임상 소견 …)'],['fantasy','판타지 (종족·계약 …)'],['idol','아이돌 (소속사·데뷔·담당·팬덤 …)'],['streamer','스트리머 (활동명·플랫폼·구독자 애칭 …)'],['custom','직접 입력']].map(([k,l])=>`<option value="${k}" ${(cur?cur[0]:'custom')===k?'selected':''}>${l}</option>`).join('')}</select>
+  <label class="f">항목 (쉼표)</label><input class="in" id="ps_tplf" value="${esc(cfg.tpl.join(', '))}">
+  <div class="g2"><div><label class="f">인연 톡 호감도 단계 (쉼표)</label><input class="in" id="ps_aff" value="${esc(cfg.affLv.join(', '))}"></div><div><label class="f">메모리얼 호감도</label><input class="in" type="number" id="ps_memo" min="1" max="10" value="${cfg.memoLv}"></div></div>
+  <div class="row" style="margin:8px 0"><button class="btn sm" data-act="pscfg">설정 저장</button></div>
+  <h3 class="sec">검수 결과 <span class="muted" style="font-size:.8rem">(낮은 순)</span></h3>
+  <div style="max-height:280px;overflow:auto;font-size:.82rem">${L.map(({c,r})=>`<label style="display:flex;gap:6px;align-items:flex-start;padding:3px 0;border-bottom:1px solid var(--line)"><input type="checkbox" data-psc="${c.id}" ${r.score<55?'checked':''}><b style="min-width:70px">${esc(c.name)}</b><span class="badge">${r.grade} ${r.score}</span><span class="muted">${esc(r.issues.slice(0,3).map(x=>x.msg).join(' · '))}${r.issues.length>3?' …':''}</span></label>`).join('')}</div>
+  <div class="row" style="margin-top:8px;flex-wrap:wrap;gap:6px"><button class="btn sm" data-act="psbatch" data-k="fill">선택: AI로 개성 채우기</button><button class="btn sm ghost" data-act="psbatch" data-k="improve">선택: AI로 다듬기(+대사)</button><button class="btn sm ghost" data-act="psbatch" data-k="talk">선택: 인연 톡 만들기</button><button class="btn sm ghost" data-act="psbatch" data-k="memo">선택: 메모리얼 만들기</button>${PS_JOB?'<button class="btn sm ghost" data-act="psstop">멈추기</button>':''}${typeof AUDIT_UNDO!=='undefined'&&AUDIT_UNDO?`<button class="btn sm ghost" data-act="psundo">되돌리기: ${esc(AUDIT_UNDO.label)}</button>`:''}</div>
+  <div class="row" style="margin-top:12px"><button class="btn ghost" data-act="close">닫기</button></div>`); }
 
   static phNewList(){ PH=null; const list=[...new Set(G.chars.map(c=>baseChar(c)))].sort((a,b)=>(Characters.own(b.id)?1:0)-(Characters.own(a.id)?1:0)); // 새로 추가한(아직 안 뽑은) 인물도 보여요
     $('#phone').innerHTML=`<div class="phone"><div class="ph-top"><button data-act="phback" aria-label="뒤로">‹</button><b>대화 추가</b><span style="width:30px"></span></div><div class="ph-list">${
@@ -1735,10 +1735,10 @@ static imgTarget(k,id,t){ const re=f=>()=>{ Challenge.render(); f&&f(); };
 
   static openModeStage(ch,s){ const cl=!!P().cleared[s.id], first=!cl, code=ch.kind==='event'?'EV'+(ch.stages.indexOf(s)+1):Story.stageCode(s.id), d=s.debate, c=s.contest;
     CoreView.openModal(`${head(esc(code+' '+s.title),`<span class="muted">${s.mode==='debate'?'회담 · 주장 속 모순을 증거·설득으로 돌파':'콘테스트 · '+System.T('crew')+'의 매력으로 심사위원을 사로잡기'}</span>`)}
-    ${s.mode==='debate'?`<p><b>상대</b> ${esc(d.opponent)} · <b>목표</b> ${esc(d.goal||'설득')}</p><p class="muted">증거 ${d.evidence.length}개 · 라운드 ${d.rounds.length} · 신뢰도 ${d.hp}</p>`:`<p><b>${esc(c.title)}</b> · 심사위원 ${c.judges.map(j=>`${esc(j.name)}(${CHARM[j.likes]})`).join(', ')}</p><p class="muted">라운드 ${c.rounds} · 경쟁자 ${c.rivals.map(r=>esc(r.name)).join(', ')||'없음'}</p>`}
-    <h3 class="sec">${s.mode==='contest'?'출전 (최대 3명)':'함께 갈 동료 (설득에 나설 수 있어요, 최대 4명)'}</h3><div class="row" style="gap:4px;flex-wrap:wrap">${G.chars.filter(x=>Characters.own(x.id)&&!x.monster).map(x=>`<label class="chip ${P().squad.includes(x.id)?'on':''}" style="cursor:pointer"><input type="checkbox" data-mdsel="${x.id}" ${P().squad.includes(x.id)?'checked':''} hidden>${esc(x.name)}</label>`).join('')}</div>
-    <p class="muted" style="font-size:.8rem">${first?'첫 클리어 보상: ◆'+s.reward:'다시 도전할 수 있어요'}</p>
-    <div class="row"><button class="btn" data-act="mdgo" data-ch="${ch.id}" data-st="${s.id}">${s.pre&&first?'이야기 보고 시작':'시작'}</button>${cl&&s.post?`<button class="btn ghost" data-act="story" data-ch="${ch.id}" data-st="${s.id}" data-k="post">끝난 뒤 이야기</button>`:''}<button class="btn ghost" data-act="chedit" data-ch="${ch.id}">스토리 편집</button></div>`); }
+  ${s.mode==='debate'?`<p><b>상대</b> ${esc(d.opponent)} · <b>목표</b> ${esc(d.goal||'설득')}</p><p class="muted">증거 ${d.evidence.length}개 · 라운드 ${d.rounds.length} · 신뢰도 ${d.hp}</p>`:`<p><b>${esc(c.title)}</b> · 심사위원 ${c.judges.map(j=>`${esc(j.name)}(${CHARM[j.likes]})`).join(', ')}</p><p class="muted">라운드 ${c.rounds} · 경쟁자 ${c.rivals.map(r=>esc(r.name)).join(', ')||'없음'}</p>`}
+  <h3 class="sec">${s.mode==='contest'?'출전 (최대 3명)':'함께 갈 동료 (설득에 나설 수 있어요, 최대 4명)'}</h3><div class="row" style="gap:4px;flex-wrap:wrap">${G.chars.filter(x=>Characters.own(x.id)&&!x.monster).map(x=>`<label class="chip ${P().squad.includes(x.id)?'on':''}" style="cursor:pointer"><input type="checkbox" data-mdsel="${x.id}" ${P().squad.includes(x.id)?'checked':''} hidden>${esc(x.name)}</label>`).join('')}</div>
+  <p class="muted" style="font-size:.8rem">${first?'첫 클리어 보상: ◆'+s.reward:'다시 도전할 수 있어요'}</p>
+  <div class="row"><button class="btn" data-act="mdgo" data-ch="${ch.id}" data-st="${s.id}">${s.pre&&first?'이야기 보고 시작':'시작'}</button>${cl&&s.post?`<button class="btn ghost" data-act="story" data-ch="${ch.id}" data-st="${s.id}" data-k="post">끝난 뒤 이야기</button>`:''}<button class="btn ghost" data-act="chedit" data-ch="${ch.id}">스토리 편집</button></div>`); }
 
   static seasonChip(){ const s=LiveOps.seasonNow(); if(!s) return ''; const m=LiveOps.seasonMeta(s.type), d=Math.max(0,Math.ceil((s.until-Date.now())/864e5)); return `<button class="lb-season s-${esc(s.type)}" data-act="seasoninfo"><i>${m[3]}</i><b>${esc(m[1])}</b><span>D-${d}</span></button>`; }
 
@@ -1747,48 +1747,48 @@ static imgTarget(k,id,t){ const re=f=>()=>{ Challenge.render(); f&&f(); };
     if(!all.length){ if(!ask) CoreView.toast('미리 그릴 그림이 없어요. 다 준비돼 있어요'); return; }
     const c=Core.naiCfg();
     CoreView.openModal(`${head(ask?'그림을 미리 준비할까요?':'그림 준비실','<span class="muted">NovelAI로 비어 있는 그림을 차례로 그려요</span>')}
-      ${Core.imgReady()?'':`<p style="color:var(--rose)">${Core.imgNeed()}</p>`}
-      <p class="muted" style="margin:0 0 8px">게임을 하는 동안 뒤에서 한 장씩 그려서 바로 적용해요. 위쪽 진행 표시에서 언제든 멈출 수 있어요. Opus 구독이면 기본 크기 생성은 Anlas가 들지 않아요.</p>
-      <div class="prepcats">${PREP_CATS().map(([k,l,d])=>cnt(k)?`<label class="pc"><input type="checkbox" data-pc="${k}" ${d?'checked':''}><b>${esc(l)}</b><span>${cnt(k)}장</span></label>`:'').join('')}</div>
-      <div class="row" style="margin-top:14px"> ${SAMPLE&&G.chars.some(c=>c.weapon&&Characters.wpBad(c.weapon.prompt))?`<button class="btn ghost" data-act="wfixall">${System.T('weapon')} 프롬프트 정리 (${G.chars.filter(c=>c.weapon&&Characters.wpBad(c.weapon.prompt)).length})</button>`:''}<button class="btn" data-act="prepgo" ${Core.imgReady()?'':'disabled'}>준비 시작</button><button class="btn ghost" data-act="close">${ask?'나중에':'닫기'}</button>${ask?'<button class="btn ghost" data-act="prepnever">다시 묻지 않기</button>':''}</div>`);
+    ${Core.imgReady()?'':`<p style="color:var(--rose)">${Core.imgNeed()}</p>`}
+    <p class="muted" style="margin:0 0 8px">게임을 하는 동안 뒤에서 한 장씩 그려서 바로 적용해요. 위쪽 진행 표시에서 언제든 멈출 수 있어요. Opus 구독이면 기본 크기 생성은 Anlas가 들지 않아요.</p>
+    <div class="prepcats">${PREP_CATS().map(([k,l,d])=>cnt(k)?`<label class="pc"><input type="checkbox" data-pc="${k}" ${d?'checked':''}><b>${esc(l)}</b><span>${cnt(k)}장</span></label>`:'').join('')}</div>
+    <div class="row" style="margin-top:14px"> ${SAMPLE&&G.chars.some(c=>c.weapon&&Characters.wpBad(c.weapon.prompt))?`<button class="btn ghost" data-act="wfixall">${System.T('weapon')} 프롬프트 정리 (${G.chars.filter(c=>c.weapon&&Characters.wpBad(c.weapon.prompt)).length})</button>`:''}<button class="btn" data-act="prepgo" ${Core.imgReady()?'':'disabled'}>준비 시작</button><button class="btn ghost" data-act="close">${ask?'나중에':'닫기'}</button>${ask?'<button class="btn ghost" data-act="prepnever">다시 묻지 않기</button>':''}</div>`);
   }
 
   static openNewPickup(pre){ pre=pre||{};
     CoreView.openModal(`${head('신규 픽업 만들기',`<span class="muted">새 ${esc(System.T('crew'))}을(를) 구상하면 픽업 배너로 올라와요. ${esc(System.T('gacha'))}으로 데려와요.</span>`)}
-      <div class="panel" style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="muted" style="font-size:.85rem">이미 있는 ${esc(System.T('crew'))}의 확률을 올리고 싶다면</span><button class="btn sm" data-act="puexist">기존 ${esc(System.T('crew'))} 픽업</button></div>
-      <label class="f" for="pu_kind">종류</label><select class="in" id="pu_kind" onchange="document.getElementById('pu_colw').hidden=this.value!=='collab';document.getElementById('pu_altw').hidden=this.value!=='alt'">${CoreView.opt([['orig','오리지널 신규 '+System.T('crew')],['alt','이격 (기존 '+System.T('crew')+'의 다른 모습)'],['collab','콜라보 (다른 작품 캐릭터가 이 세계에 등장)']],pre.kind||'orig')}</select>
-      <div id="pu_altw" ${pre.kind==='alt'?'':'hidden'}><label class="f" for="pu_base">누구의 이격인가요?</label><select class="in" id="pu_base">${G.chars.filter(c=>!c.alt).map(c=>`<option value="${c.id}" ${pre.base===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
-        <label class="f" for="pu_canon">스토리 속 위치</label><select class="in" id="pu_canon">${CoreView.opt([['side','외전 (메인 스토리에 영향 없음 · 예: 갑자기 몸이 바뀐 황당한 소동, 수영복 휴가)'],['canon','정사 (메인 스토리로 이어짐 · 예: 과거를 극복하고 각성한 모습)']],pre.canon?'canon':'side')}</select>
-        <p class="muted" style="margin:4px 0 0;font-size:.78rem">외전 이격은 이벤트 스토리에만 나오고, 메인 스토리에서는 원래 모습으로 나와요. 정사 이격은 그 뒤 메인 스토리에서 이 모습으로 나와요. 같은 사람의 다른 모습(수영복, 정장, 각성, 과거 등)이에요. 별도의 ${esc(System.T('crew'))}로 뽑을 수 있고, 속성·역할·스킬이 달라요. 아래 칸에 테마를 적어 주세요.</p></div>
-      <div id="pu_colw" hidden><div class="g2"><div><label class="f" for="pu_src">작품 이름</label><input class="in" id="pu_src" placeholder="예: 작품 이름"></div><div><label class="f" for="pu_who">캐릭터 이름 (비우면 AI가 고르기)</label><input class="in" id="pu_who" placeholder="예: 캐릭터 이름"></div></div>
-        <p class="muted" style="margin:4px 0 0;font-size:.78rem">원작의 성인 캐릭터만 나와요. 원작에서 미성년자·학생인 캐릭터는 만들지 않아요. 개인 감상용으로만 써 주세요.</p></div>
-      <label class="f" for="pu_c">어떤 ${esc(System.T('crew'))}인가요? (설정, 성격, 외모, 무기 등 자유롭게) <span class="muted" style="font-size:.78rem">콜라보는 비워도 돼요</span></label><textarea class="in" id="pu_c" style="min-height:110px" placeholder="예: 몰락한 기사단의 마지막 단장. 말수가 적고 단 것을 좋아한다. 은발, 검은 갑옷, 대검."></textarea>
-      <div class="g2"><div><label class="f" for="pu_r">희귀도</label><select class="in" id="pu_r">${CoreView.opt([['3','SSR'],['2','SR'],['1','R'],['ai','AI가 정하기']],'3')}</select></div><div><label class="f" for="pu_lim">배너</label><select class="in" id="pu_lim">${CoreView.opt([['pickup','픽업 (상시 풀에도 들어감)'],['limited','한정 (이 배너에서만)']],'pickup')}</select></div></div>
-      <div class="g2"><div><label class="f" for="pu_ex">함께 픽업</label><select class="in" id="pu_ex" onchange="const n=+this.value;document.querySelectorAll('.pu-exr').forEach((r,i)=>r.hidden=i>=n);document.getElementById('pu_splitw').hidden=!n">${CoreView.opt([['0','없음 (1명)'],['1','+1명 (2명 픽업)'],['2','+2명 (3명 픽업)']],'0')}</select></div>
-        <div id="pu_splitw" hidden><label class="f" for="pu_split">배너 나누기</label><select class="in" id="pu_split">${CoreView.opt([['same','한 배너에 함께 (예: SSR + SR 2명)'],['split','각자 배너 (예: SSR 1차 · SSR 2차 픽업)']],'same')}</select></div></div>
-      ${[1,2].map(i=>`<div class="pu-exr g2" hidden><div><label class="f" for="pu_exr${i}">함께 ${i} 희귀도</label><select class="in" id="pu_exr${i}">${CoreView.opt([['2','SR'],['3','SSR'],['1','R']],'2')}</select></div><div><label class="f" for="pu_exc${i}">함께 ${i} 설정 (비우면 AI가 어울리게)</label><input class="in" id="pu_exc${i}" placeholder="예: 주인공의 부관, 쌍검을 쓰는 쾌활한 사람"></div></div>`).join('')}
-      ${SAMPLE?`<label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="pu_story" checked><span>픽업 스토리도 같이 만들기 <span class="muted" style="font-size:.8rem">(이 ${esc(System.T('crew'))}이(가) 주인공인 짧은 이벤트 3화 · 몇 분 걸려요)</span></span></label>`:''}
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="newpu-ai" ${SAMPLE?'':'disabled'}>AI로 구상해서 올리기</button><button class="btn ghost" data-act="newpu-hand">직접 설정 입력</button></div>
-      ${SAMPLE?'':'<p class="muted">AI로 구상하려면 설정 → 글 AI를 먼저 등록해 주세요.</p>'}`);
+    <div class="panel" style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="muted" style="font-size:.85rem">이미 있는 ${esc(System.T('crew'))}의 확률을 올리고 싶다면</span><button class="btn sm" data-act="puexist">기존 ${esc(System.T('crew'))} 픽업</button></div>
+    <label class="f" for="pu_kind">종류</label><select class="in" id="pu_kind" onchange="document.getElementById('pu_colw').hidden=this.value!=='collab';document.getElementById('pu_altw').hidden=this.value!=='alt'">${CoreView.opt([['orig','오리지널 신규 '+System.T('crew')],['alt','이격 (기존 '+System.T('crew')+'의 다른 모습)'],['collab','콜라보 (다른 작품 캐릭터가 이 세계에 등장)']],pre.kind||'orig')}</select>
+    <div id="pu_altw" ${pre.kind==='alt'?'':'hidden'}><label class="f" for="pu_base">누구의 이격인가요?</label><select class="in" id="pu_base">${G.chars.filter(c=>!c.alt).map(c=>`<option value="${c.id}" ${pre.base===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+      <label class="f" for="pu_canon">스토리 속 위치</label><select class="in" id="pu_canon">${CoreView.opt([['side','외전 (메인 스토리에 영향 없음 · 예: 갑자기 몸이 바뀐 황당한 소동, 수영복 휴가)'],['canon','정사 (메인 스토리로 이어짐 · 예: 과거를 극복하고 각성한 모습)']],pre.canon?'canon':'side')}</select>
+      <p class="muted" style="margin:4px 0 0;font-size:.78rem">외전 이격은 이벤트 스토리에만 나오고, 메인 스토리에서는 원래 모습으로 나와요. 정사 이격은 그 뒤 메인 스토리에서 이 모습으로 나와요. 같은 사람의 다른 모습(수영복, 정장, 각성, 과거 등)이에요. 별도의 ${esc(System.T('crew'))}로 뽑을 수 있고, 속성·역할·스킬이 달라요. 아래 칸에 테마를 적어 주세요.</p></div>
+    <div id="pu_colw" hidden><div class="g2"><div><label class="f" for="pu_src">작품 이름</label><input class="in" id="pu_src" placeholder="예: 작품 이름"></div><div><label class="f" for="pu_who">캐릭터 이름 (비우면 AI가 고르기)</label><input class="in" id="pu_who" placeholder="예: 캐릭터 이름"></div></div>
+      <p class="muted" style="margin:4px 0 0;font-size:.78rem">원작의 성인 캐릭터만 나와요. 원작에서 미성년자·학생인 캐릭터는 만들지 않아요. 개인 감상용으로만 써 주세요.</p></div>
+    <label class="f" for="pu_c">어떤 ${esc(System.T('crew'))}인가요? (설정, 성격, 외모, 무기 등 자유롭게) <span class="muted" style="font-size:.78rem">콜라보는 비워도 돼요</span></label><textarea class="in" id="pu_c" style="min-height:110px" placeholder="예: 몰락한 기사단의 마지막 단장. 말수가 적고 단 것을 좋아한다. 은발, 검은 갑옷, 대검."></textarea>
+    <div class="g2"><div><label class="f" for="pu_r">희귀도</label><select class="in" id="pu_r">${CoreView.opt([['3','SSR'],['2','SR'],['1','R'],['ai','AI가 정하기']],'3')}</select></div><div><label class="f" for="pu_lim">배너</label><select class="in" id="pu_lim">${CoreView.opt([['pickup','픽업 (상시 풀에도 들어감)'],['limited','한정 (이 배너에서만)']],'pickup')}</select></div></div>
+    <div class="g2"><div><label class="f" for="pu_ex">함께 픽업</label><select class="in" id="pu_ex" onchange="const n=+this.value;document.querySelectorAll('.pu-exr').forEach((r,i)=>r.hidden=i>=n);document.getElementById('pu_splitw').hidden=!n">${CoreView.opt([['0','없음 (1명)'],['1','+1명 (2명 픽업)'],['2','+2명 (3명 픽업)']],'0')}</select></div>
+      <div id="pu_splitw" hidden><label class="f" for="pu_split">배너 나누기</label><select class="in" id="pu_split">${CoreView.opt([['same','한 배너에 함께 (예: SSR + SR 2명)'],['split','각자 배너 (예: SSR 1차 · SSR 2차 픽업)']],'same')}</select></div></div>
+    ${[1,2].map(i=>`<div class="pu-exr g2" hidden><div><label class="f" for="pu_exr${i}">함께 ${i} 희귀도</label><select class="in" id="pu_exr${i}">${CoreView.opt([['2','SR'],['3','SSR'],['1','R']],'2')}</select></div><div><label class="f" for="pu_exc${i}">함께 ${i} 설정 (비우면 AI가 어울리게)</label><input class="in" id="pu_exc${i}" placeholder="예: 주인공의 부관, 쌍검을 쓰는 쾌활한 사람"></div></div>`).join('')}
+    ${SAMPLE?`<label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="pu_story" checked><span>픽업 스토리도 같이 만들기 <span class="muted" style="font-size:.8rem">(이 ${esc(System.T('crew'))}이(가) 주인공인 짧은 이벤트 3화 · 몇 분 걸려요)</span></span></label>`:''}
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="newpu-ai" ${SAMPLE?'':'disabled'}>AI로 구상해서 올리기</button><button class="btn ghost" data-act="newpu-hand">직접 설정 입력</button></div>
+    ${SAMPLE?'':'<p class="muted">AI로 구상하려면 설정 → 글 AI를 먼저 등록해 주세요.</p>'}`);
   }
 
   static openPickExisting(pre){ if(pre||!PUX) PUX={ids:pre&&charById(pre)?[pre]:[],name:'',story:false}; const sn=LiveOps.seasonNow(), ids=PUX.ids, cs=G.chars.slice().sort((a,b)=>b.rarity-a.rarity);
     CoreView.openModal(`${head(System.T('crew')+' 픽업',`<span class="muted">이미 있는 ${esc(System.T('crew'))}의 확률을 올린 배너를 열어요</span>`)}
-      <label class="f">픽업할 ${esc(System.T('crew'))} <span class="muted" style="font-size:.78rem">(최대 3명 · 처음 고른 ${esc(System.T('crew'))}가 주인공)</span></label>
-      <div class="chips">${cs.map(c=>{ const i=ids.indexOf(c.id); return `<button class="chip ${i>=0?'on':''}" data-act="puxpick" data-id="${c.id}">${i>=0?(i+1)+'. ':''}${RL[c.rarity]} ${esc(c.name)}${c.limited?' · 한정':''}</button>`; }).join('')}</div>
-      <label class="f" for="pux_name">배너 이름 <span class="muted" style="font-size:.78rem">(비우면 자동)</span></label><input class="in" id="pux_name" value="${esc(PUX.name||'')}" placeholder="${esc(Core.puxNames()||'예: 세라 픽업')}">
-      <div class="g2"><div><label class="f" for="pux_days">기간</label><select class="in" id="pux_days">${CoreView.opt([...(sn?[['season','이번 시즌 끝까지']]:[]),['7','7일'],['14','14일'],['0','계속 (직접 닫을 때까지)']],PUX.days||(sn?'season':'14'))}</select></div>
-        <div><label class="f" for="pux_rate">픽업 확률</label><select class="in" id="pux_rate">${CoreView.opt([['50','50% (기본)'],['70','70%'],['100','100% (그 등급이 나오면 무조건)']],PUX.rate||'50')}</select></div></div>
-      ${SAMPLE?`<label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="pux_story" ${PUX.story?'checked':''}><span>픽업 스토리도 같이 만들기 <span class="muted" style="font-size:.8rem">(주인공 ${esc(System.T('crew'))}의 짧은 이벤트 3화 · 몇 분 걸려요)</span></span></label>`:''}
-      <p class="muted" style="font-size:.8rem;margin:8px 0 0">같은 ${esc(System.T('crew'))}의 지난 픽업 배너가 있으면 그 배너를 다시 열어요(복각). 한정 ${esc(System.T('crew'))}도 이 배너에서는 나와요. 기간이 끝나면 배너가 닫혀요.</p>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="puxgo" ${ids.length?'':'disabled'}>픽업 열기</button><button class="btn ghost" data-act="close">취소</button></div>`); }
+    <label class="f">픽업할 ${esc(System.T('crew'))} <span class="muted" style="font-size:.78rem">(최대 3명 · 처음 고른 ${esc(System.T('crew'))}가 주인공)</span></label>
+    <div class="chips">${cs.map(c=>{ const i=ids.indexOf(c.id); return `<button class="chip ${i>=0?'on':''}" data-act="puxpick" data-id="${c.id}">${i>=0?(i+1)+'. ':''}${RL[c.rarity]} ${esc(c.name)}${c.limited?' · 한정':''}</button>`; }).join('')}</div>
+    <label class="f" for="pux_name">배너 이름 <span class="muted" style="font-size:.78rem">(비우면 자동)</span></label><input class="in" id="pux_name" value="${esc(PUX.name||'')}" placeholder="${esc(Core.puxNames()||'예: 세라 픽업')}">
+    <div class="g2"><div><label class="f" for="pux_days">기간</label><select class="in" id="pux_days">${CoreView.opt([...(sn?[['season','이번 시즌 끝까지']]:[]),['7','7일'],['14','14일'],['0','계속 (직접 닫을 때까지)']],PUX.days||(sn?'season':'14'))}</select></div>
+      <div><label class="f" for="pux_rate">픽업 확률</label><select class="in" id="pux_rate">${CoreView.opt([['50','50% (기본)'],['70','70%'],['100','100% (그 등급이 나오면 무조건)']],PUX.rate||'50')}</select></div></div>
+    ${SAMPLE?`<label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="pux_story" ${PUX.story?'checked':''}><span>픽업 스토리도 같이 만들기 <span class="muted" style="font-size:.8rem">(주인공 ${esc(System.T('crew'))}의 짧은 이벤트 3화 · 몇 분 걸려요)</span></span></label>`:''}
+    <p class="muted" style="font-size:.8rem;margin:8px 0 0">같은 ${esc(System.T('crew'))}의 지난 픽업 배너가 있으면 그 배너를 다시 열어요(복각). 한정 ${esc(System.T('crew'))}도 이 배너에서는 나와요. 기간이 끝나면 배너가 닫혀요.</p>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="puxgo" ${ids.length?'':'disabled'}>픽업 열기</button><button class="btn ghost" data-act="close">취소</button></div>`); }
 
     /* 캐릭터만 추가(픽업 배너 없이): 상시 뽑기에 넣거나 바로 내 ${'캐릭터'}로 */
 static openAddChar(){ CoreView.openModal(`${head(System.T('crew')+' 추가',`<span class="muted">픽업 배너 없이 캐릭터만 만들어요</span>`)}
-      <label class="f" for="ac_c">어떤 ${esc(System.T('crew'))}인가요?</label><textarea class="in" id="ac_c" placeholder="예: 과묵한 정비공, 은발 단발, 렌치를 무기로 씀"></textarea>
-      <div class="g2"><div><label class="f" for="ac_r">등급</label><select class="in" id="ac_r">${CoreView.opt([['1','R'],['2','SR'],['3','SSR'],['ai','AI가 정하기']],'2')}</select></div>
-      <div><label class="f" for="ac_how">얻는 방법</label><select class="in" id="ac_how">${CoreView.opt([['std','상시 뽑기에 추가'],['own','바로 내 '+System.T('crew')+'로']],'std')}</select></div></div>
-      <div class="row" style="margin-top:12px">${SAMPLE?`<button class="btn" data-act="addchar-ai">AI로 만들기</button>`:''}<button class="btn ghost" data-act="addchar-hand">직접 만들기</button></div>`); }
+    <label class="f" for="ac_c">어떤 ${esc(System.T('crew'))}인가요?</label><textarea class="in" id="ac_c" placeholder="예: 과묵한 정비공, 은발 단발, 렌치를 무기로 씀"></textarea>
+    <div class="g2"><div><label class="f" for="ac_r">등급</label><select class="in" id="ac_r">${CoreView.opt([['1','R'],['2','SR'],['3','SSR'],['ai','AI가 정하기']],'2')}</select></div>
+    <div><label class="f" for="ac_how">얻는 방법</label><select class="in" id="ac_how">${CoreView.opt([['std','상시 뽑기에 추가'],['own','바로 내 '+System.T('crew')+'로']],'std')}</select></div></div>
+    <div class="row" style="margin-top:12px">${SAMPLE?`<button class="btn" data-act="addchar-ai">AI로 만들기</button>`:''}<button class="btn ghost" data-act="addchar-hand">직접 만들기</button></div>`); }
 
     /* 가챠 컷인 닫기(View) */
 static gachaCutHide(el){ el.remove(); }
@@ -1796,19 +1796,19 @@ static gachaCutHide(el){ el.remove(); }
   static crewHTML(){
     const busy=busyIds(), list=[...G.chars].sort((a,b)=>(Characters.own(b.id)?1:0)-(Characters.own(a.id)?1:0)||b.rarity-a.rarity||(a.ord||0)-(b.ord||0));
     return `${pageHead(System.T('crew'),'UNITS')}<div class="chap"><span class="muted">${G.chars.filter(c=>Characters.own(c.id)).length} / ${G.chars.length}</span><div class="row"><button class="btn sm ghost" data-act="addchar-open">＋ ${esc(System.T('crew'))} 추가</button><button class="btn sm" data-act="newpu">✦ 신규 픽업 만들기</button><button class="btn sm ghost" data-act="castfaces">😊 표정 한꺼번에 만들기</button></div></div>
-    <div class="grid">${list.map(c=>{const o=Characters.own(c.id);return `<button class="cc r${c.rarity} ${o?'':'off'}" data-act="char" data-id="${c.id}">${CoreView.art(c)}<span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${o&&o.dup?`<span class="dup">${'★'.repeat(o.dup)}</span>`:''}${busy.has(c.id)?'<span class="busy">파견 중</span>':''}<span class="lbl"><i>${RL[c.rarity]} · ${ROLE_EN[c.role]}</i><b>${esc(c.name)}</b>${o?`Lv.${o.lv}`:'미보유'}</span></button>`;}).join('')}</div>`;
+  <div class="grid">${list.map(c=>{const o=Characters.own(c.id);return `<button class="cc r${c.rarity} ${o?'':'off'}" data-act="char" data-id="${c.id}">${CoreView.art(c)}<span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${o&&o.dup?`<span class="dup">${'★'.repeat(o.dup)}</span>`:''}${busy.has(c.id)?'<span class="busy">파견 중</span>':''}<span class="lbl"><i>${RL[c.rarity]} · ${ROLE_EN[c.role]}</i><b>${esc(c.name)}</b>${o?`Lv.${o.lv}`:'미보유'}</span></button>`;}).join('')}</div>`;
   }
 
   static renderVoice(msg){
     const c=charById(VS.cid);
     CoreView.openModal(`${head(`${esc(c.name)} 목소리`,`<span class="muted">현재: ${c.voiceId?esc(c.voiceName||c.voiceId):'없음'}</span>`)}
-      <label class="f" for="vs_q">검색어 (음성 제목)</label><input class="in" id="vs_q" value="${esc(VS.q)}" placeholder="예: 누나, お姉さん, calm female">
-      <div class="g2"><div><label class="f" for="vs_lang">언어</label><select class="in" id="vs_lang">${CoreView.opt([['ko','한국어'],['ja','일본어'],['en','영어'],['','전체']],VS.lang)}</select></div>
-      <div style="display:flex;align-items:flex-end;gap:6px"><button class="btn sm" data-act="vsearch">검색</button><button class="btn sm ghost" data-act="vsai">AI 추천</button></div></div>
-      <label class="f" for="vs_id">또는 보이스 ID나 fish.audio 주소를 직접 입력</label><div class="row"><input class="in" id="vs_id" style="flex:3" placeholder="https://fish.audio/m/..."><button class="btn sm ghost" data-act="vsetid">적용</button></div>
-      ${msg?`<p class="muted">${esc(msg)}</p>`:''}
-      <div style="margin-top:8px">${VS.results.map(MiscView.voiceRow).join('')}</div>
-      ${c.voiceId?`<div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="vclear" data-id="${c.id}">목소리 해제</button></div>`:''}`);
+    <label class="f" for="vs_q">검색어 (음성 제목)</label><input class="in" id="vs_q" value="${esc(VS.q)}" placeholder="예: 누나, お姉さん, calm female">
+    <div class="g2"><div><label class="f" for="vs_lang">언어</label><select class="in" id="vs_lang">${CoreView.opt([['ko','한국어'],['ja','일본어'],['en','영어'],['','전체']],VS.lang)}</select></div>
+    <div style="display:flex;align-items:flex-end;gap:6px"><button class="btn sm" data-act="vsearch">검색</button><button class="btn sm ghost" data-act="vsai">AI 추천</button></div></div>
+    <label class="f" for="vs_id">또는 보이스 ID나 fish.audio 주소를 직접 입력</label><div class="row"><input class="in" id="vs_id" style="flex:3" placeholder="https://fish.audio/m/..."><button class="btn sm ghost" data-act="vsetid">적용</button></div>
+    ${msg?`<p class="muted">${esc(msg)}</p>`:''}
+    <div style="margin-top:8px">${VS.results.map(MiscView.voiceRow).join('')}</div>
+    ${c.voiceId?`<div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="vclear" data-id="${c.id}">목소리 해제</button></div>`:''}`);
   }
 
   static settingsNavigate(next){if(next&&!STTAB)STROOTSCROLL=$('#view').scrollTop;STTAB=next||'';Challenge.render();$('#view').scrollTop=STTAB?0:STROOTSCROLL;}
@@ -1854,32 +1854,32 @@ static csTabShow(){ document.querySelectorAll('.cs-tabs button').forEach(b=>Core
     const c=id?charById(id):Characters.cleanChar({name:''});
     const kv=o=>Object.entries(o||{}).flatMap(([k,v])=>(v||[]).map(x=>`${k}: ${x}`)).join('\n');
     CoreView.openModal(`${head(id?'설정 편집':'새 '+System.T('crew'))}
-      <div class="g2"><div><label class="f" for="f_name">이름</label><input class="in" id="f_name" value="${esc(c.name)}" maxlength="20"></div>
-      <div><label class="f" for="f_fac">소속</label><input class="in" id="f_fac" value="${esc(c.faction)}" list="faclist"><datalist id="faclist">${[...new Set(G.chars.map(x=>x.faction).filter(Boolean))].map(f=>`<option value="${esc(f)}">`).join('')}</datalist></div></div>
-      <div class="g2"><div><label class="f" for="f_rar">등급</label><select class="in" id="f_rar">${CoreView.opt([[3,'SSR'],[2,'SR'],[1,'R']],c.rarity)}</select></div>
-      <div><label class="f" for="f_pos">포지션 <span class="muted" style="font-size:.75rem">(전투 기본형)</span></label><select class="in" id="f_pos">${CoreView.opt(Rules.POSITIONS().map(p=>[p.id,`${p.name} (${ROLE[p.base]}형)`]),Core.posOf(c).id)}</select></div></div>
-      <div class="g2"><div><label class="f" for="f_elem">속성</label><select class="in" id="f_elem">${CoreView.opt(ELEMS.map(elem=>[elem,elem]),c.elem)}</select></div>
-      <div><label class="f" for="f_lim">한정 여부</label><select class="in" id="f_lim">${CoreView.opt([['0','상시'],['1','한정 (이벤트 배너에서만)']],c.limited?'1':'0')}</select></div></div>
-      <div class="g4"><div><label class="f" for="f_hp">기본 체력</label><input class="in" id="f_hp" type="number" value="${c.hp}"></div><div><label class="f" for="f_atk">공격</label><input class="in" id="f_atk" type="number" value="${c.atk}"></div><div><label class="f" for="f_def">기본 방어력</label><input class="in" id="f_def" type="number" value="${c.def}"></div><div><label class="f" for="f_spd">속도</label><input class="in" id="f_spd" type="number" value="${c.spd}"></div></div>
-      <p class="muted">아래는 심연탐사 호환용 스킬입니다. 일반 전투 스킬은 캐릭터 상세의 「일반 전투 스킬 편집 · AI 생성」에서 설정하세요.</p>
-      <div class="g2"><div><label class="f" for="f_sk">심연탐사 스킬 이름</label><input class="in" id="f_sk" value="${esc(c.skill.name)}"></div><div><label class="f" for="f_kind">스킬 효과</label><select class="in" id="f_kind">${CoreView.opt(Object.entries(KIND),c.skill.kind)}</select></div></div>
-      <div class="g2"><div><label class="f" for="f_pow">위력 배율</label><input class="in" id="f_pow" type="number" step="0.1" value="${c.skill.power}"></div><div><label class="f" for="f_cd">쿨타임(턴)</label><input class="in" id="f_cd" type="number" value="${c.skill.cd}"></div></div>
-      <label class="f" for="f_skd">스킬 설명</label><input class="in" id="f_skd" value="${esc(c.skill.desc)}">
-      <label class="f" for="f_prof">프로필</label><textarea class="in" id="f_prof">${esc(c.profile)}</textarea>
-      <label class="f" for="f_files">${System.T('files')} (한 줄에 하나, "${System.T('limit')}단계: 내용")</label><textarea class="in" id="f_files">${esc(c.files.map(f=>f.dup+': '+f.text).join('\n'))}</textarea>
-      <label class="f" for="f_intro">${System.T('gacha')} 연출 대사</label><input class="in" id="f_intro" value="${esc(c.intro)}">
-      <label class="f" for="f_lines">로비 대사 (한 줄에 하나)</label><textarea class="in" id="f_lines">${esc(c.lines.join('\n'))}</textarea>
-      <label class="f" for="f_aff">호감도별 대사 ("레벨: 대사", 그 레벨부터 로비에 섞여 나와요)</label><textarea class="in" id="f_aff">${esc(kv(c.affLines))}</textarea>
-      <div class="g2"><div><label class="f" for="f_lv">${System.T('enhance')} 대사</label><textarea class="in" id="f_lv">${esc(c.lvLines.join('\n'))}</textarea></div><div><label class="f" for="f_dup">${System.T('limit')} 대사</label><textarea class="in" id="f_dup">${esc(c.dupLines.join('\n'))}</textarea></div></div>
-      <div class="g2"><div><label class="f" for="f_head">머리 터치 반응</label><textarea class="in" id="f_head">${esc(c.touch.head.join('\n'))}</textarea></div><div><label class="f" for="f_body">몸 터치 반응</label><textarea class="in" id="f_body">${esc(c.touch.body.join('\n'))}</textarea></div></div>
-      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="ailines">AI로 대사 채우기</button><button class="btn sm ghost" data-act="ailinesmore">AI로 대사 늘리기 (지금 대사에 더해요)</button></div>
-      <div class="g2"><div><label class="f" for="f_wn">${System.T('weapon')} 이름</label><input class="in" id="f_wn" value="${esc(c.weapon.name)}"></div><div><label class="f" for="f_wd">${System.T('weapon')} 설명</label><input class="in" id="f_wd" value="${esc(c.weapon.desc)}"></div></div>
-      <label class="f" for="f_wp">${System.T('weapon')} NAI 프롬프트</label><textarea class="in" id="f_wp" data-owner="${c.id}">${esc(c.weapon.prompt)}</textarea>
-      ${id?`<div class="row" style="margin-top:6px">${SAMPLE?`<button class="btn sm ghost" data-act="wai" data-id="${c.id}">AI로 ${System.T('weapon')} 프롬프트 쓰기</button>`:''}<button class="btn sm ghost" data-act="wnai" data-id="${c.id}">NAI로 ${System.T('weapon')} 그리기</button></div>`:''}
-      <label class="f" for="f_nai">NAI 스탠딩 프롬프트</label><textarea class="in" id="f_nai" data-owner="${c.id}">${esc(c.naiPrompt)}</textarea>
-      <label class="f" style="margin-top:6px"><input type="checkbox" id="f_nodesign" ${c.noDesign?'checked':''}> 공통 디자인 태그 쓰지 않기 <span class="muted" style="font-size:.78rem">(설정 → 그림 AI → 캐릭터 디자인 통일)</span></label>
-      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="ainai">AI로 NAI 프롬프트 쓰기</button></div>
-      <div class="row" style="margin-top:16px"><button class="btn" data-act="savechar" data-id="${id||''}">저장</button>${id?`<button class="btn ghost" data-act="delchar" data-id="${c.id}">삭제</button>`:''}</div>`);
+    <div class="g2"><div><label class="f" for="f_name">이름</label><input class="in" id="f_name" value="${esc(c.name)}" maxlength="20"></div>
+    <div><label class="f" for="f_fac">소속</label><input class="in" id="f_fac" value="${esc(c.faction)}" list="faclist"><datalist id="faclist">${[...new Set(G.chars.map(x=>x.faction).filter(Boolean))].map(f=>`<option value="${esc(f)}">`).join('')}</datalist></div></div>
+    <div class="g2"><div><label class="f" for="f_rar">등급</label><select class="in" id="f_rar">${CoreView.opt([[3,'SSR'],[2,'SR'],[1,'R']],c.rarity)}</select></div>
+    <div><label class="f" for="f_pos">포지션 <span class="muted" style="font-size:.75rem">(전투 기본형)</span></label><select class="in" id="f_pos">${CoreView.opt(Rules.POSITIONS().map(p=>[p.id,`${p.name} (${ROLE[p.base]}형)`]),Core.posOf(c).id)}</select></div></div>
+    <div class="g2"><div><label class="f" for="f_elem">속성</label><select class="in" id="f_elem">${CoreView.opt(ELEMS.map(elem=>[elem,elem]),c.elem)}</select></div>
+    <div><label class="f" for="f_lim">한정 여부</label><select class="in" id="f_lim">${CoreView.opt([['0','상시'],['1','한정 (이벤트 배너에서만)']],c.limited?'1':'0')}</select></div></div>
+    <div class="g4"><div><label class="f" for="f_hp">기본 체력</label><input class="in" id="f_hp" type="number" value="${c.hp}"></div><div><label class="f" for="f_atk">공격</label><input class="in" id="f_atk" type="number" value="${c.atk}"></div><div><label class="f" for="f_def">기본 방어력</label><input class="in" id="f_def" type="number" value="${c.def}"></div><div><label class="f" for="f_spd">속도</label><input class="in" id="f_spd" type="number" value="${c.spd}"></div></div>
+    <p class="muted">아래는 심연탐사 호환용 스킬입니다. 일반 전투 스킬은 캐릭터 상세의 「일반 전투 스킬 편집 · AI 생성」에서 설정하세요.</p>
+    <div class="g2"><div><label class="f" for="f_sk">심연탐사 스킬 이름</label><input class="in" id="f_sk" value="${esc(c.skill.name)}"></div><div><label class="f" for="f_kind">스킬 효과</label><select class="in" id="f_kind">${CoreView.opt(Object.entries(KIND),c.skill.kind)}</select></div></div>
+    <div class="g2"><div><label class="f" for="f_pow">위력 배율</label><input class="in" id="f_pow" type="number" step="0.1" value="${c.skill.power}"></div><div><label class="f" for="f_cd">쿨타임(턴)</label><input class="in" id="f_cd" type="number" value="${c.skill.cd}"></div></div>
+    <label class="f" for="f_skd">스킬 설명</label><input class="in" id="f_skd" value="${esc(c.skill.desc)}">
+    <label class="f" for="f_prof">프로필</label><textarea class="in" id="f_prof">${esc(c.profile)}</textarea>
+    <label class="f" for="f_files">${System.T('files')} (한 줄에 하나, "${System.T('limit')}단계: 내용")</label><textarea class="in" id="f_files">${esc(c.files.map(f=>f.dup+': '+f.text).join('\n'))}</textarea>
+    <label class="f" for="f_intro">${System.T('gacha')} 연출 대사</label><input class="in" id="f_intro" value="${esc(c.intro)}">
+    <label class="f" for="f_lines">로비 대사 (한 줄에 하나)</label><textarea class="in" id="f_lines">${esc(c.lines.join('\n'))}</textarea>
+    <label class="f" for="f_aff">호감도별 대사 ("레벨: 대사", 그 레벨부터 로비에 섞여 나와요)</label><textarea class="in" id="f_aff">${esc(kv(c.affLines))}</textarea>
+    <div class="g2"><div><label class="f" for="f_lv">${System.T('enhance')} 대사</label><textarea class="in" id="f_lv">${esc(c.lvLines.join('\n'))}</textarea></div><div><label class="f" for="f_dup">${System.T('limit')} 대사</label><textarea class="in" id="f_dup">${esc(c.dupLines.join('\n'))}</textarea></div></div>
+    <div class="g2"><div><label class="f" for="f_head">머리 터치 반응</label><textarea class="in" id="f_head">${esc(c.touch.head.join('\n'))}</textarea></div><div><label class="f" for="f_body">몸 터치 반응</label><textarea class="in" id="f_body">${esc(c.touch.body.join('\n'))}</textarea></div></div>
+    <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="ailines">AI로 대사 채우기</button><button class="btn sm ghost" data-act="ailinesmore">AI로 대사 늘리기 (지금 대사에 더해요)</button></div>
+    <div class="g2"><div><label class="f" for="f_wn">${System.T('weapon')} 이름</label><input class="in" id="f_wn" value="${esc(c.weapon.name)}"></div><div><label class="f" for="f_wd">${System.T('weapon')} 설명</label><input class="in" id="f_wd" value="${esc(c.weapon.desc)}"></div></div>
+    <label class="f" for="f_wp">${System.T('weapon')} NAI 프롬프트</label><textarea class="in" id="f_wp" data-owner="${c.id}">${esc(c.weapon.prompt)}</textarea>
+    ${id?`<div class="row" style="margin-top:6px">${SAMPLE?`<button class="btn sm ghost" data-act="wai" data-id="${c.id}">AI로 ${System.T('weapon')} 프롬프트 쓰기</button>`:''}<button class="btn sm ghost" data-act="wnai" data-id="${c.id}">NAI로 ${System.T('weapon')} 그리기</button></div>`:''}
+    <label class="f" for="f_nai">NAI 스탠딩 프롬프트</label><textarea class="in" id="f_nai" data-owner="${c.id}">${esc(c.naiPrompt)}</textarea>
+    <label class="f" style="margin-top:6px"><input type="checkbox" id="f_nodesign" ${c.noDesign?'checked':''}> 공통 디자인 태그 쓰지 않기 <span class="muted" style="font-size:.78rem">(설정 → 그림 AI → 캐릭터 디자인 통일)</span></label>
+    <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="ainai">AI로 NAI 프롬프트 쓰기</button></div>
+    <div class="row" style="margin-top:16px"><button class="btn" data-act="savechar" data-id="${id||''}">저장</button>${id?`<button class="btn ghost" data-act="delchar" data-id="${c.id}">삭제</button>`:''}</div>`);
   }
 
   static async openFormation(stage,ctx,startAct){
@@ -1897,56 +1897,56 @@ static csTabShow(){ document.querySelectorAll('.cs-tabs button').forEach(b=>Core
       return `<button class="fslot r${c.rarity} ${rw?'rowbad':''}" title="${esc(rw)}" data-act="fpick" data-id="${c.id}" style="--ec:${ECOL[c.elem]}"><div class="fs-art">${CoreView.art(c)}</div><span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${Rules.formOn()?`<em class="rgi" title="${RANGE[Core.charRange(c)]}">${RANGE_ICO[Core.charRange(c)]}</em>`:''}${rw?`<em class="rww">${esc(rw)}</em>`:''}${m.good>m.bad?'<em class="adv">유리</em>':m.bad>m.good?'<em class="dis">불리</em>':''}<div class="fs-t"><b>${esc(c.name)}</b><span>Lv.${o.lv} · ${esc(ROLE[c.role])}</span><span class="pw">${nf(charPower(c))}</span></div></button>`;};
     const head2=FORM.ctx.kind==='tower'?`<span class="muted">첫 돌파 보상: ${Core.rewardText(Core.towerReward(FORM.ctx.floor))}</span>`:FORM.ctx.kind==='raid'?`<span class="muted">이번 주 누적 피해로 보상을 받아요 · 오늘 ${Challenge.raidTriesLeft()}/3</span>`:FORM.ctx.kind==='rogue'?`<span class="muted">이 4명으로 끝까지 가요. 체력은 이어져요.</span>`:FORM.ctx.kind==='farm'?`<span class="muted">보상: ${Core.rewardText(Core.farmReward(stage.farm.key,stage.farm.lv))}</span>`:FORM.ctx.kind==='event'?`<span class="muted">이벤트 스테이지</span>`:`<span class="muted">보상 ◆${nf(stage.reward)}${P().cleared[stage.id]?'':' (첫 클리어 2배)'}</span>`;
     CoreView.openModal(`${head(esc(FORM.ctx.code?FORM.ctx.code+' ':'')+esc(stage.title),head2)}
-      <div class="fenemy">${en.map(e=>`<div class="fe ${e.boss?'boss':''}" style="--ec:${ECOL[e.elem]}"><div class="fe-art">${CharactersView.enemyArt(e)}</div><span class="el" style="--ec:${ECOL[e.elem]}">${esc(e.elem)}</span><b>${esc(e.name)}</b><span>${e.boss?'BOSS · ':''}${nf(e.hp)}</span></div>`).join('')}</div>
-      ${stage.enemies.length&&!stage.story?CharactersView.rulesHTML(stage):''}
-      ${en.filter(e=>e.boss).map(e=>`<p class="boss-pat"><b>보스 패턴</b> ${esc(e.name)}: ${esc(Core.bossPatText(e,FORM.ctx.kind==='raid'))}</p>`).join('')}
-      <p class="muted" style="margin:6px 0 0">적 속성: ${Object.entries(elemCount).map(([k,v])=>`${esc(k)}×${v}`).join(' ')} → ${Object.keys(elemCount).map(k=>{const w=ELEMS.find(elem=>BEATS[elem]===k);return w?`<b style="color:${ECOL[w]}">${esc(w)}</b> 유리`:'';}).filter(Boolean).join(', ')}</p>
-      <div class="fpower"><div><i>편성 능력치 <small style="opacity:.7">상성 반영</small></i><b class="${ratio>=1?'ok':ratio>=0.8?'warn':'bad'}">${nf(tp)}</b>${tp!==tp0?`<small class="muted" style="display:block;font-size:.7rem">기본 ${nf(tp0)}</small>`:''}</div><div><i>적 능력치 (참고)</i><b>${nf(need)}</b></div><div class="fbar"><span style="width:${Math.min(100,ratio*100)}%" class="${ratio>=1?'ok':ratio>=0.8?'warn':'bad'}"></span></div></div>
-      <div class="frow"><i>전열</i><i>후열</i></div><div class="fslots">${[0,1,2,3].map(slot).join('')}</div>
-      <p class="muted" style="margin:4px 0 0">${Rules.formOn()?esc(Core.formHelp()):'전열은 적의 공격을 두 배로 더 받아요. 방어형은 어디에 있든 공격을 끌어요.'}</p>
-      ${Object.keys(fb).length?`<p class="fbonus">${Object.entries(fb).map(([f,v])=>`${esc(f)} 소속 보너스 공격 +${v}%`).join(' · ')}</p>`:`<p class="muted" style="margin:6px 0 0">같은 소속 2명 이상이면 공격 보너스 (2명 5%, 3명 10%, 4명 15%)</p>`}
-      <div class="row" style="margin-top:8px"><button class="btn sm" data-act="fauto">자동 편성</button><button class="btn sm ghost" data-act="fclear">비우기</button>${[0,1,2].map(i=>{const pr=(P().presets||[])[i];return `<button class="btn sm ghost" data-act="fpre" data-i="${i}">${pr&&pr.length?'편성 '+(i+1):'빈 '+(i+1)}</button>`;}).join('')}<button class="btn sm ghost" data-act="fsave">현재 편성 저장</button></div>
-      <div class="ftools"><div class="chips">${[['all','전체'],...ELEMS.map(elem=>[elem,elem]),...Object.entries(ROLE)].map(([v,l])=>`<button class="chip ${FORM.filter===v?'on':''}" data-act="ffil" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div>
-        <select class="in" id="fsort" style="max-width:120px">${CoreView.opt([['power','전투력순'],['lv','레벨순'],['match','상성순']],FORM.sort)}</select></div>
-      <div class="froster">${list.map(c=>{const on=squadSel.includes(c.id),b=busy.has(c.id),m=Characters.matchup(c,en);return `<button class="fr r${c.rarity} ${on?'on':''} ${b?'busy':''}" data-act="fpick" data-id="${c.id}" ${b?'disabled':''} style="--ec:${ECOL[c.elem]}"><div class="fr-art">${CoreView.art(c)}</div><span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${b?'<em class="busy">파견</em>':m.good>m.bad?'<em class="adv">유리</em>':m.bad>m.good?'<em class="dis">불리</em>':''}${on?`<em class="num">${squadSel.indexOf(c.id)+1}</em>`:''}<b>${esc(c.name)}</b><span>Lv.${Characters.own(c.id).lv} · ${nf(charPower(c))}</span></button>`;}).join('')||'<p class="muted">보유한 '+System.T('crew')+'이(가) 없어요.</p>'}</div>
-      <div class="row" style="margin-top:14px"><button class="btn block" data-act="${startAct}" ${FORM.ctx.extra||''} ${squadSel.length?'':'disabled'}>출격 (${squadSel.length}/4)</button></div>
-      ${FORM.ctx.storyBtns||''}`,false,'','formation:'+FORM.key+':'+FORM.ctx.kind);
+    <div class="fenemy">${en.map(e=>`<div class="fe ${e.boss?'boss':''}" style="--ec:${ECOL[e.elem]}"><div class="fe-art">${CharactersView.enemyArt(e)}</div><span class="el" style="--ec:${ECOL[e.elem]}">${esc(e.elem)}</span><b>${esc(e.name)}</b><span>${e.boss?'BOSS · ':''}${nf(e.hp)}</span></div>`).join('')}</div>
+    ${stage.enemies.length&&!stage.story?CharactersView.rulesHTML(stage):''}
+    ${en.filter(e=>e.boss).map(e=>`<p class="boss-pat"><b>보스 패턴</b> ${esc(e.name)}: ${esc(Core.bossPatText(e,FORM.ctx.kind==='raid'))}</p>`).join('')}
+    <p class="muted" style="margin:6px 0 0">적 속성: ${Object.entries(elemCount).map(([k,v])=>`${esc(k)}×${v}`).join(' ')} → ${Object.keys(elemCount).map(k=>{const w=ELEMS.find(elem=>BEATS[elem]===k);return w?`<b style="color:${ECOL[w]}">${esc(w)}</b> 유리`:'';}).filter(Boolean).join(', ')}</p>
+    <div class="fpower"><div><i>편성 능력치 <small style="opacity:.7">상성 반영</small></i><b class="${ratio>=1?'ok':ratio>=0.8?'warn':'bad'}">${nf(tp)}</b>${tp!==tp0?`<small class="muted" style="display:block;font-size:.7rem">기본 ${nf(tp0)}</small>`:''}</div><div><i>적 능력치 (참고)</i><b>${nf(need)}</b></div><div class="fbar"><span style="width:${Math.min(100,ratio*100)}%" class="${ratio>=1?'ok':ratio>=0.8?'warn':'bad'}"></span></div></div>
+    <div class="frow"><i>전열</i><i>후열</i></div><div class="fslots">${[0,1,2,3].map(slot).join('')}</div>
+    <p class="muted" style="margin:4px 0 0">${Rules.formOn()?esc(Core.formHelp()):'전열은 적의 공격을 두 배로 더 받아요. 방어형은 어디에 있든 공격을 끌어요.'}</p>
+    ${Object.keys(fb).length?`<p class="fbonus">${Object.entries(fb).map(([f,v])=>`${esc(f)} 소속 보너스 공격 +${v}%`).join(' · ')}</p>`:`<p class="muted" style="margin:6px 0 0">같은 소속 2명 이상이면 공격 보너스 (2명 5%, 3명 10%, 4명 15%)</p>`}
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="fauto">자동 편성</button><button class="btn sm ghost" data-act="fclear">비우기</button>${[0,1,2].map(i=>{const pr=(P().presets||[])[i];return `<button class="btn sm ghost" data-act="fpre" data-i="${i}">${pr&&pr.length?'편성 '+(i+1):'빈 '+(i+1)}</button>`;}).join('')}<button class="btn sm ghost" data-act="fsave">현재 편성 저장</button></div>
+    <div class="ftools"><div class="chips">${[['all','전체'],...ELEMS.map(elem=>[elem,elem]),...Object.entries(ROLE)].map(([v,l])=>`<button class="chip ${FORM.filter===v?'on':''}" data-act="ffil" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div>
+      <select class="in" id="fsort" style="max-width:120px">${CoreView.opt([['power','전투력순'],['lv','레벨순'],['match','상성순']],FORM.sort)}</select></div>
+    <div class="froster">${list.map(c=>{const on=squadSel.includes(c.id),b=busy.has(c.id),m=Characters.matchup(c,en);return `<button class="fr r${c.rarity} ${on?'on':''} ${b?'busy':''}" data-act="fpick" data-id="${c.id}" ${b?'disabled':''} style="--ec:${ECOL[c.elem]}"><div class="fr-art">${CoreView.art(c)}</div><span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${b?'<em class="busy">파견</em>':m.good>m.bad?'<em class="adv">유리</em>':m.bad>m.good?'<em class="dis">불리</em>':''}${on?`<em class="num">${squadSel.indexOf(c.id)+1}</em>`:''}<b>${esc(c.name)}</b><span>Lv.${Characters.own(c.id).lv} · ${nf(charPower(c))}</span></button>`;}).join('')||'<p class="muted">보유한 '+System.T('crew')+'이(가) 없어요.</p>'}</div>
+    <div class="row" style="margin-top:14px"><button class="btn block" data-act="${startAct}" ${FORM.ctx.extra||''} ${squadSel.length?'':'disabled'}>출격 (${squadSel.length}/4)</button></div>
+    ${FORM.ctx.storyBtns||''}`,false,'','formation:'+FORM.key+':'+FORM.ctx.kind);
   }
 
   static openLibItem(id,kind){
     if((id&&libById(id)&&libById(id).kind==='cg')||(!id&&kind==='cg')){
       const l=id?libById(id):{id:'',kind:'cg',name:'',prompt:'',cast:[]}; const cast=l.cast||[];
       CoreView.openModal(`${head(id?esc(l.name):'새 CG',`<span class="muted">이벤트 CG · 대본에서 [CG: 이름]</span>`)}
-        ${id?`<div style="aspect-ratio:16/10;margin:10px 0;position:relative;overflow:hidden;background:var(--panel2)">${Characters.imgSrc(l)?`<img style="width:100%;height:100%;object-fit:cover" src="${esc(Characters.imgSrc(l))}" alt="">`:'<div class="art ph" style="--ec:var(--brass);height:100%"><small>이미지 미등록</small></div>'}</div>`:''}
-        <label class="f" for="li_name">이름</label><input class="in" id="li_name" value="${esc(l.name)}">
-        <label class="f" for="li_prompt">장면 프롬프트 (영어, 인물 외모 제외: 장소, 구도, 행동, 분위기)</label><textarea class="in" id="li_prompt" placeholder="rooftop, night, rain, two women sharing an umbrella, from side, cinematic">${esc(l.prompt)}</textarea>
-        <h3 class="sec">등장 ${System.T('crew')} (최대 4명)</h3>
-        ${[0,1,2,3].map(i=>{const x=cast[i]||{};return `<div class="g4 cgslot"><div style="grid-column:span 2"><label class="f">${i+1}번</label><select class="in" id="cg_c${i}"><option value="">없음</option>${G.chars.map(c=>`<option value="${c.id}" ${x.id===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div><div><label class="f">위치</label><select class="in" id="cg_p${i}">${CoreView.opt(CG_POS_LABEL,x.pos||'auto')}</select></div><div><label class="f">행동 태그</label><input class="in" id="cg_a${i}" value="${esc(x.act||'')}" placeholder="smile, waving"></div></div>`;}).join('')}
-        <p class="muted">각 ${System.T('crew')}의 외모는 그 ${System.T('crew')}의 NAI 프롬프트에서 가져와서 캐릭터별 프롬프트로 따로 넣어요(V4 이상).</p>
-        <label class="f" for="li_desc">AI에게 설명 (선택)</label><input class="in" id="li_desc" placeholder="예: 축제 마지막 밤, 불꽃놀이를 올려다보는 미호와 루나">
-        <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="ailib" data-k="cg">AI로 장면 프롬프트 쓰기</button></div>
-        <div class="row" style="margin-top:16px"><button class="btn" data-act="savelib" data-id="${l.id}" data-k="cg">저장</button>${id?`<button class="btn ghost" data-act="naigen" data-k="lib" data-id="${l.id}">NAI로 그리기</button><button class="btn ghost" data-act="upload" data-k="lib" data-id="${l.id}">이미지 올리기</button>${(kind==='enemy'||kind==='prop'||kind==='icon')&&Characters.imgSrc(l)?`<button class="btn ghost" data-act="cutopen" data-k="lib" data-id="${l.id}">배경 지우기</button>`:''}${l.img?XBTN('lib',l.id):''}<button class="btn ghost" data-act="dellib" data-id="${l.id}">삭제</button>`:''}</div>`);
+      ${id?`<div style="aspect-ratio:16/10;margin:10px 0;position:relative;overflow:hidden;background:var(--panel2)">${Characters.imgSrc(l)?`<img style="width:100%;height:100%;object-fit:cover" src="${esc(Characters.imgSrc(l))}" alt="">`:'<div class="art ph" style="--ec:var(--brass);height:100%"><small>이미지 미등록</small></div>'}</div>`:''}
+      <label class="f" for="li_name">이름</label><input class="in" id="li_name" value="${esc(l.name)}">
+      <label class="f" for="li_prompt">장면 프롬프트 (영어, 인물 외모 제외: 장소, 구도, 행동, 분위기)</label><textarea class="in" id="li_prompt" placeholder="rooftop, night, rain, two women sharing an umbrella, from side, cinematic">${esc(l.prompt)}</textarea>
+      <h3 class="sec">등장 ${System.T('crew')} (최대 4명)</h3>
+      ${[0,1,2,3].map(i=>{const x=cast[i]||{};return `<div class="g4 cgslot"><div style="grid-column:span 2"><label class="f">${i+1}번</label><select class="in" id="cg_c${i}"><option value="">없음</option>${G.chars.map(c=>`<option value="${c.id}" ${x.id===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div><div><label class="f">위치</label><select class="in" id="cg_p${i}">${CoreView.opt(CG_POS_LABEL,x.pos||'auto')}</select></div><div><label class="f">행동 태그</label><input class="in" id="cg_a${i}" value="${esc(x.act||'')}" placeholder="smile, waving"></div></div>`;}).join('')}
+      <p class="muted">각 ${System.T('crew')}의 외모는 그 ${System.T('crew')}의 NAI 프롬프트에서 가져와서 캐릭터별 프롬프트로 따로 넣어요(V4 이상).</p>
+      <label class="f" for="li_desc">AI에게 설명 (선택)</label><input class="in" id="li_desc" placeholder="예: 축제 마지막 밤, 불꽃놀이를 올려다보는 미호와 루나">
+      <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="ailib" data-k="cg">AI로 장면 프롬프트 쓰기</button></div>
+      <div class="row" style="margin-top:16px"><button class="btn" data-act="savelib" data-id="${l.id}" data-k="cg">저장</button>${id?`<button class="btn ghost" data-act="naigen" data-k="lib" data-id="${l.id}">NAI로 그리기</button><button class="btn ghost" data-act="upload" data-k="lib" data-id="${l.id}">이미지 올리기</button>${(kind==='enemy'||kind==='prop'||kind==='icon')&&Characters.imgSrc(l)?`<button class="btn ghost" data-act="cutopen" data-k="lib" data-id="${l.id}">배경 지우기</button>`:''}${l.img?XBTN('lib',l.id):''}<button class="btn ghost" data-act="dellib" data-id="${l.id}">삭제</button>`:''}</div>`);
       return;
     }
     if((id&&libById(id)&&libById(id).kind==='bgm')||(!id&&kind==='bgm')){
       const l=id?libById(id):{id:'',kind:'bgm',name:'',prompt:''};
       CoreView.openModal(`${head(id?esc(l.name):'새 배경음',`<span class="muted">배경음 · ${l.audio?'등록됨':'미등록'}</span>`)}
-        <label class="f" for="li_name">이름 (대본에서 [음악: 이름]으로 불러요)</label><input class="in" id="li_name" value="${esc(l.name)}">
-        <label class="f" for="li_prompt">음악 프롬프트 (영어)</label><textarea class="in" id="li_prompt">${esc(l.prompt)}</textarea>
-        <label class="f" for="li_desc">AI에게 설명 (선택)</label><input class="in" id="li_desc" placeholder="예: 비 오는 밤 둘만 남은 사무소, 쓸쓸하지만 따뜻하게">
-        <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="ailib" data-k="bgm">AI로 프롬프트 쓰기</button></div>
-        <div class="row" style="margin-top:16px"><button class="btn" data-act="savelib" data-id="${l.id}" data-k="bgm">저장</button>${id?`<button class="btn ghost" data-act="elcompose" data-id="${l.id}">AI로 작곡</button><button class="btn ghost" data-act="aupload" data-id="${l.id}">파일 올리기</button>${l.audio?`<button class="btn ghost" data-act="bgmplay" data-id="${l.id}">재생</button>`:''}<button class="btn ghost" data-act="dellib" data-id="${l.id}">삭제</button>`:''}</div>`);
+      <label class="f" for="li_name">이름 (대본에서 [음악: 이름]으로 불러요)</label><input class="in" id="li_name" value="${esc(l.name)}">
+      <label class="f" for="li_prompt">음악 프롬프트 (영어)</label><textarea class="in" id="li_prompt">${esc(l.prompt)}</textarea>
+      <label class="f" for="li_desc">AI에게 설명 (선택)</label><input class="in" id="li_desc" placeholder="예: 비 오는 밤 둘만 남은 사무소, 쓸쓸하지만 따뜻하게">
+      <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="ailib" data-k="bgm">AI로 프롬프트 쓰기</button></div>
+      <div class="row" style="margin-top:16px"><button class="btn" data-act="savelib" data-id="${l.id}" data-k="bgm">저장</button>${id?`<button class="btn ghost" data-act="elcompose" data-id="${l.id}">AI로 작곡</button><button class="btn ghost" data-act="aupload" data-id="${l.id}">파일 올리기</button>${l.audio?`<button class="btn ghost" data-act="bgmplay" data-id="${l.id}">재생</button>`:''}<button class="btn ghost" data-act="dellib" data-id="${l.id}">삭제</button>`:''}</div>`);
       return;
     }
     const l=id?libById(id):{id:'',kind,name:'',prompt:''}; kind=l.kind;
     const KN=({bg:'배경',prop:'소품',enemy:'적',icon:'재화 아이콘',map:'작전 지도'})[kind]||kind;
     CoreView.openModal(`${head(id?esc(l.name):'새 '+KN,`<span class="muted">${KN}${kind==='enemy'?' · 스테이지의 적 이름과 같으면 전투에 나와요':''}</span>`)}${l.alias&&!l.img?`<p class="muted" style="margin:0 0 8px;font-size:.8rem">지금은 「${esc((G.lib.find(x=>x.id===l.alias)||{}).name||'')}」의 그림을 같이 써요. 프롬프트를 적고 저장하면 이 적만 따로 그려요.</p>`:''}
-      ${id?`<div style="border-radius:12px;overflow:hidden;aspect-ratio:${kind==='bg'?'16/10':'1'};margin:10px 0;position:relative">${Characters.imgSrc(l)?`<img class="art" style="width:100%;height:100%;object-fit:cover" src="${esc(Characters.imgSrc(l))}" alt="">`:(kind==='bg'?`<div style="${ArtView.bgStyle(l.name)};position:absolute;inset:0"></div>`:`<div class="art ph" style="--ec:var(--brass);height:100%"><small>이미지 미등록</small></div>`)}</div>`:''}
-      <label class="f" for="li_name">이름 (대본에서 이 이름으로 불러요)</label><input class="in" id="li_name" value="${esc(l.name)}">
-      <label class="f" for="li_prompt">NAI 프롬프트</label><textarea class="in" id="li_prompt">${esc(l.prompt)}</textarea>
-      <label class="f" for="li_desc">AI에게 설명 (선택)</label><input class="in" id="li_desc" placeholder="예: 비 오는 밤 네온이 비치는 편의점 앞">
-      <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="ailib" data-k="${kind}">AI로 프롬프트 쓰기</button><button class="btn sm ghost" data-act="copyfield" data-f="li_prompt">복사</button></div>
-      <div class="row" style="margin-top:16px"><button class="btn" data-act="savelib" data-id="${l.id}" data-k="${kind}">저장</button>${id?`<button class="btn ghost" data-act="naigen" data-k="lib" data-id="${l.id}">NAI로 그리기</button><button class="btn ghost" data-act="upload" data-k="lib" data-id="${l.id}">이미지 올리기</button>${(kind==='enemy'||kind==='prop'||kind==='icon')&&Characters.imgSrc(l)?`<button class="btn ghost" data-act="cutopen" data-k="lib" data-id="${l.id}">배경 지우기</button>`:''}${l.img?XBTN('lib',l.id):''}<button class="btn ghost" data-act="dellib" data-id="${l.id}">삭제</button>`:''}</div>`);
+    ${id?`<div style="border-radius:12px;overflow:hidden;aspect-ratio:${kind==='bg'?'16/10':'1'};margin:10px 0;position:relative">${Characters.imgSrc(l)?`<img class="art" style="width:100%;height:100%;object-fit:cover" src="${esc(Characters.imgSrc(l))}" alt="">`:(kind==='bg'?`<div style="${ArtView.bgStyle(l.name)};position:absolute;inset:0"></div>`:`<div class="art ph" style="--ec:var(--brass);height:100%"><small>이미지 미등록</small></div>`)}</div>`:''}
+    <label class="f" for="li_name">이름 (대본에서 이 이름으로 불러요)</label><input class="in" id="li_name" value="${esc(l.name)}">
+    <label class="f" for="li_prompt">NAI 프롬프트</label><textarea class="in" id="li_prompt">${esc(l.prompt)}</textarea>
+    <label class="f" for="li_desc">AI에게 설명 (선택)</label><input class="in" id="li_desc" placeholder="예: 비 오는 밤 네온이 비치는 편의점 앞">
+    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="ailib" data-k="${kind}">AI로 프롬프트 쓰기</button><button class="btn sm ghost" data-act="copyfield" data-f="li_prompt">복사</button></div>
+    <div class="row" style="margin-top:16px"><button class="btn" data-act="savelib" data-id="${l.id}" data-k="${kind}">저장</button>${id?`<button class="btn ghost" data-act="naigen" data-k="lib" data-id="${l.id}">NAI로 그리기</button><button class="btn ghost" data-act="upload" data-k="lib" data-id="${l.id}">이미지 올리기</button>${(kind==='enemy'||kind==='prop'||kind==='icon')&&Characters.imgSrc(l)?`<button class="btn ghost" data-act="cutopen" data-k="lib" data-id="${l.id}">배경 지우기</button>`:''}${l.img?XBTN('lib',l.id):''}<button class="btn ghost" data-act="dellib" data-id="${l.id}">삭제</button>`:''}</div>`);
   }
 
   static openFarmSquad(st){ CharactersView.openFormation(st,{kind:'farm',extra:`data-k="${st.farm.key}" data-lv="${st.farm.lv}"`},'farmstart'); }
@@ -1959,23 +1959,23 @@ static csTabShow(){ document.querySelectorAll('.cs-tabs button').forEach(b=>Core
     const lines=pos.map(([x,y],i)=>`<line x1="50" y1="50" x2="${x}" y2="${y}"/><text x="${(50+x)/2}" y="${(50+y)/2}">${esc(rs[i].kind||'')}</text>`).join('');
     const people=[[REL_ME,Core.relName(REL_ME,true)],...G.chars.filter(x=>!x.alt).map(x=>[x.id,x.name]),...(G.npcs||[]).map(x=>[x.id,x.name+' (NPC)'])].filter(([id])=>id!==c);
     CoreView.openModal(`${head('인물 관계도',`<span class="muted">사람을 누르면 그 사람을 가운데에 두고 넓혀 봐요</span>`)}
-      <div class="rl-map"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${lines}</svg>${CharactersView.relNodeHTML(c,50,50,true)}${nb.map((x,i)=>CharactersView.relNodeHTML(x,pos[i][0],pos[i][1])).join('')}${N?'':'<p class="rl-empty muted">아직 이 사람의 관계 기록이 없어요</p>'}</div>
-      <div class="row" style="margin:6px 0">${c!==REL_ME?`<button class="btn sm ghost" data-act="relgo" data-r="${REL_ME}">나를 가운데로</button>`:''}<button class="btn sm ghost" data-act="relrebuild" title="AI 없이 대본·인물 설정을 다시 읽어 빠진 기본 관계를 채워요">🔄 빠진 관계 다시 채우기</button>${SAMPLE?'<button class="btn sm ghost" data-act="relseed">✦ AI로 관계 넓히기</button>':''}${RELUNDO?'<button class="btn sm ghost" data-act="relundo">↩ 되돌리기</button>':''}<span class="muted" style="font-size:.76rem;align-self:center">기록 ${World.RELS().length}개 · 스토리를 만들 때마다 자동으로 늘어나요</span></div>
-      <h3 class="sec">${esc(Core.relName(c,true))}의 관계</h3>
-      ${rs.map(r=>{ const o=Core.relOther(r,c); return `<div class="rl-row"><div class="t"><b>${esc(Core.relName(o,true))}</b> <em>${esc(r.kind||'')}</em><p>${esc(r.note||'')}</p>${(r.hist||[]).length?`<small>${(r.hist||[]).slice(-3).map(h=>esc((h.src?h.src+' · ':'')+h.text)).join('<br>')}</small>`:''}</div><div class="rl-acts"><button class="btn sm ghost" data-act="relgo" data-r="${esc(o)}">보기</button><button class="btn sm ghost" data-act="reledit" data-id="${r.id}">고치기</button></div></div>`; }).join('')||'<p class="muted">관계가 없어요. 아래에서 직접 추가하거나 AI로 넓혀 보세요.</p>'}
-      <h3 class="sec">관계 추가</h3>
-      <div class="g2"><div><label class="f" for="rl_b">상대</label><select class="in" id="rl_b">${people.map(([id,n])=>`<option value="${esc(id)}">${esc(n)}</option>`).join('')}</select></div><div><label class="f" for="rl_k">관계</label><input class="in" id="rl_k" maxlength="16" placeholder="예: 소꿉친구"></div></div>
-      <label class="f" for="rl_n">설명</label><input class="in" id="rl_n" maxlength="240" placeholder="예: 어릴 적 같은 마을에서 자랐지만 5년 전 사건 뒤로 연락이 끊겼다">
-      <div class="row" style="margin-top:8px"><button class="btn sm" data-act="reladd">추가</button></div>`);
+    <div class="rl-map"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${lines}</svg>${CharactersView.relNodeHTML(c,50,50,true)}${nb.map((x,i)=>CharactersView.relNodeHTML(x,pos[i][0],pos[i][1])).join('')}${N?'':'<p class="rl-empty muted">아직 이 사람의 관계 기록이 없어요</p>'}</div>
+    <div class="row" style="margin:6px 0">${c!==REL_ME?`<button class="btn sm ghost" data-act="relgo" data-r="${REL_ME}">나를 가운데로</button>`:''}<button class="btn sm ghost" data-act="relrebuild" title="AI 없이 대본·인물 설정을 다시 읽어 빠진 기본 관계를 채워요">🔄 빠진 관계 다시 채우기</button>${SAMPLE?'<button class="btn sm ghost" data-act="relseed">✦ AI로 관계 넓히기</button>':''}${RELUNDO?'<button class="btn sm ghost" data-act="relundo">↩ 되돌리기</button>':''}<span class="muted" style="font-size:.76rem;align-self:center">기록 ${World.RELS().length}개 · 스토리를 만들 때마다 자동으로 늘어나요</span></div>
+    <h3 class="sec">${esc(Core.relName(c,true))}의 관계</h3>
+    ${rs.map(r=>{ const o=Core.relOther(r,c); return `<div class="rl-row"><div class="t"><b>${esc(Core.relName(o,true))}</b> <em>${esc(r.kind||'')}</em><p>${esc(r.note||'')}</p>${(r.hist||[]).length?`<small>${(r.hist||[]).slice(-3).map(h=>esc((h.src?h.src+' · ':'')+h.text)).join('<br>')}</small>`:''}</div><div class="rl-acts"><button class="btn sm ghost" data-act="relgo" data-r="${esc(o)}">보기</button><button class="btn sm ghost" data-act="reledit" data-id="${r.id}">고치기</button></div></div>`; }).join('')||'<p class="muted">관계가 없어요. 아래에서 직접 추가하거나 AI로 넓혀 보세요.</p>'}
+    <h3 class="sec">관계 추가</h3>
+    <div class="g2"><div><label class="f" for="rl_b">상대</label><select class="in" id="rl_b">${people.map(([id,n])=>`<option value="${esc(id)}">${esc(n)}</option>`).join('')}</select></div><div><label class="f" for="rl_k">관계</label><input class="in" id="rl_k" maxlength="16" placeholder="예: 소꿉친구"></div></div>
+    <label class="f" for="rl_n">설명</label><input class="in" id="rl_n" maxlength="240" placeholder="예: 어릴 적 같은 마을에서 자랐지만 5년 전 사건 뒤로 연락이 끊겼다">
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="reladd">추가</button></div>`);
   }
 
   static openAiChapter(){
     CoreView.openModal(`${head(`AI로 ${G.chapters.length+1}장 만들기`)}
-      <label class="f" for="ai_d">이야기 방향</label><textarea class="in" id="ai_d" placeholder="예: 헬릭스의 비밀 연구소에 잠입한다. 세라의 과거 동료가 적으로 나온다. 중간에 미호와 단둘이 변장하고 파티장에 숨어드는 장면."></textarea>
-      <label class="f" for="ai_n">스테이지 수</label><select class="in" id="ai_n">${CoreView.opt([[3,'3개'],[4,'4개'],[5,'5개'],[6,'6개'],[8,'8개'],[10,'10개']],Core.storyN(4))}</select>
-      <label class="f">주요 등장 ${esc(System.T('crew'))}</label><div class="chips">${G.chars.map(c=>`<button class="chip" data-act="castt" data-id="${c.id}">${esc(c.name)}</button>`).join('')}</div>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="aichapter">만들기</button></div>
-      <p class="muted">새로 필요한 배경은 자료실에 NAI 프롬프트와 함께 추가되고, ${System.T('talk')}도 1~2개 함께 만들어져요. 시간이 조금 걸려요.</p>`);
+    <label class="f" for="ai_d">이야기 방향</label><textarea class="in" id="ai_d" placeholder="예: 헬릭스의 비밀 연구소에 잠입한다. 세라의 과거 동료가 적으로 나온다. 중간에 미호와 단둘이 변장하고 파티장에 숨어드는 장면."></textarea>
+    <label class="f" for="ai_n">스테이지 수</label><select class="in" id="ai_n">${CoreView.opt([[3,'3개'],[4,'4개'],[5,'5개'],[6,'6개'],[8,'8개'],[10,'10개']],Core.storyN(4))}</select>
+    <label class="f">주요 등장 ${esc(System.T('crew'))}</label><div class="chips">${G.chars.map(c=>`<button class="chip" data-act="castt" data-id="${c.id}">${esc(c.name)}</button>`).join('')}</div>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="aichapter">만들기</button></div>
+    <p class="muted">새로 필요한 배경은 자료실에 NAI 프롬프트와 함께 추가되고, ${System.T('talk')}도 1~2개 함께 만들어져요. 시간이 조금 걸려요.</p>`);
   }
 
   static vnShow(L){
@@ -2015,7 +2015,7 @@ static lobbyEmote(el,line,zone){ if(Characters.dirMode()==='off'||!el) return; c
   static farmHTML(){
     const p=P(), top4=G.chars.filter(c=>Characters.own(c.id)).map(c=>Characters.own(c.id).lv||1).sort((a,b)=>b-a).slice(0,4), topLv=top4.length?Math.round(top4.reduce((a,b)=>a+b,0)/top4.length):1;
     return `${pageHead(System.T('farm'),'TRAINING','lobby')}<p class="muted">반복해서 재료를 모으는 곳이에요. 단계마다 권장 레벨이 있고, 높은 단계일수록 보상이 커요. 한 번 깬 단계는 소탕으로 바로 보상을 받을 수 있어요. 보유: ${Core.rewardText({exp:p.mat.exp,wmat:p.mat.wmat,core:p.mat.core,gold:p.gold})}</p>
-    ${G.meta.farms.map(f=>`<h3 class="sec">${esc(f.name)}</h3>${Array.from({length:FARM_N},(_,k)=>k+1).map(lv=>{const id=`farm_${f.key}_${lv}`, rec=Characters.farmRec(lv), low=topLv<rec,cl=!!p.farmClear[id],open=lv===1||!!p.farmClear[`farm_${f.key}_${lv-1}`];
+  ${G.meta.farms.map(f=>`<h3 class="sec">${esc(f.name)}</h3>${Array.from({length:FARM_N},(_,k)=>k+1).map(lv=>{const id=`farm_${f.key}_${lv}`, rec=Characters.farmRec(lv), low=topLv<rec,cl=!!p.farmClear[id],open=lv===1||!!p.farmClear[`farm_${f.key}_${lv-1}`];
       return `<div class="stage ${cl?'clear':''} ${open?'':'lock'}"><span class="code">${lv}</span><span class="t"><b>${lv}단계 <small class="${low?'farm-low':'muted'}">권장 Lv.${rec}</small></b><span class="st">${Core.rewardText(Core.farmReward(f.key,lv))}</span></span>${open?`<button class="btn sm ghost" data-act="farmgo" data-k="${f.key}" data-lv="${lv}">출격</button>`:''}${cl?`<button class="btn sm" data-act="sweep" data-k="${f.key}" data-lv="${lv}">소탕</button><button class="btn sm ghost" data-act="sweep" data-k="${f.key}" data-lv="${lv}" data-n="5">×5</button>`:''}</div>`;}).join('')}`).join('')}`;
   }
 

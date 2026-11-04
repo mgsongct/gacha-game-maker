@@ -175,6 +175,22 @@ static relFromProfiles(quiet){ let n=0; const who=[...G.chars.filter(c=>!c.alt),
   static ruleClean(cat,r){ if(!r||typeof r!=='object') return null; const o={k:String(r.k||'')}; if(cat[o.k]&&cat[o.k].arg) o.a=['sec','pct','n'].includes(cat[o.k].arg)?Math.round(+r.a||0):String(r.a||'').trim(); return NewGame.ruleOk(cat,o)?o:null; }
 
   static routeClean(x){ if(!x||typeof x!=='object') return null; const r={}; ['n1','fork','a','b','boss'].forEach(k=>{ const v=String(x[k]||'').trim(); if(v) r[k]=v.slice(0,k==='fork'?60:20); }); return Object.keys(r).length?r:null; }
+
+  static illustrationScenePreparation(c,kind,custom){
+   const project=Core.PJ().active,target=c[kind],snapshot=JSON.stringify([c.profile,c.naiPrompt,c.faction,target,G.world.summary]);
+   const check=()=>{if(Core.PJ().active!==project||charById(c.id)!==c||JSON.stringify([c.profile,c.naiPrompt,c.faction,c[kind],G.world.summary])!==snapshot)throw new Error('캐릭터나 이미지 설정이 바뀌었어요. 창을 다시 열어 생성해 주세요.');};
+   const prepare=async(cfg,progress,signal)=>{
+    check();if(cfg.sceneReady)return;if(!SAMPLE)throw new Error('설정 → 글 AI를 먼저 등록해 주세요.');
+    progress(kind==='lbcg'?'캐릭터·세계관을 바탕으로 최대 돌파 CG 장면 구성 중':'캐릭터·세계관을 바탕으로 일러스트 장면 구성 중');
+    const purpose=Misc.illustrationScenePreparationPurposeText({kind});
+    const response=await v2SkillRequest(SAMPLE,World.illustrationScenePreparationPrompt({c,purpose,cfg}),signal);
+    check();if(typeof response?.tags!=='string'||!response.tags.trim())throw new Error('AI가 장면을 비워서 반환했어요. 다시 뽑기를 눌러 주세요.');
+    cfg.sceneTags=response.tags.trim().slice(0,2000);
+    cfg.prompt=PromptStudio.composeNai(kind,Core.joinTags(c.naiPrompt,Characters.designTags(c),cfg.sceneTags),{pose:custom.scenePose??'',frame:custom.sceneFrame||target.naiFrame,styleId:custom.sceneStyle||target.naiStyle||c.naiStyle}).input;
+    cfg.sceneReady=true;
+   };
+   prepare.check=check;return prepare;
+  }
 }
 
 class NewGameCtl {

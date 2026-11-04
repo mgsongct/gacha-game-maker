@@ -95,12 +95,12 @@ static debateStart(ch,s){ MD={kind:'debate',ch,s,r:0,i:0,hp:s.debate.hp,log:[],p
 
   static debateDraw(msg){ const {s,r,i,hp}=MD, d=s.debate, R=d.rounds[r], L=R.lines[i], opp=Characters.findSpeaker(d.opponent)||Characters.npcBy(d.opponent), sq=P().squad.map(charById).filter(Boolean);
     CoreView.openModal(`${head(`회담 · ${esc(d.opponent)}`,`<span class="muted">라운드 ${r+1}/${d.rounds.length} · 신뢰도 ${'◆'.repeat(hp)}${'◇'.repeat(Math.max(0,d.hp-hp))}</span>`)}
-    <div class="db-stage">${opp&&Characters.imgSrc(opp)?`<div class="db-opp">${CoreView.art(opp,'',{upper:true})}</div>`:''}<div class="db-claim"><i>${esc(R.claim||'주장')}</i><p class="db-line">“${esc(L.text)}”</p><span class="muted">${i+1}/${R.lines.length}</span></div></div>
-    ${msg?`<p class="db-msg">${esc(msg)}</p>`:''}
-    <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm ghost" data-act="dbnav" data-v="-1" ${i?'':'disabled'}>◀</button><button class="btn sm ghost" data-act="dbnav" data-v="1" ${i<R.lines.length-1?'':'disabled'}>▶</button><button class="btn sm" data-act="dbpress">추궁</button></div>
-    <h3 class="sec">증거 제시</h3><div class="db-ev">${d.evidence.map(e=>`<button class="btn sm ghost" data-act="dbshow" data-v="${e.id}" title="${esc(e.desc)}"><b>${esc(e.name)}</b><small>${esc(e.desc)}</small></button>`).join('')}</div>
-    <h3 class="sec">동료 설득</h3><div class="row" style="gap:6px;flex-wrap:wrap">${sq.map(c=>`<button class="btn sm ghost" data-act="dbpers" data-v="${c.id}">${esc(c.name)}</button>`).join('')||'<span class="muted">편성한 '+System.T('crew')+'이(가) 없어요</span>'}</div>
-    <div class="row" style="margin-top:10px"><button class="btn ghost" data-act="dbquit">그만두기</button></div>`); }
+  <div class="db-stage">${opp&&Characters.imgSrc(opp)?`<div class="db-opp">${CoreView.art(opp,'',{upper:true})}</div>`:''}<div class="db-claim"><i>${esc(R.claim||'주장')}</i><p class="db-line">“${esc(L.text)}”</p><span class="muted">${i+1}/${R.lines.length}</span></div></div>
+  ${msg?`<p class="db-msg">${esc(msg)}</p>`:''}
+  <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn sm ghost" data-act="dbnav" data-v="-1" ${i?'':'disabled'}>◀</button><button class="btn sm ghost" data-act="dbnav" data-v="1" ${i<R.lines.length-1?'':'disabled'}>▶</button><button class="btn sm" data-act="dbpress">추궁</button></div>
+  <h3 class="sec">증거 제시</h3><div class="db-ev">${d.evidence.map(e=>`<button class="btn sm ghost" data-act="dbshow" data-v="${e.id}" title="${esc(e.desc)}"><b>${esc(e.name)}</b><small>${esc(e.desc)}</small></button>`).join('')}</div>
+  <h3 class="sec">동료 설득</h3><div class="row" style="gap:6px;flex-wrap:wrap">${sq.map(c=>`<button class="btn sm ghost" data-act="dbpers" data-v="${c.id}">${esc(c.name)}</button>`).join('')||'<span class="muted">편성한 '+System.T('crew')+'이(가) 없어요</span>'}</div>
+  <div class="row" style="margin-top:10px"><button class="btn ghost" data-act="dbquit">그만두기</button></div>`); }
 
     /* 콘테스트 */
 static contestStart(ch,s){ const ent=P().squad.map(charById).filter(c=>c&&Characters.own(c.id)).slice(0,3); if(!ent.length){ CoreView.toast(`출전할 ${System.T('crew')}을(를) 편성해 주세요`); return; }
@@ -108,18 +108,18 @@ static contestStart(ch,s){ const ent=P().squad.map(charById).filter(c=>c&&Charac
 
   static contestDraw(msg){ const {s,round,ent,score,hype}=MD, c=s.contest, j=Battle.contestPref(round);
     CoreView.openModal(`${head(esc(c.title),`<span class="muted">라운드 ${round+1}/${c.rounds} · 분위기 ${'♪'.repeat(hype)||'—'}</span>`)}
-    <p>심사위원 <b>${esc(j.name)}</b>은(는) <b>${CHARM[j.likes]}</b>을(를) 좋아해요.</p>${msg?`<p class="db-msg">${esc(msg)}</p>`:''}
-    <div class="ct-board"><div><b>우리</b> ${nf(score)}</div>${MD.rivals.map(r=>`<div>${esc(r.name)} ${nf(r.score)}</div>`).join('')}</div>
-    ${ent.map(e=>{ const ch=Battle.charmOf(e); return `<div class="panel" style="padding:8px;margin:6px 0"><b>${esc(e.name)}</b>${MD.last===e.id?' <span class="muted">(방금 어필 — 연달아 쓰면 분위기가 식어요)</span>':''}<div class="row" style="gap:4px;flex-wrap:wrap;margin-top:4px">${Object.keys(CHARM).map(k=>`<button class="btn sm ${k===j.likes?'':'ghost'}" data-act="ctap" data-c="${e.id}" data-k="${k}">${CHARM[k]} ${ch[k]}</button>`).join('')}</div></div>`; }).join('')}
-    <div class="row" style="margin-top:8px"><button class="btn ghost" data-act="dbquit">그만두기</button></div>`); }
+  <p>심사위원 <b>${esc(j.name)}</b>은(는) <b>${CHARM[j.likes]}</b>을(를) 좋아해요.</p>${msg?`<p class="db-msg">${esc(msg)}</p>`:''}
+  <div class="ct-board"><div><b>우리</b> ${nf(score)}</div>${MD.rivals.map(r=>`<div>${esc(r.name)} ${nf(r.score)}</div>`).join('')}</div>
+  ${ent.map(e=>{ const ch=Battle.charmOf(e); return `<div class="panel" style="padding:8px;margin:6px 0"><b>${esc(e.name)}</b>${MD.last===e.id?' <span class="muted">(방금 어필 — 연달아 쓰면 분위기가 식어요)</span>':''}<div class="row" style="gap:4px;flex-wrap:wrap;margin-top:4px">${Object.keys(CHARM).map(k=>`<button class="btn sm ${k===j.likes?'':'ghost'}" data-act="ctap" data-c="${e.id}" data-k="${k}">${CHARM[k]} ${ch[k]}</button>`).join('')}</div></div>`; }).join('')}
+  <div class="row" style="margin-top:8px"><button class="btn ghost" data-act="dbquit">그만두기</button></div>`); }
 
   static sortieMap(msg){ const x=Battle.sortieParts(); if(!x) return; const {run,s,R}=x, cur=Battle.nodeById(R,run.node), done=new Set(run.path), sq=run.squad.map(charById).filter(Boolean);
     const nodeBtn=n=>{ const here=n.id===run.node, past=done.has(n.id); return `<div class="so-node k-${n.kind} ${here?'here':''} ${past?'past':''}"><b>${{battle:'⚔',elite:'☠',supply:'⛺',boss:'♛'}[n.kind]||'●'} ${esc(n.name)}</b>${n.hint?`<span>${esc(n.hint)}</span>`:''}</div>`; };
     const cols=[[Battle.nodeById(R,'n1')],[Battle.nodeById(R,'n2a'),Battle.nodeById(R,'n2b')],[Battle.nodeById(R,'n3')]];
     CoreView.openModal(`${head(esc(s.title),'<span class="muted">출격 경로 · 체력이 이어져요</span>')}${msg?`<p class="so-msg">${esc(msg)}</p>`:''}
-    <div class="so-map">${cols.map(c=>`<div class="so-col">${c.map(nodeBtn).join('')}</div>`).join('<i class="so-arrow">›</i>')}</div>
-    <div class="so-sq">${sq.map(c=>{ const h=run.hp[c.id]??1; return `<div class="so-u ${h<=0?'down':h<.25?'crit':''}"><b>${esc(c.name)}</b><span class="hpb"><i style="width:${Math.round(Math.max(0,h)*100)}%"></i></span><small>${RANGE_ICO[Core.charRange(c)]} ${h<=0?'전투 불능':h<.25?'대파':Math.round(h*100)+'%'}</small></div>`; }).join('')}</div>
-    ${BattleView.sortieChoices(x)}`); }
+  <div class="so-map">${cols.map(c=>`<div class="so-col">${c.map(nodeBtn).join('')}</div>`).join('<i class="so-arrow">›</i>')}</div>
+  <div class="so-sq">${sq.map(c=>{ const h=run.hp[c.id]??1; return `<div class="so-u ${h<=0?'down':h<.25?'crit':''}"><b>${esc(c.name)}</b><span class="hpb"><i style="width:${Math.round(Math.max(0,h)*100)}%"></i></span><small>${RANGE_ICO[Core.charRange(c)]} ${h<=0?'전투 불능':h<.25?'대파':Math.round(h*100)+'%'}</small></div>`; }).join('')}</div>
+  ${BattleView.sortieChoices(x)}`); }
 
   static sortieChoices(x){ const {run,R}=x, cur=Battle.nodeById(R,run.node), sq=run.squad.map(charById).filter(Boolean), crit=sq.filter(c=>(run.hp[c.id]??1)>0&&(run.hp[c.id]??1)<.25).length;
     if(!run.path.includes(cur.id)) return `<div class="row" style="margin-top:10px;gap:6px"><button class="btn" data-act="sogo">${cur.kind==='supply'?'보급 받기':cur.kind==='boss'?'보스전 시작':'전투 시작'}</button><button class="btn ghost" data-act="soretreat">퇴각</button></div>`;

@@ -13,7 +13,7 @@ const gid = process.argv[2] && gidOf(dir); if (!gid || !hasGame(PC_DIR, gid)) { 
 const game = JSON.stringify(readGame(PC_DIR, gid).game), outDir = join(dir, 'shots'); mkdirSync(outDir, { recursive: true });
 const { out, errors } = await withPage(async page => {
   const log = {}, shot = name => page.screenshot({ path: join(outDir, name + '.png') }), text = sel => page.evaluate(s => (document.querySelector(s)?.innerText || '').replace(/\s+/g, ' ').slice(0, 400), sel);
-  await page.evaluate(game => { closeModal(); closeOv(); G = fix(JSON.parse(game)); applyMeta(); P().owned = {}; P().squad = []; P().firstTen = true; P().seenOpening = true; P().gems = Math.max(P().gems, 3000); window.reloadGame = () => {}; tab = 'lobby'; render(); }, game);
+  await page.evaluate(game => { closeModal(); closeOv(); G = fix(JSON.parse(game)); applyMeta(); P().owned = {}; P().squad = []; P().firstTen = true; P().seenOpening = true; P().gems = Math.max(P().gems, 3000); SystemView.reloadGame = () => {}; tab = 'lobby'; render(); }, game);
   await page.waitForTimeout(500); await shot('01-lobby'); log.lobby = await text('#view');
   await page.evaluate(() => { tab = 'contract'; render(); }); await page.waitForTimeout(400); await shot('02-contract'); log.contract = await text('#view');
   await page.evaluate(() => pull(10)); await page.waitForTimeout(1500);

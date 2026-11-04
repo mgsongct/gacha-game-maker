@@ -34,7 +34,7 @@ for (const dir of dirs) {
   const { out, errors } = await withPage(page => page.evaluate(async game => {
     const R = [], ok = (area, link, pass, why) => R.push({ area, link, res: pass === null ? '건너뜀' : pass ? '통과' : '실패', why: String(why || '').slice(0, 300) });
     const step = async (area, fn) => { try { await fn(); } catch (e) { R.push({ area, link: '(실행)', res: '실패', why: String(e && (e.stack || e.message) || e).split('\n').slice(0, 3).join(' ← ').slice(0, 300) }); } };
-    const g = JSON.parse(game); delete g.prog; G = fix(g); applyMeta(); const p = P(); p.seenOpening = true; SAMPLE = null; const toasts = []; toast = m => { toasts.push(String(m)); }; appConfirm = async () => true; closeModal(); closeOv(); // 연출(playGacha는 const)은 그대로 — 결과 화면은 닫음
+    const g = JSON.parse(game); delete g.prog; G = fix(g); applyMeta(); const p = P(); p.seenOpening = true; SAMPLE = null; const toasts = []; CoreView.toast = m => { toasts.push(String(m)); }; appConfirm = async () => true; closeModal(); closeOv(); // 연출(playGacha는 const)은 그대로 — 결과 화면은 닫음
     const names = ids => ids.map(id => (charById(id) || {}).name || id).join(', ');
     // ① 가챠
     await step('가챠', async () => { p.gems = 999999; const bn = (G.banners || []).find(b => b.active && b.type === 'std') || (G.banners || [])[0]; if (!bn) return ok('가챠', '배너', null, '배너 없음'); p.curBanner = bn.id;
@@ -46,7 +46,7 @@ for (const dir of dirs) {
       ok('가챠 ↔ 세력', '세력 배너 후보는 그 세력만(픽업·없는 등급 채움 제외)', !bad.length, `${(fb.pool.factions || []).join(',')}: 후보 ${fp.length}명${off.length ? ' · 다른 소속 ' + off.map(c => `${c.name}(${c.faction || '무소속'}·${['', 'R', 'SR', 'SSR'][c.rarity]}${have.has(c.rarity) ? '' : ' — 세력에 이 등급 없어 채움'})`).join(', ') : ''}`); } else ok('가챠 ↔ 세력', '세력 배너', null, '세력 배너 없음'); });
     // ② 장 진행
     const main = G.chapters.filter(ch => (ch.kind || 'main') === 'main'), stanceLog = [];
-    await step('장 진행', async () => { const realPlay = playStory; playStory = (t, sc, done) => { if (done) done(); };
+    await step('장 진행', async () => { const realPlay = SystemView.playStory; SystemView.playStory = (t, sc, done) => { if (done) done(); };
       for (const ch of main.slice(0, 2)) { for (const s of ch.stages || []) {
         const debutOf = G.chars.filter(c => c.debut === s.id).map(c => c.id), inbox0 = (p.inbox || []).length, owned0 = Object.keys(p.owned).length, last = ch.stages.at(-1) === s;
         if (s.mode === 'debate' || s.mode === 'contest') modeClear(ch, s, 3);
@@ -62,7 +62,7 @@ for (const dir of dirs) {
         const trig = (G.threads || []).filter(t => t.trigger && t.trigger.type === 'stage' && t.trigger.value === s.id).map(t => t.id); if (trig.length) ok('장 진행 ↔ 메신저', `${s.title}: 클리어 톡 배달`, trig.every(id => (p.inbox || []).some(x => (x.tid || x.id || x) === id) || (p.inbox || []).length > inbox0), `톡 ${trig.length}개 · 받은 편지함 ${inbox0}→${(p.inbox || []).length}`);
         void owned0; }
         stanceLog.push({ ch: main.indexOf(ch) + 1, now: mainNow() }); }
-      playStory = realPlay;
+      SystemView.playStory = realPlay;
       ok('장 진행', '진행 장(mainNow)이 깬 장 다음으로', main.length >= 2 ? mainNow() >= Math.min(3, main.length + 1) || mainNow() === main.findIndex(ch => ch.stages.some(s => !p.cleared[s.id])) + 1 : null, JSON.stringify(stanceLog)); });
     // ③ 세력 태도·관계 ↔ AI 컨텍스트
     await step('세력·관계', async () => { const F = factions(), n = mainNow(), changing = F.filter(f => (f.stance || []).length);

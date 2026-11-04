@@ -168,16 +168,32 @@ export function tdzRefs(units) { const order = [...units.filter(u => u.name.star
   const upFind = nm => { const [c, p] = nm.split('.'); if (!p) return nm; for (let k = c, i = 0; k && i < 20; k = supOf.get(k), i++) if (fnDecl.has(`${k}.${p}`)) return `${k}.${p}`; return nm; }; /* 물려받은 static 메서드(X.run)는 상위 class에서 */
   const calleeName0 = f => f?.type === 'identifier' ? f.text : f?.type === 'member_expression' && f.childForFieldName('object')?.type === 'identifier' ? `${f.childForFieldName('object').text}.${f.childForFieldName('property')?.text}` : null;
   const calleeName = f => { const n = calleeName0(f); return n && upFind(n); };
+  /* 표 칸 함수: 맨 위 const 표(객체·배열 글자) 안의 「칸: 함수」 — 칸 이름으로 부르면(s.fill(v) · PROG_SLOTS[k].make()) 그 함수들이 돎. 값은 함수 이름·Class.이름·그 자리 함수 */
+  const TBL_SKIP = /^(map|filter|forEach|find|some|every|push|join|sort|reduce|includes|slice|concat|then|catch|call|apply|bind|get|set|has|add|delete|keys|values|entries|test|replace|match|split|trim|indexOf)$/, tableFns = new Map();
+  order.forEach(u => { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type !== 'lexical_declaration' && c.type !== 'variable_declaration') continue;
+    for (const d of c.namedChildren) { const v = d.type === 'variable_declarator' ? d.childForFieldName('value') : null; if (!v || (v.type !== 'object' && v.type !== 'array')) continue;
+      walk(v, pr => { if (pr.type !== 'pair') return; const k = pr.childForFieldName('key')?.text.replace(/^['"]|['"]$/g, ''), fv = pr.childForFieldName('value'); if (!k || TBL_SKIP.test(k) || !fv) return;
+        const t = fv.type === 'identifier' ? { name: fv.text } : fv.type === 'member_expression' && fv.childForFieldName('object')?.type === 'identifier' ? { name: `${fv.childForFieldName('object').text}.${fv.childForFieldName('property')?.text}` } : /^(arrow_function|function_expression)$/.test(fv.type) ? { node: fv, u } : null;
+        if (t) { if (!tableFns.has(k)) tableFns.set(k, []); tableFns.get(k).push(t); } }); } } });
   const LATER = /^(setTimeout|setInterval|requestAnimationFrame|requestIdleCallback|queueMicrotask|addEventListener|then|catch|finally|on\w*)$/, seenOut = new Set();
   const later = n => { const call = n.parent?.type === 'arguments' ? n.parent.parent : null, f = call?.childForFieldName('function'); return !!f && LATER.test(f.type === 'member_expression' ? f.childForFieldName('property')?.text || '' : f.text); };
   order.forEach((u, ui) => { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type === 'function_declaration') continue; const at = c.startIndex, called = new Set();
-    const hit = (n, uu, via) => { const d = decl.get(n.text); if (d && (d.ui > ui || (d.ui === ui && d.at > (via ? at : n.startIndex)))) { const k = uu.loc(n) + n.text; if (!seenOut.has(k)) { seenOut.add(k); out.push({ loc: uu.loc(n), name: n.text, decl: d.loc, ...(via ? { via: u.loc(c) + ' → ' + via } : {}) }); } } };
-    /* 부른 함수 안에서는 늘 도는 자리만(갈래 if·삼항·&&·||·??의 뒤쪽·switch case·catch는 조건에 따라 돎 — 조건식 자체는 봄) */
+    const hit = (n, uu, via, cond) => { const d = decl.get(n.text); if (d && (d.ui > ui || (d.ui === ui && d.at > (via ? at : n.startIndex)))) { const k = uu.loc(n) + n.text; if (!seenOut.has(k)) { seenOut.add(k); out.push({ loc: uu.loc(n), name: n.text, decl: d.loc, ...(via ? { via: u.loc(c) + ' → ' + via } : {}), ...(cond ? { cond: true } : {}) }); } } };
+    /* 한 번 들어간 함수: 늘 도는 길로 들어갔으면 다시 안 감, 조건 길로만 들어갔으면 늘 도는 길로는 다시 감 */
+    const enter = (nm, cond) => { if (called.has(nm) || (cond && called.has(nm + '?'))) return false; called.add(cond ? nm + '?' : nm); return true; };
+    /* 부른 함수 안에서 갈래(if·삼항·&&·||·??의 뒤쪽·switch case)는 조건에 따라 돎 — 조건식은 늘 도는 자리, 갈래 안은 조건 길(cond)로 봄: data에 따라 앱이 안 뜸(보스가 있는 샘플이면 도는 render → … → stageBg 꼴). catch 안은 안 봄 */
     const always = n => n.type === 'if_statement' ? [n.childForFieldName('condition')] : n.type === 'ternary_expression' ? [n.childForFieldName('condition')] : n.type === 'binary_expression' && /^(&&|\|\||\?\?)$/.test(n.child(1)?.text || '') ? [n.childForFieldName('left')] : n.type === 'switch_statement' ? [n.childForFieldName('value')] : n.type === 'try_statement' ? [n.childForFieldName('body')] : n.type === 'catch_clause' ? [] : null;
-    const visit = (n, uu, via, inFn) => { if (!n || (FN.test(n.type) && (!inFn || n.parent?.type !== 'arguments' || later(n)))) return; /* 안쪽 함수는 바로 넘긴 콜백(forEach·map …)만 — 객체 칸·대입한 함수는 그때 안 돎 */
-      if (n.type === 'identifier' && !(n.parent?.type === 'variable_declarator' && n.parent.childForFieldName('name')?.id === n.id)) hit(n, uu, via);
-      if (n.type === 'call_expression' && calleeName(n.childForFieldName('function'))) { const nm = calleeName(n.childForFieldName('function')), fd = fnDecl.get(nm); if (fd && !called.has(nm)) { called.add(nm); visit(fd.c.childForFieldName('body'), fd.u, via ? via + ' → ' + nm : nm, true); } }
-      const ks = via ? always(n) : null; if (ks) { ks.forEach(k => visit(k, uu, via, inFn)); return; } for (let j = 0; j < n.childCount; j++) visit(n.child(j), uu, via, inFn); };
+    /* 이 부름(call)이 그때 돌리는 함수들: 표 칸 함수(s.fill(…) — PROG_SLOTS.x.fill) · 바로 도는 콜백으로 값으로 넘긴 함수(xs.flatMap(splitTags)) · 바로 부른 함수(이름·Class.이름) → [이름표, 본문, 단위] */
+    const CB = /^(map|flatMap|filter|forEach|find|findIndex|some|every|reduce|sort)$/, decl0 = (nm, label) => { const fd = nm && fnDecl.get(upFind(nm)); return fd ? [[label || nm, fd.c.childForFieldName('body'), fd.u]] : []; };
+    const targets = call => { const f = call.childForFieldName('function'), k = f?.type === 'member_expression' ? f.childForFieldName('property')?.text : null, o = f?.childForFieldName?.('object'), out = [];
+      if (k && tableFns.has(k) && !fnDecl.has(calleeName(f) || '') && !(o?.type === 'identifier' && supOf.has(o.text))) for (const t of tableFns.get(k)) out.push(...(t.node ? [['.' + k, t.node.childForFieldName('body'), t.u]] : decl0(t.name)));
+      if (CB.test(k || '')) for (const a of call.childForFieldName('arguments')?.namedChildren || []) out.push(...decl0(calleeName(a)));
+      return out.concat(decl0(calleeName(f))); };
+    const visit = (n, uu, via, inFn, cond) => { if (!n || (FN.test(n.type) && (!inFn || n.parent?.type !== 'arguments' || later(n)))) return; /* 안쪽 함수는 바로 넘긴 콜백(forEach·map …)만 — 객체 칸·대입한 함수는 그때 안 돎 */
+      if (n.type === 'identifier' && !(n.parent?.type === 'variable_declarator' && n.parent.childForFieldName('name')?.id === n.id)) hit(n, uu, via, cond);
+      if (n.type === 'call_expression') for (const [nm, body, tu] of targets(n)) if (enter(nm, cond)) visit(body, tu, via ? via + ' → ' + nm : nm, true, cond);
+      const ks = via ? always(n) : null, sub = (x, cd) => visit(x, uu, via, inFn, cd); if (!ks) { for (let j = 0; j < n.childCount; j++) sub(n.child(j), cond); return; }
+      ks.forEach(k => sub(k, cond)); if (n.type !== 'catch_clause' && n.type !== 'try_statement') for (let j = 0; j < n.childCount; j++) if (!ks.some(k => k?.id === n.child(j).id)) sub(n.child(j), true); };
     visit(c, u, '', false); } });
   return out; }
 // 선언 바로 위의 설명 주석(// 줄·한 줄 /* */·여러 줄 /* */)까지 같이 — 파일 머리말(/* =====)과 옮김 표식(…에서 옮김 */)은 남김

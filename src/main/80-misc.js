@@ -161,7 +161,7 @@ class MiscView {
 
     /* 그림 생성 결과 창 내용(View) */
 static naiResultHTML(o,op,k,url,job){ return `${head('생성 결과',`<span class="muted">${esc(o.name)} · ${esc(op.usedModel)} · 시드 ${op.usedSeed}${op.usedTp?' · 투명 배경':''}</span>`)}<div class="naiprev ${k} done"><img src="${url}" alt="${esc(o.name)}" data-original-src="${esc(job.originalSrc)}"></div>
-        <div class="row" style="margin-top:12px"><button class="btn" data-act="naiuse">이걸로 등록</button><button class="btn ghost" data-act="naiagain">다시 뽑기</button><button class="btn ghost" data-act="naiedit">설정 고치기</button></div>`; }
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="naiuse">이걸로 등록</button><button class="btn ghost" data-act="naiagain">다시 뽑기</button><button class="btn ghost" data-act="naiedit">설정 고치기</button></div>`; }
 
     /* 그리는 중 창 내용(View) */
 static naiDrawingHTML(o,k){ return `${head('그리는 중',`<span class="muted">${esc(o.name)}</span>`)}<div class="naiprev ${k}"><div class="spin"></div></div><p class="muted" id="nai_stat" style="text-align:center">보통 10~30초 걸려요. 창을 닫으면 결과를 버려요.</p>`; }
@@ -218,18 +218,18 @@ static imageScrollGuard(){
   static castCardHTML(c){ const q=CAST&&CAST.busy, bz=k=>q&&q.c===c.id&&q.k===k, wq=k=>CAST&&CAST.q.some(x=>x.c===c.id&&x.k===k), fs=Characters.imgSrc(c), us=c.upper&&Characters.imgSrc(c.upper), nf=(c.faces||[]).filter(f=>Characters.imgSrc(f)).length;
     const box=(k,src,lbl)=>`<div class="cast-im ${k}">${src?`<img src="${esc(src)}" alt="${esc(c.name)} ${lbl}">`:''}${bz(k)?'<span class="cast-st">그리는 중…</span>':wq(k)?'<span class="cast-st">순서 기다리는 중</span>':src?'':'<span class="cast-st">아직 없음</span>'}<b>${lbl}</b></div>`;
     return `<div class="cast-card" data-cid="${c.id}"><div class="cast-hd">${c.npc?'<span class="cast-npc">NPC</span>':`<span class="cs-rar r${c.rarity}">${RL[c.rarity]}</span>`}<b>${esc(c.name)}</b><i>${esc(c.faction||'')}</i></div>
-      <div class="cast-ims">${box('full',fs,'전신')}${box('up',us,'상반신')}</div>
-      ${nf?`<div class="cast-fc">${(c.faces||[]).filter(f=>Characters.imgSrc(f)).map(f=>`<span title="${esc(f.name)}"><img src="${esc((f.up&&Characters.imgSrc(f.up))||Characters.imgSrc(f))}" data-full="${esc(Characters.imgSrc(f))}" alt="${esc(f.name)}"><i>${esc(f.name)}</i></span>`).join('')}</div>`:''}
-      <div class="cast-btns"><button class="btn sm ghost" data-act="castre" data-id="${c.id}" data-k="full">⟳ 전신</button><button class="btn sm ghost" data-act="castre" data-id="${c.id}" data-k="up">⟳ 상반신</button><button class="btn sm ghost" data-act="castface" data-id="${c.id}" ${fs&&!c.npc?'':'disabled'}>😊 표정${nf?' '+nf:''}</button></div></div>`; }
+    <div class="cast-ims">${box('full',fs,'전신')}${box('up',us,'상반신')}</div>
+    ${nf?`<div class="cast-fc">${(c.faces||[]).filter(f=>Characters.imgSrc(f)).map(f=>`<span title="${esc(f.name)}"><img src="${esc((f.up&&Characters.imgSrc(f.up))||Characters.imgSrc(f))}" data-full="${esc(Characters.imgSrc(f))}" alt="${esc(f.name)}"><i>${esc(f.name)}</i></span>`).join('')}</div>`:''}
+    <div class="cast-btns"><button class="btn sm ghost" data-act="castre" data-id="${c.id}" data-k="full">⟳ 전신</button><button class="btn sm ghost" data-act="castre" data-id="${c.id}" data-k="up">⟳ 상반신</button><button class="btn sm ghost" data-act="castface" data-id="${c.id}" ${fs&&!c.npc?'':'disabled'}>😊 표정${nf?' '+nf:''}</button></div></div>`; }
 
   static openSkinProp(){ const P0=SKPROP; if(!P0||!P0.url) return; const c=charById(P0.cid); if(!c) return; const sel=P0.sel||{upper:1,illust:1,lbcg:1,faces:0,lines:SAMPLE?1:0};
     CoreView.openModal(`${head(`「${esc(P0.name)}」 제안`,`<span class="muted">${esc(c.name)}의 새 ${esc(System.T('skin'))} · 이 모습으로 만들까요?</span>`)}
-      <div class="skp-img"><img src="${esc(P0.url)}" alt="${esc(P0.name)}"></div><p class="muted" style="text-align:center;font-size:.78rem;margin:4px 0 0">그림을 누르면 크게 봐요</p>
-      <h3 class="sec">수락하면 함께 만들 것</h3>
-      ${CoreView.skinSelHTML(sel,c)}
-      <label class="f" for="skp_scene">일러스트·CG 장면 태그 (선택)</label><input class="in" id="skp_scene" value="${esc(P0.scene||'')}" placeholder="예: beach, sunset, waves, smile">
-      <p class="muted" style="font-size:.78rem">수락하면 뒤에서 차례로 그려요(위쪽 막대에 진행이 보여요). 표정은 얼굴 범위를 칠한 뒤 전신·상반신 모두 얼굴만 다시 그려요.</p>
-      <div class="row" style="margin-top:10px"><button class="btn" data-act="skpok">수락 · 이 모습으로 만들기</button><button class="btn ghost" data-act="skpredo">다시 그리기</button><button class="btn ghost" data-act="skpcancel">취소</button></div>`); }
+    <div class="skp-img"><img src="${esc(P0.url)}" alt="${esc(P0.name)}"></div><p class="muted" style="text-align:center;font-size:.78rem;margin:4px 0 0">그림을 누르면 크게 봐요</p>
+    <h3 class="sec">수락하면 함께 만들 것</h3>
+    ${CoreView.skinSelHTML(sel,c)}
+    <label class="f" for="skp_scene">일러스트·CG 장면 태그 (선택)</label><input class="in" id="skp_scene" value="${esc(P0.scene||'')}" placeholder="예: beach, sunset, waves, smile">
+    <p class="muted" style="font-size:.78rem">수락하면 뒤에서 차례로 그려요(위쪽 막대에 진행이 보여요). 표정은 얼굴 범위를 칠한 뒤 전신·상반신 모두 얼굴만 다시 그려요.</p>
+    <div class="row" style="margin-top:10px"><button class="btn" data-act="skpok">수락 · 이 모습으로 만들기</button><button class="btn ghost" data-act="skpredo">다시 그리기</button><button class="btn ghost" data-act="skpcancel">취소</button></div>`); }
 
   static memoCheck(c,before,after){ if(c&&c.memorial&&before<(+c.memorial.lv||8)&&after>=(+c.memorial.lv||8)) setTimeout(()=>CoreView.toast(`✦ ${c.name}의 메모리얼 「${c.memorial.title}」이(가) 열렸어요`),1200); }
 

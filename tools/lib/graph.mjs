@@ -21,7 +21,7 @@ const clsOf = n => n.type === 'method_definition' && n.parent?.type === 'class_b
 export function classTable(units) { const out = new Map(); for (const u of units) { const r = u.tree.rootNode; for (let i = 0; i < r.childCount; i++) { const c = r.child(i); if (c.type !== 'class_declaration') continue; const h = c.namedChildren.find(x => x.type === 'class_heritage'); out.set(c.childForFieldName('name')?.text, h?.namedChildren[0]?.text || null); } } return out; }
 /* X.p → 함수 기록: X부터 상위 class로 올라가며 'X.p'(같은 이름이 여러 class에 있는 메서드) 또는 이름 p(하나뿐인 메서드)를 찾음 */
 export function memberFn(fns, classes, obj, prop) { for (let c = obj, k = 0; c && k < 20; c = classes.get(c), k++) { const t = fns.get(`${c}.${prop}`) || (fns.get(prop)?.cls === c ? fns.get(prop) : null); if (t) return t; } return null; }
-const aliasOf = n => { if (n.type !== 'function_declaration') return null; const b = n.childForFieldName('body'), nm = n.childForFieldName('name')?.text; if (b?.namedChildCount !== 1) return null; const m = b.namedChild(0).text.match(/^return ([A-Z][\w$]*)\.([\w$]+)\(\.\.\.a\);$/); return m && m[2] === nm ? m[1] : null; };
+export const aliasOf = n => { if (n?.type !== 'function_declaration') return null; const b = n.childForFieldName('body'), nm = n.childForFieldName('name')?.text; if (b?.namedChildCount !== 1) return null; const m = b.namedChild(0).text.match(/^return ([A-Z][\w$]*)\.([\w$]+)\(\.\.\.a\);$/); return m && m[2] === nm ? m[1] : null; };
 // 복잡도: 분기 노드 + 논리 연산(&& || ??) + 1, 최대 중첩
 function complexity(body) { let c = 1, maxDepth = 0;
   const rec = (n, d) => { if (n !== body && FN.has(n.type)) return; let dd = d;
@@ -59,12 +59,16 @@ export function buildGraph(units) {
   const ASYNC = /^(setTimeout|setInterval|requestAnimationFrame|queueMicrotask)$|\.(then|catch|finally|addEventListener)$/;
   const owner = (u, n) => { let as = false; for (let p = fnAnc(n); p; p = fnAnc(p)) { const call = p.parent?.type === 'arguments' ? p.parent.parent : null; if (call?.type === 'call_expression' && ASYNC.test(call.childForFieldName('function')?.text || '')) as = true; const nm = fnName(p); if (nm) { const f = resolve(u, p, nm) || [...fns.values()].find(r => r.node.startIndex === p.startIndex && r.unit === u.name); if (f && f.node.startIndex === p.startIndex) return { f, as }; } } return null; };
   /* Class.메서드(…) 부름: 맨 위 class의 static 메서드로 풂 */
+  /* 물려받은 메서드를 X.m(…)으로 부름(StanceGen.run → Generator.run): 상위가 this로 부르는 훅을 X에서 보이는 구현(StanceGen.apply …)으로 — 다형 호출을 부른 자리의 간선으로 */
+  const methodsOf = new Map(); for (const f of fns.values()) if (f.cls) { if (!methodsOf.has(f.cls)) methodsOf.set(f.cls, []); methodsOf.get(f.cls).push(f); }
+  const hooks = (f, to) => { const X = f?.type === 'member_expression' && f.childForFieldName('object')?.type === 'identifier' ? f.childForFieldName('object').text : null; if (!X || !to.cls || to.cls === X) return [];
+    const names = new Set((methodsOf.get(to.cls) || []).map(m => m.name)); return [...names].map(nm => memberFn(fns, classes, X, nm)).filter(t => t && t !== to && t.cls !== to.cls); };
   /* Class.메서드(…)·this.메서드(…)(static 메서드 안 — 그 class부터) 부름: 맨 위 class의 static 메서드로 풂(물려받은 것은 상위 class에서) */
   const member = (f, at) => { if (f?.type !== 'member_expression') return null; const o = f.childForFieldName('object'), p = f.childForFieldName('property')?.text; if (o?.type === 'identifier' && classes.has(o.text)) return memberFn(fns, classes, o.text, p);
     if (o?.type === 'this') { for (let q = at; q; q = q.parent) if (q.type === 'method_definition') { const c = clsOf(q); return c ? memberFn(fns, classes, c, p) : null; } } return null; };
   for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression') return; const f = n.childForFieldName('function'); if (f?.type !== 'identifier' && !member(f, n)) return;
     const to = f.type === 'identifier' ? resolve(u, n, f.text) : member(f, n); if (!to) return; const o = owner(u, n); if (!o || o.f === to) return; const from = o.f;
-    from.calls.set(to.key, (from.calls.get(to.key) || 0) + 1); to.callers.add(from.key); if (!o.as) from.async.add(to.key); }); /* async 집합 = 동기로 부르는 대상 */
+    for (const t of [to, ...hooks(f, to)]) { if (t === from) continue; from.calls.set(t.key, (from.calls.get(t.key) || 0) + 1); t.callers.add(from.key); if (!o.as) from.async.add(t.key); } }); /* async 집합 = 동기로 부르는 대상 */
   // 함수를 담은 최상위 표(const X=[{…, fix:{run:o=>f(o)}, test:c=>…}]): 표 안의 함수는 속성 이름별 의사 함수 "X.run"·"X.test"로 두고, 그 안에서 부르는 함수를 호출로 잡음.
   // 어떤 함수가 그 속성을 멤버로 호출하면(rule.fix.run(o) · r.test(x)) 그 의사 함수를 부르는 것으로 봄 — 표를 참조만 하는 곳(AUDIT_RULES.map(r=>r.since))은 연결하지 않음.
   // 비동기 간선으로 둬서 동기 콜스택·순환에는 넣지 않음
@@ -74,7 +78,7 @@ export function buildGraph(units) {
       for (const d of st.namedChildren) { if (d.type !== 'variable_declarator') continue; const v = d.childForFieldName('value'), nm = d.childForFieldName('name')?.text; if (!nm || !v || (v.type !== 'array' && v.type !== 'object') || fns.has(nm)) continue;
         walk(v, pr => { if (pr.type !== 'pair') return; const k = pr.childForFieldName('key')?.text.replace(/^['"]|['"]$/g, ''), fv = pr.childForFieldName('value'); if (!k || BUILTIN.test(k) || !fv || !FN.has(fv.type)) return;
           const key = `${nm}.${k}`; let rec = fns.get(key); if (!rec) { rec = { key, name: key, unit: 'main', loc: mainT.loc(d), lines: 1, cc: 1, depth: 0, cases: null, node: d, calls: new Map(), async: new Set(), callers: new Set(), top: true, table: true }; fns.set(key, rec); if (!byProp.has(k)) byProp.set(k, []); byProp.get(k).push(rec); }
-          walk(fv, x => { if (x.type !== 'call_expression') return; const f = x.childForFieldName('function'); if (f?.type !== 'identifier') return; const to = resolve(mainT, x, f.text); if (!to) return; rec.calls.set(to.key, (rec.calls.get(to.key) || 0) + 1); to.callers.add(rec.key); }); }); } }
+          walk(fv, x => { if (x.type !== 'call_expression') return; const f = x.childForFieldName('function'), to = f?.type === 'identifier' ? resolve(mainT, x, f.text) : member(f, x); if (!to) return; /* 표 칸 함수 안의 Class.이름(…)도 */ rec.calls.set(to.key, (rec.calls.get(to.key) || 0) + 1); to.callers.add(rec.key); }); }); } }
     if (byProp.size) walk(mainT.tree.rootNode, n => { if (n.type !== 'call_expression') return; const f = n.childForFieldName('function'); if (f?.type !== 'member_expression') return; const k = f.childForFieldName('property')?.text; if (!byProp.has(k)) return; const recv = f.childForFieldName('object');
       if (recv?.type === 'identifier' && GLOBALS.has(recv.text) && !fns.has(recv.text) && !byProp.get(k).some(t => t.key.startsWith(recv.text + '.'))) return; /* 전역 객체의 멤버 호출 */
       const o = owner(mainT, n); if (!o || o.f.table) return; for (const t of byProp.get(k)) { o.f.calls.set(t.key, (o.f.calls.get(t.key) || 0) + 1); t.callers.add(o.f.key); } }); }

@@ -205,8 +205,8 @@ class LiveOpsView {
    if(System.playMode())return;const c=charById(cid);if(!c)return;if(!SAMPLE){CoreView.toast('설정의 글 AI에서 AI를 먼저 등록해 주세요');return;}
    Core.regenCancel();v2EnsureEquipment(c);
    CoreView.openModal(`${head('AI로 다시 만들기',`<span class="muted">${esc(c.name)}</span>`)}<p class="muted">바꿀 항목만 고르세요. 결과를 확인하고 적용하기 전까지 기존 캐릭터는 유지돼요.</p>
-   ${LiveOps.regenFields().map(([k,lab,cur])=>`<div class="rg-row"><label><input type="checkbox" data-rgsel="${k}"><b>${k==='skill'?'스킬 (한 슬롯)':esc(lab)}</b><span class="muted">${esc(String(cur(c)).slice(0,80))||'—'}</span></label>${k==='skill'?`<select class="in" id="rg_skill_slot" hidden>${Object.entries(GGMCombat.SLOTS).map(([key,label])=>`<option value="${key}" ${key==='active'?'selected':''}>${label}</option>`).join('')}</select>`:''}<input class="in" data-rgreqi="${k}" placeholder="이 항목 요구사항" hidden></div>`).join('')}
-   <label class="f" for="rg_all">전체 요구사항</label><textarea class="in" id="rg_all" style="min-height:52px" placeholder="선택한 항목에 함께 반영할 컨셉"></textarea><div class="row"><button class="btn" data-act="regengo" data-id="${c.id}">✦ 다시 만들기</button><button class="btn ghost" data-act="regencancel" data-id="${c.id}">취소</button></div>`);
+ ${LiveOps.regenFields().map(([k,lab,cur])=>`<div class="rg-row"><label><input type="checkbox" data-rgsel="${k}"><b>${k==='skill'?'스킬 (한 슬롯)':esc(lab)}</b><span class="muted">${esc(String(cur(c)).slice(0,80))||'—'}</span></label>${k==='skill'?`<select class="in" id="rg_skill_slot" hidden>${Object.entries(GGMCombat.SLOTS).map(([key,label])=>`<option value="${key}" ${key==='active'?'selected':''}>${label}</option>`).join('')}</select>`:''}<input class="in" data-rgreqi="${k}" placeholder="이 항목 요구사항" hidden></div>`).join('')}
+ <label class="f" for="rg_all">전체 요구사항</label><textarea class="in" id="rg_all" style="min-height:52px" placeholder="선택한 항목에 함께 반영할 컨셉"></textarea><div class="row"><button class="btn" data-act="regengo" data-id="${c.id}">✦ 다시 만들기</button><button class="btn ghost" data-act="regencancel" data-id="${c.id}">취소</button></div>`);
    document.querySelectorAll('#modal [data-rgsel]').forEach(ch=>ch.addEventListener('change',()=>{const row=ch.closest('.rg-row');row.querySelectorAll('input.in,select').forEach(el=>el.hidden=!ch.checked);}));
   }
 
@@ -217,46 +217,46 @@ class LiveOpsView {
 
   static schedHTML(){ const sc=Core.progRead('sched'), S=LiveOps.spots();
     return `${pageHead('일정','SCHEDULE','lobby')}<p class="muted">하루 ${SCHED_N}번, 장소에 나와 있는 ${System.T('crew')}을(를) 만나요. 좋아하는 장소에서 만나면 호감도를 더 많이 얻어요. 오늘 남은 일정 <b>${sc.left}/${SCHED_N}</b></p>
-    ${S.length?`<div class="sc-spots">${S.map(s=>{ const done=sc.done.includes(s.id), who=LiveOps.spotWho(s); return `<div class="sc-spot" style="${ArtView.bgStyle(s.bg||s.name)}"><b>${esc(s.name)}</b>${s.desc?`<div class="muted" style="font-size:.75rem">${esc(s.desc)}</div>`:''}
-      <div class="sc-who">${done?'<span class="badge">다녀옴</span>':who.length?who.map(c=>`<button class="btn sm" data-act="scvisit" data-s="${s.id}" data-c="${c.id}" ${sc.left?'':'disabled'}>${esc(c.name)}${LiveOps.spotFav(c,s)?' ♥':''}</button>`).join(''):'<span class="muted">아무도 없어요</span>'}</div></div>`; }).join('')}</div>`:`<p>아직 장소가 없어요.</p><button class="btn" data-act="scauto">자료실 배경으로 장소 만들기</button>`}
-    ${System.playMode()?'':`<div class="row" style="margin-top:10px;gap:6px"><button class="btn sm ghost" data-act="scai">AI로 장소 다시 정하기</button><button class="btn sm ghost" data-act="sctalkall">AI로 장면 만들기(장면 없는 ${System.T('crew')})</button></div>`}`; }
+  ${S.length?`<div class="sc-spots">${S.map(s=>{ const done=sc.done.includes(s.id), who=LiveOps.spotWho(s); return `<div class="sc-spot" style="${ArtView.bgStyle(s.bg||s.name)}"><b>${esc(s.name)}</b>${s.desc?`<div class="muted" style="font-size:.75rem">${esc(s.desc)}</div>`:''}
+    <div class="sc-who">${done?'<span class="badge">다녀옴</span>':who.length?who.map(c=>`<button class="btn sm" data-act="scvisit" data-s="${s.id}" data-c="${c.id}" ${sc.left?'':'disabled'}>${esc(c.name)}${LiveOps.spotFav(c,s)?' ♥':''}</button>`).join(''):'<span class="muted">아무도 없어요</span>'}</div></div>`; }).join('')}</div>`:`<p>아직 장소가 없어요.</p><button class="btn" data-act="scauto">자료실 배경으로 장소 만들기</button>`}
+  ${System.playMode()?'':`<div class="row" style="margin-top:10px;gap:6px"><button class="btn sm ghost" data-act="scai">AI로 장소 다시 정하기</button><button class="btn sm ghost" data-act="sctalkall">AI로 장면 만들기(장면 없는 ${System.T('crew')})</button></div>`}`; }
 
   static liveBar(msg){let el=document.getElementById('livebar');if(!msg){if(el)el.remove();return;}if(!el){el=document.createElement('div');el.id='livebar';document.body.appendChild(el);}el.textContent=msg;}
 
   static openSeasonInfo(){ const L=P().live, s=LiveOps.seasonNow(), nx=LiveOps.seasonNext();
     CoreView.openModal(`${head('시즌',`<span class="muted">${LiveOps.seasonDays()}일마다 운영 테마가 바뀌어요</span>`)}
-      ${s?`<div class="season-now s-${esc(s.type)}"><em>${LiveOps.seasonMeta(s.type)[3]}</em><div><b>지금: ${esc(LiveOps.seasonMeta(s.type)[1])}</b><span>${esc(LiveOps.seasonMeta(s.type)[2])} · ${new Date(s.until-1).toLocaleDateString('ko-KR')}까지</span></div></div>`:'<p class="muted">아직 시즌이 시작되지 않았어요.</p>'}
-      ${nx?`<p class="muted" style="margin:10px 0 4px">다음 시즌: <b>${esc(LiveOps.seasonMeta(nx)[1])}</b></p>`:''}
-      <h3 class="sec">로테이션에 넣을 시즌</h3><div class="chips">${SEASONS.map(x=>`<button class="chip ${L.seasons[x[0]]!==false?'on':''}" data-act="seasontog" data-k="${x[0]}">${x[3]} ${esc(x[1])}</button>`).join('')}</div>
-      <p class="muted" style="font-size:.8rem;margin-top:8px">스토리·이벤트·캐릭터 시즌은 글 AI로 새 콘텐츠를 만들어요. 육성·복각 시즌은 AI 없이도 돌아가요.</p>
-      <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="seasonskip">지금 다음 시즌으로 넘기기</button><button class="btn sm" data-act="close">닫기</button></div>`); }
+    ${s?`<div class="season-now s-${esc(s.type)}"><em>${LiveOps.seasonMeta(s.type)[3]}</em><div><b>지금: ${esc(LiveOps.seasonMeta(s.type)[1])}</b><span>${esc(LiveOps.seasonMeta(s.type)[2])} · ${new Date(s.until-1).toLocaleDateString('ko-KR')}까지</span></div></div>`:'<p class="muted">아직 시즌이 시작되지 않았어요.</p>'}
+    ${nx?`<p class="muted" style="margin:10px 0 4px">다음 시즌: <b>${esc(LiveOps.seasonMeta(nx)[1])}</b></p>`:''}
+    <h3 class="sec">로테이션에 넣을 시즌</h3><div class="chips">${SEASONS.map(x=>`<button class="chip ${L.seasons[x[0]]!==false?'on':''}" data-act="seasontog" data-k="${x[0]}">${x[3]} ${esc(x[1])}</button>`).join('')}</div>
+    <p class="muted" style="font-size:.8rem;margin-top:8px">스토리·이벤트·캐릭터 시즌은 글 AI로 새 콘텐츠를 만들어요. 육성·복각 시즌은 AI 없이도 돌아가요.</p>
+    <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="seasonskip">지금 다음 시즌으로 넘기기</button><button class="btn sm" data-act="close">닫기</button></div>`); }
 
   static openNotice(i){
     const n=P().live.notices[i]; if(!n) return;
     CoreView.openModal(`${head(esc(n.title),'<span class="muted">UPDATE NOTICE</span>')}<ul class="notice">${n.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="go" data-to="notice">공지 전체 보기</button></div>`);
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="go" data-to="notice">공지 전체 보기</button></div>`);
   }
 
   static noticeHTML(){
     const L=P().live, todo=Art.drawTodo();
     return `${pageHead('공지','NOTICE','lobby')}
-    ${L.notices.length?L.notices.map((n,i)=>`<div class="panel"><h3>${esc(n.title)}</h3><ul class="notice">${n.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div>`).join(''):'<div class="panel"><p class="muted">아직 공지가 없어요. 설정의 라이브 운영을 켜 두면 날짜에 맞춰 새 콘텐츠가 생겨요.</p></div>'}
-    <div class="panel"><h3>NAI로 그릴 것 ${todo.length}개</h3><p class="muted" style="margin:0 0 10px">${todo.slice(0,12).map(x=>esc(x.label)).join(', ')}${todo.length>12?' 외':''}</p>${todo.length?'<button class="btn" data-act="prepopen">그림 준비실 열기</button>':''}</div>`;
+  ${L.notices.length?L.notices.map((n,i)=>`<div class="panel"><h3>${esc(n.title)}</h3><ul class="notice">${n.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div>`).join(''):'<div class="panel"><p class="muted">아직 공지가 없어요. 설정의 라이브 운영을 켜 두면 날짜에 맞춰 새 콘텐츠가 생겨요.</p></div>'}
+  <div class="panel"><h3>NAI로 그릴 것 ${todo.length}개</h3><p class="muted" style="margin:0 0 10px">${todo.slice(0,12).map(x=>esc(x.label)).join(', ')}${todo.length>12?' 외':''}</p>${todo.length?'<button class="btn" data-act="prepopen">그림 준비실 열기</button>':''}</div>`;
   }
 
     /* 콘텐츠 점검·업그레이드 창 내용(View) */
 static auditHTML(focus,old,res,kinds,how,chars){ return `${head(focus?`${charById(focus)?.name||''} 점검`:'콘텐츠 점검·업그레이드',`<span class="muted">생성 규칙 v${LiveOps.auditGenVer()} · ${focus?'':`구버전 생성물 ${old}명`}</span>`)}
-      <p class="muted" style="font-size:.82rem;margin:0 0 8px">생성 기능이 좋아졌거나 예전에 만든 콘텐츠에 빠진 게 있으면 여기에서 찾아 고쳐요. 고치기 전 상태는 마지막 작업 한 번까지 되돌릴 수 있어요.</p>
-      ${AUDIT_UNDO?`<div class="panel" style="padding:8px 10px"><span class="muted">마지막 작업: ${esc(AUDIT_UNDO.label)} (${AUDIT_UNDO.items.length}개)</span> <button class="btn sm ghost" data-act="audundo">되돌리기</button></div>`:''}
-      ${res.length?res.map(({rule:r,items},gi)=>`<details class="panel" style="margin:6px 0" ${gi<3?'open':''}><summary><span class="badge">${kinds[r.kind]}</span> <b>${esc(r.label)}</b> <span class="muted">${items.length}개</span></summary>
-        <div style="max-height:160px;overflow:auto;margin:6px 0;font-size:.85rem">${items.map((o,i)=>`<label style="display:flex;gap:6px"><input type="checkbox" data-aud="${r.id}" data-i="${i}" checked>${esc(LiveOps.auditName(r,o))}${r.scope==='char'&&(+o.genVer||0)<LiveOps.auditGenVer()?' <span class="muted">(구버전)</span>':''}</label>`).join('')}</div>
-        <button class="btn sm" data-act="audfix" data-rule="${r.id}">선택 항목 ${how[r.fix.mode]}</button></details>`).join(''):'<p>👍 찾은 문제가 없어요.</p>'}
-      <details class="panel" style="margin-top:10px" ${focus?'open':''}><summary><b>지정 변환 (AI)</b> <span class="muted">고른 ${esc(System.T('crew'))}의 항목을 지시대로 바꿔요</span></summary>
-        <label class="f">대상</label><div style="max-height:120px;overflow:auto;font-size:.85rem">${chars.map(c=>`<label style="display:inline-flex;gap:4px;margin:2px 8px 2px 0"><input type="checkbox" data-audc="${c.id}" ${focus?'checked':''}>${esc(c.name)}</label>`).join('')}</div>
-        <label class="f">항목</label><div class="row" style="flex-wrap:wrap">${Object.entries(AUDIT_FIELDS).map(([k,[l]])=>`<label style="display:inline-flex;gap:4px"><input type="checkbox" data-audf="${k}">${esc(l)}</label>`).join('')}</div>
-        <label class="f" for="aud_ins">지시</label><textarea class="in" id="aud_ins" rows="2" placeholder="예: 대사를 모두 반말로 / 프로필에 출신지와 좋아하는 음식 추가 / 외모 태그를 겨울 분위기로"></textarea>
-        <div class="row" style="margin-top:6px"><button class="btn sm" data-act="audconv">지정 변환 시작</button></div></details>
-      <div class="row" style="margin-top:12px">${AUDIT_JOB?'<button class="btn ghost" data-act="audstop">작업 멈추기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>`; }
+    <p class="muted" style="font-size:.82rem;margin:0 0 8px">생성 기능이 좋아졌거나 예전에 만든 콘텐츠에 빠진 게 있으면 여기에서 찾아 고쳐요. 고치기 전 상태는 마지막 작업 한 번까지 되돌릴 수 있어요.</p>
+    ${AUDIT_UNDO?`<div class="panel" style="padding:8px 10px"><span class="muted">마지막 작업: ${esc(AUDIT_UNDO.label)} (${AUDIT_UNDO.items.length}개)</span> <button class="btn sm ghost" data-act="audundo">되돌리기</button></div>`:''}
+    ${res.length?res.map(({rule:r,items},gi)=>`<details class="panel" style="margin:6px 0" ${gi<3?'open':''}><summary><span class="badge">${kinds[r.kind]}</span> <b>${esc(r.label)}</b> <span class="muted">${items.length}개</span></summary>
+      <div style="max-height:160px;overflow:auto;margin:6px 0;font-size:.85rem">${items.map((o,i)=>`<label style="display:flex;gap:6px"><input type="checkbox" data-aud="${r.id}" data-i="${i}" checked>${esc(LiveOps.auditName(r,o))}${r.scope==='char'&&(+o.genVer||0)<LiveOps.auditGenVer()?' <span class="muted">(구버전)</span>':''}</label>`).join('')}</div>
+      <button class="btn sm" data-act="audfix" data-rule="${r.id}">선택 항목 ${how[r.fix.mode]}</button></details>`).join(''):'<p>👍 찾은 문제가 없어요.</p>'}
+    <details class="panel" style="margin-top:10px" ${focus?'open':''}><summary><b>지정 변환 (AI)</b> <span class="muted">고른 ${esc(System.T('crew'))}의 항목을 지시대로 바꿔요</span></summary>
+      <label class="f">대상</label><div style="max-height:120px;overflow:auto;font-size:.85rem">${chars.map(c=>`<label style="display:inline-flex;gap:4px;margin:2px 8px 2px 0"><input type="checkbox" data-audc="${c.id}" ${focus?'checked':''}>${esc(c.name)}</label>`).join('')}</div>
+      <label class="f">항목</label><div class="row" style="flex-wrap:wrap">${Object.entries(AUDIT_FIELDS).map(([k,[l]])=>`<label style="display:inline-flex;gap:4px"><input type="checkbox" data-audf="${k}">${esc(l)}</label>`).join('')}</div>
+      <label class="f" for="aud_ins">지시</label><textarea class="in" id="aud_ins" rows="2" placeholder="예: 대사를 모두 반말로 / 프로필에 출신지와 좋아하는 음식 추가 / 외모 태그를 겨울 분위기로"></textarea>
+      <div class="row" style="margin-top:6px"><button class="btn sm" data-act="audconv">지정 변환 시작</button></div></details>
+    <div class="row" style="margin-top:12px">${AUDIT_JOB?'<button class="btn ghost" data-act="audstop">작업 멈추기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>`; }
 
   static auditPanel(){ const n=LiveOps.auditScan().reduce((a,x)=>a+x.items.length,0), fresh=(+G.meta.auditSeen||0)<LiveOps.auditVer();
     return `<div class="panel pm-hide"><h3>콘텐츠 점검·업그레이드 ${fresh?'<span class="badge">생성 기능 향상</span>':''}</h3><p class="muted" style="margin:0 0 10px">${n?`고칠 수 있는 항목 ${n}개. `:''}빠진 대사·그림·태그, 구버전 생성물을 찾아 자동·AI로 고치거나, 고른 캐릭터를 지시대로 바꿔요.</p><button class="btn sm" data-act="audopen">점검 열기</button></div>`; }
@@ -309,7 +309,7 @@ static auditHTML(focus,old,res,kinds,how,chars){ return `${head(focus?`${charByI
 
     /* 새 업데이트 안내 창 내용(View) */
 static updateFoundHTML(man){ return `${head('업데이트가 있어요',`<span class="muted">${esc(APP_BUILD)} → <b>${esc(man.build)}</b></span>`)}${LiveOpsView.notesHTML(man)}
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="updget">받기</button><button class="btn ghost" data-act="updskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`; }
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="updget">받기</button><button class="btn ghost" data-act="updskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`; }
 
     /* 전에 문제가 있던 버전 안내 창 내용(View) */
 static updateBadHTML(man){ return `${head('이 버전은 전에 문제가 있었어요',`<span class="muted">${esc(man.build)}</span>`)}<p>이 버전은 이 기기에서 제대로 실행되지 않아서 설치 버전으로 돌아왔었어요. 새 버전이 나오면 자동으로 다시 알려 드려요.</p><div class="row" style="margin-top:12px"><button class="btn ghost" data-act="updget">그래도 받기</button><button class="btn" data-act="close">닫기</button></div>`; }
@@ -319,8 +319,8 @@ static updateReadyHTML(build){ return `${head('업데이트를 받았어요')}<p
 
     /* 웹 업데이트 안내 창 내용(View) */
 static updateWebFoundHTML(man,srvOld){ return `${head('업데이트가 있어요',`<span class="muted">${esc(APP_BUILD)} → <b>${esc(man.build)}</b></span>`)}${LiveOpsView.notesHTML(man)}
-        ${srvOld?'<p class="muted" style="font-size:.82rem">PC 서버 프로그램(ggm-server.py)도 바뀌었어요. Releases의 gacha-game-maker-pc.zip을 새로 받아 덮어쓰면 좋아요.</p>':''}
-        <div class="row" style="margin-top:12px"><button class="btn" data-act="webupdgo">지금 업데이트</button><button class="btn ghost" data-act="webupdskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`; }
+      ${srvOld?'<p class="muted" style="font-size:.82rem">PC 서버 프로그램(ggm-server.py)도 바뀌었어요. Releases의 gacha-game-maker-pc.zip을 새로 받아 덮어쓰면 좋아요.</p>':''}
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="webupdgo">지금 업데이트</button><button class="btn ghost" data-act="webupdskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`; }
 
   static notesHTML(man){const n=Array.isArray(man.notes)?man.notes:String(man.notes||'').split('|').map(x=>x.trim()).filter(Boolean);return n.length?`<div class="panel" style="margin:8px 0"><h3>바뀐 점</h3><ul style="margin:0;padding-left:18px">${n.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'';}
 }

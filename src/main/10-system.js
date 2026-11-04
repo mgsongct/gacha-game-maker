@@ -759,36 +759,36 @@ class SystemView {
   }
 
   static storyFormHTML(sc){ sc=sc||{}; return `<details class="optbox" style="margin-top:10px" ${sc.plot?'open':''}><summary><b>스토리 직접 짜기 · 분량</b> <span class="muted" style="font-size:.8rem">(선택)</span></summary>
-      <label class="f" for="ng_story">내가 짠 스토리 (적으면 AI가 이 줄거리를 따라요)</label><textarea class="in tall" id="ng_story" placeholder="예: 1장 - 주인공이 몰락한 왕국의 마지막 기사를 구한다. 2장 - 기사의 배신 의혹… 결말은 주인공이 왕좌를 거절한다. 주요 인물: 레아(기사, 무뚝뚝), 미르(마녀, 장난꾸러기)">${esc(sc.plot||'')}</textarea><p class="muted" id="story-char-count">${String(sc.plot||'').length.toLocaleString()} / 100,000자 · 50,000자 이상은 AI 전달량이 커질 수 있어요. 초과 내용은 자동으로 자르지 않습니다.</p>
-      <div class="g2"><div><label class="f" for="ng_stages">장마다 스테이지 수</label><select class="in" id="ng_stages">${CoreView.opt([[0,'자동 (4~5개)'],[3,'3개'],[4,'4개'],[5,'5개'],[6,'6개'],[8,'8개'],[10,'10개']],+sc.stages||0)}</select></div>
-      <div><label class="f" for="ng_len">스토리 분량</label><select class="in" id="ng_len">${CoreView.opt(Object.entries(STORY_LEN).map(([k,v])=>[k,v[0]+' (대본 '+v[1].pre+'줄)']),sc.len||'normal')}</select></div></div>
-      <div class="g2"><div><label class="f" for="ng_depth">스토리 제작 방식</label><select class="in" id="ng_depth">${CoreView.opt([['deep','꼼꼼하게 (구성 → 스테이지마다 따로 집필)'],['fast','빠르게 (한 번에)']],sc.depth==='fast'?'fast':'deep')}</select></div>
-      <div><label class="f" for="ng_newc">새 장·이벤트마다 새 ${esc(System.T('crew'))}</label><select class="in" id="ng_newc">${CoreView.opt([[0,'만들지 않기'],[1,'1명'],[2,'2명 (권장)'],[3,'3명']],sc.newc==null?2:+sc.newc)}</select></div></div>
-      <label class="f" for="ng_talkonly">장마다 전투 없는 이야기 스테이지</label><select class="in" id="ng_talkonly">${CoreView.opt([[0,'없음'],[1,'1개 정도'],[2,'2개 정도'],[3,'많이 (절반 가까이)']],sc.talkOnly==null?1:+sc.talkOnly)}</select>
-      <p class="muted" style="margin:4px 0 0;font-size:.78rem">이후 AI가 새 장을 쓸 때도 이 설정을 따라요. 설정 → 게임 정의에서 바꿀 수 있어요. 길게·꼼꼼하게 할수록 AI 사용량과 시간이 늘어요. 꼼꼼하게는 장 전체 구성을 먼저 짜고(장면·인물 관계·복선), 스테이지마다 따로 대본을 써서 묘사가 훨씬 두꺼워요.</p></details>`; }
+    <label class="f" for="ng_story">내가 짠 스토리 (적으면 AI가 이 줄거리를 따라요)</label><textarea class="in tall" id="ng_story" placeholder="예: 1장 - 주인공이 몰락한 왕국의 마지막 기사를 구한다. 2장 - 기사의 배신 의혹… 결말은 주인공이 왕좌를 거절한다. 주요 인물: 레아(기사, 무뚝뚝), 미르(마녀, 장난꾸러기)">${esc(sc.plot||'')}</textarea><p class="muted" id="story-char-count">${String(sc.plot||'').length.toLocaleString()} / 100,000자 · 50,000자 이상은 AI 전달량이 커질 수 있어요. 초과 내용은 자동으로 자르지 않습니다.</p>
+    <div class="g2"><div><label class="f" for="ng_stages">장마다 스테이지 수</label><select class="in" id="ng_stages">${CoreView.opt([[0,'자동 (4~5개)'],[3,'3개'],[4,'4개'],[5,'5개'],[6,'6개'],[8,'8개'],[10,'10개']],+sc.stages||0)}</select></div>
+    <div><label class="f" for="ng_len">스토리 분량</label><select class="in" id="ng_len">${CoreView.opt(Object.entries(STORY_LEN).map(([k,v])=>[k,v[0]+' (대본 '+v[1].pre+'줄)']),sc.len||'normal')}</select></div></div>
+    <div class="g2"><div><label class="f" for="ng_depth">스토리 제작 방식</label><select class="in" id="ng_depth">${CoreView.opt([['deep','꼼꼼하게 (구성 → 스테이지마다 따로 집필)'],['fast','빠르게 (한 번에)']],sc.depth==='fast'?'fast':'deep')}</select></div>
+    <div><label class="f" for="ng_newc">새 장·이벤트마다 새 ${esc(System.T('crew'))}</label><select class="in" id="ng_newc">${CoreView.opt([[0,'만들지 않기'],[1,'1명'],[2,'2명 (권장)'],[3,'3명']],sc.newc==null?2:+sc.newc)}</select></div></div>
+    <label class="f" for="ng_talkonly">장마다 전투 없는 이야기 스테이지</label><select class="in" id="ng_talkonly">${CoreView.opt([[0,'없음'],[1,'1개 정도'],[2,'2개 정도'],[3,'많이 (절반 가까이)']],sc.talkOnly==null?1:+sc.talkOnly)}</select>
+    <p class="muted" style="margin:4px 0 0;font-size:.78rem">이후 AI가 새 장을 쓸 때도 이 설정을 따라요. 설정 → 게임 정의에서 바꿀 수 있어요. 길게·꼼꼼하게 할수록 AI 사용량과 시간이 늘어요. 꼼꼼하게는 장 전체 구성을 먼저 짜고(장면·인물 관계·복선), 스테이지마다 따로 대본을 써서 묘사가 훨씬 두꺼워요.</p></details>`; }
 
   static aiLogHTML(fromDraft){ const f=t=>{ const d=new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`; };
     return `${head('AI 기록',`<span class="muted">최근 ${AILOG.length}건 · 새 것이 위</span>`)}
-    <p class="muted" style="margin:0 0 8px;font-size:.8rem">초안·스토리 생성이 안 될 때 어느 단계에서 왜 멈췄는지 볼 수 있어요. '복사'로 통째로 복사해서 제보에 붙여 주세요(API 키는 들어가지 않아요).</p>
-    <div class="row" style="margin-bottom:8px">${fromDraft?'<button class="btn sm" data-act="draft-open">‹ 초안으로</button>':''}<button class="btn sm" data-act="ailogcopy">전체 복사</button><button class="btn sm ghost" data-act="ailogclear">지우기</button><button class="btn sm ghost" data-act="ailog" data-v="${fromDraft?1:''}">새로고침</button></div>
-    ${AILOG.length?AILOG.map(e=>`<details class="ailog ${e.ok?'ok':'bad'}"><summary><b>${e.ok?'✓':'✗'}</b> <span>${esc(f(e.at))}</span> <i>${esc(e.stage||'')}</i> <span class="muted">${esc(e.who||'')}${e.model?' · '+esc(e.model):''}${e.tier?' · '+esc(e.tier):''}${e.ms!=null?' · '+(e.ms/1000).toFixed(1)+'초':''}</span>${e.err?`<em>${esc(e.err)}</em>`:''}</summary>
-      ${e.req?`<div class="muted" style="font-size:.72rem;margin-top:4px">요청 앞부분 (${nf(e.reqLen||0)}자)</div><pre>${esc(e.req)}</pre>`:''}${e.res?`<div class="muted" style="font-size:.72rem">응답 앞·뒤부분 (${nf(e.resLen||0)}자)</div><pre>${esc(e.res)}</pre>`:''}</details>`).join(''):'<p class="muted">아직 기록이 없어요.</p>'}`; }
+  <p class="muted" style="margin:0 0 8px;font-size:.8rem">초안·스토리 생성이 안 될 때 어느 단계에서 왜 멈췄는지 볼 수 있어요. '복사'로 통째로 복사해서 제보에 붙여 주세요(API 키는 들어가지 않아요).</p>
+  <div class="row" style="margin-bottom:8px">${fromDraft?'<button class="btn sm" data-act="draft-open">‹ 초안으로</button>':''}<button class="btn sm" data-act="ailogcopy">전체 복사</button><button class="btn sm ghost" data-act="ailogclear">지우기</button><button class="btn sm ghost" data-act="ailog" data-v="${fromDraft?1:''}">새로고침</button></div>
+  ${AILOG.length?AILOG.map(e=>`<details class="ailog ${e.ok?'ok':'bad'}"><summary><b>${e.ok?'✓':'✗'}</b> <span>${esc(f(e.at))}</span> <i>${esc(e.stage||'')}</i> <span class="muted">${esc(e.who||'')}${e.model?' · '+esc(e.model):''}${e.tier?' · '+esc(e.tier):''}${e.ms!=null?' · '+(e.ms/1000).toFixed(1)+'초':''}</span>${e.err?`<em>${esc(e.err)}</em>`:''}</summary>
+    ${e.req?`<div class="muted" style="font-size:.72rem;margin-top:4px">요청 앞부분 (${nf(e.reqLen||0)}자)</div><pre>${esc(e.req)}</pre>`:''}${e.res?`<div class="muted" style="font-size:.72rem">응답 앞·뒤부분 (${nf(e.resLen||0)}자)</div><pre>${esc(e.res)}</pre>`:''}</details>`).join(''):'<p class="muted">아직 기록이 없어요.</p>'}`; }
 
     /* 지침 프리셋 고치기: 입력칸에 그 프리셋을 채움(View) */
 static llmPresetFormFill(x){ $('#llp_name').value=x.name||''; $('#llp_pos').value=x.pos||'top'; $('#llp_text').value=x.text||''; $('#llp_id').value=x.id; $('#llp_text').focus({preventScroll:true}); }
 
   static llmHTML(){ const L=Core.llmSlots(); return `${head('글 AI 지침','<span class="muted">모든 글 AI 요청에 들어가요</span>')}
-    <label class="f" for="llm_top">상단 <span class="muted" style="font-size:.75rem">맨 앞 · 역할, 문체, 세계관 전반 규칙</span></label><textarea class="in" id="llm_top" style="min-height:80px" placeholder="예: 너는 서브컬처 가챠 게임 전문 시나리오 작가다. 문장은 짧고 리듬감 있게.">${esc(L.top)}</textarea>
-    <label class="f" for="llm_mid">중단 <span class="muted" style="font-size:.75rem">출력 형식 바로 앞 · 내용에 대한 요구</span></label><textarea class="in" id="llm_mid" style="min-height:80px" placeholder="예: 대사마다 캐릭터의 말버릇을 한 번 이상 살린다. 장면 묘사는 2문장 이내.">${esc(L.mid)}</textarea>
-    <label class="f" for="llm_bot">하단 <span class="muted" style="font-size:.75rem">맨 끝 · 마지막 확인·금지 사항</span></label><textarea class="in" id="llm_bot" style="min-height:80px" placeholder="예: 출력 전에 이름·호칭이 설정과 맞는지 다시 확인한다.">${esc(L.bot)}</textarea>
-    <label class="f" for="llm_tag">그림 태그 지침 <span class="muted" style="font-size:.75rem">AI가 그림(NovelAI) 태그를 쓸 때만 · 캐릭터 외형·일러스트·CG·배경·소품·의상</span></label><textarea class="in" id="llm_tag" style="min-height:80px" placeholder="예: 의상은 색·재질·장식을 3가지 이상 구체적으로. 일러스트·CG 장면 태그에는 조명(rim light, backlighting 등)과 구도(dutch angle, from below 등)를 1개씩 넣는다. 노출이 많은 의상 태그는 쓰지 않는다.">${esc(L.tag||'')}</textarea>
-    <p class="muted" style="margin:4px 0 0;font-size:.76rem">그림마다 항상 똑같이 붙일 태그는 설정 → 그림 AI의 '스탠딩 뒤·일러스트 뒤…' 칸에 적으세요(AI를 거치지 않고 그대로 붙어요).</p>
-    <div class="row" style="margin-top:12px"><button class="btn" data-act="llmsave">저장</button></div>
-    <h3 class="sec">지침 프리셋 <span class="muted" style="font-size:.75rem">켜 둔 것만 위 칸 뒤에 이어 붙어요</span></h3>
-    ${L.presets.length?L.presets.map(x=>`<div class="ep"><label style="display:flex;gap:8px;align-items:center;flex:1;min-width:0"><input type="checkbox" data-act="llmtog" data-id="${x.id}" ${x.on?'checked':''}><span class="t"><b>${esc(x.name||'이름 없음')}</b><span class="muted">${({top:'상단',mid:'중단',bot:'하단',tag:'그림 태그'})[x.pos]||'상단'} · ${esc(String(x.text||'').slice(0,40))}</span></span></label><button class="btn sm ghost" data-act="llmpedit" data-id="${x.id}">수정</button><button class="btn sm ghost" data-act="llmpcopy" data-id="${x.id}">내보내기</button><button class="btn sm ghost" data-act="llmpdel" data-id="${x.id}">✕</button></div>`).join(''):'<p class="muted" style="margin:0 0 6px;font-size:.82rem">자주 쓰는 지침을 이름 붙여 저장해 두면 복붙 없이 켜고 끌 수 있어요.</p>'}
-    <div class="optbox" style="margin-top:8px"><div class="g2"><div><label class="f" for="llp_name">이름</label><input class="in" id="llp_name" maxlength="30" placeholder="예: 문체 지침"></div><div><label class="f" for="llp_pos">자리</label><select class="in" id="llp_pos">${CoreView.opt([['top','상단'],['mid','중단'],['bot','하단'],['tag','그림 태그 지침']],'top')}</select></div></div>
-      <label class="f" for="llp_text">지침 내용</label><textarea class="in" id="llp_text" style="min-height:90px"></textarea><input type="hidden" id="llp_id" value="">
-      <div class="row" style="margin-top:8px"><button class="btn sm" data-act="llmpadd">프리셋 저장</button><button class="btn sm ghost" data-act="llmpimport">코드로 가져오기</button></div></div>`; }
+  <label class="f" for="llm_top">상단 <span class="muted" style="font-size:.75rem">맨 앞 · 역할, 문체, 세계관 전반 규칙</span></label><textarea class="in" id="llm_top" style="min-height:80px" placeholder="예: 너는 서브컬처 가챠 게임 전문 시나리오 작가다. 문장은 짧고 리듬감 있게.">${esc(L.top)}</textarea>
+  <label class="f" for="llm_mid">중단 <span class="muted" style="font-size:.75rem">출력 형식 바로 앞 · 내용에 대한 요구</span></label><textarea class="in" id="llm_mid" style="min-height:80px" placeholder="예: 대사마다 캐릭터의 말버릇을 한 번 이상 살린다. 장면 묘사는 2문장 이내.">${esc(L.mid)}</textarea>
+  <label class="f" for="llm_bot">하단 <span class="muted" style="font-size:.75rem">맨 끝 · 마지막 확인·금지 사항</span></label><textarea class="in" id="llm_bot" style="min-height:80px" placeholder="예: 출력 전에 이름·호칭이 설정과 맞는지 다시 확인한다.">${esc(L.bot)}</textarea>
+  <label class="f" for="llm_tag">그림 태그 지침 <span class="muted" style="font-size:.75rem">AI가 그림(NovelAI) 태그를 쓸 때만 · 캐릭터 외형·일러스트·CG·배경·소품·의상</span></label><textarea class="in" id="llm_tag" style="min-height:80px" placeholder="예: 의상은 색·재질·장식을 3가지 이상 구체적으로. 일러스트·CG 장면 태그에는 조명(rim light, backlighting 등)과 구도(dutch angle, from below 등)를 1개씩 넣는다. 노출이 많은 의상 태그는 쓰지 않는다.">${esc(L.tag||'')}</textarea>
+  <p class="muted" style="margin:4px 0 0;font-size:.76rem">그림마다 항상 똑같이 붙일 태그는 설정 → 그림 AI의 '스탠딩 뒤·일러스트 뒤…' 칸에 적으세요(AI를 거치지 않고 그대로 붙어요).</p>
+  <div class="row" style="margin-top:12px"><button class="btn" data-act="llmsave">저장</button></div>
+  <h3 class="sec">지침 프리셋 <span class="muted" style="font-size:.75rem">켜 둔 것만 위 칸 뒤에 이어 붙어요</span></h3>
+  ${L.presets.length?L.presets.map(x=>`<div class="ep"><label style="display:flex;gap:8px;align-items:center;flex:1;min-width:0"><input type="checkbox" data-act="llmtog" data-id="${x.id}" ${x.on?'checked':''}><span class="t"><b>${esc(x.name||'이름 없음')}</b><span class="muted">${({top:'상단',mid:'중단',bot:'하단',tag:'그림 태그'})[x.pos]||'상단'} · ${esc(String(x.text||'').slice(0,40))}</span></span></label><button class="btn sm ghost" data-act="llmpedit" data-id="${x.id}">수정</button><button class="btn sm ghost" data-act="llmpcopy" data-id="${x.id}">내보내기</button><button class="btn sm ghost" data-act="llmpdel" data-id="${x.id}">✕</button></div>`).join(''):'<p class="muted" style="margin:0 0 6px;font-size:.82rem">자주 쓰는 지침을 이름 붙여 저장해 두면 복붙 없이 켜고 끌 수 있어요.</p>'}
+  <div class="optbox" style="margin-top:8px"><div class="g2"><div><label class="f" for="llp_name">이름</label><input class="in" id="llp_name" maxlength="30" placeholder="예: 문체 지침"></div><div><label class="f" for="llp_pos">자리</label><select class="in" id="llp_pos">${CoreView.opt([['top','상단'],['mid','중단'],['bot','하단'],['tag','그림 태그 지침']],'top')}</select></div></div>
+    <label class="f" for="llp_text">지침 내용</label><textarea class="in" id="llp_text" style="min-height:90px"></textarea><input type="hidden" id="llp_id" value="">
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="llmpadd">프리셋 저장</button><button class="btn sm ghost" data-act="llmpimport">코드로 가져오기</button></div></div>`; }
 
   static aiProfilesHTML(){
     const A=System.AIP(); if(!A.list.length) return '<p class="muted">아직 등록된 AI가 없어요.</p>';
@@ -810,30 +810,30 @@ static llmPresetFormFill(x){ $('#llp_name').value=x.name||''; $('#llp_pos').valu
     const sel=(id,cur)=>`<select class="in" id="${id}">${bg.map(n=>`<option value="${esc(n)}" ${n===cur?'selected':''}>${n?esc(n):'없음'}</option>`).join('')}</select>`;
     const onoff=(id,v)=>`<select class="in" id="${id}">${CoreView.opt([['1','켜기'],['0','끄기']],v?'1':'0')}</select>`;
     CoreView.openModal(`${head('소리')}
-      <div class="slider"><label for="sd_bv"><span>배경음 볼륨</span></label><input id="sd_bv" type="range" min="0" max="100" value="${Math.round(s.bgmVol*100)}"></div>
-      <div class="slider"><label for="sd_xv"><span>효과음 볼륨</span></label><input id="sd_xv" type="range" min="0" max="100" value="${Math.round(s.sfxVol*100)}"></div>
-      <div class="slider"><label for="sd_vv"><span>음성 볼륨</span></label><input id="sd_vv" type="range" min="0" max="100" value="${Math.round(s.voiceVol*100)}"></div>
-      <div class="g2"><div><label class="f">배경음</label>${onoff('sd_bon',s.bgmOn)}</div><div><label class="f">스토리 음성</label>${onoff('sd_vs',s.voiceStory)}</div></div>
-      <div class="g2"><div><label class="f">로비 터치 음성</label>${onoff('sd_vl',s.voiceLobby)}</div><div><label class="f" for="sd_lang">목소리 언어</label><select class="in" id="sd_lang">${CoreView.opt([['ko','한국어 (자막 그대로)'],['ja','일본어 (자막은 한국어)']],s.voiceLang||'ko')}</select></div></div>
-      <p class="muted" style="margin:4px 0 0;font-size:.78rem">일본어로 하면 대사를 글 AI가 일본어로 옮겨서 읽어요(한 번 옮긴 대사는 저장해서 다시 쓰고, 처음 한 번은 글 AI 요금이 조금 들어요). 일본어를 잘하는 목소리를 고르면 더 자연스러워요.</p>
-      <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">장면별 배경음</h3>
-      <div class="g2"><div><label class="f">타이틀</label>${sel('sd_title',s.scene.title)}</div><div><label class="f">로비</label>${sel('sd_lobby',s.scene.lobby)}</div></div>
-      <div class="g2"><div><label class="f">전투</label>${sel('sd_battle',s.scene.battle)}</div><div><label class="f">보스전</label>${sel('sd_boss',s.scene.boss)}</div></div>
-      <div class="g2"><div><label class="f">계약</label>${sel('sd_gacha',s.scene.gacha)}</div><div></div></div>
-      <p class="muted" style="margin:6px 0 0">스토리에서는 대본의 [음악: 이름]으로 바뀌어요.</p>
-      <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">음성 AI (Fish Audio)</h3>
-      <label class="f" for="sd_fk">API 키</label><input class="in" id="sd_fk" type="password" autocomplete="off" value="${esc(s.fishKey)}">
-      <label class="f" for="sd_fm">음성 모델</label><select class="in" id="sd_fm">${CoreView.opt([['s2.1-pro','S2.1 Pro (기본)'],['s2-pro','S2 Pro'],['s1','S1'],['s2.1-pro-free','S2.1 Pro Free (무료 개발자 등급)'],['drama-3-preview','Drama 3 Preview']],s.fishModel)}</select>
-      <p class="muted" style="margin:4px 0 0">fish.audio 로그인 → API Keys에서 만들어요. 한 번 만든 대사 음성은 기기에 저장돼서 다시 들을 때 돈이 들지 않아요.</p>
-      <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">음악 AI (ElevenLabs Music)</h3>
-      <label class="f" for="sd_ek">API 키</label><input class="in" id="sd_ek" type="password" autocomplete="off" value="${esc(s.elKey)}">
-      <label class="f" for="sd_eb">API 주소 (비우면 공식 주소 ${EL_DEF})</label><input class="in" id="sd_eb" inputmode="url" autocomplete="off" placeholder="${EL_DEF}" value="${esc(s.elBase||'')}">
-      <div class="g2"><div><label class="f" for="sd_em">모델</label><select class="in" id="sd_em">${CoreView.opt([['music_v1','Music v1'],['music_v2','Music v2']],s.elModel)}</select></div><div><label class="f" for="sd_el">곡 길이(초)</label><input class="in" id="sd_el" type="number" value="${s.elLen}"></div></div>
-      <p class="muted" style="margin:4px 0 0">elevenlabs.io → Developers → API Keys에서 만들어요. 음악 생성은 유료 요금제에서 쓸 수 있어요.</p>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="sndsave">저장</button><button class="btn ghost" data-act="fishtest">Fish 연결 확인</button></div>
-      <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">저장된 음성</h3>
-      <p class="muted" id="vstat" style="margin:4px 0 8px">세는 중…</p>
-      <div class="row"><button class="btn sm ghost" data-act="vprebuild">전체 대사 미리 만들기</button><button class="btn sm ghost" data-act="vclearall">음성 저장소 비우기</button></div>`);
+    <div class="slider"><label for="sd_bv"><span>배경음 볼륨</span></label><input id="sd_bv" type="range" min="0" max="100" value="${Math.round(s.bgmVol*100)}"></div>
+    <div class="slider"><label for="sd_xv"><span>효과음 볼륨</span></label><input id="sd_xv" type="range" min="0" max="100" value="${Math.round(s.sfxVol*100)}"></div>
+    <div class="slider"><label for="sd_vv"><span>음성 볼륨</span></label><input id="sd_vv" type="range" min="0" max="100" value="${Math.round(s.voiceVol*100)}"></div>
+    <div class="g2"><div><label class="f">배경음</label>${onoff('sd_bon',s.bgmOn)}</div><div><label class="f">스토리 음성</label>${onoff('sd_vs',s.voiceStory)}</div></div>
+    <div class="g2"><div><label class="f">로비 터치 음성</label>${onoff('sd_vl',s.voiceLobby)}</div><div><label class="f" for="sd_lang">목소리 언어</label><select class="in" id="sd_lang">${CoreView.opt([['ko','한국어 (자막 그대로)'],['ja','일본어 (자막은 한국어)']],s.voiceLang||'ko')}</select></div></div>
+    <p class="muted" style="margin:4px 0 0;font-size:.78rem">일본어로 하면 대사를 글 AI가 일본어로 옮겨서 읽어요(한 번 옮긴 대사는 저장해서 다시 쓰고, 처음 한 번은 글 AI 요금이 조금 들어요). 일본어를 잘하는 목소리를 고르면 더 자연스러워요.</p>
+    <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">장면별 배경음</h3>
+    <div class="g2"><div><label class="f">타이틀</label>${sel('sd_title',s.scene.title)}</div><div><label class="f">로비</label>${sel('sd_lobby',s.scene.lobby)}</div></div>
+    <div class="g2"><div><label class="f">전투</label>${sel('sd_battle',s.scene.battle)}</div><div><label class="f">보스전</label>${sel('sd_boss',s.scene.boss)}</div></div>
+    <div class="g2"><div><label class="f">계약</label>${sel('sd_gacha',s.scene.gacha)}</div><div></div></div>
+    <p class="muted" style="margin:6px 0 0">스토리에서는 대본의 [음악: 이름]으로 바뀌어요.</p>
+    <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">음성 AI (Fish Audio)</h3>
+    <label class="f" for="sd_fk">API 키</label><input class="in" id="sd_fk" type="password" autocomplete="off" value="${esc(s.fishKey)}">
+    <label class="f" for="sd_fm">음성 모델</label><select class="in" id="sd_fm">${CoreView.opt([['s2.1-pro','S2.1 Pro (기본)'],['s2-pro','S2 Pro'],['s1','S1'],['s2.1-pro-free','S2.1 Pro Free (무료 개발자 등급)'],['drama-3-preview','Drama 3 Preview']],s.fishModel)}</select>
+    <p class="muted" style="margin:4px 0 0">fish.audio 로그인 → API Keys에서 만들어요. 한 번 만든 대사 음성은 기기에 저장돼서 다시 들을 때 돈이 들지 않아요.</p>
+    <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">음악 AI (ElevenLabs Music)</h3>
+    <label class="f" for="sd_ek">API 키</label><input class="in" id="sd_ek" type="password" autocomplete="off" value="${esc(s.elKey)}">
+    <label class="f" for="sd_eb">API 주소 (비우면 공식 주소 ${EL_DEF})</label><input class="in" id="sd_eb" inputmode="url" autocomplete="off" placeholder="${EL_DEF}" value="${esc(s.elBase||'')}">
+    <div class="g2"><div><label class="f" for="sd_em">모델</label><select class="in" id="sd_em">${CoreView.opt([['music_v1','Music v1'],['music_v2','Music v2']],s.elModel)}</select></div><div><label class="f" for="sd_el">곡 길이(초)</label><input class="in" id="sd_el" type="number" value="${s.elLen}"></div></div>
+    <p class="muted" style="margin:4px 0 0">elevenlabs.io → Developers → API Keys에서 만들어요. 음악 생성은 유료 요금제에서 쓸 수 있어요.</p>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="sndsave">저장</button><button class="btn ghost" data-act="fishtest">Fish 연결 확인</button></div>
+    <h3 class="disp" style="margin:16px 0 0;font-size:1.05rem">저장된 음성</h3>
+    <p class="muted" id="vstat" style="margin:4px 0 8px">세는 중…</p>
+    <div class="row"><button class="btn sm ghost" data-act="vprebuild">전체 대사 미리 만들기</button><button class="btn sm ghost" data-act="vclearall">음성 저장소 비우기</button></div>`);
     System.voiceStats().then(v=>{const el=$('#vstat'); if(el) el.textContent=`${v.n}개 · ${v.mb}MB. 같은 목소리·모델·대사는 다시 요청하지 않고 이 파일을 재생해요.`;});
   }
 
@@ -917,10 +917,10 @@ static shareDoneHTML(result,name){ return `${head('공유 팩 저장 완료')}<p
 
   static exportFile(opt){ opt=opt||{}; const share=!!opt.share;
     CoreView.openModal(`${head(share?'공유 팩 저장':'백업 파일 저장')}
-      <label class="f" for="bk_dest">저장 위치</label><select class="in" id="bk_dest">${SystemView.opt_(System.bkDests(),System.bkDest())}</select>
-      ${share?'':`<label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="bk_voice"><span>캐릭터 음성도 넣기 <span class="muted" style="font-size:.8rem">(새 기기에서 다시 만들지 않아도 돼요. 파일이 커져요)</span></span></label>`}
-      <p class="muted" style="margin:8px 0 0;font-size:.82rem">${IS_NATIVE?'문서·다운로드 폴더에 저장하면 휴대폰의 \'내 파일\' 앱에서 찾을 수 있어요. 앱을 지워도 남아요.':'PC에서는 \'직접 고르기\'로 원하는 폴더에 저장할 수 있어요.'}</p>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="bkgo" data-share="${share?1:0}" data-img="${opt.img===false?0:1}" data-aud="${opt.audio?1:0}" data-gate="${opt.gate===false?0:1}">저장</button><button class="btn ghost" data-act="close">취소</button></div>`);
+    <label class="f" for="bk_dest">저장 위치</label><select class="in" id="bk_dest">${SystemView.opt_(System.bkDests(),System.bkDest())}</select>
+    ${share?'':`<label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="bk_voice"><span>캐릭터 음성도 넣기 <span class="muted" style="font-size:.8rem">(새 기기에서 다시 만들지 않아도 돼요. 파일이 커져요)</span></span></label>`}
+    <p class="muted" style="margin:8px 0 0;font-size:.82rem">${IS_NATIVE?'문서·다운로드 폴더에 저장하면 휴대폰의 \'내 파일\' 앱에서 찾을 수 있어요. 앱을 지워도 남아요.':'PC에서는 \'직접 고르기\'로 원하는 폴더에 저장할 수 있어요.'}</p>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="bkgo" data-share="${share?1:0}" data-img="${opt.img===false?0:1}" data-aud="${opt.audio?1:0}" data-gate="${opt.gate===false?0:1}">저장</button><button class="btn ghost" data-act="close">취소</button></div>`);
   }
 
   static opt_(list,v){ return list.map(([k,l])=>`<option value="${esc(k)}" ${k===v?'selected':''}>${esc(l)}</option>`).join(''); }
@@ -966,12 +966,12 @@ static dataExportDoneHTML(where,gid){ return `${head('데이터 폴더 내보내
     const cb=Acquire.curBanner(), bgn=(cb&&cb.bg)||P().gachaBg;
     const bg=bgn?ArtView.bgStyle(bgn):'background:radial-gradient(circle at 50% 40%,#3a1d3f,#05030b 70%)';
     $('#ov').innerHTML=`<div class="gc" id="gc"><div class="gc-sky" style="${bg}"></div>${StoryView.shootHTML(6)}
-      <div class="gc-seal" id="gcSeal">${SystemView.sealSVG()}</div>
-      <div class="gc-streak" id="gcStreak" style="--sc:${fake?RCOL[2]:RCOL[top]}"><i class="tail"></i><i class="core"></i></div>
-      <div class="gc-flash" id="gcFlash"></div>
-      <button class="skipb" data-act="gcskip">건너뛰기</button>
-      <div class="gc-stage" id="gcStage" hidden><div class="pgrid n${res.length}">${res.map((x,i)=>`<button class="pc r${x.c.rarity}" data-act="flip" data-i="${i}" style="--d:${i*60}ms" aria-label="카드 열기"><div class="pin"><div class="pb">◆</div><div class="pf">${x.isNew?'<span class="tag">NEW</span>':`<span class="tag d">+${x.refund}</span>`}${CoreView.art(x.c)}<div class="lbl"><span class="badge r${x.c.rarity}c" style="background:rgba(0,0,0,.45)">${RL[x.c.rarity]}</span><br>${esc(x.c.name)}</div></div></div></button>`).join('')}</div>
-      <div class="row" style="width:100%;max-width:400px"><button class="btn ghost" data-act="flipall">모두 열기</button><button class="btn" data-act="closepull">확인</button></div></div></div>`;
+    <div class="gc-seal" id="gcSeal">${SystemView.sealSVG()}</div>
+    <div class="gc-streak" id="gcStreak" style="--sc:${fake?RCOL[2]:RCOL[top]}"><i class="tail"></i><i class="core"></i></div>
+    <div class="gc-flash" id="gcFlash"></div>
+    <button class="skipb" data-act="gcskip">건너뛰기</button>
+    <div class="gc-stage" id="gcStage" hidden><div class="pgrid n${res.length}">${res.map((x,i)=>`<button class="pc r${x.c.rarity}" data-act="flip" data-i="${i}" style="--d:${i*60}ms" aria-label="카드 열기"><div class="pin"><div class="pb">◆</div><div class="pf">${x.isNew?'<span class="tag">NEW</span>':`<span class="tag d">+${x.refund}</span>`}${CoreView.art(x.c)}<div class="lbl"><span class="badge r${x.c.rarity}c" style="background:rgba(0,0,0,.45)">${RL[x.c.rarity]}</span><br>${esc(x.c.name)}</div></div></div></button>`).join('')}</div>
+    <div class="row" style="width:100%;max-width:400px"><button class="btn ghost" data-act="flipall">모두 열기</button><button class="btn" data-act="closepull">확인</button></div></div></div>`;
     $('#ov').hidden=false; ArtView.bgm(Story.sceneOf().gacha);
     const T=(ms,f)=>GC.timers.push(setTimeout(f,ms));
     Art.sfx('계약진'); T(700,()=>{$('#gcStreak').classList.add('fall');Art.sfx('낙하');});
@@ -987,76 +987,76 @@ static dataExportDoneHTML(where,gid){ return `${head('데이터 폴더 내보내
     const SEC={
     practice:`<div class="panel"><h3>연습장</h3><p class="muted">허수아비를 세워놓고 스킬을 시험할 수 있어요. 파티 구성과 공격 방식·이펙트를 확인하세요. 허수아비는 반격하지 않고 체력이 무제한이며, 행동력 소모와 보상은 없습니다.</p><button class="btn" data-act="v2practice">연습장 열기</button></div>`,
     game:`<div class="panel"><h3>플레이 모드 ${System.playMode()?'<span class="badge">켜짐</span>':''}</h3>${System.subLocked()?`<p class="muted" style="margin:0 0 10px">구독한 게임이라 <b>플레이 전용</b>이에요. 스토리·이벤트·캐릭터는 만든 사람이 업데이트하고, 이 기기에서는 시즌·새 이벤트 같은 자체 업데이트도 하지 않아요. AI 키 없이 그대로 즐기면 돼요. 직접 고치고 이어서 만들고 싶으면 아래 '구독 끊기'를 하세요.</p>`:`<p class="muted" style="margin:0 0 10px">켜면 새 캐릭터·스토리 만들기, 편집, 그림 다시 그리기, 글·그림 AI 설정 같은 메뉴를 숨기고 게임만 해요. 이미 연결해 둔 AI는 그대로 써요(${System.T('talk')}·라이브 운영 등). 언제든 여기서 다시 끌 수 있어요.</p>`}<div class="row">${System.subLocked()?'':`<button class="btn sm ${System.playMode()?'ghost':''}" data-act="playmode">${System.playMode()?'플레이 모드 끄기':'플레이 모드 켜기'}</button>`}${System.playMode()?`<button class="btn sm ghost" data-act="pj-open">게임 목록 (${pj.list.length})</button>`:''}</div></div>
-    ${AcquireView.conSettingsPanel()}
-    ${ExpeditionView.exSettingsPanel()}
-    ${LiveOpsView.auditPanel()}
-    ${RulesView.rulesPanel()}
-    ${BattleView.battleSysPanel()}
-    ${RulesView.balancePanel()}
-    ${CharactersView.personaPanel()}
-    ${WorldView.factionPanel()}
-    ${StoryView.planPanel()}
-    ${ArtView.assetPanel()}
-    ${PromptStudioView.promptPanel()}
-    <div class="panel pm-hide"><h3>게임</h3><p class="muted" style="margin:0 0 10px">지금 게임: <b>${esc(G.meta.title)}</b>. 세계관, 용어, 속성, 화면 테마를 바꾸거나, AI로 완전히 다른 가챠 게임을 새로 만들 수 있어요. 게임은 여러 개 만들어 두고 오갈 수 있어요.</p>
-      <div class="row"><button class="btn sm" data-act="meta-open">게임 정의 편집</button><button class="btn sm" data-act="draft-open">AI로 새 게임 만들기</button><button class="btn sm ghost" data-act="pj-open">게임 목록 (${pj.list.length})</button></div></div>
-    <div class="panel"><h3>게시·구독</h3><p class="muted" style="margin:0 0 10px">${G.meta.subscr?`구독 중인 게임이에요 · v${G.meta.subscr.ver||0}${G.meta.subscr.at?' · '+esc(new Date(G.meta.subscr.at).toLocaleDateString())+' 받음':''}. 만든 사람이 업데이트하면 켤 때 알려 줘요.`:G.meta.pub&&G.meta.pub.ver?`게시 중 · v${G.meta.pub.ver}. 새 장·이벤트를 만든 뒤 다시 게시하면 구독한 사람에게 업데이트가 가요.`:'내 게임을 GitHub 공개 저장소에 올려 다른 사람이 구독하게 하거나, 다른 사람이 게시한 게임을 주소로 받아요.'}</p>
-      <div class="row">${G.meta.subscr?`<button class="btn sm" data-act="subcheck">업데이트 확인</button><button class="btn sm ghost" data-act="subcopy">구독 주소 복사</button><button class="btn sm ghost" data-act="subleave">구독 끊기</button>`:`<button class="btn sm" data-act="pubopen">🌐 게임 게시</button>`}<button class="btn sm ghost" data-act="subadd">🔗 게임 구독</button></div></div>
-    <div class="panel pm-hide"><h3>스토리 기억 관리</h3><p class="muted">장별 기억·관계·도감과 최근 스토리 요청을 확인합니다. 비밀 설정이 포함되는 작가용 메뉴입니다.</p><button class="btn sm" data-sm="open">스토리 기억 관리</button></div>
-    <div class="panel pm-hide"><h3>세계관: ${esc(w.name)}</h3><p style="margin:0 0 10px">${esc(w.summary)}</p><button class="btn sm ghost" data-act="world-open">세계관과 메인 플롯 편집</button></div>
-    <div class="panel pm-hide"><h3>${System.T('gacha')} 규칙</h3>
-      <div class="slider"><label for="r_ssr"><span>SSR 확률</span><b id="v_ssr">${s.ssr}%</b></label><input id="r_ssr" type="range" min="1" max="60" value="${s.ssr}" data-set="ssr"></div>
-      <div class="slider"><label for="r_sr"><span>SR 확률</span><b id="v_sr">${s.sr}%</b></label><input id="r_sr" type="range" min="0" max="80" value="${s.sr}" data-set="sr"></div>
-      <div class="slider"><label for="r_pity"><span>천장</span><b id="v_pity">${s.pity}회</b></label><input id="r_pity" type="range" min="5" max="150" value="${s.pity}" data-set="pity"></div>
-      <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" data-act="stamtog" ${s.stamina!==false?'checked':''}><span><b>행동력 사용</b> <span class="muted" style="font-size:.8rem">(메인·이벤트 10, 재료 던전 8 · 5분마다 1 회복 · 최대 ${STAM_MAX})</span></span></label>
-      <h3 class="sec" style="margin-top:12px">획득량 배율 <span class="muted" style="font-size:.75rem">전투·소탕·파견·일일 보급 보상에 곱해요</span></h3>
-      ${[['expRate','경험치 (캐릭터 경험치·재료)'],['goldRate',System.T('gold')],['gemRate',System.T('currency')]].map(([k,l])=>`<div class="slider"><label for="r_${k}"><span>${esc(l)}</span><b id="v_${k}">${s[k]||100}%</b></label><input id="r_${k}" type="range" min="50" max="500" step="10" value="${s[k]||100}" data-set="${k}"></div>`).join('')}</div>
-    <div class="panel"><h3>AI 창작실</h3><div class="row"><button class="btn sm" data-act="newpu">신규 픽업</button><button class="btn sm" data-act="aichapter-open">다음 장</button><button class="btn sm" data-act="aievent-open">새 이벤트</button></div></div>`,
+  ${AcquireView.conSettingsPanel()}
+  ${ExpeditionView.exSettingsPanel()}
+  ${LiveOpsView.auditPanel()}
+  ${RulesView.rulesPanel()}
+  ${BattleView.battleSysPanel()}
+  ${RulesView.balancePanel()}
+  ${CharactersView.personaPanel()}
+  ${WorldView.factionPanel()}
+  ${StoryView.planPanel()}
+  ${ArtView.assetPanel()}
+  ${PromptStudioView.promptPanel()}
+  <div class="panel pm-hide"><h3>게임</h3><p class="muted" style="margin:0 0 10px">지금 게임: <b>${esc(G.meta.title)}</b>. 세계관, 용어, 속성, 화면 테마를 바꾸거나, AI로 완전히 다른 가챠 게임을 새로 만들 수 있어요. 게임은 여러 개 만들어 두고 오갈 수 있어요.</p>
+    <div class="row"><button class="btn sm" data-act="meta-open">게임 정의 편집</button><button class="btn sm" data-act="draft-open">AI로 새 게임 만들기</button><button class="btn sm ghost" data-act="pj-open">게임 목록 (${pj.list.length})</button></div></div>
+  <div class="panel"><h3>게시·구독</h3><p class="muted" style="margin:0 0 10px">${G.meta.subscr?`구독 중인 게임이에요 · v${G.meta.subscr.ver||0}${G.meta.subscr.at?' · '+esc(new Date(G.meta.subscr.at).toLocaleDateString())+' 받음':''}. 만든 사람이 업데이트하면 켤 때 알려 줘요.`:G.meta.pub&&G.meta.pub.ver?`게시 중 · v${G.meta.pub.ver}. 새 장·이벤트를 만든 뒤 다시 게시하면 구독한 사람에게 업데이트가 가요.`:'내 게임을 GitHub 공개 저장소에 올려 다른 사람이 구독하게 하거나, 다른 사람이 게시한 게임을 주소로 받아요.'}</p>
+    <div class="row">${G.meta.subscr?`<button class="btn sm" data-act="subcheck">업데이트 확인</button><button class="btn sm ghost" data-act="subcopy">구독 주소 복사</button><button class="btn sm ghost" data-act="subleave">구독 끊기</button>`:`<button class="btn sm" data-act="pubopen">🌐 게임 게시</button>`}<button class="btn sm ghost" data-act="subadd">🔗 게임 구독</button></div></div>
+  <div class="panel pm-hide"><h3>스토리 기억 관리</h3><p class="muted">장별 기억·관계·도감과 최근 스토리 요청을 확인합니다. 비밀 설정이 포함되는 작가용 메뉴입니다.</p><button class="btn sm" data-sm="open">스토리 기억 관리</button></div>
+  <div class="panel pm-hide"><h3>세계관: ${esc(w.name)}</h3><p style="margin:0 0 10px">${esc(w.summary)}</p><button class="btn sm ghost" data-act="world-open">세계관과 메인 플롯 편집</button></div>
+  <div class="panel pm-hide"><h3>${System.T('gacha')} 규칙</h3>
+    <div class="slider"><label for="r_ssr"><span>SSR 확률</span><b id="v_ssr">${s.ssr}%</b></label><input id="r_ssr" type="range" min="1" max="60" value="${s.ssr}" data-set="ssr"></div>
+    <div class="slider"><label for="r_sr"><span>SR 확률</span><b id="v_sr">${s.sr}%</b></label><input id="r_sr" type="range" min="0" max="80" value="${s.sr}" data-set="sr"></div>
+    <div class="slider"><label for="r_pity"><span>천장</span><b id="v_pity">${s.pity}회</b></label><input id="r_pity" type="range" min="5" max="150" value="${s.pity}" data-set="pity"></div>
+    <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" data-act="stamtog" ${s.stamina!==false?'checked':''}><span><b>행동력 사용</b> <span class="muted" style="font-size:.8rem">(메인·이벤트 10, 재료 던전 8 · 5분마다 1 회복 · 최대 ${STAM_MAX})</span></span></label>
+    <h3 class="sec" style="margin-top:12px">획득량 배율 <span class="muted" style="font-size:.75rem">전투·소탕·파견·일일 보급 보상에 곱해요</span></h3>
+    ${[['expRate','경험치 (캐릭터 경험치·재료)'],['goldRate',System.T('gold')],['gemRate',System.T('currency')]].map(([k,l])=>`<div class="slider"><label for="r_${k}"><span>${esc(l)}</span><b id="v_${k}">${s[k]||100}%</b></label><input id="r_${k}" type="range" min="50" max="500" step="10" value="${s[k]||100}" data-set="${k}"></div>`).join('')}</div>
+  <div class="panel"><h3>AI 창작실</h3><div class="row"><button class="btn sm" data-act="newpu">신규 픽업</button><button class="btn sm" data-act="aichapter-open">다음 장</button><button class="btn sm" data-act="aievent-open">새 이벤트</button></div></div>`,
     player:`<div class="panel"><h3>${esc(System.T('player'))}</h3><p class="muted" style="margin:0 0 4px;font-size:.8rem">이름은 스토리·${esc(System.T('talk'))} 속 {${esc(System.T('player'))}} 자리에, 성별과 외모는 AI가 쓰는 대사·호칭에 반영돼요.</p><div id="pfWrap">${PlayerView.playerFormHTML()}</div><div class="row" style="margin-top:8px"><button class="btn sm" data-act="pfsave">저장</button></div></div>`,
     view:`<div class="panel"><h3>연출</h3>
-      <div class="g2"><div><label class="f">타이틀 ${System.T('crew')}</label><select class="in" data-pset="titleChar"><option value="">자동</option>${G.chars.map(c=>`<option value="${c.id}" ${P().titleChar===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
-      <div><label class="f">타이틀 배경</label><select class="in" data-pset="titleBg">${StoryView.bgOptions(P().titleBg)}</select></div></div>
-      <div class="g2"><div><label class="f">로비 표시 (타이틀은 일러스트 우선)</label><select class="in" data-pset="lobbyMode">${CoreView.opt([['auto','자동 (포즈 → 상반신 → 스탠딩)'],['illust','일러스트 표시'],['layer','항상 배경 + 캐릭터 따로 (캐릭터만 움직임)'],['stand','항상 스탠딩 + 배경']],P().lobbyMode||'auto')}</select></div><div><label class="f">로비 캐릭터 크기</label><select class="in" data-pset="lbSize">${CoreView.opt([['fit','위 배너에 안 가리게 (기본)'],['big','크게 (머리가 가려질 수 있어요)'],['small','작게']],P().lbSize||'fit')}</select></div></div>
-      <div class="g2"><div><label class="f">대본 연출 (감정 아이콘·동작·화면 효과)</label><select class="in" data-pset="vnDirect">${CoreView.opt([['auto','대본 + 대사에 맞춰 자동 감정 (기본)'],['script','대본에 쓴 것만'],['off','끄기']],P().vnDirect||'auto')}</select></div><div><label class="f">대화 무대</label><select class="in" data-pset="vnStage">${CoreView.opt([['duo','최근 두 사람 (기본)'],['single','말하는 사람만']],P().vnStage||'duo')}</select></div></div>
-      <label class="f">전투 애니메이션</label><select class="in" data-pset="battleMotion">${CoreView.opt([['full','일반 — 타격 동작·투사체·스피드라인'],['reduced','간소화 — 이동과 스피드라인 생략'],['system','기기의 동작 줄이기 설정에 맞춤']],P().battleMotion||'full')}</select>
-      <p class="muted" style="font-size:.8rem;margin:5px 0 12px">일반 모드는 기기의 애니메이션 배율과 별도로 전투 연출을 재생해요. 움직임을 줄이고 싶으면 간소화를 선택하세요.</p>
-      <label class="f">기술 컷인 (전투에서 스킬 쓸 때)</label><select class="in" data-pset="skillCut">${CoreView.opt([['auto','직접 쓴 스킬과 컷인 그림이 있는 '+System.T('crew')+'는 크게'],['big','항상 크게 (없으면 스탠딩)'],['small','작은 띠만'],['off','끄기']],P().skillCut||'auto')}</select>
-      <div class="g2"><div><label class="f">로비 배경</label><select class="in" data-pset="lobbyBg">${StoryView.bgOptions(P().lobbyBg)}</select></div>
-      <div><label class="f">기본 ${System.T('gacha')} 배경</label><select class="in" data-pset="gachaBg">${StoryView.bgOptions(P().gachaBg,'기본')}</select></div></div>
-      <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="title">타이틀 보기</button><button class="btn sm ghost" data-act="opening-edit">오프닝 편집</button><button class="btn sm ghost" data-act="opening-play">오프닝 다시 보기</button></div></div>
-    ${IS_NATIVE?'':`<div class="panel"><h3>아이폰·웹 연결</h3><p class="muted" style="margin:0 0 10px">웹 버전은 열 때마다 최신이에요. 일부 AI 서비스는 브라우저에서 직접 부르는 걸 막아서(CORS), 막히면 중계 서버를 거쳐요. ${System.webProxy()?'지금 중계 서버: <b>'+esc(System.webProxy())+'</b>':'중계 서버 없음'}</p>
-      <label class="f" for="orient_sel">화면 방향 (휴대폰)</label><select class="in" id="orient_sel">${CoreView.opt([['auto','기기 회전 따라'],['portrait','세로로 고정'],['landscape','가로로 고정']],System.orientPref())}</select>
-      <p class="muted" style="margin:4px 0 8px;font-size:.78rem">세로로 고정하면 휴대폰을 눕혀도 세로 화면으로 해요. 앱은 새 APK부터 고정돼요(지금 앱이 지원하지 않으면 알려 드려요).</p>
-      <label class="f" for="desk_mode">PC 화면 (넓은 화면에서)</label><select class="in" id="desk_mode">${CoreView.opt([['wide','가로로 넓게 (PC 게임처럼, 추천 · 휴대폰은 가로로 돌려서)'],['auto','가운데 세로로 (휴대폰처럼) + 옆 안내'],['off','끄기 (창 전체를 씀)']],System.deskMode())}</select>
-      <div class="row" style="margin-top:10px"><button class="btn sm" data-act="pxopen">중계 서버 설정</button>${IS_IOS&&!IS_STANDALONE?'<button class="btn sm ghost" data-act="a2hs">홈 화면에 추가하는 법</button>':''}</div></div>`}`,
+    <div class="g2"><div><label class="f">타이틀 ${System.T('crew')}</label><select class="in" data-pset="titleChar"><option value="">자동</option>${G.chars.map(c=>`<option value="${c.id}" ${P().titleChar===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+    <div><label class="f">타이틀 배경</label><select class="in" data-pset="titleBg">${StoryView.bgOptions(P().titleBg)}</select></div></div>
+    <div class="g2"><div><label class="f">로비 표시 (타이틀은 일러스트 우선)</label><select class="in" data-pset="lobbyMode">${CoreView.opt([['auto','자동 (포즈 → 상반신 → 스탠딩)'],['illust','일러스트 표시'],['layer','항상 배경 + 캐릭터 따로 (캐릭터만 움직임)'],['stand','항상 스탠딩 + 배경']],P().lobbyMode||'auto')}</select></div><div><label class="f">로비 캐릭터 크기</label><select class="in" data-pset="lbSize">${CoreView.opt([['fit','위 배너에 안 가리게 (기본)'],['big','크게 (머리가 가려질 수 있어요)'],['small','작게']],P().lbSize||'fit')}</select></div></div>
+    <div class="g2"><div><label class="f">대본 연출 (감정 아이콘·동작·화면 효과)</label><select class="in" data-pset="vnDirect">${CoreView.opt([['auto','대본 + 대사에 맞춰 자동 감정 (기본)'],['script','대본에 쓴 것만'],['off','끄기']],P().vnDirect||'auto')}</select></div><div><label class="f">대화 무대</label><select class="in" data-pset="vnStage">${CoreView.opt([['duo','최근 두 사람 (기본)'],['single','말하는 사람만']],P().vnStage||'duo')}</select></div></div>
+    <label class="f">전투 애니메이션</label><select class="in" data-pset="battleMotion">${CoreView.opt([['full','일반 — 타격 동작·투사체·스피드라인'],['reduced','간소화 — 이동과 스피드라인 생략'],['system','기기의 동작 줄이기 설정에 맞춤']],P().battleMotion||'full')}</select>
+    <p class="muted" style="font-size:.8rem;margin:5px 0 12px">일반 모드는 기기의 애니메이션 배율과 별도로 전투 연출을 재생해요. 움직임을 줄이고 싶으면 간소화를 선택하세요.</p>
+    <label class="f">기술 컷인 (전투에서 스킬 쓸 때)</label><select class="in" data-pset="skillCut">${CoreView.opt([['auto','직접 쓴 스킬과 컷인 그림이 있는 '+System.T('crew')+'는 크게'],['big','항상 크게 (없으면 스탠딩)'],['small','작은 띠만'],['off','끄기']],P().skillCut||'auto')}</select>
+    <div class="g2"><div><label class="f">로비 배경</label><select class="in" data-pset="lobbyBg">${StoryView.bgOptions(P().lobbyBg)}</select></div>
+    <div><label class="f">기본 ${System.T('gacha')} 배경</label><select class="in" data-pset="gachaBg">${StoryView.bgOptions(P().gachaBg,'기본')}</select></div></div>
+    <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="title">타이틀 보기</button><button class="btn sm ghost" data-act="opening-edit">오프닝 편집</button><button class="btn sm ghost" data-act="opening-play">오프닝 다시 보기</button></div></div>
+  ${IS_NATIVE?'':`<div class="panel"><h3>아이폰·웹 연결</h3><p class="muted" style="margin:0 0 10px">웹 버전은 열 때마다 최신이에요. 일부 AI 서비스는 브라우저에서 직접 부르는 걸 막아서(CORS), 막히면 중계 서버를 거쳐요. ${System.webProxy()?'지금 중계 서버: <b>'+esc(System.webProxy())+'</b>':'중계 서버 없음'}</p>
+    <label class="f" for="orient_sel">화면 방향 (휴대폰)</label><select class="in" id="orient_sel">${CoreView.opt([['auto','기기 회전 따라'],['portrait','세로로 고정'],['landscape','가로로 고정']],System.orientPref())}</select>
+    <p class="muted" style="margin:4px 0 8px;font-size:.78rem">세로로 고정하면 휴대폰을 눕혀도 세로 화면으로 해요. 앱은 새 APK부터 고정돼요(지금 앱이 지원하지 않으면 알려 드려요).</p>
+    <label class="f" for="desk_mode">PC 화면 (넓은 화면에서)</label><select class="in" id="desk_mode">${CoreView.opt([['wide','가로로 넓게 (PC 게임처럼, 추천 · 휴대폰은 가로로 돌려서)'],['auto','가운데 세로로 (휴대폰처럼) + 옆 안내'],['off','끄기 (창 전체를 씀)']],System.deskMode())}</select>
+    <div class="row" style="margin-top:10px"><button class="btn sm" data-act="pxopen">중계 서버 설정</button>${IS_IOS&&!IS_STANDALONE?'<button class="btn sm ghost" data-act="a2hs">홈 화면에 추가하는 법</button>':''}</div></div>`}`,
     sound:`<div class="panel"><h3>소리</h3><p class="muted" style="margin:0 0 10px">${Core.SND().fishKey?'Fish Audio 연결됨':'Fish Audio 미연결'} · ${Core.SND().elKey?'ElevenLabs 연결됨':'ElevenLabs 미연결'}</p>
-      <div class="row"><button class="btn sm" data-act="sndopen">소리 설정</button><button class="btn sm ghost" data-act="lib" data-k="bgm">배경음 ${done(G.lib.filter(l=>l.kind==='bgm'))}/${G.lib.filter(l=>l.kind==='bgm').length}</button><button class="btn sm ghost" data-act="lib" data-k="sfx">효과음 ${done(nx)}/${nx.length}</button><button class="btn sm ghost" data-act="bgmall">🎵 배경음 한꺼번에 작곡</button></div></div>`,
+    <div class="row"><button class="btn sm" data-act="sndopen">소리 설정</button><button class="btn sm ghost" data-act="lib" data-k="bgm">배경음 ${done(G.lib.filter(l=>l.kind==='bgm'))}/${G.lib.filter(l=>l.kind==='bgm').length}</button><button class="btn sm ghost" data-act="lib" data-k="sfx">효과음 ${done(nx)}/${nx.length}</button><button class="btn sm ghost" data-act="bgmall">🎵 배경음 한꺼번에 작곡</button></div></div>`,
     lib:`<div class="panel"><h3>자료실</h3><p class="muted" style="margin:0 0 10px">스토리와 ${System.T('talk')}에 쓰이는 배경과 소품이에요. 이미지가 없으면 자동 생성된 풍경이 쓰여요.</p>
-      <div class="row"><button class="btn sm" data-act="lib" data-k="bg">배경 ${done(nb)}/${nb.length}</button><button class="btn sm" data-act="lib" data-k="prop">소품 ${done(np)}/${np.length}</button><button class="btn sm" data-act="lib" data-k="enemy">적 ${done(G.lib.filter(l=>l.kind==='enemy'))}/${G.lib.filter(l=>l.kind==='enemy').length}</button><button class="btn sm" data-act="lib" data-k="cg">CG ${done(G.lib.filter(l=>l.kind==='cg'))}/${G.lib.filter(l=>l.kind==='cg').length}</button><button class="btn sm" data-act="lib" data-k="icon">재화 아이콘 ${done(G.lib.filter(l=>l.kind==='icon'))}/${G.lib.filter(l=>l.kind==='icon').length}</button><button class="btn sm" data-act="lib" data-k="map">작전 지도 ${done(G.lib.filter(l=>l.kind==='map'))}/${G.lib.filter(l=>l.kind==='map').length}</button><button class="btn sm" data-act="npcopen">NPC ${(G.npcs||[]).filter(x=>Characters.imgSrc(x)).length}/${(G.npcs||[]).length}</button></div></div>`,
+    <div class="row"><button class="btn sm" data-act="lib" data-k="bg">배경 ${done(nb)}/${nb.length}</button><button class="btn sm" data-act="lib" data-k="prop">소품 ${done(np)}/${np.length}</button><button class="btn sm" data-act="lib" data-k="enemy">적 ${done(G.lib.filter(l=>l.kind==='enemy'))}/${G.lib.filter(l=>l.kind==='enemy').length}</button><button class="btn sm" data-act="lib" data-k="cg">CG ${done(G.lib.filter(l=>l.kind==='cg'))}/${G.lib.filter(l=>l.kind==='cg').length}</button><button class="btn sm" data-act="lib" data-k="icon">재화 아이콘 ${done(G.lib.filter(l=>l.kind==='icon'))}/${G.lib.filter(l=>l.kind==='icon').length}</button><button class="btn sm" data-act="lib" data-k="map">작전 지도 ${done(G.lib.filter(l=>l.kind==='map'))}/${G.lib.filter(l=>l.kind==='map').length}</button><button class="btn sm" data-act="npcopen">NPC ${(G.npcs||[]).filter(x=>Characters.imgSrc(x)).length}/${(G.npcs||[]).length}</button></div></div>`,
     text:`<div class="panel"><h3>글 AI</h3>${SystemView.aiProfilesHTML()}
-      <div class="row" style="margin-top:10px"><button class="btn sm" data-act="apnew">AI 추가</button><button class="btn sm ghost" data-act="apfb">실패하면 다음 AI로 ${System.AIP().fallback?'켜짐':'꺼짐'}</button><button class="btn sm ghost" data-act="ailog">🔍 AI 기록</button><button class="btn sm ghost" data-act="llmopen">생성 지침${(()=>{ const L=System.llmEff(); return L.top||L.mid||L.bot?' ✓':''; })()}</button></div></div>`,
+    <div class="row" style="margin-top:10px"><button class="btn sm" data-act="apnew">AI 추가</button><button class="btn sm ghost" data-act="apfb">실패하면 다음 AI로 ${System.AIP().fallback?'켜짐':'꺼짐'}</button><button class="btn sm ghost" data-act="ailog">🔍 AI 기록</button><button class="btn sm ghost" data-act="llmopen">생성 지침${(()=>{ const L=System.llmEff(); return L.top||L.mid||L.bot?' ✓':''; })()}</button></div></div>`,
     img:`<div class="panel"><h3>그림 AI</h3><p class="muted" style="margin:0 0 8px">${Art.imgProvider()==='comfy'?'ComfyUI '+(Core.imgReady()?'연결 설정됨':'설정 미완료'):'NovelAI '+(Core.naiCfg().key?'토큰 등록됨':'미등록')}</p><div class="row"><button class="btn sm ghost" data-act="naiopen">그림 AI 설정</button><button class="btn sm ghost" data-act="packopen">그림체 프리셋</button><button class="btn sm ghost" data-act="dsopen">🎨 캐릭터 디자인 통일${G.meta.design&&(G.meta.design.all||Object.values(G.meta.design.fac||{}).some(Boolean))?' ✓':''}</button><button class="btn sm" data-act="prepopen">그림 준비실 (${Art.drawTodo().length})</button><button class="btn sm ghost" data-act="setupopen">처음 설정 다시</button></div></div>`,
     live:`${v2SeasonGenerationHTML()}<div class="panel"><h3>시즌 운영</h3><p class="muted" style="margin:0 0 10px">앱을 켤 때 날짜를 보고 새 콘텐츠를 자동으로 만들어요. 켠 항목만큼 글 AI 요금이 들어요.</p>
-      <div class="chips">${(P().live.on.season?[['season',LiveOps.cycLabel('season')+' 시즌 로테이션'],['talk',LiveOps.cycLabel('talk')+(LiveOps.cycDays('talk')>1?'마다':'')+' 새 '+System.T('talk')],['pass','매달 '+System.T('pass')+' 초기화'],['skin','시즌마다 새 '+System.T('skin')+' 상점'],['fill','빈 콘텐츠 자동 채움']]:[['season',LiveOps.cycLabel('season')+' 시즌 로테이션'],['talk',LiveOps.cycLabel('talk')+(LiveOps.cycDays('talk')>1?'마다':'')+' 새 '+System.T('talk')],['event',LiveOps.cycLabel('event')+'마다 새 이벤트'],['rerun','이벤트 복각'],['rotate',LiveOps.cycLabel('rotate')+'마다 확률 업 교체'],['pass','매달 '+System.T('pass')+' 초기화'],['chapter',LiveOps.cycLabel('chapter')+'마다 메인 다음 장'],['skin',LiveOps.cycLabel('rotate')+'마다 새 '+System.T('skin')+' 상점'],['fill','빈 콘텐츠 자동 채움']]).map(([k,l])=>`<button class="chip ${P().live.on[k]?'on':''}" data-act="livetog" data-k="${k}">${esc(l)}</button>`).join('')}</div>
-      <h4 class="sec" style="margin-top:12px">운영 주기</h4>
-      <div class="g2">${(P().live.on.season?['season','talk']:['talk','event','chapter','rotate']).map(k=>`<div><label class="f" for="cyc_${k}">${({season:'시즌 길이',event:'새 이벤트',chapter:'메인 다음 장',talk:'새 '+esc(System.T('talk')),rotate:'확률 업 교체 · 새 '+esc(System.T('skin'))})[k]}</label><select class="in" id="cyc_${k}" data-cyc="${k}">${CoreView.opt(LIVE_CYC[k][1].map(([d,l])=>[d,d===1?l:l+'마다']),LiveOps.cycDays(k))}</select></div>`).join('')}</div>
-      <p class="muted" style="margin:4px 0 0;font-size:.78rem">주기를 바꾸면 그때부터 새로 세요. 짧을수록 글 AI 사용량이 늘어요.</p>
-      ${P().live.on.season?`<p class="muted" style="margin:8px 0 0;font-size:.82rem">스토리 → 이벤트 → 캐릭터 → 복각 → 육성 시즌이 ${esc(LiveOps.cycLabel('season'))}마다 돌아가요. ${LiveOps.seasonNow()?'지금: '+esc(LiveOps.seasonMeta(LiveOps.seasonNow().type)[1])+' · ':''}<button class="linkb" data-act="seasoninfo">시즌 설정</button></p>`:''}
-      <div class="row" style="margin-top:10px"><button class="btn sm" data-act="liverun">지금 업데이트 실행</button><button class="btn sm ghost" data-act="go" data-to="notice">공지 보기</button></div></div>`,
+    <div class="chips">${(P().live.on.season?[['season',LiveOps.cycLabel('season')+' 시즌 로테이션'],['talk',LiveOps.cycLabel('talk')+(LiveOps.cycDays('talk')>1?'마다':'')+' 새 '+System.T('talk')],['pass','매달 '+System.T('pass')+' 초기화'],['skin','시즌마다 새 '+System.T('skin')+' 상점'],['fill','빈 콘텐츠 자동 채움']]:[['season',LiveOps.cycLabel('season')+' 시즌 로테이션'],['talk',LiveOps.cycLabel('talk')+(LiveOps.cycDays('talk')>1?'마다':'')+' 새 '+System.T('talk')],['event',LiveOps.cycLabel('event')+'마다 새 이벤트'],['rerun','이벤트 복각'],['rotate',LiveOps.cycLabel('rotate')+'마다 확률 업 교체'],['pass','매달 '+System.T('pass')+' 초기화'],['chapter',LiveOps.cycLabel('chapter')+'마다 메인 다음 장'],['skin',LiveOps.cycLabel('rotate')+'마다 새 '+System.T('skin')+' 상점'],['fill','빈 콘텐츠 자동 채움']]).map(([k,l])=>`<button class="chip ${P().live.on[k]?'on':''}" data-act="livetog" data-k="${k}">${esc(l)}</button>`).join('')}</div>
+    <h4 class="sec" style="margin-top:12px">운영 주기</h4>
+    <div class="g2">${(P().live.on.season?['season','talk']:['talk','event','chapter','rotate']).map(k=>`<div><label class="f" for="cyc_${k}">${({season:'시즌 길이',event:'새 이벤트',chapter:'메인 다음 장',talk:'새 '+esc(System.T('talk')),rotate:'확률 업 교체 · 새 '+esc(System.T('skin'))})[k]}</label><select class="in" id="cyc_${k}" data-cyc="${k}">${CoreView.opt(LIVE_CYC[k][1].map(([d,l])=>[d,d===1?l:l+'마다']),LiveOps.cycDays(k))}</select></div>`).join('')}</div>
+    <p class="muted" style="margin:4px 0 0;font-size:.78rem">주기를 바꾸면 그때부터 새로 세요. 짧을수록 글 AI 사용량이 늘어요.</p>
+    ${P().live.on.season?`<p class="muted" style="margin:8px 0 0;font-size:.82rem">스토리 → 이벤트 → 캐릭터 → 복각 → 육성 시즌이 ${esc(LiveOps.cycLabel('season'))}마다 돌아가요. ${LiveOps.seasonNow()?'지금: '+esc(LiveOps.seasonMeta(LiveOps.seasonNow().type)[1])+' · ':''}<button class="linkb" data-act="seasoninfo">시즌 설정</button></p>`:''}
+    <div class="row" style="margin-top:10px"><button class="btn sm" data-act="liverun">지금 업데이트 실행</button><button class="btn sm ghost" data-act="go" data-to="notice">공지 보기</button></div></div>`,
     conn:`<div class="panel"><h3>PC 서버</h3><p class="muted" style="margin:0 0 10px">${System.PCS()?`연결됨 · ${esc(System.PCS().base.replace(/^https?:\/\//,''))}${System.PCS().last?' · 마지막 저장 '+esc(new Date(System.PCS().last).toLocaleString()):''}`:'내 컴퓨터를 켜 두고 QR로 휴대폰에서 접속해요. 게임이 PC에 저장되고, PC의 ComfyUI·Ollama도 휴대폰에서 써요.'}</p>
-      <div class="row">${System.PCS()?'<button class="btn sm" data-act="pcpush">PC에 저장</button><button class="btn sm ghost" data-act="pcpull">PC에서 받기</button>':''}<button class="btn sm ${System.PCS()?'ghost':''}" data-act="pcopen">${System.PCS()?'설정':'PC 서버 연결'}</button></div></div>
-    <div class="panel"><h3>PC·폰 연동</h3><p class="muted" style="margin:0 0 10px">${System.syReady()?`저장소 <b>${esc(System.SY().repo)}</b> · 이 기기: ${esc(SystemView.syDevice())}${System.SY().last?' · 마지막 '+(System.SY().lastDir==='down'?'받기':'올리기')+' '+esc(new Date(System.SY().last).toLocaleString()):''}`:'내 GitHub 비공개 저장소를 거쳐 폰과 PC(웹 버전)가 같은 게임을 이어서 할 수 있어요.'}</p>
-      <div class="row">${System.syReady()?'<button class="btn sm" data-act="sypush">올리기</button><button class="btn sm ghost" data-act="sypull">받기</button>':''}<button class="btn sm ${System.syReady()?'ghost':''}" data-act="syopen">${System.syReady()?'설정':'연동 설정'}</button></div></div>`,
+    <div class="row">${System.PCS()?'<button class="btn sm" data-act="pcpush">PC에 저장</button><button class="btn sm ghost" data-act="pcpull">PC에서 받기</button>':''}<button class="btn sm ${System.PCS()?'ghost':''}" data-act="pcopen">${System.PCS()?'설정':'PC 서버 연결'}</button></div></div>
+  <div class="panel"><h3>PC·폰 연동</h3><p class="muted" style="margin:0 0 10px">${System.syReady()?`저장소 <b>${esc(System.SY().repo)}</b> · 이 기기: ${esc(SystemView.syDevice())}${System.SY().last?' · 마지막 '+(System.SY().lastDir==='down'?'받기':'올리기')+' '+esc(new Date(System.SY().last).toLocaleString()):''}`:'내 GitHub 비공개 저장소를 거쳐 폰과 PC(웹 버전)가 같은 게임을 이어서 할 수 있어요.'}</p>
+    <div class="row">${System.syReady()?'<button class="btn sm" data-act="sypush">올리기</button><button class="btn sm ghost" data-act="sypull">받기</button>':''}<button class="btn sm ${System.syReady()?'ghost':''}" data-act="syopen">${System.syReady()?'설정':'연동 설정'}</button></div></div>`,
     data:`${SystemView.backupBlocks()}<div class="panel"><h3>기타 데이터 관리</h3><p class="muted">백업은 위의 세 종류 중에서 선택하세요. 리세마라와 앱 초기화는 데이터를 지우는 기능입니다.</p><div class="row"><button class="btn sm ghost" data-act="backup">이전 텍스트 백업</button><button class="btn sm ghost" data-act="importfile">공유 팩 불러오기</button><button class="btn sm ghost" data-act="reroll0">이 게임 리세마라</button><button class="btn sm ghost" data-act="cachewipe" style="color:var(--rose)">앱 초기화</button></div></div>`,
     info:`<div class="panel"><h3>Special Thanks</h3><p class="muted" style="margin:0 0 6px;font-size:.82rem">그림체 프리셋을 나눠 주신 분들</p>${STYLE_PRESETS.filter(x=>x.by).map(x=>`<div class="ep"><span class="t"><b>${esc(x.by)}</b><span class="muted">그림체 「${esc(x.name)}」</span></span></div>`).join('')}</div>
-  ${IS_NATIVE?`<div class="panel"><h3>앱 업데이트</h3><p class="muted" style="margin:0 0 10px">지금 버전: ${esc(window.__LIVE__?'온라인 업데이트 '+window.__LIVE__:'설치 버전 '+APP_BUILD)}. 새 버전이 나오면 앱이 GitHub에서 받아 와요. API 키는 이 기기에만 저장되고 어디로도 보내지 않아요(각 AI 회사 서버로 직접 요청할 때만 써요).</p>
-      <div class="row"><button class="btn sm" data-act="upd-open">업데이트 설정</button><button class="btn sm ghost" data-act="updcheck">지금 확인</button></div></div>`:`<div class="panel"><h3>업데이트</h3><p class="muted" style="margin:0 0 10px">지금 버전: ${esc(APP_BUILD)}${System.onPcServer()?' · PC 서버로 실행 중':''}. 새 버전이 나오면 켤 때와 30분마다 확인해서 알려 드려요. 받기를 누르면 바로 새 버전으로 다시 열려요.</p>
-      <div class="row"><button class="btn sm ghost" data-act="webupdcheck">지금 확인</button></div></div>`}
-    <div class="panel"><h3>공유와 피드백</h3><p class="muted" style="margin:0 0 10px">공유팩은 .ggmpack 파일로 저장하며, 기존 JSON 공유팩도 불러올 수 있어요. 공유 팩에는 API 키, 업데이트 토큰, 진행 상황, 음성이 들어가지 않아요.</p>
-      <div class="row"><button class="btn sm" data-act="shareopen">공유 팩 만들기</button><button class="btn sm ghost" data-act="importfile">공유 팩 불러오기</button><button class="btn sm ghost" data-act="fbopen">피드백 보내기</button><button class="btn sm ghost" data-act="guidecopy">친구용 안내문</button></div></div>
-    <div class="panel official"><h3>공식 배포처</h3><p class="muted" style="margin:0 0 8px">이 앱은 아래 두 곳에서만 배포해요. <b style="color:var(--ink)">다른 곳에서 받은 APK나 파일은 쓰지 마세요.</b> 개조된 파일은 넣어 둔 API 키를 빼돌릴 수 있어요.</p>
-      <div class="row"><button class="btn sm ghost" data-act="sylink" data-url="https://github.com/jjhk0803/gacha-game-maker/releases">안드로이드 APK (GitHub)</button><button class="btn sm ghost" data-act="sylink" data-url="https://jjhk0803.github.io/gacha-game-maker/">아이폰·PC 웹</button></div>
-      <p class="muted" style="margin:8px 0 0;font-size:.78rem">© jjhk0803 · 이용 조건 CC BY-NC-ND 4.0 — 개인 사용과 원본 그대로 무료 공유는 자유, 수정본 재배포·판매는 금지. 내가 만든 게임 내용(세계관·캐릭터·그림)은 만든 사람의 것이에요. <button class="linkb" data-act="sylink" data-url="https://github.com/jjhk0803/gacha-game-maker/blob/main/LICENSE.md">자세히</button></p></div>`};
+${IS_NATIVE?`<div class="panel"><h3>앱 업데이트</h3><p class="muted" style="margin:0 0 10px">지금 버전: ${esc(window.__LIVE__?'온라인 업데이트 '+window.__LIVE__:'설치 버전 '+APP_BUILD)}. 새 버전이 나오면 앱이 GitHub에서 받아 와요. API 키는 이 기기에만 저장되고 어디로도 보내지 않아요(각 AI 회사 서버로 직접 요청할 때만 써요).</p>
+    <div class="row"><button class="btn sm" data-act="upd-open">업데이트 설정</button><button class="btn sm ghost" data-act="updcheck">지금 확인</button></div></div>`:`<div class="panel"><h3>업데이트</h3><p class="muted" style="margin:0 0 10px">지금 버전: ${esc(APP_BUILD)}${System.onPcServer()?' · PC 서버로 실행 중':''}. 새 버전이 나오면 켤 때와 30분마다 확인해서 알려 드려요. 받기를 누르면 바로 새 버전으로 다시 열려요.</p>
+    <div class="row"><button class="btn sm ghost" data-act="webupdcheck">지금 확인</button></div></div>`}
+  <div class="panel"><h3>공유와 피드백</h3><p class="muted" style="margin:0 0 10px">공유팩은 .ggmpack 파일로 저장하며, 기존 JSON 공유팩도 불러올 수 있어요. 공유 팩에는 API 키, 업데이트 토큰, 진행 상황, 음성이 들어가지 않아요.</p>
+    <div class="row"><button class="btn sm" data-act="shareopen">공유 팩 만들기</button><button class="btn sm ghost" data-act="importfile">공유 팩 불러오기</button><button class="btn sm ghost" data-act="fbopen">피드백 보내기</button><button class="btn sm ghost" data-act="guidecopy">친구용 안내문</button></div></div>
+  <div class="panel official"><h3>공식 배포처</h3><p class="muted" style="margin:0 0 8px">이 앱은 아래 두 곳에서만 배포해요. <b style="color:var(--ink)">다른 곳에서 받은 APK나 파일은 쓰지 마세요.</b> 개조된 파일은 넣어 둔 API 키를 빼돌릴 수 있어요.</p>
+    <div class="row"><button class="btn sm ghost" data-act="sylink" data-url="https://github.com/jjhk0803/gacha-game-maker/releases">안드로이드 APK (GitHub)</button><button class="btn sm ghost" data-act="sylink" data-url="https://jjhk0803.github.io/gacha-game-maker/">아이폰·PC 웹</button></div>
+    <p class="muted" style="margin:8px 0 0;font-size:.78rem">© jjhk0803 · 이용 조건 CC BY-NC-ND 4.0 — 개인 사용과 원본 그대로 무료 공유는 자유, 수정본 재배포·판매는 금지. 내가 만든 게임 내용(세계관·캐릭터·그림)은 만든 사람의 것이에요. <button class="linkb" data-act="sylink" data-url="https://github.com/jjhk0803/gacha-game-maker/blob/main/LICENSE.md">자세히</button></p></div>`};
     if(!STTAB||!SEC[STTAB]) return `${pageHead('설정','SYSTEM')}<div class="st-grid">${ST.map(([k,l,ic,sub2])=>`<button class="st-tile" data-act="sttab" data-k="${k}"><i>${ic}</i><b>${esc(l)}</b><span>${esc(sub2||'')}</span></button>`).join('')}</div>`;
     const cur=ST.find(x=>x[0]===STTAB);
     return `<div class="st-head"><button class="x" data-act="sttab" data-k="" aria-label="설정으로">‹</button><b>${cur[2]} ${esc(cur[1])}</b></div>${SEC[STTAB]}`;
@@ -1074,28 +1074,28 @@ static fitBrand(){ const el=document.querySelector('.brand .brand-t'); if(!el) r
     let side=$('#deskSide'); if(!on){ if(side) side.remove(); return; }
     if(!side){ side=document.createElement('aside'); side.id='deskSide'; document.body.appendChild(side); }
     side.innerHTML=`<div class="ds-logo"><i>GACHA GAME MAKER</i><b>${esc(G.meta.title)}</b><span>${esc(G.meta.sub||'')}</span></div>
-      <div class="ds-keys"><h4>키보드</h4><p><kbd>1</kbd>~<kbd>5</kbd> 아래 메뉴</p><p><kbd>Space</kbd> <kbd>Enter</kbd> 대사 넘기기</p><p><kbd>Esc</kbd> 창 닫기</p><p><kbd>A</kbd> 스토리 자동 진행</p></div>
-      <p class="ds-foot">설정 → 아이폰·웹 연결에서 PC 화면을 끌 수 있어요.</p>`;
+    <div class="ds-keys"><h4>키보드</h4><p><kbd>1</kbd>~<kbd>5</kbd> 아래 메뉴</p><p><kbd>Space</kbd> <kbd>Enter</kbd> 대사 넘기기</p><p><kbd>Esc</kbd> 창 닫기</p><p><kbd>A</kbd> 스토리 자동 진행</p></div>
+    <p class="ds-foot">설정 → 아이폰·웹 연결에서 PC 화면을 끌 수 있어요.</p>`;
     try{ const l=G.lib.find(x=>x.kind==='bg'&&x.name===P().lobbyBg), s=l&&Characters.imgSrc(l); document.body.style.setProperty('--deskbg',s?`url('${s}')`:'none'); }catch(e){}
   }
 
   static openMeta(){
     const m=G.meta;
     CoreView.openModal(`${head('게임 정의',`<span class="muted">이름, 용어, 속성, 테마를 바꾸면 화면 전체와 AI가 쓰는 글에 반영돼요</span>`)}
-      <div class="g2"><div><label class="f" for="mt_title">게임 이름</label><input class="in" id="mt_title" value="${esc(m.title)}"></div><div><label class="f" for="mt_sub">영문 부제</label><input class="in" id="mt_sub" value="${esc(m.sub)}"></div></div>
-      <label class="f" for="mt_art">이 게임 그림체 태그 (비우면 설정의 기본 그림체)</label><textarea class="in" id="mt_art" style="min-height:60px" placeholder="${esc(Core.naiCfg().styles[0].tags||STYLE_EX)}">${esc(m.artTags||'')}</textarea>
-      <label class="f" for="mt_artn">이 게임 그림체 네거티브 (선택)</label><input class="in" id="mt_artn" value="${esc(m.artNeg||'')}">
-      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="artcopy">⇩ 지금 기본 그림체 가져오기</button><button class="btn sm ghost" data-act="artclear">비우기 (기본 그림체 따라가기)</button></div>
-      <div class="g2"><div><label class="f" for="mt_theme">화면 테마</label><select class="in" id="mt_theme">${CoreView.opt([['tactical','택티컬'],['fantasy','판타지'],['neon','네온 사이버'],['pastel','파스텔 (밝은 화면)'],['noir','모노 누아르']],m.theme)}</select></div><div><label class="f" for="mt_acc">강조 색</label><input class="in" id="mt_acc" type="color" value="${esc(m.accent)}" style="height:42px;padding:4px"></div></div>
-      <h3 class="sec">용어</h3><div class="g2">${Object.keys(DEFAULT_META.terms).map(k=>`<div><label class="f" for="mt_t_${k}">${TERM_LABEL[k]||k}</label><input class="in" id="mt_t_${k}" value="${esc(System.T(k))}" ${k==='abyss'?'maxlength="12"':''}></div>`).join('')}</div>
-      <h3 class="sec">속성 (첫째가 둘째에, 둘째가 셋째에, 셋째가 첫째에 강해요)</h3>
-      ${m.elems.map((e,i)=>`<div class="g2"><div><label class="f">속성 ${i+1}</label><input class="in" id="mt_e${i}" value="${esc(e.n)}" maxlength="4"></div><div><label class="f">색</label><input class="in" id="mt_c${i}" type="color" value="${esc(e.c)}" style="height:42px;padding:4px"></div></div>`).join('')}
-      <h3 class="sec">역할 이름</h3><div class="g4">${['atk','def','sup'].map(k=>`<div><label class="f">${{atk:'공격형',def:'방어형',sup:'지원형'}[k]}</label><input class="in" id="mt_r_${k}" value="${esc(m.roles[k])}"></div>`).join('')}</div>
-      <label class="f" for="mt_logo">타이틀 로고 모양</label><div class="row"><select class="in" id="mt_logo" style="flex:1">${CoreView.opt(LOGO_STYLES,m.logoStyle||'auto')}</select><button class="btn sm ghost" type="button" data-act="logoprev">미리 보기</button></div>
-      <h3 class="sec">스토리</h3><label class="f" for="mt_tone">분위기 (AI가 쓰는 글의 톤, 비우면 정하지 않음)</label><input class="in" id="mt_tone" value="${esc(m.tone||'')}" placeholder="예: 진지하고 비장하게 / 가볍고 유쾌하게">
-      <label class="f" for="mt_cast">등장인물 성별 <span class="muted" style="font-size:.75rem">(앞으로 새로 만드는 ${esc(System.T('crew'))}·인물에 적용)</span></label><select class="in" id="mt_cast">${CoreView.opt([['','AI가 정하기 (키워드에 맞게)'],['f','여성만'],['m','남성만'],['mix','여성 + 남성 혼성']],m.castSex||'')}</select>${SystemView.storyFormHTML(G.meta.story||{})}
-      <h3 class="sec">재료 던전 이름</h3><div class="g2">${m.farms.map((f,i)=>`<div><label class="f">${{exp:'경험치',gold:'일반 재화',wmat:'스킬 강화 재료',core:'승급(Lv1~70) 재료'}[f.key]||f.key}</label><input class="in" id="mt_f${i}" value="${esc(f.name)}"></div>`).join('')}</div>
-      <div class="row" style="margin-top:16px"><button class="btn" data-act="metasave">저장</button></div>`);
+    <div class="g2"><div><label class="f" for="mt_title">게임 이름</label><input class="in" id="mt_title" value="${esc(m.title)}"></div><div><label class="f" for="mt_sub">영문 부제</label><input class="in" id="mt_sub" value="${esc(m.sub)}"></div></div>
+    <label class="f" for="mt_art">이 게임 그림체 태그 (비우면 설정의 기본 그림체)</label><textarea class="in" id="mt_art" style="min-height:60px" placeholder="${esc(Core.naiCfg().styles[0].tags||STYLE_EX)}">${esc(m.artTags||'')}</textarea>
+    <label class="f" for="mt_artn">이 게임 그림체 네거티브 (선택)</label><input class="in" id="mt_artn" value="${esc(m.artNeg||'')}">
+    <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="artcopy">⇩ 지금 기본 그림체 가져오기</button><button class="btn sm ghost" data-act="artclear">비우기 (기본 그림체 따라가기)</button></div>
+    <div class="g2"><div><label class="f" for="mt_theme">화면 테마</label><select class="in" id="mt_theme">${CoreView.opt([['tactical','택티컬'],['fantasy','판타지'],['neon','네온 사이버'],['pastel','파스텔 (밝은 화면)'],['noir','모노 누아르']],m.theme)}</select></div><div><label class="f" for="mt_acc">강조 색</label><input class="in" id="mt_acc" type="color" value="${esc(m.accent)}" style="height:42px;padding:4px"></div></div>
+    <h3 class="sec">용어</h3><div class="g2">${Object.keys(DEFAULT_META.terms).map(k=>`<div><label class="f" for="mt_t_${k}">${TERM_LABEL[k]||k}</label><input class="in" id="mt_t_${k}" value="${esc(System.T(k))}" ${k==='abyss'?'maxlength="12"':''}></div>`).join('')}</div>
+    <h3 class="sec">속성 (첫째가 둘째에, 둘째가 셋째에, 셋째가 첫째에 강해요)</h3>
+    ${m.elems.map((e,i)=>`<div class="g2"><div><label class="f">속성 ${i+1}</label><input class="in" id="mt_e${i}" value="${esc(e.n)}" maxlength="4"></div><div><label class="f">색</label><input class="in" id="mt_c${i}" type="color" value="${esc(e.c)}" style="height:42px;padding:4px"></div></div>`).join('')}
+    <h3 class="sec">역할 이름</h3><div class="g4">${['atk','def','sup'].map(k=>`<div><label class="f">${{atk:'공격형',def:'방어형',sup:'지원형'}[k]}</label><input class="in" id="mt_r_${k}" value="${esc(m.roles[k])}"></div>`).join('')}</div>
+    <label class="f" for="mt_logo">타이틀 로고 모양</label><div class="row"><select class="in" id="mt_logo" style="flex:1">${CoreView.opt(LOGO_STYLES,m.logoStyle||'auto')}</select><button class="btn sm ghost" type="button" data-act="logoprev">미리 보기</button></div>
+    <h3 class="sec">스토리</h3><label class="f" for="mt_tone">분위기 (AI가 쓰는 글의 톤, 비우면 정하지 않음)</label><input class="in" id="mt_tone" value="${esc(m.tone||'')}" placeholder="예: 진지하고 비장하게 / 가볍고 유쾌하게">
+    <label class="f" for="mt_cast">등장인물 성별 <span class="muted" style="font-size:.75rem">(앞으로 새로 만드는 ${esc(System.T('crew'))}·인물에 적용)</span></label><select class="in" id="mt_cast">${CoreView.opt([['','AI가 정하기 (키워드에 맞게)'],['f','여성만'],['m','남성만'],['mix','여성 + 남성 혼성']],m.castSex||'')}</select>${SystemView.storyFormHTML(G.meta.story||{})}
+    <h3 class="sec">재료 던전 이름</h3><div class="g2">${m.farms.map((f,i)=>`<div><label class="f">${{exp:'경험치',gold:'일반 재화',wmat:'스킬 강화 재료',core:'승급(Lv1~70) 재료'}[f.key]||f.key}</label><input class="in" id="mt_f${i}" value="${esc(f.name)}"></div>`).join('')}</div>
+    <div class="row" style="margin-top:16px"><button class="btn" data-act="metasave">저장</button></div>`);
   }
 
   static async pcPush(silent,force){
@@ -1201,24 +1201,24 @@ static async syncStageMedia(S,load,prefix){
 
   static openPcSet(lost){ const pc=System.PCS();
     CoreView.openModal(`${head('PC 서버',`<span class="muted">내 컴퓨터를 저장소·AI 중계로 쓰기</span>`)}
-      ${lost?`<div class="panel" style="border-color:var(--gold);margin-bottom:10px"><b>PC 서버에 다시 연결해 주세요</b><p class="muted" style="margin:6px 0 0">이 주소는 PC 서버인데 연결 키가 없어서 이 기기의 빈 게임으로 열렸어요. PC 화면의 QR을 다시 찍거나, QR 주소(끝에 ?pc=… 가 붙은 주소)를 아래에 붙여 넣으면 PC에 저장된 게임을 받아 와요.${IS_IOS?' 아이폰은 홈 화면 앱과 Safari의 저장 공간이 따로라서, 홈 화면 아이콘으로 열면 이렇게 될 수 있어요.':''}</p></div>`:''}
-      <p class="muted">PC에서 <b>PC서버-시작.bat</b>을 켜면 QR이 떠요. 휴대폰으로 찍으면 연결되고, 게임이 PC에 저장돼요. 내 PC의 ComfyUI·Ollama 주소(127.0.0.1)도 그대로 쓸 수 있어요.</p>
-      <label class="f" for="pc_link">PC 서버 주소 (QR 주소를 붙여 넣기)</label><input class="in" id="pc_link" value="${pc?esc(pc.base+'/?pc='+pc.key):''}" placeholder="https://xxxx.trycloudflare.com/?pc=...">
-      <label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="pc_auto" ${!pc||pc.auto!==false?'checked':''}><span>자동으로 PC에 저장 (저장할 때마다 몇 초 안에 · PC의 data/게임/종류.json)</span></label>
-      <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="pc_lock" ${!pc||pc.lock!==false?'checked':''}><span>한 번에 한 기기만 (다른 기기에서 하면 여기는 멈추고, 넘겨받을 때 진행을 이어받아요)</span></label>
-      <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="pc_pxoff" ${System.proxyOff()?'checked':''}><span>AI 요청은 PC를 거치지 않고 직접 보내기 <span class="muted" style="font-size:.78rem">(PC와 같은 기기에서 쓸 때 더 빨라요. 휴대폰에서 PC의 로컬 AI를 쓰거나 웹에서 막히는 서비스가 있으면 끄세요)</span></span></label>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="pcsave">연결</button>${pc?'<button class="btn ghost" data-act="pcoff">연결 해제</button>':''}</div>
-      ${pc?`<div class="row" style="margin-top:8px"><button class="btn sm" data-act="pcpush">지금 PC에 저장</button><button class="btn sm ghost" data-act="pcpull">PC에서 받기</button></div>`:''}
-      ${pc?`<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="pchist">PC 백업에서 되살리기</button></div>`:''}
-      <p class="muted" style="margin-top:10px;font-size:.8rem">PC 서버 프로그램은 공개 저장소의 gacha-game-maker-pc.zip에 있어요(Python 필요). 바깥 주소(trycloudflare)는 PC 서버를 켤 때마다 바뀌어요. 바뀌면 QR을 다시 찍으면 되고, 게임은 PC에 있으니 그대로 이어져요.</p>`); }
+    ${lost?`<div class="panel" style="border-color:var(--gold);margin-bottom:10px"><b>PC 서버에 다시 연결해 주세요</b><p class="muted" style="margin:6px 0 0">이 주소는 PC 서버인데 연결 키가 없어서 이 기기의 빈 게임으로 열렸어요. PC 화면의 QR을 다시 찍거나, QR 주소(끝에 ?pc=… 가 붙은 주소)를 아래에 붙여 넣으면 PC에 저장된 게임을 받아 와요.${IS_IOS?' 아이폰은 홈 화면 앱과 Safari의 저장 공간이 따로라서, 홈 화면 아이콘으로 열면 이렇게 될 수 있어요.':''}</p></div>`:''}
+    <p class="muted">PC에서 <b>PC서버-시작.bat</b>을 켜면 QR이 떠요. 휴대폰으로 찍으면 연결되고, 게임이 PC에 저장돼요. 내 PC의 ComfyUI·Ollama 주소(127.0.0.1)도 그대로 쓸 수 있어요.</p>
+    <label class="f" for="pc_link">PC 서버 주소 (QR 주소를 붙여 넣기)</label><input class="in" id="pc_link" value="${pc?esc(pc.base+'/?pc='+pc.key):''}" placeholder="https://xxxx.trycloudflare.com/?pc=...">
+    <label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="pc_auto" ${!pc||pc.auto!==false?'checked':''}><span>자동으로 PC에 저장 (저장할 때마다 몇 초 안에 · PC의 data/게임/종류.json)</span></label>
+    <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="pc_lock" ${!pc||pc.lock!==false?'checked':''}><span>한 번에 한 기기만 (다른 기기에서 하면 여기는 멈추고, 넘겨받을 때 진행을 이어받아요)</span></label>
+    <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="pc_pxoff" ${System.proxyOff()?'checked':''}><span>AI 요청은 PC를 거치지 않고 직접 보내기 <span class="muted" style="font-size:.78rem">(PC와 같은 기기에서 쓸 때 더 빨라요. 휴대폰에서 PC의 로컬 AI를 쓰거나 웹에서 막히는 서비스가 있으면 끄세요)</span></span></label>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="pcsave">연결</button>${pc?'<button class="btn ghost" data-act="pcoff">연결 해제</button>':''}</div>
+    ${pc?`<div class="row" style="margin-top:8px"><button class="btn sm" data-act="pcpush">지금 PC에 저장</button><button class="btn sm ghost" data-act="pcpull">PC에서 받기</button></div>`:''}
+    ${pc?`<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="pchist">PC 백업에서 되살리기</button></div>`:''}
+    <p class="muted" style="margin-top:10px;font-size:.8rem">PC 서버 프로그램은 공개 저장소의 gacha-game-maker-pc.zip에 있어요(Python 필요). 바깥 주소(trycloudflare)는 PC 서버를 켤 때마다 바뀌어요. 바뀌면 QR을 다시 찍으면 되고, 게임은 PC에 있으니 그대로 이어져요.</p>`); }
 
     // PC 서버의 ggm-data/history에 남은 저장 백업(최근 20번 + 크게 줄어들기 전 저장)에서 되살리기
 static async openPcHist(){ let L=null; try{ L=await System.pcApi('/api/store/history',{ok404:true,timeout:20000}); }catch(e){ CoreView.toast('PC 서버에 연결하지 못했어요. '+System.syErr(e)); return; }
     if(!L||!Array.isArray(L.items)){ CoreView.openModal(`${head('PC 백업')}<p>지금 켜 둔 PC 서버 프로그램이 예전 버전이라 백업 목록을 볼 수 없어요.</p><p class="muted">Releases의 gacha-game-maker-pc.zip을 새로 받아 덮어쓴 뒤 다시 켜 주세요(ggm-data 폴더는 그대로 두면 돼요). 그 전까지는 PC의 ggm-data/history 폴더에 있는 state-날짜.json을 state.json으로 바꿔 넣으면 그 시점으로 돌아가요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="close">닫기</button></div>`); return; }
     const kb=n=>n>1048576?(n/1048576).toFixed(1)+'MB':Math.max(1,Math.round(n/1024))+'KB';
     CoreView.openModal(`${head('PC 백업에서 되살리기',`<span class="muted">PC에 저장할 때마다 남겨 둔 기록이에요</span>`)}
-      <p class="muted" style="margin:0 0 8px">게임이 초기화됐거나 진행이 사라졌다면, 사라지기 전 시간의 백업을 고르세요. 용량이 크게 줄어든 저장 바로 앞의 백업은 따로 오래 남겨 둬요(★).</p>
-      <div class="mlist">${L.items.length?L.items.map(x=>`<div class="mrow" style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><div style="min-width:0"><b>${x.keep?'★ ':''}${esc(new Date(x.at||0).toLocaleString())}</b><div class="muted" style="font-size:.8rem">${esc(x.device||'')} · ${esc((x.games||[]).join(', ')||'게임')} · ${kb(x.size||0)}</div></div><button class="btn sm" data-act="pchistgo" data-id="${esc(x.name)}">되살리기</button></div>`).join(''):'<p class="muted">아직 백업이 없어요.</p>'}</div>`); }
+    <p class="muted" style="margin:0 0 8px">게임이 초기화됐거나 진행이 사라졌다면, 사라지기 전 시간의 백업을 고르세요. 용량이 크게 줄어든 저장 바로 앞의 백업은 따로 오래 남겨 둬요(★).</p>
+    <div class="mlist">${L.items.length?L.items.map(x=>`<div class="mrow" style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><div style="min-width:0"><b>${x.keep?'★ ':''}${esc(new Date(x.at||0).toLocaleString())}</b><div class="muted" style="font-size:.8rem">${esc(x.device||'')} · ${esc((x.games||[]).join(', ')||'게임')} · ${kb(x.size||0)}</div></div><button class="btn sm" data-act="pchistgo" data-id="${esc(x.name)}">되살리기</button></div>`).join(''):'<p class="muted">아직 백업이 없어요.</p>'}</div>`); }
 
     /* 올리기·받기·시작할 때 확인·설정 화면 */
   /* 다른 기기에 더 새 데이터가 있을 때 창 내용(View) */
@@ -1236,19 +1236,19 @@ static syConflictHTML(R){ return `${head('다른 기기에 더 새 데이터가 
   static openSync(){
     const o=System.SY();
     CoreView.openModal(`${head('PC·폰 연동',`<span class="muted">내 GitHub 비공개 저장소에 게임을 올리고 받아요</span>`)}
-      <ol class="a2hs"><li><button class="linkb" data-act="sylink" data-url="https://github.com/new?name=ggm-save&visibility=private">GitHub에서 비공개 저장소 만들기</button> (이름 예: ggm-save, <b>Private</b>)</li>
-      <li><button class="linkb" data-act="sylink" data-url="https://github.com/settings/personal-access-tokens/new">토큰 만들기</button> → Repository access: <b>Only select repositories</b>에서 그 저장소만 → Permissions의 <b>Contents: Read and write</b> → 만들기</li>
-      <li>아래에 <b>아이디/저장소이름</b>과 토큰을 넣고, 다른 기기에도 똑같이 넣어요.</li></ol>
-      <label class="f" for="sy_repo">저장소</label><input class="in" id="sy_repo" value="${esc(o.repo||'')}" placeholder="내아이디/ggm-save">
-      <label class="f" for="sy_tok">토큰</label><input class="in" id="sy_tok" type="password" autocomplete="off" value="${esc(o.token||'')}" placeholder="github_pat_...">
-      <label class="f" for="sy_dev">이 기기 이름</label><input class="in" id="sy_dev" value="${esc(SystemView.syDevice())}">
-      <label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="sy_auto" ${o.auto!==false?'checked':''}><span>켤 때 다른 기기의 새 데이터가 있으면 알려 주기</span></label>
-      <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="sy_up" ${o.autoUp?'checked':''}><span>앱을 나갈 때 자동으로 올리기</span></label>
-      <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="sy_lock" ${o.lock!==false?'checked':''}><span>한 번에 한 기기만 (다른 기기에서 하면 여기는 멈추고, 나갈 때 자동으로 올려요)</span></label>
-      <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="sy_keys" ${o.keys?'checked':''}><span>AI·그림·목소리 키도 같이 옮기기 <span class="muted" style="font-size:.8rem">(비공개 저장소일 때만 켜세요)</span></span></label>
-      <p class="muted" style="margin:8px 0 0;font-size:.82rem">게임 진행, 만든 게임들, 그림·음악·목소리가 올라가요. 그림은 바뀐 것만 올려서 두 번째부터는 빨라요. 토큰은 이 기기에만 저장돼요.</p>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="sysave">저장하고 연결 확인</button></div>
-      ${System.syReady()?`<div class="row" style="margin-top:8px"><button class="btn sm" data-act="sypush">지금 올리기</button><button class="btn sm ghost" data-act="sypull">받기</button><button class="btn sm ghost" data-act="syoff">연동 해제</button></div>`:''}`);
+    <ol class="a2hs"><li><button class="linkb" data-act="sylink" data-url="https://github.com/new?name=ggm-save&visibility=private">GitHub에서 비공개 저장소 만들기</button> (이름 예: ggm-save, <b>Private</b>)</li>
+    <li><button class="linkb" data-act="sylink" data-url="https://github.com/settings/personal-access-tokens/new">토큰 만들기</button> → Repository access: <b>Only select repositories</b>에서 그 저장소만 → Permissions의 <b>Contents: Read and write</b> → 만들기</li>
+    <li>아래에 <b>아이디/저장소이름</b>과 토큰을 넣고, 다른 기기에도 똑같이 넣어요.</li></ol>
+    <label class="f" for="sy_repo">저장소</label><input class="in" id="sy_repo" value="${esc(o.repo||'')}" placeholder="내아이디/ggm-save">
+    <label class="f" for="sy_tok">토큰</label><input class="in" id="sy_tok" type="password" autocomplete="off" value="${esc(o.token||'')}" placeholder="github_pat_...">
+    <label class="f" for="sy_dev">이 기기 이름</label><input class="in" id="sy_dev" value="${esc(SystemView.syDevice())}">
+    <label style="display:flex;gap:8px;margin-top:10px"><input type="checkbox" id="sy_auto" ${o.auto!==false?'checked':''}><span>켤 때 다른 기기의 새 데이터가 있으면 알려 주기</span></label>
+    <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="sy_up" ${o.autoUp?'checked':''}><span>앱을 나갈 때 자동으로 올리기</span></label>
+    <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="sy_lock" ${o.lock!==false?'checked':''}><span>한 번에 한 기기만 (다른 기기에서 하면 여기는 멈추고, 나갈 때 자동으로 올려요)</span></label>
+    <label style="display:flex;gap:8px;margin-top:6px"><input type="checkbox" id="sy_keys" ${o.keys?'checked':''}><span>AI·그림·목소리 키도 같이 옮기기 <span class="muted" style="font-size:.8rem">(비공개 저장소일 때만 켜세요)</span></span></label>
+    <p class="muted" style="margin:8px 0 0;font-size:.82rem">게임 진행, 만든 게임들, 그림·음악·목소리가 올라가요. 그림은 바뀐 것만 올려서 두 번째부터는 빨라요. 토큰은 이 기기에만 저장돼요.</p>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="sysave">저장하고 연결 확인</button></div>
+    ${System.syReady()?`<div class="row" style="margin-top:8px"><button class="btn sm" data-act="sypush">지금 올리기</button><button class="btn sm ghost" data-act="sypull">받기</button><button class="btn sm ghost" data-act="syoff">연동 해제</button></div>`:''}`);
   }
 
     /* GitHub 연결 확인 뒤 창(View): 다른 기기가 올린 데이터가 있으면 받기/올리기를 고르고, 없으면 지금 올릴지 물음 */
@@ -1257,35 +1257,35 @@ static openSyLinked(st){ if(st) CoreView.openModal(`${head('연결됐어요')}<p
 
     /* 게임 게시 완료 창 내용(View) */
 static pubDoneHTML(ver,o,dir,need){ return `${head('게시했어요',`<span class="muted">「${esc(G.meta.title)}」 v${ver}</span>`)}
-        <p style="margin:0 0 6px">이 주소를 받은 사람은 설정 → 게임 → 🔗 게임 구독에 넣으면 이 게임을 받고, 다음 게시부터 자동으로 업데이트를 받아요.</p>
-        <textarea class="in" id="pub_addr" readonly style="min-height:56px">${esc(System.subAddr(o.repo,o.branch,dir))}</textarea>
-        <p class="muted" style="font-size:.78rem;margin:4px 0 0">새 그림 ${need.length}장을 올렸어요. GitHub가 파일을 퍼뜨리는 데 몇 분 걸릴 수 있어요. 저장소는 꼭 공개(Public)로 두세요.</p>
-        <div class="row" style="margin-top:10px"><button class="btn" data-act="pubcopy">주소 복사</button><button class="btn ghost" data-act="close">닫기</button></div>`; }
+      <p style="margin:0 0 6px">이 주소를 받은 사람은 설정 → 게임 → 🔗 게임 구독에 넣으면 이 게임을 받고, 다음 게시부터 자동으로 업데이트를 받아요.</p>
+      <textarea class="in" id="pub_addr" readonly style="min-height:56px">${esc(System.subAddr(o.repo,o.branch,dir))}</textarea>
+      <p class="muted" style="font-size:.78rem;margin:4px 0 0">새 그림 ${need.length}장을 올렸어요. GitHub가 파일을 퍼뜨리는 데 몇 분 걸릴 수 있어요. 저장소는 꼭 공개(Public)로 두세요.</p>
+      <div class="row" style="margin-top:10px"><button class="btn" data-act="pubcopy">주소 복사</button><button class="btn ghost" data-act="close">닫기</button></div>`; }
 
   static openPub(){ const P0=System.PUB(), M=G.meta.pub||{}, dir=M.slug?'games/'+M.slug:'';
     CoreView.openModal(`${head('🌐 게임 게시',`<span class="muted">다른 사람이 구독하고 업데이트를 받아요</span>`)}
-      <p class="muted" style="margin:0 0 8px;font-size:.82rem">내 GitHub <b>공개</b> 저장소에 이 게임을 올려요. 진행 상황·API 키·음성은 올라가지 않아요. 새 장·이벤트를 만든 뒤 다시 게시하면 구독한 사람에게 업데이트가 가요(그 사람의 진행·보유 캐릭터는 그대로).</p>
-      ${M.ver?`<div class="optbox" style="font-size:.82rem;margin:0 0 8px">지금 게시: v${M.ver} · ${M.at?new Date(M.at).toLocaleString():''}<br><span style="word-break:break-all">${esc(System.subAddr(M.repo||P0.repo||'',M.branch||P0.branch||'main',dir))}</span> <button class="linkb" type="button" data-act="pubcopy2" data-v="${esc(System.subAddr(M.repo||P0.repo||'',M.branch||P0.branch||'main',dir))}">복사</button></div>`:''}
-      <label class="f" for="pb_repo">저장소 (주인/이름)</label><input class="in" id="pb_repo" placeholder="예: myname/my-gacha-games" value="${esc(P0.repo||'')}">
-      <div class="g2"><div><label class="f" for="pb_branch">브랜치</label><input class="in" id="pb_branch" value="${esc(P0.branch||'main')}"></div><div><label class="f" for="pb_tok">토큰</label><input class="in" id="pb_tok" type="password" autocomplete="off" value="${esc(P0.token||'')}" placeholder="github_pat_…"></div></div>
-      <p class="muted" style="margin:4px 0 0;font-size:.76rem">GitHub → Settings → Developer settings → Fine-grained tokens → 이 저장소만 · Contents: Read and write. 토큰은 이 기기에만 저장돼요(게임·공유 팩에 안 들어가요).</p>
-      <label class="f" for="pb_notes">이번 업데이트 내용 (구독자에게 보여요)</label><textarea class="in" id="pb_notes" placeholder="예: 3장 「그늘 아래의 안내소」 추가, 여름 이벤트 개최"></textarea>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="pubgo">${M.ver?'업데이트 게시 (v'+(M.ver+1)+')':'처음 게시하기'}</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
+    <p class="muted" style="margin:0 0 8px;font-size:.82rem">내 GitHub <b>공개</b> 저장소에 이 게임을 올려요. 진행 상황·API 키·음성은 올라가지 않아요. 새 장·이벤트를 만든 뒤 다시 게시하면 구독한 사람에게 업데이트가 가요(그 사람의 진행·보유 캐릭터는 그대로).</p>
+    ${M.ver?`<div class="optbox" style="font-size:.82rem;margin:0 0 8px">지금 게시: v${M.ver} · ${M.at?new Date(M.at).toLocaleString():''}<br><span style="word-break:break-all">${esc(System.subAddr(M.repo||P0.repo||'',M.branch||P0.branch||'main',dir))}</span> <button class="linkb" type="button" data-act="pubcopy2" data-v="${esc(System.subAddr(M.repo||P0.repo||'',M.branch||P0.branch||'main',dir))}">복사</button></div>`:''}
+    <label class="f" for="pb_repo">저장소 (주인/이름)</label><input class="in" id="pb_repo" placeholder="예: myname/my-gacha-games" value="${esc(P0.repo||'')}">
+    <div class="g2"><div><label class="f" for="pb_branch">브랜치</label><input class="in" id="pb_branch" value="${esc(P0.branch||'main')}"></div><div><label class="f" for="pb_tok">토큰</label><input class="in" id="pb_tok" type="password" autocomplete="off" value="${esc(P0.token||'')}" placeholder="github_pat_…"></div></div>
+    <p class="muted" style="margin:4px 0 0;font-size:.76rem">GitHub → Settings → Developer settings → Fine-grained tokens → 이 저장소만 · Contents: Read and write. 토큰은 이 기기에만 저장돼요(게임·공유 팩에 안 들어가요).</p>
+    <label class="f" for="pb_notes">이번 업데이트 내용 (구독자에게 보여요)</label><textarea class="in" id="pb_notes" placeholder="예: 3장 「그늘 아래의 안내소」 추가, 여름 이벤트 개최"></textarea>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="pubgo">${M.ver?'업데이트 게시 (v'+(M.ver+1)+')':'처음 게시하기'}</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
 
     // 받는 쪽
 static openSubAdd(){ CoreView.openModal(`${head('🔗 게임 구독','<span class="muted">다른 사람이 게시한 게임을 받아요</span>')}
-      <label class="f" for="sb_addr">게임 주소</label><textarea class="in" id="sb_addr" style="min-height:60px" placeholder="GGMSUB:주인/저장소/main/games/…"></textarea>
-      <p class="muted" style="font-size:.78rem;margin:4px 0 0">새 게임으로 추가돼요(지금 게임은 그대로). 만든 사람이 업데이트하면 켤 때 알려 주고, 받으면 콘텐츠만 바뀌어요. 내 진행·보유 캐릭터·재화는 그대로예요.</p>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="subgo">구독하기</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
+    <label class="f" for="sb_addr">게임 주소</label><textarea class="in" id="sb_addr" style="min-height:60px" placeholder="GGMSUB:주인/저장소/main/games/…"></textarea>
+    <p class="muted" style="font-size:.78rem;margin:4px 0 0">새 게임으로 추가돼요(지금 게임은 그대로). 만든 사람이 업데이트하면 켤 때 알려 주고, 받으면 콘텐츠만 바뀌어요. 내 진행·보유 캐릭터·재화는 그대로예요.</p>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="subgo">구독하기</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
 
   static async subCheck(manual){ const S=G.meta.subscr; if(!S||!S.base) { if(manual) CoreView.toast('구독한 게임이 아니에요'); return null; }
     try{ const man=JSON.parse(await System.subGet(S.base,'manifest.json')); SUBCHK=man;
       if(!(man.ver>(S.ver||0))){ if(manual) CoreView.toast(`최신이에요 (v${S.ver||0})`); return null; }
       if(!manual&&S.skip===man.ver) return man;
       CoreView.openModal(`${head(`「${esc(man.title||S.title)}」 업데이트`,`<span class="muted">v${S.ver||0} → v${man.ver}</span>`)}
-        ${man.notes?`<div class="mbody">${esc(man.notes).replace(/\n/g,'<br>')}</div>`:'<p class="muted">만든 사람이 새 버전을 올렸어요.</p>'}
-        <p class="muted" style="font-size:.78rem">받으면 세계관·캐릭터·스토리·이벤트·그림이 새 버전으로 바뀌어요. 내 진행·보유 캐릭터·재화·호감도는 그대로예요.</p>
-        <div class="row" style="margin-top:12px"><button class="btn" data-act="subapply">지금 받기</button><button class="btn ghost" data-act="subskip" data-v="${man.ver}">나중에</button></div>`);
+      ${man.notes?`<div class="mbody">${esc(man.notes).replace(/\n/g,'<br>')}</div>`:'<p class="muted">만든 사람이 새 버전을 올렸어요.</p>'}
+      <p class="muted" style="font-size:.78rem">받으면 세계관·캐릭터·스토리·이벤트·그림이 새 버전으로 바뀌어요. 내 진행·보유 캐릭터·재화·호감도는 그대로예요.</p>
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="subapply">지금 받기</button><button class="btn ghost" data-act="subskip" data-v="${man.ver}">나중에</button></div>`);
       return man; }
     catch(e){ if(manual) CoreView.toast('업데이트 확인 실패. '+((e&&e.message)||'')); return null; } }
 
@@ -1315,24 +1315,24 @@ static openSubAdd(){ CoreView.openModal(`${head('🔗 게임 구독','<span clas
   static openUpdSet(){
     const o=Core.LV(), hasPrev=!!o.prevBuild;
     CoreView.openModal(`${head('앱 업데이트',`<span class="muted">지금 실행 중: ${esc(window.__LIVE__?('온라인 업데이트 '+window.__LIVE__):('설치 버전 '+APP_BUILD))} · 앱 ${esc(window.__SHELL__||APP_BUILD)}</span>`)}
-      <p class="muted">앱이 GitHub 공개 저장소에서 새 버전을 받아 와요. 게임 데이터와 키는 그대로 남아요. 받기 전에 바뀐 점을 보여 주고 물어봐요.</p>
-      ${SystemView.updateCheckHTML(o)}
-      <label class="f" for="up_mode">새 버전이 있으면</label><select class="in" id="up_mode">${CoreView.opt([['ask','물어보고 받기'],['silent','조용히 받아서 다음 실행에 적용'],['off','확인하지 않기']],o.auto===false?'off':(o.mode||'ask'))}</select>
-      <details style="margin-top:10px"><summary class="muted">개발자용: 받을 저장소 바꾸기</summary>
-        <label class="f" for="up_repo">저장소 (아이디/저장소이름, 비우면 기본 ${RELEASE_REPO})</label><input class="in" id="up_repo" value="${esc(o.repo||'')}" placeholder="${RELEASE_REPO}">
-        <div class="g2"><div><label class="f" for="up_br">브랜치</label><input class="in" id="up_br" value="${esc(o.branch||'main')}"></div><div><label class="f" for="up_path">파일 경로</label><input class="in" id="up_path" value="${esc(o.path||'www/index.html')}"></div></div>
-        <label class="f" for="up_tok">읽기 전용 토큰 (비공개 저장소일 때만)</label><input class="in" id="up_tok" type="password" autocomplete="off" value="${esc(o.token||'')}" placeholder="github_pat_...">
-      </details>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="upsave">저장하고 확인</button><button class="btn ghost" data-act="relnotes">배포 페이지</button></div>
-      <div class="row" style="margin-top:8px">${hasPrev?'<button class="btn sm ghost" data-act="uprollback">이전 버전으로 되돌리기</button>':''}${o.on?'<button class="btn sm ghost" data-act="upbuiltin">설치 버전으로 돌아가기</button>':''}</div>`);
+    <p class="muted">앱이 GitHub 공개 저장소에서 새 버전을 받아 와요. 게임 데이터와 키는 그대로 남아요. 받기 전에 바뀐 점을 보여 주고 물어봐요.</p>
+    ${SystemView.updateCheckHTML(o)}
+    <label class="f" for="up_mode">새 버전이 있으면</label><select class="in" id="up_mode">${CoreView.opt([['ask','물어보고 받기'],['silent','조용히 받아서 다음 실행에 적용'],['off','확인하지 않기']],o.auto===false?'off':(o.mode||'ask'))}</select>
+    <details style="margin-top:10px"><summary class="muted">개발자용: 받을 저장소 바꾸기</summary>
+      <label class="f" for="up_repo">저장소 (아이디/저장소이름, 비우면 기본 ${RELEASE_REPO})</label><input class="in" id="up_repo" value="${esc(o.repo||'')}" placeholder="${RELEASE_REPO}">
+      <div class="g2"><div><label class="f" for="up_br">브랜치</label><input class="in" id="up_br" value="${esc(o.branch||'main')}"></div><div><label class="f" for="up_path">파일 경로</label><input class="in" id="up_path" value="${esc(o.path||'www/index.html')}"></div></div>
+      <label class="f" for="up_tok">읽기 전용 토큰 (비공개 저장소일 때만)</label><input class="in" id="up_tok" type="password" autocomplete="off" value="${esc(o.token||'')}" placeholder="github_pat_...">
+    </details>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="upsave">저장하고 확인</button><button class="btn ghost" data-act="relnotes">배포 페이지</button></div>
+    <div class="row" style="margin-top:8px">${hasPrev?'<button class="btn sm ghost" data-act="uprollback">이전 버전으로 되돌리기</button>':''}${o.on?'<button class="btn sm ghost" data-act="upbuiltin">설치 버전으로 돌아가기</button>':''}</div>`);
   }
 
   static openBackup(){
     CoreView.openModal(`${head('백업과 가져오기')}
-      <label class="f" for="bk_out">현재 데이터</label><textarea class="in tall" id="bk_out" readonly>${esc(JSON.stringify(G))}</textarea>
-      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="copyfield" data-f="bk_out">복사</button></div>
-      <label class="f" for="bk_in">가져올 데이터 붙여넣기</label><textarea class="in" id="bk_in"></textarea>
-      <div class="row" style="margin-top:8px"><button class="btn sm" data-act="importbk">가져오기</button></div>`);
+    <label class="f" for="bk_out">현재 데이터</label><textarea class="in tall" id="bk_out" readonly>${esc(JSON.stringify(G))}</textarea>
+    <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="copyfield" data-f="bk_out">복사</button></div>
+    <label class="f" for="bk_in">가져올 데이터 붙여넣기</label><textarea class="in" id="bk_in"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="importbk">가져오기</button></div>`);
   }
 
   static playStory(title,script,done){
@@ -1340,9 +1340,9 @@ static openSubAdd(){ CoreView.openModal(`${head('🔗 게임 구독','<span clas
     S={title,lines:ls,i:0,done,cur:null,log:[],typing:false,full:'',timer:null,autoT:null,auto:false,choice:null,pick:0};
     { const sd=Core.SND(); if(sd.voiceLang==='ja'&&sd.fishKey&&sd.voiceStory) System.jaBatch(ls.filter(L=>L.type==='say'&&!isMe(L.who)&&Economy.voiceOf(Characters.findSpeaker(L.who))).map(L=>L.text).slice(2)); } // 처음 두 줄은 바로 한 줄씩 옮겨서 기다리지 않게
     $('#ov').innerHTML=`<div class="vn" id="vn" data-act="vnnext"><div class="vn-bg" id="vnBg"></div><div class="vn-cg" id="vnCG" hidden></div><div class="vn-char dim ${P().settings.vnFull?'':'up'}" id="vnChar"></div><div class="vn-prop" id="vnProp" hidden></div><div class="vn-flash" id="vnFlash"></div><div class="vn-phone" id="vnPhone" hidden><div class="vp-top" id="vnPhName"></div><div class="vp-body" id="vnPhBody"></div></div>
-      <div class="vn-top"><span class="ttl">${esc(title)}</span><button data-act="vnauto" id="vnAuto">자동</button><button data-act="vnlog">로그</button><button data-act="vnskip">건너뛰기</button></div>
-      <div class="vn-place" id="vnPlace"></div>
-      <div class="vn-box"><div class="vn-in"><div class="vn-name" id="vnName"></div><div class="vn-text" id="vnText"></div><div class="vn-choices" id="vnCh"></div></div><span class="vn-next" id="vnNext" hidden>▼</span></div></div>`;
+    <div class="vn-top"><span class="ttl">${esc(title)}</span><button data-act="vnauto" id="vnAuto">자동</button><button data-act="vnlog">로그</button><button data-act="vnskip">건너뛰기</button></div>
+    <div class="vn-place" id="vnPlace"></div>
+    <div class="vn-box"><div class="vn-in"><div class="vn-name" id="vnName"></div><div class="vn-text" id="vnText"></div><div class="vn-choices" id="vnCh"></div></div><span class="vn-next" id="vnNext" hidden>▼</span></div></div>`;
     $('#ov').hidden=false;
     const fb=ls.find(l=>(l.type==='cmd'&&l.cmd==='배경')||l.type==='place'); SystemView.setVnBg(fb?(fb.arg||fb.text):'');
     CoreView.vnStep();
@@ -1374,11 +1374,11 @@ static vnStage(c,face){ const ch=$('#vnChar'); if(!ch) return null; S.stage=S.st
     B.engine=GGMCombat.create(allies,enemies,{...v2Options(),timedImpacts:true,externalImpacts:true,seed:ctx.kind==='practice'?77:Math.floor(Math.random()*0xffffffff),maxTime:System.fieldTime(s)||119,practice:ctx.kind==='practice'});
     if(Object.keys(fbon).length) setTimeout(()=>B&&blog(Object.entries(fbon).map(([f,v])=>`${f} 소속 보너스 공격 +${v}%`).join(', ')),300);
     $('#ov').innerHTML=`<div class="bt"><div class="bt-bg" style="${ArtView.bgStyle(Core.stageBg(s)||'폐선로')}"></div>
-      <div class="bt-top"><span class="ttl"><i>${ctx.kind==='practice'?'PRACTICE':ctx.kind==='farm'?'TRAINING':ctx.kind==='event'?'EVENT':ctx.kind==='raid'?'RAID · '+Math.ceil(RAID_TICKS*GGMCombat.DT)+'s':ctx.kind==='rogue'?'EXPEDITION':'OPERATION'}</i>${esc(s.title)}</span><button data-act="bauto" class="on">필살 자동</button><button data-act="bspeed" class="${(P().settings.bspeed||1)>1?'on':''}">${[1,2,3].includes(P().settings.bspeed)?P().settings.bspeed:1}x</button><button data-act="bquit">${ctx.kind==='practice'?'연습 종료':'후퇴'}</button></div>
-      <div class="bt-en">${enemies.map((en,i)=>`<div data-act="bfocus" data-i="${i}" class="eu row-${en.row||'front'} ${en.boss?'boss':''} ${Art.enemyLib(en.name)&&Characters.imgSrc(Art.enemyLib(en.name))?'hasimg':''}" id="u_e${i}" style="--ec:${ECOL[en.elem]}">${CharactersView.enemyArt(en)}<b>${esc(en.name)}</b><div class="hpb"><i></i></div><div class="gg"><i></i></div></div>`).join('')}</div>
-      <div class="bt-log" id="bLog"></div>
-      <div class="bt-al">${allies.map((u,i)=>`<div class="au row-${u.row||'front'}" id="u_a${i}" style="--ec:${ECOL[u.elem]}"><div class="au-art">${SystemView.battleCharacterArt(u.c)}</div>${B.engine.formation?`<em class="rg" title="${RANGE[u.range]||''} · ${u.row==='back'?'후열':'전열'}">${RANGE_ICO[u.range]||''}</em>`:''}<div class="meta"><div class="hpb"><i></i></div><div class="shb"><i></i></div></div><button class="skill" data-act="skill" data-i="${i}">${esc(u.kit.ultimate.name)}<small></small><span class="v2-sp" role="progressbar" aria-label="궁극기 SP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" ><i></i></span></button><small class="v2-active-time" style="display:block;text-align:center;font-size:10px"></small></div>`).join('')}</div>
-      <div class="cutin" id="cutin"></div></div>`;
+    <div class="bt-top"><span class="ttl"><i>${ctx.kind==='practice'?'PRACTICE':ctx.kind==='farm'?'TRAINING':ctx.kind==='event'?'EVENT':ctx.kind==='raid'?'RAID · '+Math.ceil(RAID_TICKS*GGMCombat.DT)+'s':ctx.kind==='rogue'?'EXPEDITION':'OPERATION'}</i>${esc(s.title)}</span><button data-act="bauto" class="on">필살 자동</button><button data-act="bspeed" class="${(P().settings.bspeed||1)>1?'on':''}">${[1,2,3].includes(P().settings.bspeed)?P().settings.bspeed:1}x</button><button data-act="bquit">${ctx.kind==='practice'?'연습 종료':'후퇴'}</button></div>
+    <div class="bt-en">${enemies.map((en,i)=>`<div data-act="bfocus" data-i="${i}" class="eu row-${en.row||'front'} ${en.boss?'boss':''} ${Art.enemyLib(en.name)&&Characters.imgSrc(Art.enemyLib(en.name))?'hasimg':''}" id="u_e${i}" style="--ec:${ECOL[en.elem]}">${CharactersView.enemyArt(en)}<b>${esc(en.name)}</b><div class="hpb"><i></i></div><div class="gg"><i></i></div></div>`).join('')}</div>
+    <div class="bt-log" id="bLog"></div>
+    <div class="bt-al">${allies.map((u,i)=>`<div class="au row-${u.row||'front'}" id="u_a${i}" style="--ec:${ECOL[u.elem]}"><div class="au-art">${SystemView.battleCharacterArt(u.c)}</div>${B.engine.formation?`<em class="rg" title="${RANGE[u.range]||''} · ${u.row==='back'?'후열':'전열'}">${RANGE_ICO[u.range]||''}</em>`:''}<div class="meta"><div class="hpb"><i></i></div><div class="shb"><i></i></div></div><button class="skill" data-act="skill" data-i="${i}">${esc(u.kit.ultimate.name)}<small></small><span class="v2-sp" role="progressbar" aria-label="궁극기 SP" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" ><i></i></span></button><small class="v2-active-time" style="display:block;text-align:center;font-size:10px"></small></div>`).join('')}</div>
+    <div class="cutin" id="cutin"></div></div>`;
     $('#ov').hidden=false;if(ctx.kind==='practice')v2MountPractice(); v2BattleEvents(B.engine.events); SystemView.bUpdate(); System.bRun(); SystemView.sceneBgm();
   }
 

@@ -19,9 +19,9 @@ static autoNpcsPrompt({names,lines}){ return `${Core.pf('AUTO_NPCS',{castRule:Ne
 static stanceAIPrompt({F,main}){ return `${RULES}\n${World.ctx()}\n\n메인 장:\n${main.map((ch,i)=>`${i+1}장 「${ch.title}」: ${String(ch.memory?.brief||ch.summary||ch.logline||'').slice(0,300)||'(요약 없음)'}`).join('\n')||'(아직 없음)'}\n\n세력: ${JSON.stringify(F.map(f=>({name:f.name,kind:f.kind,desc:String(f.desc||'').slice(0,200),rel:f.rel||{}}))).slice(0,3000)}\n\n${Core.pf('STANCE_AI',{last:main.length})}\nJSON만 출력: {"stance":[{"faction":"세력 이름","ch":1,"s":"ally|neutral|hostile","why":"한 줄 이유"}]}`; }
 
   static factionAIPrompt({F,instruction,M}){ return `${RULES}\n${World.ctx()}\n\n${Core.pf(F.length?'FACTION_AI_IMPROVE':'FACTION_AI_NEW',{rule:FACTION_RULE,now:World.mainNow()})}${instruction?'\n추가 지시: '+instruction:''}
-  적(몬스터) 목록: ${M.map(l=>l.name).join(', ')||'없음'} — ${BESTIARY_AI_RULE}
-  기존 세력: ${JSON.stringify(F.map(f=>({name:f.name,kind:f.kind,desc:f.desc}))).slice(0,3000)}
-  JSON만 출력: {"factions":[{"name":"","kind":"playable|hostile|neutral|monster","desc":"","goal":"","leader":"","base":"","ideology":"","secret":"","origin":"","nature":"","weakness":"","rel":{"다른 세력 이름":"관계"},"stance":[]}],"bestiary":[{"name":"적 이름 그대로","faction":"","desc":"","nature":"","weak":""}]}`; }
+적(몬스터) 목록: ${M.map(l=>l.name).join(', ')||'없음'} — ${BESTIARY_AI_RULE}
+기존 세력: ${JSON.stringify(F.map(f=>({name:f.name,kind:f.kind,desc:f.desc}))).slice(0,3000)}
+JSON만 출력: {"factions":[{"name":"","kind":"playable|hostile|neutral|monster","desc":"","goal":"","leader":"","base":"","ideology":"","secret":"","origin":"","nature":"","weakness":"","rel":{"다른 세력 이름":"관계"},"stance":[]}],"bestiary":[{"name":"적 이름 그대로","faction":"","desc":"","nature":"","weak":""}]}`; }
 
   static ailibPrompt({nm,ds,ids}){ return `${Core.pf('CG_ART',{summary:G.world.summary,nm,ds:ds?' ('+ds+')':'',name:ids.map(c=>c.name).join(', ')||'없음'})}\nJSON만 출력: {"prompt":"...","acts":["1번 인물 행동 태그","2번 ..."]}`; }
 
@@ -69,21 +69,6 @@ static cxProgressText(){ const st=World.mainStages(), done=st.filter(s=>P().clea
    return response.tags.trim().slice(0,2000);
   }
 
-  static illustrationScenePreparation(c,kind,custom){
-   const project=Core.PJ().active,target=c[kind],snapshot=JSON.stringify([c.profile,c.naiPrompt,c.faction,target,G.world.summary]);
-   const check=()=>{if(Core.PJ().active!==project||charById(c.id)!==c||JSON.stringify([c.profile,c.naiPrompt,c.faction,c[kind],G.world.summary])!==snapshot)throw new Error('캐릭터나 이미지 설정이 바뀌었어요. 창을 다시 열어 생성해 주세요.');};
-   const prepare=async(cfg,progress,signal)=>{
-    check();if(cfg.sceneReady)return;if(!SAMPLE)throw new Error('설정 → 글 AI를 먼저 등록해 주세요.');
-    progress(kind==='lbcg'?'캐릭터·세계관을 바탕으로 최대 돌파 CG 장면 구성 중':'캐릭터·세계관을 바탕으로 일러스트 장면 구성 중');
-    const purpose=Misc.illustrationScenePreparationPurposeText({kind});
-    const response=await v2SkillRequest(SAMPLE,World.illustrationScenePreparationPrompt({c,purpose,cfg}),signal);
-    check();if(typeof response?.tags!=='string'||!response.tags.trim())throw new Error('AI가 장면을 비워서 반환했어요. 다시 뽑기를 눌러 주세요.');
-    cfg.sceneTags=response.tags.trim().slice(0,2000);
-    cfg.prompt=PromptStudio.composeNai(kind,Core.joinTags(c.naiPrompt,Characters.designTags(c),cfg.sceneTags),{pose:custom.scenePose??'',frame:custom.sceneFrame||target.naiFrame,styleId:custom.sceneStyle||target.naiStyle||c.naiStyle}).input;
-    cfg.sceneReady=true;
-   };
-   prepare.check=check;return prepare;
-  }
 
     /* /CHARACTER_REGEN_MODULE */
 static designFacs(){ const n=f=>G.chars.filter(c=>c.faction===f&&!c.collab).length; return [...new Set([...((G.world&&G.world.factions)||[]).map(f=>f.name),...G.chars.map(c=>c.faction)].filter(Boolean))].sort((a,b)=>n(b)-n(a)); }
@@ -241,17 +226,17 @@ class WorldView {
   static openWorld(){
     const w=G.world;
     CoreView.openModal(`${head('세계관')}
-      <label class="f" for="w_name">이름</label><input class="in" id="w_name" value="${esc(w.name)}">
-      <label class="f" for="w_sum">요약</label><textarea class="in" id="w_sum">${esc(w.summary)}</textarea>
-      <label class="f" for="w_lore">상세 설정</label><textarea class="in tall" id="w_lore">${esc(w.lore)}</textarea>
-      <label class="f" for="w_plot">메인 플롯 (비밀 설정, 복선, 장기 전개. AI가 다음 장을 쓸 때 참고해요)</label><textarea class="in tall" id="w_plot">${esc(w.plot||'')}</textarea>
-      <label class="f" for="w_fac">세력 (한 줄에 하나: 이름: 설명)</label><textarea class="in" id="w_fac">${esc(w.factions.map(f=>f.name+': '+f.desc).join('\n'))}</textarea>
-      <label class="f" for="w_kw">AI로 새로 짜기: 키워드</label><input class="in" id="w_kw" placeholder="예: 사이버펑크 해상도시, 기업 전쟁, 인공 천사">
-      <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aiworld">AI로 세계관 쓰기</button></div>
-      <p class="muted">AI 결과는 입력칸에만 채워져요. 저장을 눌러야 반영돼요.</p>
-      <div class="optbox" id="w_terms" hidden><label class="f"><input type="checkbox" id="w_tchk" checked> 용어도 세계관에 맞게 바꾸기</label><span class="muted" style="font-size:.8rem"></span></div>
-      <p class="muted" style="margin:8px 0 0">지금 용어: ${esc(System.T('player'))} · ${esc(System.T('crew'))} · ${esc(System.T('talk'))} · ${esc(System.T('currency'))} · ${esc(System.T('gacha'))} · ${esc(System.T('abyss'))} <button class="linkb" data-act="meta-open">용어 직접 바꾸기</button></p>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="saveworld">저장</button></div>`);
+    <label class="f" for="w_name">이름</label><input class="in" id="w_name" value="${esc(w.name)}">
+    <label class="f" for="w_sum">요약</label><textarea class="in" id="w_sum">${esc(w.summary)}</textarea>
+    <label class="f" for="w_lore">상세 설정</label><textarea class="in tall" id="w_lore">${esc(w.lore)}</textarea>
+    <label class="f" for="w_plot">메인 플롯 (비밀 설정, 복선, 장기 전개. AI가 다음 장을 쓸 때 참고해요)</label><textarea class="in tall" id="w_plot">${esc(w.plot||'')}</textarea>
+    <label class="f" for="w_fac">세력 (한 줄에 하나: 이름: 설명)</label><textarea class="in" id="w_fac">${esc(w.factions.map(f=>f.name+': '+f.desc).join('\n'))}</textarea>
+    <label class="f" for="w_kw">AI로 새로 짜기: 키워드</label><input class="in" id="w_kw" placeholder="예: 사이버펑크 해상도시, 기업 전쟁, 인공 천사">
+    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aiworld">AI로 세계관 쓰기</button></div>
+    <p class="muted">AI 결과는 입력칸에만 채워져요. 저장을 눌러야 반영돼요.</p>
+    <div class="optbox" id="w_terms" hidden><label class="f"><input type="checkbox" id="w_tchk" checked> 용어도 세계관에 맞게 바꾸기</label><span class="muted" style="font-size:.8rem"></span></div>
+    <p class="muted" style="margin:8px 0 0">지금 용어: ${esc(System.T('player'))} · ${esc(System.T('crew'))} · ${esc(System.T('talk'))} · ${esc(System.T('currency'))} · ${esc(System.T('gacha'))} · ${esc(System.T('abyss'))} <button class="linkb" data-act="meta-open">용어 직접 바꾸기</button></p>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="saveworld">저장</button></div>`);
   }
 
     /* 도감 기록 보기(Controller): 잠겼으면 알림, 열렸으면 본 것으로 하고 카드의 새 표시를 지운 뒤 창 */
@@ -270,11 +255,11 @@ static openCx(key){
     const all=World.cxEntries(), cat=CXCAT, list=all.filter(e=>cat==='all'||e.cat===cat), un=all.filter(e=>e.open).length;
     const cnt=k=>k==='all'?all.length:all.filter(e=>e.cat===k).length;
     return `${pageHead('도감','LORE BOOK','lobby')}
-    <div class="cx-head"><div class="cx-meter"><b>${un}</b><span>/ ${all.length} 기록 해금</span></div><div class="cx-bar"><i style="width:${all.length?un/all.length*100:0}%"></i></div>
-      <div class="cx-acts">${SAMPLE?`<button class="btn sm" data-act="cxdisc">✦ AI로 로어북 채우기</button>`:''}<button class="btn sm ghost" data-act="cxadd">＋ 직접 쓰기</button><button class="btn sm ghost" data-act="relopen" data-r="me">🕸 인물 관계도</button>${all.some(e=>e.open&&!Core.progRead('cxSeen')[e.key])?'<button class="btn sm ghost" data-act="cxreadall">NEW 모두 지우기</button>':''}</div></div>
-    <div class="cx-cats">${CX_CATS.filter(([k])=>cnt(k)).map(([k,l])=>`<button class="${k===cat?'on':''}" data-act="cxcat" data-v="${k}">${l}<em>${cnt(k)}</em></button>`).join('')}</div>
-    ${!World.cxStore().length&&SAMPLE?`<div class="panel cx-hint"><b>세계를 더 깊게</b><p class="muted" style="margin:4px 0 0">AI가 세계관과 메인 플롯을 바탕으로 장소, 용어, 역사, 숨은 인물 같은 기록을 써요. 비밀이 담긴 기록은 해당 스테이지를 깨야 열려요.</p></div>`:''}
-    <div class="cx-list">${list.map(WorldView.cxCard).join('')||'<p class="muted">항목이 없어요</p>'}</div>`;
+  <div class="cx-head"><div class="cx-meter"><b>${un}</b><span>/ ${all.length} 기록 해금</span></div><div class="cx-bar"><i style="width:${all.length?un/all.length*100:0}%"></i></div>
+    <div class="cx-acts">${SAMPLE?`<button class="btn sm" data-act="cxdisc">✦ AI로 로어북 채우기</button>`:''}<button class="btn sm ghost" data-act="cxadd">＋ 직접 쓰기</button><button class="btn sm ghost" data-act="relopen" data-r="me">🕸 인물 관계도</button>${all.some(e=>e.open&&!Core.progRead('cxSeen')[e.key])?'<button class="btn sm ghost" data-act="cxreadall">NEW 모두 지우기</button>':''}</div></div>
+  <div class="cx-cats">${CX_CATS.filter(([k])=>cnt(k)).map(([k,l])=>`<button class="${k===cat?'on':''}" data-act="cxcat" data-v="${k}">${l}<em>${cnt(k)}</em></button>`).join('')}</div>
+  ${!World.cxStore().length&&SAMPLE?`<div class="panel cx-hint"><b>세계를 더 깊게</b><p class="muted" style="margin:4px 0 0">AI가 세계관과 메인 플롯을 바탕으로 장소, 용어, 역사, 숨은 인물 같은 기록을 써요. 비밀이 담긴 기록은 해당 스테이지를 깨야 열려요.</p></div>`:''}
+  <div class="cx-list">${list.map(WorldView.cxCard).join('')||'<p class="muted">항목이 없어요</p>'}</div>`;
   }
 
     /* 도감 카드의 새 표시 지우기 · 기록 보기 창 내용(View) */
@@ -282,23 +267,23 @@ static cxCardSeenShow(key){ document.querySelectorAll('.cx-card[data-k]').forEac
 
   static cxViewHTML(e,key){ const para=t=>String(t||'').split(/\n{2,}/).map(x=>`<p>${esc(x).replace(/\n/g,'<br>')}</p>`).join('');
     return `<div class="cx-view c-${esc(e.cat)}">
-      ${e.img||e.char?`<div class="cx-hero">${e.char?CoreView.art(e.char,'cx-ch'):`<img src="${esc(e.img)}" alt="" class="${e.contain?'ct':''}">`}</div>`:''}
-      <div class="cx-vh"><i>${esc(CX_LABEL[e.cat]||'')}</i><h2>${esc(e.title)}</h2><span class="muted">${esc(e.sub||'')}</span></div>
-      <div class="cx-body">${e.body?para(e.body):'<p class="muted">아직 기록이 없어요. 아래 \'더 알아보기\'를 누르면 AI가 지금까지 밝혀진 범위 안에서 써 줘요.</p>'}
-        ${e.notes.map(n=>`<div class="cx-note"><small>${esc(n.at||'')}</small>${para(n.text)}</div>`).join('')}</div>
-      ${SAMPLE?`<button class="btn block" data-act="cxdeep" data-k="${esc(key)}" style="margin-top:14px">✦ 더 알아보기</button>`:''}
-      <div class="cx-sub">${e.char&&Characters.own(e.char.id)?`<button class="btn sm ghost" data-act="char" data-id="${esc(e.char.id)}">${esc(System.T('crew'))} 정보</button>`:''}${e.stored?`<button class="btn sm ghost" data-act="cxedit" data-id="${esc(e.stored.id)}">편집</button>`:''}<button class="btn sm ghost" data-act="cxnote" data-k="${esc(key)}">메모 추가</button><button class="btn sm ghost" data-act="close">닫기</button></div>
-    </div>`; }
+    ${e.img||e.char?`<div class="cx-hero">${e.char?CoreView.art(e.char,'cx-ch'):`<img src="${esc(e.img)}" alt="" class="${e.contain?'ct':''}">`}</div>`:''}
+    <div class="cx-vh"><i>${esc(CX_LABEL[e.cat]||'')}</i><h2>${esc(e.title)}</h2><span class="muted">${esc(e.sub||'')}</span></div>
+    <div class="cx-body">${e.body?para(e.body):'<p class="muted">아직 기록이 없어요. 아래 \'더 알아보기\'를 누르면 AI가 지금까지 밝혀진 범위 안에서 써 줘요.</p>'}
+      ${e.notes.map(n=>`<div class="cx-note"><small>${esc(n.at||'')}</small>${para(n.text)}</div>`).join('')}</div>
+    ${SAMPLE?`<button class="btn block" data-act="cxdeep" data-k="${esc(key)}" style="margin-top:14px">✦ 더 알아보기</button>`:''}
+    <div class="cx-sub">${e.char&&Characters.own(e.char.id)?`<button class="btn sm ghost" data-act="char" data-id="${esc(e.char.id)}">${esc(System.T('crew'))} 정보</button>`:''}${e.stored?`<button class="btn sm ghost" data-act="cxedit" data-id="${esc(e.stored.id)}">편집</button>`:''}<button class="btn sm ghost" data-act="cxnote" data-k="${esc(key)}">메모 추가</button><button class="btn sm ghost" data-act="close">닫기</button></div>
+  </div>`; }
 
   static openCxEdit(id){
     const x=id?World.cxStore().find(q=>q.id===id):{id:'',cat:'term',title:'',body:'',unlock:{type:'start'}}; if(!x) return;
     const st=World.mainStages();
     CoreView.openModal(`${head(id?'기록 편집':'기록 쓰기')}
-      <div class="g2"><div><label class="f" for="cx_cat">분류</label><select class="in" id="cx_cat">${CoreView.opt(CX_CATS.filter(c=>c[0]!=='all'&&c[0]!=='enemy'),x.cat)}</select></div>
-      <div><label class="f" for="cx_un">공개 시점</label><select class="in" id="cx_un">${CoreView.opt([['start','처음부터'],...st.map(s=>[s.id,s.code+' 클리어 후'])],x.unlock&&x.unlock.type==='clear'?x.unlock.value:'start')}</select></div></div>
-      <label class="f" for="cx_t">제목</label><input class="in" id="cx_t" value="${esc(x.title)}">
-      <label class="f" for="cx_b">내용</label><textarea class="in" id="cx_b" style="min-height:180px">${esc(x.body)}</textarea>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="cxsave" data-id="${esc(x.id)}">저장</button>${id?`<button class="btn ghost" data-act="cxdel" data-id="${esc(x.id)}">삭제</button>`:''}</div>`);
+    <div class="g2"><div><label class="f" for="cx_cat">분류</label><select class="in" id="cx_cat">${CoreView.opt(CX_CATS.filter(c=>c[0]!=='all'&&c[0]!=='enemy'),x.cat)}</select></div>
+    <div><label class="f" for="cx_un">공개 시점</label><select class="in" id="cx_un">${CoreView.opt([['start','처음부터'],...st.map(s=>[s.id,s.code+' 클리어 후'])],x.unlock&&x.unlock.type==='clear'?x.unlock.value:'start')}</select></div></div>
+    <label class="f" for="cx_t">제목</label><input class="in" id="cx_t" value="${esc(x.title)}">
+    <label class="f" for="cx_b">내용</label><textarea class="in" id="cx_b" style="min-height:180px">${esc(x.body)}</textarea>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="cxsave" data-id="${esc(x.id)}">저장</button>${id?`<button class="btn ghost" data-act="cxdel" data-id="${esc(x.id)}">삭제</button>`:''}</div>`);
   }
 
   static factionPanel(){ const r=World.factionReview(); return `<div class="panel pm-hide"><h3>세력·몬스터·등장 관리 <span class="badge">${r.score}점</span></h3><p class="muted" style="margin:0 0 6px">세력 ${World.factions().length}개 · 몬스터 ${World.monsterNames().length}종 · 점검 ${r.issues.length}건. 세력의 종류·목적·관계와 장마다 바뀌는 적대/우호, 몬스터의 정체, ${System.T('crew')}의 첫 등장·${System.T('gacha')} 잠금을 관리해요.</p><button class="btn sm" data-act="fwopen">세력·몬스터·등장 관리</button></div>`; }
@@ -306,21 +291,21 @@ static cxCardSeenShow(key){ document.querySelectorAll('.cx-card[data-k]').forEac
   static openWorldDesign(tab){ if(tab) FW_TAB=tab; const F=World.factions(), now=World.mainNow(), rv=World.factionReview(), t=(k,v,ph)=>`<input class="in" data-fw="${k}" value="${esc(v??'')}" placeholder="${esc(ph||'')}">`, ta=(k,v,ph)=>`<textarea class="in" rows="2" data-fw="${k}" placeholder="${esc(ph||'')}">${esc(v||'')}</textarea>`;
     const tabs=[['fac','세력'],['mon','적·몬스터 도감'],['cast','등장·영입']]; let body='';
     if(FW_TAB==='fac') body=F.map((f,i)=>`<details class="panel" style="padding:8px;margin:6px 0"><summary><b>${esc(f.name)}</b> <span class="muted">${FKIND[f.kind]} · 지금 ${FSTANCE[World.stanceAt(f,now)]}</span></summary>
-      <div class="g2"><div><label class="f">종류</label><select class="in" data-fw="f.${i}.kind">${CoreView.opt(Object.entries(FKIND),f.kind)}</select></div><div><label class="f">이름</label>${t(`f.${i}.name`,f.name)}</div></div>
-      ${F_FIELDS.map(([k,l])=>`<label class="f">${l}</label>${k==='desc'||k==='secret'?ta(`f.${i}.${k}`,f[k]):t(`f.${i}.${k}`,f[k])}`).join('')}
-      ${f.kind==='monster'?M_FIELDS.map(([k,l])=>`<label class="f">${l}</label>${t(`f.${i}.${k}`,f[k])}`).join(''):''}
-      <label class="f">다른 세력과의 관계 (세력 | 관계, 줄마다)</label>${ta(`f.${i}.rel`,Object.entries(f.rel).map(([k,v])=>k+' | '+v).join('\n'))}
-      <label class="f">플레이어와의 관계 변화 (장 | ally·neutral·hostile | 이유, 줄마다 · 비우면 종류대로)</label>${ta(`f.${i}.stance`,f.stance.map(s=>`${s.ch} | ${s.s} | ${s.why||''}`).join('\n'),'예: 1 | hostile | 처음엔 적\n4 | ally | 진실을 알고 손잡음')}
-      <div class="muted" style="font-size:.78rem">소속: ${esc(G.chars.filter(c=>c.faction===f.name).map(c=>c.name).join(', ')||'없음')}${World.monsterNames().filter(l=>World.enemyFaction(l)===f.name).length?' · 몬스터: '+esc(World.monsterNames().filter(l=>World.enemyFaction(l)===f.name).map(l=>l.name).join(', ')):''}</div></details>`).join('')+`<button class="btn sm ghost" data-act="fwadd">+ 세력</button>`;
+    <div class="g2"><div><label class="f">종류</label><select class="in" data-fw="f.${i}.kind">${CoreView.opt(Object.entries(FKIND),f.kind)}</select></div><div><label class="f">이름</label>${t(`f.${i}.name`,f.name)}</div></div>
+    ${F_FIELDS.map(([k,l])=>`<label class="f">${l}</label>${k==='desc'||k==='secret'?ta(`f.${i}.${k}`,f[k]):t(`f.${i}.${k}`,f[k])}`).join('')}
+    ${f.kind==='monster'?M_FIELDS.map(([k,l])=>`<label class="f">${l}</label>${t(`f.${i}.${k}`,f[k])}`).join(''):''}
+    <label class="f">다른 세력과의 관계 (세력 | 관계, 줄마다)</label>${ta(`f.${i}.rel`,Object.entries(f.rel).map(([k,v])=>k+' | '+v).join('\n'))}
+    <label class="f">플레이어와의 관계 변화 (장 | ally·neutral·hostile | 이유, 줄마다 · 비우면 종류대로)</label>${ta(`f.${i}.stance`,f.stance.map(s=>`${s.ch} | ${s.s} | ${s.why||''}`).join('\n'),'예: 1 | hostile | 처음엔 적\n4 | ally | 진실을 알고 손잡음')}
+    <div class="muted" style="font-size:.78rem">소속: ${esc(G.chars.filter(c=>c.faction===f.name).map(c=>c.name).join(', ')||'없음')}${World.monsterNames().filter(l=>World.enemyFaction(l)===f.name).length?' · 몬스터: '+esc(World.monsterNames().filter(l=>World.enemyFaction(l)===f.name).map(l=>l.name).join(', ')):''}</div></details>`).join('')+`<button class="btn sm ghost" data-act="fwadd">+ 세력</button>`;
     else if(FW_TAB==='mon'){ const M=World.monsterNames(); body=`<p class="muted" style="font-size:.82rem">캐릭터가 아닌 적(몬스터·적 병력)이에요. 정체·습성·약점을 정하면 스토리·도감에 쓰이고, AI가 몬스터를 동료·NPC·메신저 상대로 만들지 않아요.</p>${M.map((l,i)=>`<div class="panel" style="padding:8px;margin:6px 0"><b>${esc(l.name)}</b> <select class="in" data-fw="m.${l.id}.faction" style="max-width:150px;display:inline-block"><option value="">무리 없음</option>${F.map(f=>`<option ${World.enemyFaction(l)===f.name?'selected':''}>${esc(f.name)}</option>`).join('')}</select>${t(`m.${l.id}.desc`,l.desc,'정체 (무엇인가)')}${t(`m.${l.id}.nature`,l.nature,'습성·행동')}${t(`m.${l.id}.weak`,l.weak,'약점')}</div>`).join('')||'<p class="muted">적이 없어요</p>'}`; }
     else { const L=G.chars.filter(c=>!c.alt&&!c.npc), stg=G.chapters.flatMap(ch=>(ch.stages||[]).map(s=>[s.id,`${ch.kind==='main'?Story.stageCode(s.id):ch.title} ${s.title}`]));
       body=`<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-fw="cast.pickupGate" ${World.castCfg().pickupGate?'checked':''}>픽업 배너도 첫 등장 스테이지를 깨기 전엔 잠금</label><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-fw="cast.hostileGate" ${World.castCfg().hostileGate?'checked':''}>소속 세력이 지금 적대면 ${System.T('gacha')}·건조에서 잠금</label>
-      <p class="muted" style="font-size:.8rem">첫 등장을 정하면 그 스테이지를 깨기 전까지 ${System.T('gacha')}에 안 나오고, 스토리에서 처음 만나는 장면이 돼요. "처음부터"인 ${System.T('crew')}는 뽑아서 합류하면 AI가 이미 함께 작전 중인 동료로 다뤄요.</p>
-      ${L.map(c=>{ const lk=World.castLock(c); return `<div class="ep"><span class="t"><b>${esc(c.name)}${c.monster?' (몬스터)':''}</b><span class="muted">${esc(c.faction||'무소속')} · ${Characters.own(c.id)?'보유':'미보유'} · ${World.metInStory(c)?'스토리에서 만남':'아직 안 만남'}${lk?' · 🔒 '+esc(lk):''}</span></span><select class="in" data-fw="c.${c.id}.debut" style="max-width:170px"><option value="">처음부터</option>${stg.map(([id,l])=>`<option value="${id}" ${c.debut===id?'selected':''}>${esc(l)}</option>`).join('')}</select>${!c.monster&&Art.isMonsterLike(c)?`<button class="btn sm ghost" data-act="fwmon" data-id="${c.id}">몬스터로 전환</button>`:''}</div>`; }).join('')}`; }
+    <p class="muted" style="font-size:.8rem">첫 등장을 정하면 그 스테이지를 깨기 전까지 ${System.T('gacha')}에 안 나오고, 스토리에서 처음 만나는 장면이 돼요. "처음부터"인 ${System.T('crew')}는 뽑아서 합류하면 AI가 이미 함께 작전 중인 동료로 다뤄요.</p>
+    ${L.map(c=>{ const lk=World.castLock(c); return `<div class="ep"><span class="t"><b>${esc(c.name)}${c.monster?' (몬스터)':''}</b><span class="muted">${esc(c.faction||'무소속')} · ${Characters.own(c.id)?'보유':'미보유'} · ${World.metInStory(c)?'스토리에서 만남':'아직 안 만남'}${lk?' · 🔒 '+esc(lk):''}</span></span><select class="in" data-fw="c.${c.id}.debut" style="max-width:170px"><option value="">처음부터</option>${stg.map(([id,l])=>`<option value="${id}" ${c.debut===id?'selected':''}>${esc(l)}</option>`).join('')}</select>${!c.monster&&Art.isMonsterLike(c)?`<button class="btn sm ghost" data-act="fwmon" data-id="${c.id}">몬스터로 전환</button>`:''}</div>`; }).join('')}`; }
     CoreView.openModal(`${head('세력·몬스터·등장 관리',`<span class="muted">점수 ${rv.score}</span>`)}${rv.issues.length?`<div class="panel" style="border-color:var(--gold)"><b>점검</b><ul style="margin:4px 0;padding-left:18px;font-size:.8rem">${rv.issues.map(x=>`<li>${esc(x.msg)}</li>`).join('')}</ul></div>`:''}
-    <div class="row" style="gap:4px;margin:6px 0">${tabs.map(([k,l])=>`<button class="btn sm ${FW_TAB===k?'':'ghost'}" data-act="fwtab" data-k="${k}">${l}</button>`).join('')}</div>${body}
-    <label class="f" style="margin-top:8px">AI 추가 지시 (선택)</label><input class="in" id="fw_ins" placeholder="예: 헬릭스는 3장 이후 내분으로 일부가 우리 편이 된다">
-    <div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><button class="btn" data-act="fwsave">저장</button><button class="btn ghost" data-act="fwai">AI로 깊이 채우기</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
+  <div class="row" style="gap:4px;margin:6px 0">${tabs.map(([k,l])=>`<button class="btn sm ${FW_TAB===k?'':'ghost'}" data-act="fwtab" data-k="${k}">${l}</button>`).join('')}</div>${body}
+  <label class="f" style="margin-top:8px">AI 추가 지시 (선택)</label><input class="in" id="fw_ins" placeholder="예: 헬릭스는 3장 이후 내분으로 일부가 우리 편이 된다">
+  <div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><button class="btn" data-act="fwsave">저장</button><button class="btn ghost" data-act="fwai">AI로 깊이 채우기</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
 }
 
 /* ===== World의 AI 생성 흐름(Generator 하위 — docs/redesign.md 3절) ===== */

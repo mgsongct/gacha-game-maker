@@ -132,8 +132,8 @@ static evsPokeShow(t,c,l,zone,lv,x,y){ CoreView.ripple(x,y,lv>=7); CoreView.char
 
   static openStam(need){ const s=Core.progRead('stam'), left=s.v>=STAM_MAX?0:Math.ceil((STAM_MS-(Date.now()-s.at))/60000), full=s.v>=STAM_MAX?0:Math.ceil(((STAM_MAX-s.v-1)*STAM_MS+(STAM_MS-(Date.now()-s.at)))/60000);
     CoreView.openModal(`${head('⚡ 행동력',`<span class="muted">${s.v} / ${STAM_MAX}</span>`)}${need?`<p style="margin:0 0 8px">행동력이 모자라요. 필요 <b>${need}</b> · 지금 <b>${s.v}</b></p>`:''}
-      <p class="muted" style="margin:0 0 10px;font-size:.85rem">5분마다 1씩 차요.${s.v<STAM_MAX?` 다음 1 회복까지 ${left}분 · 가득 차기까지 약 ${full}분`:' 지금 가득 찼어요.'}<br>메인·이벤트 전투 10, 재료 던전 8을 써요.</p>
-      <div class="row"><button class="btn" data-act="stamfill" ${P().gems>=STAM_FILL[0]?'':'disabled'}>${EconomyView.rIco('gems')} ${STAM_FILL[0]}로 ⚡${STAM_FILL[1]} 회복</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
+    <p class="muted" style="margin:0 0 10px;font-size:.85rem">5분마다 1씩 차요.${s.v<STAM_MAX?` 다음 1 회복까지 ${left}분 · 가득 차기까지 약 ${full}분`:' 지금 가득 찼어요.'}<br>메인·이벤트 전투 10, 재료 던전 8을 써요.</p>
+    <div class="row"><button class="btn" data-act="stamfill" ${P().gems>=STAM_FILL[0]?'':'disabled'}>${EconomyView.rIco('gems')} ${STAM_FILL[0]}로 ⚡${STAM_FILL[1]} 회복</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
 
   static hsDecorate(){ document.querySelectorAll('.bsel,.cx-cats').forEach(el=>{
       if(!el.parentElement.classList.contains('hs-wrap')){ const w=document.createElement('div'); w.className='hs-wrap'; el.parentNode.insertBefore(w,el); w.appendChild(el); w.insertAdjacentHTML('beforeend','<button class="hs-ar l" data-hs="-1" aria-label="왼쪽으로">‹</button><button class="hs-ar r" data-hs="1" aria-label="오른쪽으로">›</button>'); el.addEventListener('scroll',()=>EconomyView.hsUpd(w),{passive:true}); }
@@ -147,13 +147,13 @@ static evsPokeShow(t,c,l,zone,lv,x,y){ CoreView.ripple(x,y,lv>=7); CoreView.char
   static passHTML(){
     const p=P(), d=Core.progRead('dm'), lv=passLv(), xp=p.pass.xp;
     return `${pageHead(System.T('pass'),'SEASON PASS','lobby')}
-    <div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Lv.${lv} / ${PASS_MAX}</h3><span class="muted">${nf(xp%PASS_PER)} / ${PASS_PER} XP</span></div><div class="bar"><i style="width:${lv>=PASS_MAX?100:(xp%PASS_PER)/PASS_PER*100}%"></i></div></div>
-    <div class="row" style="margin:8px 0"><button class="btn sm" data-act="pgetall">모두 받기 <small>(임무·패스 보상)</small></button></div>
-    <h3 class="sec">오늘의 임무</h3>
-    ${MISSIONS.map(m=>{const c=Math.min(m.goal,d.cnt[m.k]||0),ok=c>=m.goal,got=d.got[m.k];return `<div class="ep"><span class="t"><b>${m.name}</b><span class="muted">${c}/${m.goal} · ${m.xp} XP</span></span><button class="btn sm ${got?'ghost':''}" data-act="mget" data-k="${m.k}" ${ok&&!got?'':'disabled'}>${got?'완료':'받기'}</button></div>`;}).join('')}
-    <h3 class="sec">패스 보상</h3>
-    <div class="passgrid">${Array.from({length:PASS_MAX},(_,i)=>i+1).map(l=>{const got=p.pass.got.includes(l),ok=l<=lv;return `<button class="pv ${got?'got':ok?'ok':''}" data-act="pget" data-lv="${l}" ${ok&&!got?'':'disabled'}><i>${l}</i><span>${Core.rewardText(Economy.passReward(l))}</span></button>`;}).join('')}</div>
-    <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="passreset">새 시즌 시작</button></div>`;
+  <div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Lv.${lv} / ${PASS_MAX}</h3><span class="muted">${nf(xp%PASS_PER)} / ${PASS_PER} XP</span></div><div class="bar"><i style="width:${lv>=PASS_MAX?100:(xp%PASS_PER)/PASS_PER*100}%"></i></div></div>
+  <div class="row" style="margin:8px 0"><button class="btn sm" data-act="pgetall">모두 받기 <small>(임무·패스 보상)</small></button></div>
+  <h3 class="sec">오늘의 임무</h3>
+  ${MISSIONS.map(m=>{const c=Math.min(m.goal,d.cnt[m.k]||0),ok=c>=m.goal,got=d.got[m.k];return `<div class="ep"><span class="t"><b>${m.name}</b><span class="muted">${c}/${m.goal} · ${m.xp} XP</span></span><button class="btn sm ${got?'ghost':''}" data-act="mget" data-k="${m.k}" ${ok&&!got?'':'disabled'}>${got?'완료':'받기'}</button></div>`;}).join('')}
+  <h3 class="sec">패스 보상</h3>
+  <div class="passgrid">${Array.from({length:PASS_MAX},(_,i)=>i+1).map(l=>{const got=p.pass.got.includes(l),ok=l<=lv;return `<button class="pv ${got?'got':ok?'ok':''}" data-act="pget" data-lv="${l}" ${ok&&!got?'':'disabled'}><i>${l}</i><span>${Core.rewardText(Economy.passReward(l))}</span></button>`;}).join('')}</div>
+  <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="passreset">새 시즌 시작</button></div>`;
   }
 
   static skinPkgHTML(){ const a=Characters.skinShopList(), so=P().skinOwn||{};
@@ -164,11 +164,11 @@ static evsPokeShow(t,c,l,zone,lv,x,y){ CoreView.ripple(x,y,lv>=7); CoreView.char
 
   static openSkinBuy(id){ const f=Characters.skinShopList().find(x=>x.k.id===id); if(!f) return; const {c,k}=f, src=Core.skinPreviewSrc(c,k), pr=k.price||SKIN_PRICE, got=!!(P().skinOwn||{})[k.id], sel=SKBUYSEL||(SKBUYSEL={upper:1,illust:1,lbcg:1,faces:0,lines:SAMPLE?1:0});
     CoreView.openModal(`${head(`${esc(c.name)} 「${esc(k.name)}」`,`<span class="muted">${esc(k.desc||System.T('skin'))}</span>`)}
-      ${src?`<div class="skp-img"><img src="${esc(src)}" alt="${esc(k.name)}"></div><p class="muted" style="text-align:center;font-size:.78rem;margin:4px 0 0">그림을 누르면 크게 봐요</p>`:`<p class="muted">아직 이 스킨의 그림이 없어요. 사기 전에 그려서 확인해 보세요.</p>`}
-      ${c.useStanding===false&&!Core.skinDisplayReady(c,k)?'<p class="muted">스탠딩 사용이 꺼져 있어 이 스킨의 상반신이 필요해요. 아래에서 상반신을 그린 뒤 구매할 수 있어요.</p>':''}
-      ${k.line?`<p style="margin:8px 0 0;text-align:center">“${esc(sub(k.line))}”</p>`:''}
-      ${got||System.playMode()?'':`<h3 class="sec">사면 함께 만들 것</h3>${CoreView.skinSelHTML(sel,c,k)}<p class="muted" style="font-size:.78rem">사면 뒤에서 차례로 그려요. 표정은 얼굴 범위를 칠한 뒤 전신·상반신 모두 얼굴만 다시 그려요.</p>`}
-      <div class="row" style="margin-top:10px">${got?'<button class="btn" disabled>보유 중</button>':`<button class="btn" data-act="skbbuy" data-id="${k.id}" ${Core.skinDisplayReady(c,k)?'':'disabled'}>${EconomyView.rIco('gems')}${nf(pr)} 구매</button>`}${Core.imgReady()&&(!System.playMode()||!Core.skinDisplayReady(c,k))?`<button class="btn ghost" data-act="skbdraw" data-id="${k.id}">${Core.skinDisplayReady(c,k)?'다시 그리기':c.useStanding===false?'상반신 그려 보기':'스탠딩 그려 보기'}</button>`:''}${got||System.playMode()?'':`<button class="btn ghost" data-act="skinpkgdel" data-id="${k.id}">패키지 지우기</button>`}<button class="btn ghost" data-act="close">닫기</button></div>`); }
+    ${src?`<div class="skp-img"><img src="${esc(src)}" alt="${esc(k.name)}"></div><p class="muted" style="text-align:center;font-size:.78rem;margin:4px 0 0">그림을 누르면 크게 봐요</p>`:`<p class="muted">아직 이 스킨의 그림이 없어요. 사기 전에 그려서 확인해 보세요.</p>`}
+    ${c.useStanding===false&&!Core.skinDisplayReady(c,k)?'<p class="muted">스탠딩 사용이 꺼져 있어 이 스킨의 상반신이 필요해요. 아래에서 상반신을 그린 뒤 구매할 수 있어요.</p>':''}
+    ${k.line?`<p style="margin:8px 0 0;text-align:center">“${esc(sub(k.line))}”</p>`:''}
+    ${got||System.playMode()?'':`<h3 class="sec">사면 함께 만들 것</h3>${CoreView.skinSelHTML(sel,c,k)}<p class="muted" style="font-size:.78rem">사면 뒤에서 차례로 그려요. 표정은 얼굴 범위를 칠한 뒤 전신·상반신 모두 얼굴만 다시 그려요.</p>`}
+    <div class="row" style="margin-top:10px">${got?'<button class="btn" disabled>보유 중</button>':`<button class="btn" data-act="skbbuy" data-id="${k.id}" ${Core.skinDisplayReady(c,k)?'':'disabled'}>${EconomyView.rIco('gems')}${nf(pr)} 구매</button>`}${Core.imgReady()&&(!System.playMode()||!Core.skinDisplayReady(c,k))?`<button class="btn ghost" data-act="skbdraw" data-id="${k.id}">${Core.skinDisplayReady(c,k)?'다시 그리기':c.useStanding===false?'상반신 그려 보기':'스탠딩 그려 보기'}</button>`:''}${got||System.playMode()?'':`<button class="btn ghost" data-act="skinpkgdel" data-id="${k.id}">패키지 지우기</button>`}<button class="btn ghost" data-act="close">닫기</button></div>`); }
 
     /* 그리기(View): 지금 탭 화면·머리 재화·탭 표시 */
 static renderView(){ const scrollKey=Story.uiPageScrollKey(),viewBefore=$('#view'),viewState=UI_PAGE_SCROLL_ROUTE===scrollKey&&UI_PAGE_SCROLL_GAME===G?PlayerView.uiScrollCapture(viewBefore):null; setTimeout(()=>{ try{ EconomyView.fitLobby(); }catch(e){} },0); document.body.classList.toggle('play',System.playMode()); if(System.playMode()&&PLAY_HIDE_ST.includes(STTAB)) STTAB='';
@@ -190,10 +190,10 @@ static renderView(){ const scrollKey=Story.uiPageScrollKey(),viewBefore=$('#view
     if(EVS_FOR!==ev.id){ EVS_FOR=ev.id; const pool=host?[...(host.lines||[]),...(host.dupLines||[])].filter(Boolean):[]; EVS_LINE=pool.length?rand(pool):`어서 와요! 「${ev.title}」 기념 교환소예요. ${ev.token}(으)로 마음에 드는 걸 골라 가요.`; }
     const sil='<div class="sil"><svg viewBox="0 0 100 120" fill="currentColor"><circle cx="50" cy="34" r="20"/><path d="M14 120c2-34 16-52 36-52s34 18 36 52z"/></svg></div>';
     return `${pageHead(ev.title+' 교환소','EVENT EXCHANGE','evd')}
-    <div class="evs-wrap"><div class="evs-host"><div class="evs-hbg" style="${ArtView.bgStyle(ev.bg||'회색구 골목')}"></div><div class="evs-hart" ${host?`data-act="evspoke" data-id="${host.id}"`:''}>${host?CoreView.art(host,'',{upper:true}):sil}</div>
-      <div class="evs-talk"><b>${esc(host?host.name:'교환소')}</b><p id="evsLine">${esc(sub(EVS_LINE))}</p></div></div>
-    <div class="evs-shelf"><div class="wallet"><span>🎟 ${esc(ev.token)} <b>${nf(tok)}</b></span></div>
-    <div class="shop-grid evs-grid">${(ev.shop||[]).map(it=>{ const left=it.limit-(buy[it.id]||0), c=it.type==='char'?charById(it.ref):null, out=left<=0, poor=tok<it.price;
+  <div class="evs-wrap"><div class="evs-host"><div class="evs-hbg" style="${ArtView.bgStyle(ev.bg||'회색구 골목')}"></div><div class="evs-hart" ${host?`data-act="evspoke" data-id="${host.id}"`:''}>${host?CoreView.art(host,'',{upper:true}):sil}</div>
+    <div class="evs-talk"><b>${esc(host?host.name:'교환소')}</b><p id="evsLine">${esc(sub(EVS_LINE))}</p></div></div>
+  <div class="evs-shelf"><div class="wallet"><span>🎟 ${esc(ev.token)} <b>${nf(tok)}</b></span></div>
+  <div class="shop-grid evs-grid">${(ev.shop||[]).map(it=>{ const left=it.limit-(buy[it.id]||0), c=it.type==='char'?charById(it.ref):null, out=left<=0, poor=tok<it.price;
       const name=c?`${c.name} ${Characters.own(c.id)?System.T('limit')+' +1':'획득'}`:Core.rewardText({[it.type]:it.amt});
       return `<div class="si ${out?'soldout':''} ${c?'char':''}">${c?'<span class="tag">한정</span>':''}<span class="ri">${c?`<i class="evs-c">${CoreView.art(c)}</i>`:EconomyView.rIcon({[it.type]:1})}</span><b>${esc(name)}</b><small>${esc(ev.token)} ${nf(it.price)} · 남은 ${Math.max(0,left)}/${it.limit}</small><button class="btn ${c?'':'ghost'}" data-act="evbuy" data-id="${it.id}" ${out||poor?'disabled':''}>${out?'매진':poor?'부족':'교환'}</button></div>`; }).join('')||'<p class="muted">상품이 없어요.</p>'}</div></div></div>`;
   }
@@ -206,32 +206,32 @@ static renderView(){ const scrollKey=Story.uiPageScrollKey(),viewBefore=$('#view
     const p=P(), sd=Core.progRead('shop'), {m,c,self}=Economy.shopkeeper(); if(!SHOP_LINE) SHOP_LINE=rand(m.hello)||'어서 와요.';
     const sil='<div class="sil"><svg viewBox="0 0 100 120" fill="currentColor"><circle cx="50" cy="34" r="20"/><path d="M14 120c2-34 16-52 36-52s34 18 36 52z"/></svg></div>';
     return `${pageHead('상점','SUPPLY SHOP','lobby')}
-    <div class="shk fr-upper"><div class="shk-bg" style="${ArtView.bgStyle(P().lobbyBg||'새벽등대 사무소')}"></div>
-      <div class="shk-art">${self?`<img class="art" src="${esc(self)}" alt="${esc(m.name||'')}">`:c?CoreView.art(c,'',{upper:true}):sil}</div>
-      <div class="shk-talk"><b>${esc(m.name||'상점 주인')}</b><p id="shkLine">${esc(sub(SHOP_LINE))}</p></div>
-      <button class="btn sm ghost shk-edit" data-act="shkedit">주인 설정</button></div>
-    <div class="wallet"><span>${EconomyView.rIco('gold')}${nf(p.gold)}</span><span>${EconomyView.rIco('exp')}${nf(p.mat.exp)}</span><span>${EconomyView.rIco('wmat')}${nf(p.mat.wmat)}</span><span>${EconomyView.rIco('core')}${nf(p.mat.core)}</span><span title="${esc(System.T('gearMat'))}">${EconomyView.rIco('gearMat')}${nf(p.mat.gearMat||0)}</span><span title="${esc(System.T('transcMat'))}">${EconomyView.rIco('transcMat')}${nf(p.mat.transcMat||0)}</span></div>
-    <h3 class="sec">오늘의 상품 <span class="muted" style="font-size:.75rem">매일 초기화</span></h3>
-    <div class="shop-grid">${SHOP_ITEMS().map(it=>{const n=sd.buy[it.id]||0,left=it.limit-n,out=left<=0;
+  <div class="shk fr-upper"><div class="shk-bg" style="${ArtView.bgStyle(P().lobbyBg||'새벽등대 사무소')}"></div>
+    <div class="shk-art">${self?`<img class="art" src="${esc(self)}" alt="${esc(m.name||'')}">`:c?CoreView.art(c,'',{upper:true}):sil}</div>
+    <div class="shk-talk"><b>${esc(m.name||'상점 주인')}</b><p id="shkLine">${esc(sub(SHOP_LINE))}</p></div>
+    <button class="btn sm ghost shk-edit" data-act="shkedit">주인 설정</button></div>
+  <div class="wallet"><span>${EconomyView.rIco('gold')}${nf(p.gold)}</span><span>${EconomyView.rIco('exp')}${nf(p.mat.exp)}</span><span>${EconomyView.rIco('wmat')}${nf(p.mat.wmat)}</span><span>${EconomyView.rIco('core')}${nf(p.mat.core)}</span><span title="${esc(System.T('gearMat'))}">${EconomyView.rIco('gearMat')}${nf(p.mat.gearMat||0)}</span><span title="${esc(System.T('transcMat'))}">${EconomyView.rIco('transcMat')}${nf(p.mat.transcMat||0)}</span></div>
+  <h3 class="sec">오늘의 상품 <span class="muted" style="font-size:.75rem">매일 초기화</span></h3>
+  <div class="shop-grid">${SHOP_ITEMS().map(it=>{const n=sd.buy[it.id]||0,left=it.limit-n,out=left<=0;
       return `<div class="si ${out?'soldout':''}">${it.tag?`<span class="tag">${it.tag}</span>`:''}<span class="ri">${EconomyView.rIcon(it.give)}</span><b>${esc(it.name)}</b><small>${Economy.costText(it.cost)} · 남은 ${Math.max(0,left)}/${it.limit}</small><button class="btn ${it.tag==='FREE'?'':'ghost'}" data-act="shopbuy" data-id="${it.id}" ${out?'disabled':''}>${out?'매진':it.tag==='FREE'?'받기':'구매'}</button></div>`;}).join('')}</div>
-    <h3 class="sec">재료 교환</h3>
-    ${SHOP_SWAP().map(x=>`<div class="swap"><span class="t">${Economy.costText(x.cost)} → <b>${Economy.costText(x.give)}</b></span><button class="btn sm" data-act="shopswap" data-id="${x.id}" ${Economy.canPay(x.cost)?'':'disabled'}>교환</button><button class="btn sm ghost" data-act="shopswap" data-id="${x.id}" data-n="10" ${Economy.canPay(Object.fromEntries(Object.entries(x.cost).map(([k,v])=>[k,v*10])))?'':'disabled'}>×10</button></div>`).join('')}
-    <div class="row" style="margin-top:12px"><button class="btn ghost block" data-act="go" data-to="cash">◆ ${esc(System.T('currency'))}이(가) 필요하면 캐시 상점으로</button></div>`;
+  <h3 class="sec">재료 교환</h3>
+  ${SHOP_SWAP().map(x=>`<div class="swap"><span class="t">${Economy.costText(x.cost)} → <b>${Economy.costText(x.give)}</b></span><button class="btn sm" data-act="shopswap" data-id="${x.id}" ${Economy.canPay(x.cost)?'':'disabled'}>교환</button><button class="btn sm ghost" data-act="shopswap" data-id="${x.id}" data-n="10" ${Economy.canPay(Object.fromEntries(Object.entries(x.cost).map(([k,v])=>[k,v*10])))?'':'disabled'}>×10</button></div>`).join('')}
+  <div class="row" style="margin-top:12px"><button class="btn ghost block" data-act="go" data-to="cash">◆ ${esc(System.T('currency'))}이(가) 필요하면 캐시 상점으로</button></div>`;
   }
 
   static openShk(){
     const m=G.meta.shop;
     CoreView.openModal(`${head('상점 주인')}
-      <label class="f" for="sk_name">이름</label><input class="in" id="sk_name" value="${esc(m.name)}" maxlength="20">
-      <label class="f" for="sk_char">모습</label><select class="in" id="sk_char" onchange="document.getElementById('skSelf').hidden=this.value!=='__self'"><option value="">실루엣</option><option value="__self" ${m.charId==='__self'?'selected':''}>직접 만든 모습 (상인 전용 그림)</option>${G.chars.map(c=>`<option value="${c.id}" ${m.charId===c.id?'selected':''}>${esc(c.name)} 상반신 빌리기</option>`).join('')}</select>
-      <div class="optbox" id="skSelf" style="margin-top:8px" ${m.charId==='__self'?'':'hidden'}><div style="display:flex;gap:10px;align-items:flex-start"><div class="sk-prev">${m.self&&Characters.imgSrc(m.self)?`<img src="${esc(Characters.imgSrc(m.self))}" alt="">`:'<span>그림 없음</span>'}</div><div style="flex:1;min-width:0">
-        <label class="f" for="sk_prompt">외형 프롬프트 (그림 AI 영어 태그)</label><textarea class="in" id="sk_prompt" style="min-height:70px" placeholder="1girl, solo, merchant, apron, smile, holding ledger">${esc((m.self&&m.self.naiPrompt)||'')}</textarea>
-        <div class="row" style="margin-top:6px">${Core.imgReady()?`<button class="btn sm" data-act="shkdraw">${m.self&&Characters.imgSrc(m.self)?'다시 그리기':'그리기'}</button>`:''}<button class="btn sm ghost" data-act="upload" data-k="shk">그림 올리기</button>${m.self&&m.self.img?XBTN('shk',''):''}</div></div></div></div>
-      <label class="f" for="sk_hello">인사 대사 (한 줄에 하나)</label><textarea class="in" id="sk_hello">${esc(m.hello.join('\n'))}</textarea>
-      <label class="f" for="sk_buy">구매했을 때</label><textarea class="in" id="sk_buy">${esc(m.buy.join('\n'))}</textarea>
-      <label class="f" for="sk_poor">재화가 모자랄 때</label><textarea class="in" id="sk_poor">${esc(m.poor.join('\n'))}</textarea>
-      <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="shkai">AI로 대사 쓰기</button></div>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="shksave">저장</button></div>`);
+    <label class="f" for="sk_name">이름</label><input class="in" id="sk_name" value="${esc(m.name)}" maxlength="20">
+    <label class="f" for="sk_char">모습</label><select class="in" id="sk_char" onchange="document.getElementById('skSelf').hidden=this.value!=='__self'"><option value="">실루엣</option><option value="__self" ${m.charId==='__self'?'selected':''}>직접 만든 모습 (상인 전용 그림)</option>${G.chars.map(c=>`<option value="${c.id}" ${m.charId===c.id?'selected':''}>${esc(c.name)} 상반신 빌리기</option>`).join('')}</select>
+    <div class="optbox" id="skSelf" style="margin-top:8px" ${m.charId==='__self'?'':'hidden'}><div style="display:flex;gap:10px;align-items:flex-start"><div class="sk-prev">${m.self&&Characters.imgSrc(m.self)?`<img src="${esc(Characters.imgSrc(m.self))}" alt="">`:'<span>그림 없음</span>'}</div><div style="flex:1;min-width:0">
+      <label class="f" for="sk_prompt">외형 프롬프트 (그림 AI 영어 태그)</label><textarea class="in" id="sk_prompt" style="min-height:70px" placeholder="1girl, solo, merchant, apron, smile, holding ledger">${esc((m.self&&m.self.naiPrompt)||'')}</textarea>
+      <div class="row" style="margin-top:6px">${Core.imgReady()?`<button class="btn sm" data-act="shkdraw">${m.self&&Characters.imgSrc(m.self)?'다시 그리기':'그리기'}</button>`:''}<button class="btn sm ghost" data-act="upload" data-k="shk">그림 올리기</button>${m.self&&m.self.img?XBTN('shk',''):''}</div></div></div></div>
+    <label class="f" for="sk_hello">인사 대사 (한 줄에 하나)</label><textarea class="in" id="sk_hello">${esc(m.hello.join('\n'))}</textarea>
+    <label class="f" for="sk_buy">구매했을 때</label><textarea class="in" id="sk_buy">${esc(m.buy.join('\n'))}</textarea>
+    <label class="f" for="sk_poor">재화가 모자랄 때</label><textarea class="in" id="sk_poor">${esc(m.poor.join('\n'))}</textarea>
+    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="shkai">AI로 대사 쓰기</button></div>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="shksave">저장</button></div>`);
   }
 
     /* 캐시 상점 화면: 젬 그림·월간 카드 지급·화면·구매 연출 */
@@ -240,15 +240,15 @@ static gemArt(t){const n=Math.min(6,t);let g='';for(let i=0;i<n;i++){const x=12+
   static cashHTML(){
     const p=P(), mo=p.cash.month, act=mo.until>Date.now(), days=act?Math.ceil((mo.until-Date.now())/864e5):0;
     return `${pageHead('캐시 상점','CASH SHOP','lobby')}
-    <div class="cashhero"><i>PREMIUM STORE</i><h2>◆ ${esc(System.T('currency'))} 충전소</h2><div class="bal">${EconomyView.rIco('gems')}${nf(p.gems)}</div><p>나만의 게임이라 전부 무료예요. 마음껏 충전하세요.</p></div>
-    <h3 class="sec">월간 보급 카드</h3>
-    <div class="cs-card month hot"><div class="t"><b>월간 보급 카드</b><span class="muted" style="color:#cfe6ff">즉시 ◆300 + 30일 동안 매일 ◆100 (매일 우편함으로 와요)</span>${act?`<div style="margin-top:4px;color:#7fd8ff">남은 기간 ${days}일 · 오늘 ${mo.last===today()?'받음':'미수령'}</div>`:''}</div><button class="btn sm" data-act="cashmonth">${act?'연장':'무료'}</button></div>
-    <h3 class="sec">${esc(System.T('currency'))}</h3>
-    <div class="cash-grid">${CASH_PACKS.map((k,i)=>{const first=!p.cash.first[k.id];return `<div class="cs-card gem hot t${i+1}">${first?'<span class="rib">첫 구매 2배</span>':''}<div class="gv">${EconomyView.gemArt(i+1)}</div><div class="amt">${nf(k.gems)}<small>${first?'+'+nf(k.gems)+' 첫 구매 보너스':k.bonus?'+'+nf(k.bonus)+' 보너스':'&nbsp;'}</small></div><button class="btn" data-act="cashbuy" data-id="${k.id}">₩0 무료</button></div>`;}).join('')}</div>
-    <h3 class="sec">패키지</h3>
-    ${CASH_PKGS().map(k=>`<div class="cs-card pkg"><span class="wthumb">${EconomyView.rIcon(k.give)}</span><div class="t"><b>${esc(k.name)}</b><span class="muted" style="color:#e9d9b0">${Core.rewardText(k.give)}</span></div><button class="btn sm" data-act="cashpkg" data-id="${k.id}">무료</button></div>`).join('')}
-    <h3 class="sec">자원 보급</h3>
-    ${CASH_RES().map(k=>`<div class="cs-card pkg"><span class="wthumb">${k.ico||EconomyView.rIcon(k.give)}</span><div class="t"><b>${esc(k.name)}</b><span class="muted" style="color:#e9d9b0">${Core.rewardText(k.give)}</span></div><button class="btn sm" data-act="cashpkg" data-id="${k.id}">₩0</button></div>`).join('')}${EconomyView.skinPkgHTML()}`;
+  <div class="cashhero"><i>PREMIUM STORE</i><h2>◆ ${esc(System.T('currency'))} 충전소</h2><div class="bal">${EconomyView.rIco('gems')}${nf(p.gems)}</div><p>나만의 게임이라 전부 무료예요. 마음껏 충전하세요.</p></div>
+  <h3 class="sec">월간 보급 카드</h3>
+  <div class="cs-card month hot"><div class="t"><b>월간 보급 카드</b><span class="muted" style="color:#cfe6ff">즉시 ◆300 + 30일 동안 매일 ◆100 (매일 우편함으로 와요)</span>${act?`<div style="margin-top:4px;color:#7fd8ff">남은 기간 ${days}일 · 오늘 ${mo.last===today()?'받음':'미수령'}</div>`:''}</div><button class="btn sm" data-act="cashmonth">${act?'연장':'무료'}</button></div>
+  <h3 class="sec">${esc(System.T('currency'))}</h3>
+  <div class="cash-grid">${CASH_PACKS.map((k,i)=>{const first=!p.cash.first[k.id];return `<div class="cs-card gem hot t${i+1}">${first?'<span class="rib">첫 구매 2배</span>':''}<div class="gv">${EconomyView.gemArt(i+1)}</div><div class="amt">${nf(k.gems)}<small>${first?'+'+nf(k.gems)+' 첫 구매 보너스':k.bonus?'+'+nf(k.bonus)+' 보너스':'&nbsp;'}</small></div><button class="btn" data-act="cashbuy" data-id="${k.id}">₩0 무료</button></div>`;}).join('')}</div>
+  <h3 class="sec">패키지</h3>
+  ${CASH_PKGS().map(k=>`<div class="cs-card pkg"><span class="wthumb">${EconomyView.rIcon(k.give)}</span><div class="t"><b>${esc(k.name)}</b><span class="muted" style="color:#e9d9b0">${Core.rewardText(k.give)}</span></div><button class="btn sm" data-act="cashpkg" data-id="${k.id}">무료</button></div>`).join('')}
+  <h3 class="sec">자원 보급</h3>
+  ${CASH_RES().map(k=>`<div class="cs-card pkg"><span class="wthumb">${k.ico||EconomyView.rIcon(k.give)}</span><div class="t"><b>${esc(k.name)}</b><span class="muted" style="color:#e9d9b0">${Core.rewardText(k.give)}</span></div><button class="btn sm" data-act="cashpkg" data-id="${k.id}">₩0</button></div>`).join('')}${EconomyView.skinPkgHTML()}`;
   }
 
     /* 상점 주인 편집 창: 새로 그린 그림 미리 보기·고른 주인 표시(View) */
@@ -260,14 +260,14 @@ static shopKeeperShow(o){ const pv=document.querySelector('.sk-prev'); if(pv) pv
   static openMail(){
     const box=Core.progRead('mail'), n=Economy.mailCount();
     CoreView.openModal(`${head('우편함',`<span class="muted">받을 수 있는 우편 ${n}개 · 받지 않은 우편은 기간이 지나면 사라져요</span>`)}
-      <div class="mlist">${box.length?box.map(EconomyView.mailRow).join(''):'<p class="muted" style="text-align:center;padding:30px 0">우편이 없어요.</p>'}</div>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="mailall" ${n?'':'disabled'}>모두 받기</button><button class="btn ghost" data-act="mailclean" ${box.some(mailDone)?'':'disabled'}>받은·읽은 우편 지우기</button></div>`);
+    <div class="mlist">${box.length?box.map(EconomyView.mailRow).join(''):'<p class="muted" style="text-align:center;padding:30px 0">우편이 없어요.</p>'}</div>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="mailall" ${n?'':'disabled'}>모두 받기</button><button class="btn ghost" data-act="mailclean" ${box.some(mailDone)?'':'disabled'}>받은·읽은 우편 지우기</button></div>`);
   }
 
     /* 우편 한 통 보기 창(View) */
 static openMailView(x){ const has=Object.keys(x.reward||{}).length;
     CoreView.openModal(`${head(esc(x.title),`<span class="muted">${esc(x.from)} · ${new Date(x.at).toLocaleDateString()}</span>`)}<div class="mbody">${esc(x.body).replace(/\n/g,'<br>')}</div>${has?`<div class="mreward">${EconomyView.rIcon(x.reward)}<b>${Core.rewardText(x.reward)}</b></div>`:''}
-          <div class="row" style="margin-top:12px">${has&&Economy.mailLive(x)?`<button class="btn" data-act="mailget" data-id="${x.id}" data-back="1">받기</button>`:`<button class="btn ghost" data-act="maildel" data-id="${x.id}">지우기</button>`}<button class="btn ghost" data-act="mailopen">목록</button></div>`); }
+        <div class="row" style="margin-top:12px">${has&&Economy.mailLive(x)?`<button class="btn" data-act="mailget" data-id="${x.id}" data-back="1">받기</button>`:`<button class="btn ghost" data-act="maildel" data-id="${x.id}">지우기</button>`}<button class="btn ghost" data-act="mailopen">목록</button></div>`); }
 }
 
 class EconomyCtl {

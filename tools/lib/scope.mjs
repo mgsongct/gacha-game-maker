@@ -81,10 +81,11 @@ function declare(n, fs, bs, add) { const t = n.type, nm = n.childForFieldName('n
   if (t === 'for_in_statement') { const k = n.childForFieldName('kind')?.text, names = patternNames(n.childForFieldName('left')); if (k === 'var') add(fs, names); else if (k) { add(n, names); return [fs, n]; } }
   if (t === 'variable_declaration') add(fs, declNames(n)); else if (t === 'lexical_declaration') add(bs, declNames(n));
   return [fs, bs]; }
-export function unboundRefs(root) { const decl = new Map(), add = (s, names) => { let x = decl.get(s.id); if (!x) decl.set(s.id, x = new Set()); for (const n of names) x.add(n); };
+/* opt.topFree: 맨 위(스크립트) 선언으로만 풀리는 이름도 풀리지 않은 것으로 냄 — 맨 위 이름을 부르는 곳 찾기(옛 이름 다리 등) */
+export function unboundRefs(root, opt = {}) { const decl = new Map(), add = (s, names) => { let x = decl.get(s.id); if (!x) decl.set(s.id, x = new Set()); for (const n of names) x.add(n); };
   const p1 = (n, fs, bs) => { const [f2, b2] = declare(n, fs, bs, add); for (const c of n.namedChildren) p1(c, f2, b2); };
   p1(root, root, root);
   const out = [], stack = [], p2 = n => { const s = decl.get(n.id); if (s) stack.push(s); const t = n.type;
-    if ((t === 'identifier' || t === 'shorthand_property_identifier') && !(n.parent?.type === 'unary_expression' && n.parent.child(0)?.type === 'typeof') && n.text !== 'arguments') { let ok = false; for (let i = stack.length - 1; i >= 0 && !ok; i--) ok = stack[i].has(n.text); if (!ok) out.push(n); }
+    if ((t === 'identifier' || t === 'shorthand_property_identifier') && !(n.parent?.type === 'unary_expression' && n.parent.child(0)?.type === 'typeof') && n.text !== 'arguments') { let ok = false; for (let i = stack.length - 1; i >= 0 && !ok; i--) ok = !(opt.topFree && stack[i] === decl.get(root.id)) && stack[i].has(n.text); if (!ok) out.push(n); }
     for (const c of n.namedChildren) p2(c); if (s) stack.pop(); };
   p2(root); return { refs: out, top: decl.get(root.id) || new Set() }; }

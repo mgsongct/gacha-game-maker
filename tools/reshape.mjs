@@ -7,11 +7,14 @@
 //   파일: src/main/00-core.js(상위 class 뼈대 + Core…) · 10-<기능>.js(기능의 class들) · 90-load.js(함수가 아닌 맨 위 문장 — 상수·상태·리스너 — 원래 순서)
 //     · 99-aliases.js(옛 전역 이름 → Owner.name 임시 다리: 시험·HTML onclick·엔진 모듈이 부르는 이름 — 이슈로 기록하고 나중에 지움)
 //   class 선언은 끌어올려지지 않으므로 class 파일을 앞에, 불러올 때 도는 문장(90-load)을 뒤에 둠. 깨지는 것은 고치지 않고 이슈로(사용자 지시 U16)
+// node tools/reshape.mjs --hoist [--apply]: src/main/90-load.js에서 부작용 없는 선언(글자 값·객체·배열·정규식·함수 값·new Map 같은 빈 그릇 — 부름·대입이 없음)을
+//   실행 문장(부팅·리스너·불러올 때 부름)보다 앞으로, 원래 순서대로 올림. 아직 안 올린 이름을 읽는 선언은 두고 감(더 바뀌지 않을 때까지).
+//   불러올 때 도는 문장이 갈래에 따라 아직 선언 안 된 상태를 쓰는 TDZ(node tools/check.mjs — 갈래 안: data에 따라 앱이 뜨지 않음)를 일괄로 없앰
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { loadHtmlUnits } from './lib/source.mjs';
+import { loadHtmlUnits, tsInit, walk } from './lib/source.mjs';
 import { leadComments } from './lib/extra.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..'), APPLY = process.argv.includes('--apply'), MAIN = join(ROOT, 'src/main');
@@ -33,10 +36,96 @@ export function renameEdits(root, owner) { const out = []; const walk = n => { i
       const par = n.parent, isDeclName = par && FN.test(par.type) && par.childForFieldName('name')?.startIndex === n.startIndex;
       if (!isDeclName && !(par?.type === 'variable_declarator' && par.childForFieldName('name')?.startIndex === n.startIndex) && !shadowed(n, n.text)) out.push({ a: n.startIndex, b: n.endIndex, to: n.type === 'shorthand_property_identifier' ? `${n.text}: ${owner.get(n.text)}.${n.text}` : `${owner.get(n.text)}.${n.text}` }); }
     for (let i = 0; i < n.childCount; i++) walk(n.child(i)); }; walk(root); return out; }
+/* 글 안 줄바꿈 자리: 템플릿·문자열의 글 조각(string_fragment) 안 '\n' 바로 뒤 — 들여쓰기를 더하거나 빼면 글(프롬프트 등)이 바뀜 */
+export function textNewlines(root) { const out = new Set(); walk(root, n => { if (n.type === 'string_fragment' && /^(template_string|string)$/.test(n.parent?.type || '')) for (let i = n.text.indexOf('\n'); i >= 0; i = n.text.indexOf('\n', i + 1)) out.add(n.startIndex + i + 1); }); return out; }
+/* 코드 줄만 들여 씀(글 안 줄은 그대로): text는 root 안 [base, base+len) 구간 */
+export function indentCode(text, base, inText, pad = '  ') { let out = ''; for (let i = 0; i < text.length; i++) { out += text[i]; if (text[i] === '\n' && !inText.has(base + i + 1)) out += pad; } return out; }
 const applyEdits = (text, base, edits) => { let t = text; edits.filter(e => e.a >= base && e.b <= base + text.length).sort((x, y) => y.a - x.a).forEach(e => { t = t.slice(0, e.a - base) + e.to + t.slice(e.b - base); }); return t; };
 // function 선언 글 → static 메서드 글
 export const toMethod = (fnText, name) => fnText.replace(new RegExp(`^(\\s*)(async\\s+)?function(\\s*\\*)?\\s+${name.replace(/\$/g, '\\$')}\\s*\\(`), (m, sp, as, gen) => `${sp}static ${as || ''}${gen ? '*' : ''}${name}(`);
 
+/* 부작용 없는 선언인가: 값마다 앱 함수 부름·대입·증감·await가 없음. 부름은 JS 내장 순수 함수(Object.fromEntries·JSON.parse·Math.* …)와 값의 내장 메서드(map·filter·join …)만 —
+   그때 도는 콜백 본문도 같은 기준으로 봄. new는 빈 그릇(Map·Set …)만. 다른 함수 값의 본문은 그때 안 돎. 읽는 맨 위 이름(free)·안 되는 까닭(why)을 돌려줌 */
+const PURE_NEW = /^(Map|Set|WeakMap|WeakSet|Array|Object|Date|RegExp)$/, PURE_FN = /^(Object\.(freeze|fromEntries|entries|keys|values)|Array\.(from|isArray)|JSON\.(parse|stringify)|Math\.\w+|Promise\.resolve|String|Number|Boolean|parseInt|parseFloat)$/;
+const PURE_M = /^(map|flatMap|filter|reduce|concat|join|slice|flat|split|trim|toLowerCase|toUpperCase|replace|replaceAll|includes|indexOf|some|every|find|findIndex|padStart|padEnd|repeat|at|fill|keys|values|entries)$/;
+export function pureDecl(st) { if (!/^(lexical_declaration|variable_declaration)$/.test(st.type)) return { free: null, why: '선언 아님' }; const free = new Set(); let why = '';
+  for (const d of st.namedChildren) { if (d.type !== 'variable_declarator') continue; const v = d.childForFieldName('value'); if (!v) continue;
+    walk(v, n => { if (why) return false; if (/^(arrow_function|function_expression|generator_function|class)$/.test(n.type) && n.parent?.type !== 'arguments') return false;
+      if (n.type === 'call_expression') { const f = n.childForFieldName('function'); if (!(PURE_FN.test(f?.text || '') || (f?.type === 'member_expression' && PURE_M.test(f.childForFieldName('property')?.text || '') && !/^[A-Z][a-z]\w*$/.test(f.childForFieldName('object')?.text || '') /* Class.이름(…)은 앱 함수 */))) why = '부름 ' + (f?.text || '').slice(0, 40); }
+      else if (/^(assignment_expression|augmented_assignment_expression|update_expression|await_expression|yield_expression)$/.test(n.type)) why = n.type;
+      else if (n.type === 'new_expression' && !PURE_NEW.test(n.childForFieldName('constructor')?.text || '')) why = 'new ' + n.childForFieldName('constructor')?.text;
+      if (n.type === 'identifier') free.add(n.text); }); }
+  return why ? { free: null, why } : { free, why: '' }; }
+export function hoistPlan(src, root) { const sts = [], names = new Map(); let prevEnd = 0;
+  for (let i = 0; i < root.childCount; i++) { const c = root.child(i); if (c.type === 'comment') continue; const start = Math.max(prevEnd, leadComments(src, src.lastIndexOf('\n', c.startIndex - 1) + 1));
+    const decl = []; if (/^(lexical_declaration|variable_declaration)$/.test(c.type)) walk(c, n => { if (n.type === 'variable_declarator') { const nm = n.childForFieldName('name'); walk(nm, x => { if (/^(identifier|shorthand_property_identifier_pattern)$/.test(x.type)) decl.push(x.text); }); return false; } });
+    const pd = pureDecl(c); sts.push({ i: sts.length, text: src.slice(start, c.endIndex), free: pd.free, why: pd.why, decl }); decl.forEach(n => names.set(n, sts.length - 1)); prevEnd = c.endIndex; }
+  const up = new Set(sts.filter(x => x.free).map(x => x.i)); for (let ch = true; ch;) { ch = false; for (const i of [...up]) { const bad = [...sts[i].free].find(n => names.has(n) && !up.has(names.get(n))); if (bad) { up.delete(i); sts[i].why = `안 올린 ${bad}를 읽음`; ch = true; } } }
+  return { up: sts.filter(x => up.has(x.i)), rest: sts.filter(x => !up.has(x.i)), tail: src.slice(prevEnd) }; }
+
+// node tools/reshape.mjs --strings [--apply]: 1단계가 메서드 본문을 2칸 들여 쓰며 여러 줄 템플릿·문자열 글 안 줄까지 들여 쓴 것(보낸 프롬프트가 기준 빌드와 다름 —
+//   node tools/play/combos.mjs --ref <커밋>)을 class 파일(00-core·10-*·80-misc)에서 되돌림: 글 안 줄바꿈 뒤 두 칸을 뺌
+export async function stringFixes(src) { const { parser } = await tsInit(), root = parser.parse(src).rootNode, at = [...textNewlines(root)].filter(i => src.slice(i, i + 2) === '  ').sort((a, b) => b - a); let t = src; for (const i of at) t = t.slice(0, i) + t.slice(i + 2); return { text: t, n: at.length }; }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--strings')) {
+  for (const f of readdirSync(MAIN).filter(f => /^(00-core|10-[a-z]+|80-misc)\.js$/.test(f))) { const E = await stringFixes(readFileSync(join(MAIN, f), 'utf8')); if (E.n) { console.log(`${f}: 글 안 줄 ${E.n}`); if (APPLY) writeFileSync(join(MAIN, f), E.text); } }
+  process.exit(0); }
+// node tools/reshape.mjs --move <메서드 이름> <대상 class> [--apply]: class의 static 메서드를 다른 class 끝으로 옮김(설명 주석 같이, 글은 그대로) — 기능 분산(점검 자연 경계: 연결이
+//   더 많은 기능)·자리를 잘못 정한 매핑(docs/restructure.md R8)을 고칠 때. 원래Class.이름 참조는 src/main·시험(build/test.mjs·tools/play)에서 같이 바꿈(옛 이름 다리 본문 포함)
+export function moveMethod(files, name, to) { const { parser } = TS; let from = null, cut = null;
+  for (const [f, src] of Object.entries(files)) { const root = parser.parse(src).rootNode; for (let i = 0; i < root.childCount; i++) { const c = root.child(i); if (c.type !== 'class_declaration') continue;
+      for (const m of c.childForFieldName('body').namedChildren) if (m.type === 'method_definition' && m.childForFieldName('name')?.text === name && m.child(0)?.text === 'static') { let first = m; for (let p = m.previousSibling; p?.type === 'comment' && !/\S/.test(src.slice(p.endIndex, first.startIndex).replace(/\n/, '')) && !/\n\s*\n/.test(src.slice(p.endIndex, first.startIndex)); p = p.previousSibling) first = p; /* 바로 위 설명 주석(들여 쓴 것도) */
+        const a = src.lastIndexOf('\n', first.startIndex - 1) + 1; from = { f, cls: c.childForFieldName('name').text }; cut = { a, b: m.endIndex, text: src.slice(a, m.endIndex) }; } } }
+  if (!from) return { error: `static 메서드 ${name} 없음` }; const out = { ...files }; out[from.f] = out[from.f].slice(0, cut.a) + out[from.f].slice(cut.b).replace(/^[ \t]*\n/, '');
+  const tf = Object.keys(out).find(f => new RegExp(`^class ${to}\\b`, 'm').test(out[f])); if (!tf) return { error: `class ${to} 없음` }; const troot = parser.parse(out[tf]).rootNode; let end = -1;
+  for (let i = 0; i < troot.childCount; i++) { const c = troot.child(i); if (c.type === 'class_declaration' && c.childForFieldName('name')?.text === to) end = c.childForFieldName('body').endIndex - 1; }
+  out[tf] = out[tf].slice(0, end).replace(/\s*$/, '\n\n') + cut.text.replace(/^\n+/, '') + '\n' + out[tf].slice(end); const re = new RegExp(`\\b${from.cls}\\.${name}\\b`, 'g'); let n = 0;
+  for (const f of Object.keys(out)) out[f] = out[f].replace(re, () => { n++; return `${to}.${name}`; }); return { from, to: tf, refs: n, files: out }; }
+const TS = await tsInit();
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--move')) {
+  const i = process.argv.indexOf('--move'), name = process.argv[i + 1], to = process.argv[i + 2], paths = [...readdirSync(MAIN).filter(f => f.endsWith('.js')).map(f => `src/main/${f}`), 'build/test.mjs', ...readdirSync(join(ROOT, 'tools/play'), { recursive: true }).filter(f => String(f).endsWith('.mjs') && !/^(games|reports|fixtures|node_modules)\//.test(f)).map(f => `tools/play/${f}`)];
+  const files = Object.fromEntries(paths.map(f => [f, readFileSync(join(ROOT, f), 'utf8')])), R = moveMethod(files, name, to); if (R.error) { console.log(R.error); process.exit(1); }
+  console.log(`${R.from.cls}.${name}(${R.from.f}) → ${to}(${R.to}) · 참조 ${R.refs}`); if (APPLY) for (const f of paths) if (R.files[f] !== files[f]) writeFileSync(join(ROOT, f), R.files[f]); process.exit(0); }
+// node tools/reshape.mjs --studio [--apply]: 90-load.js의 프롬프트 조각 등록 문장(X.pfDef('ID', …) — 불러올 때 도는 맨 위 문장)을 프롬프트 스튜디오 class의 메서드
+//   PromptStudio.defineFragments()로 모으고, 첫 등록 자리에서 그 메서드를 부름(도는 때는 그대로 — 불러올 때, 같은 순서). 조각이 스튜디오 파일 한곳에(규칙 P1·사용자 지시: 스튜디오가 있는데 흩어 넣지 않음)
+export function studioPlan(src, root) { const NL = textNewlines(root), regs = [], isReg = c => c.type === 'expression_statement' && c.namedChildren[0]?.type === 'call_expression' && /^([A-Z][\w$]*\.)?pfDef$/.test(c.namedChildren[0].childForFieldName('function')?.text || '');
+  let prevEnd = 0; for (let i = 0; i < root.childCount; i++) { const c = root.child(i); if (c.type === 'comment') continue; const start = Math.max(prevEnd, leadComments(src, src.lastIndexOf('\n', c.startIndex - 1) + 1)); if (isReg(c)) { let a = start; while (src[a] === '\n') a++; regs.push({ start, end: c.endIndex, text: '    ' + indentCode(src.slice(a, c.endIndex), a, NL, '    ') }); } prevEnd = c.endIndex; }
+  return regs; }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--studio')) {
+  const F = join(MAIN, '90-load.js'), S = join(MAIN, '10-promptstudio.js'), src = readFileSync(F, 'utf8'), { parser } = await tsInit(), regs = studioPlan(src, parser.parse(src).rootNode);
+  console.log(`90-load.js 조각 등록 ${regs.length}문장 → PromptStudio.defineFragments()`);
+  /* 점검(analyze — 규칙 P1)이 스튜디오 밖 프롬프트 글로 찾은 90-load.js의 맨 위 선언(조각 기본 글·그림 태그 상수) → 스튜디오 파일 머리로(class보다 앞 — 먼저 불러와짐) */
+  const { analyze } = await import('./lib/analyze.mjs'), A = await analyze(ROOT), keys = new Set([...A.R.prompts, ...A.R.promptAll, ...A.R.promptImg].filter(x => /^src\/main\/90-load\.js:/.test(x.loc)).map(x => x.top || String(x.key).split(' ')[1]));
+  const root0 = parser.parse(src).rootNode, decls = []; let pe = 0; for (let i = 0; i < root0.childCount; i++) { const c = root0.child(i); if (c.type === 'comment') continue; const start = Math.max(pe, leadComments(src, src.lastIndexOf('\n', c.startIndex - 1) + 1)); pe = c.endIndex;
+    if (/^(lexical_declaration|variable_declaration)$/.test(c.type) && c.namedChildren.some(d => d.type === 'variable_declarator' && keys.has(d.childForFieldName('name')?.text))) { let a0 = start; while (src[a0] === '\n') a0++; decls.push({ start, end: c.endIndex, text: src.slice(a0, c.endIndex), names: c.namedChildren.filter(d => d.type === 'variable_declarator').map(d => d.childForFieldName('name')?.text) }); } }
+  console.log(`스튜디오 밖 프롬프트 글을 가진 맨 위 선언 ${decls.length}: ${decls.flatMap(d => d.names).join(' · ')}`);
+  if (APPLY && (regs.length || decls.length)) { const cut = [...regs.map((r, i) => ({ ...r, call: i === 0 })), ...decls].sort((x, y) => y.start - x.start); let t = src; for (const r of cut) t = t.slice(0, r.start) + (r.call ? '\nPromptStudio.defineFragments(); /* 프롬프트 조각 등록(스튜디오 — tools/reshape.mjs --studio) */' : '') + t.slice(r.end); writeFileSync(F, t);
+    let st = readFileSync(S, 'utf8'); const at = st.indexOf('class PromptStudio {') + 'class PromptStudio {'.length;
+    if (regs.length) st = st.slice(0, at) + '\n  /* 프롬프트 조각 등록(pfDef — 조각마다 이름·설명·기본 글): 불러올 때 90-load.js가 한 번 부름(원래 자리·순서) */\n  static defineFragments(){\n' + regs.map(r => r.text).join('\n') + '\n  }\n' + st.slice(at);
+    if (decls.length) { const h = st.indexOf('\n') + 1; st = st.slice(0, h) + '/* 프롬프트 조각의 기본 글·그림 태그(스튜디오 — tools/reshape.mjs --studio가 90-load.js에서 옮김) */\n' + decls.map(d => d.text).join('\n') + '\n' + st.slice(h); }
+    writeFileSync(S, st); console.log('고침: 90-load.js · 10-promptstudio.js'); }
+  /* 부르는 자리: 등록이 불러올 때 읽는 이름의 선언보다 뒤여야 함 — TDZ 점검(lib/extra.mjs tdzRefs)이 그 부름에서 난 TDZ를 내면 그 선언 문장 뒤로 옮김(더 없을 때까지) */
+  if (APPLY) { const { loadUnits } = await import('./lib/source.mjs'), { tdzRefs } = await import('./lib/extra.mjs'), CALL = /\nPromptStudio\.defineFragments\(\);[^\n]*/;
+    for (let k = 0; k < 20; k++) { const t = readFileSync(F, 'utf8'), m = t.match(CALL), callLine = m ? t.slice(0, m.index + 1).split('\n').length : 0, bad = tdzRefs(await loadUnits(ROOT)).filter(x => String(x.via || '').startsWith(`src/main/90-load.js:${callLine} `) && /^src\/main\/90-load\.js:/.test(x.decl));
+      if (!m || !bad.length) break; const line = Math.max(...bad.map(x => +x.decl.split(':')[1])), root2 = parser.parse(t).rootNode; let endAt = -1; for (let i = 0; i < root2.childCount; i++) { const c = root2.child(i); if (c.startPosition.row + 1 <= line && c.endPosition.row + 1 >= line) { endAt = c.endIndex; break; } }
+      if (endAt < 0) break; const u = t.replace(CALL, ''), shift = endAt > m.index ? m[0].length : 0, at = endAt - shift; writeFileSync(F, u.slice(0, at) + m[0] + u.slice(at)); console.log(`부르는 자리를 ${bad.map(x => x.name).join('·')} 선언 뒤로(90-load.js:${line})`); } }
+  process.exit(0); }
+// node tools/reshape.mjs --drivers [--apply]: 페이지를 모는 시험 도구(build/test.mjs·tools/play)가 다리 이름을 덮어써 가로채는 줄(규칙 A1 — 시험 도구가 덮어씀)에서
+//   그 줄의 다리 이름(window.이름·이름)을 모두 Class.이름으로 — 덮어쓰기와 원본 담기(const tt = toast)를 같이 바꿔야 가짜가 다리를 거쳐 자기를 부르지 않음
+export function driverEdits(text, path, items) { const L = String(text).split('\n'), lines = new Map(); for (const x of items) { const m = String(x.at).match(/^(.*):(\d+)$/); if (m && m[1] === path) { if (!lines.has(+m[2])) lines.set(+m[2], new Map()); lines.get(+m[2]).set(x.name, x.to); } }
+  let n = 0; for (const [ln, names] of lines) { const re = new RegExp(`(?<![\\w$.])(?:window\\.|globalThis\\.)?(${[...names.keys()].join('|')})(?![\\w$])(?!\\s*:)`, 'g'); L[ln - 1] = L[ln - 1].replace(re, (m0, nm) => { n++; return `${names.get(nm)}.${nm}`; }); }
+  return { text: L.join('\n'), n, lines: lines.size }; }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--drivers')) {
+  const { analyze } = await import('./lib/analyze.mjs'), { aliasUses } = await import('./lib/rules.mjs'), A = await analyze(ROOT), files = ['build/test.mjs', ...readdirSync(join(ROOT, 'tools/play'), { recursive: true }).filter(f => String(f).endsWith('.mjs') && !/^(games|reports|fixtures|node_modules)\//.test(f)).map(f => `tools/play/${f}`)];
+  const items = aliasUses(A.units, '', files.map(f => ({ path: f, text: readFileSync(join(ROOT, f), 'utf8') }))).filter(x => x.driver);
+  for (const f of new Set(items.map(x => x.at.replace(/:\d+$/, '')))) { const E = driverEdits(readFileSync(join(ROOT, f), 'utf8'), f, items); console.log(`${f}: 줄 ${E.lines} · 바꿈 ${E.n}`); if (APPLY) writeFileSync(join(ROOT, f), E.text); }
+  process.exit(0); }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--hoist')) {
+  const F = join(MAIN, '90-load.js'), src = readFileSync(F, 'utf8'), { parser } = await tsInit(), root = parser.parse(src).rootNode, head = (src.match(/^\/\* =====[^\n]*\n/) || [''])[0];
+  const P = hoistPlan(src.slice(head.length), parser.parse(src.slice(head.length)).rootNode), firstRun = P.rest.findIndex(x => !x.decl.length), moved = P.up.filter(x => x.i > (P.rest[firstRun]?.i ?? Infinity));
+  console.log(`90-load.js 문장 ${P.up.length + P.rest.length}: 부작용 없는 선언 ${P.up.length}(그중 실행 문장 뒤에 있던 것 ${moved.length}: ${moved.flatMap(x => x.decl).slice(0, 30).join(' · ')}${moved.length > 30 ? ' …' : ''}) · 나머지 ${P.rest.length}`);
+  const kept = P.rest.filter(x => x.decl.length); console.log(`안 올린 선언 ${kept.length}: ${kept.map(x => `${x.decl.slice(0, 3).join(',')}(${x.why})`).join(' · ')}`);
+  if (APPLY) { writeFileSync(F, head + '/* ── 부작용 없는 선언(상수·상태 초기값 — tools/reshape.mjs --hoist가 실행 문장 앞으로 올림, 원래 순서) ── */\n' + P.up.map(x => x.text.replace(/^\n+/, '')).join('\n') + '\n/* ── 불러올 때 도는 문장(원래 순서) ── */\n' + P.rest.map(x => x.text.replace(/^\n+/, '')).join('\n') + P.tail); console.log('고침: src/main/90-load.js'); }
+  process.exit(0); }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const html = readFileSync(join(ROOT, 'www/index.html'), 'utf8'), units = await loadHtmlUnits(html, 'www/index.html'), main = units.find(u => u.name === 'main'), src = main.text, root = main.tree.rootNode;
   const map = JSON.parse(readFileSync(join(ROOT, 'tools/out/redesign-map-www.json'), 'utf8')).filter(x => /#ggm-main/.test(x.loc)), info = new Map(map.map(x => [x.name, x]));
@@ -44,7 +133,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const edits = renameEdits(root, owner), classes = new Map(), rest = []; let prevEnd = 0;
   for (let i = 0; i < root.childCount; i++) { const c = root.child(i); if (c.type === 'comment') continue; const start = Math.max(prevEnd, leadComments(src, src.lastIndexOf('\n', c.startIndex - 1) + 1)) /* 한 줄에 문장이 여럿이면 앞 문장 끝부터 */;
     if (FN.test(c.type)) { const nm = c.childForFieldName('name').text, o = owner.get(nm), body = applyEdits(src.slice(c.startIndex, c.endIndex), c.startIndex, edits), lead = src.slice(start, c.startIndex);
-      if (!classes.has(o)) classes.set(o, []); classes.get(o).push(lead.replace(/^/gm, '  ').replace(/ +$/, '') + toMethod(body, nm).replace(/\n/g, '\n  ')); }
+      if (!classes.has(o)) classes.set(o, []); classes.get(o).push(lead.replace(/^/gm, '  ').replace(/ +$/, '') + toMethod(body, nm).replace(/\n/g, '\n  ')); /* 글 안 줄도 들여 씀 — 프롬프트가 바뀜(아래 --strings로 고침; 다시 옮길 때는 indentCode로) */ }
     else rest.push(applyEdits(src.slice(start, c.endIndex), start, edits)); prevEnd = c.endIndex; }
   const featOfClass = o => o.replace(/(View|Ctl)$/, ''), files = new Map(); for (const [o, ms] of classes) { const f = FILE[featOfClass(o)] || `10-${featOfClass(o).toLowerCase()}`; if (!files.has(f)) files.set(f, []); files.get(f).push(`class ${o} {\n${ms.map(m => '  ' + m).join('\n\n')}\n}\n`); }
   console.log(`함수 ${owner.size} → class ${classes.size}(${[...classes].map(([o, m]) => `${o} ${m.length}`).join(' · ')}) · 이름 바꾼 자리 ${edits.length} · 함수 아닌 맨 위 문장 ${rest.length} · 파일 ${files.size + 2}`);

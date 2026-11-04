@@ -11,10 +11,14 @@ const tree = d => readdirSync(d).filter(f => !f.startsWith('.')).sort().flatMap(
 let parser = null, JS = null;
 export async function tsInit() { if (parser) return { parser, JS }; await Parser.init(); JS = await Language.load(req.resolve('tree-sitter-javascript/tree-sitter-javascript.wasm')); parser = new Parser(); parser.setLanguage(JS); return { parser, JS }; }
 
+/* 앱 class(불러온 코드의 맨 위 class 선언 — tools/reshape.mjs로 함수를 옮긴 자리)와 부른 이름: Class.이름(…)은 옛 함수 이름(이름)으로 풂, 내장(Object.assign·JSON.parse …)과 값의 메서드(SAMPLE.json)는 글 그대로.
+   부른 이름으로 판정하는 도구(프롬프트 요청 지점·조합·연관 맵·배선)가 이 함수 하나를 같이 씀 */
+export const APP_CLASSES = new Set();
+export function calleeName(call) { const f = call?.childForFieldName?.('function'), o = f?.type === 'member_expression' ? f.childForFieldName('object') : null; return o?.type === 'identifier' && APP_CLASSES.has(o.text) ? f.childForFieldName('property')?.text : f?.text; }
 function unit(root, name, parts) { // parts: [{path, text}]
   let text = '', row = 0; const files = [];
   for (const p of parts) { const n = p.text.split('\n').length - 1; files.push({ path: relative(root, p.path), start: row, end: row + n }); text += p.text; row += n; }
-  const t = parser.parse(text), at = r => { const f = files.find(x => r >= x.start && r < x.end) || files.at(-1); return { file: f.path, line: r - f.start + 1 }; };
+  const t = parser.parse(text); for (let i = 0; i < t.rootNode.childCount; i++) { const c = t.rootNode.child(i); if (c.type === 'class_declaration') APP_CLASSES.add(c.childForFieldName('name')?.text); } const at = r => { const f = files.find(x => r >= x.start && r < x.end) || files.at(-1); return { file: f.path, line: r - f.start + 1 }; };
   return { name, text, files, tree: t, sg: sgParse(Lang.JavaScript, text).root(), at, loc: node => { const p = at(node.startPosition.row); return `${p.file}:${p.line}`; } };
 }
 export async function loadUnits(root) {

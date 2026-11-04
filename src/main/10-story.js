@@ -15,7 +15,7 @@ static writeStagesPrompt({o,s,ch,outline,i,prevTail,n}){ return `【스토리 �
 
     /* src/main/0465-story-plan.js */
 static planAIPrompt({mode,p,n,instruction}){ return `${RULES}\n${World.ctx()}\n\n${Core.pf('PLAN_AI',{how:Core.pf(mode==='extend'?'PLAN_AI_EXTEND':mode==='improve'?'PLAN_AI_IMPROVE':'PLAN_AI_NEW',{plan:JSON.stringify(p).slice(0,3000)}),n,extra:instruction?'추가 지시: '+instruction+'\n':'',crew:System.T('crew')})}
-  JSON만 출력: {"logline":"","theme":"","ending":"","acts":[{"name":"1막 이름","upto":4,"goal":""}],"twists":[{"id":"t1","truth":"","reveal":5,"who":"관련 인물","clues":[{"ch":2,"hint":""}]}],"branches":[{"id":"b1","at":3,"question":"","options":[{"label":"","result":""}]}],"arcs":[{"name":"캐릭터 이름","start":"","change":"","end":""}]}`; }
+JSON만 출력: {"logline":"","theme":"","ending":"","acts":[{"name":"1막 이름","upto":4,"goal":""}],"twists":[{"id":"t1","truth":"","reveal":5,"who":"관련 인물","clues":[{"ch":2,"hint":""}]}],"branches":[{"id":"b1","at":3,"question":"","options":[{"label":"","result":""}]}],"arcs":[{"name":"캐릭터 이름","start":"","change":"","end":""}]}`; }
 
     /* src/main/0510-actions/040-story-and-authoring.js */
 static aiepPrompt({c,dup,af,lv,stg,hint}){ return `${Core.pf('EPISODE',{RULES,ctx:World.ctx(),SCRIPT_FMT,name:c.name,profile:c.profile,lines:c.lines.join(' / '),files:System.T('files'),files2:c.files.filter(f=>f.dup<=dup).map(f=>f.text).join(' / ')||'없음',title:af?Core.pf('EPISODE_AFTER',{title:af.title,post:String(af.post||'').slice(0,400)}):'',lv,stg,dup:dup?Core.pf('EPISODE_SECRET',{limit:System.T('limit'),dup,files:System.T('files')}):'',episodes:c.episodes.map(x=>`Lv.${x.lv} ${x.title}`).join(', ')||'없음',hint:hint?'요청: '+hint:'',player:System.T('player')})}\nJSON만 출력: {"title":"제목","script":"대본"}`; }
@@ -523,7 +523,7 @@ static async aiChapterGen0(dir,n,cast){
   case 'delstage': { Story.readChForm(); if(chDraft.stages.length<=1){ CoreView.toast('스테이지는 1개 이상 있어야 해요'); break; } const st=chDraft.stages[+t.dataset.j], live=G.chapters.find(x=>x.id===chDraft.id);
         const L=st&&live&&live.stages.some(x=>x.id===st.id)?Story.storyLinks([st.id],live,live.eventId&&G.events.find(e=>e.id===live.eventId)):null, n=L?L.threads.length+L.codex.length+L.libs.length+L.rels.length:0;
         if(n&&(await appConfirm(`이 스테이지에 연결된 ${System.T('talk')} ${L.threads.length}개, 도감 ${L.codex.length}개, CG·소품 ${L.libs.length}개, 관계 기록 ${L.rels.length}개도 지울까요?
-  (저장을 눌러야 반영돼요. 취소하면 스테이지만 지워요)`))) (chDraft.__purge=chDraft.__purge||[]).push(st.id);
+(저장을 눌러야 반영돼요. 취소하면 스테이지만 지워요)`))) (chDraft.__purge=chDraft.__purge||[]).push(st.id);
         chDraft.stages.splice(+t.dataset.j,1); StoryView.openChEdit(); break; }
   case 'savech': { Story.readChForm(); const pg=chDraft.__purge; delete chDraft.__purge; const old=G.chapters.find(x=>x.id===chDraft.id);
         if(pg&&pg.length&&old){ Acquire.storyPurge(Story.storyLinks(pg,old,old.eventId&&G.events.find(e=>e.id===old.eventId)),{threads:1,codex:1,libs:1,rels:1}); pg.forEach(id=>{ delete P().cleared[id]; }); }
@@ -654,16 +654,16 @@ class StoryView {
 
   static openAiEvent(){
     CoreView.openModal(`${head('AI로 이벤트 만들기')}
-      <label class="f" for="ae_d">이벤트 내용</label><textarea class="in" id="ae_d" placeholder="예: 여름 해변 축제. 바다에서 떠오른 잔광 해파리 소동. 수영복 차림의 카야와 이브가 주인공."></textarea>
-      <label class="f">주연 ${System.T('crew')}</label><div class="chips">${G.chars.map(c=>`<button class="chip" data-act="castt" data-id="${c.id}">${esc(c.name)}</button>`).join('')}</div>
-      <div class="g2"><div><label class="f" for="ae_n">스테이지 수</label><select class="in" id="ae_n">${CoreView.opt([[3,'3개'],[4,'4개'],[5,'5개']],3)}</select></div>
-      <div><label class="f" for="ae_new">한정 ${System.T('crew')}</label><select class="in" id="ae_new">${CoreView.opt([['1','새로 만들기'],['0','만들지 않기']],'1')}</select></div></div>
-      <label class="f" for="ae_len">스토리 분량</label><select class="in" id="ae_len">${CoreView.opt(Object.entries(STORY_LEN).map(([k,v])=>[k,v[0]+' (스테이지마다 대본 '+v[1].pre+'줄)']),Battle.storyCfg().len)}</select>
-      <p class="muted" style="margin:4px 0 0;font-size:.78rem">길게 쓸수록 시간이 더 걸리고 글 AI 사용량이 늘어요.</p>
-      <label class="f" for="ae_lore">이야기 종류 (로어북)</label><select class="in" id="ae_lore">${CoreView.opt(Characters.loreOpts(),'')}</select>
-      <p class="muted" style="margin:4px 0 0;font-size:.78rem">IF 스토리는 관계도·스토리 기억에 남지 않아서, 본편과 다른 과감한 이야기도 마음껏 쓸 수 있어요. 이격 전용은 그 이격의 관계 기록에만 남아요.</p>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="aievent">만들기</button></div>
-      <p class="muted">이벤트 스토리, 한정 배너, 교환소, 필요한 배경과 음악, ${System.T('talk')}까지 만들어요.</p>`);
+    <label class="f" for="ae_d">이벤트 내용</label><textarea class="in" id="ae_d" placeholder="예: 여름 해변 축제. 바다에서 떠오른 잔광 해파리 소동. 수영복 차림의 카야와 이브가 주인공."></textarea>
+    <label class="f">주연 ${System.T('crew')}</label><div class="chips">${G.chars.map(c=>`<button class="chip" data-act="castt" data-id="${c.id}">${esc(c.name)}</button>`).join('')}</div>
+    <div class="g2"><div><label class="f" for="ae_n">스테이지 수</label><select class="in" id="ae_n">${CoreView.opt([[3,'3개'],[4,'4개'],[5,'5개']],3)}</select></div>
+    <div><label class="f" for="ae_new">한정 ${System.T('crew')}</label><select class="in" id="ae_new">${CoreView.opt([['1','새로 만들기'],['0','만들지 않기']],'1')}</select></div></div>
+    <label class="f" for="ae_len">스토리 분량</label><select class="in" id="ae_len">${CoreView.opt(Object.entries(STORY_LEN).map(([k,v])=>[k,v[0]+' (스테이지마다 대본 '+v[1].pre+'줄)']),Battle.storyCfg().len)}</select>
+    <p class="muted" style="margin:4px 0 0;font-size:.78rem">길게 쓸수록 시간이 더 걸리고 글 AI 사용량이 늘어요.</p>
+    <label class="f" for="ae_lore">이야기 종류 (로어북)</label><select class="in" id="ae_lore">${CoreView.opt(Characters.loreOpts(),'')}</select>
+    <p class="muted" style="margin:4px 0 0;font-size:.78rem">IF 스토리는 관계도·스토리 기억에 남지 않아서, 본편과 다른 과감한 이야기도 마음껏 쓸 수 있어요. 이격 전용은 그 이격의 관계 기록에만 남아요.</p>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="aievent">만들기</button></div>
+    <p class="muted">이벤트 스토리, 한정 배너, 교환소, 필요한 배경과 음악, ${System.T('talk')}까지 만들어요.</p>`);
   }
 
   static auditNotice(){ try{ if((+G.meta.auditSeen||0)>=LiveOps.auditVer()||!P().seenOpening) return; const n=LiveOps.auditScan().reduce((a,x)=>a+x.items.length,0); if(n) CoreView.toast(`생성 기능이 좋아졌어요. 설정 → 게임 → 콘텐츠 점검에서 ${n}개를 업그레이드할 수 있어요`); }catch(e){} }
@@ -674,7 +674,7 @@ class StoryView {
   static opsListHTML(){ const main=G.chapters.filter(ch=>ch.kind==='main'); let prevDone=true, curIdx=-1;
     const cards=main.map((ch,ci)=>{ const n=ch.stages.length, done=ch.stages.filter(s=>P().cleared[s.id]).length, open=prevDone, full=n&&done===n; prevDone=full; if(open&&!full&&curIdx<0) curIdx=ci;
       return `<button class="chc ${open?'':'lock'} ${full?'clear':''} ${open&&!full?'cur':''}" data-act="${open?'opsch':'locked'}" data-ch="${ch.id}"><div class="chc-art" style="${StoryView.chCover(ch)}"></div><div class="chc-no"><i>CHAPTER</i><b>${String(ci+1).padStart(2,'0')}</b></div>${full?'<em class="chc-st">CLEAR</em>':open?'<em class="chc-st now">진행 중</em>':'<em class="chc-st">🔒 잠김</em>'}
-        <div class="chc-t"><b>${esc(ch.title)}</b><p>${open?esc(Story.chLogline(ch)||'이야기가 기다리고 있어요.'):'앞 장을 모두 끝내면 열려요.'}</p><div class="chc-bar"><i style="width:${n?done/n*100:0}%"></i></div><span>${done} / ${n}</span></div></button>`; }).join('');
+      <div class="chc-t"><b>${esc(ch.title)}</b><p>${open?esc(Story.chLogline(ch)||'이야기가 기다리고 있어요.'):'앞 장을 모두 끝내면 열려요.'}</p><div class="chc-bar"><i style="width:${n?done/n*100:0}%"></i></div><span>${done} / ${n}</span></div></button>`; }).join('');
     const nxt=`<button class="chc next" data-act="${SAMPLE?'aichapter-open':'nextneedai'}"><div class="chc-art"></div><div class="chc-no"><i>CHAPTER</i><b>${String(main.length+1).padStart(2,'0')}</b></div><em class="chc-st">다음 이야기</em><div class="chc-t"><b>＋ 다음 장 만들기</b><p>${SAMPLE?'AI가 지금까지의 이야기와 보유한 '+esc(System.T('crew'))+'을(를) 반영해 다음 장을 써요.':'글 AI를 등록하면 다음 장을 만들 수 있어요.'}</p></div></button>`;
     if(curIdx>=0) setTimeout(()=>{ const el=document.querySelectorAll('.chc')[curIdx]; if(el&&el.parentNode) el.parentNode.scrollLeft=Math.max(0,el.offsetLeft-24); },30);
     return `${pageHead(System.T('ops'),'MAIN STORY')}<div class="chc-row">${cards}${nxt}</div><p class="muted" style="margin:6px 2px;font-size:.75rem">← 옆으로 넘겨서 장을 고르세요 →</p><button class="linkb" data-act="rebal" style="margin-top:6px">적 스탯 자동조정 · 새 스킬 기준</button>`; }
@@ -692,12 +692,12 @@ class StoryView {
         const boss=!s.story&&(s.enemies.some(en=>en.boss)||si===n-1), p=pts[si];
         return `<button class="onode ${cl?'clear':''} ${open?'':'lock'} ${cur?'cur':''} ${boss?'boss':''} ${s.story?'story':''} ${s.mode?'m-'+s.mode:''}" style="left:${p.x}%;top:${p.y}px" data-act="${open?'stage':'locked'}" data-ch="${ch.id}" data-st="${s.id}"><span class="dia"><span>${cl?'✓':open?(Story.modeIcon(s)||(boss?'★':s.story?'📖':'')):'🔒'}</span></span><span class="ont"><i>${ci+1}-${si+1}</i><b>${esc(s.title)}</b>${P().stars&&P().stars[s.id]?`<small class="ost">${'★'.repeat(P().stars[s.id])}${'☆'.repeat(3-P().stars[s.id])}</small>`:''}<em>${s.enemies.slice(0,4).map(e=>`<u style="--ec:${ECOL[e.elem]}"></u>`).join('')}</em></span></button>`;}).join('');
       out+=`<section class="omap">
-        <div class="omap-h"><div><i>CHAPTER ${ci+1}</i><h3>${esc(ch.title)}</h3></div><span>${done}/${n}</span><button class="btn sm ghost" data-act="mapedit" data-ch="${ch.id}">지도</button><button class="btn sm ghost" data-act="chedit" data-ch="${ch.id}">편집</button></div>
-        <div class="omap-b" style="height:${Hh}px;${ms?`background-image:url('${esc(ms)}');background-size:cover;background-position:center`:ArtView.bgStyle(ch.title)}">
-          <div class="omap-grid"></div>
-          <svg class="omap-path" viewBox="0 0 100 ${Hh}" preserveAspectRatio="none"><path d="${d}" class="bg"/><path d="${d}" class="fg" style="stroke-dasharray:${Math.max(0,done-0.5)*RH*1.3} 99999"/></svg>
-          ${nodes}
-        </div></section>`;
+      <div class="omap-h"><div><i>CHAPTER ${ci+1}</i><h3>${esc(ch.title)}</h3></div><span>${done}/${n}</span><button class="btn sm ghost" data-act="mapedit" data-ch="${ch.id}">지도</button><button class="btn sm ghost" data-act="chedit" data-ch="${ch.id}">편집</button></div>
+      <div class="omap-b" style="height:${Hh}px;${ms?`background-image:url('${esc(ms)}');background-size:cover;background-position:center`:ArtView.bgStyle(ch.title)}">
+        <div class="omap-grid"></div>
+        <svg class="omap-path" viewBox="0 0 100 ${Hh}" preserveAspectRatio="none"><path d="${d}" class="bg"/><path d="${d}" class="fg" style="stroke-dasharray:${Math.max(0,done-0.5)*RH*1.3} 99999"/></svg>
+        ${nodes}
+      </div></section>`;
     });
     return out+`<div class="row" style="margin:10px 0"><button class="btn ghost block" data-act="opsback">‹ 장 목록으로</button></div><div class="panel" hidden><h3>다음 이야기</h3><p class="muted" style="margin:0 0 10px">AI가 메인 플롯과 지금까지의 진행, 보유한 ${System.T('crew')}을(를) 반영해서 다음 장을 써요. 필요한 배경, 음악, ${System.T('talk')}도 함께 만들어요.</p><button class="btn block" data-act="aichapter-open">AI로 다음 장 만들기</button><button class="linkb" data-act="rebal" style="margin-top:10px">적 스탯 자동조정 · 새 스킬 기준</button></div>`;
   }
@@ -712,15 +712,15 @@ static viewTop(){ $('#view').scrollTop=0; }
   static openEpEdit(cid,eid){
     const c=charById(cid); const e=eid?c.episodes.find(x=>x.id===eid):{id:'',lv:[2,4,6,8,10].find(l=>!c.episodes.some(x=>x.lv===l))||10,dup:0,after:'',title:'',script:''};
     CoreView.openModal(`${head(`${esc(c.name)} 개인 스토리`)}
-      <div class="g2"><div><label class="f" for="ep_lv">호감도 조건</label><select class="in" id="ep_lv">${CoreView.opt([1,2,3,4,5,6,7,8,9,10].map(n=>[n,'Lv.'+n]),e.lv)}</select></div>
-      <div><label class="f" for="ep_dup">${System.T('limit')} 조건</label><select class="in" id="ep_dup">${CoreView.opt([0,1,2,3,4,5].map(n=>[n,n?n+'단계':'없음']),e.dup||0)}</select></div></div>
-      <label class="f" for="ep_after">메인 스토리 조건 (이 스테이지를 깨야 열림)</label><select class="in" id="ep_after">${StoryView.stageOptions(e.after)}</select>
-      <label class="f" for="ep_title">제목</label><input class="in" id="ep_title" value="${esc(e.title)}">
-      <label class="f" for="ep_script">대본</label><textarea class="in tall" id="ep_script">${esc(e.script)}</textarea><button class="btn sm ghost scimg-b" data-act="scimg" data-ta="ep_script">🖼 이미지 넣기</button>
-      <p class="muted" style="margin:4px 0 0">이름: 대사 / 이름[표정]: 대사 / [배경: 이름] / [소품: 이름] / [음악: 이름] / [효과음: 이름] / [톡: 이름] ~ [톡 끝] / 선택: A | B 와 1) 2) 분기</p>
-      <label class="f" for="ep_hint">AI에게 바라는 내용 (선택)</label><input class="in" id="ep_hint" placeholder="예: 메인 2장 사건 직후, 둘만 남은 옥상">
-      <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aiep" data-id="${cid}">AI로 대본 쓰기</button></div>
-      <div class="row" style="margin-top:16px"><button class="btn" data-act="saveep" data-id="${cid}" data-ep="${e.id}">저장</button>${eid?`<button class="btn ghost" data-act="delep" data-id="${cid}" data-ep="${e.id}">삭제</button>`:''}</div>`);
+    <div class="g2"><div><label class="f" for="ep_lv">호감도 조건</label><select class="in" id="ep_lv">${CoreView.opt([1,2,3,4,5,6,7,8,9,10].map(n=>[n,'Lv.'+n]),e.lv)}</select></div>
+    <div><label class="f" for="ep_dup">${System.T('limit')} 조건</label><select class="in" id="ep_dup">${CoreView.opt([0,1,2,3,4,5].map(n=>[n,n?n+'단계':'없음']),e.dup||0)}</select></div></div>
+    <label class="f" for="ep_after">메인 스토리 조건 (이 스테이지를 깨야 열림)</label><select class="in" id="ep_after">${StoryView.stageOptions(e.after)}</select>
+    <label class="f" for="ep_title">제목</label><input class="in" id="ep_title" value="${esc(e.title)}">
+    <label class="f" for="ep_script">대본</label><textarea class="in tall" id="ep_script">${esc(e.script)}</textarea><button class="btn sm ghost scimg-b" data-act="scimg" data-ta="ep_script">🖼 이미지 넣기</button>
+    <p class="muted" style="margin:4px 0 0">이름: 대사 / 이름[표정]: 대사 / [배경: 이름] / [소품: 이름] / [음악: 이름] / [효과음: 이름] / [톡: 이름] ~ [톡 끝] / 선택: A | B 와 1) 2) 분기</p>
+    <label class="f" for="ep_hint">AI에게 바라는 내용 (선택)</label><input class="in" id="ep_hint" placeholder="예: 메인 2장 사건 직후, 둘만 남은 옥상">
+    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aiep" data-id="${cid}">AI로 대본 쓰기</button></div>
+    <div class="row" style="margin-top:16px"><button class="btn" data-act="saveep" data-id="${cid}" data-ep="${e.id}">저장</button>${eid?`<button class="btn ghost" data-act="delep" data-id="${cid}" data-ep="${e.id}">삭제</button>`:''}</div>`);
   }
 
   static trigOptions(cur){
@@ -734,13 +734,13 @@ static viewTop(){ $('#view').scrollTop=0; }
   static openThEdit(cid,tid){
     const c=charById(cid); const t=tid?threadById(tid):{id:'',title:'',trigger:{type:'aff',value:3},needOwn:true,script:''};
     CoreView.openModal(`${head(`${esc(c.name)} ${esc(System.T('talk'))}`)}
-      <label class="f" for="th_title">제목</label><input class="in" id="th_title" value="${esc(t.title)}">
-      <label class="f" for="th_trig">도착 조건</label><select class="in" id="th_trig">${StoryView.trigOptions(t.trigger)}</select>
-      <label class="f" for="th_own">계약 필요 여부</label><select class="in" id="th_own">${CoreView.opt([['1','계약한 경우에만'],['0','계약 전에도 도착']],t.needOwn===false?'0':'1')}</select>
-      <label class="f" for="th_script">대화</label><textarea class="in tall" id="th_script" placeholder="${esc(c.name)}: 메시지&#10;선택: 답장1 | 답장2&#10;1) ${esc(c.name)}: 1번 답장에 대한 반응&#10;[사진: 소품이름]">${esc(t.script)}</textarea>
-      <label class="f" for="th_hint">AI에게 바라는 내용 (선택)</label><input class="in" id="th_hint" placeholder="예: 새벽에 잠이 안 온다며 셀카를 보낼지 고민하는 대화">
-      <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aithread" data-id="${cid}">AI로 대화 쓰기</button></div>
-      <div class="row" style="margin-top:16px"><button class="btn" data-act="saveth" data-id="${cid}" data-th="${t.id}">저장</button>${tid?`<button class="btn ghost" data-act="resetth" data-th="${t.id}">다시 받기</button><button class="btn ghost" data-act="delth" data-id="${cid}" data-th="${t.id}">삭제</button>`:''}</div>`);
+    <label class="f" for="th_title">제목</label><input class="in" id="th_title" value="${esc(t.title)}">
+    <label class="f" for="th_trig">도착 조건</label><select class="in" id="th_trig">${StoryView.trigOptions(t.trigger)}</select>
+    <label class="f" for="th_own">계약 필요 여부</label><select class="in" id="th_own">${CoreView.opt([['1','계약한 경우에만'],['0','계약 전에도 도착']],t.needOwn===false?'0':'1')}</select>
+    <label class="f" for="th_script">대화</label><textarea class="in tall" id="th_script" placeholder="${esc(c.name)}: 메시지&#10;선택: 답장1 | 답장2&#10;1) ${esc(c.name)}: 1번 답장에 대한 반응&#10;[사진: 소품이름]">${esc(t.script)}</textarea>
+    <label class="f" for="th_hint">AI에게 바라는 내용 (선택)</label><input class="in" id="th_hint" placeholder="예: 새벽에 잠이 안 온다며 셀카를 보낼지 고민하는 대화">
+    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aithread" data-id="${cid}">AI로 대화 쓰기</button></div>
+    <div class="row" style="margin-top:16px"><button class="btn" data-act="saveth" data-id="${cid}" data-th="${t.id}">저장</button>${tid?`<button class="btn ghost" data-act="resetth" data-th="${t.id}">다시 받기</button><button class="btn ghost" data-act="delth" data-id="${cid}" data-th="${t.id}">삭제</button>`:''}</div>`);
   }
 
   static openStage(chId,stId){
@@ -753,25 +753,25 @@ static viewTop(){ $('#view').scrollTop=0; }
   static openChEdit(){
     const ch=chDraft;
     CoreView.openModal(`${head('챕터 편집')}
-      <label class="f" for="ch_title">챕터 제목</label><input class="in" id="ch_title" value="${esc(ch.title)}">
-      ${ch.stages.map((s,j)=>`<div class="stage-edit">
-        <div class="g2"><div><label class="f">스테이지 ${j+1} 제목</label><input class="in" id="st_t_${j}" value="${esc(s.title)}"></div><div><label class="f">보상 성석</label><input class="in" type="number" id="st_r_${j}" value="${s.reward}"></div></div>
-        <label class="f" style="margin-top:6px"><input type="checkbox" id="st_s_${j}" ${s.story?'checked':''}> 전투 없음 (이야기만 보는 스테이지 · 전투 전 대본만 써요)</label>
-        <label class="f">적 (한 줄에 하나: 이름, 속성, 체력, 공격, 방어, 속도, 보스면 끝에 보스)</label><textarea class="in" id="st_e_${j}">${esc(s.enemies.map(en=>[en.name,en.elem,en.hp,en.atk,en.def,en.spd].join(', ')+(en.boss?', 보스':'')).join('\n'))}</textarea>
-        <label class="f">전투 전 대본</label><textarea class="in tall" id="st_pre_${j}">${esc(s.pre||'')}</textarea><button class="btn sm ghost scimg-b" data-act="scimg" data-ta="st_pre_${j}">🖼 이미지 넣기</button>
-        <label class="f">전투 후 대본</label><textarea class="in" id="st_post_${j}" style="min-height:160px">${esc(s.post||'')}</textarea><button class="btn sm ghost scimg-b" data-act="scimg" data-ta="st_post_${j}">🖼 이미지 넣기</button>
-        <div class="row" style="margin-top:8px">${SAMPLE?`<button class="btn sm ghost" data-act="stdetail" data-j="${j}">✦ AI로 디테일 보강</button>`:''}<button class="btn sm ghost" data-act="delstage" data-j="${j}">이 스테이지 삭제</button></div></div>`).join('')}
-      <div class="row"><button class="btn sm ghost" data-act="addstage">스테이지 추가</button></div>
-      <div class="row" style="margin-top:16px"><button class="btn" data-act="savech">저장</button><button class="btn ghost" data-act="delch">챕터 삭제</button></div>`);
+    <label class="f" for="ch_title">챕터 제목</label><input class="in" id="ch_title" value="${esc(ch.title)}">
+    ${ch.stages.map((s,j)=>`<div class="stage-edit">
+      <div class="g2"><div><label class="f">스테이지 ${j+1} 제목</label><input class="in" id="st_t_${j}" value="${esc(s.title)}"></div><div><label class="f">보상 성석</label><input class="in" type="number" id="st_r_${j}" value="${s.reward}"></div></div>
+      <label class="f" style="margin-top:6px"><input type="checkbox" id="st_s_${j}" ${s.story?'checked':''}> 전투 없음 (이야기만 보는 스테이지 · 전투 전 대본만 써요)</label>
+      <label class="f">적 (한 줄에 하나: 이름, 속성, 체력, 공격, 방어, 속도, 보스면 끝에 보스)</label><textarea class="in" id="st_e_${j}">${esc(s.enemies.map(en=>[en.name,en.elem,en.hp,en.atk,en.def,en.spd].join(', ')+(en.boss?', 보스':'')).join('\n'))}</textarea>
+      <label class="f">전투 전 대본</label><textarea class="in tall" id="st_pre_${j}">${esc(s.pre||'')}</textarea><button class="btn sm ghost scimg-b" data-act="scimg" data-ta="st_pre_${j}">🖼 이미지 넣기</button>
+      <label class="f">전투 후 대본</label><textarea class="in" id="st_post_${j}" style="min-height:160px">${esc(s.post||'')}</textarea><button class="btn sm ghost scimg-b" data-act="scimg" data-ta="st_post_${j}">🖼 이미지 넣기</button>
+      <div class="row" style="margin-top:8px">${SAMPLE?`<button class="btn sm ghost" data-act="stdetail" data-j="${j}">✦ AI로 디테일 보강</button>`:''}<button class="btn sm ghost" data-act="delstage" data-j="${j}">이 스테이지 삭제</button></div></div>`).join('')}
+    <div class="row"><button class="btn sm ghost" data-act="addstage">스테이지 추가</button></div>
+    <div class="row" style="margin-top:16px"><button class="btn" data-act="savech">저장</button><button class="btn ghost" data-act="delch">챕터 삭제</button></div>`);
   }
 
   static openOpeningEdit(){
     CoreView.openModal(`${head('오프닝')}
-      <label class="f" for="op_lines">오프닝 영상 문구 (한 줄에 한 장면, 마지막 줄은 크게 표시)</label><textarea class="in" id="op_lines" style="min-height:160px">${esc(G.opening.lines.join('\n'))}</textarea>
-      <label class="f" for="op_pro">프롤로그 대본</label><textarea class="in tall" id="op_pro">${esc(G.opening.prologue)}</textarea><button class="btn sm ghost scimg-b" data-act="scimg" data-ta="op_pro">🖼 이미지 넣기</button>
-      <label class="f" for="op_hint">AI에게 바라는 방향 (선택)</label><input class="in" id="op_hint" placeholder="예: 더 어둡고 미스터리하게">
-      <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aiopening">AI로 오프닝 쓰기</button></div>
-      <div class="row" style="margin-top:16px"><button class="btn" data-act="saveopening">저장</button></div>`);
+    <label class="f" for="op_lines">오프닝 영상 문구 (한 줄에 한 장면, 마지막 줄은 크게 표시)</label><textarea class="in" id="op_lines" style="min-height:160px">${esc(G.opening.lines.join('\n'))}</textarea>
+    <label class="f" for="op_pro">프롤로그 대본</label><textarea class="in tall" id="op_pro">${esc(G.opening.prologue)}</textarea><button class="btn sm ghost scimg-b" data-act="scimg" data-ta="op_pro">🖼 이미지 넣기</button>
+    <label class="f" for="op_hint">AI에게 바라는 방향 (선택)</label><input class="in" id="op_hint" placeholder="예: 더 어둡고 미스터리하게">
+    <div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="aiopening">AI로 오프닝 쓰기</button></div>
+    <div class="row" style="margin-top:16px"><button class="btn" data-act="saveopening">저장</button></div>`);
   }
 
     /* 세계관 편집 창에 AI가 낸 값 채우기(View) — 용어 바꾸기 제안(WTERMS)은 처리기가 먼저 담음 */
@@ -786,22 +786,22 @@ static genStep(key,label){ return m=>{ const j=typeof BGJOBS!=='undefined'&&BGJO
     const row=(k,label,n,on,hint)=>n?`<label class="pc"><input type="checkbox" data-sd="${k}" ${on?'checked':''}><b>${esc(label)}</b><span>${n}개</span>${hint?`<small class="muted" style="display:block;font-size:.72rem">${esc(hint)}</small>`:''}</label>`:'';
     const rows=row('threads',System.T('talk')+' (이 스토리를 깨면 오는 대화)',L.threads.length,1)+row('codex','도감 기록',L.codex.length,1)+row('libs','CG·소품 (이 스토리에만 나오는 것)',L.libs.length,1)+row('rels','관계 기록 (이 스토리에서 생긴 것)',L.rels.length,1)+row('chars','이 스토리에서 만난 인연 '+System.T('crew'),L.chars.length,0,'아직 보유하지 않은 '+System.T('crew')+'만 · '+L.chars.map(c=>c.name).join(', '));
     CoreView.openModal(`${head('스토리 삭제',`<span class="muted">${esc(o.title)}</span>`)}
-      <p style="margin:0 0 8px">이 스토리를 지울까요?${rows?' 함께 지울 것을 골라 주세요.':''}</p>
-      ${rows?`<div class="prepcats">${rows}</div>`:'<p class="muted">함께 지울 톡·도감·CG가 없어요.</p>'}
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="sdelgo" style="background:var(--rose)">삭제</button><button class="btn ghost" data-act="sdelno">취소</button></div>`); }
+    <p style="margin:0 0 8px">이 스토리를 지울까요?${rows?' 함께 지울 것을 골라 주세요.':''}</p>
+    ${rows?`<div class="prepcats">${rows}</div>`:'<p class="muted">함께 지울 톡·도감·CG가 없어요.</p>'}
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="sdelgo" style="background:var(--rose)">삭제</button><button class="btn ghost" data-act="sdelno">취소</button></div>`); }
 
   static openEvEdit(id){
     const ev=G.events.find(e=>e.id===id);
     CoreView.openModal(`${head('이벤트 편집')}
-      <label class="f" for="ev_t">제목</label><input class="in" id="ev_t" value="${esc(ev.title)}">
-      <label class="f" for="ev_d">설명</label><textarea class="in" id="ev_d">${esc(ev.desc)}</textarea>
-      <div class="g2"><div><label class="f" for="ev_tok">이벤트 재화 이름</label><input class="in" id="ev_tok" value="${esc(ev.token)}"></div><div><label class="f" for="ev_bg">배경</label><select class="in" id="ev_bg">${StoryView.bgOptions(ev.bg,'기본')}</select></div></div>
-      <label class="f" for="ev_shop">교환소 (한 줄에 하나: 종류, 수량, 가격, 횟수 / 종류는 gems·gold·exp·wmat·core·char:대원ID)</label>
-      <textarea class="in" id="ev_shop">${esc((ev.shop||[]).map(i=>[(i.type==='char'?'char:'+i.ref:i.type),i.amt,i.price,i.limit].join(', ')).join('\n'))}</textarea>
-      <label class="f" for="ev_act">상태</label><select class="in" id="ev_act">${CoreView.opt([['1','진행 중'],['0','종료']],ev.active!==false?'1':'0')}</select>
-      <label class="f" for="ev_lore">이야기 종류 (로어북)</label><select class="in" id="ev_lore">${CoreView.opt(Characters.loreOpts(),Story.loreOf(ev))}</select>
-      <p class="muted" style="margin:4px 0 0;font-size:.78rem">바꾸면 이 이벤트가 남긴 관계 기록을 지우고 새 범위로 다시 정리해요. IF 스토리로 바꾸면 관계도·스토리 기억에서 빠져요.</p>
-      <div class="row" style="margin-top:16px"><button class="btn" data-act="evsave" data-id="${ev.id}">저장</button><button class="btn ghost" data-act="evdel" data-id="${ev.id}">삭제</button></div>`);
+    <label class="f" for="ev_t">제목</label><input class="in" id="ev_t" value="${esc(ev.title)}">
+    <label class="f" for="ev_d">설명</label><textarea class="in" id="ev_d">${esc(ev.desc)}</textarea>
+    <div class="g2"><div><label class="f" for="ev_tok">이벤트 재화 이름</label><input class="in" id="ev_tok" value="${esc(ev.token)}"></div><div><label class="f" for="ev_bg">배경</label><select class="in" id="ev_bg">${StoryView.bgOptions(ev.bg,'기본')}</select></div></div>
+    <label class="f" for="ev_shop">교환소 (한 줄에 하나: 종류, 수량, 가격, 횟수 / 종류는 gems·gold·exp·wmat·core·char:대원ID)</label>
+    <textarea class="in" id="ev_shop">${esc((ev.shop||[]).map(i=>[(i.type==='char'?'char:'+i.ref:i.type),i.amt,i.price,i.limit].join(', ')).join('\n'))}</textarea>
+    <label class="f" for="ev_act">상태</label><select class="in" id="ev_act">${CoreView.opt([['1','진행 중'],['0','종료']],ev.active!==false?'1':'0')}</select>
+    <label class="f" for="ev_lore">이야기 종류 (로어북)</label><select class="in" id="ev_lore">${CoreView.opt(Characters.loreOpts(),Story.loreOf(ev))}</select>
+    <p class="muted" style="margin:4px 0 0;font-size:.78rem">바꾸면 이 이벤트가 남긴 관계 기록을 지우고 새 범위로 다시 정리해요. IF 스토리로 바꾸면 관계도·스토리 기억에서 빠져요.</p>
+    <div class="row" style="margin-top:16px"><button class="btn" data-act="evsave" data-id="${ev.id}">저장</button><button class="btn ghost" data-act="evdel" data-id="${ev.id}">삭제</button></div>`);
   }
 
     /* 화면 */
@@ -809,18 +809,18 @@ static planPanel(){ const p=G.world.plan||{}, iss=Story.planHas()?Story.planChec
 
   static openPlan(){ const p=Story.PLAN(), n=G.chapters.filter(ch=>ch.kind==='main').length, F=P().flags||{}, iss=Story.planCheck(), t=(k,v,ph,rows)=>rows?`<textarea class="in" data-pl="${k}" rows="${rows}" placeholder="${esc(ph||'')}">${esc(v||'')}</textarea>`:`<input class="in" data-pl="${k}" value="${esc(v??'')}" placeholder="${esc(ph||'')}">`, num=(k,v)=>`<input class="in" type="number" min="1" data-pl="${k}" value="${v??''}" style="max-width:70px">`;
     CoreView.openModal(`${head('시나리오 설계',`<span class="muted">지금 메인 ${n}장</span>`)}
-    ${iss.length?`<div class="panel" style="border-color:var(--gold)"><b>점검</b><ul style="margin:4px 0;padding-left:18px;font-size:.82rem">${iss.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
-    <label class="f">로그라인 (한 줄 요약)</label>${t('logline',p.logline)}<div class="g2"><div><label class="f">주제</label>${t('theme',p.theme)}</div><div><label class="f">목표 결말</label>${t('ending',p.ending)}</div></div>
-    <h3 class="sec">막 구성</h3>${p.acts.map((a,i)=>`<div class="row" style="gap:4px;margin:3px 0;flex-wrap:wrap">${t(`a.${i}.name`,a.name,'막 이름')}<span class="muted">~</span>${num(`a.${i}.upto`,a.upto)}<span class="muted">장</span>${t(`a.${i}.goal`,a.goal,'이 막의 목표')}<button class="btn sm ghost" data-act="plandel" data-k="acts" data-i="${i}">삭제</button></div>`).join('')}<button class="btn sm ghost" data-act="planadd" data-k="acts">+ 막</button>
-    <h3 class="sec">숨겨진 반전</h3>${p.twists.map((x,i)=>`<div class="panel" style="padding:8px;margin:6px 0"><div class="row" style="gap:4px;flex-wrap:wrap">${t(`t.${i}.truth`,x.truth,'숨겨진 진실')}<span class="muted">공개</span>${num(`t.${i}.reveal`,x.reveal)}<span class="muted">장</span>${t(`t.${i}.who`,x.who,'관련 인물')}<label style="display:inline-flex;gap:3px;font-size:.8rem"><input type="checkbox" data-pl="t.${i}.done" ${x.done?'checked':''}>공개됨</label><button class="btn sm ghost" data-act="plandel" data-k="twists" data-i="${i}">삭제</button></div>
-      <div style="font-size:.82rem;margin-top:4px">복선 (장 번호 | 힌트, 줄마다)</div><textarea class="in" rows="2" data-pl="t.${i}.clues">${esc((x.clues||[]).map(c=>`${c.ch} | ${c.hint}`).join('\n'))}</textarea></div>`).join('')}<button class="btn sm ghost" data-act="planadd" data-k="twists">+ 반전</button>
-    <h3 class="sec">분기</h3>${p.branches.map((b,i)=>`<div class="panel" style="padding:8px;margin:6px 0"><div class="row" style="gap:4px;flex-wrap:wrap"><span class="muted">${esc(b.id)}</span>${num(`b.${i}.at`,b.at)}<span class="muted">장</span>${t(`b.${i}.question`,b.question,'플레이어가 고를 질문')}${F[b.id]?`<span class="badge">고름: ${esc((b.options[F[b.id].n-1]||{}).label||F[b.id].label)}</span>`:''}<button class="btn sm ghost" data-act="plandel" data-k="branches" data-i="${i}">삭제</button></div>
-      <div style="font-size:.82rem;margin-top:4px">보기 (보기 | 이후에 바뀌는 것, 줄마다)</div><textarea class="in" rows="2" data-pl="b.${i}.options">${esc((b.options||[]).map(o=>`${o.label} | ${o.result}`).join('\n'))}</textarea></div>`).join('')}<button class="btn sm ghost" data-act="planadd" data-k="branches">+ 분기</button>
-    <h3 class="sec">캐릭터 아크</h3>${p.arcs.map((a,i)=>`<div class="row" style="gap:4px;margin:3px 0;flex-wrap:wrap">${t(`r.${i}.name`,a.name,'이름')}${t(`r.${i}.start`,a.start,'시작')}${t(`r.${i}.change`,a.change,'변화')}${t(`r.${i}.end`,a.end,'끝')}<button class="btn sm ghost" data-act="plandel" data-k="arcs" data-i="${i}">삭제</button></div>`).join('')}<button class="btn sm ghost" data-act="planadd" data-k="arcs">+ 아크</button>
-    <label class="f" style="margin-top:8px">설계 메모 (AI에 함께 전달)</label>${t('notes',p.notes,'금기·일관성 규칙 등',2)}
-    <label class="f" style="margin-top:8px">AI 추가 지시 (선택)</label><input class="in" id="pl_ins" placeholder="예: 3막에서 동료 한 명의 배신을 넣어 줘">
-    <div class="row" style="margin-top:12px;flex-wrap:wrap;gap:6px"><button class="btn" data-act="plansave">저장</button><button class="btn ghost" data-act="planai" data-k="${Story.planHas()?'improve':'new'}">${Story.planHas()?'AI로 다듬기':'AI로 설계'}</button>${Story.planHas()?'<button class="btn ghost" data-act="planai" data-k="extend">AI로 다음 막 잇기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>
-    <p class="muted" style="font-size:.78rem;margin-top:8px">새 장(메인 스토리)을 만들 때 이 설계에서 그 장에 필요한 것만 AI에 넘겨요. 분기는 대본의 [분기: id] 다음 선택지로 기록되고, 이후 장에 반영돼요.</p>`); }
+  ${iss.length?`<div class="panel" style="border-color:var(--gold)"><b>점검</b><ul style="margin:4px 0;padding-left:18px;font-size:.82rem">${iss.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
+  <label class="f">로그라인 (한 줄 요약)</label>${t('logline',p.logline)}<div class="g2"><div><label class="f">주제</label>${t('theme',p.theme)}</div><div><label class="f">목표 결말</label>${t('ending',p.ending)}</div></div>
+  <h3 class="sec">막 구성</h3>${p.acts.map((a,i)=>`<div class="row" style="gap:4px;margin:3px 0;flex-wrap:wrap">${t(`a.${i}.name`,a.name,'막 이름')}<span class="muted">~</span>${num(`a.${i}.upto`,a.upto)}<span class="muted">장</span>${t(`a.${i}.goal`,a.goal,'이 막의 목표')}<button class="btn sm ghost" data-act="plandel" data-k="acts" data-i="${i}">삭제</button></div>`).join('')}<button class="btn sm ghost" data-act="planadd" data-k="acts">+ 막</button>
+  <h3 class="sec">숨겨진 반전</h3>${p.twists.map((x,i)=>`<div class="panel" style="padding:8px;margin:6px 0"><div class="row" style="gap:4px;flex-wrap:wrap">${t(`t.${i}.truth`,x.truth,'숨겨진 진실')}<span class="muted">공개</span>${num(`t.${i}.reveal`,x.reveal)}<span class="muted">장</span>${t(`t.${i}.who`,x.who,'관련 인물')}<label style="display:inline-flex;gap:3px;font-size:.8rem"><input type="checkbox" data-pl="t.${i}.done" ${x.done?'checked':''}>공개됨</label><button class="btn sm ghost" data-act="plandel" data-k="twists" data-i="${i}">삭제</button></div>
+    <div style="font-size:.82rem;margin-top:4px">복선 (장 번호 | 힌트, 줄마다)</div><textarea class="in" rows="2" data-pl="t.${i}.clues">${esc((x.clues||[]).map(c=>`${c.ch} | ${c.hint}`).join('\n'))}</textarea></div>`).join('')}<button class="btn sm ghost" data-act="planadd" data-k="twists">+ 반전</button>
+  <h3 class="sec">분기</h3>${p.branches.map((b,i)=>`<div class="panel" style="padding:8px;margin:6px 0"><div class="row" style="gap:4px;flex-wrap:wrap"><span class="muted">${esc(b.id)}</span>${num(`b.${i}.at`,b.at)}<span class="muted">장</span>${t(`b.${i}.question`,b.question,'플레이어가 고를 질문')}${F[b.id]?`<span class="badge">고름: ${esc((b.options[F[b.id].n-1]||{}).label||F[b.id].label)}</span>`:''}<button class="btn sm ghost" data-act="plandel" data-k="branches" data-i="${i}">삭제</button></div>
+    <div style="font-size:.82rem;margin-top:4px">보기 (보기 | 이후에 바뀌는 것, 줄마다)</div><textarea class="in" rows="2" data-pl="b.${i}.options">${esc((b.options||[]).map(o=>`${o.label} | ${o.result}`).join('\n'))}</textarea></div>`).join('')}<button class="btn sm ghost" data-act="planadd" data-k="branches">+ 분기</button>
+  <h3 class="sec">캐릭터 아크</h3>${p.arcs.map((a,i)=>`<div class="row" style="gap:4px;margin:3px 0;flex-wrap:wrap">${t(`r.${i}.name`,a.name,'이름')}${t(`r.${i}.start`,a.start,'시작')}${t(`r.${i}.change`,a.change,'변화')}${t(`r.${i}.end`,a.end,'끝')}<button class="btn sm ghost" data-act="plandel" data-k="arcs" data-i="${i}">삭제</button></div>`).join('')}<button class="btn sm ghost" data-act="planadd" data-k="arcs">+ 아크</button>
+  <label class="f" style="margin-top:8px">설계 메모 (AI에 함께 전달)</label>${t('notes',p.notes,'금기·일관성 규칙 등',2)}
+  <label class="f" style="margin-top:8px">AI 추가 지시 (선택)</label><input class="in" id="pl_ins" placeholder="예: 3막에서 동료 한 명의 배신을 넣어 줘">
+  <div class="row" style="margin-top:12px;flex-wrap:wrap;gap:6px"><button class="btn" data-act="plansave">저장</button><button class="btn ghost" data-act="planai" data-k="${Story.planHas()?'improve':'new'}">${Story.planHas()?'AI로 다듬기':'AI로 설계'}</button>${Story.planHas()?'<button class="btn ghost" data-act="planai" data-k="extend">AI로 다음 막 잇기</button>':''}<button class="btn ghost" data-act="close">닫기</button></div>
+  <p class="muted" style="font-size:.78rem;margin-top:8px">새 장(메인 스토리)을 만들 때 이 설계에서 그 장에 필요한 것만 AI에 넘겨요. 분기는 대본의 [분기: id] 다음 선택지로 기록되고, 이후 장에 반영돼요.</p>`); }
 
   static openStoryMemory(){if(System.playMode()){CoreView.toast('플레이 모드를 끄면 작가용 기억을 확인할 수 있어요.');return;}const state=Story.smState();CoreView.openModal(`${head('스토리 기억 관리')}<p class="muted">AI가 다음 이야기에 참고하는 기록입니다. 여기서 수정해도 이미 만든 대본은 바뀌지 않고 이후 생성부터 반영됩니다. 도감과 달리 작가용 비밀이 포함될 수 있어 플레이 모드에서는 숨깁니다.</p><section class="panel"><h3>장별 이야기 기억</h3>${G.chapters.filter(ch=>ch.kind==='main'||(ch.kind==='event'&&!Story.loreOf(ch))).map(ch=>`<div class="ep"><span class="t"><b>${esc(ch.title)}</b><span class="muted">${ch.memory?.locked?'확정 · ':''}${ch.memory?'상세 기억 '+ch.memory.text.length+'자':ch.summary?'이전 요약 '+ch.summary.length+'자':'제목 기반 임시 기억'}${ch.memory&&ch.memory.fingerprint!==Story.smFingerprint(ch)?' · 대본 변경됨':''}</span></span><button class="btn sm ghost" data-sm="chapter" data-id="${esc(ch.id)}">확인·편집</button></div>`).join('')}</section><section class="panel"><h3>작가 확정 사실·공개 금지</h3><p class="muted">실제 사실 / 인물이 아는 사실 / 공개 시점을 구분해서 적어 주세요. 메인 스토리 생성에 함께 전달하며 AI가 자동으로 덮어쓰지 않습니다. 최대 8,000자.</p><textarea class="in tall" id="sm-notes">${esc(state.notes||'')}</textarea><button class="btn sm" data-sm="notes-save">확정 규칙 저장</button></section><section class="panel"><h3>현재 저장과 참조 확인</h3><div class="row"><button class="btn sm ghost" data-sm="inspect">저장된 관계·도감 확인</button><button class="btn sm ghost" data-sm="memo">이어쓰기 기억 미리보기</button><button class="btn sm" data-sm="request">최근 스토리 요청 확인</button></div><p class="muted">최근 요청은 현재 게임에 마지막 요청 1건만 보관합니다. 실제로 전달한 글을 보여주며 모델 내부의 기억이나 이해를 보장하는 화면은 아닙니다.</p></section>`);}
 
@@ -833,22 +833,22 @@ static planPanel(){ const p=G.world.plan||{}, iss=Story.planHas()?Story.planChec
 
   static openDraftExport(name,d,back){ DRX={name,d,back}; const code=draftCode(d,name);
     CoreView.openModal(`${head('초안 내보내기',`<span class="muted">「${esc(name)}」</span>`)}
-      <p class="muted" style="margin:0 0 6px;font-size:.82rem">코드를 복사해 다른 기기·다른 사람에게 보내거나 파일로 저장해요. 받는 쪽은 새 게임 초안 → 📂 초안 보관함 → 📥 가져오기에서 넣어요. 주인공 프로필 그림은 들어가지 않아요(외모 글은 들어가요).</p>
-      <textarea class="in" id="drx_code" readonly style="min-height:110px;font-size:.72rem">${esc(code)}</textarea>
-      <p class="muted" style="margin:4px 0 0;font-size:.74rem">${nf(code.length)}자</p>
-      <div class="row" style="margin-top:10px"><button class="btn" data-act="drxcopy">코드 복사</button><button class="btn ghost" data-act="drxfile">파일로 저장</button><button class="btn ghost" data-act="drxback">돌아가기</button></div>`); }
+    <p class="muted" style="margin:0 0 6px;font-size:.82rem">코드를 복사해 다른 기기·다른 사람에게 보내거나 파일로 저장해요. 받는 쪽은 새 게임 초안 → 📂 초안 보관함 → 📥 가져오기에서 넣어요. 주인공 프로필 그림은 들어가지 않아요(외모 글은 들어가요).</p>
+    <textarea class="in" id="drx_code" readonly style="min-height:110px;font-size:.72rem">${esc(code)}</textarea>
+    <p class="muted" style="margin:4px 0 0;font-size:.74rem">${nf(code.length)}자</p>
+    <div class="row" style="margin-top:10px"><button class="btn" data-act="drxcopy">코드 복사</button><button class="btn ghost" data-act="drxfile">파일로 저장</button><button class="btn ghost" data-act="drxback">돌아가기</button></div>`); }
 
   static openDraftImport(){ CoreView.openModal(`${head('초안 가져오기','<span class="muted">코드나 파일로 받은 초안을 보관함에 넣어요</span>')}
-      <label class="f" for="dri_code">초안 코드 (GGMDRAFT:로 시작)</label><textarea class="in" id="dri_code" style="min-height:110px;font-size:.75rem" placeholder="GGMDRAFT:…"></textarea>
-      <label class="f"><input type="checkbox" id="dri_load" checked> 가져온 뒤 바로 불러오기</label>
-      <div class="row" style="margin-top:10px"><button class="btn" data-act="drigo">코드로 가져오기</button><button class="btn ghost" data-act="drifile">파일 고르기</button><button class="btn ghost" data-act="drxback">돌아가기</button></div>`); }
+    <label class="f" for="dri_code">초안 코드 (GGMDRAFT:로 시작)</label><textarea class="in" id="dri_code" style="min-height:110px;font-size:.75rem" placeholder="GGMDRAFT:…"></textarea>
+    <label class="f"><input type="checkbox" id="dri_load" checked> 가져온 뒤 바로 불러오기</label>
+    <div class="row" style="margin-top:10px"><button class="btn" data-act="drigo">코드로 가져오기</button><button class="btn ghost" data-act="drifile">파일 고르기</button><button class="btn ghost" data-act="drxback">돌아가기</button></div>`); }
 
   static drLibHTML(){ const a=Story.drLib(); return `<div class="dr-lib" id="drLib"><div class="row" style="margin:0 0 6px"><b style="flex:1">저장한 초안 ${a.length}개</b><button class="btn sm" data-act="drlibsave">💾 지금 초안 저장</button></div>
-    <div class="row" style="margin:0 0 6px"><button class="btn sm ghost" data-act="drxcur">📤 지금 초안 내보내기</button><button class="btn sm ghost" data-act="drimport">📥 가져오기 (코드·파일)</button></div>
-    ${a.length?a.map(x=>`<div class="sw-pjr"><b>${esc(x.name)}</b><i>${new Date(x.at).toLocaleDateString()}</i><button class="btn sm" data-act="drlibload" data-id="${x.id}">불러오기</button><button class="btn sm ghost" data-act="drxlib" data-id="${x.id}">내보내기</button><button class="btn sm ghost" data-act="drlibdel" data-id="${x.id}">✕</button></div>`).join(''):'<p class="muted" style="margin:0;font-size:.8rem">아직 없어요. 지금 초안을 저장해 두면 언제든 이대로 다시 만들 수 있어요.</p>'}</div>`; }
+  <div class="row" style="margin:0 0 6px"><button class="btn sm ghost" data-act="drxcur">📤 지금 초안 내보내기</button><button class="btn sm ghost" data-act="drimport">📥 가져오기 (코드·파일)</button></div>
+  ${a.length?a.map(x=>`<div class="sw-pjr"><b>${esc(x.name)}</b><i>${new Date(x.at).toLocaleDateString()}</i><button class="btn sm" data-act="drlibload" data-id="${x.id}">불러오기</button><button class="btn sm ghost" data-act="drxlib" data-id="${x.id}">내보내기</button><button class="btn sm ghost" data-act="drlibdel" data-id="${x.id}">✕</button></div>`).join(''):'<p class="muted" style="margin:0;font-size:.8rem">아직 없어요. 지금 초안을 저장해 두면 언제든 이대로 다시 만들 수 있어요.</p>'}</div>`; }
 
   static drModeHTML(){ return `<div class="dr-modes"><button class="dr-mode" data-act="drmode" data-v="auto"><em>1</em><b>자율주행</b><span>한 줄만 적으면 AI가 세계관·인물·이야기를 모두 만들어요.<br><i>예: 미소녀들만 있는 이세계 판타지.</i></span></button>
-      <button class="dr-mode" data-act="drmode" data-v="detail"><em>2</em><b>디테일</b><span>테마·세계관·설정·인물·주인공을 직접 자세히 적어요. 적은 건 그대로 살리고 빈 곳만 AI가 채워요.</span></button></div>`; }
+    <button class="dr-mode" data-act="drmode" data-v="detail"><em>2</em><b>디테일</b><span>테마·세계관·설정·인물·주인공을 직접 자세히 적어요. 적은 건 그대로 살리고 빈 곳만 AI가 채워요.</span></button></div>`; }
 
   static openDraft(tab){ DR2=Core.drLoad(); if(tab) DRTAB=tab;
     if(DR2.hero.av&&!DRAVU){ Core.idbGet('draft_avatar').then(b=>{ if(b){ DRAVU=URL.createObjectURL(b); const el=$('#drAvBox'); if(el) el.innerHTML=`<img src="${esc(DRAVU)}" alt="프로필">`; } }).catch(()=>{}); }
@@ -856,12 +856,12 @@ static planPanel(){ const p=G.world.plan||{}, iss=Story.planHas()?Story.planChec
     if(!DR2.mode){ CoreView.openModal(`<div id="drPage" class="dr-page">${top}<p class="muted" style="margin:0 0 10px">어떻게 만들까요? 지금 게임은 그대로 남아요.</p>${StoryView.drModeHTML()}</div>`,false,'cs-sheet dr-sheet'); return; }
     if(DR2.mode==='auto'){ CoreView.openModal(`<div id="drPage" class="dr-page">${top}${ArtView.drAutoHTML()}</div>`,false,'cs-sheet dr-sheet'); return; }
     CoreView.openModal(`<div id="drPage" class="dr-page">${top}
-      <div class="dr-intro"><p class="muted" style="margin:0">적은 내용은 그대로 살리고, 빈 곳만 AI가 채워요.</p>
-        <p class="muted" style="margin:6px 0">전체 <b id="drCount">${nf(Story.drLen())}</b>자</p>
-        <div class="row"><button class="btn" data-act="drmake" ${SAMPLE?'':'disabled'}>이 설정으로 새 게임 만들기</button><button class="btn sm ghost" data-act="drmanual" title="글 AI 없이 적은 내용 그대로 게임을 만들어요">✍ AI 없이 직접 시작</button><button class="btn sm ghost" data-act="drdedup" title="AI 없이, 여러 칸에 똑같이 들어 있는 문장을 한 번만 남겨요">🧹 겹치는 문장 정리</button><button class="btn sm ghost" data-act="drharmony" ${SAMPLE?'':'disabled'}>✦ 전체를 서로 맞춰 다듬기</button>${DR2.undo?`<button class="btn sm ghost" data-act="drundo">↶ 되돌리기 (${esc(DR2.undo.label||'')})</button>`:''}<button class="btn sm ghost" data-act="drpreview">AI에 들어가는 설정 보기</button><button class="btn sm ghost" data-act="drclear">초안 비우기</button></div>
-        ${SAMPLE?'':'<p class="muted" style="font-size:.8rem;margin:6px 0 0">글 AI 없이도 「✍ AI 없이 직접 시작」으로 적은 내용 그대로 게임을 만들 수 있어요. 나중에 글 AI를 등록하면 써 둔 내용을 바탕으로 다듬어요.</p>'}<p class="muted" id="ng_stat" style="margin:6px 0 0"></p><button class="linkb" data-act="ailog" style="margin-top:4px;font-size:.8rem">🔍 AI 기록 보기 (안 만들어질 때 원인 확인)</button></div>
-      <div class="chips dr-tabs">${DR_TABS.map(([k,l])=>`<button class="chip ${DRTAB===k?'on':''}" data-act="drtab" data-k="${k}">${l}</button>`).join('')}</div>
-      ${DR_TABS.map(([k])=>CoreView.drTabHTML(k)).join('')}</div>`,false,'cs-sheet dr-sheet'); }
+    <div class="dr-intro"><p class="muted" style="margin:0">적은 내용은 그대로 살리고, 빈 곳만 AI가 채워요.</p>
+      <p class="muted" style="margin:6px 0">전체 <b id="drCount">${nf(Story.drLen())}</b>자</p>
+      <div class="row"><button class="btn" data-act="drmake" ${SAMPLE?'':'disabled'}>이 설정으로 새 게임 만들기</button><button class="btn sm ghost" data-act="drmanual" title="글 AI 없이 적은 내용 그대로 게임을 만들어요">✍ AI 없이 직접 시작</button><button class="btn sm ghost" data-act="drdedup" title="AI 없이, 여러 칸에 똑같이 들어 있는 문장을 한 번만 남겨요">🧹 겹치는 문장 정리</button><button class="btn sm ghost" data-act="drharmony" ${SAMPLE?'':'disabled'}>✦ 전체를 서로 맞춰 다듬기</button>${DR2.undo?`<button class="btn sm ghost" data-act="drundo">↶ 되돌리기 (${esc(DR2.undo.label||'')})</button>`:''}<button class="btn sm ghost" data-act="drpreview">AI에 들어가는 설정 보기</button><button class="btn sm ghost" data-act="drclear">초안 비우기</button></div>
+      ${SAMPLE?'':'<p class="muted" style="font-size:.8rem;margin:6px 0 0">글 AI 없이도 「✍ AI 없이 직접 시작」으로 적은 내용 그대로 게임을 만들 수 있어요. 나중에 글 AI를 등록하면 써 둔 내용을 바탕으로 다듬어요.</p>'}<p class="muted" id="ng_stat" style="margin:6px 0 0"></p><button class="linkb" data-act="ailog" style="margin-top:4px;font-size:.8rem">🔍 AI 기록 보기 (안 만들어질 때 원인 확인)</button></div>
+    <div class="chips dr-tabs">${DR_TABS.map(([k,l])=>`<button class="chip ${DRTAB===k?'on':''}" data-act="drtab" data-k="${k}">${l}</button>`).join('')}</div>
+    ${DR_TABS.map(([k])=>CoreView.drTabHTML(k)).join('')}</div>`,false,'cs-sheet dr-sheet'); }
 
     /* 초안 화면 부분 갱신(View): 보관함 열고 닫기·다시 그리기 · 탭 · 그림체 칩 · 미리 보기 · 만드는 동안 단추 잠금 */
 static drLibToggle(){ const ex=$('#drLib'); if(ex){ ex.remove(); return; } const top=document.querySelector('#drPage .dr-top'); if(top) top.insertAdjacentHTML('afterend',StoryView.drLibHTML()); }
@@ -879,9 +879,9 @@ static drLibToggle(){ const ex=$('#drLib'); if(ex){ ex.remove(); return; } const
   static eventsHTML(){
     const evs=G.events.filter(Acquire.gateOpen), locked=G.events.length-evs.length;
     return `${pageHead(System.T('event'),'EVENT','lobby')}
-    ${evs.length?evs.map(ev=>`<button class="evcard ${ev.active===false?'off':''}" data-act="evopen" data-id="${ev.id}"><div class="bgl" style="${ArtView.bgStyle(ev.bg||'회색구 골목')}"></div><div class="ev-t"><i>${ev.active===false?'CLOSED':'NOW OPEN'}${Story.loreOf(ev)?' · '+esc(Story.loreLabel(Story.loreOf(ev))):''}</i><b>${esc(ev.title)}</b><span>${esc(ev.desc||'')}</span><em>${esc(ev.token)} ${nf(P().tokens[ev.id]||0)}</em></div></button>`).join(''):'<div class="panel"><p class="muted">아직 이벤트가 없어요.</p></div>'}
-    ${locked?`<p class="muted" style="text-align:center;margin:8px 0">🔒 아직 열리지 않은 ${esc(System.T('event'))} ${locked}개 · 메인 스토리를 진행하면 차례로 열려요</p>`:''}
-    <div class="panel pm-hide"><h3>새 이벤트</h3><p class="muted" style="margin:0 0 10px">AI가 이벤트 스토리, 이벤트 한정 배너, 교환소, 필요하면 한정 ${System.T('crew')}까지 한 번에 만들어요.</p><button class="btn block" data-act="aievent-open">AI로 이벤트 만들기</button></div>`;
+  ${evs.length?evs.map(ev=>`<button class="evcard ${ev.active===false?'off':''}" data-act="evopen" data-id="${ev.id}"><div class="bgl" style="${ArtView.bgStyle(ev.bg||'회색구 골목')}"></div><div class="ev-t"><i>${ev.active===false?'CLOSED':'NOW OPEN'}${Story.loreOf(ev)?' · '+esc(Story.loreLabel(Story.loreOf(ev))):''}</i><b>${esc(ev.title)}</b><span>${esc(ev.desc||'')}</span><em>${esc(ev.token)} ${nf(P().tokens[ev.id]||0)}</em></div></button>`).join(''):'<div class="panel"><p class="muted">아직 이벤트가 없어요.</p></div>'}
+  ${locked?`<p class="muted" style="text-align:center;margin:8px 0">🔒 아직 열리지 않은 ${esc(System.T('event'))} ${locked}개 · 메인 스토리를 진행하면 차례로 열려요</p>`:''}
+  <div class="panel pm-hide"><h3>새 이벤트</h3><p class="muted" style="margin:0 0 10px">AI가 이벤트 스토리, 이벤트 한정 배너, 교환소, 필요하면 한정 ${System.T('crew')}까지 한 번에 만들어요.</p><button class="btn block" data-act="aievent-open">AI로 이벤트 만들기</button></div>`;
   }
 
   static eventDetailHTML(){
@@ -893,11 +893,11 @@ static drLibToggle(){ const ex=$('#drLib'); if(ex){ ex.remove(); return; } const
       const name=c?`${c.name} (${Characters.own(c.id)?System.T('limit')+' +1':'획득'})`:Core.rewardText({[it.type]:it.amt});
       return `<div class="ep"><span class="t"><b>${esc(name)}</b><span class="muted">${esc(ev.token)} ${it.price} · 남은 횟수 ${left}</span></span><button class="btn sm" data-act="evbuy" data-id="${it.id}" ${left<=0||tok<it.price?'disabled':''}>교환</button></div>`;};
     return `${pageHead(ev.title,'EVENT','event')}
-    <section class="banner" style="min-height:180px"><div class="bgl" style="${ArtView.bgStyle(ev.bg||'회색구 골목')}"></div><div class="bn-t"><i>${ev.active===false?'CLOSED':'EVENT'}${Story.loreOf(ev)?' · '+esc(Story.loreLabel(Story.loreOf(ev))):''}</i><h1>${esc(ev.title)}</h1><p>${esc(ev.desc||'')}</p><p class="ups">${esc(ev.token)} <b>${nf(tok)}</b></p></div></section>
-    <h3 class="sec">이벤트 스토리</h3>${st||'<p class="muted">스테이지가 없어요.</p>'}
-    ${bn?`<button class="btn block" style="margin:10px 0" data-act="bsel" data-id="${bn.id}" data-go="1">이벤트 ${System.T('gacha')}: ${esc(bn.name)}</button>`:''}
-    ${(()=>{ const host=Acquire.evHost(ev); return `<button class="evs-door" data-act="go" data-to="evshop"><div class="evs-bg" style="${ArtView.bgStyle(ev.bg||'회색구 골목')}"></div><div class="evs-av">${host?CoreView.art(host):''}</div><div class="evs-t"><i>EXCHANGE</i><b>이벤트 교환소</b><span>${host?esc(host.name)+'이(가) 기다리고 있어요 · ':''}${esc(ev.token)} ${nf(tok)} · 상품 ${(ev.shop||[]).length}개</span></div><em>입장 ›</em></button>`; })()}
-    <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="evedit" data-id="${ev.id}">이벤트 편집</button>${ch?`<button class="btn sm ghost" data-act="chedit" data-ch="${ch.id}">스토리 편집</button>`:''}${ch&&SAMPLE?`<button class="btn sm ghost" data-act="evreroll" data-id="${ev.id}">🎲 스토리 다시 쓰기</button>`:''}</div>`;
+  <section class="banner" style="min-height:180px"><div class="bgl" style="${ArtView.bgStyle(ev.bg||'회색구 골목')}"></div><div class="bn-t"><i>${ev.active===false?'CLOSED':'EVENT'}${Story.loreOf(ev)?' · '+esc(Story.loreLabel(Story.loreOf(ev))):''}</i><h1>${esc(ev.title)}</h1><p>${esc(ev.desc||'')}</p><p class="ups">${esc(ev.token)} <b>${nf(tok)}</b></p></div></section>
+  <h3 class="sec">이벤트 스토리</h3>${st||'<p class="muted">스테이지가 없어요.</p>'}
+  ${bn?`<button class="btn block" style="margin:10px 0" data-act="bsel" data-id="${bn.id}" data-go="1">이벤트 ${System.T('gacha')}: ${esc(bn.name)}</button>`:''}
+  ${(()=>{ const host=Acquire.evHost(ev); return `<button class="evs-door" data-act="go" data-to="evshop"><div class="evs-bg" style="${ArtView.bgStyle(ev.bg||'회색구 골목')}"></div><div class="evs-av">${host?CoreView.art(host):''}</div><div class="evs-t"><i>EXCHANGE</i><b>이벤트 교환소</b><span>${host?esc(host.name)+'이(가) 기다리고 있어요 · ':''}${esc(ev.token)} ${nf(tok)} · 상품 ${(ev.shop||[]).length}개</span></div><em>입장 ›</em></button>`; })()}
+  <div class="row" style="margin-top:12px"><button class="btn sm ghost" data-act="evedit" data-id="${ev.id}">이벤트 편집</button>${ch?`<button class="btn sm ghost" data-act="chedit" data-ch="${ch.id}">스토리 편집</button>`:''}${ch&&SAMPLE?`<button class="btn sm ghost" data-act="evreroll" data-id="${ev.id}">🎲 스토리 다시 쓰기</button>`:''}</div>`;
   }
 
   static async bootSync(){ const pc=System.PCS(), so=System.SY(); const mode=pc?'pc':(System.syReady()&&so.auto!==false?'gh':null); if(!mode) return false;
@@ -921,10 +921,10 @@ static drLibToggle(){ const ex=$('#drLib'); if(ex){ ex.remove(); return; } const
 
   static openPullFail(mode,why){ const pc=mode==='pc';
     CoreView.openModal(`${head(pc?'PC의 게임을 받지 못했어요':'클라우드 게임을 받지 못했어요')}
-      <p>${why==='loop'?'받아 온 게임으로 다시 시작했는데도 계속 다시 받으려고 해서 멈췄어요.':esc(PULLERR||'연결이 끊겼거나 시간이 오래 걸렸어요.')}</p>
-      ${PULLERR_QUOTA||why==='loop'?'<p class="muted">이 기기(브라우저)의 저장 공간이 모자라면 받은 게임이 저장되지 않아요. 아이폰 Safari는 저장 공간이 작아요. 안 쓰는 게임을 PC에서 지우거나(설정 → 게임 목록), 사진·음성을 줄인 뒤 다시 받아 보세요.</p>':''}
-      <p class="muted">${pc?'PC에 저장된 게임은 그대로 있어요. 이 기기에서 새로 시작한 게임은 PC에 자동으로 덮어쓰지 않아요.':'클라우드에 올린 데이터는 그대로 있어요.'}</p>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="${pc?'pcpullgo':'sypull'}">다시 받기</button>${pc?'<button class="btn ghost" data-act="pchist">PC 백업</button>':''}<button class="btn ghost" data-act="close">이 기기로 계속</button></div>`); }
+    <p>${why==='loop'?'받아 온 게임으로 다시 시작했는데도 계속 다시 받으려고 해서 멈췄어요.':esc(PULLERR||'연결이 끊겼거나 시간이 오래 걸렸어요.')}</p>
+    ${PULLERR_QUOTA||why==='loop'?'<p class="muted">이 기기(브라우저)의 저장 공간이 모자라면 받은 게임이 저장되지 않아요. 아이폰 Safari는 저장 공간이 작아요. 안 쓰는 게임을 PC에서 지우거나(설정 → 게임 목록), 사진·음성을 줄인 뒤 다시 받아 보세요.</p>':''}
+    <p class="muted">${pc?'PC에 저장된 게임은 그대로 있어요. 이 기기에서 새로 시작한 게임은 PC에 자동으로 덮어쓰지 않아요.':'클라우드에 올린 데이터는 그대로 있어요.'}</p>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="${pc?'pcpullgo':'sypull'}">다시 받기</button>${pc?'<button class="btn ghost" data-act="pchist">PC 백업</button>':''}<button class="btn ghost" data-act="close">이 기기로 계속</button></div>`); }
 
   static logoHTML(st){ const t=String(G.meta.title||''), w=t.split(/\s+/).filter(Boolean), sub=String(G.meta.sub||'');
     let kr=Story.titleLines(t).map(tlSpan).join('');
@@ -937,9 +937,9 @@ static drLibToggle(){ const ex=$('#drLib'); if(ex){ ex.remove(); return; } const
     const c=charById(P().titleChar)||charById(P().sec)||G.chars.find(x=>x.rarity===3&&(Characters.charIllust(x)||Characters.imgSrc(x)))||G.chars.find(x=>x.rarity===3)||G.chars[0];
     const oc=c&&Characters.own(c.id), ill=c&&P().lobbyMode!=='stand'&&((oc&&oc.useCg&&oc.dup>=5&&Characters.lbcgSrc(c))||Characters.charIllust(c));
     $('#ov').innerHTML=`<div class="title" data-act="titletap">${ill?`<div class="t-bg t-ill"><img src="${esc(ill)}" alt="" draggable="false"></div>`:`<div class="t-bg" style="${ArtView.bgStyle(P().titleBg||'낙성 분화구')}"></div>${c?`<div class="t-char">${CoreView.art(c)}</div>`:''}`}<div class="t-shade"></div>${StoryView.shootHTML(7)}
-      ${StoryView.logoHTML(Story.logoStyle(logo))}
-      <button class="t-snd" id="tsnd" data-act="titlesnd" aria-label="${Story.titleSndLabel(Core.SND().bgmOn)}">${Core.SND().bgmOn?'🔊':'🔇'}</button>
-      <div class="t-touch">화면을 터치하세요</div><div class="t-ver">GACHA GAME MAKER · ${esc(APP_BUILD)}</div></div>`;
+    ${StoryView.logoHTML(Story.logoStyle(logo))}
+    <button class="t-snd" id="tsnd" data-act="titlesnd" aria-label="${Story.titleSndLabel(Core.SND().bgmOn)}">${Core.SND().bgmOn?'🔊':'🔇'}</button>
+    <div class="t-touch">화면을 터치하세요</div><div class="t-ver">GACHA GAME MAKER · ${esc(APP_BUILD)}</div></div>`;
     $('#ov').hidden=false; ArtView.bgm(Story.sceneOf().title);
   }
 
@@ -962,9 +962,9 @@ static drLibToggle(){ const ex=$('#drLib'); if(ex){ ex.remove(); return; } const
     // 전투 없는 이야기 스테이지: 대본만 보고 클리어해요
 static openStoryStage(ch,s){ const cl=!!P().cleared[s.id], code=ch.kind==='event'?'EV'+(ch.stages.indexOf(s)+1):Story.stageCode(s.id);
     CoreView.openModal(`${head(esc(code+' '+s.title),'<span class="muted">STORY · 전투 없는 이야기</span>')}
-      <div class="ststory" style="${ArtView.bgStyle(Core.stageBg(s)||ch.title)}"><span>📖</span></div>
-      <p class="muted" style="margin:8px 0">${cl?'다시 볼 수 있어요.':'이야기를 끝까지 보면 클리어돼요. 첫 클리어 보상: '+(ch.kind==='event'?esc(((G.events.find(ev=>ev.id===ch.eventId)||{}).token)||'토큰')+' '+s.reward*2:'◆'+s.reward)}</p>
-      <div class="row"><button class="btn" data-act="ststory" data-ch="${ch.id}" data-st="${s.id}">${cl?'다시 보기':'이야기 보기'}</button><button class="btn ghost" data-act="chedit" data-ch="${ch.id}">스토리 편집</button></div>`); }
+    <div class="ststory" style="${ArtView.bgStyle(Core.stageBg(s)||ch.title)}"><span>📖</span></div>
+    <p class="muted" style="margin:8px 0">${cl?'다시 볼 수 있어요.':'이야기를 끝까지 보면 클리어돼요. 첫 클리어 보상: '+(ch.kind==='event'?esc(((G.events.find(ev=>ev.id===ch.eventId)||{}).token)||'토큰')+' '+s.reward*2:'◆'+s.reward)}</p>
+    <div class="row"><button class="btn" data-act="ststory" data-ch="${ch.id}" data-st="${s.id}">${cl?'다시 보기':'이야기 보기'}</button><button class="btn ghost" data-act="chedit" data-ch="${ch.id}">스토리 편집</button></div>`); }
 }
 
 class StoryCtl {

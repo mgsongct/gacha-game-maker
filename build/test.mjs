@@ -601,7 +601,7 @@ try {
       if (/프롤로그 다음으로 이어지는 1장/.test(p)) return { summary: 's', relations: [], chapter: { title: '1장', logline: 'l', stages: [1, 2, 3, 4].map(i => ({ route: i === 1 ? { n1: '부두 입구', boss: '등대 꼭대기' } : undefined, title: 's' + i, battle: true, pre: i === 2 ? '네오: 처음 뵙겠습니다' : '하나: 가자', post: '', enemies: [{ name: i === 4 ? '심연의 눈' : '촉수 무리', elem: '불', boss: i === 4, faction: '심해의 것', look: 'no humans, monster' }] })) }, bestiary: [{ name: '촉수 무리', faction: '심해의 것', desc: '심연의 촉수가 떼로 올라온 것', nature: '밤에 몰려온다', weak: '불' }, { name: '심연의 눈', faction: '심해의 것', desc: '거대한 눈', nature: '', weak: '빛' }], threads: [] };
       return {}; } };
     let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [k, v] of Object.entries(recs)) if (/"chapters"/.test(v)) saved = JSON.parse(v); return orig(recs); };
-    window.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
+    SystemView.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
     await buildNewGameDraft(uiProg(btn, '#ng_stat'), { mode: 'auto', auto: '등불섬 판타지', n: 6, con: true }, PJ().active);
     const g = saved; o.built = !!g && g.meta.title === '심연등불';
     if (!g) return o;
@@ -688,7 +688,7 @@ try {
     const mode0 = G.meta.expedition; G.meta.expedition = Object.assign({}, mode0 || {}, { mode: 'idol' }); delete P().exped; const own0 = G.chars[0]; const had0 = P().owned[own0.id]; P().owned[own0.id] = had0 || { levelCapVersion: 1, transc: 0, growthCostVersion: 1, lv: 1, exp: 0, dup: 0, aff: 0, seen: [], wlv: 0, skin: '' }; render();
     o.expedTick = !!(P().exped && own0 && P().exped.offers[own0.id] && P().exped.offers[own0.id].day === today()); G.meta.expedition = mode0;
     /* 액션 처리기(Controller)에서 화면 조작을 기능 모듈 View로 뺀 case가 실제 클릭 분배로 오류 없이 돎(처리 중 예외는 분배기가 '작업을 완료하지 못했습니다'로 알림) */
-    const said = [], toast0 = window.toast; window.toast = m => { said.push(String(m)); toast0(m); };
+    const said = [], toast0 = CoreView.toast; CoreView.toast = m => { said.push(String(m)); toast0(m); };
     const act = async (a, data = {}, inner = '') => { const b = document.createElement('button'); b.dataset.act = a; Object.assign(b.dataset, data); b.innerHTML = inner; document.body.appendChild(b); b.click(); await new Promise(r => setTimeout(r, 40)); b.remove(); };
     P().owned[own0.id] = P().owned[own0.id] || { levelCapVersion: 1, transc: 0, growthCostVersion: 1, lv: 1, exp: 0, dup: 0, aff: 0, seen: [], wlv: 0, skin: '' }; P().sec = own0.id; tab = 'lobby'; render();
     await act('lbhide'); const hid = document.body.classList.contains('lb-hidden'); await act('lbshow'); o.lobbyMenu = hid && !document.body.classList.contains('lb-hidden');
@@ -702,7 +702,7 @@ try {
     P().live.seen = 0; tab = 'notice'; renderView(); const nv = P().live.seen === 0; render(); o.noticeEnter = nv && P().live.seen > 0; const fv = JSON.stringify(P().farmClear); tab = 'farm'; renderView(); o.farmView = JSON.stringify(P().farmClear) === fv; tab = 'codex'; render(); o.codex = !!document.querySelector('#view .cx-card, #view [data-act]');
     /* 저장 결과는 창 이벤트로(Model은 화면을 부르지 않음): 실패 알림 → 경고·다시 시도 단추(액션), 저장됨 알림 → 경고 지움 */
     saveFailed('시험 저장 실패'); o.saveWarn = !!document.querySelector('#save-warning [data-act="saveretry"]') && document.getElementById('save-warning').textContent.includes('시험 저장 실패'); dispatchEvent(new CustomEvent('ggm-saved')); o.saveClear = !document.getElementById('save-warning');
-    o.noFail = !said.some(m => m.includes('작업을 완료하지 못했습니다')) || said.join(' / '); window.toast = toast0; if (!had0) delete P().owned[own0.id];
+    o.noFail = !said.some(m => m.includes('작업을 완료하지 못했습니다')) || said.join(' / '); CoreView.toast = toast0; if (!had0) delete P().owned[own0.id];
     return o; });
   assert.ok(Object.values(r26).every(v => v === true), JSON.stringify(r26)); assert.deepEqual(err26, [], '페이지 오류');
   const r26m = await p26.evaluate(async () => {

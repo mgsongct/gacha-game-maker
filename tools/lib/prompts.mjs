@@ -5,7 +5,8 @@
 // 지시문은 해라체(…한다·…쓴다·…않는다·…하라·JSON만 출력)라 데이터 글과 갈림. pfDef에 등록된 기본값(getter가 가리키는 함수·상수)은 스튜디오 조각이라 뺌.
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { walk } from './source.mjs';
+import { walk, calleeName } from './source.mjs';
+import { aliasOf } from './graph.mjs';
 import { moduleOf, inModule, localDefs } from './scope.mjs';
 
 // 해라체 판별: 받침 ㄴ 음절 + 다(…한다·…는다·…쓴다) · 이다·아니다 · …하라/…어라 · 명사로 끝낸 지시(…금지·…필수). 해요체(화면 글)는 걸리지 않음.
@@ -18,11 +19,11 @@ const declName = n => { if (n.type === 'function_declaration') return n.childFor
   return null; };
 const topOf = n => { while (n.parent && n.parent.type !== 'program') n = n.parent; return n; };
 // 글이 속한 이름: 가장 가까운 이름 있는 함수(모듈 IIFE 안 함수 포함), 없으면 최상위 선언
-const ownerOf = n => { for (let p = n.parent; p; p = p.parent) { if (p.type === 'function_declaration') return p.childForFieldName('name')?.text; if (p.type === 'variable_declarator' && /function|arrow_function/.test(p.childForFieldName('value')?.type || '') && p.parent?.parent?.type === 'program') return p.childForFieldName('name')?.text; } return declName(topOf(n)); };
+const ownerOf = n => { for (let p = n.parent; p; p = p.parent) { if (p.type === 'function_declaration' || (p.type === 'method_definition' && p.parent?.type === 'class_body')) return p.childForFieldName('name')?.text; /* class 메서드는 메서드 이름(실행 호출 경로의 Class.이름과 맞춤) */ if (p.type === 'variable_declarator' && /function|arrow_function/.test(p.childForFieldName('value')?.type || '') && p.parent?.parent?.type === 'program') return p.childForFieldName('name')?.text; } return declName(topOf(n)); };
 // 따라갈 이름: 불린 함수, 또는 글(문자열·템플릿·그 연결·화살표 함수)을 값으로 가진 상수 — 배열·객체 데이터(샘플 게임 등)는 프롬프트 조립이 아님
 const assembles = (n, t) => { if (n.parent?.type === 'call_expression' && n.parent.childForFieldName('function')?.id === n.id) return true; /* 노드 객체는 접근마다 새로 만들어져 id로 비교 */
   const v = t.node.namedChildren.find(c => c.type === 'variable_declarator')?.childForFieldName('value'); return /^(string|template_string|binary_expression|arrow_function|function_expression)$/.test(v?.type || ''); };
-const callee = n => n.childForFieldName('function')?.text;
+const callee = calleeName; // Class.이름(…)은 이름으로(lib/source.mjs)
 
 // pfDef(id, label, get): get이 가리키는 이름 — 조각 기본값 선언
 function fragBases(units) { const out = new Set();
@@ -105,7 +106,7 @@ export const IMAGE_SINKS = ['naiGenerate', 'naiGenerate0', 'comfyGenerate'];
 export const tagText = t => /[a-z]{3,}/.test(t) && !/^[\w.-]+$/.test(t.trim()) && !/^https?:|<\/?[a-z]|&[a-z]+;/.test(t); // 주소·HTML 조각은 태그가 아님
 // 조각이 한곳에 모였는지: 프롬프트 스튜디오는 지시문을 파편화되지 않게 한곳에 모아 두고 거기서 개선하는 곳(사용자) — pfDef 등록이 여러 파일에 있으면 흩어진 것
 export function fragmentFiles(units) { const files = new Map(), mods = new Map();
-  for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'call_expression' && callee(n) === 'pfDef') { const f = u.loc(n).split(':')[0]; files.set(f, (files.get(f) || 0) + 1); mods.set(moduleOf(f), (mods.get(moduleOf(f)) || 0) + 1); } });
+  for (const u of units) walk(u.tree.rootNode, n => { if (aliasOf(n)) return false; /* 옛 이름 다리(function pfDef(...a){ return X.pfDef(...a); })는 조각 정의가 아님 */ if (n.type === 'call_expression' && callee(n) === 'pfDef') { const f = u.loc(n).split(':')[0]; files.set(f, (files.get(f) || 0) + 1); mods.set(moduleOf(f), (mods.get(moduleOf(f)) || 0) + 1); } });
   const home = [...mods].sort((a, b) => b[1] - a[1])[0]?.[0] || null; /* 스튜디오 모듈: 조각이 가장 많은 모듈(폴더 모듈이면 폴더) */
   return { home, stray: [...files].filter(([f]) => moduleOf(f) !== home).sort((a, b) => b[1] - a[1]).map(([file, n]) => ({ file, n })) }; }
 // 순수 모듈 경계: 머리 주석에 "순수·DOM-free·Pure"라고 밝힌 모듈(규칙 엔진 — 건조·원정·전투 코어, 전투 코어는 Web Worker에서도 돎)은

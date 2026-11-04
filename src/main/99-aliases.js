@@ -309,7 +309,7 @@ function charImgItems(...a) { return Characters.charImgItems(...a); }
 function ultimateSceneTags(...a) { return Messenger.ultimateSceneTags(...a); }
 function ultimateSceneSnapshot(...a) { return Misc.ultimateSceneSnapshot(...a); }
 function requestUltimateScene(...a) { return World.requestUltimateScene(...a); }
-function illustrationScenePreparation(...a) { return World.illustrationScenePreparation(...a); }
+function illustrationScenePreparation(...a) { return NewGame.illustrationScenePreparation(...a); }
 function designFacs(...a) { return World.designFacs(...a); }
 function wpBad(...a) { return Characters.wpBad(...a); }
 function weaponPromptAI(...a) { return Characters.weaponPromptAI(...a); }

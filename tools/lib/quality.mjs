@@ -12,7 +12,9 @@ export function sgRules(units) { const R = { listeners: [], emptyCatch: [] };
     for (const n of sg.findAll("document.addEventListener('click', $$$)")) R.listeners.push(at(n));
     for (const n of [...sg.findAll('try { $$$ } catch ($E) {}'), ...sg.findAll('try { $$$ } catch {}')]) { const t = n.text().replace(/catch[\s\S]*$/, ''), cb = n.text().slice(n.text().lastIndexOf('catch')); R.emptyCatch.push({ loc: at(n), cat: /\/\*|\/\//.test(cb) ? '의도 표시' : /JSON\.parse/.test(t) ? '파싱 대체' : /appStorage|localStorage|sessionStorage|idb|indexedDB/.test(t) ? '저장소 대체' : /\bawait\b|fetch\(|aiJSON|http\(/.test(t) ? '비동기 작업' : '동기 대체' }); } }
   return R; }
-export function complexFns(fns, cc = 40, lines = 120) { return [...fns.values()].filter(f => !f.cases && !f.table && (f.cc >= cc || f.lines >= lines || f.depth >= 7)).sort((a, b) => b.cc - a.cc); }
+/* 선언 목록(본문이 같은 함수를 부르는 문장뿐 — 조각 등록 pfDef(…)×200): 갈래 없는 표라 길이로 복잡하다 하지 않음 */
+const declList = f => { const b = f.node?.childForFieldName?.('body'), sts = b?.namedChildren?.filter(c => c.type !== 'comment') || []; if (f.cc > 2 || sts.length < 10) return false; const callee = c => c.type === 'expression_statement' && c.namedChildren[0]?.type === 'call_expression' ? c.namedChildren[0].childForFieldName('function')?.text : null; const k = callee(sts[0]); return !!k && sts.every(c => callee(c) === k); };
+export function complexFns(fns, cc = 40, lines = 120) { return [...fns.values()].filter(f => !f.cases && !f.table && (f.cc >= cc || (f.lines >= lines && !declList(f)) || f.depth >= 7)).sort((a, b) => b.cc - a.cc); }
 // 분배기의 case 중 복잡한 것(case 하나가 함수 하나만큼 커지면 따로 빼는 게 좋음)
 export function complexCases(fns, cc = 20) { return [...fns.values()].filter(f => f.cases).flatMap(f => f.cases.map(c => ({ ...c, fn: f.name }))).filter(c => c.cc >= cc || c.depth >= 5).sort((a, b) => b.cc - a.cc); }
 // 주석 속 코드: 한 줄에 여러 문장을 쓰는 코드 중간에 // 주석을 넣으면 그 뒤 문장이 통째로 주석이 됨(문법 오류가 아니라 조용히 빠짐).

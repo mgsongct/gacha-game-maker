@@ -726,19 +726,19 @@ static say(el,msg){ const x=typeof el==='string'?$(el):el; if(x) x.textContent=m
     if(d.type==='copilot'){ fields=`<div class="optbox" style="margin-top:8px"><div class="row"><b style="flex:1">GitHub 계정 · <span id="cpState">${d.gh?'로그인됨':'로그인 안 됨'}</span></b><button class="btn sm" data-act="cplogin">${d.gh?'다시 로그인':'GitHub로 로그인'}</button></div><div id="cpBox"></div></div>`; help='GitHub Copilot 구독(무료 플랜 포함)이 있는 계정으로 로그인하면 Copilot에 들어 있는 모델(GPT·Claude·Gemini)을 써요. 공식 API가 아닌 비공식 연결 방식이라 GitHub 정책에 따라 막히거나 계정에 제한이 생길 수 있어요. 무료 플랜은 사용량이 적어요. 웹 버전에서는 중계 서버가 필요해요.'; }
     if(d.type==='vertex'){
       fields=`<label class="f" for="ap_pub">모델 종류</label><select class="in" id="ap_pub">${CoreView.opt([['google','Gemini'],['anthropic','Claude (Model Garden)']],d.pub||'google')}</select>
-        <label class="f" for="ap_sa">서비스 계정 키 (JSON 파일 내용 전체)</label><textarea class="in" id="ap_sa" placeholder='{"type": "service_account", "project_id": ...}'>${esc(d.sa||'')}</textarea>
-        <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="saload">JSON 파일 불러오기</button></div>
-        <div class="g2"><div>${f('ap_region','리전',d.region,'global')}</div><div>${f('ap_project','프로젝트 ID (비우면 JSON에서)',d.project,'')}</div></div>
-        ${(d.pub||'google')==='google'?f('ap_vkey','또는 익스프레스 API 키 (Gemini 전용, 서비스 계정 대신)',d.vkey,'','password'):''}`;
+      <label class="f" for="ap_sa">서비스 계정 키 (JSON 파일 내용 전체)</label><textarea class="in" id="ap_sa" placeholder='{"type": "service_account", "project_id": ...}'>${esc(d.sa||'')}</textarea>
+      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="saload">JSON 파일 불러오기</button></div>
+      <div class="g2"><div>${f('ap_region','리전',d.region,'global')}</div><div>${f('ap_project','프로젝트 ID (비우면 JSON에서)',d.project,'')}</div></div>
+      ${(d.pub||'google')==='google'?f('ap_vkey','또는 익스프레스 API 키 (Gemini 전용, 서비스 계정 대신)',d.vkey,'','password'):''}`;
       help=(d.pub==='anthropic')?'Google Cloud 콘솔 → IAM 및 관리자 → 서비스 계정 → 키 추가 → JSON. 계정에 Vertex AI 사용자 역할이 필요해요. Model Garden에서 Claude 모델을 먼저 사용 설정하고, 모델 이름은 Model Garden에 나온 ID를 그대로 써요.'
         :'Google Cloud 콘솔 → IAM 및 관리자 → 서비스 계정 → 키 추가 → JSON. 계정에 Vertex AI 사용자 역할이 필요해요. 익스프레스 모드 API 키가 있으면 서비스 계정 없이 그것만 넣어도 돼요.';
     }
     return `<label class="f" for="ap_type">종류</label><select class="in" id="ap_type">${CoreView.opt(Object.entries(AITYPE),d.type)}</select>
-      ${f('ap_name','이름 (구분용)',d.name,'예: 버텍스 제미니')}
-      ${fields}
-      <datalist id="ap_ml">${sg.map(m=>`<option value="${esc(m)}">`).join('')}</datalist>
-      <div class="g2"><div>${f('ap_model','기본 모델 (직접 입력 가능)',d.model,dm[0]||'모델 ID','text','ap_ml')}</div><div>${f('ap_quick','빠른 모델 (짧은 작업용)',d.quick,dm[1]||'비우면 기본 모델','text','ap_ml')}</div></div>
-      <p class="muted" style="margin-top:8px">${help} 모델 칸을 누르면 추천 목록이 나오고, 다른 모델 ID도 직접 쓸 수 있어요. 비우면 흐린 글씨의 기본값을 써요.</p>`;
+    ${f('ap_name','이름 (구분용)',d.name,'예: 버텍스 제미니')}
+    ${fields}
+    <datalist id="ap_ml">${sg.map(m=>`<option value="${esc(m)}">`).join('')}</datalist>
+    <div class="g2"><div>${f('ap_model','기본 모델 (직접 입력 가능)',d.model,dm[0]||'모델 ID','text','ap_ml')}</div><div>${f('ap_quick','빠른 모델 (짧은 작업용)',d.quick,dm[1]||'비우면 기본 모델','text','ap_ml')}</div></div>
+    <p class="muted" style="margin-top:8px">${help} 모델 칸을 누르면 추천 목록이 나오고, 다른 모델 ID도 직접 쓸 수 있어요. 비우면 흐린 글씨의 기본값을 써요.</p>`;
   }
 
   static readAp(){
@@ -763,7 +763,7 @@ static say(el,msg){ const x=typeof el==='string'?$(el):el; if(x) x.textContent=m
         if(k==='cg'){ op.refs=[]; for(const x of Core.cgCast(o)) if(Characters.imgSrc(x.c)) op.refs.push(Object.assign({image:await Characters.refImage(Characters.imgSrc(x.c))},rf)); }
       }
       if(custom.i2i&&Characters.imgSrc(o)){ const [w,h]=custom.size||System.naiSize(k,c); op.img2img={image:await Core.imgB64(Characters.imgSrc(o),w,h,'#ffffff'),strength:custom.i2i.strength,noise:custom.i2i.noise}; op.noCut=false; }
-      const scenePrep=['illust','lbcg'].includes(kind)&&!custom.sceneReady?World.illustrationScenePreparation(charById(id),kind,custom):null;
+      const scenePrep=['illust','lbcg'].includes(kind)&&!custom.sceneReady?NewGame.illustrationScenePreparation(charById(id),kind,custom):null;
       if(scenePrep)op.prepareCandidates=scenePrep;
       const blob=await Core.naiGenerate(custom.input,k,op);
       scenePrep?.check();
@@ -836,24 +836,24 @@ static say(el,msg){ const x=typeof el==='string'?$(el):el; if(x) x.textContent=m
     NPREP={kind,id,k,base};
     const sizes=[...NAI_SIZES.map(x=>[x[0]+'x'+x[1],x[2]])]; if(!sizes.some(x=>x[0]===sz)) sizes.unshift([sz,sz]);
     CoreView.openModal(`${head('그리기 전 확인',`<span class="muted">${esc(o.name)}</span>`)}
-      <input type="hidden" id="np_style" value="${esc(styleId)}"><div class="g2"><div><label class="f">그림체</label><p class="muted" style="margin:6px 0 0;font-size:.78rem;word-break:break-all">${esc(String(Core.naiStyle(c).tags||'').slice(0,80)||'태그 없음 (모델 기본)')}</p></div>
-      <div><label class="f" for="np_model">모델</label><select class="in" id="np_model">${CoreView.opt([...NAI_MODELS,...(NAI_MODELS.some(m=>m[0]===c.model)?[]:[[c.model,c.model]])],c.model)}</select></div></div>
-      <div class="g2"><div><label class="f" for="np_size">크기</label><select class="in" id="np_size">${CoreView.opt(sizes,sz)}</select></div>
-      ${k==='char'||ILK(k)?`<div><label class="f" for="np_frame">구도</label><select class="in" id="np_frame">${CoreView.opt(NAI_FRAMES,frame)}</select></div>`:'<div></div>'}</div>
-      ${k==='char'||ILK(k)?`<div class="g2"><div><label class="f" for="np_posesel">자세</label><select class="in" id="np_posesel">${c.poses.map(x=>`<option value="${esc(x.t)}" ${x.t===pose?'selected':''}>${esc(x.n)}</option>`).join('')}<option value="__custom" ${c.poses.some(x=>x.t===pose)?'':'selected'}>직접 입력</option></select></div><div><label class="f" for="np_pose">자세 태그</label><input class="in" id="np_pose" value="${esc(pose)}"></div></div>`:''}
-      ${Art.imgProvider()==='comfy'?'<p class="muted" style="margin:8px 0 0">ComfyUI로 그려요. 모델·샘플러는 워크플로를 따르고, 레퍼런스와 img2img는 NovelAI 전용이라 쓰지 않아요.</p>':''}
-      <label class="f" for="np_in">${k==='cg'?'장면 프롬프트 (전체)':'최종 프롬프트'} (직접 고쳐도 돼요)</label><textarea class="in" id="np_in" style="min-height:120px">${esc(p.input)}</textarea>
-      ${k==='cg'&&p.chars.length?`<h3 class="sec">캐릭터별 프롬프트</h3>${p.chars.map((x,i)=>`<div class="cgrow"><div class="g2"><div><label class="f">${esc(x.name)}</label><select class="in" id="np_cp${i}">${CoreView.opt(CG_POS_LABEL,x.pos)}</select></div><div></div></div><textarea class="in" id="np_cc${i}" data-cid="${x.id}">${esc(x.prompt)}</textarea></div>`).join('')}<p class="muted" style="margin:4px 0 0">위치는 2명 이상일 때 적용돼요. 하나라도 자동이 아니면 좌표를 써요.</p>`:''}
-      <label class="f" for="np_neg">네거티브</label><textarea class="in" id="np_neg">${esc(p.neg)}</textarea>
-      ${canRef?`<div class="optbox"><label class="f"><input type="checkbox" id="np_ref" ${k!=='char'&&Art.autoRefOn(k)?'checked':''}> ${k==='cg'?'등장 '+System.T('crew')+' 스탠딩을 캐릭터 레퍼런스로':'지금 스탠딩을 캐릭터 레퍼런스로 (얼굴과 머리 유지)'}</label>
-        <div class="g4"><div><label class="f" for="np_rtype">종류</label><select class="in" id="np_rtype">${CoreView.opt([['character','캐릭터'],['character&style','캐릭터+화풍'],['style','화풍만']],c.ref.type)}</select></div><div><label class="f" for="np_rstr">강도</label><select class="in" id="np_rstr">${CoreView.opt([[1,'1.0'],[0.8,'0.8'],[0.6,'0.6'],[0.4,'0.4']],c.ref.strength)}</select></div><div><label class="f" for="np_rfid">충실도</label><select class="in" id="np_rfid">${CoreView.opt([[1,'1.0'],[0.8,'0.8'],[0.6,'0.6'],[0.4,'0.4']],c.ref.fidelity)}</select></div><div></div></div>
-        <p class="muted" style="margin:4px 0 0">캐릭터 레퍼런스는 V4.5에서만 돼서 이번 생성은 ${esc(isV45(c.refModel)?c.refModel:'nai-diffusion-4-5-full')}로 그려요. Anlas가 더 들 수 있어요.</p></div>`:''}
-      ${hasImg?`<div class="optbox"><label class="f"><input type="checkbox" id="np_i2i"> 지금 이미지를 바탕으로 다시 그리기 (img2img)</label>
-        <div class="g2"><div><label class="f" for="np_istr">변화량</label><select class="in" id="np_istr">${CoreView.opt([[0.4,'0.4 조금'],[0.55,'0.55'],[0.7,'0.7'],[0.85,'0.85'],[1,'1.0 많이']],0.55)}</select></div><div><label class="f" for="np_inoise">노이즈</label><select class="in" id="np_inoise">${CoreView.opt([[0,'0'],[0.1,'0.1'],[0.2,'0.2']],0)}</select></div></div></div>`:''}
-      <div class="g2"><div><label class="f" for="np_seed">시드 (비우면 랜덤)</label><input class="in" id="np_seed" type="number" value="${esc(NLASTSEED[id]||'')}" placeholder="랜덤"></div><div></div></div>
-      ${k==='char'||k==='cg'||ILK(k)?`<label class="f"><input type="checkbox" id="np_keep" checked> 다음에 이 이미지를 그릴 때도 화풍${k==='cg'?'·위치':'·자세·구도'} 유지</label>`:''}
-      <p class="muted" style="margin:6px 0 0">가중치는 <code>1.3::태그::</code>(강하게), <code>0.7::태그::</code>(약하게), 작가 태그는 <code>artist:이름</code>으로 써요.</p>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="naigo">그리기</button></div>`);
+    <input type="hidden" id="np_style" value="${esc(styleId)}"><div class="g2"><div><label class="f">그림체</label><p class="muted" style="margin:6px 0 0;font-size:.78rem;word-break:break-all">${esc(String(Core.naiStyle(c).tags||'').slice(0,80)||'태그 없음 (모델 기본)')}</p></div>
+    <div><label class="f" for="np_model">모델</label><select class="in" id="np_model">${CoreView.opt([...NAI_MODELS,...(NAI_MODELS.some(m=>m[0]===c.model)?[]:[[c.model,c.model]])],c.model)}</select></div></div>
+    <div class="g2"><div><label class="f" for="np_size">크기</label><select class="in" id="np_size">${CoreView.opt(sizes,sz)}</select></div>
+    ${k==='char'||ILK(k)?`<div><label class="f" for="np_frame">구도</label><select class="in" id="np_frame">${CoreView.opt(NAI_FRAMES,frame)}</select></div>`:'<div></div>'}</div>
+    ${k==='char'||ILK(k)?`<div class="g2"><div><label class="f" for="np_posesel">자세</label><select class="in" id="np_posesel">${c.poses.map(x=>`<option value="${esc(x.t)}" ${x.t===pose?'selected':''}>${esc(x.n)}</option>`).join('')}<option value="__custom" ${c.poses.some(x=>x.t===pose)?'':'selected'}>직접 입력</option></select></div><div><label class="f" for="np_pose">자세 태그</label><input class="in" id="np_pose" value="${esc(pose)}"></div></div>`:''}
+    ${Art.imgProvider()==='comfy'?'<p class="muted" style="margin:8px 0 0">ComfyUI로 그려요. 모델·샘플러는 워크플로를 따르고, 레퍼런스와 img2img는 NovelAI 전용이라 쓰지 않아요.</p>':''}
+    <label class="f" for="np_in">${k==='cg'?'장면 프롬프트 (전체)':'최종 프롬프트'} (직접 고쳐도 돼요)</label><textarea class="in" id="np_in" style="min-height:120px">${esc(p.input)}</textarea>
+    ${k==='cg'&&p.chars.length?`<h3 class="sec">캐릭터별 프롬프트</h3>${p.chars.map((x,i)=>`<div class="cgrow"><div class="g2"><div><label class="f">${esc(x.name)}</label><select class="in" id="np_cp${i}">${CoreView.opt(CG_POS_LABEL,x.pos)}</select></div><div></div></div><textarea class="in" id="np_cc${i}" data-cid="${x.id}">${esc(x.prompt)}</textarea></div>`).join('')}<p class="muted" style="margin:4px 0 0">위치는 2명 이상일 때 적용돼요. 하나라도 자동이 아니면 좌표를 써요.</p>`:''}
+    <label class="f" for="np_neg">네거티브</label><textarea class="in" id="np_neg">${esc(p.neg)}</textarea>
+    ${canRef?`<div class="optbox"><label class="f"><input type="checkbox" id="np_ref" ${k!=='char'&&Art.autoRefOn(k)?'checked':''}> ${k==='cg'?'등장 '+System.T('crew')+' 스탠딩을 캐릭터 레퍼런스로':'지금 스탠딩을 캐릭터 레퍼런스로 (얼굴과 머리 유지)'}</label>
+      <div class="g4"><div><label class="f" for="np_rtype">종류</label><select class="in" id="np_rtype">${CoreView.opt([['character','캐릭터'],['character&style','캐릭터+화풍'],['style','화풍만']],c.ref.type)}</select></div><div><label class="f" for="np_rstr">강도</label><select class="in" id="np_rstr">${CoreView.opt([[1,'1.0'],[0.8,'0.8'],[0.6,'0.6'],[0.4,'0.4']],c.ref.strength)}</select></div><div><label class="f" for="np_rfid">충실도</label><select class="in" id="np_rfid">${CoreView.opt([[1,'1.0'],[0.8,'0.8'],[0.6,'0.6'],[0.4,'0.4']],c.ref.fidelity)}</select></div><div></div></div>
+      <p class="muted" style="margin:4px 0 0">캐릭터 레퍼런스는 V4.5에서만 돼서 이번 생성은 ${esc(isV45(c.refModel)?c.refModel:'nai-diffusion-4-5-full')}로 그려요. Anlas가 더 들 수 있어요.</p></div>`:''}
+    ${hasImg?`<div class="optbox"><label class="f"><input type="checkbox" id="np_i2i"> 지금 이미지를 바탕으로 다시 그리기 (img2img)</label>
+      <div class="g2"><div><label class="f" for="np_istr">변화량</label><select class="in" id="np_istr">${CoreView.opt([[0.4,'0.4 조금'],[0.55,'0.55'],[0.7,'0.7'],[0.85,'0.85'],[1,'1.0 많이']],0.55)}</select></div><div><label class="f" for="np_inoise">노이즈</label><select class="in" id="np_inoise">${CoreView.opt([[0,'0'],[0.1,'0.1'],[0.2,'0.2']],0)}</select></div></div></div>`:''}
+    <div class="g2"><div><label class="f" for="np_seed">시드 (비우면 랜덤)</label><input class="in" id="np_seed" type="number" value="${esc(NLASTSEED[id]||'')}" placeholder="랜덤"></div><div></div></div>
+    ${k==='char'||k==='cg'||ILK(k)?`<label class="f"><input type="checkbox" id="np_keep" checked> 다음에 이 이미지를 그릴 때도 화풍${k==='cg'?'·위치':'·자세·구도'} 유지</label>`:''}
+    <p class="muted" style="margin:6px 0 0">가중치는 <code>1.3::태그::</code>(강하게), <code>0.7::태그::</code>(약하게), 작가 태그는 <code>artist:이름</code>으로 써요.</p>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="naigo">그리기</button></div>`);
   }
 
   static reNaiPrep(){
@@ -866,11 +866,11 @@ static say(el,msg){ const x=typeof el==='string'?$(el):el; if(x) x.textContent=m
   static skinCard(c,k){
     const slot=(x,l,o)=>`<div class="sk-slot ${x==='illust'||x==='lbcg'?'wide':''}">${o&&Art.imgSrcRaw(o)?`<img src="${esc(Art.imgSrcRaw(o))}" alt="">`:'<span>없음</span>'}<b>${l}</b><div class="sk-acts"><button class="btn sm" data-act="skpartgen" data-id="${c.id}" data-s="${k.id}" data-x="${x}">그리기</button><button class="btn sm ghost" data-act="skpartup" data-id="${c.id}" data-s="${k.id}" data-x="${x}">올리기</button>${o&&o.img?XBTN('skinpart',c.id,` data-s="${k.id}" data-x="${x}"`,'✕'):''}</div></div>`;
     return `<div class="sk-card"><div class="sk-h"><b>${esc(k.name)}</b><span><button class="btn sm" data-act="skpartall" data-id="${c.id}" data-s="${k.id}">빈 칸 모두 그리기</button> <button class="btn sm ghost" data-act="skindel" data-id="${c.id}" data-s="${k.id}">삭제</button></span></div>
-      <details><summary>의상 프롬프트 편집</summary><textarea class="in" id="skin_prompt_${k.id}" data-skin-prompt="${k.id}" data-owner="${c.id}">${esc(k.prompt||'')}</textarea><button class="btn sm" data-act="skinpromptsave" data-id="${c.id}" data-s="${k.id}">프롬프트 저장</button><p class="muted">저장한 내용은 이후 새로 그리는 그림에 적용돼요. 기존 그림은 유지돼요.</p></details><div class="sk-grid">${slot('stand','스탠딩',k)}${slot('upper','상반신',k.upper)}${slot('illust','일러스트',k.illust)}${slot('lbcg',System.T('limit')+' CG',k.lbcg)}</div>
-      <label class="f" for="skscene_${k.id}">일러스트·${System.T('limit')} CG 장면 태그 (선택)</label><input class="in" id="skscene_${k.id}" value="${esc(k.scene||'')}" placeholder="예: beach, sunset, waves, smile">
-      <div class="sk-extra"><b>표정</b> ${(k.faces||[]).filter(f=>Characters.imgSrc(f)).map(f=>`<span class="sk-face"><img src="${esc(Characters.imgSrc(f))}" alt=""><i>${esc(f.name)}</i></span>`).join('')||'<span class="muted">없음 · 없으면 이 '+esc(System.T('skin'))+' 스탠딩을 써요</span>'}<button class="btn sm ghost" data-act="faces-open" data-id="${c.id}" data-s="${k.id}">표정 만들기</button></div>
-      <div class="sk-extra"><b>대사</b> <span class="muted">${(k.lines||[]).length?esc((k.lines||[]).slice(0,2).join(' / '))+((k.lines||[]).length>2?' …':''):'없음 · 없으면 기본 대사를 써요'}</span><button class="btn sm ghost" data-act="skinlines" data-id="${c.id}" data-s="${k.id}">${(k.lines||[]).length?'대사 다시 쓰기':'AI로 대사 쓰기'}</button></div>
-      <div class="sk-extra"><b>목소리</b> <span class="muted">${k.voiceId?esc(k.voiceName||'지정됨'):'기본 목소리'}</span><button class="btn sm ghost" data-act="voice" data-id="${c.id}" data-s="${k.id}">${k.voiceId?'바꾸기':'이 '+esc(System.T('skin'))+' 목소리 고르기'}</button>${k.voiceId?`<button class="btn sm ghost" data-act="skvclear" data-id="${c.id}" data-s="${k.id}">기본으로</button>`:''}</div></div>`; }
+    <details><summary>의상 프롬프트 편집</summary><textarea class="in" id="skin_prompt_${k.id}" data-skin-prompt="${k.id}" data-owner="${c.id}">${esc(k.prompt||'')}</textarea><button class="btn sm" data-act="skinpromptsave" data-id="${c.id}" data-s="${k.id}">프롬프트 저장</button><p class="muted">저장한 내용은 이후 새로 그리는 그림에 적용돼요. 기존 그림은 유지돼요.</p></details><div class="sk-grid">${slot('stand','스탠딩',k)}${slot('upper','상반신',k.upper)}${slot('illust','일러스트',k.illust)}${slot('lbcg',System.T('limit')+' CG',k.lbcg)}</div>
+    <label class="f" for="skscene_${k.id}">일러스트·${System.T('limit')} CG 장면 태그 (선택)</label><input class="in" id="skscene_${k.id}" value="${esc(k.scene||'')}" placeholder="예: beach, sunset, waves, smile">
+    <div class="sk-extra"><b>표정</b> ${(k.faces||[]).filter(f=>Characters.imgSrc(f)).map(f=>`<span class="sk-face"><img src="${esc(Characters.imgSrc(f))}" alt=""><i>${esc(f.name)}</i></span>`).join('')||'<span class="muted">없음 · 없으면 이 '+esc(System.T('skin'))+' 스탠딩을 써요</span>'}<button class="btn sm ghost" data-act="faces-open" data-id="${c.id}" data-s="${k.id}">표정 만들기</button></div>
+    <div class="sk-extra"><b>대사</b> <span class="muted">${(k.lines||[]).length?esc((k.lines||[]).slice(0,2).join(' / '))+((k.lines||[]).length>2?' …':''):'없음 · 없으면 기본 대사를 써요'}</span><button class="btn sm ghost" data-act="skinlines" data-id="${c.id}" data-s="${k.id}">${(k.lines||[]).length?'대사 다시 쓰기':'AI로 대사 쓰기'}</button></div>
+    <div class="sk-extra"><b>목소리</b> <span class="muted">${k.voiceId?esc(k.voiceName||'지정됨'):'기본 목소리'}</span><button class="btn sm ghost" data-act="voice" data-id="${c.id}" data-s="${k.id}">${k.voiceId?'바꾸기':'이 '+esc(System.T('skin'))+' 목소리 고르기'}</button>${k.voiceId?`<button class="btn sm ghost" data-act="skvclear" data-id="${c.id}" data-s="${k.id}">기본으로</button>`:''}</div></div>`; }
 
   static artAfterAI(snap,label){
     if(!Core.imgReady()) return;
@@ -881,10 +881,10 @@ static say(el,msg){ const x=typeof el==='string'?$(el):el; if(x) x.textContent=m
     let tries=0; const show=()=>{ if((!$('#modal').hidden||!$('#ov').hidden)&&tries++<200) return setTimeout(show,3000); if(!$('#modal').hidden) return;
       ART_ASK=keys; const cnt={}; fresh.forEach(x=>{const n=({upper:'상반신',char:'스탠딩',illust:'일러스트',bg:'배경',enemy:'적',icon:'아이콘',map:'지도',cg:'CG',prop:'소품',weapon:System.T('weapon')})[x.cat]||x.cat; cnt[n]=(cnt[n]||0)+1;});
       CoreView.openModal(`${head('새 그림을 그릴까요?',`<span class="muted">${esc(label||'AI가 새로 만든 것')}</span>`)}
-        <p style="margin:0 0 8px">새로 생긴 그림 <b>${fresh.length}장</b> · ${Object.entries(cnt).map(([k,v])=>esc(k)+' '+v).join(', ')}</p>
-        <p class="muted" style="margin:0 0 12px">게임을 하는 동안 뒤에서 한 장씩 그려요. 위쪽 진행 표시에서 언제든 멈출 수 있어요.</p>
-        <div class="row"><button class="btn" data-act="artgo">그리기</button><button class="btn ghost" data-act="close">나중에</button></div>
-        <button class="linkb" data-act="artalways" style="margin-top:10px">앞으로는 묻지 않고 자동으로 그리기</button>`); };
+      <p style="margin:0 0 8px">새로 생긴 그림 <b>${fresh.length}장</b> · ${Object.entries(cnt).map(([k,v])=>esc(k)+' '+v).join(', ')}</p>
+      <p class="muted" style="margin:0 0 12px">게임을 하는 동안 뒤에서 한 장씩 그려요. 위쪽 진행 표시에서 언제든 멈출 수 있어요.</p>
+      <div class="row"><button class="btn" data-act="artgo">그리기</button><button class="btn ghost" data-act="close">나중에</button></div>
+      <button class="linkb" data-act="artalways" style="margin-top:10px">앞으로는 묻지 않고 자동으로 그리기</button>`); };
     setTimeout(show,600);
   }
 
@@ -933,10 +933,10 @@ static bgmPickShow(v){ document.querySelectorAll('#modal [data-act="bgmpick"]').
   static openUpConfirm(c,k){ const u=Economy.upPlan(c,k); if(!u) return;
     const ok=u.ok&&u.cost.every(x=>x[2]>=x[1]);
     CoreView.openModal(`${head(esc(c.name)+' · '+esc(u.title))}
-      <div class="upc"><div class="upc-ft"><span>${esc(u.from)}</span><b>→</b><span>${esc(u.to)}</span></div>
-      ${u.cost.length?`<div class="upc-cost">${u.cost.map(([n,need,have])=>`<div class="${have<need?'lack':''}"><span>${esc(n)}</span><b>${nf(need)}</b><i>보유 ${nf(have)}${have<need?' · '+nf(need-have)+' 부족':''}</i></div>`).join('')}</div>`:''}
-      ${u.note?`<p class="muted" style="margin:8px 0 0;font-size:.82rem">${esc(u.note)}</p>`:''}</div>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="upgo" data-k="${k}" data-id="${c.id}" ${ok?'':'disabled'}>${ok?'확인':'재료가 부족해요'}</button><button class="btn ghost" data-act="char" data-id="${c.id}">취소</button></div>`); }
+    <div class="upc"><div class="upc-ft"><span>${esc(u.from)}</span><b>→</b><span>${esc(u.to)}</span></div>
+    ${u.cost.length?`<div class="upc-cost">${u.cost.map(([n,need,have])=>`<div class="${have<need?'lack':''}"><span>${esc(n)}</span><b>${nf(need)}</b><i>보유 ${nf(have)}${have<need?' · '+nf(need-have)+' 부족':''}</i></div>`).join('')}</div>`:''}
+    ${u.note?`<p class="muted" style="margin:8px 0 0;font-size:.82rem">${esc(u.note)}</p>`:''}</div>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="upgo" data-k="${k}" data-id="${c.id}" ${ok?'':'disabled'}>${ok?'확인':'재료가 부족해요'}</button><button class="btn ghost" data-act="char" data-id="${c.id}">취소</button></div>`); }
 
   static skinSelHTML(sel,c,k){const required=c?.useStanding===false&&(!k||!Art.imgSrcRaw(k.upper)); return `<div class="prepcats">${[['upper','상반신'],['illust','일러스트 (로비)'],['lbcg',System.T('limit')+' CG (개화)'],['faces','표정 기본 6종 (얼굴 범위를 칠해요)'],['lines','이 '+System.T('skin')+' 전용 대사 (글 AI)']].map(([k,l])=>`<label class="pc"><input type="checkbox" data-skp="${k}" ${sel[k]||k==='upper'&&required?'checked':''} ${k==='lines'&&!SAMPLE||k==='upper'&&required?'disabled':''}><b>${esc(l)}${k==='upper'&&required?' (현재 표시 방식에 필수)':''}</b></label>`).join('')}</div>`; }
 
@@ -956,9 +956,9 @@ static bgmPickShow(v){ document.querySelectorAll('#modal [data-act="bgmpick"]').
 
     /* 대화방 화면(View) */
 static roomShow(c,it){ $('#phone').innerHTML=`<div class="phone"><div class="ph-top"><button data-act="${PH.sel?'phselend':'phback'}" aria-label="뒤로">‹</button><b>${PH.sel?'지울 메시지를 누르세요':esc(c.name)}</b>${PH.sel?`<button class="ph-done" data-act="phselend">완료</button>`:`<button data-act="phmenu" data-id="${esc(c.id)}" aria-label="메뉴">⋯</button>`}</div>
-      <div class="ph-chat ${PH.sel?'selmode':''}" id="phChat">${it.length?it.map((x,i)=>PH.sel?`<div class="phsel" data-act="phdel" data-i="${i}">${ArtView.bubbleHTML(x.l,c)}</div>`:ArtView.bubbleHTML(x.l,c)).join(''):`<div class="sys empty">${esc(c.name)}와(과)의 대화방이에요. 오른쪽 위 ⋯ → 대화 추가로 새 대화를 받거나, 아래에서 바로 말을 걸어 보세요.</div>`}</div>
-      <div class="ph-in" id="phIn" hidden></div>
-      <div class="ph-pend" id="phPend" hidden></div><div class="ph-in fcin" id="phFree" ${PH.sel?'hidden':''}><button class="btn sm ghost ph-sw" data-act="phmode" data-v="pick" hidden aria-label="선택지 보기">선택지</button><button class="btn sm ghost ph-cam" data-act="fcphoto" aria-label="사진 보내기" ${SAMPLE?'':'disabled'}>📷</button><textarea id="fcIn" rows="1" maxlength="400" placeholder="${SAMPLE?'메시지 보내기':'글 AI를 등록하면 직접 말을 걸 수 있어요'}" ${SAMPLE?'':'disabled'}></textarea><button class="btn sm" data-act="fcsend" ${SAMPLE?'':'disabled'}>전송</button></div></div>`;
+    <div class="ph-chat ${PH.sel?'selmode':''}" id="phChat">${it.length?it.map((x,i)=>PH.sel?`<div class="phsel" data-act="phdel" data-i="${i}">${ArtView.bubbleHTML(x.l,c)}</div>`:ArtView.bubbleHTML(x.l,c)).join(''):`<div class="sys empty">${esc(c.name)}와(과)의 대화방이에요. 오른쪽 위 ⋯ → 대화 추가로 새 대화를 받거나, 아래에서 바로 말을 걸어 보세요.</div>`}</div>
+    <div class="ph-in" id="phIn" hidden></div>
+    <div class="ph-pend" id="phPend" hidden></div><div class="ph-in fcin" id="phFree" ${PH.sel?'hidden':''}><button class="btn sm ghost ph-sw" data-act="phmode" data-v="pick" hidden aria-label="선택지 보기">선택지</button><button class="btn sm ghost ph-cam" data-act="fcphoto" aria-label="사진 보내기" ${SAMPLE?'':'disabled'}>📷</button><textarea id="fcIn" rows="1" maxlength="400" placeholder="${SAMPLE?'메시지 보내기':'글 AI를 등록하면 직접 말을 걸 수 있어요'}" ${SAMPLE?'':'disabled'}></textarea><button class="btn sm" data-act="fcsend" ${SAMPLE?'':'disabled'}>전송</button></div></div>`;
   }
 
   static phBubble(m,c){ const ch=$('#phChat'); if(!ch) return; ch.insertAdjacentHTML('beforeend',ArtView.bubbleHTML(m,c)); CoreView.phScroll(); }
@@ -1016,17 +1016,17 @@ static characterDetailArt(c,upper=false){
 
     /* 홈 화면에 추가 안내 창 내용(View) */
 static a2hsHTML(){ return `${head('홈 화면에 추가해 주세요',`<span class="muted">아이폰은 앱처럼 쓰려면 이 단계가 필요해요</span>`)}
-      <ol class="a2hs"><li>Safari 아래쪽(또는 위쪽)의 <b>공유 버튼</b> <span class="kbd">⬆︎</span>을 눌러요.</li><li>목록을 내려서 <b>홈 화면에 추가</b>를 눌러요.</li><li>오른쪽 위 <b>추가</b>를 누르면 홈 화면에 '가챠 메이커' 아이콘이 생겨요.</li><li>앞으로는 그 아이콘으로 열어요. 전체 화면으로 열리고, 저장한 게임도 안전하게 남아요.</li></ol>
-      <p class="muted">Safari 탭에서 그냥 쓰면 오래 안 열었을 때 아이폰이 저장 데이터를 지울 수 있어요. 가끔 설정 → 백업으로 내보내 두면 더 안전해요.</p>
-      ${System.pcOrigin()?'<p class="muted"><b>PC 서버로 접속 중이에요.</b> 게임은 PC에 저장되니 홈 화면에 추가하지 않아도 돼요. 바깥 주소(trycloudflare)는 PC 서버를 켤 때마다 바뀌어서, 홈 화면 아이콘은 다음에 안 열릴 수 있어요. 그럴 땐 PC의 QR을 다시 찍으면 PC에 저장된 게임이 그대로 이어져요.</p>':''}
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="close">알겠어요</button></div>`; }
+    <ol class="a2hs"><li>Safari 아래쪽(또는 위쪽)의 <b>공유 버튼</b> <span class="kbd">⬆︎</span>을 눌러요.</li><li>목록을 내려서 <b>홈 화면에 추가</b>를 눌러요.</li><li>오른쪽 위 <b>추가</b>를 누르면 홈 화면에 '가챠 메이커' 아이콘이 생겨요.</li><li>앞으로는 그 아이콘으로 열어요. 전체 화면으로 열리고, 저장한 게임도 안전하게 남아요.</li></ol>
+    <p class="muted">Safari 탭에서 그냥 쓰면 오래 안 열었을 때 아이폰이 저장 데이터를 지울 수 있어요. 가끔 설정 → 백업으로 내보내 두면 더 안전해요.</p>
+    ${System.pcOrigin()?'<p class="muted"><b>PC 서버로 접속 중이에요.</b> 게임은 PC에 저장되니 홈 화면에 추가하지 않아도 돼요. 바깥 주소(trycloudflare)는 PC 서버를 켤 때마다 바뀌어서, 홈 화면 아이콘은 다음에 안 열릴 수 있어요. 그럴 땐 PC의 QR을 다시 찍으면 PC에 저장된 게임이 그대로 이어져요.</p>':''}
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="close">알겠어요</button></div>`; }
 
   static openProxySet(){
     CoreView.openModal(`${head('중계 서버 (아이폰·웹)')}
-      <p class="muted">브라우저는 보안 규칙(CORS) 때문에 일부 AI 서비스에 직접 연결하지 못해요. 그럴 때만 중계 서버를 거쳐요. 직접 연결이 되는 서비스는 그대로 직접 연결해요.</p>
-      <label class="f" for="px_url">중계 서버 주소</label><input class="in" id="px_url" value="${esc(System.webProxy())}" placeholder="https://내-이름.workers.dev">
-      <p class="muted" style="margin:6px 0 0">Cloudflare Workers나 Vercel에 무료로 직접 만들 수 있어요. 만드는 법은 배포 페이지 README의 '아이폰' 항목과 proxy 폴더에 있어요(Vercel은 proxy/vercel). 중계 서버를 거치는 요청에는 API 키가 함께 지나가니, 내가 만든 서버나 믿을 수 있는 서버만 넣어 주세요.</p>
-      <div class="row" style="margin-top:14px"><button class="btn" data-act="pxsave">저장</button><button class="btn ghost" data-act="pxtest">연결 확인</button></div>`); }
+    <p class="muted">브라우저는 보안 규칙(CORS) 때문에 일부 AI 서비스에 직접 연결하지 못해요. 그럴 때만 중계 서버를 거쳐요. 직접 연결이 되는 서비스는 그대로 직접 연결해요.</p>
+    <label class="f" for="px_url">중계 서버 주소</label><input class="in" id="px_url" value="${esc(System.webProxy())}" placeholder="https://내-이름.workers.dev">
+    <p class="muted" style="margin:6px 0 0">Cloudflare Workers나 Vercel에 무료로 직접 만들 수 있어요. 만드는 법은 배포 페이지 README의 '아이폰' 항목과 proxy 폴더에 있어요(Vercel은 proxy/vercel). 중계 서버를 거치는 요청에는 API 키가 함께 지나가니, 내가 만든 서버나 믿을 수 있는 서버만 넣어 주세요.</p>
+    <div class="row" style="margin-top:14px"><button class="btn" data-act="pxsave">저장</button><button class="btn ghost" data-act="pxtest">연결 확인</button></div>`); }
 
   static refreshForm(){ if(FORM) CharactersView.openFormation(FORM.stage,FORM.ctx,FORM.startAct); }
 
@@ -1040,10 +1040,10 @@ static a2hsHTML(){ return `${head('홈 화면에 추가해 주세요',`<span cla
   static openProjects(){
     const pj=Core.PJ();
     CoreView.openModal(`${head('게임 목록')}
-      ${pj.list.map(x=>`<div class="ep"><span class="t"><b>${esc(x.title)}</b><span class="muted">${x.id===pj.active?'지금 플레이 중':''}${x.sub?' · 🔗 구독':''}</span></span><button class="btn sm ghost" data-act="swpjdraft" data-id="${x.id}">초안으로 새로</button><button class="btn sm ghost" data-act="pjdraftx" data-id="${x.id}">초안 내보내기</button><button class="btn sm ghost" data-act="pjreroll" data-id="${x.id}">🎲 그림 유지 리롤</button>${x.id===pj.active?'':`<button class="btn sm" data-act="pjswitch" data-id="${x.id}">전환</button><button class="btn sm ghost" data-act="pjdel" data-id="${x.id}">삭제</button>`}</div>`).join('')}
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="draft-open">AI로 새 게임 만들기 (초안)</button><button class="btn ghost" data-act="pjblank">기본 게임 복사본 만들기</button></div>
-      <label class="f" for="pj_start">앱을 켤 때</label><select class="in" id="pj_start" onchange="try{appStorage.setItem('ggm-start',this.value)}catch(e){}">${CoreView.opt([['last','마지막으로 한 게임 바로 시작'],['pick','게임 목록에서 골라서 시작']],Art.startMode())}</select>
-      <p class="muted">게임마다 진행 상황, ${System.T('crew')}, 스토리가 따로 저장돼요. 이미지와 소리는 기기 안에 같이 보관돼요.</p>`);
+    ${pj.list.map(x=>`<div class="ep"><span class="t"><b>${esc(x.title)}</b><span class="muted">${x.id===pj.active?'지금 플레이 중':''}${x.sub?' · 🔗 구독':''}</span></span><button class="btn sm ghost" data-act="swpjdraft" data-id="${x.id}">초안으로 새로</button><button class="btn sm ghost" data-act="pjdraftx" data-id="${x.id}">초안 내보내기</button><button class="btn sm ghost" data-act="pjreroll" data-id="${x.id}">🎲 그림 유지 리롤</button>${x.id===pj.active?'':`<button class="btn sm" data-act="pjswitch" data-id="${x.id}">전환</button><button class="btn sm ghost" data-act="pjdel" data-id="${x.id}">삭제</button>`}</div>`).join('')}
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="draft-open">AI로 새 게임 만들기 (초안)</button><button class="btn ghost" data-act="pjblank">기본 게임 복사본 만들기</button></div>
+    <label class="f" for="pj_start">앱을 켤 때</label><select class="in" id="pj_start" onchange="try{appStorage.setItem('ggm-start',this.value)}catch(e){}">${CoreView.opt([['last','마지막으로 한 게임 바로 시작'],['pick','게임 목록에서 골라서 시작']],Art.startMode())}</select>
+    <p class="muted">게임마다 진행 상황, ${System.T('crew')}, 스토리가 따로 저장돼요. 이미지와 소리는 기기 안에 같이 보관돼요.</p>`);
   }
 
   static drRead(){ if(!DR2||!$('#drPage')) return; const v=id=>{const el=$('#'+id);return el?(el.type==='checkbox'?el.checked:el.value):undefined;}, set=(k,id,f)=>{const x=v(id); if(x!==undefined) DR2[k]=f?f(x):x;};
@@ -1054,33 +1054,33 @@ static a2hsHTML(){ return `${head('홈 화면에 추가해 주세요',`<span cla
 
   static drTabHTML(k){ const d=DR2, sec=(id,h)=>`<section data-dr="${id}" ${DRTAB===id?'':'hidden'}>${h}</section>`;
     if(k==='theme') return sec('theme',`<h3 class="sec">테마</h3><p class="muted dr-help">장르, 분위기, 화면 테마, 규모를 정해요. 비워도 되는 칸은 AI가 채워요.</p>
-      <label class="f" for="dr_gtitle">게임 이름 (선택 · 비우면 AI가 지어요)</label><input class="in" id="dr_gtitle" maxlength="30" value="${esc(d.gtitle||'')}" placeholder="예: 심연잔향, 어비스 에코">
-      <label class="f" for="dr_crew">아군 호칭 <span class="muted" style="font-size:.75rem">(유닛 이름 · 비우면 AI가 새로 지어요)</span></label><input class="in" id="dr_crew" maxlength="8" value="${esc(d.crewTerm||'')}" placeholder="예: 대원, 요원, 사도">
-      <label class="f" for="dr_cast">등장인물 성별</label><select class="in" id="dr_cast">${CoreView.opt([['','AI가 정하기 (키워드에 맞게)'],['f','여성만'],['m','남성만'],['mix','여성 + 남성 혼성']],d.castSex||'')}</select>
-      <label class="f" for="ng_kw">장르와 키워드</label><textarea class="in" id="ng_kw" placeholder="예: 정통 판타지. 몰락한 왕국을 되찾는 용병단.">${esc(d.kw)}</textarea>
-      <label class="f" for="ng_tone">분위기</label><input class="in" id="ng_tone" value="${esc(d.tone)}" placeholder="예: 진지하고 비장하게">
-      <div class="g2"><div><label class="f" for="ng_theme">화면 테마</label><select class="in" id="ng_theme">${CoreView.opt([['auto','AI가 고르기'],['tactical','택티컬'],['fantasy','판타지'],['neon','네온 사이버'],['pastel','파스텔'],['noir','모노 누아르']],d.theme)}</select></div>
-      <div><label class="f" for="ng_n">${esc(d.crewTerm||'동료')} 수 (인물 탭에 적은 인물 포함)</label><select class="in" id="ng_n">${CoreView.opt([[6,'6명'],[8,'8명'],[10,'10명'],[12,'12명']],d.n)}</select></div></div>
-      <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng_fan" ${d.fan?'checked':''} onchange="document.getElementById('ng_srcw').hidden=!this.checked"><span><b>2차 창작</b> <span class="muted" style="font-size:.8rem">(원작 세계관·캐릭터로 만들기)</span></span></label>
-      <div id="ng_srcw" ${d.fan?'':'hidden'}><label class="f" for="ng_src">원작 이름</label><input class="in" id="ng_src" value="${esc(d.src)}" placeholder="예: 작품 이름"><p class="muted" style="margin:4px 0 0;font-size:.78rem">원작에서 미성년자·학생인 캐릭터는 넣지 않고 성인 캐릭터만 써요. 개인 감상용으로만 써 주세요.</p></div>
-      ${ArtView.drPresetHTML()}
-      <label class="f" for="ng_style">이 게임 그림체 태그 (선택 · 프리셋보다 우선)</label><input class="in" id="ng_style" value="${esc(d.style)}" placeholder="예: dark fantasy, muted colors">
-      <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng_con" ${d.con?'checked':''}><span><b>건조/영입 사용</b> <span class="muted" style="font-size:.8rem">(자원 4종을 넣어 영입 · 기본 ${esc(d.crewTerm||'동료')}은(는) 뽑기, 특별 의상 바리에이션은 건조로 · 나중에 설정에서 켜고 끌 수 있어요)</span></span></label>
-      ${SystemView.storyFormHTML({plot:d.story,stages:d.stages,len:d.len,depth:d.depth,newc:d.newc,talkOnly:d.talkOnly})}
-      <button class="btn sm ghost" data-act="drpolish" data-k="story">✦ 스토리 개요 AI로 다듬기</button>`);
+    <label class="f" for="dr_gtitle">게임 이름 (선택 · 비우면 AI가 지어요)</label><input class="in" id="dr_gtitle" maxlength="30" value="${esc(d.gtitle||'')}" placeholder="예: 심연잔향, 어비스 에코">
+    <label class="f" for="dr_crew">아군 호칭 <span class="muted" style="font-size:.75rem">(유닛 이름 · 비우면 AI가 새로 지어요)</span></label><input class="in" id="dr_crew" maxlength="8" value="${esc(d.crewTerm||'')}" placeholder="예: 대원, 요원, 사도">
+    <label class="f" for="dr_cast">등장인물 성별</label><select class="in" id="dr_cast">${CoreView.opt([['','AI가 정하기 (키워드에 맞게)'],['f','여성만'],['m','남성만'],['mix','여성 + 남성 혼성']],d.castSex||'')}</select>
+    <label class="f" for="ng_kw">장르와 키워드</label><textarea class="in" id="ng_kw" placeholder="예: 정통 판타지. 몰락한 왕국을 되찾는 용병단.">${esc(d.kw)}</textarea>
+    <label class="f" for="ng_tone">분위기</label><input class="in" id="ng_tone" value="${esc(d.tone)}" placeholder="예: 진지하고 비장하게">
+    <div class="g2"><div><label class="f" for="ng_theme">화면 테마</label><select class="in" id="ng_theme">${CoreView.opt([['auto','AI가 고르기'],['tactical','택티컬'],['fantasy','판타지'],['neon','네온 사이버'],['pastel','파스텔'],['noir','모노 누아르']],d.theme)}</select></div>
+    <div><label class="f" for="ng_n">${esc(d.crewTerm||'동료')} 수 (인물 탭에 적은 인물 포함)</label><select class="in" id="ng_n">${CoreView.opt([[6,'6명'],[8,'8명'],[10,'10명'],[12,'12명']],d.n)}</select></div></div>
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng_fan" ${d.fan?'checked':''} onchange="document.getElementById('ng_srcw').hidden=!this.checked"><span><b>2차 창작</b> <span class="muted" style="font-size:.8rem">(원작 세계관·캐릭터로 만들기)</span></span></label>
+    <div id="ng_srcw" ${d.fan?'':'hidden'}><label class="f" for="ng_src">원작 이름</label><input class="in" id="ng_src" value="${esc(d.src)}" placeholder="예: 작품 이름"><p class="muted" style="margin:4px 0 0;font-size:.78rem">원작에서 미성년자·학생인 캐릭터는 넣지 않고 성인 캐릭터만 써요. 개인 감상용으로만 써 주세요.</p></div>
+    ${ArtView.drPresetHTML()}
+    <label class="f" for="ng_style">이 게임 그림체 태그 (선택 · 프리셋보다 우선)</label><input class="in" id="ng_style" value="${esc(d.style)}" placeholder="예: dark fantasy, muted colors">
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng_con" ${d.con?'checked':''}><span><b>건조/영입 사용</b> <span class="muted" style="font-size:.8rem">(자원 4종을 넣어 영입 · 기본 ${esc(d.crewTerm||'동료')}은(는) 뽑기, 특별 의상 바리에이션은 건조로 · 나중에 설정에서 켜고 끌 수 있어요)</span></span></label>
+    ${SystemView.storyFormHTML({plot:d.story,stages:d.stages,len:d.len,depth:d.depth,newc:d.newc,talkOnly:d.talkOnly})}
+    <button class="btn sm ghost" data-act="drpolish" data-k="story">✦ 스토리 개요 AI로 다듬기</button>`);
     if(k==='world') return sec('world',`<div class="dr-h"><h3 class="sec">세계관</h3><span class="muted">${nf(d.world.length)}자 / 권장 8,000</span></div><p class="muted dr-help">역사, 사회 구조, 기술이나 마법의 규칙, 지금 벌어지는 갈등, 사람들이 일상에서 겪는 불편까지. 고유명사와 구체적인 디테일이 많을수록 AI가 지어낼 틈이 줄어요. 플레이어에게 숨길 반전은 여기 말고 <b>설정</b> 탭에 '비밀'로 따로 적어 두세요.</p>
-      <textarea class="in dr-big" id="dr_world" placeholder="예) 대붕괴 이후 300년. 도시는 운하로 나뉜 일곱 구역으로 이루어져 있고…">${esc(d.world)}</textarea>
-      <button class="btn sm ghost" data-act="drpolish" data-k="world">✦ AI로 다듬기</button>`);
+    <textarea class="in dr-big" id="dr_world" placeholder="예) 대붕괴 이후 300년. 도시는 운하로 나뉜 일곱 구역으로 이루어져 있고…">${esc(d.world)}</textarea>
+    <button class="btn sm ghost" data-act="drpolish" data-k="world">✦ AI로 다듬기</button>`);
     if(k==='setting') return sec('setting',`<div class="dr-h"><h3 class="sec">설정</h3><span class="muted">${nf(d.setting.length)}자</span></div><p class="muted dr-help">세력과 조직, 고유 용어, 전투·능력의 규칙, 그리고 '비밀:'로 시작하는 줄에 숨겨진 진실과 반전을 적어요. 비밀은 AI가 이야기 속에서 천천히 드러내고, 개인 채팅 같은 곳에서는 새지 않게 해요.</p>
-      <textarea class="in dr-big" id="dr_setting" placeholder="세력: 운하 길드 — 물길을 쥔 상인 연합…&#10;용어: 잔광 — 대붕괴 때 남은 빛의 파편…&#10;비밀: 길드장은 사실 대붕괴를 일으킨 장본인이다.">${esc(d.setting)}</textarea>
-      <button class="btn sm ghost" data-act="drpolish" data-k="setting">✦ AI로 다듬기</button>`);
+    <textarea class="in dr-big" id="dr_setting" placeholder="세력: 운하 길드 — 물길을 쥔 상인 연합…&#10;용어: 잔광 — 대붕괴 때 남은 빛의 파편…&#10;비밀: 길드장은 사실 대붕괴를 일으킨 장본인이다.">${esc(d.setting)}</textarea>
+    <button class="btn sm ghost" data-act="drpolish" data-k="setting">✦ AI로 다듬기</button>`);
     if(k==='chars') return sec('chars',`<div class="dr-h"><h3 class="sec">인물</h3><span class="muted">${d.chars.length}명</span></div><p class="muted dr-help">꼭 넣고 싶은 동료을(를) 적어요. 적은 이름과 설정은 그대로 쓰고, 빈 칸과 모자란 인원은 AI가 채워요.</p>
-      ${d.chars.map((c,i)=>`<div class="dr-card"><div class="g2" style="margin-bottom:4px"><div><label class="f">구분</label><select class="in" data-dc="kind" data-i="${i}">${CoreView.opt([['crew',(d.crewTerm||'동료')+' (뽑기·편성 가능)'],['npc','NPC (스토리 조연, 그림만)']],c.kind||'crew')}</select></div><div><label class="f">등급</label><select class="in" data-dc="rank" data-i="${i}" ${c.kind==='npc'?'disabled':''}>${CoreView.opt([['','AI가 정하기'],['3','SSR'],['2','SR'],['1','R']],c.rank||'')}</select></div></div><div class="g2"><div><label class="f">이름</label><input class="in" data-dc="name" data-i="${i}" value="${esc(c.name||'')}"></div><div><label class="f">역할·한 줄 소개</label><input class="in" data-dc="role" data-i="${i}" value="${esc(c.role||'')}" placeholder="예: 무뚝뚝한 저격수"></div></div>
-        <label class="f">성격·과거·관계</label><textarea class="in" data-dc="profile" data-i="${i}">${esc(c.profile||'')}</textarea>
-        <div class="g2"><div><label class="f">말투</label><input class="in" data-dc="speech" data-i="${i}" value="${esc(c.speech||'')}" placeholder="예: 짧게 끊는 반말"></div><div><label class="f">외모</label><input class="in" data-dc="look" data-i="${i}" value="${esc(c.look||'')}" placeholder="예: 은발 포니테일, 검은 코트"></div></div>
-        <label class="f">외형 프롬프트 <span class="muted" style="font-size:.75rem">(선택 · 그림 AI 영어 태그. 적으면 AI가 바꾸지 않고 그대로 그려요)</span></label><textarea class="in" data-dc="tags" data-i="${i}" style="min-height:52px" placeholder="예: 1girl, solo, silver hair, ponytail, red eyes, black long coat, gloves">${esc(c.tags||'')}</textarea>
-        <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="drcfill" data-i="${i}">✦ AI로 다듬기</button><button class="btn sm ghost" data-act="drcdel" data-i="${i}">삭제</button></div></div>`).join('')}
-      <button class="btn sm" data-act="drcadd">＋ 인물 추가</button>`);
+    ${d.chars.map((c,i)=>`<div class="dr-card"><div class="g2" style="margin-bottom:4px"><div><label class="f">구분</label><select class="in" data-dc="kind" data-i="${i}">${CoreView.opt([['crew',(d.crewTerm||'동료')+' (뽑기·편성 가능)'],['npc','NPC (스토리 조연, 그림만)']],c.kind||'crew')}</select></div><div><label class="f">등급</label><select class="in" data-dc="rank" data-i="${i}" ${c.kind==='npc'?'disabled':''}>${CoreView.opt([['','AI가 정하기'],['3','SSR'],['2','SR'],['1','R']],c.rank||'')}</select></div></div><div class="g2"><div><label class="f">이름</label><input class="in" data-dc="name" data-i="${i}" value="${esc(c.name||'')}"></div><div><label class="f">역할·한 줄 소개</label><input class="in" data-dc="role" data-i="${i}" value="${esc(c.role||'')}" placeholder="예: 무뚝뚝한 저격수"></div></div>
+      <label class="f">성격·과거·관계</label><textarea class="in" data-dc="profile" data-i="${i}">${esc(c.profile||'')}</textarea>
+      <div class="g2"><div><label class="f">말투</label><input class="in" data-dc="speech" data-i="${i}" value="${esc(c.speech||'')}" placeholder="예: 짧게 끊는 반말"></div><div><label class="f">외모</label><input class="in" data-dc="look" data-i="${i}" value="${esc(c.look||'')}" placeholder="예: 은발 포니테일, 검은 코트"></div></div>
+      <label class="f">외형 프롬프트 <span class="muted" style="font-size:.75rem">(선택 · 그림 AI 영어 태그. 적으면 AI가 바꾸지 않고 그대로 그려요)</span></label><textarea class="in" data-dc="tags" data-i="${i}" style="min-height:52px" placeholder="예: 1girl, solo, silver hair, ponytail, red eyes, black long coat, gloves">${esc(c.tags||'')}</textarea>
+      <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="drcfill" data-i="${i}">✦ AI로 다듬기</button><button class="btn sm ghost" data-act="drcdel" data-i="${i}">삭제</button></div></div>`).join('')}
+    <button class="btn sm" data-act="drcadd">＋ 인물 추가</button>`);
     if(k==='hero') return sec('hero',`<h3 class="sec">주인공</h3>${ArtView.drHeroHTML()}`);
     return ''; }
 
@@ -1089,10 +1089,10 @@ static drRerender(){ CoreView.modalKeep(StoryView.openDraft); }
 
   static openRelEdit(id){ const r=World.RELS().find(x=>x.id===id); if(!r) return;
     CoreView.openModal(`${head('관계 고치기',`<span class="muted">${esc(Core.relName(r.a,true))} ↔ ${esc(Core.relName(r.b,true))}</span>`)}
-      <label class="f" for="rle_k">관계</label><input class="in" id="rle_k" maxlength="16" value="${esc(r.kind||'')}">
-      <label class="f" for="rle_n">설명</label><textarea class="in" id="rle_n" maxlength="240">${esc(r.note||'')}</textarea>
-      <label class="f" for="rle_h">있었던 일 (한 줄에 하나, 최근이 아래)</label><textarea class="in" id="rle_h">${esc((r.hist||[]).map(h=>(h.src?h.src+' · ':'')+h.text).join('\n'))}</textarea>
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="relsave" data-id="${r.id}">저장</button><button class="btn ghost" data-act="reldel" data-id="${r.id}">이 관계 지우기</button><button class="btn ghost" data-act="relgo" data-r="${esc(RELC)}">돌아가기</button></div>`); }
+    <label class="f" for="rle_k">관계</label><input class="in" id="rle_k" maxlength="16" value="${esc(r.kind||'')}">
+    <label class="f" for="rle_n">설명</label><textarea class="in" id="rle_n" maxlength="240">${esc(r.note||'')}</textarea>
+    <label class="f" for="rle_h">있었던 일 (한 줄에 하나, 최근이 아래)</label><textarea class="in" id="rle_h">${esc((r.hist||[]).map(h=>(h.src?h.src+' · ':'')+h.text).join('\n'))}</textarea>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="relsave" data-id="${r.id}">저장</button><button class="btn ghost" data-act="reldel" data-id="${r.id}">이 관계 지우기</button><button class="btn ghost" data-act="relgo" data-r="${esc(RELC)}">돌아가기</button></div>`); }
 
   static async updateDownloadHTML(base,path,man){
    let response;try{response=await System.http(base+path+'?t='+Date.now(),{timeout:60000,binary:true});}catch(e){throw Error('업데이트 실행 파일을 확인하지 못했어요. 다시 확인해 주세요.');}

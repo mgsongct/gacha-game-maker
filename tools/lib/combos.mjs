@@ -3,12 +3,12 @@
 //                       응답에서 코드가 읽는 키(답 받는 변수의 속성). 흐름은 tools/lib/prompts.mjs promptFlow와 같음
 //   checkPrompt      — 실제로 보낸 프롬프트 글 하나 검사: 깨짐(안 채운 자리·undefined·빈 머리말·표식·형식 견본) · 과잉(같은 줄·같은 조각 되풀이, 충돌 지시, 읽지 않는 키 요구) · 과소(형식 지시 없음, 읽는데 요구하지 않은 키)
 //   동적 실행(상황별로 실제 index.html에서 프롬프트를 받아 봄)은 tools/play/combos.mjs
-import { walk } from './source.mjs';
+import { walk, calleeName } from './source.mjs';
 import { promptFlow, outputPos, promptText, ownText } from './prompts.mjs';
 import { promptConflicts } from '../play/lib/conflicts.mjs';
 
 const FN = new Set(['function_declaration', 'function_expression', 'arrow_function', 'method_definition']);
-const callee = n => n.childForFieldName('function')?.text;
+const callee = calleeName; // Class.이름(…)은 이름으로(lib/source.mjs)
 const short = (t, n = 70) => String(t).replace(/\s+/g, ' ').trim().slice(0, n);
 export function fragmentIds(units) { const ids = new Set(); for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'call_expression' && callee(n) === 'pfDef') { const a = n.childForFieldName('arguments')?.namedChildren[0]; if (a?.type === 'string') ids.add(a.text.slice(1, -1)); } }); return ids; }
 // 조건 속 상황 변수: G.meta.x·storyCfg().x·draft.x 같은 멤버 사슬과 이름(키워드·짧은 지역 이름 뺌)

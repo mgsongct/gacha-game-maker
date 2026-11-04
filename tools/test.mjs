@@ -260,10 +260,36 @@ assert.ok(!stateFlow(units, fns).writeOnly.some(x => x.key === 'P().scene'), 'G.
   const T = tdzRefs(await loadUnits(r10)).map(x => x.name).sort(); assert.deepEqual(T, ['B', 'OK'], 'TDZ: ' + JSON.stringify(T));
   /* 불러올 때 부르는 함수도 따라감(바로 넘긴 콜백 포함) — 갈래 안·타이머·객체 칸의 함수는 안 따라감 */
   writeFileSync(join(r10, 'src/main/010-a.js'), "function norm(x){ return K[x]; }\nfunction sync(xs){ xs.forEach(x=>norm(x)); if(xs.q) return Q; setTimeout(()=>R,1); return {get:()=>S}; }\nconst G0 = sync([1]);\nconst K = {}, Q = 1, R = 2, S = 3;\n"); writeFileSync(join(r10, 'src/main/020-b.js'), "\n");
-  const T2 = tdzRefs(await loadUnits(r10)).map(x => x.name).sort(); assert.deepEqual(T2, ['K'], 'TDZ(불러올 때 부른 함수): ' + JSON.stringify(T2));
+  const T2a = tdzRefs(await loadUnits(r10)), T2 = T2a.filter(x => !x.cond).map(x => x.name).sort(); assert.deepEqual([T2, T2a.filter(x => x.cond).map(x => x.name)], [['K'], ['Q']], 'TDZ(불러올 때 부른 함수 — 늘 도는 길 K, 갈래 안 Q): ' + JSON.stringify(T2a));
   /* class로 옮긴 코드(tools/reshape.mjs): static 메서드 = 함수, Class.이름(…) = 부름, 임시 다리(function n(...a){ return C.n(...a); })는 함수로 안 셈 · TDZ·도달·전역 만드는 메서드도 같이 */
   writeFileSync(join(r10, 'src/main/010-a.js'), "class Box {\n  static def(k,v){ Object.defineProperty(window,k,{get:v}); }\n  static boot(){ return Box.read(); }\n  static read(){ return K2; }\n  static dead(){ return 1; }\n}\nfunction read(...a) { return Box.read(...a); }\nBox.def('RULE',()=>1);\nconst X = Box.boot();\nconst K2 = RULE;\n");
   const U12 = await loadUnits(r10), g12 = buildGraph(U12), T3 = tdzRefs(U12).map(x => x.name), { undefinedNames: un12 } = await import('./lib/extra.mjs'), R12 = reachable(U12, g12.fns);
+  /* 표 칸 함수를 칸 이름으로 부름(s.fill(v) — PROG_SLOTS.raid.fill = Ch.fill): 불러올 때 도는 render → tick → s.fill → 뒤에 선언된 TAG(재설계 1단계에서 앱이 안 뜬 꼴) */
+  writeFileSync(join(r10, 'src/main/020-b.js'), "class Ch {\n  static fill(r){ return [r].flatMap(Ch.split); }\n  static split(l){ return TAG.test(l); }\n}\nconst SLOTS = { raid: { fill: Ch.fill, make: x=>X0 } };\nfunction tick(){ for (const k in SLOTS) { const s = SLOTS[k]; s.make(1); s.fill(1); } }\ntick();\nconst TAG = /x/, X0 = 1;\n");
+  const T4 = tdzRefs(await loadUnits(r10)).map(x => x.name).sort(); writeFileSync(join(r10, 'src/main/020-b.js'), "\n");
+  assert.ok(T4.includes('TAG') && T4.includes('X0'), 'TDZ(표 칸 함수): ' + JSON.stringify(T4));
+  /* 갈래 안(data에 따라 도는 길)도 cond로 잡음 · 선언 올리기(tools/reshape.mjs --hoist): 부작용 없는 선언만 실행 문장 앞으로(원래 순서), 앱 함수를 부르거나 안 올린 이름을 읽는 선언은 둠 */
+  writeFileSync(join(r10, 'src/main/020-b.js'), "function boot(g){ if(g.x) save(); }\nfunction save(){ dirty.add(1); }\nboot({x:1});\nlet dirty=new Set(), CX=Object.fromEntries([['a',1]].map(([k,v])=>[k,v])), LK=pick(), N2=LK+1, F=x=>later(x);\nfunction pick(){ return 1; }\n");
+  const T5 = tdzRefs(await loadUnits(r10)); assert.ok(T5.some(x => x.name === 'dirty' && x.cond), 'TDZ(갈래 안): ' + JSON.stringify(T5));
+  { const { hoistPlan } = await import('./reshape.mjs'), { tsInit } = await import('./lib/source.mjs'), { parser } = await tsInit(), src5 = "go();\nconst A=1, B=[A].map(x=>x+1);\nconst C=app();\nconst D=C+1, E=()=>C;\nlet S=new Set();\n", P5 = hoistPlan(src5, parser.parse(src5).rootNode);
+    assert.deepEqual([P5.up.flatMap(x => x.decl), P5.rest.flatMap(x => x.decl)], [['A', 'B', 'S'], ['C', 'D', 'E']], '선언 올리기: ' + JSON.stringify(P5.rest.map(x => x.why))); }
+  writeFileSync(join(r10, 'src/main/020-b.js'), "\n");
+  /* 재설계 도구(tools/reshape.mjs): 글 안 줄은 들여쓰기를 더하거나 빼지 않음(--strings·indentCode) · 조각 등록 모으기(--studio) · 시험 도구의 다리 덮어쓰기 → Class.이름(--drivers) */
+  { const R = await import('./reshape.mjs'), { tsInit } = await import('./lib/source.mjs'), { parser } = await tsInit();
+    const s6 = "class A {\n  static f(){ return `가\n    나\n  다`; }\n}\n", F6 = await R.stringFixes(s6); assert.equal(F6.text, "class A {\n  static f(){ return `가\n  나\n다`; }\n}\n", '글 안 줄 되돌리기: ' + F6.text);
+    const s7 = "f(1, `x\ny`);\n", r7 = parser.parse(s7).rootNode; assert.equal(R.indentCode(s7, 0, R.textNewlines(r7)), "f(1, `x\ny`);\n  ", '코드 줄만 들여 씀');
+    const s8 = "const A=1;\nSystem.pfDef('X','x',()=>A);\ngo();\nPromptStudio.pfDef('Y','y',()=>`a\nb`);\n", P8 = R.studioPlan(s8, parser.parse(s8).rootNode); assert.ok(P8.length === 2 && P8[1].text.includes('`a\nb`') && P8[0].text.startsWith('    System.pfDef'), '조각 등록 모으기: ' + JSON.stringify(P8.map(x => x.text)));
+    const E9 = R.driverEdits("x\nconst t = toast; toast = m => t(m); window.reload = () => {};\n", 'd.mjs', [{ at: 'd.mjs:2', name: 'toast', to: 'CoreView' }, { at: 'd.mjs:2', name: 'reload', to: 'SystemView' }]);
+    assert.equal(E9.text, "x\nconst t = CoreView.toast; CoreView.toast = m => t(m); SystemView.reload = () => {};\n", '다리 덮어쓰기 바꾸기: ' + E9.text);
+    const M10 = R.moveMethod({ 'a.js': "class A {\n  /* 설명 */\n  static f(){ return `x\ny`; }\n  static g(){ return A.f(); }\n}\n", 'b.js': "class B {\n  static h(){}\n}\n", 't.mjs': "go(() => A.f());" }, 'f', 'B');
+    assert.ok(!M10.files['a.js'].includes('static f') && M10.files['b.js'].includes('/* 설명 */\n  static f(){ return `x\ny`; }') && M10.files['a.js'].includes('B.f()') && M10.files['t.mjs'] === 'go(() => B.f());' && M10.refs === 2, '메서드 옮기기: ' + JSON.stringify(M10.files)); }
+  /* 규칙 C1(역할 무리가 상위 class 밖)·A1(옛 이름 다리로 부름) · 선언 목록은 길어도 복잡 아님 */
+  { const { roleFamilies, aliasUses } = await import('./lib/rules.mjs'), { classTable } = await import('./lib/graph.mjs'), { complexFns } = await import('./lib/quality.mjs');
+    writeFileSync(join(r10, 'src/main/010-a.js'), "class Core {\n  static aiJSON(p){ return p; }\n  static toast(m){ return m; }\n}\nclass Generator {\n  static run(){ return Core.aiJSON('p'); }\n}\nclass Story {\n  static old(){ return Core.aiJSON('q'); }\n  static regs(){\n" + Array.from({ length: 130 }, (_, i) => `    reg('k${i}', ${i});`).join('\n') + "\n  }\n}\nfunction toast(...a) { return Core.toast(...a); }\nfunction reg(){}\ntoast('x');\n");
+    const U13 = await loadUnits(r10), g13 = buildGraph(U13), RF = roleFamilies(g13.fns, classTable(U13))['AI 생성 흐름'], AU = aliasUses(U13, '<b onclick="toast(1)">', [{ path: 't.mjs', text: "window.toast = () => {};\nconst toast = 1;" }]);
+    assert.deepEqual(RF.map(x => [x.name, x.under]).sort(), [['old', false], ['run', true]], 'C1 역할 무리: ' + JSON.stringify(RF));
+    assert.deepEqual(AU.map(x => [x.at.replace(/^.*\//, '').replace(/:\d+$/, ''), x.name, !!x.driver]), [['010-a.js', 'toast', false], ['index.html', 'toast', false], ['t.mjs', 'toast', true]], 'A1 다리: ' + JSON.stringify(AU));
+    assert.ok(!complexFns(g13.fns).some(f => f.name === 'regs'), '선언 목록은 복잡 아님'); }
   assert.ok(g12.fns.get('boot')?.cls === 'Box' && g12.fns.get('boot').calls.has('read') && !g12.issues.some(i => i.kind === '중복 정의') && T3.includes('K2') && !un12(U12, {}).some(x => x.name === 'RULE') && R12.has('read') && !R12.has('dead'), 'class 인식: ' + JSON.stringify({ T3, iss: g12.issues, R: [...R12] }));
   rmSync(r10, { recursive: true, force: true }); }
 // 프롬프트 조립 함수(조각을 고르고 잇는 함수)가 스튜디오 밖이면 잡음 · 조각을 데이터와 바로 보내는 요청 지점은 안 잡음 · 불러올 때 조각 읽기 잡음

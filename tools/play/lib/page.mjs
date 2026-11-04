@@ -6,7 +6,7 @@
 //    (CLAUDE.md §0의 실제 흐름 그대로 — 게임을 JSON으로 따로 덤프하지 않음)
 // playwright가 필요해요(build/test.mjs와 같은 방식으로 찾음). 없으면 hasBrowser()가 false.
 import { createServer } from 'node:http';
-import { readFileSync, existsSync, mkdirSync, copyFileSync, cpSync, rmSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, copyFileSync, cpSync, rmSync, readdirSync } from 'node:fs';
 import { join, extname, resolve, dirname } from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
@@ -31,6 +31,8 @@ async function startPC(pcHome, www = WWW) {
   return { port, proc, key: readFileSync(join(pcHome, 'ggm-data/key.txt'), 'utf8').trim() };
 }
 
+/* 앱 class 이름(src/main의 맨 위 class 선언): 시험 도구가 Class.이름으로 덮어쓰고 부름 */
+export function appClassNames() { const dir = join(ROOT, 'src/main'); return existsSync(dir) ? readdirSync(dir).filter(f => f.endsWith('.js')).flatMap(f => [...readFileSync(join(dir, f), 'utf8').matchAll(/^class ([A-Z][\w$]*)/gm)].map(m => m[1])) : []; }
 export async function withPage(fn, { tag = 'play', viewport, pcHome, gid, www = WWW } = {}) {
   if (!chromium) throw new Error('playwright가 없어요: 브라우저 도구(tools/play)는 playwright가 설치된 환경에서만 돌아요 — ' + noBrowser);
   let srv = null, pc = null, url;
@@ -39,6 +41,7 @@ export async function withPage(fn, { tag = 'play', viewport, pcHome, gid, www = 
       if (!f.startsWith(www) || !existsSync(f)) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'content-type': TYPES[extname(f)] || 'application/octet-stream' }); r.end(readFileSync(f)); }).listen(0);
     url = `http://127.0.0.1:${srv.address().port}/?t=${tag}`; }
   const b = await chromium.launch(), page = await b.newPage(), errors = [];
+  await page.addInitScript(names => { for (const c of names) if (!(c in window)) window[c] = window; }, appClassNames()); /* 옛 빌드 호환(--ref): 시험 도구가 쓰는 Class.이름 — 새 빌드는 class 선언이 가리고, class가 없는 옛 빌드는 전역 함수(window)로 */
   if (viewport) await page.setViewportSize(viewport);
   page.on('pageerror', e => errors.push(String(e.stack || e).split('\n').slice(0, 4).join(' ← '))); await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
   try {

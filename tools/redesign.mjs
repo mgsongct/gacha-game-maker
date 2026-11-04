@@ -20,7 +20,8 @@ import { buildMap } from './lib/map.mjs';
 import { layers } from './lib/arch.mjs';
 import { surfaceOf, placeOf } from './lib/surface.mjs';
 import { execFileSync } from 'node:child_process';
-import { buildGraph } from './lib/graph.mjs';
+import { buildGraph, classTable } from './lib/graph.mjs';
+import { roleFamilies } from './lib/rules.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..'), OUT = join(ROOT, 'tools/out');
 const LEAF = /^(identifier|property_identifier|shorthand_property_identifier|shorthand_property_identifier_pattern|statement_identifier)$/, LIT = /^(string|template_string|number|regex|true|false|null)$/;
@@ -30,9 +31,7 @@ export function sameShapes(fns, min = 40) { const g = new Map(); for (const f of
   return [...g.values()].filter(x => x.length > 1).map(x => ({ size: shapeOf(x[0].node.childForFieldName('body')).size, fns: x.map(f => ({ name: f.name, loc: f.loc })) })).sort((a, b) => b.size * b.fns.length - a.size * a.fns.length); }
 export function sameSkeletons(fns, min = 3) { const g = new Map(); for (const f of fns.values()) { if (!f.top || f.table) continue; const cs = [...f.calls.keys()].map(k => fns.get(k)).filter(c => c?.top && c.callers.size < 25).map(c => c.name).sort(); if (cs.length < min) continue; const k = cs.join(','); if (!g.has(k)) g.set(k, []); g.get(k).push(f); }
   return [...g].filter(([, x]) => x.length > 1).map(([k, x]) => ({ calls: k.split(','), fns: x.map(f => ({ name: f.name, loc: f.loc })) })).sort((a, b) => b.fns.length * b.calls.length - a.fns.length * a.calls.length); }
-const ROLES = { 'AI 생성 흐름': /^(aiJSON|aiCall|aiJSONRetry|aiOne)$/, '그림 생성': /^(naiGenerate|naiDraw|naiDrawItem|naiDrawItem0|comfyGenerate|imageCandidates)$/, '창 열기': /^openModal$/, '진행 칸 쓰기': /^progSlot$/, '게임 칸 쓰기': /^gameSlot$/ };
-export function roleFamilies(fns) { const out = {}; for (const [role, re] of Object.entries(ROLES)) { const hit = [...fns.values()].filter(f => f.top && !f.table && [...f.calls.keys()].some(k => re.test(fns.get(k)?.name || ''))); out[role] = hit.map(f => ({ name: f.name, mod: f.loc.split(':')[0] })); }
-  out['화면 그리기(HTML)'] = [...fns.values()].filter(f => f.top && !f.table && /HTML\d*$/.test(f.name)).map(f => ({ name: f.name, mod: f.loc.split(':')[0] })); return out; }
+/* 역할 꼴(무리)·무리의 상위 class: lib/rules.mjs ROLES·ROLE_BASE·roleFamilies(규칙 C1이 같이 씀) */
 
 // 추상 매핑 표 읽기: | 기능 | `파일.json` … | meta 칸 | prog 칸 | world 칸 | → 'chars.json' · 'meta.json›variants' … → 기능
 export function readDataMap(md) { const sec = String(md).split(/^## /m).find(t => t.startsWith('2. 추상 매핑')) || '', out = new Map();
@@ -61,7 +60,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const arg = k => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : null; }, rev = arg('--rev'), label = arg('--label') || (rev ? rev.slice(0, 7) : 'www');
   const html = rev ? (() => { for (const p of ['www/index.html', 'index.html']) { try { const t = execFileSync('git', ['show', `${rev}:${p}`], { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 28 }); if (/ggm-main/.test(t)) return t; } catch { /* 그 커밋에 없음 */ } } throw new Error(`${rev}에 index.html이 없어요`); })() : readFileSync(resolve(arg('--html') || join(ROOT, 'www/index.html')), 'utf8');
   const units = await loadHtmlUnits(html, `${label}/index.html`), { fns } = buildGraph(units), top = [...fns.values()].filter(f => f.top && !f.table), short = m => String(m);
-  const S = sameShapes(fns), K = sameSkeletons(fns), R = roleFamilies(fns), sf = stateFlow(units, fns);
+  const S = sameShapes(fns), K = sameSkeletons(fns), R = roleFamilies(fns, classTable(units)), sf = stateFlow(units, fns);
   if (process.argv.includes('--map')) { const RD = readFileSync(join(ROOT, 'docs/redesign.md'), 'utf8'), DM = readDataMap(RD), F = featureMap(units, fns, html, DM, readScreenMap(RD)), feats = [...new Set(F.map(x => x.feature))].sort(), kinds = ['Repository', 'Generator', 'Service', 'Controller', 'Screen', 'Dialog', 'Helper'];
     const md = [`# 추상 매핑 — 함수 → 기능 · class 종류 (${label})`, '', `생성: \`node tools/redesign.mjs --map${rev ? ' --rev ' + rev : ''}\` · 매핑 표: docs/redesign.md 2절(data ${DM.size}칸) · 함수 ${F.length}`, '', `| 기능 | 합 | ${kinds.join(' | ')} |`, `|---|---|${kinds.map(() => '---').join('|')}|`,
       ...feats.map(ft => { const xs = F.filter(x => x.feature === ft); return `| ${ft} | ${xs.length} | ${kinds.map(k => xs.filter(x => x.kind === k).length).join(' | ')} |`; }), '', `기능이 정해진 까닭: ${['쓰는 data', '화면', '읽는 상태', '부르는·불리는 함수', '공용(많이 불림)', '공용(여러 기능)', '—'].map(w => `${w} ${F.filter(x => x.why === w).length}`).join(' · ')}`, '',

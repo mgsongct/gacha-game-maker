@@ -335,9 +335,9 @@ static towerEnd(win){ const R=Challenge.towerSettle(win); Art.sfx(win?'승리':'
 class ChallengeView {
     /* 레이드 결과(View) */
 static raidResultHTML(R){ return `<h2 class="disp" style="color:var(--rose);margin:0">${R.killed?'토벌 완료!':'레이드 종료'}</h2><div class="rd-big">${nf(R.dealt)}<small>이번 피해</small></div>
-      <div class="rd-bar"><i style="width:${Math.min(100,R.ratio*100)}%"></i><span>${Math.min(100,Math.floor(R.ratio*1000)/10)}%</span></div>
-      <p style="margin:6px 0">${Object.keys(R.got).length?'달성 보상: '+Core.rewardText(R.got):'다음 보상까지 '+(R.next!=null?Math.ceil((R.next-R.ratio)*100)+'%':'—')}<br>참가 ${System.T('crew')} 경험치 +80</p>
-      <button class="btn" data-act="bdone">계속</button>`; }
+    <div class="rd-bar"><i style="width:${Math.min(100,R.ratio*100)}%"></i><span>${Math.min(100,Math.floor(R.ratio*1000)/10)}%</span></div>
+    <p style="margin:6px 0">${Object.keys(R.got).length?'달성 보상: '+Core.rewardText(R.got):'다음 보상까지 '+(R.next!=null?Math.ceil((R.next-R.ratio)*100)+'%':'—')}<br>참가 ${System.T('crew')} 경험치 +80</p>
+    <button class="btn" data-act="bdone">계속</button>`; }
 
   static pixFill(){ document.querySelectorAll('img[data-pix]:not([src])').forEach(el=>{ const c=charById(el.dataset.pix); if(!c) return; Challenge.pixSprite(c).then(u=>{ if(u){ el.src=u; el.parentNode&&el.parentNode.classList.add('has'); } }); }); }
 
@@ -356,13 +356,13 @@ static raidResultHTML(R){ return `<h2 class="disp" style="color:var(--rose);marg
     CB={kind,run,units,allies:[L],enemies,defA:avg('def'),R,str:1,draw:Challenge.cbShuffle(run.deck.map(x=>Object.assign({},x))),hand:[],disc:[],exh:[],energy:0,block:0,turn:0,tgt:0,taunt:-1,busy:false,over:false,log:[],ult:Math.min(ULT_MAX,2*Challenge.rgCount('ultcharge')),sel:-1,atkN:0,phoenix:Challenge.rgCount('phoenix')>0,last:null,charge:3*Challenge.rgCount('capacitor'),rage:0};
     const title=`B${run.floor} · ${DG_ROOM[kind][1]}`, ab=LEAD_AB[L.role]||LEAD_AB.atk;
     $('#ov').innerHTML=`<div class="cb v3"><div class="bt-bg" style="${ArtView.bgStyle(P().dgBg||'폐선로')}"></div><div class="cb-dim"></div>
-      <div class="bt-top"><span class="ttl"><i>DUNGEON · CARD BATTLE</i>${esc(title)}</span><button data-act="cbdeck">덱</button><button data-act="cbquit">후퇴</button></div>
-      <div class="cb-en" id="cbEn"></div><div class="cb-log" id="cbLog"></div>
-      <div class="cb-lead" id="cbLead"><div class="cl-art">${CoreView.art(L.c)}</div><div class="cl-info"><b>${esc(L.name)} <small>리더</small></b><span class="hpb"><i id="clHp"></i></span><span class="cl-n" id="clN"></span><span class="cl-ab" title="${esc(ab[1])}">◆ ${esc(ab[0])} · ${esc(ab[1])}</span><span class="cl-st" id="clSt"></span></div>
-        <button class="cl-ult" id="cbUlt" data-act="cbult"><i id="cbUltG"></i><b>필살</b><small>${esc(L.c.skill.name)}</small></button></div>
-      <div class="cb-bar"><div class="cb-orb" id="cbOrb"></div><div class="cb-blk" id="cbBlk"></div><span class="cb-pile" id="cbPile"></span><button class="btn sm" data-act="cbend" id="cbEndB">턴 종료</button></div>
-      <div class="cb-detail" id="cbDet" hidden></div>
-      <div class="cb-hand fan" id="cbHand"></div></div>`;
+    <div class="bt-top"><span class="ttl"><i>DUNGEON · CARD BATTLE</i>${esc(title)}</span><button data-act="cbdeck">덱</button><button data-act="cbquit">후퇴</button></div>
+    <div class="cb-en" id="cbEn"></div><div class="cb-log" id="cbLog"></div>
+    <div class="cb-lead" id="cbLead"><div class="cl-art">${CoreView.art(L.c)}</div><div class="cl-info"><b>${esc(L.name)} <small>리더</small></b><span class="hpb"><i id="clHp"></i></span><span class="cl-n" id="clN"></span><span class="cl-ab" title="${esc(ab[1])}">◆ ${esc(ab[0])} · ${esc(ab[1])}</span><span class="cl-st" id="clSt"></span></div>
+      <button class="cl-ult" id="cbUlt" data-act="cbult"><i id="cbUltG"></i><b>필살</b><small>${esc(L.c.skill.name)}</small></button></div>
+    <div class="cb-bar"><div class="cb-orb" id="cbOrb"></div><div class="cb-blk" id="cbBlk"></div><span class="cb-pile" id="cbPile"></span><button class="btn sm" data-act="cbend" id="cbEndB">턴 종료</button></div>
+    <div class="cb-detail" id="cbDet" hidden></div>
+    <div class="cb-hand fan" id="cbHand"></div></div>`;
     $('#ov').hidden=false; SystemView.sceneBgm(); Challenge.cbIntents(); ChallengeView.cbTurn(true); }
 
   static cbTurn(first){ if(!CB||CB.over) return; const L=Challenge.cbLead(); CB.turn++; CB.block=CB.retain?Math.floor(CB.block*0.5):0; CB.retain=false; CB.counter=0; CB.taunt=-1; CB.played=0; CB.disc1=false; CB.chainOK=false; CB.firstFree=Challenge.rgCount('firstfree')>0; CB.last=null; CB.sel=-1;
@@ -432,7 +432,7 @@ static dgHTML(run){ const map=run.map, here=run.pos, W=map.w;
     const lead=charById(run.squad.find(id=>run.hp[id]>0)||run.squad[0]);
     const hx=here%W, hy=Math.floor(here/W);
     return `<div class="dg-wrap"><div class="dg" id="dgMap" style="--w:${W};--h:${map.h}">${cells}<div class="dg-hero" id="dgHero" style="--x:${hx};--y:${hy}">${lead?`<img data-pix="${lead.id}" alt=""><span class="dg-fb">${esc(lead.name.slice(0,1))}</span>`:''}</div></div>
-      <div class="dg-leg">${['battle','elite','treasure','rest','event',run.floor>=DG_FLOORS?'boss':'stairs'].map(k=>`<span><i class="r-${k}">${DG_ROOM[k][0]}</i>${DG_ROOM[k][1]}</span>`).join('')}</div></div>`; }
+    <div class="dg-leg">${['battle','elite','treasure','rest','event',run.floor>=DG_FLOORS?'boss':'stairs'].map(k=>`<span><i class="r-${k}">${DG_ROOM[k][0]}</i>${DG_ROOM[k][1]}</span>`).join('')}</div></div>`; }
 
     /* 주인공이 경로를 따라 걷는 연출(View) — 끝나면 done */
 static dgHeroWalk(path,W,done){ const hero=$('#dgHero'); let k=1; const go=()=>{ if(k<path.length){ const i=path[k++]; if(hero){ hero.style.setProperty('--x',i%W); hero.style.setProperty('--y',Math.floor(i/W)); } Art.sfx('확인'); setTimeout(go,170); return; } done(); }; go(); }
@@ -447,10 +447,10 @@ static dgHeroWalk(path,W,done){ const hero=$('#dgHero'); let k=1; const go=()=>{
     else if(run.rest){ body=`<h4 class="ch-sub">야영지</h4><div class="rg-nodes"><button class="rg-node n-rest" data-act="rgrest" data-v="heal"><em>⛺</em><b>휴식</b><span>체력 35% 회복 · 쓰러진 대원 부활</span></button>${run.mode==='card'?`<button class="rg-node n-treasure" data-act="rgrest" data-v="upg"><em>⚒</em><b>카드 강화</b><span>카드 1장을 + 로 강화</span></button><button class="rg-node n-event" data-act="rgrest" data-v="rm"><em>✂</em><b>정리</b><span>덱에서 카드 1장 빼기</span></button><button class="rg-node n-rest" data-act="rgsave"><em>💾</em><b>저장하고 나가기</b><span>여기서 멈추고 나중에 이어서 해요. 탐사 경로는 매주 월요일에 바뀌어서, 그 전에 돌아와야 해요</span></button>`:`<button class="rg-node n-treasure" data-act="rgrest" data-v="train"><em>⚒</em><b>훈련</b><span>공격 +5%</span></button>`}</div>`; }
     else { body=ChallengeView.dgHTML(run)+((c.t==='stairs')?`<div class="row" style="margin-top:8px"><button class="btn" data-act="dgdown">▼ 제${run.floor+1}구역으로 이동</button></div>`:`<p class="muted dg-hint">밝은 방을 누르면 그곳으로 이동해요. 옆방은 미리 보여요.</p>`); }
     return `${ov}<section class="ch-card rog dgcard"><div class="ch-h"><i>EXPEDITION · ${run.floor}/${DG_FLOORS}</i><h3>${esc(System.T('abyss'))}</h3>${run.msg?`<span class="rg-msg">${esc(Challenge.rgMessage(run))}</span>`:''}</div>
-      <div class="rg-sq">${run.squad.map((id,i)=>{ const c=charById(id), h=run.hp[id]==null?1:run.hp[id]; if(!c) return ''; if(run.mode!=='auto'&&i>0) return `<div class="rg-u card"><div class="rg-a">${CoreView.art(c)}</div><b>${esc(c.name)}</b><span class="muted" style="font-size:.62rem">카드</span></div>`; return `<div class="rg-u ${h<=0?'down':''} ${run.mode!=='auto'?'lead':''}"><div class="rg-a">${CoreView.art(c)}</div><b>${esc(c.name)}${run.mode!=='auto'?' · 리더':''}</b><span class="hpb"><i style="width:${Math.round(h*100)}%"></i></span></div>`; }).join('')}</div>
-      ${run.mode!=='auto'&&charById(run.squad[0])?`<p class="muted" style="font-size:.75rem;margin:4px 0">◆ 리더 능력 「${esc((LEAD_AB[charById(run.squad[0]).role]||LEAD_AB.atk)[0])}」 ${esc((LEAD_AB[charById(run.squad[0]).role]||LEAD_AB.atk)[1])} · 필살: ${esc(charById(run.squad[0]).skill.name)}</p>`:''}
-      ${run.relics.length?`<div class="rg-rel">${[...new Set(run.relics)].map(k=>`<span title="${esc(RELICS[k][1])}">${esc(RELICS[k][0])}${Challenge.rgCount(k)>1?' ×'+Challenge.rgCount(k):''}</span>`).join('')}</div>`:''}
-      ${body}<div class="row" style="margin-top:10px">${run.mode==='card'?`<button class="btn sm ghost" data-act="rgdeck">덱 ${run.deck.length}장 보기</button>`:''}<button class="btn sm ghost" data-act="rgquit">탐사 끝내기</button></div></section>`; }
+    <div class="rg-sq">${run.squad.map((id,i)=>{ const c=charById(id), h=run.hp[id]==null?1:run.hp[id]; if(!c) return ''; if(run.mode!=='auto'&&i>0) return `<div class="rg-u card"><div class="rg-a">${CoreView.art(c)}</div><b>${esc(c.name)}</b><span class="muted" style="font-size:.62rem">카드</span></div>`; return `<div class="rg-u ${h<=0?'down':''} ${run.mode!=='auto'?'lead':''}"><div class="rg-a">${CoreView.art(c)}</div><b>${esc(c.name)}${run.mode!=='auto'?' · 리더':''}</b><span class="hpb"><i style="width:${Math.round(h*100)}%"></i></span></div>`; }).join('')}</div>
+    ${run.mode!=='auto'&&charById(run.squad[0])?`<p class="muted" style="font-size:.75rem;margin:4px 0">◆ 리더 능력 「${esc((LEAD_AB[charById(run.squad[0]).role]||LEAD_AB.atk)[0])}」 ${esc((LEAD_AB[charById(run.squad[0]).role]||LEAD_AB.atk)[1])} · 필살: ${esc(charById(run.squad[0]).skill.name)}</p>`:''}
+    ${run.relics.length?`<div class="rg-rel">${[...new Set(run.relics)].map(k=>`<span title="${esc(RELICS[k][1])}">${esc(RELICS[k][0])}${Challenge.rgCount(k)>1?' ×'+Challenge.rgCount(k):''}</span>`).join('')}</div>`:''}
+    ${body}<div class="row" style="margin-top:10px">${run.mode==='card'?`<button class="btn sm ghost" data-act="rgdeck">덱 ${run.deck.length}장 보기</button>`:''}<button class="btn sm ghost" data-act="rgquit">탐사 끝내기</button></div></section>`; }
 
   static rgDeckModal(deck){ const miss=new Set(deck.filter(cd=>!Core.cardIllObj(cd)).map(cd=>cd.o+'|'+cd.k)).size;
     CoreView.openModal(`${head('덱',`<span class="muted">${deck.length}장 · 매 턴 5장을 뽑고 에너지 3으로 써요</span>`)}${miss&&Core.imgReady()?`<div class="row" style="margin:0 0 8px"><button class="btn sm" data-act="cdart">카드 일러스트 그리기 (${miss}장)</button><span class="muted" style="font-size:.75rem">대원·카드마다 한 장씩, 그림 AI 사용량이 들어요</span></div>`:''}<div class="cd-row wrap">${deck.map(cd=>ChallengeView.cardHTML(cd,{})).join('')}</div>`); }
@@ -460,19 +460,19 @@ static dgHeroWalk(path,W,done){ const hero=$('#dgHero'); let k=1; const go=()=>{
     const L=charById(RF.s[0]), ids=Challenge.rfIds(), deck=ids.length?Challenge.rgDeck(ids):[];
     const chip=cd=>`<span class="rf-cd t-${Challenge.cardType(cd)}">${esc(Challenge.cardName(cd))}</span>`;
     const lead=L?`<button class="rf-lead ${RF.sel===0?'sel':''}" data-act="rfslot" data-i="0" style="--ec:${ECOL[L.elem]}"><div class="rf-la">${CoreView.art(L)}</div><div class="rf-lt"><i>LEADER · 직접 싸워요</i><b>${esc(L.name)}</b><span class="el" style="--ec:${ECOL[L.elem]}">${esc(L.elem)}</span> <small>${esc(ROLE[L.role])} · Lv.${Characters.own(L.id).lv}</small>
-        <p><b>리더 능력 · ${esc((LEAD_AB[L.role]||LEAD_AB.atk)[0])}</b> ${esc((LEAD_AB[L.role]||LEAD_AB.atk)[1])}</p><p><b>필살기 · ${esc(L.skill.name)}</b> 게이지 ${ULT_MAX}칸이 차면 써요.</p><div class="rf-cds">${chip({k:'strike',o:L.id})}<em>×4</em>${chip({k:'guard',o:L.id})}<em>×4</em></div></div></button>`
+      <p><b>리더 능력 · ${esc((LEAD_AB[L.role]||LEAD_AB.atk)[0])}</b> ${esc((LEAD_AB[L.role]||LEAD_AB.atk)[1])}</p><p><b>필살기 · ${esc(L.skill.name)}</b> 게이지 ${ULT_MAX}칸이 차면 써요.</p><div class="rf-cds">${chip({k:'strike',o:L.id})}<em>×4</em>${chip({k:'guard',o:L.id})}<em>×4</em></div></div></button>`
       :`<button class="rf-lead empty ${RF.sel===0?'sel':''}" data-act="rfslot" data-i="0"><span>+</span><b>리더를 골라 주세요</b><small>아래 목록에서 ${esc(System.T('crew'))}을(를) 누르면 이 자리에 들어가요</small></button>`;
     const sup=i=>{ const c=charById(RF.s[i]); if(!c) return `<button class="rf-sup empty ${RF.sel===i?'sel':''}" data-act="rfslot" data-i="${i}"><span>+</span><small>카드 ${i}</small></button>`;
       const cds=L?Challenge.rgDeck([L.id,c.id]).slice(8):[]; return `<button class="rf-sup ${RF.sel===i?'sel':''}" data-act="rfslot" data-i="${i}" style="--ec:${ECOL[c.elem]}"><div class="rf-sa">${CoreView.art(c)}</div><b>${esc(c.name)}</b><small>${esc(ROLE[c.role])}</small><div class="rf-cds">${cds.map(chip).join('')}</div></button>`; };
     const list=G.chars.filter(c=>Characters.own(c.id)&&(RF.filter==='all'||c.role===RF.filter)).sort((a,b)=>charPower(b)-charPower(a));
     CoreView.openModal(`${head(esc(System.T('abyss'))+' 편성','<span class="muted">리더 1명이 직접 싸우고, 뒤의 3명은 카드가 되어 덱에 들어가요</span>')}
-      <div class="rf-tee">${lead}<div class="rf-stem"></div><div class="rf-sups">${[1,2,3].map(sup).join('')}</div></div>
-      <p class="muted" style="margin:6px 0 0;font-size:.75rem">자리를 누른 뒤 아래에서 ${esc(System.T('crew'))}을(를) 고르세요. 이미 편성된 ${esc(System.T('crew'))}을(를) 고르면 자리가 바뀌어요.</p>
-      <div class="row" style="margin-top:8px"><button class="btn sm" data-act="rfauto">자동 편성</button><button class="btn sm ghost" data-act="rfclr">비우기</button>${deck.length&&Core.imgReady()&&deck.some(cd=>!Core.cardIllObj(cd))?'<button class="btn sm ghost" data-act="cdart">카드 일러스트 그리기</button>':''}</div>
-      <div class="ftools" style="margin-top:10px"><div class="chips">${[['all','전체'],...Object.entries(ROLE)].map(([v,l])=>`<button class="chip ${RF.filter===v?'on':''}" data-act="rffil" data-v="${v}">${esc(l)}</button>`).join('')}</div></div>
-      <div class="froster">${list.map(c=>{ const k=RF.s.indexOf(c.id), b=busy.has(c.id); return `<button class="fr r${c.rarity} ${k>=0?'on':''} ${b?'busy':''}" data-act="rfpick" data-id="${c.id}" ${b?'disabled':''} style="--ec:${ECOL[c.elem]}"><div class="fr-art">${CoreView.art(c)}</div><span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${b?'<em class="busy">파견</em>':k>=0?`<em class="num">${k?'카드':'리더'}</em>`:''}<b>${esc(c.name)}</b><span>${esc(ROLE[c.role])} · ${nf(charPower(c))}</span></button>`; }).join('')||'<p class="muted">보유한 '+System.T('crew')+'이(가) 없어요.</p>'}</div>
-      ${deck.length?`<details class="rf-deck"><summary>시작 덱 ${deck.length}장 전체 보기</summary><div class="cd-row wrap">${deck.map(cd=>ChallengeView.cardHTML(cd,{})).join('')}</div></details>`:''}
-      <div class="row" style="margin-top:14px"><button class="btn block" data-act="rfgo" ${L?'':'disabled'}>${L?`탐사 시작 (리더 ${esc(L.name)} · 카드 ${ids.length-1}명)`:'리더를 먼저 골라 주세요'}</button></div>`); }
+    <div class="rf-tee">${lead}<div class="rf-stem"></div><div class="rf-sups">${[1,2,3].map(sup).join('')}</div></div>
+    <p class="muted" style="margin:6px 0 0;font-size:.75rem">자리를 누른 뒤 아래에서 ${esc(System.T('crew'))}을(를) 고르세요. 이미 편성된 ${esc(System.T('crew'))}을(를) 고르면 자리가 바뀌어요.</p>
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="rfauto">자동 편성</button><button class="btn sm ghost" data-act="rfclr">비우기</button>${deck.length&&Core.imgReady()&&deck.some(cd=>!Core.cardIllObj(cd))?'<button class="btn sm ghost" data-act="cdart">카드 일러스트 그리기</button>':''}</div>
+    <div class="ftools" style="margin-top:10px"><div class="chips">${[['all','전체'],...Object.entries(ROLE)].map(([v,l])=>`<button class="chip ${RF.filter===v?'on':''}" data-act="rffil" data-v="${v}">${esc(l)}</button>`).join('')}</div></div>
+    <div class="froster">${list.map(c=>{ const k=RF.s.indexOf(c.id), b=busy.has(c.id); return `<button class="fr r${c.rarity} ${k>=0?'on':''} ${b?'busy':''}" data-act="rfpick" data-id="${c.id}" ${b?'disabled':''} style="--ec:${ECOL[c.elem]}"><div class="fr-art">${CoreView.art(c)}</div><span class="el" style="--ec:${ECOL[c.elem]}">${esc(c.elem)}</span>${b?'<em class="busy">파견</em>':k>=0?`<em class="num">${k?'카드':'리더'}</em>`:''}<b>${esc(c.name)}</b><span>${esc(ROLE[c.role])} · ${nf(charPower(c))}</span></button>`; }).join('')||'<p class="muted">보유한 '+System.T('crew')+'이(가) 없어요.</p>'}</div>
+    ${deck.length?`<details class="rf-deck"><summary>시작 덱 ${deck.length}장 전체 보기</summary><div class="cd-row wrap">${deck.map(cd=>ChallengeView.cardHTML(cd,{})).join('')}</div></details>`:''}
+    <div class="row" style="margin-top:14px"><button class="btn block" data-act="rfgo" ${L?'':'disabled'}>${L?`탐사 시작 (리더 ${esc(L.name)} · 카드 ${ids.length-1}명)`:'리더를 먼저 골라 주세요'}</button></div>`); }
 
   static abyssHTML(){ const run=Core.progRead('rogue').run; if(!run||run.v!==2) return ChallengeView.challengeHTML();
     setTimeout(ChallengeView.pixFill,30);
@@ -481,27 +481,27 @@ static dgHeroWalk(path,W,done){ const hero=$('#dgHero'); let k=1; const go=()=>{
   static challengeHTML(){
     const r=Core.progRead('raid'), b=Challenge.raidBoss(), ratio=r.dmg/b.total, left=Challenge.raidTriesLeft(), g=Core.progRead('rogue'), run=g.run;
     const raid=`<section class="ch-card raid"><div class="ch-h"><i>WEEKLY RAID · Lv.${r.lv}</i><h3>${esc(b.name)}</h3><span>이번 주 함께 깎는 보스예요. 한 번에 ${Math.ceil(RAID_TICKS*GGMCombat.DT)}초 동안 싸우고, 준 피해가 쌓여요.</span></div>
-      <div class="rd-hero ${r.killed?'dead':''}" style="--ec:${ECOL[b.elem]}"><div class="rd-bg" style="${b.bg?ArtView.bgStyle(b.bg):ArtView.bgStyle(P().lobbyBg||'')}"></div><div class="rd-glow"></div>
-        <div class="rd-boss">${CharactersView.enemyArt(b,'rd-img')}</div><div class="rd-shade"></div>
-        <div class="rd-tag"><span class="el" style="--ec:${ECOL[b.elem]}">${esc(b.elem)}</span><i>WEEKLY RAID BOSS</i></div>
-        <div class="rd-name"><b>${esc(b.name)}</b><span>Lv.${r.lv} · 남은 체력 ${Math.max(0,100-Math.min(100,Math.floor(ratio*1000)/10))}%</span></div>
-        <div class="rd-pats">${Challenge.bossPats(b,true).map(k=>`<span title="${esc(BPATS[k][1])}">${esc(BPATS[k][0])}</span>`).join('')}<span title="체력 50% 이하에서 공격·속도 증가">광폭화</span></div>
-        <div class="rd-hp"><i style="width:${Math.max(0,100-Math.min(100,ratio*100))}%"></i><span>${nf(Math.max(0,b.total-r.dmg))} / ${nf(b.total)}</span></div>
-        ${r.killed?'<div class="rd-stamp">토벌 완료</div>':''}</div>
-      <div class="rd-ms">${RAID_MS.map(([t,rw],i)=>`<span class="${r.got.includes(i)?'on':''}" title="${esc(Core.rewardText(rw))}">${Math.round(t*100)}%</span>`).join('')}</div>
-      <div class="row" style="margin-top:10px"><button class="btn" data-act="raidgo" ${left&&!r.killed?'':'disabled'}>${r.killed?'이번 주 토벌 완료':'도전 (오늘 '+left+'/3)'}</button></div>
-      <p class="muted" style="margin:6px 0 0;font-size:.78rem">최고 피해 ${nf(r.best||0)} · 토벌하면 다음 주에 더 강한 보스가 나와요.</p></section>`;
+    <div class="rd-hero ${r.killed?'dead':''}" style="--ec:${ECOL[b.elem]}"><div class="rd-bg" style="${b.bg?ArtView.bgStyle(b.bg):ArtView.bgStyle(P().lobbyBg||'')}"></div><div class="rd-glow"></div>
+      <div class="rd-boss">${CharactersView.enemyArt(b,'rd-img')}</div><div class="rd-shade"></div>
+      <div class="rd-tag"><span class="el" style="--ec:${ECOL[b.elem]}">${esc(b.elem)}</span><i>WEEKLY RAID BOSS</i></div>
+      <div class="rd-name"><b>${esc(b.name)}</b><span>Lv.${r.lv} · 남은 체력 ${Math.max(0,100-Math.min(100,Math.floor(ratio*1000)/10))}%</span></div>
+      <div class="rd-pats">${Challenge.bossPats(b,true).map(k=>`<span title="${esc(BPATS[k][1])}">${esc(BPATS[k][0])}</span>`).join('')}<span title="체력 50% 이하에서 공격·속도 증가">광폭화</span></div>
+      <div class="rd-hp"><i style="width:${Math.max(0,100-Math.min(100,ratio*100))}%"></i><span>${nf(Math.max(0,b.total-r.dmg))} / ${nf(b.total)}</span></div>
+      ${r.killed?'<div class="rd-stamp">토벌 완료</div>':''}</div>
+    <div class="rd-ms">${RAID_MS.map(([t,rw],i)=>`<span class="${r.got.includes(i)?'on':''}" title="${esc(Core.rewardText(rw))}">${Math.round(t*100)}%</span>`).join('')}</div>
+    <div class="row" style="margin-top:10px"><button class="btn" data-act="raidgo" ${left&&!r.killed?'':'disabled'}>${r.killed?'이번 주 토벌 완료':'도전 (오늘 '+left+'/3)'}</button></div>
+    <p class="muted" style="margin:6px 0 0;font-size:.78rem">최고 피해 ${nf(r.best||0)} · 토벌하면 다음 주에 더 강한 보스가 나와요.</p></section>`;
     let rog;
     if(!run){ rog=`<section class="ch-card rog"><div class="ch-h"><i>EXPEDITION · ${DG_FLOORS} AREAS</i><h3>${esc(System.T('abyss'))}</h3><span>한 번 고른 4명으로 ${DG_FLOORS}개 구역을 탐사해요. 미지의 경로에서 전투·보물·야영지·사건을 만나고 다음 구역으로 이동해요. 마지막 구역에는 보스가 기다려요. 체력은 이어져요.</span></div>
-        <p class="muted" style="margin:8px 0">최고 진척 ${g.best||0}/${RG_FLOORS} · 오늘 ${g.day===today()?g.n:0}번 (3번째부터 보상 25%)</p><div class="rg-mode one"><button class="rg-node n-treasure" data-act="rgnew" data-v="card"><em>🂠</em><b>탐사 시작</b><span>첫 번째로 고른 ${esc(System.T('crew'))}이(가) 리더로 싸우고, 나머지는 카드가 되어 능력을 빌려줘요.</span></button></div></section>`; }
+      <p class="muted" style="margin:8px 0">최고 진척 ${g.best||0}/${RG_FLOORS} · 오늘 ${g.day===today()?g.n:0}번 (3번째부터 보상 25%)</p><div class="rg-mode one"><button class="rg-node n-treasure" data-act="rgnew" data-v="card"><em>🂠</em><b>탐사 시작</b><span>첫 번째로 고른 ${esc(System.T('crew'))}이(가) 리더로 싸우고, 나머지는 카드가 되어 능력을 빌려줘요.</span></button></div></section>`; }
     else if(run.v===2){ const L=charById(run.squad[0]), c=run.map.cells[run.pos]; rog=`<section class="ch-card rog dgcard"><div class="ch-h"><i>EXPEDITION · ${run.floor}/${DG_FLOORS}</i><h3>${esc(System.T('abyss'))} 진행 중</h3><span>${L?`리더 ${esc(L.name)} · `:''}제${run.floor}구역${run.rest?' 야영지':''}${run.saved?' · 저장됨':''}${run.wk&&run.wk!==Challenge.weekKey()?' · 탐사 경로가 바뀌었어요(제1구역부터 다시)':''}</span></div><div class="rg-mode one"><button class="rg-node n-treasure" data-act="go" data-to="abyss"><em>▶</em><b>이어서 탐사하기</b><span>화면 전체로 던전을 탐색해요</span></button></div></section>`; }
     else {
       const nodes=run.pick?`<h4 class="ch-sub">유물을 하나 고르세요</h4><div class="rg-picks">${run.pick.filter(k=>RELICS[k]).map(k=>{ const n=run.relics.filter(x=>x===k).length; return `<button class="rg-relic" data-act="rgrelic" data-v="${k}"><b>${esc(RELICS[k][0])}${n?` <small>×${n+1}</small>`:''}</b><span>${esc(RELICS[k][1])}${n?' · 겹쳐서 더 강해져요':''}</span></button>`; }).join('')}</div><div class="row" style="margin-top:8px"><button class="btn sm ghost" data-act="rgskip">고르지 않고 지나가기 (체력 10% 회복)</button></div>`
         :`<h4 class="ch-sub">${run.floor}구역 · 어디로 갈까요?</h4><div class="rg-nodes">${(run.opts||[]).map(k=>`<button class="rg-node n-${k}" data-act="rgnode" data-v="${k}"><em>${RG_NODE[k][0]}</em><b>${RG_NODE[k][1]}</b><span>${RG_NODE[k][2]}</span></button>`).join('')}</div>`;
       rog=`<section class="ch-card rog"><div class="ch-h"><i>EXPEDITION · ${run.floor}/${RG_FLOORS}구역</i><h3>${esc(System.T('abyss'))}</h3>${run.msg?`<span class="rg-msg">${esc(Challenge.rgMessage(run))}</span>`:''}</div>
-        <div class="rg-sq">${run.squad.map(id=>{ const c=charById(id), h=run.hp[id]||0; return c?`<div class="rg-u ${h<=0?'down':''}"><div class="rg-a">${CoreView.art(c)}</div><b>${esc(c.name)}</b><span class="hpb"><i style="width:${Math.round(h*100)}%"></i></span></div>`:''; }).join('')}</div>
-        ${run.relics.length?`<div class="rg-rel">${[...new Set(run.relics)].map(k=>`<span title="${esc(RELICS[k][1])}">${esc(RELICS[k][0])}${Challenge.rgCount(k)>1?' ×'+Challenge.rgCount(k):''}</span>`).join('')}</div>`:''}
-        ${nodes}<div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="rgquit">탐사 끝내기</button></div></section>`; }
+      <div class="rg-sq">${run.squad.map(id=>{ const c=charById(id), h=run.hp[id]||0; return c?`<div class="rg-u ${h<=0?'down':''}"><div class="rg-a">${CoreView.art(c)}</div><b>${esc(c.name)}</b><span class="hpb"><i style="width:${Math.round(h*100)}%"></i></span></div>`:''; }).join('')}</div>
+      ${run.relics.length?`<div class="rg-rel">${[...new Set(run.relics)].map(k=>`<span title="${esc(RELICS[k][1])}">${esc(RELICS[k][0])}${Challenge.rgCount(k)>1?' ×'+Challenge.rgCount(k):''}</span>`).join('')}</div>`:''}
+      ${nodes}<div class="row" style="margin-top:10px"><button class="btn sm ghost" data-act="rgquit">탐사 끝내기</button></div></section>`; }
     return `${pageHead('도전','CHALLENGE','lobby')}${raid}${ChallengeView.towerHTML()}${rog}`;
   }
 
@@ -522,7 +522,7 @@ static abyssCardFocus(){ setTimeout(()=>{ const el=document.querySelector('.ch-c
 static towerResultHTML(R){ return `<h2 class="disp" style="color:${R.win?'var(--rose)':'#ff5277'};margin:0">${R.win?`${R.floor}층 돌파!`:`${R.floor}층 실패`}</h2><p>${R.r?'첫 돌파 보상: '+Core.rewardText(R.r):R.win?'':'편성·속성을 바꾸거나 더 키워서 다시 도전하세요. 전장 규칙을 확인해 보세요.'}</p><button class="btn" data-act="bdone">계속</button>`; }
 
   static towerHTML(){ const T0=Core.progRead('tower'); return `<section class="ch-card"><div class="ch-h"><i>TRIAL TOWER</i><h3>시련의 탑</h3><span>층마다 강해지는 적과 바뀌는 전장 규칙. 제한 탑은 그 소속·속성 ${System.T('crew')}만 출전해요. 5층마다 보스와 큰 보상.</span></div>
-    <div class="tw-list">${Challenge.towerList().map(t=>{ const b=(T0[t.id]||{}).best||0, n=t.allow?G.chars.filter(c=>Characters.own(c.id)&&t.allow(c)).length:G.chars.filter(c=>Characters.own(c.id)).length;
+  <div class="tw-list">${Challenge.towerList().map(t=>{ const b=(T0[t.id]||{}).best||0, n=t.allow?G.chars.filter(c=>Characters.own(c.id)&&t.allow(c)).length:G.chars.filter(c=>Characters.own(c.id)).length;
       return `<button class="tw-card" data-act="towergo" data-v="${esc(t.id)}" ${n?'':'disabled'}><b>${esc(t.name)}</b><span>${esc(t.desc)} · 보유 ${n}명</span><br><span>최고 ${b}층 → 다음 ${b+1}층</span></button>`; }).join('')}</div></section>`; }
 
     /* 대열에 넣은 대원 반응(View): 몸짓 · 한마디 말풍선 — 고른 한마디를 돌려줌(목소리는 처리기가) */
