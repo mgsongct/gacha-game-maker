@@ -500,12 +500,11 @@ function naiBlocksOwner(e){
  if(id.startsWith('nai_p_'))return {o:naiCfg().parts[id.slice(6)],key:'suffix'};
  if(['wp_scene','il_scene','lb_scene','sc_scene','lbbg_scene'].includes(id)){const c=charById(e.closest('.cs-sheet')?.dataset.cid);return {o:id==='wp_scene'?c?.weapon:c?.[({il_scene:'illust',lb_scene:'lbcg',sc_scene:'scg',lbbg_scene:'lbbg'})[id]],key:'prompt'};}
  if(id==='v2-icon-prompt'&&typeof V2ICONS!=='undefined'){const p=V2ICONS?.preview;return {o:p&&{prompt:p.prompt,naiBlocks:{prompt:p.promptParts}},key:'prompt'};}
- if(id==='pf_nai')return {o:progSlot('avatar'),key:'prompt'}; /* 플레이어 외형 칸은 0160 avatarObj가 맡음(없으면 만듦) */
+ if(id==='pf_nai')return {o:progRead('avatar'),key:'prompt'}; /* 플레이어 외형 칸: 진행 칸 avatar(그리기 전 처리가 늘 만들어 둠 — 0070 PROG_SLOTS tick) */
  if(id==='sk_prompt'&&document.getElementById('sk_char'))return {o:G.meta.shop?.self,key:'naiPrompt'};
  if(id==='rg_e_look')return {o:REGEN?.nc,key:'naiPrompt'};
  if(id==='li_prompt')return {o:libById(document.querySelector('[data-act=savelib]')?.dataset.id),key:'prompt'};
  if(e.dataset.skinPrompt){const c=charById(e.dataset.owner);return {o:c?.skins?.find(k=>k.id===e.dataset.skinPrompt),key:'prompt'};}
- if(e.dataset.candidateField==='prompt'&&typeof IMAGE_CANDIDATES!=='undefined'&&IMAGE_CANDIDATES?.config?.promptParts){e.dataset.naiBlocks=JSON.stringify(IMAGE_CANDIDATES.config.promptParts);}
  return null;
 }
 function naiBlocksEditable(e){
@@ -519,6 +518,7 @@ function naiBlocksEditable(e){
 }
 function naiBlocksMount(e){
  if(e._naiBlocksUI||!naiBlocksEditable(e))return;
+ if(e.dataset.candidateField==='prompt'&&typeof IMAGE_CANDIDATES!=='undefined'&&IMAGE_CANDIDATES?.config?.promptParts){e.dataset.naiBlocks=JSON.stringify(IMAGE_CANDIDATES.config.promptParts);} /* 후보 그림 프롬프트 칸은 후보 설정의 블록으로 시작 */
  const key=e.id||'nai-block-'+(++naiBlocksMount.serial),origin=e.value,owner=naiBlocksOwner(e);
  if(!e.id)e.id=key;
  if(owner?.o&&!e.dataset.naiBlocks){const saved=owner.o.naiBlocks?.[owner.key];if(saved?.combined===origin)e.dataset.naiBlocks=JSON.stringify(saved);}

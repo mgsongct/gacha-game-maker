@@ -84,8 +84,10 @@ function regenPreview(){const R=REGEN,c=R&&charById(R.cid);if(!R||!c)return;cons
 }
 /* 다시 만들기로 바꾼 스킬의 설계 의도(슬롯 재설계 plan)를 캐릭터에 */
 function regenKeepPlan(c,nc){ if(nc.skillPlan) c.skillPlan=clone(nc.skillPlan); }
+/* 다시 만들기 창의 적용·다시 시도·고치기 단추 잠금(View) */
+function regenButtonsLock(on){ document.querySelectorAll('[data-act=regenapply],[data-act=regenretry],[data-act=regenedit]').forEach(b=>b.disabled=on); }
 async function regenApply(){const R=REGEN;if(!R||R.busy)return;const c=charById(R.cid);if(!c)return;try{regenAssertCurrent(R);regenReadPreview(R);}catch(e){toast(e.message);return;}R.busy=true;R.controller=new AbortController();
- const status=t=>{const el=document.getElementById('regen-apply-status');if(el)el.textContent=t;};document.querySelectorAll('[data-act=regenapply],[data-act=regenretry],[data-act=regenedit]').forEach(b=>b.disabled=true);
+ const status=t=>say('#regen-apply-status',t);regenButtonsLock(true);
  try{const nc=R.nc,S=R.sel;let report=R.report;
   if(S.skill){status('선택한 스킬의 최종 유효성과 성능을 확인하는 중…');const errors=GGMCombat.validate(nc.skills);if(errors.length)throw new Error(errors.join(' '));const result=await v2Job('inspectSkill',[v2CharacterInput(nc),{...v2Options(),referenceSlot:R.slot}],{signal:R.controller.signal});v2CheckCancelled(R.controller.signal);if(REGEN!==R)return;if(result.report.status==='strong')throw new Error('세대 기준보다 강해졌어요. 다시 생성하거나 스킬 편집기에서 조정해 주세요.');report=result.report;}
   regenAssertCurrent(R);if(REGEN!==R)return;R.committing=true;const old=c.name,oldWeapon=c.weapon,base=clone(v2Ensure(c)),cleanup=[];
@@ -97,7 +99,7 @@ async function regenApply(){const R=REGEN;if(!R||R.busy)return;const c=charById(
   if(S.lines)for(const k of ['lines','affLines','lvLines','dupLines','touch'])if(nc[k]!==undefined)c[k]=clone(nc[k]);
   v2SyncEquipment(c);mark('c:'+c.id);await Promise.allSettled(cleanup);if(REGEN!==R||PJ().active!==R.project)return;REGEN=null;closeModal();render();openChar(c.id);toast('선택한 항목을 적용했어요. 강화 단계는 유지돼요.');
  }catch(e){if(REGEN===R){status(e.name==='AbortError'?'적용을 중단했어요.':e.message);toast(e.message);}}
- finally{R.busy=false;R.committing=false;if(REGEN===R)document.querySelectorAll('[data-act=regenapply],[data-act=regenretry],[data-act=regenedit]').forEach(b=>b.disabled=false);}
+ finally{R.busy=false;R.committing=false;if(REGEN===R)regenButtonsLock(false);}
 }
 // One inventory feeds both the gallery and image download list, including skin faces and skill icons.
 function charImgItems(c){if(!c)return [];const L=[],add=(k,label,o,group='기본')=>{if(o)L.push({k,label,o,group});};

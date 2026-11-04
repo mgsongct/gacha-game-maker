@@ -165,8 +165,8 @@
 | 지점 | 위치 | 갈래 |
 |---|---|---|
 | 0030-image/010-engine.js regenRun | src/main/0030-image/010-engine.js:48 | 6 |
-| 0030-image/010-engine.js requestUltimateScene | src/main/0030-image/010-engine.js:118 | 7 |
-| 0030-image/010-engine.js illustrationScenePreparation | src/main/0030-image/010-engine.js:143 | 7 |
+| 0030-image/010-engine.js requestUltimateScene | src/main/0030-image/010-engine.js:120 | 7 |
+| 0030-image/010-engine.js illustrationScenePreparation | src/main/0030-image/010-engine.js:145 | 7 |
 | 0100-messenger.js fcSend | src/main/0100-messenger.js:152 | 41 |
 | 0100-messenger.js fcSummarize | src/main/0100-messenger.js:178 | 0 |
 | 0185-game-rules.js posAI | src/main/0185-game-rules.js:129 | 25 |
@@ -206,9 +206,9 @@
 | modules/combat/060-generation.js v2GenerateSelected | src/modules/combat/060-generation.js:161 | 3 |
 | modules/combat/060-generation.js v2GenerateSelected#2 | src/modules/combat/060-generation.js:188 | 4 |
 | modules/combat/070-equipment.js v2GearGenerate | src/modules/combat/070-equipment.js:73 | 0 |
-| 그림 0030-image/010-engine.js naiDraw#2 | src/main/0030-image/010-engine.js:178 | 1 |
-| 그림 0030-image/010-engine.js openNaiGen | src/main/0030-image/010-engine.js:749 | 0 |
-| 그림 0030-image/010-engine.js faceDrawOne | src/main/0030-image/010-engine.js:837 | 1 |
+| 그림 0030-image/010-engine.js naiDraw#2 | src/main/0030-image/010-engine.js:180 | 1 |
+| 그림 0030-image/010-engine.js openNaiGen | src/main/0030-image/010-engine.js:751 | 0 |
+| 그림 0030-image/010-engine.js faceDrawOne | src/main/0030-image/010-engine.js:839 | 1 |
 
 ## 흐름 오류 (15)
 

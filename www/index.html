@@ -5875,12 +5875,11 @@ function naiBlocksOwner(e){
  if(id.startsWith('nai_p_'))return {o:naiCfg().parts[id.slice(6)],key:'suffix'};
  if(['wp_scene','il_scene','lb_scene','sc_scene','lbbg_scene'].includes(id)){const c=charById(e.closest('.cs-sheet')?.dataset.cid);return {o:id==='wp_scene'?c?.weapon:c?.[({il_scene:'illust',lb_scene:'lbcg',sc_scene:'scg',lbbg_scene:'lbbg'})[id]],key:'prompt'};}
  if(id==='v2-icon-prompt'&&typeof V2ICONS!=='undefined'){const p=V2ICONS?.preview;return {o:p&&{prompt:p.prompt,naiBlocks:{prompt:p.promptParts}},key:'prompt'};}
- if(id==='pf_nai')return {o:progSlot('avatar'),key:'prompt'}; /* 플레이어 외형 칸은 0160 avatarObj가 맡음(없으면 만듦) */
+ if(id==='pf_nai')return {o:progRead('avatar'),key:'prompt'}; /* 플레이어 외형 칸: 진행 칸 avatar(그리기 전 처리가 늘 만들어 둠 — 0070 PROG_SLOTS tick) */
  if(id==='sk_prompt'&&document.getElementById('sk_char'))return {o:G.meta.shop?.self,key:'naiPrompt'};
  if(id==='rg_e_look')return {o:REGEN?.nc,key:'naiPrompt'};
  if(id==='li_prompt')return {o:libById(document.querySelector('[data-act=savelib]')?.dataset.id),key:'prompt'};
  if(e.dataset.skinPrompt){const c=charById(e.dataset.owner);return {o:c?.skins?.find(k=>k.id===e.dataset.skinPrompt),key:'prompt'};}
- if(e.dataset.candidateField==='prompt'&&typeof IMAGE_CANDIDATES!=='undefined'&&IMAGE_CANDIDATES?.config?.promptParts){e.dataset.naiBlocks=JSON.stringify(IMAGE_CANDIDATES.config.promptParts);}
  return null;
 }
 function naiBlocksEditable(e){
@@ -5894,6 +5893,7 @@ function naiBlocksEditable(e){
 }
 function naiBlocksMount(e){
  if(e._naiBlocksUI||!naiBlocksEditable(e))return;
+ if(e.dataset.candidateField==='prompt'&&typeof IMAGE_CANDIDATES!=='undefined'&&IMAGE_CANDIDATES?.config?.promptParts){e.dataset.naiBlocks=JSON.stringify(IMAGE_CANDIDATES.config.promptParts);} /* 후보 그림 프롬프트 칸은 후보 설정의 블록으로 시작 */
  const key=e.id||'nai-block-'+(++naiBlocksMount.serial),origin=e.value,owner=naiBlocksOwner(e);
  if(!e.id)e.id=key;
  if(owner?.o&&!e.dataset.naiBlocks){const saved=owner.o.naiBlocks?.[owner.key];if(saved?.combined===origin)e.dataset.naiBlocks=JSON.stringify(saved);}
@@ -6048,8 +6048,10 @@ function regenPreview(){const R=REGEN,c=R&&charById(R.cid);if(!R||!c)return;cons
 }
 /* 다시 만들기로 바꾼 스킬의 설계 의도(슬롯 재설계 plan)를 캐릭터에 */
 function regenKeepPlan(c,nc){ if(nc.skillPlan) c.skillPlan=clone(nc.skillPlan); }
+/* 다시 만들기 창의 적용·다시 시도·고치기 단추 잠금(View) */
+function regenButtonsLock(on){ document.querySelectorAll('[data-act=regenapply],[data-act=regenretry],[data-act=regenedit]').forEach(b=>b.disabled=on); }
 async function regenApply(){const R=REGEN;if(!R||R.busy)return;const c=charById(R.cid);if(!c)return;try{regenAssertCurrent(R);regenReadPreview(R);}catch(e){toast(e.message);return;}R.busy=true;R.controller=new AbortController();
- const status=t=>{const el=document.getElementById('regen-apply-status');if(el)el.textContent=t;};document.querySelectorAll('[data-act=regenapply],[data-act=regenretry],[data-act=regenedit]').forEach(b=>b.disabled=true);
+ const status=t=>say('#regen-apply-status',t);regenButtonsLock(true);
  try{const nc=R.nc,S=R.sel;let report=R.report;
   if(S.skill){status('선택한 스킬의 최종 유효성과 성능을 확인하는 중…');const errors=GGMCombat.validate(nc.skills);if(errors.length)throw new Error(errors.join(' '));const result=await v2Job('inspectSkill',[v2CharacterInput(nc),{...v2Options(),referenceSlot:R.slot}],{signal:R.controller.signal});v2CheckCancelled(R.controller.signal);if(REGEN!==R)return;if(result.report.status==='strong')throw new Error('세대 기준보다 강해졌어요. 다시 생성하거나 스킬 편집기에서 조정해 주세요.');report=result.report;}
   regenAssertCurrent(R);if(REGEN!==R)return;R.committing=true;const old=c.name,oldWeapon=c.weapon,base=clone(v2Ensure(c)),cleanup=[];
@@ -6061,7 +6063,7 @@ async function regenApply(){const R=REGEN;if(!R||R.busy)return;const c=charById(
   if(S.lines)for(const k of ['lines','affLines','lvLines','dupLines','touch'])if(nc[k]!==undefined)c[k]=clone(nc[k]);
   v2SyncEquipment(c);mark('c:'+c.id);await Promise.allSettled(cleanup);if(REGEN!==R||PJ().active!==R.project)return;REGEN=null;closeModal();render();openChar(c.id);toast('선택한 항목을 적용했어요. 강화 단계는 유지돼요.');
  }catch(e){if(REGEN===R){status(e.name==='AbortError'?'적용을 중단했어요.':e.message);toast(e.message);}}
- finally{R.busy=false;R.committing=false;if(REGEN===R)document.querySelectorAll('[data-act=regenapply],[data-act=regenretry],[data-act=regenedit]').forEach(b=>b.disabled=false);}
+ finally{R.busy=false;R.committing=false;if(REGEN===R)regenButtonsLock(false);}
 }
 // One inventory feeds both the gallery and image download list, including skin faces and skill icons.
 function charImgItems(c){if(!c)return [];const L=[],add=(k,label,o,group='기본')=>{if(o)L.push({k,label,o,group});};
@@ -7617,8 +7619,10 @@ function petTick(P0){ const {kind,el,c,x,y}=P0, o=own(c.id), lv=o?affLv(o):1, im
   if(P0.n===1){ const f=im&&(im.classList.contains('lobby-ill')||im.classList.contains('lobby-pose'))?'':pickFace(c,lv>=4?['미소','수줍음','부끄럼','웃음','평온']:['당황','수줍음','부끄럼','놀람','평온']); if(f&&im&&im.tagName==='IMG') faceSwap(c,im,f,3200);
     const l=petLine(c,o), box=kind==='poke'?$('#bubble'):kind==='cspoke'?$('#csSay'):$('#evsLine');
     if(l&&box){ box.textContent=sub(l); box.hidden=false; box.classList.remove('pop'); void box.offsetWidth; box.classList.add('pop'); if(kind==='cspoke'){ clearTimeout(window._csT); window._csT=setTimeout(()=>{if(box.isConnected)box.hidden=true;},3200); } if(kind==='evspoke') EVS_LINE=l; if(voiceOf(c)&&SND().voiceLobby) speak(c,l); }
-    if(o){ const now=Date.now(); if(now-(o.petAt||0)>8000){ o.petAt=now; addAff(c,3); bump('touch'); mark('prog'); } } }
+  }
 }
+/* 쓰다듬기 반영(Model): 8초에 한 번 호감도 +3·미션 */
+function petAffect(c){ const o=own(c.id); if(!o) return; const now=Date.now(); if(now-(o.petAt||0)>8000){ o.petAt=now; addAff(c,3); bump('touch'); mark('prog'); } }
 document.addEventListener('pointerdown',e=>{ if(e.button>0) return; const el=e.target.closest&&e.target.closest('[data-act=poke],[data-act=cspoke],[data-act=evspoke]'); if(!el) return;
   const kind=el.dataset.act, c=charById(kind==='poke'?P().sec:el.dataset.id); if(!c) return;
   const S0={kind,el,c,x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,dir:0,last:e.clientX,turns:0,n:0,id:e.pointerId,hand:null,ring:null};
@@ -7628,7 +7632,7 @@ document.addEventListener('pointerdown',e=>{ if(e.button>0) return; const el=e.t
     if(!S0.hand){ if(Math.hypot(ev.clientX-S0.x0,ev.clientY-S0.y0)>12) end(); return; }
     ev.preventDefault(); S0.hand.style.left=S0.x+'px'; S0.hand.style.top=S0.y+'px'; S0.ring&&(S0.ring.style.left=S0.x+'px',S0.ring.style.top=S0.y+'px');
     const dx=ev.clientX-S0.last; if(Math.abs(dx)<14) return; const d=dx>0?1:-1; S0.last=ev.clientX;
-    if(d!==S0.dir){ if(S0.dir) S0.turns++; S0.dir=d; S0.hand.style.transform=`translate(-50%,-70%) rotate(${d*14}deg)`; if(S0.turns&&S0.turns%2===0){ S0.n++; petTick(S0); } } };
+    if(d!==S0.dir){ if(S0.dir) S0.turns++; S0.dir=d; S0.hand.style.transform=`translate(-50%,-70%) rotate(${d*14}deg)`; if(S0.turns&&S0.turns%2===0){ S0.n++; petTick(S0); if(S0.n===1) petAffect(S0.c); } } };
   const up=ev=>{ if(ev.pointerId===S0.id) end(); };
   addEventListener('pointermove',mv,{passive:false}); addEventListener('pointerup',up); addEventListener('pointercancel',up); },true);
 document.addEventListener('click',e=>{ if(PET.swallow&&Date.now()-PET.swallow<400){ PET.swallow=0; e.stopPropagation(); e.preventDefault(); } },true);
@@ -7703,7 +7707,7 @@ const PROG_SLOTS={
   rogue:{make:()=>({run:null,best:0,day:'',n:0}), fill:r=>{ const x=r.run; if(x&&x.v===3){ x.v=2; x.c3=1; } }}, // 탐사 — 예전 3판 형식은 2판으로
   tower:{make:()=>({})}, gifts:{make:()=>({})}, fchat:{make:()=>({})}, cxSeen:{make:cxSeenNew,tick:true}, // 탑 · 선물 보관함 · 자유 대화 · 도감에서 본 항목
   sched:{make:()=>({day:today(),left:SCHED_N,done:[]}), stale:v=>v.day!==today(), tick:true}, // 오늘의 일정 — 날이 바뀌면 새로
-  avatar:{make:()=>({id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null})}, // 프로필 그림
+  avatar:{make:()=>({id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null}),tick:true}, // 프로필 그림
   shop:{make:()=>({day:today(),buy:{}}), stale:v=>v.day!==today(), tick:true}, // 상점 일일 구매 — 날이 바뀌면 새로
   mail:{make:()=>[], ok:Array.isArray}, // 우편함
   dboard:{make:()=>({day:'',list:[],rr:0}), ok:b=>progObj(b)&&Array.isArray(b.list), fill:dispBoardFill, tick:true}, // 파견 게시판 — 날마다 의뢰 채우기
@@ -8670,10 +8674,13 @@ function dgHTML(run){ const map=run.map, here=run.pos, W=map.w;
   const hx=here%W, hy=Math.floor(here/W);
   return `<div class="dg-wrap"><div class="dg" id="dgMap" style="--w:${W};--h:${map.h}">${cells}<div class="dg-hero" id="dgHero" style="--x:${hx};--y:${hy}">${lead?`<img data-pix="${lead.id}" alt=""><span class="dg-fb">${esc(lead.name.slice(0,1))}</span>`:''}</div></div>
     <div class="dg-leg">${['battle','elite','treasure','rest','event',run.floor>=DG_FLOORS?'boss':'stairs'].map(k=>`<span><i class="r-${k}">${DG_ROOM[k][0]}</i>${DG_ROOM[k][1]}</span>`).join('')}</div></div>`; }
-function dgMove(to){ const run=progSlot('rogue').run; if(!run||run.busy) return; const path=dgPath(run.map,run.pos,to); if(!path) return; run.busy=true; const W=run.map.w, hero=$('#dgHero'); let k=1;
-  const go=()=>{ if(k<path.length){ const i=path[k++]; if(hero){ hero.style.setProperty('--x',i%W); hero.style.setProperty('--y',Math.floor(i/W)); } sfx('확인'); setTimeout(go,170); return; }
-    run.busy=false; run.pos=to; dgReveal(run.map,to); dgEnter(run); };
-  go(); }
+/* 던전 칸으로 이동(Controller): 이동 시작(Model) → 걸어가는 연출(View) → 도착(Model) → 그 칸의 일 */
+function dgMove(to){ const run=progSlot('rogue').run; if(!run||run.busy) return; const path=dgPath(run.map,run.pos,to); if(!path) return; dgWalkStart(run); dgHeroWalk(path,run.map.w,()=>{ dgArrive(run,to); dgEnter(run); }); }
+/* 이동 시작·도착(Model) */
+function dgWalkStart(run){ run.busy=true; }
+function dgArrive(run,to){ run.busy=false; run.pos=to; dgReveal(run.map,to); }
+/* 주인공이 경로를 따라 걷는 연출(View) — 끝나면 done */
+function dgHeroWalk(path,W,done){ const hero=$('#dgHero'); let k=1; const go=()=>{ if(k<path.length){ const i=path[k++]; if(hero){ hero.style.setProperty('--x',i%W); hero.style.setProperty('--y',Math.floor(i/W)); } sfx('확인'); setTimeout(go,170); return; } done(); }; go(); }
 function dgEnter(run){ const c=run.map.cells[run.pos]; run.msg=''; if(c.done&&c.t!=='stairs'&&c.t!=='boss'){ mark('prog'); render(); return; }
   const t=c.t;
   if(t==='battle'||t==='elite'||t==='boss'){ mark('prog'); if(run.mode!=='auto') cbStart(t); else rgBattle(t); return; }

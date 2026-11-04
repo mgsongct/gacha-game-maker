@@ -18,7 +18,7 @@ const PROG_SLOTS={
   rogue:{make:()=>({run:null,best:0,day:'',n:0}), fill:r=>{ const x=r.run; if(x&&x.v===3){ x.v=2; x.c3=1; } }}, // 탐사 — 예전 3판 형식은 2판으로
   tower:{make:()=>({})}, gifts:{make:()=>({})}, fchat:{make:()=>({})}, cxSeen:{make:cxSeenNew,tick:true}, // 탑 · 선물 보관함 · 자유 대화 · 도감에서 본 항목
   sched:{make:()=>({day:today(),left:SCHED_N,done:[]}), stale:v=>v.day!==today(), tick:true}, // 오늘의 일정 — 날이 바뀌면 새로
-  avatar:{make:()=>({id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null})}, // 프로필 그림
+  avatar:{make:()=>({id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null}),tick:true}, // 프로필 그림
   shop:{make:()=>({day:today(),buy:{}}), stale:v=>v.day!==today(), tick:true}, // 상점 일일 구매 — 날이 바뀌면 새로
   mail:{make:()=>[], ok:Array.isArray}, // 우편함
   dboard:{make:()=>({day:'',list:[],rr:0}), ok:b=>progObj(b)&&Array.isArray(b.list), fill:dispBoardFill, tick:true}, // 파견 게시판 — 날마다 의뢰 채우기

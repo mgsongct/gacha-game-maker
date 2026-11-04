@@ -296,10 +296,13 @@ function dgHTML(run){ const map=run.map, here=run.pos, W=map.w;
   const hx=here%W, hy=Math.floor(here/W);
   return `<div class="dg-wrap"><div class="dg" id="dgMap" style="--w:${W};--h:${map.h}">${cells}<div class="dg-hero" id="dgHero" style="--x:${hx};--y:${hy}">${lead?`<img data-pix="${lead.id}" alt=""><span class="dg-fb">${esc(lead.name.slice(0,1))}</span>`:''}</div></div>
     <div class="dg-leg">${['battle','elite','treasure','rest','event',run.floor>=DG_FLOORS?'boss':'stairs'].map(k=>`<span><i class="r-${k}">${DG_ROOM[k][0]}</i>${DG_ROOM[k][1]}</span>`).join('')}</div></div>`; }
-function dgMove(to){ const run=progSlot('rogue').run; if(!run||run.busy) return; const path=dgPath(run.map,run.pos,to); if(!path) return; run.busy=true; const W=run.map.w, hero=$('#dgHero'); let k=1;
-  const go=()=>{ if(k<path.length){ const i=path[k++]; if(hero){ hero.style.setProperty('--x',i%W); hero.style.setProperty('--y',Math.floor(i/W)); } sfx('확인'); setTimeout(go,170); return; }
-    run.busy=false; run.pos=to; dgReveal(run.map,to); dgEnter(run); };
-  go(); }
+/* 던전 칸으로 이동(Controller): 이동 시작(Model) → 걸어가는 연출(View) → 도착(Model) → 그 칸의 일 */
+function dgMove(to){ const run=progSlot('rogue').run; if(!run||run.busy) return; const path=dgPath(run.map,run.pos,to); if(!path) return; dgWalkStart(run); dgHeroWalk(path,run.map.w,()=>{ dgArrive(run,to); dgEnter(run); }); }
+/* 이동 시작·도착(Model) */
+function dgWalkStart(run){ run.busy=true; }
+function dgArrive(run,to){ run.busy=false; run.pos=to; dgReveal(run.map,to); }
+/* 주인공이 경로를 따라 걷는 연출(View) — 끝나면 done */
+function dgHeroWalk(path,W,done){ const hero=$('#dgHero'); let k=1; const go=()=>{ if(k<path.length){ const i=path[k++]; if(hero){ hero.style.setProperty('--x',i%W); hero.style.setProperty('--y',Math.floor(i/W)); } sfx('확인'); setTimeout(go,170); return; } done(); }; go(); }
 function dgEnter(run){ const c=run.map.cells[run.pos]; run.msg=''; if(c.done&&c.t!=='stairs'&&c.t!=='boss'){ mark('prog'); render(); return; }
   const t=c.t;
   if(t==='battle'||t==='elite'||t==='boss'){ mark('prog'); if(run.mode!=='auto') cbStart(t); else rgBattle(t); return; }

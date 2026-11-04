@@ -50,8 +50,10 @@ function petTick(P0){ const {kind,el,c,x,y}=P0, o=own(c.id), lv=o?affLv(o):1, im
   if(P0.n===1){ const f=im&&(im.classList.contains('lobby-ill')||im.classList.contains('lobby-pose'))?'':pickFace(c,lv>=4?['미소','수줍음','부끄럼','웃음','평온']:['당황','수줍음','부끄럼','놀람','평온']); if(f&&im&&im.tagName==='IMG') faceSwap(c,im,f,3200);
     const l=petLine(c,o), box=kind==='poke'?$('#bubble'):kind==='cspoke'?$('#csSay'):$('#evsLine');
     if(l&&box){ box.textContent=sub(l); box.hidden=false; box.classList.remove('pop'); void box.offsetWidth; box.classList.add('pop'); if(kind==='cspoke'){ clearTimeout(window._csT); window._csT=setTimeout(()=>{if(box.isConnected)box.hidden=true;},3200); } if(kind==='evspoke') EVS_LINE=l; if(voiceOf(c)&&SND().voiceLobby) speak(c,l); }
-    if(o){ const now=Date.now(); if(now-(o.petAt||0)>8000){ o.petAt=now; addAff(c,3); bump('touch'); mark('prog'); } } }
+  }
 }
+/* 쓰다듬기 반영(Model): 8초에 한 번 호감도 +3·미션 */
+function petAffect(c){ const o=own(c.id); if(!o) return; const now=Date.now(); if(now-(o.petAt||0)>8000){ o.petAt=now; addAff(c,3); bump('touch'); mark('prog'); } }
 document.addEventListener('pointerdown',e=>{ if(e.button>0) return; const el=e.target.closest&&e.target.closest('[data-act=poke],[data-act=cspoke],[data-act=evspoke]'); if(!el) return;
   const kind=el.dataset.act, c=charById(kind==='poke'?P().sec:el.dataset.id); if(!c) return;
   const S0={kind,el,c,x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,dir:0,last:e.clientX,turns:0,n:0,id:e.pointerId,hand:null,ring:null};
@@ -61,7 +63,7 @@ document.addEventListener('pointerdown',e=>{ if(e.button>0) return; const el=e.t
     if(!S0.hand){ if(Math.hypot(ev.clientX-S0.x0,ev.clientY-S0.y0)>12) end(); return; }
     ev.preventDefault(); S0.hand.style.left=S0.x+'px'; S0.hand.style.top=S0.y+'px'; S0.ring&&(S0.ring.style.left=S0.x+'px',S0.ring.style.top=S0.y+'px');
     const dx=ev.clientX-S0.last; if(Math.abs(dx)<14) return; const d=dx>0?1:-1; S0.last=ev.clientX;
-    if(d!==S0.dir){ if(S0.dir) S0.turns++; S0.dir=d; S0.hand.style.transform=`translate(-50%,-70%) rotate(${d*14}deg)`; if(S0.turns&&S0.turns%2===0){ S0.n++; petTick(S0); } } };
+    if(d!==S0.dir){ if(S0.dir) S0.turns++; S0.dir=d; S0.hand.style.transform=`translate(-50%,-70%) rotate(${d*14}deg)`; if(S0.turns&&S0.turns%2===0){ S0.n++; petTick(S0); if(S0.n===1) petAffect(S0.c); } } };
   const up=ev=>{ if(ev.pointerId===S0.id) end(); };
   addEventListener('pointermove',mv,{passive:false}); addEventListener('pointerup',up); addEventListener('pointercancel',up); },true);
 document.addEventListener('click',e=>{ if(PET.swallow&&Date.now()-PET.swallow<400){ PET.swallow=0; e.stopPropagation(); e.preventDefault(); } },true);
