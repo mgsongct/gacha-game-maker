@@ -71,7 +71,7 @@ src/
 
 | 하려는 것 | 방법 |
 |---|---|
-| 앱 본체 기능 추가 | `src/main/`에 새 파일. 번호로 위치 지정(예: `0545-my-feature.js`는 `0540-start.js`와 `0550-standalone-app.js` 사이). 번호를 10 단위로 띄워 둔 이유 |
+| 앱 본체 기능 추가 | 새 파일이 아니라 그 기능이 속한 모듈 안에(사용자 지시 — 모듈을 분류 없이 늘리지 않음). 속할 모듈은 연관 맵의 기능 표면(`docs/map.md` 2절: 메뉴 → 화면·패널·창 → 얽힌 모듈)과 모듈 판정(3절)에서 그 기능 단위의 고유 모듈. 새 모듈(`src/main/`의 번호 파일 — 예: `0545-my-feature.js`는 `0540-start.js`와 `0550-standalone-app.js` 사이, 번호를 10 단위로 띄워 둔 이유)은 도구가 새 기능 단위로 판정할 때만. 고친 뒤 `node tools/map.mjs --strict`(조각·흩어짐·슈퍼가 늘면 실패) |
 | 독립 모듈 추가 (먼저 실행, 자체 클릭 리스너 등) | `src/modules/app/020-my-module.js` → `id="ggm-app-my-module"`로 자동 등록·실행 |
 | 새 모듈 묶음 | `src/modules/<묶음>/` 폴더를 만들고 `src/index.html`에 `<!--@modules modules/<묶음>/ ggm-<묶음>- -->` 한 줄 추가 |
 | 기존 섹션 수정 | 해당 `src/main/*.js` 파일 수정 |

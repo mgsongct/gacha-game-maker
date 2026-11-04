@@ -38348,11 +38348,24 @@
     "shared": 4,
     "base": 1,
     "unreached": 0,
-    "units": []
+    "units": [],
+    "members": {
+     "공용": [
+      "elemLine",
+      "jo",
+      "explorationName"
+     ],
+     "공용 기반": [
+      "T"
+     ],
+     "메뉴:배경": [
+      "applyMeta"
+     ]
+    }
    },
    {
     "mod": "src/main/0015-prompt-studio/",
-    "kind": "슈퍼",
+    "kind": "층",
     "n": 156,
     "feat": 109,
     "shared": 23,
@@ -38392,114 +38405,234 @@
       4
      ]
     ],
-    "split": [
-     {
-      "units": [
-       "배경.새 게임 생성",
-       "창:openCharEdit",
-       "창:openDraft",
-       "창:openLibItem",
-       "studio.game.4",
-       "창:openLib",
-       "studio.game.3"
-      ],
-      "n": 47,
-      "to": null
-     },
-     {
-      "units": [
-       "studio.game.11",
-       "studio.game.7"
-      ],
-      "n": 15,
-      "to": null
-     },
-     {
-      "units": [
-       "창:openChar",
-       "창:openEpEdit"
-      ],
-      "n": 8,
-      "to": "src/main/0100-messenger.js"
-     },
-     {
-      "units": [
-       "창:openChEdit"
-      ],
-      "n": 5,
-      "to": null
-     },
-     {
-      "units": [
-       "배경.앱 시작"
-      ],
-      "n": 4,
-      "to": null
-     },
-     {
-      "units": [
-       "창:openSkin"
-      ],
-      "n": 4,
-      "to": "src/main/0020-ai-connect.js"
-     },
-     {
-      "units": [
-       "codex"
-      ],
-      "n": 3,
-      "to": "src/main/0300-codex.js"
-     },
-     {
-      "units": [
-       "창:regenPreview"
-      ],
-      "n": 2,
-      "to": "src/main/0030-image/"
-     },
-     {
-      "units": [
-       "sched"
-      ],
-      "n": 2,
-      "to": "src/main/0135-schedule.js"
-     },
-     {
-      "units": [
-       "배경.실행 중 AI"
-      ],
-      "n": 2,
-      "to": "src/main/0290-season-rotation.js"
-     },
-     {
-      "units": [
-       "창:openFaces"
-      ],
-      "n": 2,
-      "to": "src/main/0030-image/"
-     },
-     {
-      "units": [
-       "창:openNpcs"
-      ],
-      "n": 2,
-      "to": "src/main/0330-casting.js"
-     },
-     {
-      "units": [
-       "shop"
-      ],
-      "n": 2,
-      "to": "src/main/0190-shop.js"
-     },
-     {
-      "units": [
-       "창:smRebuild"
-      ],
-      "n": 2,
-      "to": "src/main/0530-story-memory.js"
-     }
-    ]
+    "members": {
+     "배경.앱 시작": [
+      "pfDef",
+      "promptFrag",
+      "plInject",
+      "llmWrap"
+     ],
+     "studio.game.11": [
+      "promptOv",
+      "plList",
+      "plSave",
+      "plAdd",
+      "imgAuditScan",
+      "imgAuditFix",
+      "aiLogStats",
+      "promptPanel",
+      "openStudio",
+      "pfSet",
+      "pstPolish"
+     ],
+     "공용 기반": [
+      "pf",
+      "ctx"
+     ],
+     "닿지 않음": [
+      "scriptFmt",
+      "threadFmt",
+      "stanceAIPrompt",
+      "aiJSONSkillPromptText",
+      "personaAIReviewPrompt",
+      "directScriptPrompt",
+      "v2GenerateSkillsPromptText",
+      "v2ConceptPromptPrompt",
+      "v2ResolvePalettePrompt",
+      "v2GenerateSelectedReasonText",
+      "v2GearGeneratePrompt",
+      "genderText",
+      "factionCtx",
+      "castLockCtx",
+      "smCodex",
+      "v2PalettePrompt",
+      "v2DesignContext",
+      "v2SlotPrompt",
+      "genderText0",
+      "callText",
+      "rulesText",
+      "smNotes"
+     ],
+     "공용": [
+      "imgGuard",
+      "plHit",
+      "jaBatchPrompt",
+      "writeStagesPrompt",
+      "writeStagesOutlineText",
+      "ensureLibPromptsPrompt",
+      "aiChapterGen0Prompt",
+      "aiEventGen0Prompt",
+      "aiEventGen0LoreHintText",
+      "aiNewPickupCharPrompt",
+      "aiNewPickupCharCOLText",
+      "aiAltCharPrompt",
+      "skinlinesPrompt",
+      "storyWrapUpPrompt",
+      "playerCast",
+      "stageWhat",
+      "planCtx",
+      "newcRule",
+      "stageSchema",
+      "drText",
+      "evPastHint",
+      "enemyReuseHint"
+     ],
+     "창:openSkin": [
+      "naiBlocksSeparatePrompt",
+      "aiskinPrompt",
+      "vsaiPrompt",
+      "vsaiPrompt2"
+     ],
+     "창:openAp": [
+      "aiOneP2Text"
+     ],
+     "창:regenPreview": [
+      "regenRunPrompt",
+      "regenSchema"
+     ],
+     "창:openChar": [
+      "requestUltimateScenePrompt",
+      "fcSendPrompt",
+      "fcSendRecentText",
+      "fcSummarizePrompt",
+      "phaddaiPrompt",
+      "fcProgress"
+     ],
+     "창:openCharEdit": [
+      "illustrationScenePreparationPrompt",
+      "illustrationScenePreparationPurposeText",
+      "weaponPromptAIPrompt",
+      "weaponPromptAIVText",
+      "ainaiPrompt",
+      "ailinesPrompt",
+      "ailinesmorePrompt",
+      "composeNai",
+      "composeCG"
+     ],
+     "창:openDesign": [
+      "designAIPrompt"
+     ],
+     "창:openSound": [
+      "toJaPrompt"
+     ],
+     "sched": [
+      "spotsAIPrompt",
+      "spotTalkAIPrompt"
+     ],
+     "배경.새 게임 생성": [
+      "heroTagsPrompt",
+      "buildNewGameDraftPrompt",
+      "buildNewGameDraftBaseText",
+      "buildNewGameDraftFANText",
+      "buildNewGameDraftSTYText",
+      "buildNewGameDraftDRAText",
+      "buildNewGameDraftPrompt2",
+      "buildNewGameDraftPrompt3",
+      "buildNewGameDraftPrompt4",
+      "buildNewGameDraftPrompt5",
+      "buildNewGameDraftKEEPHINTText",
+      "buildNewGameDraftPrompt6",
+      "castPlanData",
+      "REL_SCHEMA",
+      "charSchema",
+      "modeSchema",
+      "finaleRule",
+      "profileTplSchema",
+      "castRule",
+      "npcRule",
+      "talkOnlyRule"
+     ],
+     "studio.game.4": [
+      "rulesAIDataPrompt",
+      "rulesPosAIPrompt"
+     ],
+     "배경.실행 중 AI": [
+      "skinAutoPrompt",
+      "dailyTalksPrompt"
+     ],
+     "창:openDraft": [
+      "drPolishPrompt",
+      "drPolishWhatText",
+      "drPolishHeroPrompt",
+      "drHarmonyPrompt",
+      "drFillCharPrompt",
+      "drCtx",
+      "drTheme"
+     ],
+     "창:openFaces": [
+      "faceDrawOnePzText",
+      "faceDrawOneEmphText"
+     ],
+     "메뉴:lobby": [
+      "skinLinesAIPrompt"
+     ],
+     "codex": [
+      "cxDiscoverPrompt",
+      "cxDeepenPrompt",
+      "cxProgressText"
+     ],
+     "창:openNpcs": [
+      "autoNpcsPrompt",
+      "npctagsPrompt"
+     ],
+     "studio.game.8": [
+      "factionAIPrompt"
+     ],
+     "창:openRelEdit": [
+      "relSeedAIPrompt"
+     ],
+     "studio.game.7": [
+      "personaAIPrompt",
+      "talkAffGenPrompt",
+      "memorialGenPrompt",
+      "personaBrief"
+     ],
+     "studio.game.9": [
+      "planAIPrompt"
+     ],
+     "창:openOpeningEdit": [
+      "aiopeningPrompt"
+     ],
+     "창:openLibItem": [
+      "ailibPrompt",
+      "ailibPrompt2",
+      "ailibPrompt3",
+      "ailibPrompt4"
+     ],
+     "창:openEpEdit": [
+      "aiepPrompt",
+      "aiepStgText"
+     ],
+     "창:openThEdit": [
+      "aithreadPrompt"
+     ],
+     "창:openChEdit": [
+      "stdetailPrompt",
+      "stdetailNbText",
+      "storyMemo",
+      "relCtx",
+      "sysDigest"
+     ],
+     "창:openWorld": [
+      "aiworldPrompt"
+     ],
+     "창:openLib": [
+      "ailooksallPrompt",
+      "ailooksPrompt"
+     ],
+     "shop": [
+      "shkaiPrompt",
+      "shkaiNmText"
+     ],
+     "창:smRebuild": [
+      "smExtractPrompt",
+      "smExtractPrompt2"
+     ],
+     "studio.game.3": [
+      "auditAIFillPrompt",
+      "auditAIStagePrompt"
+     ]
+    }
    },
    {
     "mod": "src/main/0020-ai-connect.js",
@@ -38543,6 +38676,150 @@
       2
      ]
     ],
+    "members": {
+     "studio.text": [
+      "AIP",
+      "saveAIP",
+      "defKey",
+      "aiLogHTML",
+      "aiLogText",
+      "llmEff",
+      "llmCode",
+      "llmHTML"
+     ],
+     "창:openAp": [
+      "normBase",
+      "copilotTok",
+      "copilotLogin",
+      "b64url",
+      "parseLoose",
+      "jsonStrEnd",
+      "jsonRepair",
+      "vertexToken",
+      "claudeMsg",
+      "geminiCall",
+      "aiOne"
+     ],
+     "공용": [
+      "apValid",
+      "setPCS",
+      "isLocalHost",
+      "pcSoon",
+      "abortedMsg",
+      "http",
+      "errOf",
+      "okJSON",
+      "aiLog",
+      "allPresets",
+      "tagList",
+      "tagKey",
+      "joinTags",
+      "stripAge",
+      "cgCast",
+      "naiBlocksUpgrade",
+      "naiBlocksRemember",
+      "naiBlocksFieldParts",
+      "naiBlocksSave",
+      "naiBlocksSeed"
+     ],
+     "배경.앱 시작": [
+      "setupAI",
+      "aiCall"
+     ],
+     "studio.conn.1": [
+      "PCS"
+     ],
+     "창:openPcSet": [
+      "parsePcLink",
+      "proxyOff"
+     ],
+     "창:openA2HS": [
+      "pcOrigin"
+     ],
+     "닿지 않음": [
+      "pcLostKey",
+      "thumbData",
+      "naiQuality",
+      "naiBlocksOwner",
+      "naiBlocksEditable",
+      "naiBlocksMount",
+      "naiBlocksScan"
+     ],
+     "studio.view.2": [
+      "webProxy"
+     ],
+     "메뉴:studio": [
+      "b64ToBytes",
+      "userPacks",
+      "saveUserPacks",
+      "pthumbHTML",
+      "llmSlots",
+      "saveLlm",
+      "setMyStyle"
+     ],
+     "studio.img": [
+      "pthumbs",
+      "pthumb",
+      "packCode",
+      "packApply",
+      "packHTML",
+      "presetToCfg",
+      "aiErrText",
+      "myStyle"
+     ],
+     "창:openPresetCode": [
+      "llmFromCode",
+      "openPresetCode",
+      "packFromCode"
+     ],
+     "배경.새 게임 생성": [
+      "presetQualityParts"
+     ],
+     "창:openDraft": [
+      "drPresetHTML"
+     ],
+     "창:openNaiSet": [
+      "applyStylePreset",
+      "naiBase"
+     ],
+     "메뉴:공용": [
+      "ILK"
+     ],
+     "창:openCharEdit": [
+      "isV4p",
+      "isV45",
+      "naiSize",
+      "naiStyle",
+      "designTags",
+      "naiBlocksTokens",
+      "naiBlocksTagKey",
+      "naiBlocksIsStyle",
+      "naiBlocksKnownStyle",
+      "naiBlocksTagSlot",
+      "naiBlocksSplit"
+     ],
+     "공용 기반": [
+      "naiCfg",
+      "aiJSON"
+     ],
+     "창:openSkin": [
+      "naiBlocksJoin",
+      "naiBlocksOf",
+      "naiBlocksValidateSplit",
+      "naiBlocksSeparate",
+      "naiSkinBase",
+      "naiSkinParts"
+     ],
+     "메뉴:배경": [
+      "naiBlocksGame"
+     ],
+     "배경.실행 중 AI": [
+      "naiBlocksStore"
+     ],
+     "창:artAfterAI": [
+      "naiSaved"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -38621,6 +38898,154 @@
       1
      ]
     ],
+    "members": {
+     "창:regenPreview": [
+      "unFaceless",
+      "charCGs",
+      "weaponRenameOk",
+      "regenSlot",
+      "regenSourceSnapshot",
+      "regenSourceCurrent",
+      "regenAssertCurrent",
+      "regenWeaponPrompt",
+      "regenParseCharacter",
+      "regenProgress",
+      "regenRun",
+      "regenReadPreview",
+      "regenPreview",
+      "regenKeepPlan",
+      "regenApply"
+     ],
+     "공용": [
+      "regenSkillLabel",
+      "regenFields",
+      "regenCancelJob",
+      "regenCancel",
+      "wpBad",
+      "fixWeaponPrompts",
+      "standRefs",
+      "naiDrawItem",
+      "naiDrawItem0",
+      "naiErr",
+      "imgNeed",
+      "skinRefresh",
+      "skinCard",
+      "skinPartDraw",
+      "skinPartGen"
+     ],
+     "창:openRegen": [
+      "openRegen"
+     ],
+     "창:openChar": [
+      "charImgItems",
+      "openImgLib",
+      "ultimateSceneTags",
+      "ultimateSceneSnapshot",
+      "requestUltimateScene",
+      "generateUltimateCutin",
+      "imagePreviewClose",
+      "imageCandidateAbort",
+      "imageCandidates"
+     ],
+     "창:openCharEdit": [
+      "illustrationScenePreparation",
+      "weaponPromptAI",
+      "allyTags",
+      "charCaption",
+      "autoRefOn",
+      "imgB64",
+      "naiDecode",
+      "refImage",
+      "retryAfterMs",
+      "alphaInfo",
+      "sdTags",
+      "comfyBind",
+      "comfyGenerate",
+      "naiGenerate",
+      "naiGenerate0",
+      "openNaiPrep",
+      "openNaiGen",
+      "registerNaiJob",
+      "imageCandidateEligible"
+     ],
+     "창:openDesign": [
+      "designFacs",
+      "openDesign",
+      "designRead",
+      "designAI"
+     ],
+     "배경.새 게임 생성": [
+      "naiDraw"
+     ],
+     "창:openNaiSet": [
+      "NAI_HDR",
+      "openNaiSet",
+      "readNai"
+     ],
+     "창:openLibItem": [
+      "loadImg",
+      "imgType",
+      "unzipAll",
+      "alphaBorder",
+      "naiBgRemove",
+      "eraseColorData",
+      "cutCtx",
+      "cutPush",
+      "cutLoadBlob",
+      "cutBlob",
+      "cutMap",
+      "cutMode",
+      "cutBrush",
+      "cutPlaceCursor",
+      "cutDrawLoupe",
+      "cutAimAt",
+      "cutStamp",
+      "cutEraseHere",
+      "cutBind",
+      "cutCfg",
+      "cutoutWhite",
+      "openCut"
+     ],
+     "창:openFaces": [
+      "naiEmotion",
+      "unzipFirst",
+      "fitDims",
+      "openMaskPainter",
+      "focusedInpaint",
+      "faceDrawOne",
+      "faceUpperObj",
+      "openFaces",
+      "faceOptRead"
+     ],
+     "studio.img": [
+      "imgProvider"
+     ],
+     "메뉴:studio": [
+      "comfyCfg"
+     ],
+     "공용 기반": [
+      "imgReady"
+     ],
+     "shop": [
+      "stripMinor"
+     ],
+     "메뉴:공용": [
+      "naiTarget"
+     ],
+     "닿지 않음": [
+      "reNaiPrep",
+      "imagePreviewOpen",
+      "imagePreviewThumbnail",
+      "imageCandidateBack",
+      "imageScrollGuard"
+     ],
+     "창:naiBatch": [
+      "naiBatch"
+     ],
+     "창:openSkin": [
+      "openSkin"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -38689,6 +39114,54 @@
       1
      ]
     ],
+    "members": {
+     "메뉴:공용": [
+      "elUrl"
+     ],
+     "공용 기반": [
+      "SND",
+      "sfx"
+     ],
+     "공용": [
+      "storeAudio",
+      "bgm",
+      "jaMap",
+      "jaKey",
+      "jaBatch",
+      "stopVoice",
+      "speak",
+      "prefetchTTS",
+      "fishSearch"
+     ],
+     "배경.앱 시작": [
+      "loadAudio"
+     ],
+     "창:openLib": [
+      "bgmFade",
+      "elSfx"
+     ],
+     "창:openLibItem": [
+      "bgmPrompt",
+      "elCompose"
+     ],
+     "창:openBgmAll": [
+      "openBgmAll",
+      "bgmAllGo",
+      "sceneBgmName"
+     ],
+     "메뉴:studio": [
+      "sceneOf"
+     ],
+     "창:openSound": [
+      "sceneBgm",
+      "cleanTTS",
+      "toJa",
+      "ttsBlob"
+     ],
+     "evshop": [
+      "voiceOf"
+     ]
+    },
     "unit": "창:openSound"
    },
    {
@@ -38705,6 +39178,14 @@
       4
      ]
     ],
+    "members": {
+     "배경.앱 시작": [
+      "LI",
+      "C",
+      "E",
+      "TH"
+     ]
+    },
     "unit": "배경.앱 시작"
    },
    {
@@ -38724,7 +39205,51 @@
       "studio.view.1",
       1
      ]
-    ]
+    ],
+    "members": {
+     "공용 기반": [
+      "$",
+      "clone",
+      "uid",
+      "nf",
+      "esc",
+      "P",
+      "charById",
+      "sub",
+      "quietErr",
+      "toast"
+     ],
+     "공용": [
+      "rand",
+      "num",
+      "today",
+      "wait",
+      "libById",
+      "playerName",
+      "ripple",
+      "hearts",
+      "skinFaces",
+      "facePool",
+      "pickFace",
+      "touchFace",
+      "textFace",
+      "faceSwap",
+      "charReact",
+      "nl",
+      "unComma",
+      "strs"
+     ],
+     "창:openSound": [
+      "isMe"
+     ],
+     "닿지 않음": [
+      "petLine",
+      "petTick"
+     ],
+     "studio.view.1": [
+      "shootHTML"
+     ]
+    }
    },
    {
     "mod": "src/main/0065-inherit.js",
@@ -38739,7 +39264,26 @@
       "창:openChar",
       2
      ]
-    ]
+    ],
+    "members": {
+     "메뉴:배경": [
+      "inheritKeys",
+      "inheritStats",
+      "inheritSame",
+      "inheritDiff",
+      "inheritApply",
+      "inheritAll"
+     ],
+     "닿지 않음": [
+      "inheritStore",
+      "inheritOnMark",
+      "inheritReset"
+     ],
+     "창:openChar": [
+      "inheritLabel",
+      "inheritHTML"
+     ]
+    }
    },
    {
     "mod": "src/main/0070-save.js",
@@ -38754,7 +39298,32 @@
       "배경.앱 시작",
       2
      ]
-    ]
+    ],
+    "members": {
+     "공용 기반": [
+      "PJ",
+      "mark",
+      "flush"
+     ],
+     "배경.앱 시작": [
+      "pjKey",
+      "markAll"
+     ],
+     "공용": [
+      "enemyNames",
+      "syncEnemies"
+     ],
+     "메뉴:배경": [
+      "defaultShop",
+      "defaults",
+      "safeIds",
+      "repairRefs",
+      "fix"
+     ],
+     "닿지 않음": [
+      "flushNow"
+     ]
+    }
    },
    {
     "mod": "src/main/0080-storage-integration.js",
@@ -38797,7 +39366,77 @@
       "창:openPub",
       1
      ]
-    ]
+    ],
+    "members": {
+     "studio.data": [
+      "storageWarning",
+      "reloadGame"
+     ],
+     "창:openProjects": [
+      "switchProject"
+     ],
+     "닿지 않음": [
+      "writeKey",
+      "procBg",
+      "addFaceFile"
+     ],
+     "창:openBackup": [
+      "replaceAll"
+     ],
+     "공용": [
+      "idbGetNS",
+      "idbOpen",
+      "idbKeys",
+      "idbDel",
+      "idbGet",
+      "allImgObjs",
+      "imgSrcRaw",
+      "skinOf",
+      "skinPreviewSrc",
+      "skinDisplayReady",
+      "skinPartSrc",
+      "lbcgSrc",
+      "battleCharacterArt",
+      "enemyLib",
+      "enemyArt",
+      "libArt",
+      "storeImage",
+      "imgClear",
+      "XBTN"
+     ],
+     "배경.새 게임 생성": [
+      "idbPut"
+     ],
+     "창:openSound": [
+      "voiceStats",
+      "hash"
+     ],
+     "창:openPub": [
+      "imgObjsOf"
+     ],
+     "배경.앱 시작": [
+      "loadIdbImages",
+      "noSkin"
+     ],
+     "공용 기반": [
+      "imgSrc",
+      "art",
+      "bgStyle"
+     ],
+     "창:openChar": [
+      "skinPart",
+      "shrink"
+     ],
+     "cash": [
+      "skinPrimaryPart"
+     ],
+     "메뉴:lobby": [
+      "charSrc"
+     ],
+     "창:openFaces": [
+      "faceTgt"
+     ]
+    }
    },
    {
     "mod": "src/main/0090-growth.js",
@@ -38841,6 +39480,69 @@
       1
      ]
     ],
+    "members": {
+     "공용 기반": [
+      "own",
+      "rewardText"
+     ],
+     "창:openChar": [
+      "levelCap",
+      "stats"
+     ],
+     "farm": [
+      "rateR",
+      "stamCost",
+      "stamUse"
+     ],
+     "공용": [
+      "expR",
+      "stam",
+      "bump",
+      "busyIds",
+      "seenText",
+      "spoilFree",
+      "affLinePool",
+      "pickTouchLine",
+      "affLinePool0",
+      "affLv",
+      "addAff",
+      "stageCode"
+     ],
+     "studio.game.17": [
+      "stamOn",
+      "updStam"
+     ],
+     "창:openStam": [
+      "openStam"
+     ],
+     "메뉴:lobby": [
+      "giveReward",
+      "passLv"
+     ],
+     "배경.앱 시작": [
+      "dm"
+     ],
+     "pass": [
+      "passReward"
+     ],
+     "lobby": [
+      "passClaimable",
+      "dispDone"
+     ],
+     "창:openGift": [
+      "linePop",
+      "affFull"
+     ],
+     "창:openUpConfirm": [
+      "enhance",
+      "limitBreak",
+      "transcendUp",
+      "weaponUp",
+      "upPlan",
+      "openUpConfirm",
+      "gainExp"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -38902,6 +39604,47 @@
       1
      ]
     ],
+    "members": {
+     "창:openThEdit": [
+      "threadById"
+     ],
+     "lobby": [
+      "threadChar",
+      "unread"
+     ],
+     "공용": [
+      "trigOk",
+      "checkTriggers",
+      "updateBadge",
+      "notify"
+     ],
+     "창:openChar": [
+      "openPhone",
+      "closePhone",
+      "phoneList",
+      "phRooms",
+      "roomThreads",
+      "roomItems",
+      "roomLog",
+      "roomDel",
+      "roomLastBlock",
+      "phNewList",
+      "phAddView",
+      "chatImgHTML",
+      "hydrateChatImgs",
+      "bubbleHTML",
+      "chatImgView",
+      "chatImgB64",
+      "phPendRender",
+      "openThread",
+      "openRoom",
+      "phMenu",
+      "phMode"
+     ],
+     "닿지 않음": [
+      "chatPhotoPick"
+     ]
+    },
     "unit": "창:openChar"
    },
    {
@@ -38917,7 +39660,21 @@
       "challenge",
       1
      ]
-    ]
+    ],
+    "members": {
+     "메뉴:lobby": [
+      "progK",
+      "RAID"
+     ],
+     "공용": [
+      "hashN",
+      "raidTriesLeft",
+      "raidEnd"
+     ],
+     "challenge": [
+      "raidBoss"
+     ]
+    }
    },
    {
     "mod": "src/main/0120-abyss.js",
@@ -38944,7 +39701,90 @@
       "창:rgAbandon",
       1
      ]
-    ]
+    ],
+    "members": {
+     "메뉴:lobby": [
+      "dgGen",
+      "dgNb",
+      "dgReveal",
+      "rgScore",
+      "rgDeck",
+      "cardCost",
+      "cardTxt",
+      "cardIllObj",
+      "cardArtHTML",
+      "cardHTML",
+      "drawCardArts",
+      "cbAtkVal",
+      "cbBlk",
+      "cbSkillVal",
+      "cbEnemyDmg",
+      "cbShuffle",
+      "cbLead",
+      "cbUnit",
+      "cbAliveE",
+      "cbLog",
+      "cbDraw",
+      "cbIntentHTML",
+      "cbFanStyle",
+      "cbRender",
+      "cbFx",
+      "cbHitE",
+      "cbOnExhaust",
+      "cbHealLead",
+      "cbPlay",
+      "cbSkill",
+      "cbEnd",
+      "rfIds",
+      "RG",
+      "rgStart",
+      "rgReward",
+      "rgFinish"
+     ],
+     "abyss": [
+      "dgLinked",
+      "dgPath",
+      "pixSprite",
+      "pixFill",
+      "cardOffer",
+      "rgUnits",
+      "cbStart",
+      "cbTurn",
+      "cbIntents",
+      "cbUlt",
+      "cbEndTurn",
+      "dgHTML",
+      "dgMove",
+      "dgEnter",
+      "dgDescend",
+      "rgRunHTML2",
+      "abyssHTML"
+     ],
+     "challenge": [
+      "rgEq",
+      "cardName",
+      "cardType",
+      "rgMessage",
+      "rfAuto",
+      "openRgForm",
+      "challengeHTML",
+      "rgCount",
+      "rgOpts",
+      "rgPick3",
+      "rgEnemies",
+      "rgBattle",
+      "rgNode"
+     ],
+     "창:rgDeckModal": [
+      "rgDeckModal"
+     ],
+     "창:rgAbandon": [
+      "rgAbandon"
+     ],
+     "공용": [
+      "rogueEnd"
+     ]
+    }
    },
    {
     "mod": "src/main/0125-tower.js",
@@ -38964,6 +39804,23 @@
       1
      ]
     ],
+    "members": {
+     "challenge": [
+      "TOWER",
+      "towerList",
+      "towerById",
+      "towerPool",
+      "towerStage",
+      "towerGo",
+      "towerHTML"
+     ],
+     "창:openFormation": [
+      "towerReward"
+     ],
+     "공용": [
+      "towerEnd"
+     ]
+    },
     "unit": "challenge"
    },
    {
@@ -38984,6 +39841,25 @@
       1
      ]
     ],
+    "members": {
+     "창:openGift": [
+      "giftById",
+      "GI",
+      "giftLikes",
+      "openGift"
+     ],
+     "메뉴:lobby": [
+      "addGifts"
+     ],
+     "contract": [
+      "bannerStep"
+     ],
+     "닿지 않음": [
+      "hsDecorate",
+      "hsUpd",
+      "fitLobby"
+     ]
+    },
     "unit": "창:openGift"
    },
    {
@@ -39000,6 +39876,22 @@
       9
      ]
     ],
+    "members": {
+     "메뉴:lobby": [
+      "SCHED"
+     ],
+     "sched": [
+      "spots",
+      "spotsAuto",
+      "spotFav",
+      "spotWho",
+      "spotTemplate",
+      "spotsAI",
+      "spotTalkAI",
+      "schedVisit",
+      "schedHTML"
+     ]
+    },
     "unit": "sched"
    },
    {
@@ -39016,6 +39908,11 @@
       1
      ]
     ],
+    "members": {
+     "창:openNewPickup": [
+      "openNewPickup"
+     ]
+    },
     "unit": "창:openNewPickup"
    },
    {
@@ -39040,6 +39937,27 @@
       1
      ]
     ],
+    "members": {
+     "창:openPickExisting": [
+      "puxNames",
+      "puxRead",
+      "openPickExisting",
+      "puxGo"
+     ],
+     "공용": [
+      "puStoryBg",
+      "joinChar"
+     ],
+     "crew": [
+      "openAddChar"
+     ],
+     "창:openModeStage": [
+      "recruitCheck"
+     ],
+     "메뉴:공용": [
+      "addPickupFor"
+     ]
+    },
     "unit": "창:openPickExisting"
    },
    {
@@ -39064,6 +39982,30 @@
       2
      ]
     ],
+    "members": {
+     "studio.player": [
+      "avatarObj",
+      "playerFormHTML",
+      "readPlayerForm",
+      "refreshPlayerForm",
+      "playerDraw"
+     ],
+     "배경.새 게임 생성": [
+      "genderCode",
+      "heroTags"
+     ],
+     "창:openChar": [
+      "FC",
+      "fcOf",
+      "openFree",
+      "fcSend",
+      "fcPhotoOn",
+      "fcNpcPhoto",
+      "fcSummarize",
+      "phScroll",
+      "phPlay"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -39102,6 +40044,12 @@
       2
      ]
     ],
+    "members": {
+     "studio.game.12": [
+      "subLocked",
+      "playMode"
+     ]
+    },
     "unit": "studio.game.12"
    },
    {
@@ -39146,6 +40094,86 @@
       1
      ]
     ],
+    "members": {
+     "studio.player": [
+      "uiScrollPath",
+      "uiScrollResolve",
+      "uiScrollCapture",
+      "uiScrollRestore"
+     ],
+     "닿지 않음": [
+      "uiPageScrollKey",
+      "settingsNavigate",
+      "settingsBack"
+     ],
+     "공용": [
+      "uiSelectText",
+      "pageHead",
+      "nextStage",
+      "scgOf",
+      "charIllust",
+      "lobbyCharacterArt",
+      "chMapLib",
+      "ensureChMap"
+     ],
+     "공용 기반": [
+      "render"
+     ],
+     "lobby": [
+      "lobbyHTML"
+     ],
+     "ops": [
+      "chLogline",
+      "chCover",
+      "opsListHTML",
+      "opsHTML"
+     ],
+     "contract": [
+      "contractHTML0"
+     ],
+     "crew": [
+      "crewHTML"
+     ],
+     "event": [
+      "eventsHTML"
+     ],
+     "evd": [
+      "eventDetailHTML"
+     ],
+     "메뉴:lobby": [
+      "evHost"
+     ],
+     "evshop": [
+      "evShopHTML"
+     ],
+     "farm": [
+      "farmHTML"
+     ],
+     "pass": [
+      "passHTML"
+     ],
+     "studio.view.1": [
+      "bgOptions"
+     ],
+     "studio.text": [
+      "aiProfilesHTML"
+     ],
+     "창:openAp": [
+      "apForm",
+      "openAp",
+      "readAp"
+     ],
+     "창:openSound": [
+      "openSound"
+     ],
+     "창:openSkin": [
+      "voiceRow",
+      "renderVoice"
+     ],
+     "studio": [
+      "studioHTML"
+     ]
+    },
     "unit": "studio.player"
    },
    {
@@ -39178,6 +40206,59 @@
       1
      ]
     ],
+    "members": {
+     "공용": [
+      "RULESM",
+      "posDefaults",
+      "POSITIONS",
+      "posById",
+      "posAssign",
+      "posOf",
+      "posTraitText"
+     ],
+     "배경.새 게임 생성": [
+      "elemName",
+      "reactClean",
+      "posClean",
+      "posValid"
+     ],
+     "studio.game.4": [
+      "rulesBeats",
+      "rulesElemMat",
+      "rulesOptions",
+      "rulesPct",
+      "rulesPanel",
+      "rulesDraft",
+      "openRules",
+      "rulesRead",
+      "rulesSave",
+      "rulesCodex",
+      "rulesAIData",
+      "rulesAI",
+      "rulesPosAI",
+      "rulesRecalc",
+      "posSpread",
+      "rulesPosAssign"
+     ],
+     "창:openMeta": [
+      "rulesRename"
+     ],
+     "메뉴:배경": [
+      "rulesApply"
+     ],
+     "창:openChar": [
+      "rulesElemLine",
+      "rulesCharHTML"
+     ],
+     "studio.game.3": [
+      "rulesAIFill"
+     ],
+     "닿지 않음": [
+      "rulesMissingDesc",
+      "rulesNotInCodex",
+      "posAI"
+     ]
+    },
     "unit": "studio.game.4"
    },
    {
@@ -39198,6 +40279,32 @@
       1
      ]
     ],
+    "members": {
+     "studio.game.6": [
+      "BAL",
+      "balPower",
+      "balExpected",
+      "balDev",
+      "balInfo",
+      "balReport",
+      "balNormalize",
+      "balRemaster",
+      "balRemasterAI",
+      "balancePanel",
+      "openBalance",
+      "balSave",
+      "balFix"
+     ],
+     "닿지 않음": [
+      "balanceGeneration"
+     ],
+     "studio.game.4": [
+      "balanceOptions"
+     ],
+     "공용": [
+      "balanceOnCreate"
+     ]
+    },
     "unit": "studio.game.6"
    },
    {
@@ -39222,6 +40329,38 @@
       1
      ]
     ],
+    "members": {
+     "메뉴:lobby": [
+      "iconLib",
+      "rIco",
+      "rIcon",
+      "pay"
+     ],
+     "shop": [
+      "shopDay",
+      "SHOP_ITEMS",
+      "SHOP_SWAP",
+      "costText",
+      "canPay",
+      "shopkeeper",
+      "shkSelf",
+      "shopHTML",
+      "openShk"
+     ],
+     "cash": [
+      "CASH_RES",
+      "CASH_PKGS",
+      "gemArt",
+      "cashTick",
+      "cashHTML"
+     ],
+     "construct": [
+      "cashTopUp"
+     ],
+     "공용": [
+      "buyFx"
+     ]
+    },
     "unit": "shop"
    },
    {
@@ -39246,6 +40385,21 @@
       1
      ]
     ],
+    "members": {
+     "창:openChar": [
+      "skinHave"
+     ],
+     "공용": [
+      "skinShopList"
+     ],
+     "배경.실행 중 AI": [
+      "skinPeriodKey",
+      "skinAuto"
+     ],
+     "cash": [
+      "skinPkgHTML"
+     ]
+    },
     "unit": "배경.실행 중 AI",
     "to": "src/main/0290-season-rotation.js",
     "n0": 2,
@@ -39269,6 +40423,24 @@
       2
      ]
     ],
+    "members": {
+     "닿지 않음": [
+      "needSetup"
+     ],
+     "studio.img": [
+      "showSetup",
+      "swProfile",
+      "renderSetup"
+     ],
+     "창:openProjects": [
+      "swRead",
+      "swSave"
+     ],
+     "메뉴:studio": [
+      "swStyleId",
+      "swAddAI"
+     ]
+    },
     "unit": "studio.img",
     "to": "src/main/0020-ai-connect.js",
     "n0": 3,
@@ -39288,6 +40460,25 @@
       8
      ]
     ],
+    "members": {
+     "창:openMail": [
+      "mailBox",
+      "mailRemove",
+      "mailLive",
+      "mailHas",
+      "mailDone",
+      "mailRow",
+      "openMail",
+      "claimMail"
+     ],
+     "공용": [
+      "sendMail",
+      "mailCount"
+     ],
+     "닿지 않음": [
+      "mailTick"
+     ]
+    },
     "unit": "창:openMail"
    },
    {
@@ -39332,6 +40523,65 @@
       1
      ]
     ],
+    "members": {
+     "공용 기반": [
+      "openModal",
+      "closeModal",
+      "head",
+      "opt"
+     ],
+     "메뉴:배경": [
+      "fitBrand"
+     ],
+     "창:openChar": [
+      "trigDesc",
+      "epLock",
+      "wideFit",
+      "imgViewer",
+      "lbReveal",
+      "crewOrder",
+      "characterDetailArt",
+      "characterDetailPreviewTargets",
+      "openChar"
+     ],
+     "창:shareText": [
+      "shareText"
+     ],
+     "창:openShare": [
+      "openShare"
+     ],
+     "창:openFeedback": [
+      "openFeedback",
+      "feedbackText"
+     ],
+     "studio.info.4": [
+      "guideText"
+     ],
+     "창:openCharEdit": [
+      "openCharEdit",
+      "renameEverywhere",
+      "readCharForm"
+     ],
+     "공용": [
+      "lines",
+      "unitPower",
+      "charPower"
+     ],
+     "창:openEpEdit": [
+      "stageOptions",
+      "openEpEdit"
+     ],
+     "창:openThEdit": [
+      "trigOptions",
+      "openThEdit"
+     ],
+     "창:openFormation": [
+      "enemyPower",
+      "stagePower",
+      "factionBonus",
+      "teamPower"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -39407,6 +40657,51 @@
       1
      ]
     ],
+    "members": {
+     "공용": [
+      "enemyTarget",
+      "fitEnemy",
+      "openStage",
+      "aiChapterGen"
+     ],
+     "창:openChar": [
+      "capExtra"
+     ],
+     "메뉴:배경": [
+      "rebalanceChapter"
+     ],
+     "창:openFormation": [
+      "effPower",
+      "matchup",
+      "openFormation",
+      "refreshForm",
+      "autoSquad"
+     ],
+     "창:openChEdit": [
+      "openChEdit",
+      "parseEnemies",
+      "readChForm"
+     ],
+     "창:openWorld": [
+      "openWorld"
+     ],
+     "창:openOpeningEdit": [
+      "openOpeningEdit"
+     ],
+     "창:openLib": [
+      "openLib"
+     ],
+     "창:openLibItem": [
+      "openLibItem"
+     ],
+     "contract": [
+      "openBanner",
+      "openBannerFrom"
+     ],
+     "farm": [
+      "openFarmSquad"
+     ]
+    },
     "unit": "창:openFormation"
    },
    {
@@ -39450,7 +40745,74 @@
       "contract",
       1
      ]
-    ]
+    ],
+    "members": {
+     "공용": [
+      "genStep",
+      "nameTaken",
+      "mkNpc",
+      "addNpcs",
+      "addLib",
+      "addNewChars",
+      "relSrcOf",
+      "storyLinks",
+      "storyPurge",
+      "relGC",
+      "buildStages",
+      "aiJSONRetry",
+      "writeStages",
+      "storyTalkLines",
+      "addThreads",
+      "ensureLibPrompts",
+      "aiChapterGen0",
+      "aiEventGen",
+      "aiEventGen0",
+      "sysStats",
+      "sysEventFoes",
+      "cleanChar",
+      "cleanChar0"
+     ],
+     "배경.실행 중 AI": [
+      "bondNote"
+     ],
+     "창:openStoryDel": [
+      "openStoryDel"
+     ],
+     "studio.game.8": [
+      "stageById",
+      "debutOk"
+     ],
+     "창:openStoryStage": [
+      "newBonds"
+     ],
+     "배경.새 게임 생성": [
+      "normTalk",
+      "storySayNorms",
+      "threadDup"
+     ],
+     "메뉴:공용": [
+      "scanScriptAssets"
+     ],
+     "창:openAiEvent": [
+      "aiEvent"
+     ],
+     "contract": [
+      "readBanner"
+     ],
+     "evd": [
+      "evLoreSet",
+      "openEvEdit"
+     ],
+     "창:openMeta": [
+      "openMeta"
+     ],
+     "창:openProjects": [
+      "openProjects"
+     ],
+     "닿지 않음": [
+      "skillResume"
+     ]
+    }
    },
    {
     "mod": "src/main/0260-new-game/",
@@ -39482,6 +40844,71 @@
       1
      ]
     ],
+    "members": {
+     "공용": [
+      "drLoad",
+      "drName",
+      "drClean",
+      "dupTxt"
+     ],
+     "메뉴:공용": [
+      "drLib",
+      "drLibSave"
+     ],
+     "창:openDraftExport": [
+      "draftCode",
+      "saveTextFile",
+      "openDraftExport"
+     ],
+     "창:openDraftImport": [
+      "draftFrom",
+      "openDraftImport",
+      "draftImportDone"
+     ],
+     "창:openDraft": [
+      "drLibHTML",
+      "drSave",
+      "drLen",
+      "drRead",
+      "drTabHTML",
+      "drHeroHTML",
+      "drAvatarDraw",
+      "drModeHTML",
+      "drAutoHTML",
+      "openDraft",
+      "drRerender",
+      "drDedup",
+      "drSnap",
+      "drPolish",
+      "drPolishHero",
+      "drHarmony",
+      "drFillChar"
+     ],
+     "창:openProjects": [
+      "drLoadFrom"
+     ],
+     "배경.새 게임 생성": [
+      "sentKey",
+      "dedupText",
+      "blankWorld",
+      "ngFinish",
+      "neutralShop",
+      "ngWorldExtras",
+      "ngCharsPost",
+      "rarityFix",
+      "reuseSrc",
+      "nameKey",
+      "nameEq",
+      "remapIds",
+      "artReuse",
+      "artReuseCopy",
+      "newGame",
+      "newGameManual",
+      "runNewGameBuild",
+      "buildNewGameDraft",
+      "buildManualGameDraft"
+     ]
+    },
     "unit": "배경.새 게임 생성"
    },
    {
@@ -39505,7 +40932,28 @@
       "창:openAiEvent",
       1
      ]
-    ]
+    ],
+    "members": {
+     "메뉴:lobby": [
+      "skinPropDraw",
+      "skinLinesAI",
+      "skinMakeRest",
+      "skinSelHTML",
+      "skinFacesRun",
+      "skinAcceptRun"
+     ],
+     "창:openSkinProp": [
+      "openSkinProp",
+      "skinPropRead"
+     ],
+     "cash": [
+      "skinSelRead",
+      "openSkinBuy"
+     ],
+     "창:openAiEvent": [
+      "openAiEvent"
+     ]
+    }
    },
    {
     "mod": "src/main/0274-dispatch.js",
@@ -39525,6 +40973,19 @@
       1
      ]
     ],
+    "members": {
+     "disp": [
+      "dispHTML",
+      "dispOffer",
+      "DBOARD",
+      "dispList",
+      "dispClaim",
+      "openDispSel"
+     ],
+     "studio.game.2": [
+      "dispEndAll"
+     ]
+    },
     "unit": "disp",
     "to": "src/main/0275-expedition.js",
     "n0": 6,
@@ -39548,6 +41009,45 @@
       5
      ]
     ],
+    "members": {
+     "studio.game.2": [
+      "exMeta",
+      "EXC",
+      "exSettingsPanel",
+      "openExSet",
+      "exSave"
+     ],
+     "공용": [
+      "exMode",
+      "exBusyIds"
+     ],
+     "disp": [
+      "EXS",
+      "exBizOf",
+      "exCond",
+      "exSetCond",
+      "exJobOf",
+      "exResting",
+      "exGive",
+      "exFameName",
+      "exOffers",
+      "exStart",
+      "exRest",
+      "exClaim",
+      "exLibSettle",
+      "exBizState",
+      "exBizSettle",
+      "exIco",
+      "exBar",
+      "exStatus",
+      "exCharRow",
+      "exHTML",
+      "dispPageHTML"
+     ],
+     "닿지 않음": [
+      "exAssign"
+     ]
+    },
     "unit": "disp"
    },
    {
@@ -39568,6 +41068,23 @@
       1
      ]
     ],
+    "members": {
+     "배경.실행 중 AI": [
+      "dayKey",
+      "liveBar",
+      "rotatePickups",
+      "dailyTalks"
+     ],
+     "메뉴:lobby": [
+      "weekKey"
+     ],
+     "창:openNewPickup": [
+      "bgJobsDraw"
+     ],
+     "공용": [
+      "bgJob"
+     ]
+    },
     "unit": "배경.실행 중 AI"
    },
    {
@@ -39612,6 +41129,58 @@
       1
      ]
     ],
+    "members": {
+     "studio.live": [
+      "cycDays",
+      "cycLabel",
+      "seasonNow",
+      "seasonMeta"
+     ],
+     "배경.실행 중 AI": [
+      "cycKey",
+      "seasonKey",
+      "aiPickupStory",
+      "seasonStart",
+      "liveTick",
+      "openNotice"
+     ],
+     "창:openSeasonInfo": [
+      "seasonDays",
+      "openSeasonInfo"
+     ],
+     "공용": [
+      "seasonIs",
+      "seasonNext",
+      "aiNewPickupChar",
+      "aiAltChar",
+      "addCGs",
+      "prepChip",
+      "runPrep"
+     ],
+     "창:openChar": [
+      "baseChar",
+      "altsOf"
+     ],
+     "lobby": [
+      "seasonChip"
+     ],
+     "배경.새 게임 생성": [
+      "lookMap"
+     ],
+     "studio.img": [
+      "drawTodo"
+     ],
+     "창:openPrep": [
+      "PREP_CATS",
+      "openPrep"
+     ],
+     "studio.view.1": [
+      "prepAsk"
+     ],
+     "notice": [
+      "noticeHTML"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -39662,6 +41231,35 @@
       1
      ]
     ],
+    "members": {
+     "codex": [
+      "cxStore",
+      "cxNotes",
+      "libSrc",
+      "mainStages",
+      "escRe",
+      "cxMention",
+      "cxSeenText",
+      "cxUnlocked",
+      "cxLockText",
+      "cxEntries",
+      "cxSeenSet",
+      "cxNew",
+      "cxCard",
+      "codexHTML",
+      "openCx",
+      "openCxEdit",
+      "codeToStage",
+      "cxDiscover",
+      "cxDeepen"
+     ],
+     "lobby": [
+      "cxNewFast"
+     ],
+     "공용": [
+      "cxFromChapter"
+     ]
+    },
     "unit": "codex"
    },
    {
@@ -39682,6 +41280,16 @@
       1
      ]
     ],
+    "members": {
+     "창:artAfterAI": [
+      "artKey",
+      "artRun",
+      "artAfterAI"
+     ],
+     "창:openNpcs": [
+      "artSnap"
+     ]
+    },
     "unit": "창:artAfterAI"
    },
    {
@@ -39706,6 +41314,32 @@
       2
      ]
     ],
+    "members": {
+     "studio.img": [
+      "castNeeded",
+      "showCast"
+     ],
+     "창:openNpcs": [
+      "npcNew",
+      "npcCardHTML",
+      "openNpcs",
+      "npcRefresh",
+      "npcRead",
+      "npcDraw",
+      "autoNpcs"
+     ],
+     "창:openCastFaces": [
+      "castChars",
+      "castById",
+      "castCardHTML",
+      "castFaceOpt",
+      "openCastFaces",
+      "castFacesGo",
+      "castStat",
+      "castRefresh",
+      "castRun"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -39743,7 +41377,25 @@
       "창:openPub",
       1
      ]
-    ]
+    ],
+    "members": {
+     "공용": [
+      "ghH",
+      "gh",
+      "ghSafeMessage",
+      "ghRequestError"
+     ],
+     "메뉴:studio": [
+      "ghSHA",
+      "ghRefPath",
+      "ghCommitFiles",
+      "ghCreateBlob",
+      "ghUploadPool"
+     ],
+     "창:openPub": [
+      "ghEnsureBranch"
+     ]
+    }
    },
    {
     "mod": "src/main/0360-sync/",
@@ -39787,6 +41439,79 @@
       1
      ]
     ],
+    "members": {
+     "studio.conn.2": [
+      "SY",
+      "syDevice",
+      "syMerge",
+      "syReady",
+      "syPull"
+     ],
+     "공용": [
+      "saveSY",
+      "syIdx",
+      "saveSyIdx",
+      "shaHex",
+      "sha256js",
+      "syLsValue",
+      "syLsKeys",
+      "syBar",
+      "syErr",
+      "pcApi",
+      "syRemote",
+      "lsHoldMerge",
+      "freshGame",
+      "devId",
+      "LKMODE",
+      "lkGet",
+      "lkOp",
+      "lkSave",
+      "lkUnlock"
+     ],
+     "창:pcPush": [
+      "bytesToB64",
+      "pcPush"
+     ],
+     "창:syPush": [
+      "syStrip",
+      "syPush"
+     ],
+     "메뉴:studio": [
+      "syncStageMedia",
+      "lsApply"
+     ],
+     "studio.conn.1": [
+      "pcPull"
+     ],
+     "창:openPcSet": [
+      "pcStart",
+      "openPcSet",
+      "bootPullOk",
+      "lkAway",
+      "lkNewer",
+      "lkPullIfNewer",
+      "lkActivate",
+      "lkLock",
+      "lkTake"
+     ],
+     "창:openPcHist": [
+      "openPcHist"
+     ],
+     "창:syCheckOnStart": [
+      "syCheckOnStart"
+     ],
+     "창:openSync": [
+      "openSync",
+      "lkLoop",
+      "lkTick"
+     ],
+     "닿지 않음": [
+      "bootSync"
+     ],
+     "창:openPullFail": [
+      "openPullFail"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -39843,6 +41568,20 @@
       1
      ]
     ],
+    "members": {
+     "창:openProjects": [
+      "startMode"
+     ],
+     "studio.img": [
+      "showPicker",
+      "showStart",
+      "showBootPrep",
+      "bpRead",
+      "bootPrepRun",
+      "bootCats",
+      "bootPrepNeeded"
+     ]
+    },
     "unit": "studio.img"
    },
    {
@@ -39871,6 +41610,33 @@
       1
      ]
     ],
+    "members": {
+     "창:openPub": [
+      "PUB",
+      "savePUB",
+      "pubMeta",
+      "pubContent",
+      "pubUpload",
+      "openPub"
+     ],
+     "창:openSubAdd": [
+      "subBase",
+      "subParse",
+      "openSubAdd",
+      "subscribe"
+     ],
+     "studio.game.14": [
+      "subAddr"
+     ],
+     "창:subCheck": [
+      "subGet",
+      "subCheck",
+      "subApply"
+     ],
+     "메뉴:studio": [
+      "subPullImages"
+     ]
+    },
     "unit": "창:openPub"
    },
    {
@@ -39899,6 +41665,26 @@
       1
      ]
     ],
+    "members": {
+     "공용": [
+      "orientPref"
+     ],
+     "배경.앱 시작": [
+      "applyOrient"
+     ],
+     "studio.view.2": [
+      "deskMode"
+     ],
+     "닿지 않음": [
+      "applyDesk"
+     ],
+     "창:openA2HS": [
+      "openA2HS"
+     ],
+     "창:openProxySet": [
+      "openProxySet"
+     ]
+    },
     "spread": [
      {
       "unit": "배경.앱 시작",
@@ -39960,6 +41746,51 @@
       1
      ]
     ],
+    "members": {
+     "메뉴:studio": [
+      "verCmp",
+      "updRepo",
+      "notesHTML",
+      "LV",
+      "saveLV"
+     ],
+     "창:checkUpdate": [
+      "sha256hex",
+      "updateHTMLMinimum",
+      "updateMinimum",
+      "updateCheckRecord",
+      "updateCurrentMessage",
+      "updateReleaseURL",
+      "updateAPKRequired",
+      "updateDownloadHTML",
+      "checkUpdate",
+      "applyUpdate",
+      "checkUpdatePrivate"
+     ],
+     "창:openUrl": [
+      "openUrl"
+     ],
+     "창:openUpdSet": [
+      "updateCheckHTML",
+      "openUpdSet"
+     ],
+     "studio.info.3": [
+      "onPcServer"
+     ],
+     "창:checkWebUpdate": [
+      "checkWebUpdate",
+      "applyWebUpdate"
+     ],
+     "닿지 않음": [
+      "checkNoticeWeb"
+     ],
+     "창:openAiChapter": [
+      "openAiChapter"
+     ],
+     "창:openBackup": [
+      "openBackup"
+     ]
+    },
     "unit": "창:checkUpdate"
    },
    {
@@ -39975,7 +41806,18 @@
       "창:openMeta",
       2
      ]
-    ]
+    ],
+    "members": {
+     "공용": [
+      "storyCfg",
+      "storyN",
+      "lenSpec"
+     ],
+     "창:openMeta": [
+      "storyFormHTML",
+      "readStoryForm"
+     ]
+    }
    },
    {
     "mod": "src/main/0445-factions.js",
@@ -39999,6 +41841,43 @@
       1
      ]
     ],
+    "members": {
+     "studio.game.8": [
+      "castCfg",
+      "factions",
+      "mainNow",
+      "stanceAt",
+      "monsterNames",
+      "enemyFaction",
+      "metInStory",
+      "castLock",
+      "factionReview",
+      "factionAI",
+      "charToMonster",
+      "factionPanel",
+      "openWorldDesign",
+      "fwRead"
+     ],
+     "공용": [
+      "facByName",
+      "isMonsterLike",
+      "stanceApply",
+      "monsterFromGen",
+      "debutResolve"
+     ],
+     "contract": [
+      "castOk"
+     ],
+     "닿지 않음": [
+      "stanceAI",
+      "firstSpeak"
+     ],
+     "배경.새 게임 생성": [
+      "factionMatch",
+      "factionClean",
+      "bestiaryApply"
+     ]
+    },
     "unit": "studio.game.8"
    },
    {
@@ -40023,6 +41902,44 @@
       1
      ]
     ],
+    "members": {
+     "창:openRelEdit": [
+      "RELS",
+      "relPair",
+      "relLine",
+      "memCatchUp",
+      "relSeedAI",
+      "relNodeHTML",
+      "openRel",
+      "openRelEdit"
+     ],
+     "배경.새 게임 생성": [
+      "relRef",
+      "relApply",
+      "relFromProfiles"
+     ],
+     "메뉴:공용": [
+      "relObj",
+      "relName",
+      "relOf",
+      "relOther"
+     ],
+     "창:openChEdit": [
+      "relKeys"
+     ],
+     "공용": [
+      "loreOf",
+      "loreMap",
+      "loreOpts",
+      "stageCast",
+      "relNew",
+      "relNames",
+      "relFromScripts"
+     ],
+     "메뉴:lobby": [
+      "loreLabel"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -40062,6 +41979,39 @@
       1
      ]
     ],
+    "members": {
+     "공용": [
+      "PERSONA_CFG",
+      "personaClean",
+      "pfieldsClean",
+      "affThreads",
+      "memoCheck"
+     ],
+     "studio.game.7": [
+      "pStrs",
+      "personaReview",
+      "personaAI",
+      "talkAffGen",
+      "memorialGen",
+      "personaPanel",
+      "openPersonaAll",
+      "personaBatch",
+      "personaCfgSave"
+     ],
+     "닿지 않음": [
+      "personaAIReview",
+      "personaSave",
+      "psReopen"
+     ],
+     "창:openChar": [
+      "memoOpen",
+      "memoOn",
+      "personaHTML"
+     ],
+     "창:openPersona": [
+      "openPersona"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -40092,7 +42042,32 @@
       "창:openSound",
       2
      ]
-    ]
+    ],
+    "members": {
+     "창:openSound": [
+      "splitTags",
+      "parseScript"
+     ],
+     "공용": [
+      "findSpeaker",
+      "vnSpeaker",
+      "playStory",
+      "setVnBg",
+      "vnStep",
+      "vnCmd",
+      "vnShow",
+      "vnPrefetch",
+      "vnType",
+      "vnFinish",
+      "vnAutoNext",
+      "vnSkip",
+      "vnEnd",
+      "closeOv"
+     ],
+     "메뉴:공용": [
+      "npcBy"
+     ]
+    }
    },
    {
     "mod": "src/main/0462-direction.js",
@@ -40120,6 +42095,38 @@
       1
      ]
     ],
+    "members": {
+     "배경.앱 시작": [
+      "EMO_SVG"
+     ],
+     "studio.game.10": [
+      "emoKey",
+      "emoteHTML"
+     ],
+     "창:openSound": [
+      "dirSplit"
+     ],
+     "lobby": [
+      "autoEmote",
+      "dirMode",
+      "lobbyEmote"
+     ],
+     "공용": [
+      "vnStage",
+      "slotOf",
+      "vnEmote",
+      "vnMotion",
+      "vnScreen",
+      "vnDirectSay",
+      "vnDirectCmd"
+     ],
+     "닿지 않음": [
+      "dirStrip",
+      "dirCount",
+      "directScript",
+      "directStage"
+     ]
+    },
     "unit": "lobby"
    },
    {
@@ -40136,6 +42143,23 @@
       8
      ]
     ],
+    "members": {
+     "studio.game.9": [
+      "PLAN",
+      "planHas",
+      "planCheck",
+      "planAI",
+      "planClean",
+      "planPanel",
+      "openPlan",
+      "planRead"
+     ],
+     "공용": [
+      "planActOf",
+      "storyFlag",
+      "planEnsure"
+     ]
+    },
     "unit": "studio.game.9"
    },
    {
@@ -40156,6 +42180,22 @@
       2
      ]
     ],
+    "members": {
+     "studio.view.1": [
+      "tlLen",
+      "titleLines",
+      "tlSpan",
+      "logoHTML",
+      "logoStyle",
+      "showTitle",
+      "playOpening",
+      "opNext"
+     ],
+     "창:opEnd": [
+      "opEnd",
+      "afterPrologue"
+     ]
+    },
     "unit": "studio.view.1"
    },
    {
@@ -40175,7 +42215,33 @@
       "창:openChar",
       2
      ]
-    ]
+    ],
+    "members": {
+     "창:openStoryStage": [
+      "stageBg",
+      "openStoryStage",
+      "playStoryStage"
+     ],
+     "닿지 않음": [
+      "startBattle",
+      "attackFx",
+      "uel"
+     ],
+     "공용": [
+      "startStage",
+      "bRun",
+      "alive",
+      "bTick",
+      "useSkill",
+      "bUpdate",
+      "bCheck",
+      "bEnd"
+     ],
+     "창:openChar": [
+      "cutFace",
+      "skillCut"
+     ]
+    }
    },
    {
     "mod": "src/main/0485-battle-rules.js",
@@ -40195,6 +42261,27 @@
       3
      ]
     ],
+    "members": {
+     "배경.새 게임 생성": [
+      "ruleFacs",
+      "ruleArg",
+      "ruleOk",
+      "ruleClean",
+      "stageAutoRules"
+     ],
+     "창:openFormation": [
+      "fieldText",
+      "goalText",
+      "rulesHTML"
+     ],
+     "공용": [
+      "fieldApply",
+      "fieldTime"
+     ],
+     "닿지 않음": [
+      "bFocus"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -40238,6 +42325,43 @@
       1
      ]
     ],
+    "members": {
+     "메뉴:공용": [
+      "charRange"
+     ],
+     "공용": [
+      "formOn",
+      "SORTIE",
+      "sortieNodeEnd",
+      "sortieResult",
+      "quitConfirm"
+     ],
+     "studio.game.5": [
+      "sortieOn",
+      "battleSysPanel"
+     ],
+     "창:openFormation": [
+      "rowWarn",
+      "formHelp"
+     ],
+     "창:sortieMap": [
+      "routeAuto",
+      "routeOf",
+      "nodeById",
+      "nodeStage",
+      "sortieParts",
+      "sortieMap",
+      "sortieChoices",
+      "sortieFight",
+      "sortieEnd"
+     ],
+     "배경.새 게임 생성": [
+      "routeClean"
+     ],
+     "닿지 않음": [
+      "sortieBegin"
+     ]
+    },
     "unit": "창:sortieMap"
    },
    {
@@ -40266,6 +42390,35 @@
       1
      ]
     ],
+    "members": {
+     "배경.새 게임 생성": [
+      "finaleOf",
+      "S_",
+      "modeClean"
+     ],
+     "공용": [
+      "finaleEnd"
+     ],
+     "studio.game.5": [
+      "modesCfg"
+     ],
+     "창:openModeStage": [
+      "charmOf",
+      "openModeStage",
+      "modeClear",
+      "debateStart",
+      "debateDraw",
+      "debateHit",
+      "debateMiss",
+      "contestStart",
+      "contestPref",
+      "contestDraw",
+      "contestAppeal"
+     ],
+     "ops": [
+      "modeIcon"
+     ]
+    },
     "unit": "창:openModeStage"
    },
    {
@@ -40290,6 +42443,22 @@
       1
      ]
     ],
+    "members": {
+     "challenge": [
+      "bossPats"
+     ],
+     "창:openFormation": [
+      "bossPatText"
+     ],
+     "공용": [
+      "bossNext",
+      "farmReward"
+     ],
+     "farm": [
+      "farmRec",
+      "farmStage"
+     ]
+    },
     "unit": "farm"
    },
    {
@@ -40318,6 +42487,42 @@
       1
      ]
     ],
+    "members": {
+     "메뉴:contract": [
+      "sealSVG",
+      "playGacha0",
+      "revealCard0",
+      "showCut0",
+      "flipAll"
+     ],
+     "공용": [
+      "mainCleared",
+      "gateOpen",
+      "curBanner",
+      "bannerPool"
+     ],
+     "contract": [
+      "bnOpen",
+      "pityKey",
+      "pityGet",
+      "pitySet",
+      "guarGet",
+      "softRate",
+      "rollOne",
+      "openSpark",
+      "openHistory",
+      "pull"
+     ],
+     "창:openModeStage": [
+      "gateCheck"
+     ],
+     "배경.실행 중 AI": [
+      "sparkSettle"
+     ],
+     "construct": [
+      "grantOwned"
+     ]
+    },
     "unit": "contract"
    },
    {
@@ -40350,6 +42555,51 @@
       1
      ]
     ],
+    "members": {
+     "배경.새 게임 생성": [
+      "variantsFromAI",
+      "conStartNew"
+     ],
+     "studio.game.1": [
+      "conMeta",
+      "conSettingsPanel",
+      "conVariantRow",
+      "openConSet",
+      "conReadVariants",
+      "conSave"
+     ],
+     "공용": [
+      "CON",
+      "conOn",
+      "VARIANTS",
+      "conTargets"
+     ],
+     "construct": [
+      "CRES",
+      "CBUILD",
+      "conGem",
+      "conResIcon",
+      "conResBar",
+      "conVariantOf",
+      "conVariantChoices",
+      "conPool",
+      "conMakeVariant",
+      "conDefaultInput",
+      "conReadInput",
+      "conEmptyWhy",
+      "conBuild",
+      "conBuy",
+      "conNeedText",
+      "conInfoHTML",
+      "constructHTML"
+     ],
+     "disp": [
+      "conDispReward"
+     ],
+     "contract": [
+      "conEntryHTML"
+     ]
+    },
     "unit": "construct"
    },
    {
@@ -40365,7 +42615,29 @@
       "창:openProjects",
       1
      ]
-    ]
+    ],
+    "members": {
+     "닿지 않음": [
+      "handleSetupAction",
+      "handleNavigationAndToolsAction",
+      "handleMailAction",
+      "handleStoryAndAuthoringAction",
+      "handleSettingsAndAudioAction",
+      "handleStorageAndSharingAction",
+      "handleCombatAndFormationAction",
+      "handleUpdatesAction",
+      "handleCharactersAction",
+      "handleImagesAndAssetsAction",
+      "handleEconomyAction",
+      "handleMessengerAction"
+     ],
+     "창:openProjects": [
+      "rerollDraft"
+     ],
+     "공용": [
+      "imgTarget"
+     ]
+    }
    },
    {
     "mod": "src/main/0520-backup-storage.js",
@@ -40389,6 +42661,44 @@
       2
      ]
     ],
+    "members": {
+     "studio.data.1": [
+      "backupBlocks",
+      "openBackupChoice"
+     ],
+     "창:backupExport": [
+      "backupIdentity",
+      "backupExport"
+     ],
+     "닿지 않음": [
+      "backupMatches",
+      "backupLines",
+      "legacyBackupEntries",
+      "stageBackup",
+      "attachBackupMedia",
+      "backupImport",
+      "clearImportedMediaCache",
+      "applySharedArchive",
+      "legacyMediaBlob"
+     ],
+     "메뉴:studio": [
+      "backupChatKeys",
+      "backupMedia",
+      "backupBytes",
+      "backupBusyOverlay",
+      "bkDests",
+      "bkDest",
+      "opt_",
+      "bkWriter"
+     ],
+     "창:openShare": [
+      "shareDefinition",
+      "shareExport",
+      "backupTransferStatus",
+      "exportFile",
+      "exportGo"
+     ]
+    },
     "unit": "창:openShare"
    },
    {
@@ -40405,6 +42715,22 @@
       12
      ]
     ],
+    "members": {
+     "studio.data.1": [
+      "dataSplit",
+      "dataJoin",
+      "crc32",
+      "zipMake",
+      "zipRead",
+      "jsonBytes",
+      "dataExportZip",
+      "dataReadZip",
+      "dataSaveBlob",
+      "dataExport",
+      "dataImport",
+      "dataFolderBlock"
+     ]
+    },
     "unit": "studio.data.1"
    },
    {
@@ -40437,6 +42763,37 @@
       1
      ]
     ],
+    "members": {
+     "창:openStoryMemory": [
+      "smState",
+      "smFingerprint",
+      "openStoryMemory"
+     ],
+     "공용": [
+      "smPrevious",
+      "storyWrapUp"
+     ],
+     "닿지 않음": [
+      "smFocused",
+      "smProfile",
+      "smVoice"
+     ],
+     "창:smRebuild": [
+      "smChunks",
+      "smExtract",
+      "openStoryMemoryEditor",
+      "smRebuild"
+     ],
+     "창:openAp": [
+      "smRecord"
+     ],
+     "창:smTextView": [
+      "smTextView"
+     ],
+     "창:openChEdit": [
+      "smRelationRows"
+     ]
+    },
     "split": [
      {
       "units": [
@@ -40468,6 +42825,32 @@
       15
      ]
     ],
+    "members": {
+     "studio.game.3": [
+      "auditGenVer",
+      "auditStrs",
+      "auditVer",
+      "auditTargets",
+      "auditName",
+      "auditScan",
+      "auditMarkObj",
+      "auditAIFill",
+      "auditAIStage",
+      "auditAutoRun",
+      "auditFixOne",
+      "auditFix",
+      "auditConvert",
+      "openAudit",
+      "auditPanel"
+     ],
+     "메뉴:studio": [
+      "auditSnap",
+      "auditUndo"
+     ],
+     "닿지 않음": [
+      "auditNotice"
+     ]
+    },
     "unit": "studio.game.3"
    },
    {
@@ -40484,6 +42867,14 @@
       4
      ]
     ],
+    "members": {
+     "배경.실행 중 AI": [
+      "liveFill",
+      "liveFillStep",
+      "liveFillRun",
+      "liveFillNotes"
+     ]
+    },
     "unit": "배경.실행 중 AI"
    },
    {
@@ -40500,6 +42891,16 @@
       3
      ]
     ],
+    "members": {
+     "메뉴:studio": [
+      "blobToData"
+     ],
+     "창:openChar": [
+      "saveImgBlob",
+      "charImgList",
+      "saveImgUrl"
+     ]
+    },
     "unit": "창:openChar",
     "to": "src/main/0100-messenger.js",
     "n0": 3,
@@ -40519,6 +42920,26 @@
       13
      ]
     ],
+    "members": {
+     "studio.game.10": [
+      "shAudio",
+      "shList",
+      "shSave",
+      "shSrc",
+      "libTarget",
+      "libBlob",
+      "shPut",
+      "shTake",
+      "libUsage",
+      "libDupes",
+      "libMerge",
+      "openAssets",
+      "assetPanel"
+     ],
+     "메뉴:공용": [
+      "shAdopt"
+     ]
+    },
     "unit": "studio.game.10"
    }
   ],
@@ -41093,8 +43514,8 @@
   ]
  },
  "gamesN": 2,
- "at": "2026-11-04T00:19",
- "head": "274e94f",
+ "at": "2026-11-04T00:34",
+ "head": "de137de",
  "inputs": {
   "src": {
    "src/boot/durable-storage.js": "9e1fdc434852",
@@ -41231,9 +43652,57 @@
    "idol-audition": "a443d928bb99",
    "sky-knights": "c782aafba942"
   },
-  "tool": "f5e26c9130b3"
+  "tool": "859431bd4b89"
  },
  "changes": [
+  {
+   "at": "2026-11-04T00:34",
+   "head": "de137de",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-04T00:33",
+   "head": "de137de",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
   {
    "at": "2026-11-04T00:19",
    "head": "274e94f",

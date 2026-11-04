@@ -9,6 +9,7 @@ import { walk } from './source.mjs';
 import { STAGES } from './lifecycle.mjs';
 import { constLiterals } from './wiring.mjs';
 import { moduleOf } from './scope.mjs';
+import { fragmentFiles } from './prompts.mjs';
 
 const FNT = /^(function_declaration|function_expression|arrow_function|method_definition|generator_function_declaration)$/;
 const HUB = 25; // 이만큼 많은 함수가 부르면 공용 기반
@@ -131,6 +132,7 @@ function verdict(C, mod, m, nd) { const n = [...m.values()].reduce((a, b) => a +
   const parts = []; for (const [u, c] of feat.filter(([, c]) => c >= 2)) { const p = parts.find(x => x.units.some(y => C.related(y, u))); if (p) { p.units.push(u); p.n += c; } else parts.push({ units: [u], n: c }); }
   const big = parts.filter(p => p.n >= Math.max(3, nf * 0.2)), v = { mod, n, feat: nf, shared, base, unreached: m.get('닿지 않음') || 0, units: feat, parts }, away = u => C.home.get(u) !== mod ? C.home.get(u) : null;
   if (nd * 2 >= n) return { ...v, kind: '분배' }; /* 액션 분배기 층(원안 설계 — 화면 동작을 기능으로 넘김): 판정 대상 아님 */
+  if (mod === C.layer) return { ...v, kind: '층' }; /* 프롬프트 스튜디오(사용자 지시 — 모든 기능의 프롬프트를 한 모듈로 취합): 여러 기능을 담는 것이 설계 */
   if (base > nf && base >= shared) return { ...v, kind: '기반' }; if (shared > nf) return { ...v, kind: '엔진' };
   if (nf >= 3 && !parts.length && feat[0][1] * 2 < nf) return { ...v, kind: '흩어짐', spread: feat.map(([u, c]) => ({ unit: u, n: c, to: away(u) })) }; /* 기능 함수가 여러 단위에 하나씩 — 함수마다 제 기능 쪽으로 */
   if (big.length >= 2 || parts.length >= MANY) return { ...v, kind: '슈퍼', split: parts.map(p => ({ units: p.units, n: p.n, to: away(p.units[0]) })) };
@@ -141,20 +143,22 @@ function verdict(C, mod, m, nd) { const n = [...m.values()].reduce((a, b) => a +
 //   슈퍼 — 관계없는 기능 단위를 둘 이상 의미 있게 담음(나눌 대상: 단위마다 옮길 곳 = 그 단위 함수가 가장 많은 다른 모듈, 없으면 새 자리)
 //   조각 — 중심 단위의 함수 대부분이 다른 모듈에 있음(그 모듈로 합칠 대상)
 //   엔진 — 여러 메뉴가 같이 쓰는 함수 중심 · 기반 — 공용 기반(허브) 중심 · 분배 — 액션 분배기(handle*Action·data-act 리스너) 층(판정 대상 아님)
+//   층 — 설계상 여러 기능을 담는 층(프롬프트 스튜디오 — 사용자 지시로 모든 프롬프트를 취합): 판정 대상 아님
 //   흩어짐 — 기능 함수(3개↑)가 여러 단위에 하나씩, 어느 단위도 절반이 안 됨(함수마다 그 단위 함수가 많은 모듈로 나눠 보낼 대상)
 //   의미 있는 단위 = 함수 max(3, 모듈 기능 함수의 20%) 이상
-export function moduleVerdicts(rows, rel = new Map()) { // rows: [{ mod, fn, place, dispatch }]
+export function moduleVerdicts(rows, rel = new Map(), layer = null) { // rows: [{ mod, fn, place, dispatch }] · layer: 설계상 층(프롬프트 스튜디오)
   const byMod = new Map(), byUnit = new Map(), disp = new Map(); for (const r of rows) { if (!byMod.has(r.mod)) byMod.set(r.mod, new Map()); const m = byMod.get(r.mod); m.set(r.place, (m.get(r.place) || 0) + 1); if (r.dispatch) disp.set(r.mod, (disp.get(r.mod) || 0) + 1); if (!NONFEAT(r.place)) { if (!byUnit.has(r.place)) byUnit.set(r.place, new Map()); const g = byUnit.get(r.place); g.set(r.mod, (g.get(r.mod) || 0) + 1); } }
   const home = new Map(); for (const [u, m] of byUnit) home.set(u, [...m].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0][0]);
-  const ctx = { home, byUnit, related: (a, b) => !!rel.get(a)?.has(b) }, out = [...byMod].map(([mod, m]) => verdict(ctx, mod, m, disp.get(mod) || 0));
+  const ctx = { home, byUnit, layer, related: (a, b) => !!rel.get(a)?.has(b) }, out = [...byMod].map(([mod, m]) => verdict(ctx, mod, m, disp.get(mod) || 0));
   /* 기능 단위 파편화: 함수 5개 이상인 단위가 3개 이상 모듈에 흩어지고 가장 많은 모듈 몫이 60% 미만 */
   const frag = [...byUnit].map(([u, m]) => { const tot = [...m.values()].reduce((a, b) => a + b, 0), top = Math.max(...m.values()); return { unit: u, n: tot, mods: [...m].sort((a, b) => b[1] - a[1]), top: Math.round(100 * top / tot) }; }).filter(x => x.n >= 5 && x.mods.length >= 3 && x.top < 60);
   return { modules: out.sort((a, b) => a.mod.localeCompare(b.mod)), home, units: byUnit, frag }; }
 
 // 맵에 넣을 요약(직렬화): 기능 단위(메뉴·종류·함수 수·얽힌 모듈·안에 든 창) · 함수마다 자리 · 모듈 판정 · 파편화 단위
 export function surfaceMap(units, fns, stf, html) { const sf = surfaceOf(units, fns, html), rel = unitRelations(sf, stf);
-  const rows = [...fns.values()].filter(f => f.top && !f.table && f.unit === 'main').map(f => ({ mod: moduleOf(f.loc.split(':')[0]), fn: f.key, place: unitPlace(sf, f.key), dispatch: /^handle\w+Action$/.test(f.name) })), V = moduleVerdicts(rows, rel);
+  const rows = [...fns.values()].filter(f => f.top && !f.table && f.unit === 'main').map(f => ({ mod: moduleOf(f.loc.split(':')[0]), fn: f.key, place: unitPlace(sf, f.key), dispatch: /^handle\w+Action$/.test(f.name) })), V = moduleVerdicts(rows, rel, fragmentFiles(units).home);
   const feats = {}; for (const f of sf.feats.values()) { if (f.unit !== f.key) continue; const m = V.units.get(f.key) || new Map();
     feats[f.key] = { label: fullLabel(sf, f.key), kind: f.kind, menu: f.menu, n: [...m.values()].reduce((a, b) => a + b, 0), mods: [...m].sort((a, b) => b[1] - a[1]), windows: [...sf.feats.values()].filter(w => w.kind === 'window' && w.unit === f.key && w.key !== f.key).map(w => w.label), openers: (f.openers || []).map(o => sf.feats.get(o)?.unit).filter((x, i, a) => x && a.indexOf(x) === i), related: [...(rel.get(f.key) || [])].map(([u, why]) => [u, why]) }; }
-  const verdicts = V.modules.map(v => ({ mod: v.mod, kind: v.kind, n: v.n, feat: v.feat, shared: v.shared, base: v.base, unreached: v.unreached, units: v.units.slice(0, 8), ...(v.split ? { split: v.split } : {}), ...(v.spread ? { spread: v.spread } : {}), ...(v.to ? { unit: v.unit, to: v.to, n0: v.n0, n1: v.n1 } : v.unit ? { unit: v.unit } : {}) }));
+  /* 판정 근거(--why <모듈>): 모듈의 자리마다 함수 이름 */ const members = new Map(); for (const r of rows) { if (!members.has(r.mod)) members.set(r.mod, {}); (members.get(r.mod)[r.place] ||= []).push(fns.get(r.fn)?.name || r.fn); }
+  const verdicts = V.modules.map(v => ({ mod: v.mod, kind: v.kind, n: v.n, feat: v.feat, shared: v.shared, base: v.base, unreached: v.unreached, units: v.units.slice(0, 8), members: members.get(v.mod) || {}, ...(v.split ? { split: v.split } : {}), ...(v.spread ? { spread: v.spread } : {}), ...(v.to ? { unit: v.unit, to: v.to, n0: v.n0, n1: v.n1 } : v.unit ? { unit: v.unit } : {}) }));
   return { tabs: sf.tabs, feats, place: Object.fromEntries(rows.map(r => [r.fn, r.place])), verdicts, frag: V.frag.map(x => ({ unit: x.unit, n: x.n, top: x.top, mods: x.mods })) }; }

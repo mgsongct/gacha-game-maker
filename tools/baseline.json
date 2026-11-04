@@ -2043,13 +2043,6 @@
  ],
  "surface": [
   {
-   "key": "기능 표면 슈퍼|src/main/0015-prompt-studio/",
-   "num": {
-    "함수": 109
-   },
-   "text": "슈퍼 0015-prompt-studio/"
-  },
-  {
    "key": "기능 표면 슈퍼|src/main/0020-ai-connect.js",
    "num": {
     "함수": 60
