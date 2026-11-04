@@ -41093,8 +41093,8 @@
   ]
  },
  "gamesN": 2,
- "at": "2026-11-04T00:18",
- "head": "1dd6b9c",
+ "at": "2026-11-04T00:19",
+ "head": "274e94f",
  "inputs": {
   "src": {
    "src/boot/durable-storage.js": "9e1fdc434852",
@@ -41231,9 +41231,33 @@
    "idol-audition": "a443d928bb99",
    "sky-knights": "c782aafba942"
   },
-  "tool": "65382d0166ef"
+  "tool": "f5e26c9130b3"
  },
  "changes": [
+  {
+   "at": "2026-11-04T00:19",
+   "head": "274e94f",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
   {
    "at": "2026-11-04T00:18",
    "head": "1dd6b9c",
