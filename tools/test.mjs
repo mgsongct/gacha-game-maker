@@ -16,9 +16,11 @@ import { stageClosures } from './lib/lifecycle.mjs';
 import { bindings, violations, renameEdits } from './lib/names.mjs';
 import { inlinePrompts, pureModules, imperative, fragmentFiles } from './lib/prompts.mjs';
 import { moveLiteral, slotName } from './prompts-move.mjs';
-import { moduleMap } from './lib/modules.mjs';
+import { moduleMap, louvain } from './lib/modules.mjs';
 import { reachable, claimNames } from './lib/history.mjs';
 import { surfaceOf, placeOf, surfaceMap } from './lib/surface.mjs';
+import { archMap } from './lib/arch.mjs';
+import { moduleOf } from './lib/scope.mjs';
 
 const root = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w = (p, s) => { mkdirSync(join(root, p, '..'), { recursive: true }); writeFileSync(join(root, p), s); };
 w('src/index.html', '<script>\n<!--@ main/ -->\n</script>\n');
@@ -285,10 +287,28 @@ function featA(){ return [G.meta.made, G.meta.never, G.world.lore, G.world.plot2
   assert.equal(F.get('창:openReceipt')?.unit, 'shop', '한 화면만 여는 창은 그 화면 단위');
   const pl = k => placeOf(S, k); assert.ok(pl('buyItem').unit === 'shop' && pl('pullOne').unit === 'gacha' && pl('editRules').unit === 'studio.game.1' && pl('receiptLine').unit === 'shop', '함수 자리 = 가장 가까운 기능 단위(동작 처리기·창 안 포함): ' + ['buyItem', 'pullOne', 'editRules', 'receiptLine'].map(k => JSON.stringify(pl(k))).join(' '));
   assert.equal(pl('bothUse').kind, '여러 메뉴', '두 메뉴가 같은 거리로 쓰는 함수 = 공용');
-  const V = surfaceMap(u14, g14.fns, stateFlow(u14, g14.fns), html).verdicts, vd = m => V.find(v => v.mod === 'src/main/' + m);
-  assert.ok(vd('050-fragment.js').kind === '조각' && vd('050-fragment.js').to === 'src/main/030-shop.js', '조각 모듈 → 그 단위 함수가 많은 모듈로: ' + JSON.stringify(vd('050-fragment.js')));
-  assert.ok(vd('060-mixed.js').kind === '슈퍼' && vd('060-mixed.js').split.length === 2, '관계없는 두 기능을 담은 모듈 = 슈퍼: ' + JSON.stringify(vd('060-mixed.js')));
-  assert.equal(vd('030-shop.js').kind, '고유', '한 기능 중심 모듈 = 고유');
+  const SM = surfaceMap(u14, g14.fns, S); assert.ok(SM.feats.shop?.n >= 3 && SM.feats.shop.mods[0][0] === 'src/main/030-shop.js', '화면 단위 요약: 그 단위에서만 닿는 함수가 있는 모듈: ' + JSON.stringify(SM.feats.shop));
   rmSync(r14, { recursive: true, force: true }); }
+// 아키텍처(lib/arch.mjs — CLAUDE.md §0-2): 함수마다 계층(View·Controller·Model·섞임)·방향 위반, Model·Controller를 같은 데이터·호출로 묶은 기능, 모듈 판정(슈퍼·조각·고유), 저장 정책(갈래 없는 키·세션·낡은 표)
+{ const r15 = mkdtempSync(join(tmpdir(), 'ggm-tools-')), w15 = (p, x) => { mkdirSync(join(r15, p, '..'), { recursive: true }); writeFileSync(join(r15, p), x); };
+  w15('src/index.html', '<div id="app"></div>');
+  w15('src/main/010-core.js', "let G={shop:{},rates:{},misc:{}};\nfunction render(){ document.body.innerHTML=''; }\nfunction openModal(h){ document.body.insertAdjacentHTML('beforeend',h); }\n");
+  w15('src/main/020-shop.js', "function shopHTML(){ return '<div>'+shopPrice()+'</div>'; }\nfunction buyItem(){ G.shop.sold=1; shopStock(); render(); }\nfunction shopPrice(){ return G.shop.price||1; }\nfunction shopStock(){ G.shop.stock=shopPrice()-1; }\nfunction shopLog(){ G.shop.log=[shopPrice()]; }\n");
+  w15('src/main/030-gacha.js', "function gachaHTML(){ return '<p>'+rollRate()+'</p>'; }\nfunction pullOne(){ G.rates.n=1; pityAdd(); render(); }\nfunction rollRate(){ return G.rates.ssr||3; }\nfunction pityAdd(){ G.rates.pity=rollRate()+1; }\nfunction gachaLog(){ G.rates.log=[rollRate()]; }\n");
+  w15('src/main/040-mixed.js', "function shopTax(){ G.shop.tax=shopPrice(); return 1; }\nfunction shopFee(){ G.shop.fee=shopTax(); }\nfunction shopCut(){ G.shop.cut=shopTax()+shopPrice(); }\nfunction gachaBonus(){ G.rates.bonus=rollRate(); return 1; }\nfunction gachaBoost(){ G.rates.boost=gachaBonus(); }\nfunction gachaLuck(){ G.rates.luck=gachaBonus()+rollRate(); }\n");
+  w15('src/main/050-frag.js', "function shopDiscount(){ G.shop.disc=shopPrice()*0.9; }\n");
+  w15('src/main/060-bad.js', "function mixedFn(){ G.misc.bad=1; return '<b>'+shopPrice()+'</b>'; }\nfunction viewWrite(){ pityAdd(); return '<i>x</i>'; }\nfunction modelCallsView(){ G.misc.cv=1; return shopHTML(); }\n");
+  w15('src/main/070-store.js', "const STORE_POLICY={sync:['k-sync'],secret:{'k-sec':['key']},keep:{},device:['k-dev'],cache:[],legacy:[]};\nfunction st(){ appStorage.setItem('k-sync','1'); appStorage.setItem('k-dev','1'); appStorage.setItem('k-what','1'); sessionStorage.setItem('k-ses','1'); }\n");
+  const u15 = await loadUnits(r15), g15 = buildGraph(u15), sf15 = stateFlow(u15, g15.fns), writers = new Set(mutations(u15, g15.fns).mut.keys()), keyUse = new Map();
+  for (const k of sf15.list) { for (const f of k.w) { if (!keyUse.has(f)) keyUse.set(f, new Map()); keyUse.get(f).set(k.key, 'w'); } for (const f of k.r) { if (!keyUse.has(f)) keyUse.set(f, new Map()); if (!keyUse.get(f).has(k.key)) keyUse.get(f).set(k.key, 'r'); } }
+  const A = archMap(u15, g15.fns, { writers, keyUse, sf: surfaceOf(u15, g15.fns, ''), louvain, layer: null, modOf: moduleOf }), ly = n => A.fnLayer[n]?.layer, vd = m => A.verdicts.find(v => v.mod === 'src/main/' + m);
+  assert.deepEqual(['shopHTML', 'buyItem', 'shopStock', 'shopPrice', 'mixedFn'].map(ly), ['View', 'Controller', 'Model', 'Model', '섞임'], '계층: 마크업 = View · 상태를 바꾸고 다시 그림 = Controller · 상태 씀·계산 = Model · 마크업 + 상태 씀 = 섞임');
+  const bad = A.bad.map(b => `${b.fn}→${b.to}`); assert.ok(bad.includes('viewWrite→pityAdd') && bad.includes('modelCallsView→shopHTML'), '방향 위반: View가 상태를 바꾸는 함수를 부름 · Model이 화면 함수를 부름: ' + bad);
+  assert.ok(A.fnLayer.buyItem.feat && A.fnLayer.buyItem.feat === A.fnLayer.shopLog.feat && A.fnLayer.pullOne.feat === A.fnLayer.gachaLog.feat && A.fnLayer.buyItem.feat !== A.fnLayer.pullOne.feat, '기능 = 같은 데이터·호출로 묶은 Model·Controller(상점·뽑기 둘): ' + JSON.stringify(A.fnLayer));
+  assert.ok(vd('040-mixed.js').kind === '슈퍼' && vd('040-mixed.js').split.length === 2, '관계없는 두 기능을 담은 모듈 = 슈퍼(발산적 변경): ' + JSON.stringify(vd('040-mixed.js')));
+  assert.ok(vd('050-frag.js').kind === '조각' && vd('050-frag.js').to === 'src/main/020-shop.js', '조각 → 그 기능 함수가 많은 모듈로(게으른 모듈): ' + JSON.stringify(vd('050-frag.js')));
+  assert.equal(vd('020-shop.js').kind, '고유', '한 기능 중심 모듈 = 고유'); assert.ok(vd('060-bad.js').mixed.includes('mixedFn') && vd('060-bad.js').bad >= 2, '모듈마다 섞인 함수·방향 위반 수');
+  const K = Object.fromEntries(A.store.keys.map(k => [k.key, k.kind])); assert.deepEqual([K['k-sync'], K['k-dev'], K['k-what'], K['k-ses']], ['sync', 'device', null, 'session'], '저장 정책: 표의 갈래 · 갈래 없는 키(null) · sessionStorage = 세션'); assert.deepEqual(A.store.stale, ['k-sec'], '표에만 있고 코드가 안 쓰는 키');
+  rmSync(r15, { recursive: true, force: true }); }
 rmSync(root, { recursive: true, force: true });
-console.log('ok tools: index.html 기능 표면(탭·경로표·하위 화면 패널·창·동작 → 기능 단위·함수 자리·조각·슈퍼 모듈) · 연관 맵(data 경로·역할·생성 함수·목록 변수·구조 판정·차이·게임 값) · 스튜디오 밖 조립 함수·불러올 때 조각 읽기 · 불러올 때 아직 없는 이름(TDZ) · 자연 경계(모듈성 묶기)·이름 범위(지역 이름·쓰기·await) · 프롬프트 흐름 보강(지역 변수·연결 층·넘겨받은 글 AI·돌려주는 식·출력 자리) · 프롬프트 글 검사(깨짐·과잉·과소·견본 읽기·조각 구성) · 개발 내역 검증(닿는 함수·보내는 쪽 없는 액션·글 속 코드 이름) · 모듈 경계(영역 침범·남의 상태 쓰기·파편화) · 지시문 옮기기(원문 그대로·자리 이름·표식 남김) · 프롬프트 조각 한곳(흩어짐 오류) · 프롬프트 스튜디오 밖 프롬프트 글(글 AI 호출 흐름·해라체) · 순수 모듈 경계 · 분석 코드 = 빌드된 SPA · 주석 속 코드 · 함수를 담은 표(멤버 호출 연결) · 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');
+console.log('ok tools: 아키텍처(계층 View·Controller·Model·섞임·방향 위반 · 같은 데이터로 묶은 기능 · 슈퍼·조각·고유 · 저장 정책 갈래) · index.html 기능 표면(탭·경로표·하위 화면 패널·창·동작 → 화면 단위·함수 자리) · 연관 맵(data 경로·역할·생성 함수·목록 변수·구조 판정·차이·게임 값) · 스튜디오 밖 조립 함수·불러올 때 조각 읽기 · 불러올 때 아직 없는 이름(TDZ) · 자연 경계(모듈성 묶기)·이름 범위(지역 이름·쓰기·await) · 프롬프트 흐름 보강(지역 변수·연결 층·넘겨받은 글 AI·돌려주는 식·출력 자리) · 프롬프트 글 검사(깨짐·과잉·과소·견본 읽기·조각 구성) · 개발 내역 검증(닿는 함수·보내는 쪽 없는 액션·글 속 코드 이름) · 모듈 경계(영역 침범·남의 상태 쓰기·파편화) · 지시문 옮기기(원문 그대로·자리 이름·표식 남김) · 프롬프트 조각 한곳(흩어짐 오류) · 프롬프트 스튜디오 밖 프롬프트 글(글 AI 호출 흐름·해라체) · 순수 모듈 경계 · 분석 코드 = 빌드된 SPA · 주석 속 코드 · 함수를 담은 표(멤버 호출 연결) · 이름 규칙(종류 자동 판별·안전한 치환) · SPA 단일 파일 전제 · 배선 점검(생성기 키·스키마·지연 기본값·엔티티 필드 ↔ 생성물) · 위반 래칫(줄 이동 무시·새 빈 catch·복잡도 증가) · DOM id 참조·HTML 주입(T() 안전성)·저장 키·전역 리스너 누수·CSS 괄호/파싱·안 쓰는 클래스·부속 파일(서비스 워커·파이썬) 파싱·중계 허용 주소·분배 표↔case·도우미 인자 발신·분배기 case 복잡도·별칭·빈 catch 분류·이름 충돌·파싱 오류·안 쓰는 함수·순환·비동기 콜스택·액션 누락/죽은 처리기/중복 처리·저장 누락·쓰기 전용 키·화면 흐름·다중화·파편화·ast-grep 규칙');

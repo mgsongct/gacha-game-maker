@@ -9,7 +9,6 @@ import { walk } from './source.mjs';
 import { STAGES } from './lifecycle.mjs';
 import { constLiterals } from './wiring.mjs';
 import { moduleOf } from './scope.mjs';
-import { fragmentFiles } from './prompts.mjs';
 
 const FNT = /^(function_declaration|function_expression|arrow_function|method_definition|generator_function_declaration)$/;
 const HUB = 25; // 이만큼 많은 함수가 부르면 공용 기반
@@ -107,58 +106,14 @@ function unitsOf(C, best) { const openers = new Map(), memo = new Map(); for (co
 export function placeOf(sf, k) { const r = sf.any.get(k); if (!r || !r.size) return { kind: sf.hub.has(k) ? '공용 기반' : '닿지 않음' }; const menus = new Set([...r].map(x => sf.feats.get(x).menu)), near = [...(sf.reach.get(k) || [])];
   if (r.size === 1) return { kind: '단위', unit: [...r][0], menu: [...menus][0] }; if (menus.size === 1) return { kind: '메뉴', menu: [...menus][0], units: [...r], near }; return { kind: '여러 메뉴', menus: [...menus], units: [...r], near }; }
 
-// 같은 기능의 다른 단위(실행기 화면 ↔ 편집기 패널 ↔ 창) — 짝마다만 봄(이어 붙이면 모든 단위가 한 덩어리로 이어짐):
-//   ① 한쪽이 다른 쪽 창을 엶(여는 단위가 RARE개 이하인 창만 — 캐릭터 상세처럼 모든 화면이 여는 창은 아님)
-//   ② 드문 상태 키(쓰는 단위가 RARE개 이하)를 같이 쓰고 그중 하나가 그 키를 씀 · ③ 같은 단위가 여는 창끼리 · ④ 같은 메뉴 안에서 드문 함수를 둘 이상 같이 씀
-const RARE = 3;
-export function unitRelations(sf, stf) { const rel = new Map(), add = (a, b, why) => { if (!a || !b || a === b) return; for (const [x, y] of [[a, b], [b, a]]) { if (!rel.has(x)) rel.set(x, new Map()); if (!rel.get(x).has(y)) rel.get(x).set(y, why); } };
-  const openers = new Map(); for (const f of sf.feats.values()) for (const o of f.opens || []) { const u = sf.feats.get(o).unit; if (!openers.has(u)) openers.set(u, new Set()); openers.get(u).add(f.unit); }
-  for (const [w, os] of openers) if (os.size <= RARE) for (const o of os) add(o, w, '창을 엶');
-  /* ③ 같은 단위가 여는 창끼리(형제 창 — 게시 창·구독 창처럼 한 패널이 여는 창들) */ const kids = new Map(); for (const [w, os] of openers) if (os.size <= RARE) for (const o of os) { if (!kids.has(o)) kids.set(o, []); kids.get(o).push(w); }
-  for (const [o, ws] of kids) for (let i = 0; i < ws.length; i++) for (let j = i + 1; j < ws.length; j++) add(ws[i], ws[j], '같은 곳이 여는 창');
-  /* ④ 드문 함수(가까이서 닿는 단위가 RARE개 이하)를 둘 이상 같이 씀 — 같은 기능의 도우미(설정 저장 위치가 G 밖 — 동기화·업데이트 설정 — 이라 상태 키로 안 잡히는 것) */
-  const share = new Map(); for (const [, r] of sf.any) { if (r.size < 2 || r.size > RARE) continue; const a = [...r]; for (let i = 0; i < a.length; i++) for (let j = i + 1; j < a.length; j++) { const k = a[i] < a[j] ? a[i] + '|' + a[j] : a[j] + '|' + a[i]; share.set(k, (share.get(k) || 0) + 1); } }
-  for (const [k, n] of share) { const [a, b] = k.split('|'); if (n >= 2 && sf.feats.get(a).menu === sf.feats.get(b).menu) add(a, b, `같이 쓰는 함수 ${n}`); } /* 같은 메뉴 안에서만 — 메뉴를 넘는 공용 도우미(화면 머리 등)는 근거가 아님 */
-  for (const k of stf.list) { const us = new Set(), wr = new Set(); for (const fk of [...k.r, ...k.w]) for (const u of sf.any.get(fk) || []) { us.add(u); if (k.w.has(fk)) wr.add(u); } if (us.size < 2 || us.size > RARE || !wr.size) continue; const a = [...us]; for (let i = 0; i < a.length; i++) for (let j = i + 1; j < a.length; j++) add(a[i], a[j], k.key); }
-  return rel; }
 export function fullLabel(sf, k) { const f = sf.feats.get(k); if (!f) return k; const p = f.parent ? sf.feats.get(f.parent) : null; return (p ? fullLabel(sf, p.key) + ' › ' : f.kind === 'window' ? '창 ' : '') + f.label; }
 // 함수 하나의 자리(모듈 판정용): 기능 단위 하나 · 메뉴 안 공용 · 공용(여러 메뉴 — 엔진) · 공용 기반 · 닿지 않음
 export function unitPlace(sf, k) { const p = placeOf(sf, k); return p.kind === '단위' ? p.unit : p.kind === '메뉴' ? '메뉴:' + p.menu : p.kind === '여러 메뉴' ? '공용' : p.kind; }
-const MANY = 4; // 관계없는 기능(함수 2개 이상)을 이만큼 담으면 슈퍼(화면 함수만 모은 파일 등)
-const NONFEAT = p => p === '공용' || p === '공용 기반' || p === '닿지 않음' || String(p).startsWith('메뉴:');
-
-// 모듈 하나 판정(moduleVerdicts가 부름): m = 자리 → 함수 수, nd = 액션 분배기 함수 수
-function verdict(C, mod, m, nd) { const n = [...m.values()].reduce((a, b) => a + b, 0), feat = [...m].filter(([p]) => !NONFEAT(p)).sort((a, b) => b[1] - a[1]), nf = feat.reduce((a, [, c]) => a + c, 0), shared = [...m].filter(([p]) => p === '공용' || String(p).startsWith('메뉴:')).reduce((a, [, c]) => a + c, 0), base = m.get('공용 기반') || 0;
-  const parts = []; for (const [u, c] of feat.filter(([, c]) => c >= 2)) { const p = parts.find(x => x.units.some(y => C.related(y, u))); if (p) { p.units.push(u); p.n += c; } else parts.push({ units: [u], n: c }); }
-  const big = parts.filter(p => p.n >= Math.max(3, nf * 0.2)), v = { mod, n, feat: nf, shared, base, unreached: m.get('닿지 않음') || 0, units: feat, parts }, away = u => C.home.get(u) !== mod ? C.home.get(u) : null;
-  if (nd * 2 >= n) return { ...v, kind: '분배' }; /* 액션 분배기 층(원안 설계 — 화면 동작을 기능으로 넘김): 판정 대상 아님 */
-  if (mod === C.layer) return { ...v, kind: '층' }; /* 프롬프트 스튜디오(사용자 지시 — 모든 기능의 프롬프트를 한 모듈로 취합): 여러 기능을 담는 것이 설계 */
-  if (base > nf && base >= shared) return { ...v, kind: '기반' }; if (shared > nf) return { ...v, kind: '엔진' };
-  if (nf >= 3 && !parts.length && feat[0][1] * 2 < nf) return { ...v, kind: '흩어짐', spread: feat.map(([u, c]) => ({ unit: u, n: c, to: away(u) })) }; /* 기능 함수가 여러 단위에 하나씩 — 함수마다 제 기능 쪽으로 */
-  if (big.length >= 2 || parts.length >= MANY) return { ...v, kind: '슈퍼', split: parts.map(p => ({ units: p.units, n: p.n, to: away(p.units[0]) })) };
-  const [u, c] = feat[0] || [], hm = u && away(u), other = hm ? C.byUnit.get(u).get(hm) : 0;
-  return u && hm && c * 2 <= other ? { ...v, kind: '조각', unit: u, to: hm, n0: c, n1: other } : { ...v, kind: u ? '고유' : '엔진', unit: u }; }
-// 모듈 판정(src/main 모듈마다): 함수가 어느 기능 단위에 있나 →
-//   고유 — 한 기능 단위가 중심(같은 데이터를 쓰는 실행기 화면·편집기 패널·창을 같이 담아도 한 기능)
-//   슈퍼 — 관계없는 기능 단위를 둘 이상 의미 있게 담음(나눌 대상: 단위마다 옮길 곳 = 그 단위 함수가 가장 많은 다른 모듈, 없으면 새 자리)
-//   조각 — 중심 단위의 함수 대부분이 다른 모듈에 있음(그 모듈로 합칠 대상)
-//   엔진 — 여러 메뉴가 같이 쓰는 함수 중심 · 기반 — 공용 기반(허브) 중심 · 분배 — 액션 분배기(handle*Action·data-act 리스너) 층(판정 대상 아님)
-//   층 — 설계상 여러 기능을 담는 층(프롬프트 스튜디오 — 사용자 지시로 모든 프롬프트를 취합): 판정 대상 아님
-//   흩어짐 — 기능 함수(3개↑)가 여러 단위에 하나씩, 어느 단위도 절반이 안 됨(함수마다 그 단위 함수가 많은 모듈로 나눠 보낼 대상)
-//   의미 있는 단위 = 함수 max(3, 모듈 기능 함수의 20%) 이상
-export function moduleVerdicts(rows, rel = new Map(), layer = null) { // rows: [{ mod, fn, place, dispatch }] · layer: 설계상 층(프롬프트 스튜디오)
-  const byMod = new Map(), byUnit = new Map(), disp = new Map(); for (const r of rows) { if (!byMod.has(r.mod)) byMod.set(r.mod, new Map()); const m = byMod.get(r.mod); m.set(r.place, (m.get(r.place) || 0) + 1); if (r.dispatch) disp.set(r.mod, (disp.get(r.mod) || 0) + 1); if (!NONFEAT(r.place)) { if (!byUnit.has(r.place)) byUnit.set(r.place, new Map()); const g = byUnit.get(r.place); g.set(r.mod, (g.get(r.mod) || 0) + 1); } }
-  const home = new Map(); for (const [u, m] of byUnit) home.set(u, [...m].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0][0]);
-  const ctx = { home, byUnit, layer, related: (a, b) => !!rel.get(a)?.has(b) }, out = [...byMod].map(([mod, m]) => verdict(ctx, mod, m, disp.get(mod) || 0));
-  /* 기능 단위 파편화: 함수 5개 이상인 단위가 3개 이상 모듈에 흩어지고 가장 많은 모듈 몫이 60% 미만 */
-  const frag = [...byUnit].map(([u, m]) => { const tot = [...m.values()].reduce((a, b) => a + b, 0), top = Math.max(...m.values()); return { unit: u, n: tot, mods: [...m].sort((a, b) => b[1] - a[1]), top: Math.round(100 * top / tot) }; }).filter(x => x.n >= 5 && x.mods.length >= 3 && x.top < 60);
-  return { modules: out.sort((a, b) => a.mod.localeCompare(b.mod)), home, units: byUnit, frag }; }
-
-// 맵에 넣을 요약(직렬화): 기능 단위(메뉴·종류·함수 수·얽힌 모듈·안에 든 창) · 함수마다 자리 · 모듈 판정 · 파편화 단위
-export function surfaceMap(units, fns, stf, html) { const sf = surfaceOf(units, fns, html), rel = unitRelations(sf, stf);
-  const rows = [...fns.values()].filter(f => f.top && !f.table && f.unit === 'main').map(f => ({ mod: moduleOf(f.loc.split(':')[0]), fn: f.key, place: unitPlace(sf, f.key), dispatch: /^handle\w+Action$/.test(f.name) })), V = moduleVerdicts(rows, rel, fragmentFiles(units).home);
-  const feats = {}; for (const f of sf.feats.values()) { if (f.unit !== f.key) continue; const m = V.units.get(f.key) || new Map();
-    feats[f.key] = { label: fullLabel(sf, f.key), kind: f.kind, menu: f.menu, n: [...m.values()].reduce((a, b) => a + b, 0), mods: [...m].sort((a, b) => b[1] - a[1]), windows: [...sf.feats.values()].filter(w => w.kind === 'window' && w.unit === f.key && w.key !== f.key).map(w => w.label), openers: (f.openers || []).map(o => sf.feats.get(o)?.unit).filter((x, i, a) => x && a.indexOf(x) === i), related: [...(rel.get(f.key) || [])].map(([u, why]) => [u, why]) }; }
-  /* 판정 근거(--why <모듈>): 모듈의 자리마다 함수 이름 */ const members = new Map(); for (const r of rows) { if (!members.has(r.mod)) members.set(r.mod, {}); (members.get(r.mod)[r.place] ||= []).push(fns.get(r.fn)?.name || r.fn); }
-  const verdicts = V.modules.map(v => ({ mod: v.mod, kind: v.kind, n: v.n, feat: v.feat, shared: v.shared, base: v.base, unreached: v.unreached, units: v.units.slice(0, 8), members: members.get(v.mod) || {}, ...(v.split ? { split: v.split } : {}), ...(v.spread ? { spread: v.spread } : {}), ...(v.to ? { unit: v.unit, to: v.to, n0: v.n0, n1: v.n1 } : v.unit ? { unit: v.unit } : {}) }));
-  return { tabs: sf.tabs, feats, place: Object.fromEntries(rows.map(r => [r.fn, r.place])), verdicts, frag: V.frag.map(x => ({ unit: x.unit, n: x.n, top: x.top, mods: x.mods })) }; }
+// 맵에 넣을 요약(직렬화): 기능 단위(화면·패널·공용 창·배경)마다 메뉴·종류·그 단위에서만 닿는 함수 수·그 함수가 있는 모듈·안에 든 창 · 함수마다 자리
+//   (모듈 판정은 계층·기능 축으로 lib/arch.mjs가 함 — 화면 단위만으로는 판정하지 않음)
+export function surfaceMap(units, fns, sf) {
+  const rows = [...fns.values()].filter(f => f.top && !f.table && f.unit === 'main').map(f => ({ mod: moduleOf(f.loc.split(':')[0]), fn: f.key, place: unitPlace(sf, f.key) })), byUnit = new Map();
+  for (const r of rows) { if (sf.feats.has(r.place)) { if (!byUnit.has(r.place)) byUnit.set(r.place, new Map()); const m = byUnit.get(r.place); m.set(r.mod, (m.get(r.mod) || 0) + 1); } }
+  const feats = {}; for (const f of sf.feats.values()) { if (f.unit !== f.key) continue; const m = byUnit.get(f.key) || new Map();
+    feats[f.key] = { label: fullLabel(sf, f.key), kind: f.kind, menu: f.menu, n: [...m.values()].reduce((a, b) => a + b, 0), mods: [...m].sort((a, b) => b[1] - a[1]), windows: [...sf.feats.values()].filter(w => w.kind === 'window' && w.unit === f.key && w.key !== f.key).map(w => w.label) }; }
+  return { tabs: sf.tabs, feats, place: Object.fromEntries(rows.map(r => [r.fn, r.place])) }; }

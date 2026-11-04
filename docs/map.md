@@ -1,6 +1,6 @@
 # 연관 맵 — 모듈 → 빌드 → index.html(생성기·실행기·편집기) → data 게임 파일
 
-생성: `node tools/map.mjs` · 2026-11-04T00:34 · git de137de · 입력: src 128파일 · www/index.html b8465c88e814 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
+생성: `node tools/map.mjs` · 2026-11-04T01:11 · git d2b44df · 입력: src 128파일 · www/index.html e9fcfb54f2e9 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
 
 ## 읽는 법 — 거꾸로 따라가기
 
@@ -8,8 +8,8 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 
 1. 아래 1절에서 그 파일·경로를 찾아 **누가 만들고 고치나**(역할별 함수<sub>모듈</sub>)를 봄 — 시나리오면 `chapters.json`, 캐릭터 밸런스·스킬·이격이면 `chars.json`(`[].skills`·`[].hp`·`[].alt`·`[].over` …)
 2. `node tools/map.mjs --why <경로·함수·말>` — 함수마다 src 파일:줄 · index.html 줄 · 쓰는 프롬프트 조각, 그 경로의 점검 규칙·읽는 모듈·연계 모듈까지 한 번에
-3. 4절에서 그 모듈의 index.html 줄 범위·쓰는 데이터·연계 모듈(호출 수)을 보고, 고친 뒤 `node tools/map.mjs`로 맵을 갱신
-4. 화면·창이 이상하면 2절(기능 표면)에서 그 기능 단위에 얽힌 모듈을, 3절에서 모듈 판정(조각·슈퍼)을 봄 — `--why <화면·창 이름>`도 기능 단위를 찾음
+3. 6절에서 그 모듈의 index.html 줄 범위·쓰는 데이터·연계 모듈(호출 수)을 보고, 고친 뒤 `node tools/map.mjs`로 맵을 갱신
+4. 화면·창이 이상하면 2절(기능 표면)에서 그 화면 단위에 얽힌 모듈을, 3절에서 계층(View·Controller·Model — 섞임·방향 위반), 4절에서 같은 데이터·처리로 묶은 기능과 모듈 판정, 5절에서 저장 정책을 봄 — `--why <화면·창 이름·모듈>`
 
 역할 판정(정적): 생성기 = 새 게임 생성 단계(newGame…)가 부르는 함수 · 실행기 = 실행 중 AI(liveTick)·불러오기(fix)·앱을 열 때(부팅·게임 열기)가 부르거나, 사용자 조작이 진행(prog.json)을 쓰거나, 플레이 조작(진행을 쓰는 사용자 함수 — CRES()·CBUILD() 같은 접근 함수로 받은 객체 포함, 액션 분배기 제외)에서 닿는 콘텐츠 쓰기(예: 건조 바리에이션) · 편집기 = 사용자 조작이 플레이 조작을 거치지 않고 콘텐츠를 씀 · 기타 = 위 시작점에서 닿지 않음(엔진 안쪽 등). 한 함수가 여러 역할일 수 있음(예: cleanChar는 생성·실행 중 AI 둘 다). 「게임」 = 시험 게임 2개 중 값이 있는 수
 
@@ -449,10 +449,10 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | 설정 › 게임 › exSettingsPanel | 패널 | 6 | 0275-expedition 5, 0274-dispatch 1 | openExSet |
 | 창 캐릭터 디자인 통일 | 공용 창 | 5 | 0030-image/ 4, 0015-prompt-studio/ 1 |  |
 | 창 그림 AI | 공용 창 | 5 | 0030-image/ 3, 0020-ai-connect 2 |  |
-| 설정 › 연동 › PC·폰 연동 | 패널 | 5 | 0360-sync/ 5 |  |
 | 창 게임 정의 | 공용 창 | 4 | 0440-ai-context 2, 0185-game-rules 1, 0250-story-factory 1 |  |
 | 창 🔗 게임 구독 | 공용 창 | 4 | 0400-publish-subscribe 4 |  |
 | 설정 › 시즌 운영 | 화면 | 4 | 0290-season-rotation 4 |  |
+| 설정 › 연동 › PC·폰 연동 | 패널 | 4 | 0360-sync/ 4 |  |
 | 창 openPresetCode | 공용 창 | 3 | 0020-ai-connect 3 |  |
 | 창 배경음 한꺼번에 만들기 | 공용 창 | 3 | 0040-sound 3 |  |
 | 창 초안 내보내기 | 공용 창 | 3 | 0260-new-game/ 3 |  |
@@ -533,128 +533,232 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 | 창 프로필 | 공용 창 | 1 | 0455-persona 1 |  |
 | 창 smTextView | 공용 창 | 1 | 0530-story-memory 1 |  |
 
-## 3. 모듈 판정 — 고유 · 조각(합칠 곳) · 슈퍼(나눌 기능) · 엔진 · 기반
+## 3. 계층(MVC) — 모듈마다 View · Controller · Model, 섞인 함수, 방향 위반
 
-src/main 모듈 69: 고유 37 · 조각 4 · 흩어짐 1 · 슈퍼 12 · 엔진 13 · 기반 0 · 분배 1 · 층 1 · 파편화 단위 17 — 판정(lib/surface.mjs moduleVerdicts): 고유 = 한 기능 단위가 중심(같은 데이터·창·도우미를 짝으로 같이 쓰는 실행기 화면·편집기 패널·창은 한 기능) · 조각 = 중심 단위 함수가 다른 모듈에 2배 이상 → 그 모듈로 합칠 대상 · 흩어짐 = 기능 함수가 여러 단위에 하나씩(어느 단위도 절반 미만) → 함수마다 제 기능 쪽으로 · 슈퍼 = 관계없는 기능(함수 max(3, 20%)↑)을 둘 이상, 또는 함수 2개↑ 기능을 4개 이상 담음 → 나눌 대상 · 엔진 = 여러 메뉴가 같이 쓰는 함수 중심 · 기반 = 허브 함수 중심 · 분배 = 액션 분배기 층 · 층 = 프롬프트 스튜디오(사용자 지시로 모든 프롬프트를 취합한 층) — 둘은 판정 대상 아님. `node tools/map.mjs --strict`: 조각·흩어짐·슈퍼·파편화가 기준선(tools/baseline.json의 surface)보다 늘면 실패
+기준(CLAUDE.md §0-2, docs/research/developer-role.md 1-1 — 함수 자신이 하는 일로 판정, lib/arch.mjs): View = HTML 마크업 글을 만들거나 DOM을 바꿈 · Controller = 액션 처리기 또는 화면 갱신(render·toast·openModal·closeModal)을 부름 · Model = 게임 상태를 씀·저장소 쓰기·네트워크·AI·그림 서비스 또는 화면과 관계없는 계산·조회 · **섞임** = 한 함수가 화면을 만들면서 상태·저장·서비스를 직접 씀. **방향 위반** = View가 상태·저장·서비스를 바꾸는 함수를 부름(그리다가 바꿈) · Model이 화면을 만드는 함수를 부름. src/main 함수: View 318 · Controller 98 · Model 1089 · 섞임 60 · 방향 위반 182
 
-### 슈퍼 모듈 — 나눌 기능
+| 모듈 | View | Controller | Model | 섞임 | 방향 위반 | 섞인 함수(예) | 방향 위반(예) |
+|---|---|---|---|---|---|---|---|
+| 0120-abyss | 19 | 4 | 42 | 4 | 19 | drawCardArts, abyssHTML, rogueEnd, rgFinish | cbStart→RG, cbTurn→cbRender, cbHitE→cbLog |
+| 0360-sync/ | 12 | 5 | 28 | 2 | 16 | pcPush, syPush | syncStageMedia→syBar, pcStart→pcPush, pcStart→devId |
+| 0510-actions/ | 1 | 0 | 1 | 12 | 1 | handleSetupAction, handleNavigationAndToolsAction, handleMailAction, handleStoryAndAuthoringAction … | imgTarget→openChar |
+| 0030-image/ | 23 | 4 | 79 | 4 | 8 | regenApply, openNaiGen, naiBatch, skinPartGen | regenRun→regenParseCharacter, generateUltimateCutin→imageCandidates, weaponPromptAI→aiJSON |
+| 0180-ui-scroll | 23 | 0 | 14 | 1 | 11 | farmHTML | render→RG, render→mailTick, render→dm |
+| 0505-construct | 9 | 2 | 19 | 1 | 7 | conBuild | conResBar→CRES, conInfoHTML→CBUILD, constructHTML→CBUILD |
+| 0020-ai-connect | 12 | 3 | 83 | 0 | 7 |  | copilotLogin→http, pcSoon→pcPush, openPresetCode→saveLlm |
+| 0160-free-chat | 3 | 0 | 9 | 4 | 3 | playerDraw, fcSend, fcNpcPhoto, phPlay | heroTags→aiJSON, openFree→openRoom, fcSummarize→aiJSON |
+| 0260-new-game/ | 11 | 7 | 27 | 4 | 3 | drAvatarDraw, runNewGameBuild, buildNewGameDraft, buildManualGameDraft | drRead→drSave, newGame→runNewGameBuild, newGameManual→runNewGameBuild |
+| 0290-season-rotation | 5 | 2 | 20 | 1 | 6 | noticeHTML | aiNewPickupChar→aiJSON, aiAltChar→aiJSON, seasonStart→liveBar |
+| 0480-battle | 4 | 1 | 10 | 1 | 6 | bEnd | startBattle→openModeStage, startBattle→startStage, startStage→stamUse |
+| 0250-story-factory | 5 | 2 | 30 | 2 | 4 | aiChapterGen0, aiEventGen0 | aiJSONRetry→aiJSON, aiEventGen→aiEventGen0, aiEventGen→artAfterAI |
+| 0300-codex | 2 | 0 | 17 | 2 | 4 | codexHTML, openCx | cxCard→cxSeenSet, openCxEdit→cxStore, cxDiscover→aiJSON |
+| 0420-app-update | 8 | 1 | 12 | 4 | 2 | checkUpdate, applyUpdate, checkWebUpdate, applyWebUpdate | checkUpdatePrivate→http, checkUpdatePrivate→saveLV |
+| 0100-messenger | 14 | 0 | 13 | 2 | 3 | chatPhotoPick, openRoom | checkTriggers→notify, checkTriggers→updateBadge, openThread→openRoom |
+| 0275-expedition | 6 | 7 | 16 | 0 | 5 |  | exCharRow→EXS, exHTML→EXS, exHTML→exOffers |
+| 0370-game-picker | 3 | 0 | 5 | 0 | 5 |  | showStart→showPicker, showStart→showCast, showStart→showBootPrep |
+| 0462-direction | 8 | 0 | 10 | 0 | 5 |  | slotOf→vnStage, vnDirectSay→vnStage, vnDirectSay→vnMotion |
+| 0520-backup-storage | 7 | 2 | 15 | 2 | 3 | backupExport, shareExport | stageBackup→legacyMediaBlob, exportGo→shareExport, exportGo→backupExport |
+| 0080-storage-integration | 6 | 3 | 30 | 1 | 3 | storageWarning | reloadGame→flush, reloadGame→storageWarning, bgStyle→procBg |
+| 0090-growth | 4 | 5 | 28 | 0 | 4 |  | updStam→stam, stamUse→openStam, stamUse→updStam |
+| 0190-shop | 6 | 1 | 13 | 0 | 4 |  | rIcon→rIco, shopHTML→shopDay, CASH_RES→conResIcon |
+| 0230-modal | 16 | 1 | 15 | 1 | 3 | openChar | openCharEdit→cleanChar, stageOptions→opt, trigOptions→opt |
+| 0240-growth-curve | 9 | 0 | 12 | 0 | 4 |  | refreshForm→openFormation, openFarmSquad→openFormation, aiChapterGen→aiChapterGen0 |
+| 0445-factions | 2 | 0 | 23 | 0 | 4 |  | stanceAI→aiJSON, factionAI→aiJSON, factionPanel→factions |
+| 0460-script-engine | 8 | 0 | 9 | 0 | 4 |  | playStory→jaBatch, vnSkip→vnFinish, vnSkip→vnStep |
+| 0070-save | 0 | 0 | 12 | 1 | 2 | flush | mark→flush, flushNow→flush |
+| 0135-schedule | 1 | 1 | 8 | 0 | 3 |  | spotsAI→aiJSON, spotTalkAI→aiJSON, schedHTML→SCHED |
+| 0185-game-rules | 4 | 6 | 25 | 0 | 3 |  | rulesCharHTML→RULESM, rulesAIData→aiJSON, posAI→aiJSON |
+| 0400-publish-subscribe | 3 | 0 | 9 | 3 | 0 | pubUpload, subscribe, subApply |  |
+| 0455-persona | 4 | 4 | 13 | 0 | 3 |  | personaAI→aiJSON, personaAIReview→aiJSON, memorialGen→aiJSON |
+| 0487-formation-sortie | 3 | 2 | 15 | 1 | 2 | sortieNodeEnd | sortieMap→sortieParts, sortieResult→sortieNodeEnd |
+| 0488-stage-modes | 3 | 4 | 10 | 0 | 3 |  | debateStart→debateDraw, debateHit→playStory, debateHit→debateDraw |
+| 0535-content-audit | 1 | 4 | 12 | 1 | 2 | openAudit | auditAIFill→aiJSON, auditAIStage→aiJSON |
+| 0125-tower | 1 | 1 | 6 | 1 | 1 | towerEnd | towerHTML→TOWER |
+| 0187-balance | 2 | 1 | 13 | 0 | 2 |  | balancePanel→BAL, openBalance→BAL |
+| 0210-setup | 2 | 0 | 6 | 0 | 2 |  | showSetup→AIP, renderSetup→AIP |
+| 0270-skin-proposal | 4 | 3 | 3 | 1 | 1 | skinPropDraw | skinLinesAI→aiJSON |
+| 0330-casting | 8 | 3 | 7 | 0 | 2 |  | autoNpcs→aiJSON, showCast→castRun |
+| 0450-relations-memory | 3 | 1 | 20 | 0 | 2 |  | openRel→RELS, openRelEdit→RELS |
+| 0465-story-plan | 2 | 1 | 8 | 0 | 2 |  | planAI→aiJSON, openPlan→PLAN |
+| 0525-data-folder | 2 | 1 | 8 | 1 | 1 | dataExport | dataExportZip→syBar |
+| 0537-live-fill | 0 | 2 | 2 | 0 | 2 |  | liveFill→liveBar, liveFillStep→liveBar |
+| 0060-util | 6 | 0 | 25 | 1 | 0 | petTick |  |
+| 0110-challenge-raid | 0 | 0 | 5 | 1 | 0 | raidEnd |  |
+| 0130-gift | 4 | 1 | 4 | 0 | 1 |  | openGift→GI |
+| 0220-mail | 2 | 0 | 9 | 0 | 1 |  | openMail→mailBox |
+| 0274-dispatch | 2 | 0 | 5 | 0 | 1 |  | dispHTML→DBOARD |
+| 0280-live-ops | 2 | 1 | 4 | 0 | 1 |  | dailyTalks→aiJSON |
+| 0410-desktop | 2 | 0 | 3 | 1 | 0 | openA2HS |  |
+| 0530-story-memory | 4 | 1 | 10 | 0 | 1 |  | openStoryMemory→smState |
 
-| 모듈 | 함수(기능·공용·기반·닿지 않음) | 나눌 기능 묶음 → 옮길 곳(그 단위 함수가 가장 많은 다른 모듈, 없으면 새 자리) |
-|---|---|---|
-| 0020-ai-connect | 98 (60·29·2·7) | [창 openAp + 설정 › 글 AI + 설정 › 그림 AI …] 34 → 새 자리 / [창 openCharEdit] 11 → 0030-image/ / [창 만든 ] 6 → 새 자리 / [앱 시작] 2 → 0015-prompt-studio/ |
-| 0030-image/ | 110 (87·17·1·5) | [창 등장  + 창 openCharEdit + 창 개인 스토리] 50 → 새 자리 / [창 regenPreview] 15 → 새 자리 / [창 openFaces] 9 → 새 자리 / [창 캐릭터 디자인 통일 + 창 그림 AI] 7 → 새 자리 |
-| 0090-growth | 37 (21·14·2·0) | [창 openUpConfirm] 7 → 새 자리 / [훈련] 3 → 새 자리 / [창 개인 스토리 + 창 openGift] 4 → 0100-messenger / [설정 › 게임 › 패널 17] 2 → 새 자리 / [로비] 2 → 0462-direction |
-| 0160-free-chat | 16 (16·0·0·0) | [창 개인 스토리] 9 → 0100-messenger / [설정 › 관리관] 5 → 새 자리 / [새 게임 생성] 2 → 0015-prompt-studio/ |
-| 0230-modal | 33 (25·4·4·0) | [창 개인 스토리 + 창 openEpEdit + 창 openThEdit] 13 → 0100-messenger / [창 openFormation] 4 → 0240-growth-curve / [창 openCharEdit] 3 → 0030-image/ / [창 피드백 보내기] 2 → 새 자리 |
-| 0290-season-rotation | 28 (21·7·0·0) | [실행 중 AI] 6 → 새 자리 / [설정 › 시즌 운영 + 창 시즌] 6 → 새 자리 / [창 개인 스토리] 2 → 0100-messenger / [창 openPrep] 2 → 새 자리 |
-| 0330-casting | 18 (18·0·0·0) | [창 표정 한꺼번에 만들기] 9 → 새 자리 / [창 NPC] 7 → 새 자리 / [설정 › 그림 AI] 2 → 0020-ai-connect |
-| 0360-sync/ | 47 (25·21·0·1) | [창 PC 서버] 9 → 새 자리 / [설정 › 연동 › PC·폰 연동] 5 → 새 자리 / [창 PC·폰 연동] 3 → 새 자리 / [창 pcPush] 2 → 새 자리 / [창 다른 기기에 더 새 데이터가 있어요] 2 → 새 자리 |
-| 0450-relations-memory | 24 (12·12·0·0) | [창 관계 고치기] 8 → 새 자리 / [새 게임 생성] 3 → 0015-prompt-studio/ |
-| 0455-persona | 21 (13·5·0·3) | [설정 › 게임 › 캐릭터 개성·매력] 9 → 새 자리 / [창 개인 스토리] 3 → 0100-messenger |
-| 0485-battle-rules | 11 (8·2·0·1) | [새 게임 생성] 5 → 0015-prompt-studio/ / [창 openFormation] 3 → 0240-growth-curve |
-| 0530-story-memory | 15 (10·2·0·3) | [창 이야기 기억 다시 정리] 4 → 새 자리 / [창 스토리 기억 관리] 3 → 새 자리 |
+## 4. 기능(같은 데이터·처리) ↔ 화면 · 모듈 판정
 
-### 조각 모듈 — 합칠 곳
+기능 = Model·Controller 함수를 호출과 같은 상태 키·data 경로·저장소 키로 이어 모듈성 최대화로 묶은 것(순서를 바꿔 6번 — 과반이 같이 묶인 것만, 경계는 빼고), View 함수는 부르는 Model·Controller의 기능으로 이음. 화면 = 그 기능의 함수에 닿는 index.html 기능 단위(2절). 이름(아래 판정 표) = 그 기능이 가장 많이 쓰는 데이터(여러 기능이 다 쓰는 데이터는 뺌)
 
-| 모듈 | 함수 | 중심 기능 단위 | 이 모듈 | 합칠 곳(그 단위 함수) |
+| 기능 | 함수 | 주로 쓰는 데이터 | 계층(View·Controller·Model·섞임) | 이어진 화면(닿는 함수 수) | 모듈(함수 수) |
+|---|---|---|---|---|---|
+| F01 | 129 | chars.json › [].skillBalance · chars.json › [].naiPrompt · chars.json › [].pos | 16·10·102·1 | 도전 6, 상점 6, evd 5, 캐시 상점 4 | 0185-game-rules 26, 0187-balance 15, 0230-modal 10, 0065-inherit 9, 0090-growth 8 …외 20 |
+| F02 | 119 | prog.json › fchat · lib.json › [].prompt · meta.json › spots | 31·4·74·10 | 로비 18, evshop 14, 미지 탐사 10, 도감 10 | 0100-messenger 23, 0060-util 10, 0300-codex 10, 0015-prompt-studio/ 8, 0160-free-chat 7 …외 21 |
+| F03 | 118 | rels.json · chapters.json › [].relScan · npcs.json | 18·4·94·2 | evd 31, 미지 탐사 6, 작전 2, 도감 2 | 0015-prompt-studio/ 25, 0450-relations-memory 21, 0250-story-factory 19, 0465-story-plan 10, 0330-casting 8 …외 15 |
+| F04 | 113 | prog.json › avatar · banners.json · chapters.json | 18·8·82·5 | 설정 › 그림 AI 5, 설정 › 관리관 3, 도전 2, 설정 › 데이터 2 | 0260-new-game/ 35, 0015-prompt-studio/ 30, 0020-ai-connect 7, 0160-free-chat 5, 0488-stage-modes 4 …외 18 |
+| F05 | 96 | chars.json › [].voiceId · chars.json › [].voiceName · 저장소 ggm-sync | 18·7·63·8 | 도감 1, 일정 1, 미지 탐사 1, 설정 › 연동 › PC·폰 연동 16 | 0360-sync/ 45, 0335-github-api 10, 0400-publish-subscribe 7, 0520-backup-storage 7, 0080-storage-integration 6 …외 12 |
+| F06 | 89 | chars.json › [].cards · chars.json › [].faceMask · chars.json › [].faces | 10·6·66·7 | 캐시 상점 8, 상점 7, 설정 › 그림 AI 6, 도전 2 | 0030-image/ 50, 0020-ai-connect 11, 0015-prompt-studio/ 7, 0270-skin-proposal 6, 0310-art-after-ai 3 …외 9 |
+| F07 | 76 | lib.json › [].prompt · lib.json › [].img · chapters.json › [].stages[].field | 16·6·51·3 | 설정 › 그림 AI 7, 상점 6, 작전 5, 캐시 상점 5 | 0030-image/ 13, 0080-storage-integration 9, 0180-ui-scroll 7, 0565-asset-library 7, 0290-season-rotation 5 …외 19 |
+| F08 | 72 | prog.json › rogue · prog.json › raid · chapters.json › [].stages[].enemies[].atk | 20·4·44·4 | 도전 50, 미지 탐사 25, 로비 3, 이벤트 3 | 0120-abyss 57, 0110-challenge-raid 4, 0180-ui-scroll 4, 0240-growth-curve 4, 0280-live-ops 1 …외 2 |
+| F09 | 70 | prog.json › curBanner · banners.json › [].bg · banners.json › [].desc | 11·8·50·1 | 계약 15, 로비 7, 대원 5, 영입 5 | 0290-season-rotation 16, 0500-gacha 15, 0150-pickup-existing 6, 0015-prompt-studio/ 5, 0280-live-ops 4 …외 15 |
+| F10 | 63 | 저장소 starfall-nai · 저장소 starfall-sound · 저장소 starfall-ai-profiles | 12·2·47·2 | 설정 › 글 AI 9, 설정 › 그림 AI 8, 설정 1, 설정 › 화면·연출 › 아이폰·웹 연결 2 | 0020-ai-connect 35, 0210-setup 6, 0180-ui-scroll 5, 0015-prompt-studio/ 4, 0520-backup-storage 3 …외 5 |
+| F11 | 63 | prog.json › cres · prog.json › sortie · prog.json › stam | 10·12·36·5 | 도전 15, 훈련 9, 영입 4, evd 3 | 0487-formation-sortie 13, 0090-growth 9, 0480-battle 8, 0125-tower 7, 0488-stage-modes 7 …외 9 |
+| F12 | 53 | prog.json › exped · meta.json › expedition · meta.json › variants | 11·7·34·1 | disp 29, 영입 5, 대원 3, 도전 2 | 0275-expedition 27, 0505-construct 10, 0274-dispatch 7, 0090-growth 2, 0260-new-game/ 2 …외 4 |
+| F13 | 48 | meta.json › auditSeen · chars.json › [].weapon · meta.json › construct | 5·6·36·1 | 설정 › 게임 › 콘텐츠 점검·업그레이드 19, 설정 › 게임 › 캐릭터 개성·매력 11, 설정 › 게임 › 게임 규칙 (속성·포지션·능력치) 3, 설정 › 게임 › 에셋 관리 2 | 0535-content-audit 17, 0455-persona 10, 0015-prompt-studio/ 8, 0462-direction 3, 0030-image/ 3 …외 5 |
+| F14 | 37 | prog.json › mail · 저장소 ggm-upd-notes · chars.json › [].upper | 8·4·20·5 | evd 1, 대원 1, 로비 1, 이벤트 1 | 0420-app-update 18, 0220-mail 9, 0040-sound 3, 0280-live-ops 2, 0510-actions/ 2 …외 3 |
+| F15 | 37 | world.json › factions[].stance · world.json › factions[].kind · world.json › factions[].rel | 5·1·31·0 | 영입 4, 계약 3, 로비 1, 일정 1 | 0445-factions 17, 0015-prompt-studio/ 6, 0505-construct 4, 0030-image/ 3, 0500-gacha 2 …외 3 |
+| F16 | 30 | 저장소 ggm-voice-ja | 8·1·21·0 | 미지 탐사 12, evshop 3, 로비 2, 계약 1 | 0040-sound 10, 0460-script-engine 7, 0015-prompt-studio/ 4, 0530-story-memory 4, 0080-storage-integration 2 …외 3 |
+| F17 | 23 | prog.json › dm · prog.json › prepAsked · lib.json › [].live | 4·2·15·2 | 설정 › 그림 AI 3, 로비 3, 캐시 상점 2, 상점 1 | 0400-publish-subscribe 7, 0370-game-picker 3, 0090-growth 3, 0190-shop 2, 0170-render 2 …외 6 |
+| F18 | 21 | chars.json › [].naiBlocks | 4·0·17·0 | 새 게임 생성 1, 불러오기 1, 앱 시작 1, 실행 중 AI 1 | 0020-ai-connect 17, 0030-image/ 3, 0015-prompt-studio/ 1 |
+| F19 | 13 | meta.json › prompts · 저장소 ggm-plessons | 2·1·10·0 | 설정 › 게임 › 프롬프트 스튜디오 11, 앱 시작 2, 창 openCharEdit 1 | 0015-prompt-studio/ 13 |
+| F20 | 11 |  | 6·0·5·0 | 창 등장  11 | 0030-image/ 11 |
+| F21 | 10 |  | 2·1·6·1 | 설정 › 데이터 › backupBlocks 8, 창 개인 스토리 2, 창 backupExport 1, 창 공유 팩 만들기 1 | 0525-data-folder 7, 0550-standalone-app 3 |
+| F22 | 6 |  | 3·0·3·0 | 로비 3, 미지 탐사 3, 창 rgAbandon 3, 창 개인 스토리 3 | 0462-direction 6 |
+| F23 | 6 | 저장소 ggm-packs | 2·1·3·0 | 설정 › 그림 AI 6, 창 openPresetCode 2, 창 그림 AI 1 | 0020-ai-connect 6 |
+| F24 | 6 |  | 4·0·2·0 | 설정 › 관리관 4, 설정 › 그림 AI 1, 창 openPresetCode 1, 창 등장  1 | 0180-ui-scroll 4, 0160-free-chat 1, 0210-setup 1 |
+| F25 | 5 |  | 2·0·3·0 | 창 regenPreview 5, 창 AI로 다시 만들기 2 | 0030-image/ 5 |
+| F26 | 5 |  | 0·0·5·0 |  | 0015-prompt-studio/ 5 |
+| F27 | 4 |  | 2·0·2·0 | 설정 › 화면·연출 › 연출 4 | 0470-title-opening 4 |
+| F28 | 3 |  | 0·0·2·1 | 새 게임 생성 3 | 0260-new-game/ 3 |
+| F29 | 3 |  | 0·0·3·0 |  | 0530-story-memory 3 |
+| F30 | 2 |  | 0·0·2·0 | 설정 › 화면·연출 › 아이폰·웹 연결 1, 앱 시작 2 | 0410-desktop 2 |
+| F31 | 2 |  | 0·0·2·0 | 도전 1, 창 openFormation 1 | 0490-boss-patterns 2 |
+| F32 | 2 |  | 0·0·2·0 | 창 우편함 2 | 0220-mail 2 |
+| F33 | 2 |  | 0·0·2·0 | 창 AI로 다시 만들기 2, 창 regenPreview 2 | 0030-image/ 2 |
+| F34 | 2 |  | 0·0·2·0 | 창 regenPreview 2 | 0015-prompt-studio/ 2 |
+
+### 모듈 판정 — src/main 모듈 69: 고유 18 · 조각 22 · 흩어짐 7 · 슈퍼 18 · 기반 2 · 분배 1 · 층 1
+
+기준(코드 냄새 — docs/research/developer-role.md 1-3): 슈퍼 = 관계없는 기능 둘 이상이 각각 함수 max(3, 20%)↑(발산적 변경 → 기능별로 나눔) · 조각 = 중심 기능의 함수가 다른 모듈에 2배↑(게으른 모듈 → 그 모듈로 합침) · 흩어짐 = 어느 기능도 절반이 안 되고 셋 이상에 나뉨(함수마다 제 기능 모듈로) · 기반 = 허브 함수(25개↑ 함수가 부름) 중심 · 분배 = 액션 분배기 층 · 층 = 프롬프트 스튜디오(사용자 지시로 모든 기능의 프롬프트를 취합) — 분배·층은 판정 대상 아님. 기능 하나 = 모듈 하나(사용자 결정)이고 그 안에서 계층은 함수 단위로 가름(3절). `node tools/map.mjs --why <모듈>`로 근거
+
+| 모듈 | 판정 | 함수 | 기능(함수 수) | 나눌·합칠·보낼 곳 |
 |---|---|---|---|---|
-| 0200-skin-shop | 5 | 실행 중 AI | 2 | 0290-season-rotation (6) |
-| 0210-setup | 8 | 설정 › 그림 AI | 3 | 0020-ai-connect (8) |
-| 0274-dispatch | 7 | disp | 6 | 0275-expedition (21) |
-| 0550-standalone-app | 4 | 창 개인 스토리 | 3 | 0100-messenger (21) |
+| 0010-rules | 조각 | 5 | prog.json › avatar 3, chars.json › [].skillBalance 1 | → 0260-new-game/ (prog.json › avatar 3/35) |
+| 0015-prompt-studio/ | 층 | 156 | prog.json › avatar 30, rels.json 25, meta.json › prompts 13 |  |
+| 0020-ai-connect | 흩어짐 | 98 | 저장소 starfall-nai 35, chars.json › [].naiBlocks 17, chars.json › [].cards 11 | 저장소 starfall-nai 35 → 여기 / chars.json › [].naiBlocks 17 → 여기 / chars.json › [].cards 11 → 0030-image/ / prog.json › avatar 7 → 0260-new-game/ / 저장소 ggm-packs 6 → 여기 / chars.json › [].voiceId 5 → 0360-sync/ / lib.json › [].prompt 2 → 0030-image/ / chars.json › [].skillBalance 2 → 0185-game-rules / prog.json › fchat 1 → 0100-messenger |
+| 0030-image/ | 고유 | 110 | chars.json › [].cards 50, lib.json › [].prompt 13, 창 등장  11 |  |
+| 0040-sound | 흩어짐 | 26 | 저장소 ggm-voice-ja 10, chars.json › [].voiceId 4, prog.json › mail 3 | 저장소 ggm-voice-ja 10 → 여기 / chars.json › [].voiceId 4 → 0360-sync/ / prog.json › mail 3 → 0420-app-update / prog.json › avatar 2 → 0260-new-game/ / 저장소 starfall-nai 2 → 0020-ai-connect |
+| 0050-default-content | 기반 | 4 |  |  |
+| 0060-util | 조각 | 32 | prog.json › fchat 10, prog.json › curBanner 2, chars.json › [].skillBalance 2 | → 0100-messenger (prog.json › fchat 10/23) |
+| 0065-inherit | 조각 | 11 | chars.json › [].skillBalance 9 | → 0185-game-rules (chars.json › [].skillBalance 9/26) |
+| 0070-save | 흩어짐 | 13 | chars.json › [].skillBalance 3, prog.json › avatar 2, lib.json › [].prompt 2 | chars.json › [].skillBalance 3 → 0185-game-rules / prog.json › avatar 2 → 0260-new-game/ / lib.json › [].prompt 2 → 0030-image/ / prog.json › curBanner 1 → 0290-season-rotation / prog.json › fchat 1 → 0100-messenger |
+| 0080-storage-integration | 슈퍼 | 40 | lib.json › [].prompt 9, prog.json › fchat 6, chars.json › [].voiceId 6 | lib.json › [].prompt 9 → 0030-image/ / prog.json › fchat 6 → 0100-messenger / chars.json › [].voiceId 6 → 0360-sync/ |
+| 0090-growth | 슈퍼 | 37 | prog.json › cres 9, chars.json › [].skillBalance 8, prog.json › fchat 7 | prog.json › cres 9 → 0487-formation-sortie / chars.json › [].skillBalance 8 → 0185-game-rules / prog.json › fchat 7 → 0100-messenger |
+| 0100-messenger | 고유 | 29 | prog.json › fchat 23, rels.json 1, chars.json › [].voiceId 1 |  |
+| 0110-challenge-raid | 조각 | 6 | prog.json › rogue 4, lib.json › [].prompt 1, prog.json › cres 1 | → 0120-abyss (prog.json › rogue 4/57) |
+| 0120-abyss | 고유 | 69 | prog.json › rogue 57, prog.json › fchat 3, chars.json › [].cards 3 |  |
+| 0125-tower | 고유 | 9 | prog.json › cres 7 |  |
+| 0130-gift | 조각 | 9 | lib.json › [].prompt 2, prog.json › cres 1, prog.json › curBanner 1 | → 0030-image/ (lib.json › [].prompt 2/13) |
+| 0135-schedule | 조각 | 10 | prog.json › fchat 7, chars.json › [].skillBalance 2, world.json › factions[].stance 1 | → 0100-messenger (prog.json › fchat 7/23) |
+| 0140-pickup-new | 기반 | 1 |  |  |
+| 0150-pickup-existing | 조각 | 9 | prog.json › curBanner 6, prog.json › cres 2 | → 0290-season-rotation (prog.json › curBanner 6/16) |
+| 0160-free-chat | 슈퍼 | 16 | prog.json › fchat 7, prog.json › avatar 5, 설정 › 관리관 1 | prog.json › fchat 7 → 0100-messenger / prog.json › avatar 5 → 0260-new-game/ |
+| 0170-render | 조각 | 2 | prog.json › dm 2 | → 0400-publish-subscribe (prog.json › dm 2/7) |
+| 0180-ui-scroll | 흩어짐 | 38 | lib.json › [].prompt 7, 저장소 starfall-nai 5, 설정 › 관리관 4 | lib.json › [].prompt 7 → 0030-image/ / 저장소 starfall-nai 5 → 0020-ai-connect / 설정 › 관리관 4 → 여기 / prog.json › rogue 4 → 0120-abyss / prog.json › curBanner 2 → 0290-season-rotation / prog.json › fchat 2 → 0100-messenger / prog.json › mail 1 → 0420-app-update / rels.json 1 → 0450-relations-memory / prog.json › exped 1 → 0275-expedition / chars.json › [].skillBalance 1 → 0185-game-rules / prog.json › cres 1 → 0487-formation-sortie / prog.json › dm 1 → 0400-publish-subscribe / chars.json › [].voiceId 1 → 0360-sync/ |
+| 0185-game-rules | 고유 | 35 | chars.json › [].skillBalance 26, meta.json › auditSeen 3, prog.json › avatar 1 |  |
+| 0187-balance | 고유 | 16 | chars.json › [].skillBalance 15 |  |
+| 0190-shop | 흩어짐 | 20 | chars.json › [].skillBalance 5, prog.json › dm 2, prog.json › exped 2 | chars.json › [].skillBalance 5 → 0185-game-rules / prog.json › dm 2 → 0400-publish-subscribe / prog.json › exped 2 → 0275-expedition / prog.json › cres 2 → 0487-formation-sortie |
+| 0200-skin-shop | 조각 | 5 | prog.json › curBanner 4 | → 0290-season-rotation (prog.json › curBanner 4/16) |
+| 0210-setup | 조각 | 8 | 저장소 starfall-nai 6, chars.json › [].cards 1, 설정 › 관리관 1 | → 0020-ai-connect (저장소 starfall-nai 6/35) |
+| 0220-mail | 조각 | 11 | prog.json › mail 9, 창 우편함 2 | → 0420-app-update (prog.json › mail 9/18) |
+| 0230-modal | 슈퍼 | 33 | chars.json › [].skillBalance 10, prog.json › fchat 7, lib.json › [].prompt 2 | chars.json › [].skillBalance 10 → 0185-game-rules / prog.json › fchat 7 → 0100-messenger |
+| 0240-growth-curve | 슈퍼 | 21 | chars.json › [].skillBalance 7, prog.json › rogue 4, prog.json › exped 1 | chars.json › [].skillBalance 7 → 0185-game-rules / prog.json › rogue 4 → 0120-abyss |
+| 0250-story-factory | 고유 | 39 | rels.json 19, chars.json › [].skillBalance 5, prog.json › fchat 4 |  |
+| 0260-new-game/ | 고유 | 49 | prog.json › avatar 35, 새 게임 생성 3, prog.json › exped 2 |  |
+| 0270-skin-proposal | 조각 | 11 | chars.json › [].cards 6, lib.json › [].prompt 2, chars.json › [].skillBalance 1 | → 0030-image/ (chars.json › [].cards 6/50) |
+| 0274-dispatch | 조각 | 7 | prog.json › exped 7 | → 0275-expedition (prog.json › exped 7/27) |
+| 0275-expedition | 고유 | 29 | prog.json › exped 27, chars.json › [].skillBalance 1 |  |
+| 0280-live-ops | 조각 | 7 | prog.json › curBanner 4, prog.json › mail 2, prog.json › rogue 1 | → 0290-season-rotation (prog.json › curBanner 4/16) |
+| 0290-season-rotation | 고유 | 28 | prog.json › curBanner 16, lib.json › [].prompt 5, rels.json 3 |  |
+| 0300-codex | 슈퍼 | 21 | prog.json › fchat 10, rels.json 4 | prog.json › fchat 10 → 0100-messenger / rels.json 4 → 0450-relations-memory |
+| 0310-art-after-ai | 조각 | 4 | chars.json › [].cards 3, lib.json › [].prompt 1 | → 0030-image/ (chars.json › [].cards 3/50) |
+| 0330-casting | 슈퍼 | 18 | rels.json 8, lib.json › [].prompt 4, prog.json › avatar 1 | rels.json 8 → 0450-relations-memory / lib.json › [].prompt 4 → 0030-image/ |
+| 0335-github-api | 조각 | 10 | chars.json › [].voiceId 10 | → 0360-sync/ (chars.json › [].voiceId 10/45) |
+| 0360-sync/ | 고유 | 47 | chars.json › [].voiceId 45, prog.json › avatar 1, 저장소 ggm-voice-ja 1 |  |
+| 0370-game-picker | 슈퍼 | 8 | prog.json › avatar 3, prog.json › dm 3, lib.json › [].prompt 2 | prog.json › avatar 3 → 0260-new-game/ / prog.json › dm 3 → 0400-publish-subscribe |
+| 0400-publish-subscribe | 슈퍼 | 15 | chars.json › [].voiceId 7, prog.json › dm 7 | chars.json › [].voiceId 7 → 0360-sync/ / prog.json › dm 7 → 여기 |
+| 0410-desktop | 조각 | 6 | 저장소 starfall-nai 3, 설정 › 화면·연출 › 아이폰·웹 연결 2, chars.json › [].voiceId 1 | → 0020-ai-connect (저장소 starfall-nai 3/35) |
+| 0420-app-update | 고유 | 25 | prog.json › mail 18, chars.json › [].voiceId 1, prog.json › curBanner 1 |  |
+| 0440-ai-context | 조각 | 5 | prog.json › avatar 2, prog.json › curBanner 1, rels.json 1 | → 0260-new-game/ (prog.json › avatar 2/35) |
+| 0445-factions | 고유 | 25 | world.json › factions[].stance 17, lib.json › [].prompt 2, rels.json 2 |  |
+| 0450-relations-memory | 고유 | 24 | rels.json 21, prog.json › avatar 2, prog.json › rogue 1 |  |
+| 0455-persona | 슈퍼 | 21 | meta.json › auditSeen 10, chars.json › [].skillBalance 7, prog.json › fchat 3 | meta.json › auditSeen 10 → 0535-content-audit / chars.json › [].skillBalance 7 → 0185-game-rules |
+| 0460-script-engine | 슈퍼 | 17 | rels.json 7, 저장소 ggm-voice-ja 7, prog.json › fchat 1 | rels.json 7 → 0450-relations-memory / 저장소 ggm-voice-ja 7 → 0040-sound |
+| 0462-direction | 슈퍼 | 18 | 로비 6, prog.json › fchat 4, rels.json 3 | 로비 6 → 여기 / prog.json › fchat 4 → 0100-messenger |
+| 0465-story-plan | 조각 | 11 | rels.json 10 | → 0450-relations-memory (rels.json 10/21) |
+| 0470-title-opening | 고유 | 10 | 설정 › 화면·연출 › 연출 4, prog.json › avatar 1, prog.json › fchat 1 |  |
+| 0480-battle | 슈퍼 | 16 | prog.json › cres 8, prog.json › fchat 3, rels.json 1 | prog.json › cres 8 → 0487-formation-sortie / prog.json › fchat 3 → 0100-messenger |
+| 0485-battle-rules | 흩어짐 | 11 | prog.json › cres 3, chars.json › [].skillBalance 2, prog.json › avatar 1 | prog.json › cres 3 → 0487-formation-sortie / chars.json › [].skillBalance 2 → 0185-game-rules / prog.json › avatar 1 → 0260-new-game/ / lib.json › [].prompt 1 → 0030-image/ |
+| 0487-formation-sortie | 슈퍼 | 21 | prog.json › cres 13, chars.json › [].skillBalance 5, prog.json › avatar 3 | prog.json › cres 13 → 여기 / chars.json › [].skillBalance 5 → 0185-game-rules |
+| 0488-stage-modes | 슈퍼 | 17 | prog.json › cres 7, prog.json › avatar 4, rels.json 4 | prog.json › cres 7 → 0487-formation-sortie / prog.json › avatar 4 → 0260-new-game/ / rels.json 4 → 0450-relations-memory |
+| 0490-boss-patterns | 조각 | 6 | prog.json › cres 4, 도전 2 | → 0487-formation-sortie (prog.json › cres 4/13) |
+| 0500-gacha | 고유 | 22 | prog.json › curBanner 15, world.json › factions[].stance 2, 저장소 ggm-voice-ja 1 |  |
+| 0505-construct | 흩어짐 | 31 | prog.json › exped 10, prog.json › cres 4, world.json › factions[].stance 4 | prog.json › exped 10 → 0275-expedition / prog.json › cres 4 → 0487-formation-sortie / world.json › factions[].stance 4 → 0445-factions / prog.json › fchat 2 → 0100-messenger / meta.json › auditSeen 1 → 0535-content-audit / chars.json › [].skillBalance 1 → 0185-game-rules / prog.json › curBanner 1 → 0290-season-rotation |
+| 0510-actions/ | 분배 | 14 | prog.json › fchat 3, 저장소 starfall-nai 2, prog.json › mail 2 |  |
+| 0520-backup-storage | 슈퍼 | 26 | chars.json › [].voiceId 7, lib.json › [].prompt 4, 저장소 starfall-nai 3 | chars.json › [].voiceId 7 → 0360-sync/ / lib.json › [].prompt 4 → 0030-image/ |
+| 0525-data-folder | 고유 | 12 | 설정 › 데이터 › backupBlocks 7, chars.json › [].voiceId 1, 저장소 starfall-nai 1 |  |
+| 0530-story-memory | 슈퍼 | 15 | 저장소 ggm-voice-ja 4, rels.json 3, smFocused 3 | 저장소 ggm-voice-ja 4 → 0040-sound / rels.json 3 → 0450-relations-memory / smFocused 3 → 여기 |
+| 0535-content-audit | 고유 | 18 | meta.json › auditSeen 17 |  |
+| 0537-live-fill | 조각 | 4 | prog.json › curBanner 3, meta.json › auditSeen 1 | → 0290-season-rotation (prog.json › curBanner 3/16) |
+| 0550-standalone-app | 조각 | 4 | 설정 › 데이터 › backupBlocks 3, lib.json › [].prompt 1 | → 0525-data-folder (설정 › 데이터 › backupBlocks 3/7) |
+| 0565-asset-library | 슈퍼 | 14 | lib.json › [].prompt 7, chars.json › [].voiceId 3, prog.json › fchat 1 | lib.json › [].prompt 7 → 0030-image/ / chars.json › [].voiceId 3 → 0360-sync/ |
 
-### 흩어진 모듈 — 함수마다 제 기능 쪽으로
+## 5. 저장 정책 — 브라우저 저장소 키 갈래
 
-| 모듈 | 함수 | 기능 단위(함수 수) → 그 단위 함수가 많은 모듈 |
-|---|---|---|
-| 0410-desktop | 6 | 앱 시작 1 → 0015-prompt-studio/ / 설정 › 화면·연출 › 아이폰·웹 연결 1 → 0020-ai-connect / 창 홈 화면에 추가해 주세요 1 → 0020-ai-connect / 창 중계 서버 (아이폰·웹) 1 → 여기 |
+사용자 지시: 브라우저 저장소는 캐시, 원본은 PC 서버의 파일(게임은 data/, 그 밖의 설정은 ggm-data/state.json) — 자동 동기화. 갈래는 앱의 저장 정책 표 STORE_POLICY(src/main/0360-sync/010-common.js) — 보내는 목록·받는 허용 목록이 이 표를 따름. 키 37 · 갈래 없음 0(위반 — 표에 정해야 함) · 표에만 있고 코드가 안 씀 0
 
-### 파편화 기능 단위 — 3개 이상 모듈에 흩어지고 가장 많은 모듈 몫 60% 미만
-
-| 기능 단위 | 함수 | 가장 많은 모듈 몫 | 모듈(함수 수) |
+| 키 | 갈래 | 쓰기 | 쓰는 함수 |
 |---|---|---|---|
-| 앱 시작 | 18 | 22% | 0015-prompt-studio/ 4, 0050-default-content 4, 0020-ai-connect 2, 0070-save 2, 0080-storage-integration 2 …외 4 |
-| 창 만든  | 13 | 46% | 0020-ai-connect 6, 0015-prompt-studio/ 4, 0180-ui-scroll 2, 0030-image/ 1 |
-| 창 개인 스토리 | 74 | 28% | 0100-messenger 21, 0030-image/ 9, 0160-free-chat 9, 0230-modal 9, 0015-prompt-studio/ 6 …외 10 |
-| 창 openCharEdit | 42 | 45% | 0030-image/ 19, 0020-ai-connect 11, 0015-prompt-studio/ 9, 0230-modal 3 |
-| 창 소리 | 12 | 33% | 0040-sound 4, 0080-storage-integration 2, 0460-script-engine 2, 0015-prompt-studio/ 1, 0060-util 1 …외 2 |
-| 새 게임 생성 | 70 | 30% | 0015-prompt-studio/ 21, 0260-new-game/ 19, 0485-battle-rules 5, 0185-game-rules 4, 0250-story-factory 3 …외 10 |
-| 실행 중 AI | 21 | 29% | 0290-season-rotation 6, 0280-live-ops 4, 0537-live-fill 4, 0015-prompt-studio/ 2, 0200-skin-shop 2 …외 3 |
-| 창 챕터 편집 | 10 | 50% | 0015-prompt-studio/ 5, 0240-growth-curve 3, 0450-relations-memory 1, 0530-story-memory 1 |
-| 창 openLib | 5 | 40% | 0015-prompt-studio/ 2, 0040-sound 2, 0240-growth-curve 1 |
-| 설정 › 그림 AI | 22 | 36% | 0020-ai-connect 8, 0370-game-picker 7, 0210-setup 3, 0330-casting 2, 0030-image/ 1 …외 1 |
-| 창 게임 목록 | 7 | 29% | 0210-setup 2, 0080-storage-integration 1, 0250-story-factory 1, 0260-new-game/ 1, 0370-game-picker 1 …외 1 |
-| 캐시 상점 | 9 | 56% | 0190-shop 5, 0270-skin-proposal 2, 0080-storage-integration 1, 0200-skin-shop 1 |
-| 훈련 | 7 | 43% | 0090-growth 3, 0490-boss-patterns 2, 0180-ui-scroll 1, 0240-growth-curve 1 |
-| 로비 | 10 | 30% | 0462-direction 3, 0090-growth 2, 0100-messenger 2, 0180-ui-scroll 1, 0290-season-rotation 1 …외 1 |
-| 도전 | 22 | 59% | 0120-abyss 13, 0125-tower 7, 0110-challenge-raid 1, 0490-boss-patterns 1 |
-| 창 openFormation | 16 | 31% | 0240-growth-curve 5, 0230-modal 4, 0485-battle-rules 3, 0487-formation-sortie 2, 0125-tower 1 …외 1 |
-| 계약 | 17 | 59% | 0500-gacha 10, 0240-growth-curve 2, 0130-gift 1, 0180-ui-scroll 1, 0250-story-factory 1 …외 2 |
+| ggm-a2hs | 기기 | 씀 | main, openA2HS |
+| ggm-ailog | 캐시 | 씀 | aiLog, handleNavigationAndToolsAction, main |
+| ggm-backup-staging | 세션(한 번) | 씀 | backupImport |
+| ggm-bkdest | 기기 | 씀 | bkDest, shareExport |
+| ggm-bootpull | 세션(한 번) | 씀 | bootPullOk |
+| ggm-desk | 기기 | 씀 | applyDesk, deskMode, main |
+| ggm-devid | 기기 | 씀 | devId |
+| ggm-draft2 | 동기화 | 씀 | drLoad, drLoadFrom, drSave, handleStoryAndAuthoringAction |
+| ggm-drafts | 동기화 | 씀 | drLib, drLibSave |
+| ggm-llmslot | 동기화 | 씀 | llmSlots, saveLlm |
+| ggm-ng-draft | 기기 | 씀 | buildNewGameDraft |
+| ggm-orient | 기기 | 씀 | main, orientPref |
+| ggm-packs | 동기화 | 씀 | saveUserPacks, userPacks |
+| ggm-pc | 기기 | 씀 | PCS, setPCS |
+| ggm-picked | 세션(한 번) | 씀 | handleSetupAction, handleStorageAndSharingAction, showStart, switchProject |
+| ggm-play | 기기 | 씀 | handleSettingsAndAudioAction, playMode |
+| ggm-plessons | 동기화 | 씀 | plList, plSave |
+| ggm-proxy | 기기 | 씀 | handleSettingsAndAudioAction, webProxy |
+| ggm-proxy-off | 기기 | 씀 | handleStorageAndSharingAction, proxyOff |
+| ggm-pthumb | 캐시 | 씀 | handleNavigationAndToolsAction, main, pthumbs |
+| ggm-pub | 비밀(PC 서버에만) | 씀 | PUB, savePUB |
+| ggm-shared-assets | 동기화 | 씀 | shList, shSave |
+| ggm-start | 기기 | 씀 | handleStorageAndSharingAction, startMode |
+| ggm-sync | 비밀(PC 서버에만) | 씀 | SY, handleStorageAndSharingAction, saveSY |
+| ggm-sync-hold | 기기 | 씀 | lsApply, lsHoldMerge |
+| ggm-sync-idx | 기기 | 씀 | idbPut, saveSyIdx, syIdx |
+| ggm-upd-notes | 캐시 | 씀 | applyUpdate, mailTick |
+| ggm-voice-ja | 캐시 | 씀 | jaBatch, jaMap, toJa |
+| starfall-ai | 예전 키(옮기기만) | 읽기만 | AIP |
+| starfall-ai-profiles | 비밀(PC 서버에만) | 씀 | AIP, saveAIP |
+| starfall-live | 캐시 | 씀 | LV, boot:boot/head.js, boot:boot/storage-boot.js, saveLV |
+| starfall-live-html | 캐시 | 읽기만 | boot:boot/head.js |
+| starfall-nai | 비밀(PC 서버에만) | 씀 | handleImagesAndAssetsAction, handleNavigationAndToolsAction, naiCfg, naiSaved, packApply … |
+| starfall-nai-tperr | 캐시 | 씀 | naiGenerate, openNaiSet |
+| starfall-projects | 게임 저장 | 씀 | PJ, handleSetupAction, handleStorageAndSharingAction, handleStoryAndAuthoringAction |
+| starfall-setup-done | 동기화 | 씀 | handleSetupAction, handleStorageAndSharingAction, needSetup |
+| starfall-sound | 비밀(PC 서버에만) | 씀 | SND, handleSettingsAndAudioAction, handleSetupAction, swSave |
 
-### 그 밖의 모듈
-
-| 모듈 | 판정 | 함수(기능·공용·기반·닿지 않음) | 중심 기능 단위 |
-|---|---|---|---|
-| 0010-rules | 엔진 | 5 (0·4·1·0) |  |
-| 0015-prompt-studio/ | 층 | 156 (109·23·2·22) |  |
-| 0040-sound | 고유 | 26 (13·11·2·0) | 창 소리 |
-| 0050-default-content | 고유 | 4 (4·0·0·0) | 앱 시작 |
-| 0060-util | 엔진 | 32 (2·18·10·2) |  |
-| 0065-inherit | 엔진 | 11 (2·6·0·3) |  |
-| 0070-save | 엔진 | 13 (2·7·3·1) |  |
-| 0080-storage-integration | 엔진 | 40 (14·20·3·3) |  |
-| 0100-messenger | 고유 | 29 (24·4·0·1) | 창 개인 스토리 |
-| 0110-challenge-raid | 엔진 | 6 (1·5·0·0) |  |
-| 0120-abyss | 엔진 | 69 (32·37·0·0) |  |
-| 0125-tower | 고유 | 9 (8·1·0·0) | 도전 |
-| 0130-gift | 고유 | 9 (5·1·0·3) | 창 openGift |
-| 0135-schedule | 고유 | 10 (9·1·0·0) | 일정 |
-| 0140-pickup-new | 고유 | 1 (1·0·0·0) | 창 신규 픽업 만들기 |
-| 0150-pickup-existing | 고유 | 9 (6·3·0·0) | 창 openPickExisting |
-| 0170-render | 고유 | 2 (2·0·0·0) | 설정 › 게임 › 플레이 모드 |
-| 0180-ui-scroll | 고유 | 38 (25·9·1·3) | 설정 › 관리관 |
-| 0185-game-rules | 고유 | 35 (24·8·0·3) | 설정 › 게임 › 게임 규칙 (속성·포지션·능력치) |
-| 0187-balance | 고유 | 16 (14·1·0·1) | 설정 › 게임 › 밸런스 관리 |
-| 0190-shop | 고유 | 20 (15·5·0·0) | 상점 |
-| 0220-mail | 고유 | 11 (8·2·0·1) | 창 우편함 |
-| 0240-growth-curve | 고유 | 21 (16·5·0·0) | 창 openFormation |
-| 0250-story-factory | 엔진 | 39 (14·24·0·1) |  |
-| 0260-new-game/ | 고유 | 49 (43·6·0·0) | 새 게임 생성 |
-| 0270-skin-proposal | 엔진 | 11 (5·6·0·0) |  |
-| 0275-expedition | 고유 | 29 (26·2·0·1) | disp |
-| 0280-live-ops | 고유 | 7 (5·2·0·0) | 실행 중 AI |
-| 0300-codex | 고유 | 21 (20·1·0·0) | 도감 |
-| 0310-art-after-ai | 고유 | 4 (4·0·0·0) | 창 새 그림을 그릴까요? |
-| 0335-github-api | 엔진 | 10 (1·9·0·0) |  |
-| 0370-game-picker | 고유 | 8 (8·0·0·0) | 설정 › 그림 AI |
-| 0400-publish-subscribe | 고유 | 15 (14·1·0·0) | 창 🌐 게임 게시 |
-| 0420-app-update | 고유 | 25 (19·5·0·1) | 창 checkUpdate |
-| 0440-ai-context | 엔진 | 5 (2·3·0·0) |  |
-| 0445-factions | 고유 | 25 (18·5·0·2) | 설정 › 게임 › 세력·몬스터·등장 관리 |
-| 0460-script-engine | 엔진 | 17 (2·15·0·0) |  |
-| 0462-direction | 고유 | 18 (7·7·0·4) | 로비 |
-| 0465-story-plan | 고유 | 11 (8·3·0·0) | 설정 › 게임 › 시나리오 설계 |
-| 0470-title-opening | 고유 | 10 (10·0·0·0) | 설정 › 화면·연출 › 연출 |
-| 0480-battle | 엔진 | 16 (5·8·0·3) |  |
-| 0487-formation-sortie | 고유 | 21 (14·6·0·1) | 창 sortieMap |
-| 0488-stage-modes | 고유 | 17 (16·1·0·0) | 창 openModeStage |
-| 0490-boss-patterns | 고유 | 6 (4·2·0·0) | 훈련 |
-| 0500-gacha | 고유 | 22 (13·9·0·0) | 계약 |
-| 0505-construct | 고유 | 31 (27·4·0·0) | 영입 |
-| 0510-actions/ | 분배 | 14 (1·1·0·12) |  |
-| 0520-backup-storage | 고유 | 26 (9·8·0·9) | 창 공유 팩 만들기 |
-| 0525-data-folder | 고유 | 12 (12·0·0·0) | 설정 › 데이터 › backupBlocks |
-| 0535-content-audit | 고유 | 18 (15·2·0·1) | 설정 › 게임 › 콘텐츠 점검·업그레이드 |
-| 0537-live-fill | 고유 | 4 (4·0·0·0) | 실행 중 AI |
-| 0565-asset-library | 고유 | 14 (13·1·0·0) | 설정 › 게임 › 에셋 관리 |
-
-## 4. 모듈 → index.html 줄 · 역할 · 쓰는 데이터 · 연계 모듈
+## 6. 모듈 → index.html 줄 · 역할 · 쓰는 데이터 · 연계 모듈
 
 | 모듈 | index.html 줄 | 함수 | 역할(쓰기 수) | 쓰는 data | 연계 모듈(호출 수) |
 |---|---|---|---|---|---|
 | src/boot/durable-storage | 4566~4613 | 3 |  |  |  |
 | src/boot/head | 6~23 | 1 |  |  |  |
-| src/boot/storage-boot | 15035~15069 | 4 |  |  |  |
+| src/boot/storage-boot | 15051~15085 | 4 |  |  |  |
 | 0010-rules | 4616~4658 | 5 |  |  | 0185-game-rules 2, 0060-util 1, 0230-modal 1 |
 | 0015-prompt-studio/ | 4659~5033, 5034~5172, 5173~5374 | 156 | 편집기 1 | meta.json › prompts | 0010-rules 45, 0020-ai-connect 18, 0060-util 16, 0450-relations-memory 10, 0090-growth 8 |
 | 0020-ai-connect | 5375~5961 | 98 | 생성기 1 · 실행기 1 | chars.json › [].naiBlocks | 0060-util 21, 0535-content-audit 13, 0230-modal 6, 0015-prompt-studio/ 5, 0070-save 3 |
@@ -696,34 +800,34 @@ src/main 모듈 69: 고유 37 · 조각 4 · 흩어짐 1 · 슈퍼 12 · 엔진 
 | 0310-art-after-ai | 11399~11419 | 4 |  |  | 0290-season-rotation 2, 0030-image/ 1, 0020-ai-connect 1, 0060-util 1 |
 | 0330-casting | 11420~11508 | 18 | 실행기 4 · 편집기 4 | npcs.json, npcs.json › [].look, npcs.json › [].naiPrompt, npcs.json › [].role | 0060-util 20, 0030-image/ 12, 0080-storage-integration 10, 0230-modal 6, 0020-ai-connect 5 |
 | 0335-github-api | 11509~11551 | 10 |  |  | 0535-content-audit 3, 0360-sync/ 3, 0020-ai-connect 2, 0060-util 2, 0400-publish-subscribe 1 |
-| 0360-sync/ | 11552~11576, 11577~11653, 11654~11733, 11734~11784, 11785~11847 | 47 |  |  | 0060-util 35, 0020-ai-connect 17, 0230-modal 14, 0070-save 12, 0335-github-api 9 |
-| 0370-game-picker | 11848~11889 | 8 | 실행기 3 | meta.json › artTags, prog.json › bootPrep, prog.json › prepAsked | 0060-util 12, 0070-save 3, 0080-storage-integration 3, 0290-season-rotation 3, 0330-casting 2 |
-| 0400-publish-subscribe | 11893~12000 | 15 | 편집기 4 | chars.json › [].voiceId, chars.json › [].voiceName, lib.json › [].live, meta.json › pub | 0060-util 12, 0070-save 10, 0230-modal 9, 0080-storage-integration 7, 0360-sync/ 7 |
-| 0410-desktop | 12001~12045 | 6 |  |  | 0060-util 5, 0230-modal 4, 0020-ai-connect 2, 0080-storage-integration 1 |
-| 0420-app-update | 12046~12220 | 25 |  |  | 0060-util 21, 0230-modal 18, 0020-ai-connect 5, 0070-save 4, 0360-sync/ 4 |
-| 0440-ai-context | 12221~12236 | 5 |  |  | 0060-util 2, 0488-stage-modes 1, 0230-modal 1, 0010-rules 1 |
-| 0445-factions | 12237~12345 | 25 | 편집기 9 · 실행기 11 · 생성기 8 | chars.json › [].debut, chars.json › [].debutLater, chars.json › [].faction, meta.json › bestiary, meta.json › cast, world.json › factions …외 4 | 0070-save 7, 0060-util 6, 0535-content-audit 5, 0090-growth 3, 0230-modal 3 |
-| 0450-relations-memory | 12346~12415 | 24 | 생성기 2 · 실행기 3 · 편집기 1 | chapters.json › [].relScan, meta.json › relProf, rels.json | 0060-util 13, 0070-save 5, 0290-season-rotation 4, 0230-modal 4, 0010-rules 3 |
-| 0455-persona | 12416~12529 | 21 | 실행기 4 · 편집기 7 | chars.json › [].affLines, chars.json › [].lines, chars.json › [].persona, chars.json › [].pfields, meta.json › persona | 0060-util 18, 0070-save 6, 0230-modal 6, 0015-prompt-studio/ 5, 0020-ai-connect 4 |
-| 0460-script-engine | 12530~12638 | 17 |  |  | 0060-util 21, 0040-sound 13, 0080-storage-integration 4, 0535-content-audit 3, 0462-direction 3 |
-| 0462-direction | 12639~12701 | 18 |  |  | 0060-util 8, 0535-content-audit 5, 0460-script-engine 3, 0080-storage-integration 2, 0040-sound 1 |
-| 0465-story-plan | 12702~12762 | 11 | 실행기 3 · 편집기 2 | prog.json › flags, world.json › plan | 0060-util 5, 0070-save 2, 0230-modal 2, 0020-ai-connect 1, 0015-prompt-studio/ 1 |
-| 0470-title-opening | 12763~12816 | 10 | 기타 1 | prog.json › seenOpening | 0060-util 17, 0080-storage-integration 4, 0180-ui-scroll 3, 0040-sound 3, 0290-season-rotation 2 |
-| 0480-battle | 12817~12937 | 16 | 실행기 1 | prog.json › stars | 0060-util 19, 0090-growth 14, 0080-storage-integration 10, 0010-rules 4, 0487-formation-sortie 4 |
-| 0485-battle-rules | 12938~12980 | 15 | 생성기 3 · 실행기 3 | chapters.json › [].stages[].field, chapters.json › [].stages[].goal, chapters.json › [].stages[].rulesV | 0120-abyss 2, 0060-util 2, 0110-challenge-raid 1, 0480-battle 1 |
-| 0487-formation-sortie | 12981~13048 | 21 | 실행기 4 | prog.json › sortie | 0090-growth 10, 0060-util 9, 0070-save 4, 0230-modal 3, 0185-game-rules 1 |
-| 0488-stage-modes | 13049~13135 | 17 | 실행기 1 | prog.json › stars | 0060-util 13, 0230-modal 9, 0090-growth 7, 0460-script-engine 5, 0010-rules 4 |
-| 0490-boss-patterns | 13136~13157 | 6 |  |  | 0290-season-rotation 1, 0230-modal 1 |
-| 0500-gacha | 13158~13287 | 22 | 실행기 12 | banners.json › [].newAt, prog.json › firstTen, prog.json › gateSeen, prog.json › guar, prog.json › hist2, prog.json › history …외 4 | 0060-util 27, 0040-sound 6, 0010-rules 5, 0080-storage-integration 5, 0230-modal 4 |
-| 0505-construct | 13288~13439 | 31 | 실행기 24 · 편집기 2 · 생성기 3 | chars.json › [].age, chars.json › [].alt, chars.json › [].altCanon, chars.json › [].cvar, chars.json › [].faction, chars.json › [].naiPrompt …외 12 | 0060-util 31, 0010-rules 11, 0070-save 5, 0230-modal 5, 0190-shop 4 |
-| 0510-actions/ | 13440~13472, 13473~13657, 13658~13670, 13671~13837, 13838~13920, 13921~13986, 13987~14047, 14048~14068, 14069~14115, 14116~14282, 14283~14324, 14325~14367, 14368~14397 | 14 | 편집기 70 · 실행기 29 | banners.json, banners.json › [].desc, banners.json › [].id, banners.json › [].name, banners.json › [].pickup, banners.json › [].textContent …외 85 | 0060-util 103, 0030-image/ 73, 0020-ai-connect 73, 0090-growth 53, 0230-modal 47 |
-| 0520-backup-storage | 14398~14576 | 26 | 편집기 4 | chars.json › [].voiceId, chars.json › [].voiceName | 0080-storage-integration 12, 0230-modal 10, 0060-util 10, 0070-save 9, 0360-sync/ 4 |
-| 0525-data-folder | 14577~14663 | 12 |  |  | 0070-save 7, 0060-util 5, 0520-backup-storage 3, 0360-sync/ 3, 0080-storage-integration 3 |
-| 0530-story-memory | 14664~14706 | 15 | 편집기 1 | meta.json › storyMemory | 0230-modal 8, 0060-util 6, 0070-save 5, 0015-prompt-studio/ 4, 0450-relations-memory 2 |
-| 0535-content-audit | 14707~14840 | 21 | 편집기 1 | meta.json › auditSeen | 0060-util 10, 0020-ai-connect 10, 0445-factions 8, 0185-game-rules 7, 0070-save 5 |
-| 0537-live-fill | 14841~14860 | 4 |  |  | 0280-live-ops 3, 0060-util 3, 0170-render 1, 0535-content-audit 1, 0090-growth 1 |
-| 0550-standalone-app | 14868~14914 | 4 |  |  | 0060-util 3, 0535-content-audit 1, 0030-image/ 1, 0080-storage-integration 1 |
-| 0565-asset-library | 14915~14968 | 14 | 실행기 3 · 편집기 3 | lib.json › [].alias, lib.json › [].prompt, lib.json › [].shared | 0080-storage-integration 6, 0060-util 4, 0070-save 2, 0230-modal 2, 0040-sound 1 |
+| 0360-sync/ | 11552~11592, 11593~11669, 11670~11749, 11750~11800, 11801~11863 | 47 |  |  | 0060-util 35, 0020-ai-connect 17, 0230-modal 14, 0070-save 12, 0335-github-api 9 |
+| 0370-game-picker | 11864~11905 | 8 | 실행기 3 | meta.json › artTags, prog.json › bootPrep, prog.json › prepAsked | 0060-util 12, 0070-save 3, 0080-storage-integration 3, 0290-season-rotation 3, 0330-casting 2 |
+| 0400-publish-subscribe | 11909~12016 | 15 | 편집기 4 | chars.json › [].voiceId, chars.json › [].voiceName, lib.json › [].live, meta.json › pub | 0060-util 12, 0070-save 10, 0230-modal 9, 0080-storage-integration 7, 0360-sync/ 7 |
+| 0410-desktop | 12017~12061 | 6 |  |  | 0060-util 5, 0230-modal 4, 0020-ai-connect 2, 0080-storage-integration 1 |
+| 0420-app-update | 12062~12236 | 25 |  |  | 0060-util 21, 0230-modal 18, 0020-ai-connect 5, 0070-save 4, 0360-sync/ 4 |
+| 0440-ai-context | 12237~12252 | 5 |  |  | 0060-util 2, 0488-stage-modes 1, 0230-modal 1, 0010-rules 1 |
+| 0445-factions | 12253~12361 | 25 | 편집기 9 · 실행기 11 · 생성기 8 | chars.json › [].debut, chars.json › [].debutLater, chars.json › [].faction, meta.json › bestiary, meta.json › cast, world.json › factions …외 4 | 0070-save 7, 0060-util 6, 0535-content-audit 5, 0090-growth 3, 0230-modal 3 |
+| 0450-relations-memory | 12362~12431 | 24 | 생성기 2 · 실행기 3 · 편집기 1 | chapters.json › [].relScan, meta.json › relProf, rels.json | 0060-util 13, 0070-save 5, 0290-season-rotation 4, 0230-modal 4, 0010-rules 3 |
+| 0455-persona | 12432~12545 | 21 | 실행기 4 · 편집기 7 | chars.json › [].affLines, chars.json › [].lines, chars.json › [].persona, chars.json › [].pfields, meta.json › persona | 0060-util 18, 0070-save 6, 0230-modal 6, 0015-prompt-studio/ 5, 0020-ai-connect 4 |
+| 0460-script-engine | 12546~12654 | 17 |  |  | 0060-util 21, 0040-sound 13, 0080-storage-integration 4, 0535-content-audit 3, 0462-direction 3 |
+| 0462-direction | 12655~12717 | 18 |  |  | 0060-util 8, 0535-content-audit 5, 0460-script-engine 3, 0080-storage-integration 2, 0040-sound 1 |
+| 0465-story-plan | 12718~12778 | 11 | 실행기 3 · 편집기 2 | prog.json › flags, world.json › plan | 0060-util 5, 0070-save 2, 0230-modal 2, 0020-ai-connect 1, 0015-prompt-studio/ 1 |
+| 0470-title-opening | 12779~12832 | 10 | 기타 1 | prog.json › seenOpening | 0060-util 17, 0080-storage-integration 4, 0180-ui-scroll 3, 0040-sound 3, 0290-season-rotation 2 |
+| 0480-battle | 12833~12953 | 16 | 실행기 1 | prog.json › stars | 0060-util 19, 0090-growth 14, 0080-storage-integration 10, 0010-rules 4, 0487-formation-sortie 4 |
+| 0485-battle-rules | 12954~12996 | 15 | 생성기 3 · 실행기 3 | chapters.json › [].stages[].field, chapters.json › [].stages[].goal, chapters.json › [].stages[].rulesV | 0120-abyss 2, 0060-util 2, 0110-challenge-raid 1, 0480-battle 1 |
+| 0487-formation-sortie | 12997~13064 | 21 | 실행기 4 | prog.json › sortie | 0090-growth 10, 0060-util 9, 0070-save 4, 0230-modal 3, 0185-game-rules 1 |
+| 0488-stage-modes | 13065~13151 | 17 | 실행기 1 | prog.json › stars | 0060-util 13, 0230-modal 9, 0090-growth 7, 0460-script-engine 5, 0010-rules 4 |
+| 0490-boss-patterns | 13152~13173 | 6 |  |  | 0290-season-rotation 1, 0230-modal 1 |
+| 0500-gacha | 13174~13303 | 22 | 실행기 12 | banners.json › [].newAt, prog.json › firstTen, prog.json › gateSeen, prog.json › guar, prog.json › hist2, prog.json › history …외 4 | 0060-util 27, 0040-sound 6, 0010-rules 5, 0080-storage-integration 5, 0230-modal 4 |
+| 0505-construct | 13304~13455 | 31 | 실행기 24 · 편집기 2 · 생성기 3 | chars.json › [].age, chars.json › [].alt, chars.json › [].altCanon, chars.json › [].cvar, chars.json › [].faction, chars.json › [].naiPrompt …외 12 | 0060-util 31, 0010-rules 11, 0070-save 5, 0230-modal 5, 0190-shop 4 |
+| 0510-actions/ | 13456~13488, 13489~13673, 13674~13686, 13687~13853, 13854~13936, 13937~14002, 14003~14063, 14064~14084, 14085~14131, 14132~14298, 14299~14340, 14341~14383, 14384~14413 | 14 | 편집기 70 · 실행기 29 | banners.json, banners.json › [].desc, banners.json › [].id, banners.json › [].name, banners.json › [].pickup, banners.json › [].textContent …외 85 | 0060-util 103, 0030-image/ 73, 0020-ai-connect 73, 0090-growth 53, 0230-modal 47 |
+| 0520-backup-storage | 14414~14592 | 26 | 편집기 4 | chars.json › [].voiceId, chars.json › [].voiceName | 0080-storage-integration 12, 0230-modal 10, 0060-util 10, 0070-save 9, 0360-sync/ 4 |
+| 0525-data-folder | 14593~14679 | 12 |  |  | 0070-save 7, 0060-util 5, 0520-backup-storage 3, 0360-sync/ 3, 0080-storage-integration 3 |
+| 0530-story-memory | 14680~14722 | 15 | 편집기 1 | meta.json › storyMemory | 0230-modal 8, 0060-util 6, 0070-save 5, 0015-prompt-studio/ 4, 0450-relations-memory 2 |
+| 0535-content-audit | 14723~14856 | 21 | 편집기 1 | meta.json › auditSeen | 0060-util 10, 0020-ai-connect 10, 0445-factions 8, 0185-game-rules 7, 0070-save 5 |
+| 0537-live-fill | 14857~14876 | 4 |  |  | 0280-live-ops 3, 0060-util 3, 0170-render 1, 0535-content-audit 1, 0090-growth 1 |
+| 0550-standalone-app | 14884~14930 | 4 |  |  | 0060-util 3, 0535-content-audit 1, 0030-image/ 1, 0080-storage-integration 1 |
+| 0565-asset-library | 14931~14984 | 14 | 실행기 3 · 편집기 3 | lib.json › [].alias, lib.json › [].prompt, lib.json › [].shared | 0080-storage-integration 6, 0060-util 4, 0070-save 2, 0230-modal 2, 0040-sound 1 |
 | app/010-confirm | 2074~2091 | 1 |  |  |  |
 | app/020-construct | 2094~2208 | 18 |  |  |  |
 | app/030-expedition | 2211~2278 | 14 |  |  |  |
@@ -737,13 +841,13 @@ src/main 모듈 69: 고유 37 · 조각 4 · 흩어짐 1 · 슈퍼 12 · 엔진 
 | combat/080-training | 4482~4506 | 9 |  |  | 0060-util 11, 0090-growth 5, 0230-modal 3, 0010-rules 1, 0070-save 1 |
 | combat/090-practice | 4509~4562 | 9 |  |  | 0060-util 7, 0230-modal 3, 0460-script-engine 2, 0090-growth 1, 0480-battle 1 |
 
-## 5. 최근 변화(증분 갱신 기록)
+## 7. 최근 변화(증분 갱신 기록)
 
+- 2026-11-04T01:11 · git d2b44df
+- 2026-11-04T01:11 · git d2b44df
+- 2026-11-04T01:08 · git d2b44df
+- 2026-11-04T01:07 · git d2b44df · src 1: 0360-sync/010-common · index.html 다시 빌드
+- 2026-11-04T01:06 · git d2b44df
+- 2026-11-04T01:05 · git d2b44df
+- 2026-11-04T01:05 · git d2b44df · src 4: 0360-sync/010-common, 0360-sync/020-pc-server, 0360-sync/030-github, 0360-sync/040-boot · index.html 다시 빌드
 - 2026-11-04T00:34 · git de137de
-- 2026-11-04T00:33 · git de137de
-- 2026-11-04T00:19 · git 274e94f
-- 2026-11-04T00:18 · git 1dd6b9c
-- 2026-11-04T00:15 · git 0a341ea
-- 2026-11-04T00:13 · git 0a341ea
-- 2026-11-04T00:12 · git 0a341ea
-- 2026-11-04T00:11 · git 0a341ea

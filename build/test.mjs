@@ -803,7 +803,6 @@ try {
       const c4 = await b3.newContext(), p4 = await c4.newPage(); p4.on('pageerror', e => err3.push(String(e)));
       await p4.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
       await p4.goto(`http://127.0.0.1:${port}/?pc=${key}`);
-      await p4.evaluate(() => { try { appStorage.setItem('ggm-sync', JSON.stringify({ device: '둘째 기기' })); } catch (e) {} }).catch(() => 0);
       await until(() => p4.evaluate(() => typeof P === 'function' && P().gold).catch(() => 0).then(v => v === gold), 30000, '빈 기기에서 PC 게임 받기');
       { const r = await p4.evaluate(() => ({ pl: appStorage.getItem('ggm-plessons'), or: appStorage.getItem('ggm-orient'), sy: JSON.parse(appStorage.getItem('ggm-sync') || '{}') }));
         assert.ok(String(r.pl).includes('시험 교훈') && r.or == null && r.sy.repo === 'me/repo', '빈 기기: 동기화 갈래는 받고 기기 갈래는 안 받음: ' + JSON.stringify(r));

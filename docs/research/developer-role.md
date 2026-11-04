@@ -83,9 +83,9 @@
 8. **도구로 재고 시험으로 확인**: 측정은 도구로(수동 금지), 래칫으로 늘지 않게, 작은 단계로 리팩터링하고 시험을 녹색으로.
 
 ## 3. 지금 어긋난 것 (확인된 사실 → `docs/problems.md` 7-6)
-- 계층 섞임: 1-1의 예들(그리다가 상태 변경, Model이 창을 엶, 처리기가 창 HTML을 만듦) — 함수마다 계층을 재는 도구를 만드는 중(작업 #40).
-- 모듈 판정 기초: 화면 목록·호출 그래프 통계로 낸 슈퍼·조각 판정은 계층 축이 없어 잘못된 기초 — 기능(같은 데이터·처리) × 계층(MVC)으로 다시 판정(작업 #40).
-- 저장 정책: 1-5의 브라우저에만 있는 키들.
+- 계층 섞임·방향 위반: 1-1의 예들(그리다가 상태 변경, Model이 창을 엶, 처리기가 창 HTML을 만듦) — 도구가 함수마다 재고(`tools/lib/arch.mjs`, `docs/map.md` 3절) 늘면 막음(섞임 60 · 방향 위반 182, 2026-11-04).
+- 모듈 판정: 계층 × 같은 데이터·처리로 묶은 기능으로 다시 세움(`docs/map.md` 4절) — 화면 목록 기준 판정은 지움.
+- 저장 정책: 앱에 저장 정책 표(`STORE_POLICY`)를 두고 동기화가 그 표를 따르게 함, 도구가 코드의 저장 키마다 갈래를 확인(`docs/map.md` 5절).
 
 ## 출처
 - [Martin Fowler — GUI Architectures](https://www.martinfowler.com/eaaDev/uiArchs.html) (원문 미확인 — 검색 요약) · [MVC 요약(architect-handbook)](https://herrera-ignacio.github.io/architect-handbook/legacy/design-patterns/web-presentation/mvc) · [Patterns of Enterprise Application Architecture ch.14](https://www.oreilly.com/library/view/patterns-of-enterprise/0321127420/ch14.html)

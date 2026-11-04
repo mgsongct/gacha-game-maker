@@ -2041,244 +2041,853 @@
    "text": "src/modules/combat/050-bridge.js 1개"
   }
  ],
- "surface": [
+ "arch": [
   {
-   "key": "기능 표면 슈퍼|src/main/0020-ai-connect.js",
+   "key": "계층 섞임|src/main/0030-image/",
    "num": {
-    "함수": 60
+    "함수": 4
    },
-   "text": "슈퍼 0020-ai-connect"
+   "text": "섞인 함수 0030-image/ 4"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0030-image/",
+   "key": "계층 섞임|src/main/0060-util.js",
    "num": {
-    "함수": 87
+    "함수": 1
    },
-   "text": "슈퍼 0030-image/"
+   "text": "섞인 함수 0060-util 1"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0090-growth.js",
+   "key": "계층 섞임|src/main/0070-save.js",
    "num": {
-    "함수": 21
+    "함수": 1
+   },
+   "text": "섞인 함수 0070-save 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0080-storage-integration.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0080-storage-integration 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0100-messenger.js",
+   "num": {
+    "함수": 2
+   },
+   "text": "섞인 함수 0100-messenger 2"
+  },
+  {
+   "key": "계층 섞임|src/main/0110-challenge-raid.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0110-challenge-raid 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0120-abyss.js",
+   "num": {
+    "함수": 4
+   },
+   "text": "섞인 함수 0120-abyss 4"
+  },
+  {
+   "key": "계층 섞임|src/main/0125-tower.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0125-tower 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0160-free-chat.js",
+   "num": {
+    "함수": 4
+   },
+   "text": "섞인 함수 0160-free-chat 4"
+  },
+  {
+   "key": "계층 섞임|src/main/0180-ui-scroll.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0180-ui-scroll 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0230-modal.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0230-modal 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0250-story-factory.js",
+   "num": {
+    "함수": 2
+   },
+   "text": "섞인 함수 0250-story-factory 2"
+  },
+  {
+   "key": "계층 섞임|src/main/0260-new-game/",
+   "num": {
+    "함수": 4
+   },
+   "text": "섞인 함수 0260-new-game/ 4"
+  },
+  {
+   "key": "계층 섞임|src/main/0270-skin-proposal.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0270-skin-proposal 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0290-season-rotation.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0290-season-rotation 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0300-codex.js",
+   "num": {
+    "함수": 2
+   },
+   "text": "섞인 함수 0300-codex 2"
+  },
+  {
+   "key": "계층 섞임|src/main/0360-sync/",
+   "num": {
+    "함수": 2
+   },
+   "text": "섞인 함수 0360-sync/ 2"
+  },
+  {
+   "key": "계층 섞임|src/main/0400-publish-subscribe.js",
+   "num": {
+    "함수": 3
+   },
+   "text": "섞인 함수 0400-publish-subscribe 3"
+  },
+  {
+   "key": "계층 섞임|src/main/0410-desktop.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0410-desktop 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0420-app-update.js",
+   "num": {
+    "함수": 4
+   },
+   "text": "섞인 함수 0420-app-update 4"
+  },
+  {
+   "key": "계층 섞임|src/main/0480-battle.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0480-battle 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0487-formation-sortie.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0487-formation-sortie 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0505-construct.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0505-construct 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0510-actions/",
+   "num": {
+    "함수": 12
+   },
+   "text": "섞인 함수 0510-actions/ 12"
+  },
+  {
+   "key": "계층 섞임|src/main/0520-backup-storage.js",
+   "num": {
+    "함수": 2
+   },
+   "text": "섞인 함수 0520-backup-storage 2"
+  },
+  {
+   "key": "계층 섞임|src/main/0525-data-folder.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0525-data-folder 1"
+  },
+  {
+   "key": "계층 섞임|src/main/0535-content-audit.js",
+   "num": {
+    "함수": 1
+   },
+   "text": "섞인 함수 0535-content-audit 1"
+  },
+  {
+   "key": "계층 방향|src/main/0020-ai-connect.js",
+   "num": {
+    "위반": 7
+   },
+   "text": "방향 위반 0020-ai-connect 7"
+  },
+  {
+   "key": "계층 방향|src/main/0030-image/",
+   "num": {
+    "위반": 8
+   },
+   "text": "방향 위반 0030-image/ 8"
+  },
+  {
+   "key": "계층 방향|src/main/0070-save.js",
+   "num": {
+    "위반": 2
+   },
+   "text": "방향 위반 0070-save 2"
+  },
+  {
+   "key": "계층 방향|src/main/0080-storage-integration.js",
+   "num": {
+    "위반": 3
+   },
+   "text": "방향 위반 0080-storage-integration 3"
+  },
+  {
+   "key": "계층 방향|src/main/0090-growth.js",
+   "num": {
+    "위반": 4
+   },
+   "text": "방향 위반 0090-growth 4"
+  },
+  {
+   "key": "계층 방향|src/main/0100-messenger.js",
+   "num": {
+    "위반": 3
+   },
+   "text": "방향 위반 0100-messenger 3"
+  },
+  {
+   "key": "계층 방향|src/main/0120-abyss.js",
+   "num": {
+    "위반": 19
+   },
+   "text": "방향 위반 0120-abyss 19"
+  },
+  {
+   "key": "계층 방향|src/main/0125-tower.js",
+   "num": {
+    "위반": 1
+   },
+   "text": "방향 위반 0125-tower 1"
+  },
+  {
+   "key": "계층 방향|src/main/0130-gift.js",
+   "num": {
+    "위반": 1
+   },
+   "text": "방향 위반 0130-gift 1"
+  },
+  {
+   "key": "계층 방향|src/main/0135-schedule.js",
+   "num": {
+    "위반": 3
+   },
+   "text": "방향 위반 0135-schedule 3"
+  },
+  {
+   "key": "계층 방향|src/main/0160-free-chat.js",
+   "num": {
+    "위반": 3
+   },
+   "text": "방향 위반 0160-free-chat 3"
+  },
+  {
+   "key": "계층 방향|src/main/0180-ui-scroll.js",
+   "num": {
+    "위반": 11
+   },
+   "text": "방향 위반 0180-ui-scroll 11"
+  },
+  {
+   "key": "계층 방향|src/main/0185-game-rules.js",
+   "num": {
+    "위반": 3
+   },
+   "text": "방향 위반 0185-game-rules 3"
+  },
+  {
+   "key": "계층 방향|src/main/0187-balance.js",
+   "num": {
+    "위반": 2
+   },
+   "text": "방향 위반 0187-balance 2"
+  },
+  {
+   "key": "계층 방향|src/main/0190-shop.js",
+   "num": {
+    "위반": 4
+   },
+   "text": "방향 위반 0190-shop 4"
+  },
+  {
+   "key": "계층 방향|src/main/0210-setup.js",
+   "num": {
+    "위반": 2
+   },
+   "text": "방향 위반 0210-setup 2"
+  },
+  {
+   "key": "계층 방향|src/main/0220-mail.js",
+   "num": {
+    "위반": 1
+   },
+   "text": "방향 위반 0220-mail 1"
+  },
+  {
+   "key": "계층 방향|src/main/0230-modal.js",
+   "num": {
+    "위반": 3
+   },
+   "text": "방향 위반 0230-modal 3"
+  },
+  {
+   "key": "계층 방향|src/main/0240-growth-curve.js",
+   "num": {
+    "위반": 4
+   },
+   "text": "방향 위반 0240-growth-curve 4"
+  },
+  {
+   "key": "계층 방향|src/main/0250-story-factory.js",
+   "num": {
+    "위반": 4
+   },
+   "text": "방향 위반 0250-story-factory 4"
+  },
+  {
+   "key": "계층 방향|src/main/0260-new-game/",
+   "num": {
+    "위반": 3
+   },
+   "text": "방향 위반 0260-new-game/ 3"
+  },
+  {
+   "key": "계층 방향|src/main/0270-skin-proposal.js",
+   "num": {
+    "위반": 1
+   },
+   "text": "방향 위반 0270-skin-proposal 1"
+  },
+  {
+   "key": "계층 방향|src/main/0274-dispatch.js",
+   "num": {
+    "위반": 1
+   },
+   "text": "방향 위반 0274-dispatch 1"
+  },
+  {
+   "key": "계층 방향|src/main/0275-expedition.js",
+   "num": {
+    "위반": 5
+   },
+   "text": "방향 위반 0275-expedition 5"
+  },
+  {
+   "key": "계층 방향|src/main/0280-live-ops.js",
+   "num": {
+    "위반": 1
+   },
+   "text": "방향 위반 0280-live-ops 1"
+  },
+  {
+   "key": "계층 방향|src/main/0290-season-rotation.js",
+   "num": {
+    "위반": 6
+   },
+   "text": "방향 위반 0290-season-rotation 6"
+  },
+  {
+   "key": "계층 방향|src/main/0300-codex.js",
+   "num": {
+    "위반": 4
+   },
+   "text": "방향 위반 0300-codex 4"
+  },
+  {
+   "key": "계층 방향|src/main/0330-casting.js",
+   "num": {
+    "위반": 2
+   },
+   "text": "방향 위반 0330-casting 2"
+  },
+  {
+   "key": "계층 방향|src/main/0360-sync/",
+   "num": {
+    "위반": 16
+   },
+   "text": "방향 위반 0360-sync/ 16"
+  },
+  {
+   "key": "계층 방향|src/main/0370-game-picker.js",
+   "num": {
+    "위반": 5
+   },
+   "text": "방향 위반 0370-game-picker 5"
+  },
+  {
+   "key": "계층 방향|src/main/0420-app-update.js",
+   "num": {
+    "위반": 2
+   },
+   "text": "방향 위반 0420-app-update 2"
+  },
+  {
+   "key": "계층 방향|src/main/0445-factions.js",
+   "num": {
+    "위반": 4
+   },
+   "text": "방향 위반 0445-factions 4"
+  },
+  {
+   "key": "계층 방향|src/main/0450-relations-memory.js",
+   "num": {
+    "위반": 2
+   },
+   "text": "방향 위반 0450-relations-memory 2"
+  },
+  {
+   "key": "계층 방향|src/main/0455-persona.js",
+   "num": {
+    "위반": 3
+   },
+   "text": "방향 위반 0455-persona 3"
+  },
+  {
+   "key": "계층 방향|src/main/0460-script-engine.js",
+   "num": {
+    "위반": 4
+   },
+   "text": "방향 위반 0460-script-engine 4"
+  },
+  {
+   "key": "계층 방향|src/main/0462-direction.js",
+   "num": {
+    "위반": 5
+   },
+   "text": "방향 위반 0462-direction 5"
+  },
+  {
+   "key": "계층 방향|src/main/0465-story-plan.js",
+   "num": {
+    "위반": 2
+   },
+   "text": "방향 위반 0465-story-plan 2"
+  },
+  {
+   "key": "계층 방향|src/main/0480-battle.js",
+   "num": {
+    "위반": 6
+   },
+   "text": "방향 위반 0480-battle 6"
+  },
+  {
+   "key": "계층 방향|src/main/0487-formation-sortie.js",
+   "num": {
+    "위반": 2
+   },
+   "text": "방향 위반 0487-formation-sortie 2"
+  },
+  {
+   "key": "계층 방향|src/main/0488-stage-modes.js",
+   "num": {
+    "위반": 3
+   },
+   "text": "방향 위반 0488-stage-modes 3"
+  },
+  {
+   "key": "계층 방향|src/main/0505-construct.js",
+   "num": {
+    "위반": 7
+   },
+   "text": "방향 위반 0505-construct 7"
+  },
+  {
+   "key": "계층 방향|src/main/0510-actions/",
+   "num": {
+    "위반": 1
+   },
+   "text": "방향 위반 0510-actions/ 1"
+  },
+  {
+   "key": "계층 방향|src/main/0520-backup-storage.js",
+   "num": {
+    "위반": 3
+   },
+   "text": "방향 위반 0520-backup-storage 3"
+  },
+  {
+   "key": "계층 방향|src/main/0525-data-folder.js",
+   "num": {
+    "위반": 1
+   },
+   "text": "방향 위반 0525-data-folder 1"
+  },
+  {
+   "key": "계층 방향|src/main/0530-story-memory.js",
+   "num": {
+    "위반": 1
+   },
+   "text": "방향 위반 0530-story-memory 1"
+  },
+  {
+   "key": "계층 방향|src/main/0535-content-audit.js",
+   "num": {
+    "위반": 2
+   },
+   "text": "방향 위반 0535-content-audit 2"
+  },
+  {
+   "key": "계층 방향|src/main/0537-live-fill.js",
+   "num": {
+    "위반": 2
+   },
+   "text": "방향 위반 0537-live-fill 2"
+  },
+  {
+   "key": "기능 조각|src/main/0010-rules.js",
+   "num": {
+    "함수": 5
+   },
+   "text": "조각 0010-rules"
+  },
+  {
+   "key": "기능 흩어짐|src/main/0020-ai-connect.js",
+   "num": {
+    "함수": 98
+   },
+   "text": "흩어짐 0020-ai-connect"
+  },
+  {
+   "key": "기능 흩어짐|src/main/0040-sound.js",
+   "num": {
+    "함수": 26
+   },
+   "text": "흩어짐 0040-sound"
+  },
+  {
+   "key": "기능 조각|src/main/0060-util.js",
+   "num": {
+    "함수": 32
+   },
+   "text": "조각 0060-util"
+  },
+  {
+   "key": "기능 조각|src/main/0065-inherit.js",
+   "num": {
+    "함수": 11
+   },
+   "text": "조각 0065-inherit"
+  },
+  {
+   "key": "기능 흩어짐|src/main/0070-save.js",
+   "num": {
+    "함수": 13
+   },
+   "text": "흩어짐 0070-save"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0080-storage-integration.js",
+   "num": {
+    "함수": 40
+   },
+   "text": "슈퍼 0080-storage-integration"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0090-growth.js",
+   "num": {
+    "함수": 37
    },
    "text": "슈퍼 0090-growth"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0160-free-chat.js",
+   "key": "기능 조각|src/main/0110-challenge-raid.js",
+   "num": {
+    "함수": 6
+   },
+   "text": "조각 0110-challenge-raid"
+  },
+  {
+   "key": "기능 조각|src/main/0130-gift.js",
+   "num": {
+    "함수": 9
+   },
+   "text": "조각 0130-gift"
+  },
+  {
+   "key": "기능 조각|src/main/0135-schedule.js",
+   "num": {
+    "함수": 10
+   },
+   "text": "조각 0135-schedule"
+  },
+  {
+   "key": "기능 조각|src/main/0150-pickup-existing.js",
+   "num": {
+    "함수": 9
+   },
+   "text": "조각 0150-pickup-existing"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0160-free-chat.js",
    "num": {
     "함수": 16
    },
    "text": "슈퍼 0160-free-chat"
   },
   {
-   "key": "기능 표면 조각|src/main/0200-skin-shop.js",
+   "key": "기능 조각|src/main/0170-render.js",
+   "num": {
+    "함수": 2
+   },
+   "text": "조각 0170-render"
+  },
+  {
+   "key": "기능 흩어짐|src/main/0180-ui-scroll.js",
+   "num": {
+    "함수": 38
+   },
+   "text": "흩어짐 0180-ui-scroll"
+  },
+  {
+   "key": "기능 흩어짐|src/main/0190-shop.js",
+   "num": {
+    "함수": 20
+   },
+   "text": "흩어짐 0190-shop"
+  },
+  {
+   "key": "기능 조각|src/main/0200-skin-shop.js",
    "num": {
     "함수": 5
    },
    "text": "조각 0200-skin-shop"
   },
   {
-   "key": "기능 표면 조각|src/main/0210-setup.js",
+   "key": "기능 조각|src/main/0210-setup.js",
    "num": {
     "함수": 8
    },
    "text": "조각 0210-setup"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0230-modal.js",
+   "key": "기능 조각|src/main/0220-mail.js",
    "num": {
-    "함수": 25
+    "함수": 11
+   },
+   "text": "조각 0220-mail"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0230-modal.js",
+   "num": {
+    "함수": 33
    },
    "text": "슈퍼 0230-modal"
   },
   {
-   "key": "기능 표면 조각|src/main/0274-dispatch.js",
+   "key": "기능 슈퍼|src/main/0240-growth-curve.js",
+   "num": {
+    "함수": 21
+   },
+   "text": "슈퍼 0240-growth-curve"
+  },
+  {
+   "key": "기능 조각|src/main/0270-skin-proposal.js",
+   "num": {
+    "함수": 11
+   },
+   "text": "조각 0270-skin-proposal"
+  },
+  {
+   "key": "기능 조각|src/main/0274-dispatch.js",
    "num": {
     "함수": 7
    },
    "text": "조각 0274-dispatch"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0290-season-rotation.js",
+   "key": "기능 조각|src/main/0280-live-ops.js",
+   "num": {
+    "함수": 7
+   },
+   "text": "조각 0280-live-ops"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0300-codex.js",
    "num": {
     "함수": 21
    },
-   "text": "슈퍼 0290-season-rotation"
+   "text": "슈퍼 0300-codex"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0330-casting.js",
+   "key": "기능 조각|src/main/0310-art-after-ai.js",
+   "num": {
+    "함수": 4
+   },
+   "text": "조각 0310-art-after-ai"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0330-casting.js",
    "num": {
     "함수": 18
    },
    "text": "슈퍼 0330-casting"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0360-sync/",
+   "key": "기능 조각|src/main/0335-github-api.js",
    "num": {
-    "함수": 25
+    "함수": 10
    },
-   "text": "슈퍼 0360-sync/"
+   "text": "조각 0335-github-api"
   },
   {
-   "key": "기능 표면 흩어짐|src/main/0410-desktop.js",
+   "key": "기능 슈퍼|src/main/0370-game-picker.js",
+   "num": {
+    "함수": 8
+   },
+   "text": "슈퍼 0370-game-picker"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0400-publish-subscribe.js",
+   "num": {
+    "함수": 15
+   },
+   "text": "슈퍼 0400-publish-subscribe"
+  },
+  {
+   "key": "기능 조각|src/main/0410-desktop.js",
    "num": {
     "함수": 6
    },
-   "text": "흩어짐 0410-desktop"
+   "text": "조각 0410-desktop"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0450-relations-memory.js",
+   "key": "기능 조각|src/main/0440-ai-context.js",
    "num": {
-    "함수": 12
+    "함수": 5
    },
-   "text": "슈퍼 0450-relations-memory"
+   "text": "조각 0440-ai-context"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0455-persona.js",
+   "key": "기능 슈퍼|src/main/0455-persona.js",
    "num": {
-    "함수": 13
+    "함수": 21
    },
    "text": "슈퍼 0455-persona"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0485-battle-rules.js",
+   "key": "기능 슈퍼|src/main/0460-script-engine.js",
    "num": {
-    "함수": 8
+    "함수": 17
    },
-   "text": "슈퍼 0485-battle-rules"
+   "text": "슈퍼 0460-script-engine"
   },
   {
-   "key": "기능 표면 슈퍼|src/main/0530-story-memory.js",
+   "key": "기능 슈퍼|src/main/0462-direction.js",
    "num": {
-    "함수": 10
+    "함수": 18
+   },
+   "text": "슈퍼 0462-direction"
+  },
+  {
+   "key": "기능 조각|src/main/0465-story-plan.js",
+   "num": {
+    "함수": 11
+   },
+   "text": "조각 0465-story-plan"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0480-battle.js",
+   "num": {
+    "함수": 16
+   },
+   "text": "슈퍼 0480-battle"
+  },
+  {
+   "key": "기능 흩어짐|src/main/0485-battle-rules.js",
+   "num": {
+    "함수": 11
+   },
+   "text": "흩어짐 0485-battle-rules"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0487-formation-sortie.js",
+   "num": {
+    "함수": 21
+   },
+   "text": "슈퍼 0487-formation-sortie"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0488-stage-modes.js",
+   "num": {
+    "함수": 17
+   },
+   "text": "슈퍼 0488-stage-modes"
+  },
+  {
+   "key": "기능 조각|src/main/0490-boss-patterns.js",
+   "num": {
+    "함수": 6
+   },
+   "text": "조각 0490-boss-patterns"
+  },
+  {
+   "key": "기능 흩어짐|src/main/0505-construct.js",
+   "num": {
+    "함수": 31
+   },
+   "text": "흩어짐 0505-construct"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0520-backup-storage.js",
+   "num": {
+    "함수": 26
+   },
+   "text": "슈퍼 0520-backup-storage"
+  },
+  {
+   "key": "기능 슈퍼|src/main/0530-story-memory.js",
+   "num": {
+    "함수": 15
    },
    "text": "슈퍼 0530-story-memory"
   },
   {
-   "key": "기능 표면 조각|src/main/0550-standalone-app.js",
+   "key": "기능 조각|src/main/0537-live-fill.js",
+   "num": {
+    "함수": 4
+   },
+   "text": "조각 0537-live-fill"
+  },
+  {
+   "key": "기능 조각|src/main/0550-standalone-app.js",
    "num": {
     "함수": 4
    },
    "text": "조각 0550-standalone-app"
   },
   {
-   "key": "기능 표면 파편화|앱 시작",
+   "key": "기능 슈퍼|src/main/0565-asset-library.js",
    "num": {
-    "모듈": 9
+    "함수": 14
    },
-   "text": "파편화 앱 시작 모듈 9"
-  },
-  {
-   "key": "기능 표면 파편화|창 만든 ",
-   "num": {
-    "모듈": 4
-   },
-   "text": "파편화 창 만든  모듈 4"
-  },
-  {
-   "key": "기능 표면 파편화|창 개인 스토리",
-   "num": {
-    "모듈": 15
-   },
-   "text": "파편화 창 개인 스토리 모듈 15"
-  },
-  {
-   "key": "기능 표면 파편화|창 openCharEdit",
-   "num": {
-    "모듈": 4
-   },
-   "text": "파편화 창 openCharEdit 모듈 4"
-  },
-  {
-   "key": "기능 표면 파편화|창 소리",
-   "num": {
-    "모듈": 7
-   },
-   "text": "파편화 창 소리 모듈 7"
-  },
-  {
-   "key": "기능 표면 파편화|새 게임 생성",
-   "num": {
-    "모듈": 15
-   },
-   "text": "파편화 새 게임 생성 모듈 15"
-  },
-  {
-   "key": "기능 표면 파편화|실행 중 AI",
-   "num": {
-    "모듈": 8
-   },
-   "text": "파편화 실행 중 AI 모듈 8"
-  },
-  {
-   "key": "기능 표면 파편화|창 챕터 편집",
-   "num": {
-    "모듈": 4
-   },
-   "text": "파편화 창 챕터 편집 모듈 4"
-  },
-  {
-   "key": "기능 표면 파편화|창 openLib",
-   "num": {
-    "모듈": 3
-   },
-   "text": "파편화 창 openLib 모듈 3"
-  },
-  {
-   "key": "기능 표면 파편화|설정 › 그림 AI",
-   "num": {
-    "모듈": 6
-   },
-   "text": "파편화 설정 › 그림 AI 모듈 6"
-  },
-  {
-   "key": "기능 표면 파편화|창 게임 목록",
-   "num": {
-    "모듈": 6
-   },
-   "text": "파편화 창 게임 목록 모듈 6"
-  },
-  {
-   "key": "기능 표면 파편화|캐시 상점",
-   "num": {
-    "모듈": 4
-   },
-   "text": "파편화 캐시 상점 모듈 4"
-  },
-  {
-   "key": "기능 표면 파편화|훈련",
-   "num": {
-    "모듈": 4
-   },
-   "text": "파편화 훈련 모듈 4"
-  },
-  {
-   "key": "기능 표면 파편화|로비",
-   "num": {
-    "모듈": 6
-   },
-   "text": "파편화 로비 모듈 6"
-  },
-  {
-   "key": "기능 표면 파편화|도전",
-   "num": {
-    "모듈": 4
-   },
-   "text": "파편화 도전 모듈 4"
-  },
-  {
-   "key": "기능 표면 파편화|창 openFormation",
-   "num": {
-    "모듈": 6
-   },
-   "text": "파편화 창 openFormation 모듈 6"
-  },
-  {
-   "key": "기능 표면 파편화|계약",
-   "num": {
-    "모듈": 7
-   },
-   "text": "파편화 계약 모듈 7"
+   "text": "슈퍼 0565-asset-library"
   }
  ]
 }

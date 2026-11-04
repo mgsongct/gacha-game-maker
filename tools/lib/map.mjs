@@ -9,7 +9,10 @@ import { generatorVocab, constLiterals, INFRA } from './wiring.mjs';
 import { stageRoots } from './lifecycle.mjs';
 import { auditRules } from './upgrade.mjs';
 import { moduleOf } from './scope.mjs';
-import { surfaceMap } from './surface.mjs';
+import { surfaceOf, surfaceMap } from './surface.mjs';
+import { archMap } from './arch.mjs';
+import { louvain } from './modules.mjs';
+import { fragmentFiles } from './prompts.mjs';
 
 // 엔티티 → data 파일·경로(목록 안 원소). 컬렉션을 도는 콜백·찾기 함수·생성 함수 결과·매개변수(호출 지점에서 전파)로 묶인 변수의 프로퍼티를 필드로 셈 — 변수 이름으로 짐작하지 않음
 export const ENT = { 캐릭터: ['chars', '[]'], NPC: ['npcs', '[]'], 장: ['chapters', '[]'], 스테이지: ['chapters', '[].stages[]'], 적: ['chapters', '[].stages[].enemies[]'], 자료: ['lib', '[]'], 세력: ['world', 'factions[]'], 메신저: ['threads', '[]'], 이벤트: ['events', '[]'], 배너: ['banners', '[]'], 파견: ['dispatches', '[]'] };
@@ -207,8 +210,12 @@ export function buildMap(units, fns, sf, html = '') { const types = constLiteral
   attachAudits(data, auditRules(units, fns, sf), entFields, types);
   const base = wwwBase(units, html), FN = fnIndex(fns, data, promptIndex(fns, T.nameMap), base), { mods, M } = moduleSummary(units, fns, base), DATA = dataSummary(data, FN, M);
   const MODS = Object.fromEntries(Object.entries(mods).sort((a, b) => a[0].localeCompare(b[0])).map(([m, v]) => [m, { files: v.files, fns: v.fns, roles: v.roles, writes: [...v.writes].sort(), reads: v.reads.size, neighbors: [...v.calls].sort((a, b) => b[1] - a[1]).slice(0, 8) }]));
-  /* index.html 기능 표면(메뉴 → 화면·패널·창 · 배경)과 모듈 판정 — 함수마다 자리(place)를 함수 색인에 */ const S = surfaceMap(units, fns, sf, html); for (const [k, p] of Object.entries(S.place)) if (FN[k]) FN[k].place = p;
-  return { types, data: DATA, fns: FN, modules: MODS, surface: { tabs: S.tabs, feats: S.feats, verdicts: S.verdicts, frag: S.frag } }; }
+  /* index.html 기능 표면(메뉴 → 화면·패널·창 · 배경 — 화면 단위)과 아키텍처(계층 MVC · 같은 데이터·처리로 묶은 기능 · 모듈 판정 · 저장 정책) — 함수마다 자리·계층·기능을 함수 색인에 */
+  const SO = surfaceOf(units, fns, html), S = surfaceMap(units, fns, SO), keyUse = new Map(), K = (fk, k, rw) => { if (!keyUse.has(fk)) keyUse.set(fk, new Map()); if (rw === 'w' || !keyUse.get(fk).has(k)) keyUse.get(fk).set(k, rw); };
+  for (const [k, d] of data) { for (const fk of d.w.keys()) K(fk, k, 'w'); for (const fk of d.r) K(fk, k, 'r'); }
+  const A = archMap(units, fns, { writers: new Set([...data.values()].flatMap(d => [...d.w.keys()])), keyUse, sf: SO, louvain, layer: fragmentFiles(units).home, modOf: moduleOf });
+  for (const [k, p] of Object.entries(S.place)) if (FN[k]) FN[k].place = p; for (const [k, x] of Object.entries(A.fnLayer)) if (FN[k]) Object.assign(FN[k], x);
+  return { types, data: DATA, fns: FN, modules: MODS, surface: { tabs: S.tabs, feats: S.feats }, arch: { feats: A.feats, verdicts: A.verdicts, bad: A.bad, store: A.store } }; }
 
 // 두 맵의 차이(증분 갱신 기록): 함수 추가·삭제·옮김, data 경로의 만드는 곳 추가·삭제
 export function mapDiff(a, b) { const out = { fns: { added: [], removed: [], moved: [] }, data: [] }; if (!a) return out;

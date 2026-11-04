@@ -11573,14 +11573,15 @@ function syLsValue(k){ const v=appStorage.getItem(k); return v==null&&k===PJKEY?
    sync   — 사용자가 만든 내용·게임에 필요한 설정: PC 서버·GitHub 둘 다
    secret — 비밀(API 키·토큰)이 든 설정: PC 서버에는 그대로, GitHub에는 [뺄 칸]을 빼고(null이면 보내지 않음). 받을 때 빠진 비밀은 이 기기 것을 지킴
    keep   — 받을 때 이 기기 값을 지키는 칸(연동 설정의 기기 이름)
-   device — 이 기기에만 의미 있는 값 · cache — 다시 만들 수 있는 캐시·기록 (둘 다 동기화 안 함)
+   device — 이 기기에만 의미 있는 값 · cache — 다시 만들 수 있는 캐시·기록 · legacy — 예전 형식 키(읽어서 새 키로 옮기기만) (셋 다 동기화 안 함)
    새 저장 키는 여기에 갈래를 정해요(tools/map.mjs가 갈래 없는 키·목록과 다른 동기화를 막아요) */
 const STORE_POLICY={
   sync:['starfall-setup-done','ggm-plessons','ggm-packs','ggm-llmslot','ggm-shared-assets','ggm-drafts','ggm-draft2'],
   secret:{'starfall-nai':['key'],'starfall-sound':['fishKey','elKey'],'starfall-ai-profiles':null,'ggm-sync':null,'ggm-pub':null},
   keep:{'ggm-sync':['device']},
   device:['ggm-devid','ggm-orient','ggm-desk','ggm-a2hs','ggm-pc','ggm-proxy','ggm-proxy-off','ggm-play','ggm-start','ggm-bkdest','ggm-ng-draft','ggm-sync-idx','ggm-sync-hold'],
-  cache:['starfall-live','starfall-live-html','ggm-pthumb','ggm-voice-ja','ggm-ailog','ggm-upd-notes','starfall-nai-tperr']
+  cache:['starfall-live','starfall-live-html','ggm-pthumb','ggm-voice-ja','ggm-ailog','ggm-upd-notes','starfall-nai-tperr'],
+  legacy:['starfall-ai']
 };
 function syLsKeys(withKeys){ const pj=PJ(), sec=Object.entries(STORE_POLICY.secret).filter(([,f])=>withKeys||f).map(([k])=>k); return [PJKEY,...pj.list.map(x=>pjKey(x.id)),...STORE_POLICY.sync,...sec]; }
 function syStrip(k,v,withKeys){ const f=STORE_POLICY.secret[k]; if(withKeys||v==null||!f) return v; try{ const o=JSON.parse(v); f.forEach(x=>{ delete o[x]; }); return JSON.stringify(o); }catch(e){} return v; }
