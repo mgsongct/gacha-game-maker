@@ -30,12 +30,16 @@ function uiPageScrollKey(){return JSON.stringify([PJ().active,tab,tab==='studio'
 function uiSelectText(field){if(!field)return;const root=field.closest('.sheet')||document.getElementById('view'),state=uiScrollCapture(root);field.focus({preventScroll:true});try{field.setSelectionRange(0,field.value.length);}catch(e){field.select();}uiScrollRestore(root,state);}
 
 /* /UI_SCROLL_MODULE */
-function render(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewState=UI_PAGE_SCROLL_ROUTE===scrollKey&&UI_PAGE_SCROLL_GAME===G?uiScrollCapture(viewBefore):null; setTimeout(()=>{ try{ fitLobby(); }catch(e){} },0); document.body.classList.toggle('play',playMode()); if(playMode()&&PLAY_HIDE_ST.includes(STTAB)) STTAB='';
+/* 그리기 전 처리(Controller — CLAUDE.md §0-2 화면은 상태를 바꾸지 않음): 진행 칸의 하루/주 새로 만들기·형식 맞춤(progTick), 탐사를 야영지 저장 없이 떠나면 끝냄 표시, 로비에서 우편·캐시 처리 → 그리기(renderView) */
+function render(){ progTick();
   // 심연 탐사는 야영지에서 저장해야만 나갔다 올 수 있어요. 다른 길로 나가면 탐사가 끝나요.
-  if(PREVTAB==='abyss'&&tab!=='abyss'){ try{ const r=RG().run; if(r&&!r.saved) r.left=true; }catch(e){} } PREVTAB=tab;
+  if(PREVTAB==='abyss'&&tab!=='abyss'){ const r=progSlot('rogue').run; if(r&&!r.saved) r.left=true; } PREVTAB=tab;
   if(tab==='lobby'&&typeof mailTick==='function') mailTick();
   if(tab==='lobby'&&typeof cashTick==='function') cashTick();
-  updStam(); $('#gems').textContent=nf(P().gems); try{ $('#ic_gold').innerHTML=rIco('gold'); $('#ic_gems').innerHTML=rIco('gems'); }catch(e){} $('#gold').textContent=nf(P().gold); dm();
+  renderView(); }
+/* 그리기(View): 지금 탭 화면·머리 재화·탭 표시 */
+function renderView(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewState=UI_PAGE_SCROLL_ROUTE===scrollKey&&UI_PAGE_SCROLL_GAME===G?uiScrollCapture(viewBefore):null; setTimeout(()=>{ try{ fitLobby(); }catch(e){} },0); document.body.classList.toggle('play',playMode()); if(playMode()&&PLAY_HIDE_ST.includes(STTAB)) STTAB='';
+  updStam(); $('#gems').textContent=nf(P().gems); try{ $('#ic_gold').innerHTML=rIco('gold'); $('#ic_gems').innerHTML=rIco('gems'); }catch(e){} $('#gold').textContent=nf(P().gold);
   $('#tb_ops').textContent=T('ops'); $('#tb_gacha').textContent=T('gacha'); $('#tb_crew').textContent=T('crew');
   const navTab={evshop:'lobby',abyss:'lobby',challenge:'lobby',codex:'lobby',notice:'lobby',event:'lobby',evd:'lobby',farm:'lobby',disp:'lobby',sched:'lobby',construct:'contract',pass:'lobby',shop:'lobby',cash:'lobby'}[tab]||tab;
   if(tab!=='lobby') document.body.classList.remove('lb-hidden');
@@ -93,9 +97,9 @@ function lobbyHTML(){
       <div class="lb-right">
         ${ico('mailopen','','mail','우편함',mailCount()||'',mailCount()>0)}
         ${ico('go','disp','disp',T('dispatch'),dispDone()||'')}
-        ${ico('go','sched','talk','일정',G.chars.some(c=>own(c.id))&&SCHED().left?SCHED().left:'')}
+        ${ico('go','sched','talk','일정',G.chars.some(c=>own(c.id))&&progRead('sched').left?progRead('sched').left:'')}
         ${ico('go','farm','farm',T('farm'),'')}
-        ${ico('go','challenge','raid','도전',RG().run?'!':(raidTriesLeft()&&!RAID().killed?raidTriesLeft():''))}
+        ${ico('go','challenge','raid','도전',progRead('rogue').run?'!':(raidTriesLeft()&&!progRead('raid').killed?raidTriesLeft():''))}
         ${ill||has?ico('lbhide','','eye','숨기기',''):''}
       </div>
       <div class="lb-foot">
@@ -238,7 +242,7 @@ function farmHTML(){
     return `<div class="stage ${cl?'clear':''} ${open?'':'lock'}"><span class="code">${lv}</span><span class="t"><b>${lv}단계 <small class="${low?'farm-low':'muted'}">권장 Lv.${rec}</small></b><span class="st">${rewardText(farmReward(f.key,lv))}</span></span>${open?`<button class="btn sm ghost" data-act="farmgo" data-k="${f.key}" data-lv="${lv}">출격</button>`:''}${cl?`<button class="btn sm" data-act="sweep" data-k="${f.key}" data-lv="${lv}">소탕</button><button class="btn sm ghost" data-act="sweep" data-k="${f.key}" data-lv="${lv}" data-n="5">×5</button>`:''}</div>`;}).join('')}`).join('')}`;
 }
 function passHTML(){
-  const p=P(), d=dm(), lv=passLv(), xp=p.pass.xp;
+  const p=P(), d=progRead('dm'), lv=passLv(), xp=p.pass.xp;
   return `${pageHead(T('pass'),'SEASON PASS','lobby')}
   <div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Lv.${lv} / ${PASS_MAX}</h3><span class="muted">${nf(xp%PASS_PER)} / ${PASS_PER} XP</span></div><div class="bar"><i style="width:${lv>=PASS_MAX?100:(xp%PASS_PER)/PASS_PER*100}%"></i></div></div>
   <div class="row" style="margin:8px 0"><button class="btn sm" data-act="pgetall">모두 받기 <small>(임무·패스 보상)</small></button></div>

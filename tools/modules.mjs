@@ -14,9 +14,9 @@ import { readFileSync } from 'node:fs';
 import { inlinePrompts, promptSites, fragmentFiles, promptText, IMAGE_SINKS, tagText, sharedHelpers } from './lib/prompts.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..'), OUT = join(ROOT, 'tools/out');
-const units = await loadUnits(ROOT), { fns } = buildGraph(units), sf = stateFlow(units, fns), M = moduleMap(units, fns, sf, { modOf: moduleOf, layer: fragmentFiles(units).home }), home = fragmentFiles(units).home;
+const units = await loadUnits(ROOT), { fns, tops } = buildGraph(units), sf = stateFlow(units, fns), M = moduleMap(units, fns, sf, { modOf: moduleOf, layer: fragmentFiles(units).home }), home = fragmentFiles(units).home;
 const shared = sharedHelpers(ROOT), llmIns = inlinePrompts(units, { shared }), llmAll = inlinePrompts(units, { pred: promptText, home, shared }), img = inlinePrompts(units, { sinks: IMAGE_SINKS, pred: tagText, home, tables: true, shared });
-const NB = naturalBoundaries(fns, sf, M, moduleOf, fragmentFiles(units).home), short = m => String(m).replace(/^src\/(main|modules)\//, '');
+const NB = naturalBoundaries(fns, sf, M, moduleOf, fragmentFiles(units).home, new Set([...tops].filter(([, v]) => v.kind !== 'function').map(([k]) => k))), short = m => String(m).replace(/^src\/(main|modules)\//, '');
 const PS = progSlots(units, fns, sf);
 const areas = areaMap(readFileSync(join(ROOT, 'docs/modules.md'), 'utf8'), units, fns, M);
 const byFile = rows => { const m = new Map(); rows.forEach(r => { const f = r.loc.split(':')[0]; const x = m.get(f) || { n: 0, chars: 0 }; x.n++; x.chars += r.chars; m.set(f, x); }); return [...m].sort((a, b) => b[1].chars - a[1].chars); };

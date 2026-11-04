@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-// 자기점검·정적분석: node tools/check.mjs [--json] [--strict] [--out 폴더] [--diff <git 기준>] [--update-baseline]
+// 자기점검·정적분석: node tools/check.mjs [--json] [--strict] [--out 폴더] [--diff <git 기준>] [--update-baseline] [--rebase <git 기준>]
 //   tree-sitter로 함수·호출·분기를 그래프로 만들고(콜스택·병목·순환·깊이·복잡도), ast-grep 패턴으로 품질 규칙을 찾고,
 //   화면 액션(data-act)·상태(G·P())·저장 표시(mark) 흐름을 맞춰 봐요. DOM id 참조·HTML 주입·저장 키·리스너 누수, CSS(src/style)와
 //   부속 파일(서비스 워커·중계 서버·빌드·도구·PC 서버 파이썬)도 봐요. 결과: 터미널 요약 + out/report.md · out/flow.mmd · out/report.json
 //   --strict: '오류'가 있거나 기준선(tools/baseline.json)보다 새로 생기거나 나빠진 항목이 있으면 exit 1 (CI용)
 //   --diff <기준>: 그 git 커밋의 트리에 같은 분석을 돌려 이번 변경으로 새로 생김·나빠짐·해결을 보여 줌(out/diff.md)
 //   --update-baseline: 지금 결과로 기준선을 다시 씀(줄었을 때만 — 늘었으면 코드를 고침)
+//   --rebase <기준>: 분석 도구가 바뀌었을 때 바뀐 도구로 그 커밋 트리를 재서 기준선으로(지금 코드로 올리지 않음) — 그 대비 새로 생김·나빠짐이 있으면 실패
 import { promptSites } from './lib/prompts.mjs';
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
@@ -42,6 +43,9 @@ writeFileSync(join(OUT, 'report.json'), JSON.stringify(J, null, 1));
 const F = findings(J), base = readBaseline(ROOT), vsBase = base ? compare(base, F) : null, refArg = (() => { const i = process.argv.indexOf('--diff'); return i > 0 ? process.argv[i + 1] : ''; })();
 let vsRef = null; if (refArg) { const { sha, dir } = refTree(ROOT, refArg, OUT), ref = await analyze(dir); vsRef = compare(findings(ref.J), F); writeFileSync(join(OUT, 'diff.md'), `# 변경 비교: ${refArg} (${sha.slice(0, 7)}) → 작업 트리\n\n` + diffMd(vsRef, '자기점검 발견')); }
 if (vsBase) writeFileSync(join(OUT, 'baseline-diff.md'), `# 기준선(${BASELINE}) 대비\n\n` + diffMd(vsBase, '자기점검 발견'));
+/* --rebase <기준>: 분석 도구(판정 규칙)가 바뀌었을 때 — 바뀐 도구로 그 커밋의 트리를 재서 기준선으로 씀(지금 코드로 기준선을 올려 퇴보를 숨기지 않게). 그 대비 지금 코드가 새로 생김·나빠짐이면 exit 1 */
+if (process.argv.includes('--rebase')) { const ref = process.argv[process.argv.indexOf('--rebase') + 1], { sha, dir } = refTree(ROOT, ref, OUT), F0 = findings((await analyze(dir)).J), d = compare(F0, F);
+  writeBaseline(ROOT, F0); console.log(`기준선을 ${sha.slice(0, 7)}의 트리(지금 도구로 잼)로: ${F0.length}개 · 지금 코드는 그 대비 새로 생김 ${d.added.length} · 나빠짐 ${d.worse.length} · 해결 ${d.fixed.length} · 좋아짐 ${d.better.length}`); [...d.added, ...d.worse].forEach(f => console.log('  + ' + f.text)); process.exit(d.added.length || d.worse.length ? 1 : 0); }
 if (arg('--update-baseline')) { if (vsBase && (vsBase.added.length || vsBase.worse.length) && !arg('--force')) { console.log(`기준선을 올리는 갱신은 하지 않아요: 새로 생김 ${vsBase.added.length} · 나빠짐 ${vsBase.worse.length} — 코드를 고치세요(out/baseline-diff.md). 정말 받아들일 때만 --force`); process.exit(1); } writeBaseline(ROOT, F); console.log(`기준선 갱신: ${BASELINE} (${F.length}개)`); }
 if (arg('--json')) console.log(JSON.stringify(J)); else {
   console.log(`메타 점검(도구 ${R.tools.files}개 파일): 빈 catch ${R.tools.emptyCatch.length} · 복잡 ${R.tools.complex.length} · 같은 본문 ${R.tools.dup.length} · 되풀이 문자열 ${R.tools.strings.length} · 안 쓰는 함수 ${R.tools.unused.length}`);

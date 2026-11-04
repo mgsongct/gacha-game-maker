@@ -22,7 +22,7 @@ case 'cxdel': { if(!(await appConfirm('이 기록을 지울까요?'))) break; G.
 case 'cxnote': { const k=t.dataset.k, v=prompt('메모로 덧붙일 내용'); if(!v||!v.trim()) break; const N=cxNotes(); (N[k]=N[k]||[]).push({text:v.trim(),at:'메모'}); mark('world'); openCx(k); pcSoon(); break; }
 case 'cxdisc': { if(!SAMPLE){toast('설정의 글 AI에서 AI를 먼저 등록해 주세요');break;} t.disabled=true; const o0=t.textContent; t.textContent='쓰는 중… 1분쯤 걸려요'; const n=await cxDiscover(t); t.disabled=false; t.textContent=o0; if(n){ render(); toast(`새 기록 ${n}개를 실었어요`); } break; }
 case 'cxdeep': { const k=t.dataset.k; t.disabled=true; t.textContent='기록을 찾는 중…'; const ok=await cxDeepen(k,t); if(ok){ openCx(k); toast('새 기록을 덧붙였어요'); } else { t.disabled=false; t.textContent='✦ 더 알아보기'; } break; }
-case 'cxreadall': { const s=cxSeenSet(); cxEntries().forEach(e=>{ if(e.open) s[e.key]=1; }); CXMEMO=null; mark('prog'); render(); break; }
+case 'cxreadall': { const s=progSlot('cxSeen'); cxEntries().forEach(e=>{ if(e.open) s[e.key]=1; }); CXMEMO=null; mark('prog'); render(); break; }
 case 'opening-play': closeModal(); playOpening(); break;
 case 'char': openChar(id); break;
 case 'evspoke': { const c=charById(id); if(!c) break; const o=own(c.id), lv=o?affLv(o):1, r=t.getBoundingClientRect(), y=el.clientY||r.top+r.height/2, zone=(y-r.top)/r.height<0.3?'head':'body';
@@ -46,7 +46,7 @@ case 'evreroll': { const ev=G.events.find(x=>x.id===id); if(!ev) break; const ol
         G.events=G.events.filter(x=>x!==ne); G.banners=G.banners.filter(bn=>bn.id!==ne.bannerId); markAll(); mark('prog');
         return {title:`이벤트 스토리 「${ev.title}」로 다시 썼어요`,body:`${T('event')} 화면에서 처음부터 플레이할 수 있어요.`}; }); break; }
 case 'stamopen': openStam(0); break;
-case 'stamfill': { if(P().gems<STAM_FILL[0]) break; pay({gems:STAM_FILL[0]}); const s=stam(); s.v+=STAM_FILL[1]; mark('prog'); closeModal(); render(); toast(`⚡ ${STAM_FILL[1]} 회복 (${s.v}/${STAM_MAX})`); break; }
+case 'stamfill': { if(P().gems<STAM_FILL[0]) break; pay({gems:STAM_FILL[0]}); const s=progSlot('stam'); s.v+=STAM_FILL[1]; mark('prog'); closeModal(); render(); toast(`⚡ ${STAM_FILL[1]} 회복 (${s.v}/${STAM_MAX})`); break; }
 case 'stamtog': { const st=P().settings; st.stamina=!t.checked?false:true; mark('prog'); updStam(); toast(st.stamina?'행동력을 켰어요':'행동력을 껐어요(전투 무제한)'); break; }
 case 'scimg': { const ta=$('#'+t.dataset.ta); if(!ta) break; uploadFor={kind:'scimg',ta:ta.id,pos:ta.selectionStart}; $('#file').click(); break; }
 case 'charedit': openCharEdit(id); break;
@@ -118,7 +118,7 @@ case 'evsave': { const ev=G.events.find(e=>e.id===id); ev.title=$('#ev_t').value
       if(sh.length) ev.shop=sh; const bn=G.banners.find(x=>x.id===ev.bannerId); if(bn) bn.active=ev.active; mark('prog'); closeModal(); render(); break; }
 case 'evdel': { const ev=G.events.find(e=>e.id===id); if(!ev) break; const ch0=G.chapters.find(c=>c.id===ev.chapterId);
       openStoryDel({title:'이벤트 「'+ev.title+'」',ids:ch0?ch0.stages.map(s=>s.id):[],ch:ch0,ev,back:()=>openEvEdit(id),after:()=>{ tab='event'; },run:()=>{ G.events=G.events.filter(e=>e.id!==id); G.chapters=G.chapters.filter(c=>c.id!==ev.chapterId); mark('ch:'+ev.chapterId); G.banners=G.banners.filter(b=>b.id!==ev.bannerId); }}); break; }
-case 'dreroll': { const bn=DBOARD(); if(bn.rr){ if(P().gold<2000){ toast('크레딧이 부족해요'); break; } P().gold-=2000; } bn.rr=(bn.rr||0)+1; bn.list=bn.list.map(o=>P().disp[o.id]?o:null); bn.list=bn.list.map(o=>o||dispOffer(bn.list.filter(Boolean).map(x=>x.name))); mark('prog'); render(); toast('새 의뢰가 올라왔어요'); break; }
+case 'dreroll': { const bn=progSlot('dboard'); if(bn.rr){ if(P().gold<2000){ toast('크레딧이 부족해요'); break; } P().gold-=2000; } bn.rr=(bn.rr||0)+1; bn.list=bn.list.map(o=>P().disp[o.id]?o:null); bn.list=bn.list.map(o=>o||dispOffer(bn.list.filter(Boolean).map(x=>x.name))); mark('prog'); render(); toast('새 의뢰가 올라왔어요'); break; }
 case 'meta-open': openMeta(); break;
 case 'metasave': { if($('#ng_story')&&$('#ng_story').value.trim().length>100000){toast('스토리는 최대 100,000자입니다. 초과 내용은 자르지 않았습니다.');break;}const m=G.meta, old=m.elems.map(e=>e.n); if($('#mt_logo')) m.logoStyle=$('#mt_logo').value; if($('#ng_story')) m.story=readStoryForm(); if($('#mt_cast')) m.castSex=$('#mt_cast').value; if($('#mt_tone')) m.tone=$('#mt_tone').value.trim(); if($('#mt_art')){ m.artTags=$('#mt_art').value.trim(); m.artNeg=$('#mt_artn').value.trim(); }
       m.title=$('#mt_title').value.trim()||m.title; m.sub=$('#mt_sub').value.trim(); m.theme=$('#mt_theme').value; m.accent=$('#mt_acc').value;

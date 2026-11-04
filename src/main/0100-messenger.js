@@ -38,15 +38,15 @@ function phoneList(){
 }
 function phRooms(){ const m={};
   Object.entries(P().inbox).forEach(([id,s])=>{ const t=threadById(id), c=threadChar(t); if(!c) return; const r=m[c.id]||(m[c.id]={c,at:0,unread:false}); r.at=Math.max(r.at,s.at||0); if(!s.done){ r.unread=true; r.title=r.title||t.title; } });
-  Object.entries(FC()).forEach(([cid,f])=>{ const c=charById(cid); if(!c||!f.log.length) return; const r=m[cid]||(m[cid]={c,at:0,unread:false}); r.at=Math.max(r.at,f.at||0); if(f.unread) r.unread=true; });
+  Object.entries(progSlot('fchat')).forEach(([cid,f])=>{ const c=charById(cid); if(!c||!f.log.length) return; const r=m[cid]||(m[cid]={c,at:0,unread:false}); r.at=Math.max(r.at,f.at||0); if(f.unread) r.unread=true; });
   return Object.values(m).map(r=>Object.assign(r,{last:roomLog(r.c.id).filter(l=>l.w!=='s').at(-1)})).sort((a,b)=>b.at-a.at); }
 function roomThreads(cid){ return Object.entries(P().inbox).map(([id,s])=>({t:threadById(id),s})).filter(x=>{ const c=threadChar(x.t); return c&&c.id===cid; }).sort((a,b)=>(a.s.t0||a.s.at||0)-(b.s.t0||b.s.at||0)); }
 function roomItems(cid){ const out=[];
   roomThreads(cid).forEach(({s})=>{ const n=s.log.length, base=s.t0||s.at||0; s.log.forEach((l,i)=>{ if(l.w==='s'&&l.t==='대화가 끝났어요') return; out.push({l,arr:s.log,k:l.at||(s.t0?base+i:base-(n-i))}); }); });
-  const f=FC()[cid]; if(f) f.log.forEach((l,i)=>out.push({l,arr:f.log,k:l.at||i,fc:true}));
+  const f=progSlot('fchat')[cid]; if(f) f.log.forEach((l,i)=>out.push({l,arr:f.log,k:l.at||i,fc:true}));
   return out.sort((a,b)=>a.k-b.k); }
 function roomLog(cid){ return roomItems(cid).map(x=>x.l); }
-function roomDel(cid,items){ const f=FC()[cid]; items.forEach(x=>{ const i=x.arr.indexOf(x.l); if(i<0) return; x.arr.splice(i,1); if(x.fc&&f&&i<(f.sumTo||0)) f.sumTo--; }); if(f&&!f.log.length){ f.sum=''; f.sumTo=0; } mark('prog'); }
+function roomDel(cid,items){ const f=progSlot('fchat')[cid]; items.forEach(x=>{ const i=x.arr.indexOf(x.l); if(i<0) return; x.arr.splice(i,1); if(x.fc&&f&&i<(f.sumTo||0)) f.sumTo--; }); if(f&&!f.log.length){ f.sum=''; f.sumTo=0; } mark('prog'); }
 function roomLastBlock(cid){ const it=roomItems(cid); if(!it.length) return []; let i=it.length-1; while(i>0&&(it[i].k-it[i-1].k)<30*60e3&&it[i].k>1e12&&it[i-1].k>1e12) i--; return it.slice(i); }
 function phNewList(){ PH=null; const list=[...new Set(G.chars.map(c=>baseChar(c)))].sort((a,b)=>(own(b.id)?1:0)-(own(a.id)?1:0)); // 새로 추가한(아직 안 뽑은) 인물도 보여요
   $('#phone').innerHTML=`<div class="phone"><div class="ph-top"><button data-act="phback" aria-label="뒤로">‹</button><b>대화 추가</b><span style="width:30px"></span></div><div class="ph-list">${

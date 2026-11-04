@@ -31,7 +31,7 @@ case 'phselend': { const cid=PH&&PH.fc; if(cid) openRoom(cid); else phoneList();
 case 'phdel': { const cid=PH&&PH.fc; if(!cid) break; const x=roomItems(cid)[+t.dataset.i]; if(!x) break; roomDel(cid,[x]); const st=$('#phChat').scrollTop; openRoom(cid,{sel:true}); $('#phChat').scrollTop=st; toast('메시지를 지웠어요'); break; }
 case 'phdelblock': { const b=roomLastBlock(id); if(!b.length) break; if(!(await appConfirm(`최근 대화 ${b.length}개 메시지를 지울까요?\n(호감도는 그대로예요)`))) break; roomDel(id,b); openRoom(id); toast('이번 대화를 지웠어요'); break; }
 case 'phdelall': { const c=charById(id); if(!c) break; if(!(await appConfirm(`${c.name}와(과)의 대화방을 모두 지울까요?\n(이야기로 받은 대화도 기록만 지워지고, 호감도는 그대로예요)`))) break;
-      roomThreads(id).forEach(({s})=>{ s.log.length=0; }); delete FC()[id]; mark('prog'); openRoom(id); toast('대화방을 비웠어요'); break; }
+      roomThreads(id).forEach(({s})=>{ s.log.length=0; }); delete progSlot('fchat')[id]; mark('prog'); openRoom(id); toast('대화방을 비웠어요'); break; }
 case 'phmode': phMode(t.dataset.v); break;
 case 'phsay': { if(!PH) break; const tid=t.dataset.tid||PH.tid, th=threadById(tid), s=th&&p.inbox[tid]; if(!th||!s) break; const c=threadChar(th), L=parseScript(th.script)[s.pos]; if(!L||L.type!=='say'||!isMe(L.who)) { openRoom(c.id); break; }
       const en={w:'me',t:sub(L.text),at:Date.now()}; s.pos++; s.log.push(en); s.at=en.at; PH.tid=tid; $('#phIn').innerHTML=''; phMode('free'); $('#phChat').insertAdjacentHTML('beforeend',bubbleHTML(en,c)); phScroll(); mark('prog'); phPlay(th,c,s,PH.token); break; }

@@ -1,7 +1,7 @@
 /* ===== 갠톡 (자유 채팅) ===== */
 let FCBUSY=false;
 const EYE_TAG=/\b(eyes?|eyelash(es)?|pupils?|heterochromia|eyeliner|tsurime|tareme|sanpaku|jitome)\b/i;
-function avatarObj(){ const p=P(); if(!p.avatar||typeof p.avatar!=='object') p.avatar={id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null}; return p.avatar; }
+
 function playerFormHTML(){ const p=P(), ai=!!SAMPLE, av=p.avatar&&imgSrc(p.avatar);
   return `<div class="g2"><div><label class="f" for="pf_call">호칭 <span class="muted" style="font-size:.75rem">(평소에 불리는 말)</span></label><input class="in" id="pf_call" maxlength="12" value="${esc(T('player'))}" placeholder="예: 지휘관"></div><div><label class="f" for="pf_name">이름 <span class="muted" style="font-size:.75rem">(필요할 때만)</span></label><input class="in" id="pf_name" maxlength="12" value="${esc(p.player||'')}" placeholder="비우면 호칭으로만 불려요"></div></div>
   ${ai?`<label class="f" for="pf_gender">당신의 성별은? (직접 쓰기)</label><input class="in" id="pf_gender" maxlength="40" value="${esc(p.genderTxt!=null?p.genderTxt:(({m:'남성',f:'여성'})[p.gender]||''))}" placeholder="예: 남성, 여성, 논바이너리… 비우면 정하지 않아요">
@@ -16,7 +16,7 @@ function readPlayerForm(){ const p=P(); if($('#pf_name')) p.player=$('#pf_name')
   if($('#pf_call')){ const cv=$('#pf_call').value.trim().slice(0,12); if(cv&&cv!==T('player')){ G.meta.terms.player=cv; mark('meta'); } }
   if($('#pf_gender')){ const g=$('#pf_gender').value.trim().slice(0,40); p.genderTxt=g; p.gender=/^(남|남성|남자|male|man)$/i.test(g)?'m':/^(여|여성|여자|female|woman)$/i.test(g)?'f':''; }
   if($('#pf_gsel')){ p.gender=$('#pf_gsel').value; p.genderTxt=''; }
-  if($('#pf_look')) p.look=$('#pf_look').value.trim().slice(0,400); if($('#pf_bio')) p.bio=$('#pf_bio').value.trim().slice(0,1500); if($('#pf_hide')) p.hideEyes=$('#pf_hide').checked;if($('#pf_nai'))naiBlocksSave(avatarObj(),'prompt','pf_nai'); mark('prog'); }
+  if($('#pf_look')) p.look=$('#pf_look').value.trim().slice(0,400); if($('#pf_bio')) p.bio=$('#pf_bio').value.trim().slice(0,1500); if($('#pf_hide')) p.hideEyes=$('#pf_hide').checked;if($('#pf_nai'))naiBlocksSave(progSlot('avatar'),'prompt','pf_nai'); mark('prog'); }
 const genderCode=g=>/^(남|남성|남자|male|man)$/i.test(g||'')?'m':/^(여|여성|여자|female|woman)$/i.test(g||'')?'f':'';
 async function heroTags(hr){ const r=await aiJSON(heroTagsPrompt({hr}),null,'quick');
   let tags=String((r&&r.tags)||'').trim(); if(!tags) return '';
@@ -26,11 +26,11 @@ function refreshPlayerForm(){ const w=$('#pfWrap'); if(w){const sheet=w.closest(
 async function playerDraw(btn){ readPlayerForm(); const p=P(); if(!p.look&&!p.avatar?.prompt){ toast('외모나 NAI 프롬프트를 먼저 적어 주세요'); return; } if(!imgReady()){ toast(imgNeed()); return; }
   const lab=btn.textContent; btn.disabled=true; btn.textContent='태그 만드는 중…';
   try{ const tags=p.avatar?.prompt||await heroTags({gender:p.genderTxt,look:p.look,hide:p.hideEyes}); if(!tags){ toast('태그를 만들지 못했어요. 다시 눌러 주세요'); return; }
-    btn.textContent='그리는 중…'; const o=avatarObj(); o.prompt=tags;
+    btn.textContent='그리는 중…'; const o=progSlot('avatar'); o.prompt=tags;
     const b=await naiDraw('char',tags,{candidateEligible:true,originalSrc:imgSrcRaw(o)||'',frame:'cowboy shot',pose:'looking at viewer'}); await storeImage(o,b,''); mark('prog'); toast('프로필 그림을 만들었어요'); refreshPlayerForm();
   }catch(e){ toast(naiErr(e)); } finally{ if(btn.isConnected){ btn.disabled=false; btn.textContent=lab; } } }
-function FC(){ const p=P(); if(!p.fchat||typeof p.fchat!=='object') p.fchat={}; return p.fchat; }
-function fcOf(cid){ const f=FC(); return f[cid]||(f[cid]={log:[],sum:'',sumTo:0,at:0}); }
+
+function fcOf(cid){ const f=progSlot('fchat'); return f[cid]||(f[cid]={log:[],sum:'',sumTo:0,at:0}); }
 function openFree(cid){ openRoom(cid); }
 async function fcSend(opt){
   opt=opt||{}; if(FCBUSY||!PH||!PH.fc) return; const cid=PH.fc, c=charById(cid), inp=$('#fcIn'); if(!c||!inp) return; if(!opt.img&&PH.pendImg) opt.img=PH.pendImg; const text=inp.value.trim(); if(!text&&!opt.img) return; if(!opt.img&&PH.lastSend&&PH.lastSend.t===text&&Date.now()-PH.lastSend.at<2500){ inp.value=''; return; } PH.lastSend={t:text,at:Date.now()}; if(opt.img){ PH.pendImg=null; phPendRender(); inp.placeholder='메시지 보내기'; }

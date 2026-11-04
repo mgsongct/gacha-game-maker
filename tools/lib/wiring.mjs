@@ -84,6 +84,8 @@ export function lazyDefault(fns, featureFns, key, sf) { const leaf = key.split('
       else if (par?.type === 'assignment_expression' && par.childForFieldName('left')?.startIndex === n.startIndex) { // if(!x.k) x.k = 기본값 꼴(없을 때 채우는 지연 초기화)만
         let ifs = par.parent; while (ifs && ifs.type !== 'if_statement' && !FNT.has(ifs.type)) ifs = ifs.parent; const cond = ifs?.type === 'if_statement' ? ifs.childForFieldName('condition')?.text || '' : '';
         if (new RegExp(`(!|typeof|isArray\\()[^&|]*\\b${leaf}\\b`).test(cond)) see(literal(par.childForFieldName('right'))); }
+      else if (par?.type === 'ternary_expression' && par.childForFieldName('consequence')?.startIndex === n.startIndex) { // 있으면 그 키, 없으면 기본값 — Array.isArray(x.k)?x.k:기본값() 꼴(읽을 때 기본값, 상태는 그대로)
+        const z = par.childForFieldName('alternative'); if (z && new RegExp(`\\b${leaf}\\b`).test(par.childForFieldName('condition')?.text || '')) see(literal(z)); }
       else if (par?.type === 'variable_declarator' && par.childForFieldName('value')?.startIndex === n.startIndex) { // const L=G.meta.x; … L&&L.length?L:기본값() 꼴 — 지역 이름으로 받은 뒤 없으면 기본값
         const L = par.childForFieldName('name')?.text; walk(f.node, m => { if (m.type !== 'ternary_expression' || !L) return; const c = m.childForFieldName('condition')?.text || '', y = m.childForFieldName('consequence')?.text, z = m.childForFieldName('alternative'); if (new RegExp(`\\b${L}\\b`).test(c) && y === L && z) see(literal(z)); }); } }); }
   return kind; }

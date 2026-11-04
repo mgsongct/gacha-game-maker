@@ -5872,7 +5872,7 @@ function naiBlocksOwner(e){
  if(id.startsWith('nai_p_'))return {o:naiCfg().parts[id.slice(6)],key:'suffix'};
  if(['wp_scene','il_scene','lb_scene','sc_scene','lbbg_scene'].includes(id)){const c=charById(e.closest('.cs-sheet')?.dataset.cid);return {o:id==='wp_scene'?c?.weapon:c?.[({il_scene:'illust',lb_scene:'lbcg',sc_scene:'scg',lbbg_scene:'lbbg'})[id]],key:'prompt'};}
  if(id==='v2-icon-prompt'&&typeof V2ICONS!=='undefined'){const p=V2ICONS?.preview;return {o:p&&{prompt:p.prompt,naiBlocks:{prompt:p.promptParts}},key:'prompt'};}
- if(id==='pf_nai')return {o:avatarObj(),key:'prompt'}; /* 플레이어 외형 칸은 0160 avatarObj가 맡음(없으면 만듦) */
+ if(id==='pf_nai')return {o:progSlot('avatar'),key:'prompt'}; /* 플레이어 외형 칸은 0160 avatarObj가 맡음(없으면 만듦) */
  if(id==='sk_prompt'&&document.getElementById('sk_char'))return {o:G.meta.shop?.self,key:'naiPrompt'};
  if(id==='rg_e_look')return {o:REGEN?.nc,key:'naiPrompt'};
  if(id==='li_prompt')return {o:libById(document.querySelector('[data-act=savelib]')?.dataset.id),key:'prompt'};
@@ -7548,12 +7548,6 @@ const DEFAULT_OPENING = {
 세라: …그 얘긴 나중에.
 그날 밤, 새벽등대의 불이 다시 켜졌다.`
 };
-
-const DEFAULT_PROG = {gems:3600,pity:0,total:0,owned:{},cleared:{},squad:[],sec:null,daily:'',
-  settings:{ssr:4,sr:18,pity:150,rv:2,expRate:100,goldRate:100,gemRate:100,stamina:true},firstTen:true,adult:true,show19:true,history:[],savedAt:0,
-  gold:20000,mat:{exp:40,wmat:20,core:10,gearMat:0,transcMat:0},pities:{},tokens:{},disp:{},dm:{date:'',cnt:{},got:{}},pass:{xp:0,got:[]},farmClear:{},shopBuy:{},curBanner:'',curEvent:'',live:{on:{talk:true,event:true,rerun:true,rotate:true,pass:true,chapter:false,season:true,skin:true,fill:true},last:{},notices:[],seen:0,recentPU:[],seasons:{story:true,event:true,char:true,rerun:true,train:true},skillGeneration:1,season:null},
-  player:'',gender:'',inbox:{},seenOpening:false,lobbyBg:'',titleBg:'',titleChar:'',gachaBg:''};
-
 /* =========================================================
    유틸
    ========================================================= */
@@ -7566,7 +7560,6 @@ const num=(v,a,b,d)=>{v=Number(v);if(!isFinite(v))v=d;return Math.min(b,Math.max
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const today=()=>new Date().toDateString();
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-const P=()=>G.prog;
 const charById=id=>G.chars.find(c=>c.id===id);
 const libById=id=>G.lib.find(l=>l.id===id);
 const playerName=()=>P().player||T('player');
@@ -7665,6 +7658,36 @@ document.addEventListener('click',e=>{ const el=e.target.closest('[data-act="inh
 /* =========================================================
    저장
    ========================================================= */
+/* 진행(G.prog — data/<게임id>/prog.json) 정의 한곳(CLAUDE.md §0-2 상태 정의는 한곳): 새 게임의 처음 진행 · 칸마다 없을 때 만들기·형식 검사·하루/주 새로 만들기·형식 맞춤·지금 값 계산
+   쓰는 쪽(Model·Controller)은 progSlot(칸) — 정의대로 맞춰 저장하고 돌려줌. 그리는 쪽(View)은 progRead(칸) — 저장하지 않음(없거나 날이 바뀌었으면 새로 만든 값을 저장하지 않고 돌려주고, 행동력은 지금 회복분까지 계산한 복사본)
+   하루/주 새로 만들기·형식 맞춤을 저장하는 것은 Controller 지점(progTick — 그리기 전·주기 타이머). 기능 규칙(행동력 회복 stamRegen·레이드 단계 raidNew·파견 의뢰 채우기 dispBoardFill·원정 expedFill·건조 자원 cresFill)은 기능 모듈에 두고 여기서 부름
+   make(옛 값) 처음 값 · ok 형식 검사(기본: 객체) · stale 참이면 새로 만듦 · fill 형식 맞춤(예전 형식 바꾸기·빠진 하위 칸·하루치 준비) · now 지금 값 계산 · tick 그리기 전에 늘 있게(하루/주 단위 기능 — 함수면 그 조건일 때) */
+const DEFAULT_PROG = {gems:3600,pity:0,total:0,owned:{},cleared:{},squad:[],sec:null,daily:'',
+  settings:{ssr:4,sr:18,pity:150,rv:2,expRate:100,goldRate:100,gemRate:100,stamina:true},firstTen:true,adult:true,show19:true,history:[],savedAt:0,
+  gold:20000,mat:{exp:40,wmat:20,core:10,gearMat:0,transcMat:0},pities:{},tokens:{},disp:{},dm:{date:'',cnt:{},got:{}},pass:{xp:0,got:[]},farmClear:{},shopBuy:{},curBanner:'',curEvent:'',live:{on:{talk:true,event:true,rerun:true,rotate:true,pass:true,chapter:false,season:true,skin:true,fill:true},last:{},notices:[],seen:0,recentPU:[],seasons:{story:true,event:true,char:true,rerun:true,train:true},skillGeneration:1,season:null},
+  player:'',gender:'',inbox:{},seenOpening:false,lobbyBg:'',titleBg:'',titleChar:'',gachaBg:''};
+const P=()=>G.prog;
+const progObj=v=>!!v&&typeof v==='object';
+const PROG_SLOTS={
+  stam:{make:()=>({v:STAM_MAX,at:Date.now()}), fill:(s,p)=>{ if(p.staminaCapVersion!==2){ stamRegen(s,120); p.staminaCapVersion=2; } }, now:s=>stamRegen(s,STAM_MAX)}, // 행동력 — 상한 120 시절 값은 그 상한으로 회복을 끝낸 뒤 새 상한으로
+  dm:{make:()=>({date:today(),cnt:{login:1},got:{}}), stale:v=>v.date!==today(), tick:true}, // 일일 임무 — 날이 바뀌면 새로
+  raid:{make:raidNew, stale:r=>r.wk!==weekKey(), tick:true}, // 주간 레이드 — 주가 바뀌면 지난주 결과로 단계를 정해 새로
+  rogue:{make:()=>({run:null,best:0,day:'',n:0}), fill:r=>{ const x=r.run; if(x&&x.v===3){ x.v=2; x.c3=1; } }}, // 탐사 — 예전 3판 형식은 2판으로
+  tower:{make:()=>({})}, gifts:{make:()=>({})}, fchat:{make:()=>({})}, cxSeen:{make:()=>({})}, // 탑 · 선물 보관함 · 자유 대화 · 도감에서 본 항목
+  sched:{make:()=>({day:today(),left:SCHED_N,done:[]}), stale:v=>v.day!==today(), tick:true}, // 오늘의 일정 — 날이 바뀌면 새로
+  avatar:{make:()=>({id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null})}, // 프로필 그림
+  shop:{make:()=>({day:today(),buy:{}}), stale:v=>v.day!==today(), tick:true}, // 상점 일일 구매 — 날이 바뀌면 새로
+  mail:{make:()=>[], ok:Array.isArray}, // 우편함
+  dboard:{make:()=>({day:'',list:[],rr:0}), ok:b=>progObj(b)&&Array.isArray(b.list), fill:dispBoardFill, tick:true}, // 파견 게시판 — 날마다 의뢰 채우기
+  exped:{make:()=>({}), fill:expedFill, tick:expedOn}, // 원정 — 방송 출연 등 원정 모드면 늘 두고 오늘의 출연 제안을 그리기 전에 만듦
+  cres:{make:()=>({}), fill:cresFill}, // 건조/영입 자원
+  cbuild:{make:()=>({n:0,found:{},log:[],input:null})} // 건조/영입 기록
+};
+function progSlot(k){ const s=PROG_SLOTS[k], p=G.prog; let v=p[k]; if(!(s.ok||progObj)(v)||(s.stale&&s.stale(v))){ v=p[k]=s.make(v); mark('prog'); } if(s.fill) s.fill(v,p); if(s.now) s.now(v); return v; }
+function progRead(k){ const s=PROG_SLOTS[k], v=G.prog[k]; if((s.ok||progObj)(v)&&!(s.stale&&s.stale(v))) return s.now?s.now(clone(v)):v;
+  const n=s.make(v); if(s.fill) s.fill(n,Object.assign({},G.prog)); return s.now?s.now(n):n; } /* 없거나 날이 바뀐 칸: 새로 만든 값에 형식 맞춤까지 — 저장하지 않음(진행 칸은 사본을 넘김) */
+/* 그리기 전·주기 타이머(Controller): 하루/주 단위 칸은 늘 있게, 있는 칸은 날이 바뀌었으면 새로·형식 맞춤 */
+function progTick(){ if(!G||!G.prog) return; for(const k in PROG_SLOTS){ const s=PROG_SLOTS[k], on=typeof s.tick==='function'?s.tick():s.tick; if(on||(G.prog[k]!==undefined&&(s.stale||s.fill))) progSlot(k); } } /* 맞춰 저장(progSlot) — 읽기(progRead)가 아님 */
 const PJKEY='starfall-projects';
 function PJ(){let d=null;try{d=JSON.parse(appStorage.getItem(PJKEY));}catch(e){} if(!d||!Array.isArray(d.list)){d={active:'main',list:[{id:'main',title:'낙성계약'}]};} return d;}
 function pjKey(id){return id==='main'?'starfall-contract-v1':'starfall-contract-v1-'+id;}
@@ -7950,7 +7973,7 @@ document.getElementById('afile').addEventListener('change',async e=>{
 });
 $('#file').addEventListener('change',async e=>{
   const f=e.target.files[0]; e.target.value=''; if(!f||!uploadFor) return;
-  if(uploadFor.kind==='avatar'){ try{ await storeImage(avatarObj(),await shrink(f,1200),''); mark('prog'); refreshPlayerForm(); toast('프로필 그림을 등록했어요'); }catch(err){ toast('이미지를 올리지 못했어요'); } return; }
+  if(uploadFor.kind==='avatar'){ try{ await storeImage(progSlot('avatar'),await shrink(f,1200),''); mark('prog'); refreshPlayerForm(); toast('프로필 그림을 등록했어요'); }catch(err){ toast('이미지를 올리지 못했어요'); } return; }
   if(uploadFor.kind==='skinpart'){ const c=charById(uploadFor.id), k=c&&(c.skins||[]).find(x=>x.id===uploadFor.s); if(!k) return; const x=uploadFor.x; toast('그림을 등록하는 중이에요');
     try{ let ub=await shrink(f,2200); if(x==='stand'||x==='upper'){ try{ const ai=await alphaInfo(ub); if(ai.border<0.5) ub=await cutoutWhite(ub); }catch(e){ quietErr(e,'0080-storage-integration.js:158'); } } await storeImage(x==='stand'?k:skinPart(k,x),ub,''); mark('c:'+c.id); render(); skinRefresh(c.id); toast(`${k.name} ${x==='stand'?'스탠딩':SKP[x]}을(를) 등록했어요`); }catch(err){ toast('이미지를 올리지 못했어요'); } return; }
   if(uploadFor.kind==='pthumb'){ try{ const d=await thumbData(f), id=uploadFor.id, up=userPacks(), mine=up.find(x=>x.id===id); if(mine){ mine.thumb=d; saveUserPacks(up); } else { const m=pthumbs(); m[id]=d; appStorage.setItem(PTHUMB,JSON.stringify(m)); } if($('#modal .ep [data-act="packuse"]')) openModal(packHTML()); toast('썸네일을 넣었어요'); }catch(err){ toast('썸네일을 넣지 못했어요'); } return; }
@@ -7991,33 +8014,23 @@ const expR=x=>Math.round(x*((P().settings.expRate||100)/100));
 /* 행동력: 메인·이벤트 전투 10, 재료 던전 8. 5분마다 1씩 차서 최대 240. ◆로 채울 수 있어요. 설정 → 게임에서 끌 수 있어요 */
 const STAM_MAX=240, STAM_MS=5*60e3, STAM_FILL=[60,60];
 function stamOn(){ return P().settings.stamina!==false; }
-function stam(){ const p=P();
-  if(p.staminaCapVersion!==2){
-    if(p.stam&&typeof p.stam==='object'){
-      const previous=p.stam,now=Date.now(),n=Math.max(0,Math.floor((now-previous.at)/STAM_MS));
-      if(previous.v>=120)previous.at=now;
-      else if(n>0){previous.v=Math.min(120,previous.v+n);previous.at=previous.v>=120?now:previous.at+n*STAM_MS;}
-    }
-    p.staminaCapVersion=2;mark('prog');
-  }
-  if(!p.stam||typeof p.stam!=='object') p.stam={v:STAM_MAX,at:Date.now()}; const s=p.stam, now=Date.now();
-  if(s.v>=STAM_MAX) s.at=now; else { const n=Math.floor((now-s.at)/STAM_MS); if(n>0){ s.v=Math.min(STAM_MAX,s.v+n); s.at=s.v>=STAM_MAX?now:s.at+n*STAM_MS; } } return s; }
+/* 행동력 회복 규칙: 마지막 회복 뒤 STAM_MS마다 1씩 cap까지, 가득 차 있으면 시각만 지금으로 — 진행 칸 stam의 정의(0070 PROG_SLOTS)가 부름 */
+function stamRegen(s,cap){ const now=Date.now(); if(s.v>=cap){ s.at=now; return s; } const n=Math.floor((now-s.at)/STAM_MS); if(n>0){ s.v=Math.min(cap,s.v+n); s.at=s.v>=cap?now:s.at+n*STAM_MS; } return s; }
 function stamCost(kind){ return kind==='main'||kind==='event'?10:kind==='farm'?8:0; }
-function updStam(){ const el=document.getElementById('stamBox'); if(!el) return; el.hidden=!stamOn(); if(!stamOn()) return; const s=stam(); const v=document.getElementById('stamV'); if(v) v.textContent=s.v+'/'+STAM_MAX; }
-function stamUse(n){ if(!stamOn()||!n) return true; const s=stam(); if(s.v<n){ openStam(n); return false; } s.v-=n; mark('prog'); updStam(); return true; }
-function openStam(need){ const s=stam(), left=s.v>=STAM_MAX?0:Math.ceil((STAM_MS-(Date.now()-s.at))/60000), full=s.v>=STAM_MAX?0:Math.ceil(((STAM_MAX-s.v-1)*STAM_MS+(STAM_MS-(Date.now()-s.at)))/60000);
+function updStam(){ const el=document.getElementById('stamBox'); if(!el) return; el.hidden=!stamOn(); if(!stamOn()) return; const s=progRead('stam'); const v=document.getElementById('stamV'); if(v) v.textContent=s.v+'/'+STAM_MAX; }
+function stamUse(n){ if(!stamOn()||!n) return true; const s=progSlot('stam'); if(s.v<n){ openStam(n); return false; } s.v-=n; mark('prog'); updStam(); return true; }
+function openStam(need){ const s=progRead('stam'), left=s.v>=STAM_MAX?0:Math.ceil((STAM_MS-(Date.now()-s.at))/60000), full=s.v>=STAM_MAX?0:Math.ceil(((STAM_MAX-s.v-1)*STAM_MS+(STAM_MS-(Date.now()-s.at)))/60000);
   openModal(`${head('⚡ 행동력',`<span class="muted">${s.v} / ${STAM_MAX}</span>`)}${need?`<p style="margin:0 0 8px">행동력이 모자라요. 필요 <b>${need}</b> · 지금 <b>${s.v}</b></p>`:''}
     <p class="muted" style="margin:0 0 10px;font-size:.85rem">5분마다 1씩 차요.${s.v<STAM_MAX?` 다음 1 회복까지 ${left}분 · 가득 차기까지 약 ${full}분`:' 지금 가득 찼어요.'}<br>메인·이벤트 전투 10, 재료 던전 8을 써요.</p>
     <div class="row"><button class="btn" data-act="stamfill" ${P().gems>=STAM_FILL[0]?'':'disabled'}>${rIco('gems')} ${STAM_FILL[0]}로 ⚡${STAM_FILL[1]} 회복</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
-setInterval(()=>{ try{ if(typeof G!=='undefined'&&G) updStam(); }catch(e){} },30000);
-function giveReward(r,evId){const p=P();if(r.gift)addGifts(r.gift);if(r.gems)p.gems+=r.gems;if(r.gold)p.gold+=r.gold;['exp','wmat','core','gearMat','transcMat'].forEach(k=>{if(r[k])p.mat[k]=(p.mat[k]||0)+r[k];});['res1','res2','res3','res4'].forEach(k=>{if(r[k]){const c=CRES();c[k]=(c[k]||0)+r[k];}});if(r.token&&evId)p.tokens[evId]=(p.tokens[evId]||0)+r.token;mark('prog');}
+setInterval(()=>{ try{ if(typeof G!=='undefined'&&G){ progTick(); updStam(); } }catch(e){} },30000); /* 주기 타이머(Controller): 날이 바뀐 칸 새로 만들기·행동력 표시 */
+function giveReward(r,evId){const p=P();if(r.gift)addGifts(r.gift);if(r.gems)p.gems+=r.gems;if(r.gold)p.gold+=r.gold;['exp','wmat','core','gearMat','transcMat'].forEach(k=>{if(r[k])p.mat[k]=(p.mat[k]||0)+r[k];});['res1','res2','res3','res4'].forEach(k=>{if(r[k]){const c=progSlot('cres');c[k]=(c[k]||0)+r[k];}});if(r.token&&evId)p.tokens[evId]=(p.tokens[evId]||0)+r.token;mark('prog');}
 const MISSIONS=[{k:'login',name:'출석하기',goal:1,xp:100},{k:'battle',name:'전투 3회',goal:3,xp:150},{k:'pull',name:'뽑기 1회',goal:1,xp:100},{k:'dispatch',name:'파견 보내기',goal:1,xp:100},{k:'touch',name:'로비 터치 5회',goal:5,xp:60},{k:'enhance',name:'강화 1회',goal:1,xp:100}];
-function dm(){const p=P();if(p.dm.date!==today())p.dm={date:today(),cnt:{login:1},got:{}};return p.dm;}
-function bump(k,n){const d=dm();d.cnt[k]=(d.cnt[k]||0)+(n||1);mark('prog');}
+function bump(k,n){const d=progSlot('dm');d.cnt[k]=(d.cnt[k]||0)+(n||1);mark('prog');}
 const PASS_MAX=30, PASS_PER=500;
 const passLv=()=>Math.min(PASS_MAX,Math.floor(P().pass.xp/PASS_PER));
 function passReward(l){return l%10===0?{gems:1000}:l%5===0?{core:10}:l%3===0?{wmat:15}:l%2===0?{exp:30}:{gold:8000};}
-function passClaimable(){const n=passLv();let k=0;for(let l=1;l<=n;l++)if(!P().pass.got.includes(l))k++;return k+MISSIONS.filter(m=>(dm().cnt[m.k]||0)>=m.goal&&!dm().got[m.k]).length;}
+function passClaimable(){const n=passLv();let k=0;for(let l=1;l<=n;l++)if(!P().pass.got.includes(l))k++;return k+MISSIONS.filter(m=>(progRead('dm').cnt[m.k]||0)>=m.goal&&!progRead('dm').got[m.k]).length;}
 const dispDone=()=>[...Object.values(P().disp),...Object.values((P().exped||{}).jobs||{})].filter(d=>Date.now()>=d.start+d.hours*3600e3).length; // 로비 배지: 전투형 파견 + 다른 원정 방식의 끝난 일정
 const busyIds=()=>new Set([...Object.values(P().disp).flatMap(d=>d.chars),...exBusyIds()]); // 원정 모드(방송·스트리머·경영)에서 일하는·쉬는·배치된 캐릭터 포함
 function linePop(c,text,face){
@@ -8135,15 +8148,15 @@ function phoneList(){
 }
 function phRooms(){ const m={};
   Object.entries(P().inbox).forEach(([id,s])=>{ const t=threadById(id), c=threadChar(t); if(!c) return; const r=m[c.id]||(m[c.id]={c,at:0,unread:false}); r.at=Math.max(r.at,s.at||0); if(!s.done){ r.unread=true; r.title=r.title||t.title; } });
-  Object.entries(FC()).forEach(([cid,f])=>{ const c=charById(cid); if(!c||!f.log.length) return; const r=m[cid]||(m[cid]={c,at:0,unread:false}); r.at=Math.max(r.at,f.at||0); if(f.unread) r.unread=true; });
+  Object.entries(progSlot('fchat')).forEach(([cid,f])=>{ const c=charById(cid); if(!c||!f.log.length) return; const r=m[cid]||(m[cid]={c,at:0,unread:false}); r.at=Math.max(r.at,f.at||0); if(f.unread) r.unread=true; });
   return Object.values(m).map(r=>Object.assign(r,{last:roomLog(r.c.id).filter(l=>l.w!=='s').at(-1)})).sort((a,b)=>b.at-a.at); }
 function roomThreads(cid){ return Object.entries(P().inbox).map(([id,s])=>({t:threadById(id),s})).filter(x=>{ const c=threadChar(x.t); return c&&c.id===cid; }).sort((a,b)=>(a.s.t0||a.s.at||0)-(b.s.t0||b.s.at||0)); }
 function roomItems(cid){ const out=[];
   roomThreads(cid).forEach(({s})=>{ const n=s.log.length, base=s.t0||s.at||0; s.log.forEach((l,i)=>{ if(l.w==='s'&&l.t==='대화가 끝났어요') return; out.push({l,arr:s.log,k:l.at||(s.t0?base+i:base-(n-i))}); }); });
-  const f=FC()[cid]; if(f) f.log.forEach((l,i)=>out.push({l,arr:f.log,k:l.at||i,fc:true}));
+  const f=progSlot('fchat')[cid]; if(f) f.log.forEach((l,i)=>out.push({l,arr:f.log,k:l.at||i,fc:true}));
   return out.sort((a,b)=>a.k-b.k); }
 function roomLog(cid){ return roomItems(cid).map(x=>x.l); }
-function roomDel(cid,items){ const f=FC()[cid]; items.forEach(x=>{ const i=x.arr.indexOf(x.l); if(i<0) return; x.arr.splice(i,1); if(x.fc&&f&&i<(f.sumTo||0)) f.sumTo--; }); if(f&&!f.log.length){ f.sum=''; f.sumTo=0; } mark('prog'); }
+function roomDel(cid,items){ const f=progSlot('fchat')[cid]; items.forEach(x=>{ const i=x.arr.indexOf(x.l); if(i<0) return; x.arr.splice(i,1); if(x.fc&&f&&i<(f.sumTo||0)) f.sumTo--; }); if(f&&!f.log.length){ f.sum=''; f.sumTo=0; } mark('prog'); }
 function roomLastBlock(cid){ const it=roomItems(cid); if(!it.length) return []; let i=it.length-1; while(i>0&&(it[i].k-it[i-1].k)<30*60e3&&it[i].k>1e12&&it[i-1].k>1e12) i--; return it.slice(i); }
 function phNewList(){ PH=null; const list=[...new Set(G.chars.map(c=>baseChar(c)))].sort((a,b)=>(own(b.id)?1:0)-(own(a.id)?1:0)); // 새로 추가한(아직 안 뽑은) 인물도 보여요
   $('#phone').innerHTML=`<div class="phone"><div class="ph-top"><button data-act="phback" aria-label="뒤로">‹</button><b>대화 추가</b><span style="width:30px"></span></div><div class="ph-list">${
@@ -8210,14 +8223,15 @@ const RAID_TICKS=700;
 const RAID_MS=[[0.05,{gems:100,gold:5000}],[0.15,{gems:150,wmat:10,gift:2}],[0.3,{gems:200,core:3}],[0.5,{gems:300,exp:40}],[0.75,{gems:400,core:5}],[1,{gems:800,core:10,wmat:20}]];
 function progK(){ const main=G.chapters.filter(ch=>ch.kind==='main'); let k=0; main.forEach((ch,i)=>{ if(ch.stages.some(s=>P().cleared[s.id])) k=i; }); return k; }
 function hashN(s){ let h=0; for(const ch of String(s)) h=(h*31+ch.charCodeAt(0))|0; return Math.abs(h); }
-function RAID(){ const p=P(), wk=weekKey(); let r=p.raid; if(!r||r.wk!==wk){ const pr=r&&r.total?r.dmg/r.total:0; const lv=r?Math.max(1,Math.min(6,(r.lv||1)+(r.killed?1:pr<0.5?-1:0))):1; r=p.raid={wk,lv,dmg:0,killed:false,got:[],tries:{},best:0}; mark('prog'); } return r; }
-function raidBoss(){ const r=RAID(), pool=[], bgOf={}; G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(e.boss&&!pool.some(x=>x.name===e.name)){ pool.push(e); bgOf[e.name]=stageBg(s); } })));
+/* 주간 레이드 새로 만들기(주가 바뀌면): 지난주 결과로 단계 오르내림(처치 +1, 절반 못 깎음 −1, 1~6) — 진행 칸 raid의 정의(0070 PROG_SLOTS)가 부름 */
+function raidNew(r){ r=progObj(r)?r:null; const pr=r&&r.total?r.dmg/r.total:0; const lv=r?Math.max(1,Math.min(6,(r.lv||1)+(r.killed?1:pr<0.5?-1:0))):1; return {wk:weekKey(),lv,dmg:0,killed:false,got:[],tries:{},best:0}; }
+function raidBoss(){ const r=progSlot('raid'), pool=[], bgOf={}; G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(e.boss&&!pool.some(x=>x.name===e.name)){ pool.push(e); bgOf[e.name]=stageBg(s); } })));
   const src=pool.length?pool[hashN(r.wk)%pool.length]:{name:'거대 잔광',elem:ELEMS[0]}; const b={name:src.name,elem:ELEMS[hashN(r.wk+'e')%ELEMS.length],hp:3000,atk:110,def:50,spd:95,boss:true};
   fitEnemy(b,enemyTarget(progK()+(r.lv-1)*0.6,6,true)*1.3); b.bg=bgOf[b.name]||'';
   if(r.total){ const k=r.total/30/b.hp; b.hp=Math.round(r.total/30); b.atk=Math.round(b.atk*Math.min(1.5,Math.max(0.7,k))); } else { r.total=b.hp*30; mark('prog'); }
   if(r.killed&&r.dmg<r.total) r.killed=false; return Object.assign(b,{total:r.total}); }
-function raidTriesLeft(){ const r=RAID(); return Math.max(0,3-(r.tries[today()]||0)); }
-function raidEnd(win){ const r=RAID(), b=B.enemies[0], dealt=Math.max(0,Math.round((B.ctx.hp0||0)-b.hp)); r.dmg=Math.min(B.ctx.total,r.dmg+dealt); r.best=Math.max(r.best||0,dealt);
+function raidTriesLeft(){ const r=progRead('raid'); return Math.max(0,3-(r.tries[today()]||0)); }
+function raidEnd(win){ const r=progSlot('raid'), b=B.enemies[0], dealt=Math.max(0,Math.round((B.ctx.hp0||0)-b.hp)); r.dmg=Math.min(B.ctx.total,r.dmg+dealt); r.best=Math.max(r.best||0,dealt);
   const ratio=r.dmg/B.ctx.total; if(ratio>=1) r.killed=true; let got={}; RAID_MS.forEach(([t,rw],i)=>{ if(ratio>=t&&!r.got.includes(i)){ r.got.push(i); giveReward(rw); Object.entries(rw).forEach(([k,v])=>got[k]=(got[k]||0)+v); } });
   B.allies.forEach(u=>{ const o=own(u.c.id); if(o) gainExp(o,expR(80)); }); mark('prog'); sfx(r.killed?'승리':'확인');
   return `<h2 class="disp" style="color:var(--rose);margin:0">${r.killed?'토벌 완료!':'레이드 종료'}</h2><div class="rd-big">${nf(dealt)}<small>이번 피해</small></div>
@@ -8359,7 +8373,7 @@ async function drawCardArts(deck,btn){ if(!imgReady()){ toast(imgNeed()); return
       if(cd.k==='skill'){ scgOf(c); await storeImage(c.scg,b,''); } else { c.cards=c.cards||{}; const o=c.cards[cd.k]||(c.cards[cd.k]={id:'cd_'+c.id+'_'+cd.k,kind:'illust',name:c.name+' '+cardName({k:cd.k,o:c.id}),prompt:tags,img:null}); await storeImage(o,b,''); }
       mark('c:'+c.id); n++; }
     catch(e){ toast(naiErr(e)); break; } }
-  if(btn&&btn.isConnected){ btn.disabled=false; btn.textContent=lab; } if(n) toast(`카드 일러스트 ${n}장을 그렸어요`); const run=RG().run; if($('#modal .cd-row')&&run) rgDeckModal(run.deck); if(CB) cbRender(); }
+  if(btn&&btn.isConnected){ btn.disabled=false; btn.textContent=lab; } if(n) toast(`카드 일러스트 ${n}장을 그렸어요`); const run=progSlot('rogue').run; if($('#modal .cd-row')&&run) rgDeckModal(run.deck); if(CB) cbRender(); }
 
 /* --- 카드 전투 엔진 --- */
 let CB=null;
@@ -8373,7 +8387,7 @@ function rgUnits(run,ids){ const m=id=>rgCount(id), fb=factionBonus(ids);
     u.maxhp=Math.round(st.hp*(1+0.2*m('hp')+0.08*m('res'))); u.atk=Math.round(st.atk*(1+(fb[c.faction]||0)/100)*(1+0.15*m('atk')+0.08*m('res')+0.05*m('train'))); u.def=Math.round(st.def*(1+0.25*m('def'))); u.hp=Math.round(u.maxhp*(fr==null?1:fr)); return u; }); }
 function cbLead(){ return CB.units[0]; }
 function cbUnit(id){ return CB.units.find(u=>u.c.id===id)||CB.units[0]; }
-function cbStart(kind){ const run=RG().run; const en=rgEnemies({k:run.k,floor:rgEq(run,kind)},kind);
+function cbStart(kind){ const run=progRead('rogue').run; const en=rgEnemies({k:run.k,floor:rgEq(run,kind)},kind);
   const units=rgUnits(run,run.squad), L=units[0]; L.maxhp=Math.round(L.maxhp*2.2); const fr=run.hp[L.c.id]; L.hp=Math.round(L.maxhp*(fr==null?1:fr));
   const bs=run.squad.map(charById).filter(Boolean).map(stats), avg=k=>bs.reduce((s,x)=>s+x[k],0)/Math.max(1,bs.length);
   // 적의 세기는 리더를 기준으로 정해요(체력 = 리더 공격 몇 번, 공격 = 리더 최대 체력 몇 %). 층이 깊을수록 강해지고, 탐사대가 강하면 조금만 약해져요.
@@ -8522,7 +8536,7 @@ function dgHTML(run){ const map=run.map, here=run.pos, W=map.w;
   const hx=here%W, hy=Math.floor(here/W);
   return `<div class="dg-wrap"><div class="dg" id="dgMap" style="--w:${W};--h:${map.h}">${cells}<div class="dg-hero" id="dgHero" style="--x:${hx};--y:${hy}">${lead?`<img data-pix="${lead.id}" alt=""><span class="dg-fb">${esc(lead.name.slice(0,1))}</span>`:''}</div></div>
     <div class="dg-leg">${['battle','elite','treasure','rest','event',run.floor>=DG_FLOORS?'boss':'stairs'].map(k=>`<span><i class="r-${k}">${DG_ROOM[k][0]}</i>${DG_ROOM[k][1]}</span>`).join('')}</div></div>`; }
-function dgMove(to){ const run=RG().run; if(!run||run.busy) return; const path=dgPath(run.map,run.pos,to); if(!path) return; run.busy=true; const W=run.map.w, hero=$('#dgHero'); let k=1;
+function dgMove(to){ const run=progSlot('rogue').run; if(!run||run.busy) return; const path=dgPath(run.map,run.pos,to); if(!path) return; run.busy=true; const W=run.map.w, hero=$('#dgHero'); let k=1;
   const go=()=>{ if(k<path.length){ const i=path[k++]; if(hero){ hero.style.setProperty('--x',i%W); hero.style.setProperty('--y',Math.floor(i/W)); } sfx('확인'); setTimeout(go,170); return; }
     run.busy=false; run.pos=to; dgReveal(run.map,to); dgEnter(run); };
   go(); }
@@ -8549,7 +8563,7 @@ function rgMessage(run){
  const m=msg.match(/^지하 (\d+)층에 내려왔어요\.( 이 층 어딘가에 보스가 있어요\.)?$/);
  return m?`제${m[1]}구역에 진입했어요.${m[2]?' 이 구역 어딘가에 보스가 있어요.':''}`:msg;
 }
-function rgRunHTML2(run){ const g=RG(); const c=run.map.cells[run.pos];
+function rgRunHTML2(run){ const g=progRead('rogue'); const c=run.map.cells[run.pos];
   let body;
   let ov='';
   if(run.pick){ ov=`<div class="rg-ov"><div class="rg-ban">유물을 선택하십시오</div><div class="rg-picks rg-ovp">`+run.pick.filter(k=>RELICS[k]).map((k,j)=>{ const n=rgCount(k); return `<button class="rg-relic" style="animation-delay:${j*0.09}s" data-act="rgrelic" data-v="${k}"><b>${esc(RELICS[k][0])}${n?` <small>×${n+1}</small>`:''}</b><span>${esc(RELICS[k][1])}</span></button>`; }).join('')+`</div><button class="btn rg-skipb" data-act="rgskip">넘기기 <small>(체력 10% 회복)</small></button></div>`; }
@@ -8573,7 +8587,7 @@ function rfAuto(){ const busy=busyIds(), pool=G.chars.filter(c=>own(c.id)&&!busy
   ['sup','def','atk'].forEach(r=>{ const c=pool.find(x=>x.role===r&&!out.includes(x.id)); if(c&&out.length<4) out.push(c.id); }); pool.forEach(c=>{ if(out.length<4&&!out.includes(c.id)) out.push(c.id); });
   return [0,1,2,3].map(i=>out[i]||null); }
 function openRgForm(){ const busy=busyIds();
-  if(!RF){ const prev=(RG().lastSquad||P().squad||[]).filter(id=>own(id)&&charById(id)&&!busy.has(id)).slice(0,4); RF={s:prev.length?[0,1,2,3].map(i=>prev[i]||null):rfAuto(),sel:0,filter:'all'}; }
+  if(!RF){ const prev=(progRead('rogue').lastSquad||P().squad||[]).filter(id=>own(id)&&charById(id)&&!busy.has(id)).slice(0,4); RF={s:prev.length?[0,1,2,3].map(i=>prev[i]||null):rfAuto(),sel:0,filter:'all'}; }
   const L=charById(RF.s[0]), ids=rfIds(), deck=ids.length?rgDeck(ids):[];
   const chip=cd=>`<span class="rf-cd t-${cardType(cd)}">${esc(cardName(cd))}</span>`;
   const lead=L?`<button class="rf-lead ${RF.sel===0?'sel':''}" data-act="rfslot" data-i="0" style="--ec:${ECOL[L.elem]}"><div class="rf-la">${art(L)}</div><div class="rf-lt"><i>LEADER · 직접 싸워요</i><b>${esc(L.name)}</b><span class="el" style="--ec:${ECOL[L.elem]}">${esc(L.elem)}</span> <small>${esc(ROLE[L.role])} · Lv.${own(L.id).lv}</small>
@@ -8593,16 +8607,16 @@ function openRgForm(){ const busy=busyIds();
 
 // 심연 탐사 전용 화면(진행 중일 때 화면 전체를 써요)
 function rgAbandon(why){ const html=rgFinish(false); setTimeout(()=>openModal(`<div class="result" style="position:static"><p style="margin:0 0 6px"><b>탐사가 끝났어요</b><br><span class="muted">${esc(why)}</span></p>${html.replace('data-act="bdone"','data-act="close"')}</div>`),0); }
-function abyssHTML(){ const g=RG(), run=g.run; if(!run||run.v!==2){ tab='challenge'; return challengeHTML(); }
+function abyssHTML(){ const g=progSlot('rogue'), run=g.run; if(!run||run.v!==2){ tab='challenge'; return challengeHTML(); }
   if(run.left||(!RG_LIVE&&!run.saved)){ rgAbandon('야영지에서 저장하지 않고 나가서 탐사가 끝났어요. 저장은 야영지의 \'저장하고 나가기\'로만 할 수 있어요.'); tab='challenge'; return challengeHTML(); }
   RG_LIVE=true;
   if(!run.wk){ run.wk=weekKey(); mark('prog'); }
-  if(run.wk!==weekKey()){ const sq=run.squad.slice(), html=rgFinish(false); setTimeout(()=>{ rgStart(sq,'card'); RG().run.msg='탐사 경로가 바뀌어 제1구역으로 돌아왔어요. 같은 탐사대로 처음부터 다시 시작해요.'; mark('prog'); render(); openModal(`<div class="result" style="position:static"><p style="margin:0 0 6px"><b>탐사 경로가 바뀌었어요</b><br><span class="muted">지난주 탐사는 여기까지예요. 제1구역부터 다시 시작해요.</span></p>${html.replace('data-act="bdone"','data-act="close"')}</div>`); },0); return pageHead(T('abyss'),'EXPEDITION','challenge'); }
+  if(run.wk!==weekKey()){ const sq=run.squad.slice(), html=rgFinish(false); setTimeout(()=>{ rgStart(sq,'card'); progSlot('rogue').run.msg='탐사 경로가 바뀌어 제1구역으로 돌아왔어요. 같은 탐사대로 처음부터 다시 시작해요.'; mark('prog'); render(); openModal(`<div class="result" style="position:static"><p style="margin:0 0 6px"><b>탐사 경로가 바뀌었어요</b><br><span class="muted">지난주 탐사는 여기까지예요. 제1구역부터 다시 시작해요.</span></p>${html.replace('data-act="bdone"','data-act="close"')}</div>`); },0); return pageHead(T('abyss'),'EXPEDITION','challenge'); }
   if(run.saved){ delete run.saved; mark('prog'); }
   setTimeout(pixFill,30);
   return `<div class="phead"><button class="back" data-act="rgleave" aria-label="나가기">‹</button><div><i>EXPEDITION</i><h2>${esc(T('abyss'))}</h2></div></div>${rgRunHTML2(run)}`; }
 function challengeHTML(){
-  const r=RAID(), b=raidBoss(), ratio=r.dmg/b.total, left=raidTriesLeft(), g=RG(), run=g.run;
+  const r=progRead('raid'), b=raidBoss(), ratio=r.dmg/b.total, left=raidTriesLeft(), g=progRead('rogue'), run=g.run;
   const raid=`<section class="ch-card raid"><div class="ch-h"><i>WEEKLY RAID · Lv.${r.lv}</i><h3>${esc(b.name)}</h3><span>이번 주 함께 깎는 보스예요. 한 번에 ${Math.ceil(RAID_TICKS*GGMCombat.DT)}초 동안 싸우고, 준 피해가 쌓여요.</span></div>
     <div class="rd-hero ${r.killed?'dead':''}" style="--ec:${ECOL[b.elem]}"><div class="rd-bg" style="${b.bg?bgStyle(b.bg):bgStyle(P().lobbyBg||'')}"></div><div class="rd-glow"></div>
       <div class="rd-boss">${enemyArt(b,'rd-img')}</div><div class="rd-shade"></div>
@@ -8630,10 +8644,10 @@ function challengeHTML(){
 }
 /* 심연 탐사 런: 층·유물·노드 고르기·적·시작·전투·끝·보상(도전 레이드 파일에서 모음) */
 const RG_FLOORS=12;
-function RG(){ const p=P(); if(!p.rogue||typeof p.rogue!=='object') p.rogue={run:null,best:0,day:'',n:0}; const r=p.rogue.run; if(r&&r.v===3){ r.v=2; r.c3=1; } return p.rogue; }
+
 const RELICS={chain4:['연쇄 반응','한 턴에 카드를 4장째 쓰면 에너지 +1'],brandplus:['피의 낙인','낙인을 걸 때 1개 더'],phoenix:['불사의 깃털','전투마다 한 번, 쓰러질 때 체력 30%로 버텨요'],thorns:['가시 갑옷','보호막으로 막은 피해의 30%를 공격한 적에게 돌려줘요'],opener:['선제 낙인','전투 시작 때 모든 적에게 낙인 2'],lastcard:['마지막 한 장','손에 남은 마지막 카드는 위력 2배'],ultcharge:['필살 충전기','필살 게이지를 2칸 채운 채 전투 시작'],vamp:['흡혈 송곳니','적을 쓰러뜨릴 때마다 리더 체력 8% 회복'],ashes:['잿불','카드가 소멸할 때마다 모든 적에게 피해'],deepcut:['깊은 상처','출혈 피해 +50%'],tempo:['리듬','한 턴에 카드를 6장째 쓰면 카드 2장 뽑기'],markburst:['각인 전염','낙인이 남은 적이 쓰러지면 그 낙인이 다른 적 모두에게 옮겨 붙어요'],ultecho:['잔영','필살을 쓰면 에너지 +1, 카드 2장 뽑기'],capacitor:['축전기','전투 시작 때 충전 3'],firstfree:['첫 수','매 턴 첫 카드 비용 -1'],atk:['날카로운 칼날','공격 +15%'],def:['강화 장갑','방어 +25%'],hp:['생명의 결정','최대 체력 +20%'],spd:['가속 장치','속도 +10%'],burst:['오버드라이브','전투 시작 BURST +40%'],heal:['응급 키트','전투가 끝날 때마다 체력 15% 회복'],loot:['전리품 자석','탐사 보상 +30%'],res:['공명 코어','공격 +8% · 체력 +8%'],train:['실전 훈련','공격 +5% (겹쳐요)']};
 const RG_NODE={battle:['⚔','전투','일반 적'],elite:['☠','정예','강한 적 · 이기면 유물'],rest:['⛺','휴식','체력 35% 회복, 쓰러진 대원 부활'],treasure:['✦','보물','유물 1개 고르기'],event:['?','사건','무슨 일이 생길지 몰라요'],boss:['♛','보스','마지막 전투']};
-function rgCount(id){ const run=RG().run; return run?run.relics.filter(x=>x===id).length:0; }
+function rgCount(id){ const run=progRead('rogue').run; return run?run.relics.filter(x=>x===id).length:0; }
 function rgOpts(run){ if(run.floor>=RG_FLOORS) return ['boss']; const w=[['battle',45],['elite',15],['rest',15],['treasure',10],['event',15]]; const out=[]; let guard=0;
   while(out.length<3&&guard++<40){ let x=Math.random()*100; const k=w.find(([_,p])=>(x-=p)<0)[0]; if(!out.includes(k)) out.push(k); } if(!out.includes('battle')&&!out.includes('elite')) out[0]='battle'; return out; }
 const CRELICS=['chain4','brandplus','phoenix','thorns','opener','lastcard','ultcharge','vamp','firstfree','ashes','deepcut','tempo','markburst','ultecho','capacitor','atk','hp','loot'];
@@ -8651,12 +8665,12 @@ function rgEnemies(run,kind){ const pool=[]; G.chapters.filter(ch=>ch.kind==='ma
   else { en=Array.from({length:2+(Math.random()<0.5?1:0)},()=>pick(false)); en.forEach(e=>fitEnemy(e,enemyTarget(k,i,false)*0.85)); }
   return en; }
 let RGMODE='card';
-function rgStart(ids,mode){ const g=RG(); mode=mode||'card'; const map=dgGen(1); RG_LIVE=true; g.run={v:2,c3:1,wk:weekKey(),mode:'card',floor:1,fw:0,squad:ids,hp:Object.fromEntries(ids.map(id=>[id,1])),relics:[],deck:mode==='card'?rgDeck(ids):[],map,pos:map.start,pick:null,cpick:null,k:progK(),at:Date.now(),msg:mode==='card'?'카드 전투 탐사를 시작해요. 매 턴 에너지 3으로 카드를 써요. 적 머리 위의 표시가 다음 행동이에요.':'탐사를 시작해요.'}; mark('prog'); tab='abyss'; render(); }
-function rgBattle(kind){ const run=RG().run; const en=rgEnemies(run.v===2?{k:run.k,floor:rgEq(run,kind)}:run,kind); const s={id:'rg_'+run.floor,title:`${T('abyss')} · ${run.floor}구역 · ${RG_NODE[kind][1]}`,enemies:en,pre:'',post:''};
+function rgStart(ids,mode){ const g=progSlot('rogue'); mode=mode||'card'; const map=dgGen(1); RG_LIVE=true; g.run={v:2,c3:1,wk:weekKey(),mode:'card',floor:1,fw:0,squad:ids,hp:Object.fromEntries(ids.map(id=>[id,1])),relics:[],deck:mode==='card'?rgDeck(ids):[],map,pos:map.start,pick:null,cpick:null,k:progK(),at:Date.now(),msg:mode==='card'?'카드 전투 탐사를 시작해요. 매 턴 에너지 3으로 카드를 써요. 적 머리 위의 표시가 다음 행동이에요.':'탐사를 시작해요.'}; mark('prog'); tab='abyss'; render(); }
+function rgBattle(kind){ const run=progSlot('rogue').run; const en=rgEnemies(run.v===2?{k:run.k,floor:rgEq(run,kind)}:run,kind); const s={id:'rg_'+run.floor,title:`${T('abyss')} · ${run.floor}구역 · ${RG_NODE[kind][1]}`,enemies:en,pre:'',post:''};
   const m=id=>rgCount(id);
   startStage(s,{kind:'rogue',node:kind,squad:run.squad,burst0:m('burst')?40:0,prep:(al)=>{ al.forEach(u=>{ const fr=run.hp[u.c.id]; const hpM=1+0.2*m('hp')+0.08*m('res');
       u.maxhp=Math.round(u.maxhp*hpM); u.atk=Math.round(u.atk*(1+0.15*m('atk')+0.08*m('res')+0.05*m('train'))); u.def=Math.round(u.def*(1+0.25*m('def'))); u.spd=Math.round(u.spd*(1+0.1*m('spd'))); u.hp=Math.round(u.maxhp*(fr==null?1:fr)); }); }}); }
-function rogueEnd(win){ const g=RG(), run=g.run; if(!run) return '<button class="btn" data-act="bdone">계속</button>';
+function rogueEnd(win){ const g=progSlot('rogue'), run=g.run; if(!run) return '<button class="btn" data-act="bdone">계속</button>';
   const heal=0.15*rgCount('heal'); B.allies.forEach(u=>{ run.hp[u.c.id]=u.hp>0?Math.min(1,u.hp/u.maxhp+heal):0; const o=own(u.c.id); if(o&&win) gainExp(o,expR(40)); });
   const node=B.ctx.node;
   if(win&&node==='boss'){ const html=rgFinish(true); return html; }
@@ -8665,10 +8679,10 @@ function rogueEnd(win){ const g=RG(), run=g.run; if(!run) return '<button class=
     return `<h2 class="disp" style="color:var(--rose);margin:0">전투 승리</h2><p>${node==='elite'?'정예를 쓰러뜨렸어요. 유물을 고를 수 있어요.<br>':''}${run.mode==='card'?'새 카드를 하나 고를 수 있어요.':'계속 탐사해요.'}${heal?'<br>응급 키트로 체력을 회복했어요.':''}</p><button class="btn" data-act="bdone">계속</button>`; }
   run.floor++; run.opts=rgOpts(run); if(node==='elite') run.pick=rgPick3(run); mark('prog'); sfx('승리');
   return `<h2 class="disp" style="color:var(--rose);margin:0">${run.floor-1}구역 돌파</h2><p>${node==='elite'?'정예를 쓰러뜨렸어요. 유물을 하나 고를 수 있어요.':'다음 구역으로 가요.'}${heal?'<br>응급 키트로 체력을 회복했어요.':''}</p><button class="btn" data-act="bdone">계속</button>`; }
-function rgReward(f,done,prev,won){ prev=prev||0; const nf2=Math.max(0,f-prev); let r={gold:1200*f,exp:3*f,wmat:2*f,core:Math.floor(f/3)+(done?5:0),gift:Math.floor(f/4)+(done?2:0)}; const m=(1+0.3*rgCount('loot'))*(RG().n>=2?0.25:1); Object.keys(r).forEach(k=>r[k]=Math.round(r[k]*m)); const gm=40*nf2+(done&&!won?500:0); if(gm) r.gems=gm; return r; }
-function rgFinish(done){ const g=RG(), run=g.run, f=done?RG_FLOORS:run.v===2?rgScore(run):run.floor-1; if(g.day!==today()){ g.day=today(); g.n=0; } const r=rgReward(f,done,g.best||0,!!g.won); giveReward(r); g.n++; g.best=Math.max(g.best||0,f); if(done) g.won=true; g.run=null; mark('prog'); sfx(done?'SSR':'확인');
+function rgReward(f,done,prev,won){ prev=prev||0; const nf2=Math.max(0,f-prev); let r={gold:1200*f,exp:3*f,wmat:2*f,core:Math.floor(f/3)+(done?5:0),gift:Math.floor(f/4)+(done?2:0)}; const m=(1+0.3*rgCount('loot'))*(progRead('rogue').n>=2?0.25:1); Object.keys(r).forEach(k=>r[k]=Math.round(r[k]*m)); const gm=40*nf2+(done&&!won?500:0); if(gm) r.gems=gm; return r; }
+function rgFinish(done){ const g=progSlot('rogue'), run=g.run, f=done?RG_FLOORS:run.v===2?rgScore(run):run.floor-1; if(g.day!==today()){ g.day=today(); g.n=0; } const r=rgReward(f,done,g.best||0,!!g.won); giveReward(r); g.n++; g.best=Math.max(g.best||0,f); if(done) g.won=true; g.run=null; mark('prog'); sfx(done?'SSR':'확인');
   return `<h2 class="disp" style="color:${done?'var(--rose)':'#ff5277'};margin:0">${esc(T('abyss'))} · ${done?'탐사 완료!':'탐사 종료'}</h2><p>${run.v===2?`제${run.floor}구역까지 탐사했어요 (진척 ${f}/${RG_FLOORS})`:f+'구역까지 갔어요'}.${g.n>2?' (오늘 3번째부터는 보상 25%)':''}<br>${rewardText(r)}${r.gems?'':`<br><small class="muted">${esc(T('currency'))}은(는) 최고 진척 기록을 갱신할 때만 받아요</small>`}</p><button class="btn" data-act="bdone">계속</button>`; }
-function rgNode(kind){ const g=RG(), run=g.run; if(!run) return;
+function rgNode(kind){ const g=progSlot('rogue'), run=g.run; if(!run) return;
   if(kind==='battle'||kind==='elite'||kind==='boss'){ rgBattle(kind); return; }
   let msg='';
   if(kind==='rest'){ run.squad.forEach(id=>{ run.hp[id]=Math.min(1,(run.hp[id]>0?run.hp[id]+0.35:0.25)); }); msg='모두 숨을 돌렸어요. 체력을 회복하고 쓰러진 대원이 일어났어요.'; }
@@ -8682,7 +8696,7 @@ function rgNode(kind){ const g=RG(), run=g.run; if(!run) return;
 /* 층마다 강해지는 무한 전투. 통합 탑(누구나) + 제한 탑(소속별·속성별: 그 소속/속성 캐릭터만 출전) → 여러 캐릭터를 모으고 키울 이유.
    적은 이 게임 스토리에 나온 적 이름·외형을 다시 쓰고(생성 연계), 층마다 전장 규칙이 바뀌어요(0485). 5층마다 보스·큰 보상.
    P().tower={[탑 id]:{best}} · 문서: docs/research/combat-content.md */
-function TOWER(){ const p=P(); if(!p.tower||typeof p.tower!=='object') p.tower={}; return p.tower; }
+
 function towerList(){ const L=[{id:'all',name:'시련의 탑',desc:'누구나 출전',allow:null}];
   ruleFacs().forEach(f=>L.push({id:'f:'+f,name:`${f}의 탑`,desc:`${f} 소속만 출전`,allow:c=>c.faction===f}));
   ELEMS.forEach(elem=>L.push({id:'e:'+elem,name:`${elem}의 탑`,desc:`${elem} 속성만 출전`,allow:c=>c.elem===elem}));
@@ -8696,13 +8710,13 @@ function towerStage(tid,floor){ const t=towerById(tid)||towerById('all'), h=hash
   const s={id:`tower_${tid}_${floor}`,title:`${t.name} ${floor}층`,enemies:en,reward:0,pre:'',post:''};
   stageAutoRules(s,floor%3===1?0:1,boss?2:9); return s; }
 function towerReward(floor){ return floor%5===0?{gems:80,gold:3000+floor*300,core:2}:{gems:20,gold:1500+floor*150}; }
-function towerGo(tid){ const t=towerById(tid); if(!t) return; const fl=((TOWER()[tid]||{}).best||0)+1, st=towerStage(tid,fl);
+function towerGo(tid){ const t=towerById(tid); if(!t) return; const fl=((progRead('tower')[tid]||{}).best||0)+1, st=towerStage(tid,fl);
   if(t.allow&&!G.chars.some(c=>own(c.id)&&t.allow(c))){ toast(`${t.desc} — 출전할 수 있는 ${T('crew')}이(가) 없어요`); return; }
   squadSel=null; FORM=null; openFormation(st,{kind:'tower',tid,floor:fl,allow:t.allow,code:'',extra:`data-v="${esc(tid)}"`},'towerstart'); }
-function towerEnd(win){ const c=B.ctx, rec=TOWER()[c.tid]||(TOWER()[c.tid]={best:0}); let r=null;
+function towerEnd(win){ const c=B.ctx, T0=progSlot('tower'), rec=T0[c.tid]||(T0[c.tid]={best:0}); let r=null;
   if(win&&c.floor>rec.best){ rec.best=c.floor; r=rateR(towerReward(c.floor)); giveReward(r); } B.allies.forEach(u=>{ const o=own(u.c.id); if(o) gainExp(o,expR(40+c.floor*4)); }); mark('prog'); sfx(win?'승리':'패배');
   return `<h2 class="disp" style="color:${win?'var(--rose)':'#ff5277'};margin:0">${win?`${c.floor}층 돌파!`:`${c.floor}층 실패`}</h2><p>${r?'첫 돌파 보상: '+rewardText(r):win?'':'편성·속성을 바꾸거나 더 키워서 다시 도전하세요. 전장 규칙을 확인해 보세요.'}</p><button class="btn" data-act="bdone">계속</button>`; }
-function towerHTML(){ const T0=TOWER(); return `<section class="ch-card"><div class="ch-h"><i>TRIAL TOWER</i><h3>시련의 탑</h3><span>층마다 강해지는 적과 바뀌는 전장 규칙. 제한 탑은 그 소속·속성 ${T('crew')}만 출전해요. 5층마다 보스와 큰 보상.</span></div>
+function towerHTML(){ const T0=progRead('tower'); return `<section class="ch-card"><div class="ch-h"><i>TRIAL TOWER</i><h3>시련의 탑</h3><span>층마다 강해지는 적과 바뀌는 전장 규칙. 제한 탑은 그 소속·속성 ${T('crew')}만 출전해요. 5층마다 보스와 큰 보상.</span></div>
   <div class="tw-list">${towerList().map(t=>{ const b=(T0[t.id]||{}).best||0, n=t.allow?G.chars.filter(c=>own(c.id)&&t.allow(c)).length:G.chars.filter(c=>own(c.id)).length;
     return `<button class="tw-card" data-act="towergo" data-v="${esc(t.id)}" ${n?'':'disabled'}><b>${esc(t.name)}</b><span>${esc(t.desc)} · 보유 ${n}명</span><br><span>최고 ${b}층 → 다음 ${b+1}층</span></button>`; }).join('')}</div></section>`; }
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
@@ -8711,11 +8725,11 @@ document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); 
 /* ===== 선물 ===== */
 const GIFTS=[['g_cake','달콤한 케이크','🍰',20],['g_tea','고급 찻잎','🍵',20],['g_flower','꽃다발','💐',25],['g_book','두꺼운 책','📖',25],['g_tool','공구 세트','🔧',25],['g_doll','봉제 인형','🧸',30],['g_perfume','향수','🧴',35],['g_music','음반','💿',30],['g_brooch','보석 브로치','💎',50],['g_letter','손편지','✉️',60]];
 const giftById=id=>GIFTS.find(g=>g[0]===id);
-function GI(){ const p=P(); if(!p.gifts||typeof p.gifts!=='object') p.gifts={}; return p.gifts; }
-function addGifts(n){ const inv=GI(), got=[]; for(let i=0;i<n;i++){ const w=GIFTS.map(g=>g[3]>=50?1:g[3]>=30?3:5), tot=w.reduce((a,b)=>a+b,0); let x=Math.random()*tot, k=0; while((x-=w[k])>0) k++; const id=GIFTS[k][0]; inv[id]=(inv[id]||0)+1; got.push(id); } mark('prog'); return got; }
+
+function addGifts(n){ const inv=progSlot('gifts'), got=[]; for(let i=0;i<n;i++){ const w=GIFTS.map(g=>g[3]>=50?1:g[3]>=30?3:5), tot=w.reduce((a,b)=>a+b,0); let x=Math.random()*tot, k=0; while((x-=w[k])>0) k++; const id=GIFTS[k][0]; inv[id]=(inv[id]||0)+1; got.push(id); } mark('prog'); return got; }
 function giftLikes(c){ const h=hashN(c.id+'likes'); const a=h%GIFTS.length, b=(Math.floor(h/7)+3)%GIFTS.length; return new Set([GIFTS[a][0],GIFTS[b===a?(b+1)%GIFTS.length:b][0]]); }
 function openGift(cid){
-  const c=charById(cid), inv=GI(), likes=giftLikes(c), seen=(P().giftSeen||{})[cid]||{};
+  const c=charById(cid), inv=progRead('gifts'), likes=giftLikes(c), seen=(P().giftSeen||{})[cid]||{};
   const items=GIFTS.filter(g=>inv[g[0]]>0);
   const full=affFull(own(c.id));
   openModal(`${head(`${esc(c.name)}에게 선물하기`,`<span class="muted">호감도 Lv.${affLv(own(c.id))}${full?' · <b style="color:var(--rose)">MAX</b>':''} · 좋아하는 선물은 효과가 2배예요</span>`)}
@@ -8760,7 +8774,7 @@ addEventListener('resize',()=>{ clearTimeout(window.__fitT); window.__fitT=setTi
    - 장면 c.spotTalk={[spot id]:대본} : AI로(spotTalkAI) 만들고, 없으면 개성 시트로 짧은 기본 장면(spotTemplate)
    - 생성 연계: 점검 규칙 g_spots(장소 없음 → 글 AI가 있으면 AI, 없으면 자료실 배경), c_spot(장면 없음 → AI) · 문서 docs/research/combat-content.md */
 const SCHED_N=3;
-function SCHED(){ const p=P(); if(!p.sched||p.sched.day!==today()) p.sched={day:today(),left:SCHED_N,done:[]}; return p.sched; }
+
 function spots(){ return Array.isArray(G.meta.spots)?G.meta.spots:[]; }
 function spotsAuto(){ const L=[]; G.lib.filter(l=>l.kind==='bg'&&l.name).slice(0,7).forEach(l=>L.push({id:uid(),name:l.name,desc:'',bg:l.name,tags:[]}));
   if(!L.length) ['광장','카페','훈련장','도서관'].forEach(n=>L.push({id:uid(),name:n,desc:'',bg:'',tags:[n]})); G.meta.spots=L; mark('meta'); return L.length; }
@@ -8777,9 +8791,9 @@ async function spotsAI(btn){ const r=await aiJSON(spotsAIPrompt(),btn,'complex')
 async function spotTalkAI(c,btn){ const S=spots(); if(!S.length) return false;
   const r=await aiJSON(spotTalkAIPrompt({c,S}),btn,'complex');
   let n=0; (r&&Array.isArray(r.scenes)?r.scenes:[]).forEach(x=>{ const s=S.find(y=>y.name===String(x.spot||'').trim()), t=nl(x.script); if(s&&t){ c.spotTalk=c.spotTalk||{}; c.spotTalk[s.id]=t; n++; } }); if(n) mark('c:'+c.id); return n>0; }
-function schedVisit(sid,cid){ const sc=SCHED(), s=spots().find(x=>x.id===sid), c=charById(cid); if(!s||!c||!own(c.id)) return; if(sc.left<=0){ toast('오늘 일정을 다 썼어요. 내일 다시 와요'); return; } if(sc.done.includes(sid)){ toast('오늘 이미 다녀온 장소예요'); return; }
-  const fav=spotFav(c,s); playStory(`${s.name} · ${c.name}`,(c.spotTalk&&c.spotTalk[s.id])||spotTemplate(c,s),()=>{ const k=SCHED(); k.left--; k.done.push(sid); addAff(c,fav?30:20); const r=rateR({gold:800}); giveReward(r); mark('prog'); toast(`${c.name} 호감도 +${fav?30:20}${fav?' (좋아하는 장소)':''} · ${rewardText(r)}`); render(); }); }
-function schedHTML(){ const sc=SCHED(), S=spots();
+function schedVisit(sid,cid){ const sc=progRead('sched'), s=spots().find(x=>x.id===sid), c=charById(cid); if(!s||!c||!own(c.id)) return; if(sc.left<=0){ toast('오늘 일정을 다 썼어요. 내일 다시 와요'); return; } if(sc.done.includes(sid)){ toast('오늘 이미 다녀온 장소예요'); return; }
+  const fav=spotFav(c,s); playStory(`${s.name} · ${c.name}`,(c.spotTalk&&c.spotTalk[s.id])||spotTemplate(c,s),()=>{ const k=progSlot('sched'); k.left--; k.done.push(sid); addAff(c,fav?30:20); const r=rateR({gold:800}); giveReward(r); mark('prog'); toast(`${c.name} 호감도 +${fav?30:20}${fav?' (좋아하는 장소)':''} · ${rewardText(r)}`); render(); }); }
+function schedHTML(){ const sc=progRead('sched'), S=spots();
   return `${pageHead('일정','SCHEDULE','lobby')}<p class="muted">하루 ${SCHED_N}번, 장소에 나와 있는 ${T('crew')}을(를) 만나요. 좋아하는 장소에서 만나면 호감도를 더 많이 얻어요. 오늘 남은 일정 <b>${sc.left}/${SCHED_N}</b></p>
   ${S.length?`<div class="sc-spots">${S.map(s=>{ const done=sc.done.includes(s.id), who=spotWho(s); return `<div class="sc-spot" style="${bgStyle(s.bg||s.name)}"><b>${esc(s.name)}</b>${s.desc?`<div class="muted" style="font-size:.75rem">${esc(s.desc)}</div>`:''}
     <div class="sc-who">${done?'<span class="badge">다녀옴</span>':who.length?who.map(c=>`<button class="btn sm" data-act="scvisit" data-s="${s.id}" data-c="${c.id}" ${sc.left?'':'disabled'}>${esc(c.name)}${spotFav(c,s)?' ♥':''}</button>`).join(''):'<span class="muted">아무도 없어요</span>'}</div></div>`; }).join('')}</div>`:`<p>아직 장소가 없어요.</p><button class="btn" data-act="scauto">자료실 배경으로 장소 만들기</button>`}
@@ -8859,7 +8873,7 @@ function addPickupFor(c,lim){
 /* ===== 갠톡 (자유 채팅) ===== */
 let FCBUSY=false;
 const EYE_TAG=/\b(eyes?|eyelash(es)?|pupils?|heterochromia|eyeliner|tsurime|tareme|sanpaku|jitome)\b/i;
-function avatarObj(){ const p=P(); if(!p.avatar||typeof p.avatar!=='object') p.avatar={id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:'',img:null}; return p.avatar; }
+
 function playerFormHTML(){ const p=P(), ai=!!SAMPLE, av=p.avatar&&imgSrc(p.avatar);
   return `<div class="g2"><div><label class="f" for="pf_call">호칭 <span class="muted" style="font-size:.75rem">(평소에 불리는 말)</span></label><input class="in" id="pf_call" maxlength="12" value="${esc(T('player'))}" placeholder="예: 지휘관"></div><div><label class="f" for="pf_name">이름 <span class="muted" style="font-size:.75rem">(필요할 때만)</span></label><input class="in" id="pf_name" maxlength="12" value="${esc(p.player||'')}" placeholder="비우면 호칭으로만 불려요"></div></div>
   ${ai?`<label class="f" for="pf_gender">당신의 성별은? (직접 쓰기)</label><input class="in" id="pf_gender" maxlength="40" value="${esc(p.genderTxt!=null?p.genderTxt:(({m:'남성',f:'여성'})[p.gender]||''))}" placeholder="예: 남성, 여성, 논바이너리… 비우면 정하지 않아요">
@@ -8874,7 +8888,7 @@ function readPlayerForm(){ const p=P(); if($('#pf_name')) p.player=$('#pf_name')
   if($('#pf_call')){ const cv=$('#pf_call').value.trim().slice(0,12); if(cv&&cv!==T('player')){ G.meta.terms.player=cv; mark('meta'); } }
   if($('#pf_gender')){ const g=$('#pf_gender').value.trim().slice(0,40); p.genderTxt=g; p.gender=/^(남|남성|남자|male|man)$/i.test(g)?'m':/^(여|여성|여자|female|woman)$/i.test(g)?'f':''; }
   if($('#pf_gsel')){ p.gender=$('#pf_gsel').value; p.genderTxt=''; }
-  if($('#pf_look')) p.look=$('#pf_look').value.trim().slice(0,400); if($('#pf_bio')) p.bio=$('#pf_bio').value.trim().slice(0,1500); if($('#pf_hide')) p.hideEyes=$('#pf_hide').checked;if($('#pf_nai'))naiBlocksSave(avatarObj(),'prompt','pf_nai'); mark('prog'); }
+  if($('#pf_look')) p.look=$('#pf_look').value.trim().slice(0,400); if($('#pf_bio')) p.bio=$('#pf_bio').value.trim().slice(0,1500); if($('#pf_hide')) p.hideEyes=$('#pf_hide').checked;if($('#pf_nai'))naiBlocksSave(progSlot('avatar'),'prompt','pf_nai'); mark('prog'); }
 const genderCode=g=>/^(남|남성|남자|male|man)$/i.test(g||'')?'m':/^(여|여성|여자|female|woman)$/i.test(g||'')?'f':'';
 async function heroTags(hr){ const r=await aiJSON(heroTagsPrompt({hr}),null,'quick');
   let tags=String((r&&r.tags)||'').trim(); if(!tags) return '';
@@ -8884,11 +8898,11 @@ function refreshPlayerForm(){ const w=$('#pfWrap'); if(w){const sheet=w.closest(
 async function playerDraw(btn){ readPlayerForm(); const p=P(); if(!p.look&&!p.avatar?.prompt){ toast('외모나 NAI 프롬프트를 먼저 적어 주세요'); return; } if(!imgReady()){ toast(imgNeed()); return; }
   const lab=btn.textContent; btn.disabled=true; btn.textContent='태그 만드는 중…';
   try{ const tags=p.avatar?.prompt||await heroTags({gender:p.genderTxt,look:p.look,hide:p.hideEyes}); if(!tags){ toast('태그를 만들지 못했어요. 다시 눌러 주세요'); return; }
-    btn.textContent='그리는 중…'; const o=avatarObj(); o.prompt=tags;
+    btn.textContent='그리는 중…'; const o=progSlot('avatar'); o.prompt=tags;
     const b=await naiDraw('char',tags,{candidateEligible:true,originalSrc:imgSrcRaw(o)||'',frame:'cowboy shot',pose:'looking at viewer'}); await storeImage(o,b,''); mark('prog'); toast('프로필 그림을 만들었어요'); refreshPlayerForm();
   }catch(e){ toast(naiErr(e)); } finally{ if(btn.isConnected){ btn.disabled=false; btn.textContent=lab; } } }
-function FC(){ const p=P(); if(!p.fchat||typeof p.fchat!=='object') p.fchat={}; return p.fchat; }
-function fcOf(cid){ const f=FC(); return f[cid]||(f[cid]={log:[],sum:'',sumTo:0,at:0}); }
+
+function fcOf(cid){ const f=progSlot('fchat'); return f[cid]||(f[cid]={log:[],sum:'',sumTo:0,at:0}); }
 function openFree(cid){ openRoom(cid); }
 async function fcSend(opt){
   opt=opt||{}; if(FCBUSY||!PH||!PH.fc) return; const cid=PH.fc, c=charById(cid), inp=$('#fcIn'); if(!c||!inp) return; if(!opt.img&&PH.pendImg) opt.img=PH.pendImg; const text=inp.value.trim(); if(!text&&!opt.img) return; if(!opt.img&&PH.lastSend&&PH.lastSend.t===text&&Date.now()-PH.lastSend.at<2500){ inp.value=''; return; } PH.lastSend={t:text,at:Date.now()}; if(opt.img){ PH.pendImg=null; phPendRender(); inp.placeholder='메시지 보내기'; }
@@ -9003,12 +9017,16 @@ function uiPageScrollKey(){return JSON.stringify([PJ().active,tab,tab==='studio'
 function uiSelectText(field){if(!field)return;const root=field.closest('.sheet')||document.getElementById('view'),state=uiScrollCapture(root);field.focus({preventScroll:true});try{field.setSelectionRange(0,field.value.length);}catch(e){field.select();}uiScrollRestore(root,state);}
 
 /* /UI_SCROLL_MODULE */
-function render(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewState=UI_PAGE_SCROLL_ROUTE===scrollKey&&UI_PAGE_SCROLL_GAME===G?uiScrollCapture(viewBefore):null; setTimeout(()=>{ try{ fitLobby(); }catch(e){} },0); document.body.classList.toggle('play',playMode()); if(playMode()&&PLAY_HIDE_ST.includes(STTAB)) STTAB='';
+/* 그리기 전 처리(Controller — CLAUDE.md §0-2 화면은 상태를 바꾸지 않음): 진행 칸의 하루/주 새로 만들기·형식 맞춤(progTick), 탐사를 야영지 저장 없이 떠나면 끝냄 표시, 로비에서 우편·캐시 처리 → 그리기(renderView) */
+function render(){ progTick();
   // 심연 탐사는 야영지에서 저장해야만 나갔다 올 수 있어요. 다른 길로 나가면 탐사가 끝나요.
-  if(PREVTAB==='abyss'&&tab!=='abyss'){ try{ const r=RG().run; if(r&&!r.saved) r.left=true; }catch(e){} } PREVTAB=tab;
+  if(PREVTAB==='abyss'&&tab!=='abyss'){ const r=progSlot('rogue').run; if(r&&!r.saved) r.left=true; } PREVTAB=tab;
   if(tab==='lobby'&&typeof mailTick==='function') mailTick();
   if(tab==='lobby'&&typeof cashTick==='function') cashTick();
-  updStam(); $('#gems').textContent=nf(P().gems); try{ $('#ic_gold').innerHTML=rIco('gold'); $('#ic_gems').innerHTML=rIco('gems'); }catch(e){} $('#gold').textContent=nf(P().gold); dm();
+  renderView(); }
+/* 그리기(View): 지금 탭 화면·머리 재화·탭 표시 */
+function renderView(){ const scrollKey=uiPageScrollKey(),viewBefore=$('#view'),viewState=UI_PAGE_SCROLL_ROUTE===scrollKey&&UI_PAGE_SCROLL_GAME===G?uiScrollCapture(viewBefore):null; setTimeout(()=>{ try{ fitLobby(); }catch(e){} },0); document.body.classList.toggle('play',playMode()); if(playMode()&&PLAY_HIDE_ST.includes(STTAB)) STTAB='';
+  updStam(); $('#gems').textContent=nf(P().gems); try{ $('#ic_gold').innerHTML=rIco('gold'); $('#ic_gems').innerHTML=rIco('gems'); }catch(e){} $('#gold').textContent=nf(P().gold);
   $('#tb_ops').textContent=T('ops'); $('#tb_gacha').textContent=T('gacha'); $('#tb_crew').textContent=T('crew');
   const navTab={evshop:'lobby',abyss:'lobby',challenge:'lobby',codex:'lobby',notice:'lobby',event:'lobby',evd:'lobby',farm:'lobby',disp:'lobby',sched:'lobby',construct:'contract',pass:'lobby',shop:'lobby',cash:'lobby'}[tab]||tab;
   if(tab!=='lobby') document.body.classList.remove('lb-hidden');
@@ -9066,9 +9084,9 @@ function lobbyHTML(){
       <div class="lb-right">
         ${ico('mailopen','','mail','우편함',mailCount()||'',mailCount()>0)}
         ${ico('go','disp','disp',T('dispatch'),dispDone()||'')}
-        ${ico('go','sched','talk','일정',G.chars.some(c=>own(c.id))&&SCHED().left?SCHED().left:'')}
+        ${ico('go','sched','talk','일정',G.chars.some(c=>own(c.id))&&progRead('sched').left?progRead('sched').left:'')}
         ${ico('go','farm','farm',T('farm'),'')}
-        ${ico('go','challenge','raid','도전',RG().run?'!':(raidTriesLeft()&&!RAID().killed?raidTriesLeft():''))}
+        ${ico('go','challenge','raid','도전',progRead('rogue').run?'!':(raidTriesLeft()&&!progRead('raid').killed?raidTriesLeft():''))}
         ${ill||has?ico('lbhide','','eye','숨기기',''):''}
       </div>
       <div class="lb-foot">
@@ -9211,7 +9229,7 @@ function farmHTML(){
     return `<div class="stage ${cl?'clear':''} ${open?'':'lock'}"><span class="code">${lv}</span><span class="t"><b>${lv}단계 <small class="${low?'farm-low':'muted'}">권장 Lv.${rec}</small></b><span class="st">${rewardText(farmReward(f.key,lv))}</span></span>${open?`<button class="btn sm ghost" data-act="farmgo" data-k="${f.key}" data-lv="${lv}">출격</button>`:''}${cl?`<button class="btn sm" data-act="sweep" data-k="${f.key}" data-lv="${lv}">소탕</button><button class="btn sm ghost" data-act="sweep" data-k="${f.key}" data-lv="${lv}" data-n="5">×5</button>`:''}</div>`;}).join('')}`).join('')}`;
 }
 function passHTML(){
-  const p=P(), d=dm(), lv=passLv(), xp=p.pass.xp;
+  const p=P(), d=progRead('dm'), lv=passLv(), xp=p.pass.xp;
   return `${pageHead(T('pass'),'SEASON PASS','lobby')}
   <div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Lv.${lv} / ${PASS_MAX}</h3><span class="muted">${nf(xp%PASS_PER)} / ${PASS_PER} XP</span></div><div class="bar"><i style="width:${lv>=PASS_MAX?100:(xp%PASS_PER)/PASS_PER*100}%"></i></div></div>
   <div class="row" style="margin:8px 0"><button class="btn sm" data-act="pgetall">모두 받기 <small>(임무·패스 보상)</small></button></div>
@@ -9632,7 +9650,7 @@ const RICON={
 function iconLib(k){return G.lib.find(l=>l.kind==='icon'&&l.key===k);}
 function rIco(k){const l=iconLib(k), s=l&&imgSrc(l); return s?`<img class="ricon" src="${esc(s)}" alt="">`:(RICON[k]||RICON.gold);}
 function rIcon(r){const k=['gems','transcMat','gearMat','core','wmat','exp','gold'].find(k=>r[k]); return rIco(k||'gold');}
-function shopDay(){const p=P(); if(p.shop.day!==today()) p.shop={day:today(),buy:{}}; return p.shop;}
+
 const SHOP_ITEMS=()=>[
   {id:'free',name:'오늘의 무료 보급',give:{gold:3000,exp:10},cost:{},limit:1,tag:'FREE'},
   {id:'exp',name:T('expMat')+' ×20',give:{exp:20},cost:{gold:4000},limit:10},
@@ -9652,7 +9670,7 @@ let SHOP_LINE='';
 function shopkeeper(){const m=G.meta.shop||DEFAULT_META.shop;return {m,c:m.charId&&m.charId!=='__self'?charById(m.charId):null,self:m.charId==='__self'&&m.self&&imgSrc(m.self)?imgSrc(m.self):null};}
 function shkSelf(){ const m=G.meta.shop; m.self=m.self||{id:'shk_self',kind:'char',name:'상점 주인',naiPrompt:'',img:null}; return m.self; }
 function shopHTML(){
-  const p=P(), sd=shopDay(), {m,c,self}=shopkeeper(); if(!SHOP_LINE) SHOP_LINE=rand(m.hello)||'어서 와요.';
+  const p=P(), sd=progRead('shop'), {m,c,self}=shopkeeper(); if(!SHOP_LINE) SHOP_LINE=rand(m.hello)||'어서 와요.';
   const sil='<div class="sil"><svg viewBox="0 0 100 120" fill="currentColor"><circle cx="50" cy="34" r="20"/><path d="M14 120c2-34 16-52 36-52s34 18 36 52z"/></svg></div>';
   return `${pageHead('상점','SUPPLY SHOP','lobby')}
   <div class="shk fr-upper"><div class="shk-bg" style="${bgStyle(P().lobbyBg||'새벽등대 사무소')}"></div>
@@ -9818,15 +9836,15 @@ function renderSetup(){
 /* =========================================================
    우편함
    ========================================================= */
-function mailBox(){const p=P(); if(!Array.isArray(p.mail)) p.mail=[]; return p.mail;}
+
 /* 우편 하나 지우기 — 우편 칸은 이 모듈이 맡음(액션 처리기가 칸을 직접 바꿔 끼우지 않게) */
-function mailRemove(x){ P().mail=mailBox().filter(q=>q!==x); }
-function sendMail(m){ let box=mailBox(); const now=Date.now(); if(m.kind){ const p0=P(); p0.mail=box=box.filter(x=>x.kind!==m.kind); } box.unshift({id:'m'+uid(),kind:m.kind||'',from:m.from||'운영팀',title:m.title||'우편',body:m.body||'',reward:m.reward||{},at:now,exp:m.days===0?0:now+(m.days||30)*864e5,got:false,read:false}); if(box.length>100) box.length=100; mark('prog'); }
+function mailRemove(x){ P().mail=progRead('mail').filter(q=>q!==x); }
+function sendMail(m){ let box=progSlot('mail'); const now=Date.now(); if(m.kind){ const p0=P(); p0.mail=box=box.filter(x=>x.kind!==m.kind); } box.unshift({id:'m'+uid(),kind:m.kind||'',from:m.from||'운영팀',title:m.title||'우편',body:m.body||'',reward:m.reward||{},at:now,exp:m.days===0?0:now+(m.days||30)*864e5,got:false,read:false}); if(box.length>100) box.length=100; mark('prog'); }
 function mailLive(x){return !x.got&&(!x.exp||Date.now()<x.exp);}
 const mailHas=x=>Object.keys(x.reward||{}).length>0;
 // 지워도 되는 우편: 받았거나, 기간이 지났거나, 보상이 없는 알림(업데이트 안내·완료 알림 등)
 const mailDone=x=>x.got||!(!x.exp||Date.now()<x.exp)||!mailHas(x);
-function mailCount(){return mailBox().filter(x=>mailLive(x)&&Object.keys(x.reward||{}).length).length;}
+function mailCount(){return progRead('mail').filter(x=>mailLive(x)&&Object.keys(x.reward||{}).length).length;}
 function mailTick(){
   const p=P();
   if(!p.mailInit){ p.mailInit=true; p.mailBuild=APP_BUILD; sendMail({from:'운영팀',title:`${G.meta.title}에 오신 걸 환영해요`,body:`${T('player')}님, 환영해요!\n첫 ${T('gacha')}에 보태라고 작은 선물을 보내요. 즐거운 시간 되세요.`,reward:{gems:1600,gold:20000},days:0}); return; }
@@ -9836,7 +9854,7 @@ function mailTick(){
 function mailRow(x){ const live=mailLive(x), left=x.exp?Math.max(0,Math.ceil((x.exp-Date.now())/864e5)):0, has=Object.keys(x.reward||{}).length;
   return `<div class="mrow ${x.got?'got':''} ${!live&&!x.got?'exp':''}" data-act="mailview" data-id="${x.id}"><span class="mic">${has?rIcon(x.reward):ICO.mail}</span><span class="t"><b>${esc(x.title)}</b><span class="muted">${esc(x.from)} · ${x.got?'수령 완료':!live?'기간 만료':!has?(x.read?'읽음':'알림'):x.exp?left+'일 남음':'기간 제한 없음'}</span>${has?`<span class="rw">${rewardText(x.reward)}</span>`:''}</span>${has&&live?`<button class="btn sm" data-act="mailget" data-id="${x.id}">받기</button>`:`<button class="btn sm ghost mdel" data-act="maildel" data-id="${x.id}" aria-label="지우기">✕</button>`}</div>`; }
 function openMail(){
-  const box=mailBox(), n=mailCount();
+  const box=progRead('mail'), n=mailCount();
   openModal(`${head('우편함',`<span class="muted">받을 수 있는 우편 ${n}개 · 받지 않은 우편은 기간이 지나면 사라져요</span>`)}
     <div class="mlist">${box.length?box.map(mailRow).join(''):'<p class="muted" style="text-align:center;padding:30px 0">우편이 없어요.</p>'}</div>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="mailall" ${n?'':'disabled'}>모두 받기</button><button class="btn ghost" data-act="mailclean" ${box.some(mailDone)?'':'disabled'}>받은·읽은 우편 지우기</button></div>`);
@@ -10968,7 +10986,7 @@ function dispHTML(){
   const p=P(), now=Date.now();
   const nDone=dispList().filter(d=>{ const a=p.disp[d.id]; return a&&now>=a.start+a.hours*3600e3; }).length, nFree=dispList().filter(d=>!p.disp[d.id]).length;
   return `${pageHead(T('dispatch'),'LOGISTICS','lobby')}<p class="muted">${T('crew')}을(를) 보내 두면 시간이 지나 보상을 가져와요. 파견 중인 ${T('crew')}은(는) 전투에 나갈 수 없어요.</p>
-  <div class="row" style="margin:6px 0 10px"><button class="btn sm" data-act="dispall" ${nDone?'':'disabled'}>완료된 파견 모두 받기${nDone?` (${nDone})`:''}</button><button class="btn sm ghost" data-act="dispredo" ${nFree?'':'disabled'}>빈 곳 모두 자동 파견</button><button class="btn sm ghost" data-act="dreroll" ${nFree?'':'disabled'}>의뢰 새로고침 ${DBOARD().rr?`(${rIco('gold')}2,000)`:'(오늘 1번 무료)'}</button></div>
+  <div class="row" style="margin:6px 0 10px"><button class="btn sm" data-act="dispall" ${nDone?'':'disabled'}>완료된 파견 모두 받기${nDone?` (${nDone})`:''}</button><button class="btn sm ghost" data-act="dispredo" ${nFree?'':'disabled'}>빈 곳 모두 자동 파견</button><button class="btn sm ghost" data-act="dreroll" ${nFree?'':'disabled'}>의뢰 새로고침 ${progRead('dboard').rr?`(${rIco('gold')}2,000)`:'(오늘 1번 무료)'}</button></div>
   <p class="muted" style="margin:-4px 0 8px;font-size:.75rem">의뢰는 매일 바뀌고, 하나를 받으면 그 자리에 새 의뢰가 올라와요. 보상은 시간과 인원에 비례해요.</p>
   ${dispList().map(d=>{const a=p.disp[d.id], end=a?a.start+a.hours*3600e3:0, done=a&&now>=end;
     const left=a&&!done?Math.ceil((end-now)/60000):0;
@@ -10985,16 +11003,17 @@ function dispOffer(taken){ const pool=(G.dispatches&&G.dispatches.length?G.dispa
   if(focus!=='gold') r.gold=Math.round(600*pts/100)*100; if(focus==='gold') r.gold=Math.round(r.gold/100)*100;
   if(conOn()) Object.assign(r,conDispReward(hours,need)); // 건조/영입이 켜져 있으면 원정으로 건조 자원도 모아 와요
   return {id:'o'+uid(),name:String(tpl.name||'파견'),desc:String(tpl.desc||''),hours,need,reward:r}; }
-function DBOARD(){ const p=P(); let b=p.dboard; if(!b||!Array.isArray(b.list)) b=p.dboard={day:'',list:[],rr:0};
+/* 파견 게시판 맞춤(날이 바뀌면 의뢰 새로·예전 방식 파견 잇기·5개까지 채우기) — 진행 칸 dboard의 정의(0070 PROG_SLOTS)가 부름 */
+function dispBoardFill(b,p){
   // 예전 방식으로 보낸 파견은 그대로 이어서 보여 줘요
   Object.keys(p.disp||{}).forEach(id=>{ if(!b.list.some(o=>o.id===id)){ const t=(G.dispatches||[]).find(x=>x.id===id)||{}, a=p.disp[id]; b.list.push({id,name:String(t.name||'파견'),desc:String(t.desc||''),hours:a.hours||t.hours||2,need:(a.chars||[]).length||t.need||2,reward:t.reward||{gold:2000}}); } });
   if(b.day!==today()){ b.day=today(); b.rr=0; b.list=b.list.filter(o=>p.disp[o.id]); }
   while(b.list.length<5) b.list.push(dispOffer(b.list.map(o=>o.name)));
   return b; }
-function dispList(){ return DBOARD().list; }
+function dispList(){ return progRead('dboard').list; } /* 읽기 — 게시판은 그리기 전 처리(progTick)가 날마다 채움 */
 /* 전투형 파견을 모두 보상 없이 끝내고 의뢰판을 비움 — 파견 칸(disp·dboard)은 이 모듈이 맡음. 원정 방식을 바꿀 때(0275)가 부름 */
 function dispEndAll(){ const p=P(); p.disp={}; if(p.dboard) p.dboard.list=[]; }
-function dispClaim(d){ const id=d.id; const dr=Object.assign({},d.reward,{gift:d.hours>=4?2:1}); if(dr.gems){ dr.gold=(dr.gold||0)+dr.gems*100; delete dr.gems; } if(seasonIs('train')) Object.keys(dr).forEach(k=>{ if(typeof dr[k]==='number'&&k!=='gift') dr[k]=Math.round(dr[k]*1.5); }); Object.assign(dr,rateR(dr)); giveReward(dr); (P().disp[id].chars||[]).forEach(cid=>{const c=charById(cid);if(c)addAff(c,10);}); delete P().disp[id]; const b=DBOARD(), i=b.list.findIndex(o=>o.id===id); if(i>=0) b.list.splice(i,1,dispOffer(b.list.map(o=>o.name))); return dr; }
+function dispClaim(d){ const id=d.id; const dr=Object.assign({},d.reward,{gift:d.hours>=4?2:1}); if(dr.gems){ dr.gold=(dr.gold||0)+dr.gems*100; delete dr.gems; } if(seasonIs('train')) Object.keys(dr).forEach(k=>{ if(typeof dr[k]==='number'&&k!=='gift') dr[k]=Math.round(dr[k]*1.5); }); Object.assign(dr,rateR(dr)); giveReward(dr); (P().disp[id].chars||[]).forEach(cid=>{const c=charById(cid);if(c)addAff(c,10);}); delete P().disp[id]; const b=progSlot('dboard'), i=b.list.findIndex(o=>o.id===id); if(i>=0) b.list.splice(i,1,dispOffer(b.list.map(o=>o.name))); return dr; }
 function openDispSel(did){
   const d=dispList().find(x=>x.id===did), busy=busyIds(), owned=G.chars.filter(c=>own(c.id)&&!busy.has(c.id));
   DSEL=DSEL&&DSEL.id===did?DSEL:{id:did,ids:[]};
@@ -11011,47 +11030,51 @@ const EX_MODE_LABEL={combat:['전투형 원정','지역에 보내 자원을 가�
 function exMeta(){ if(!G.meta.expedition||typeof G.meta.expedition!=='object') G.meta.expedition={mode:'combat'}; return G.meta.expedition; }
 function EXC(){ return GGMExpedition.config(exMeta()); }
 function exMode(){ return (G.meta.expedition&&G.meta.expedition.mode)||'combat'; }
-function EXS(){ const p=P(); let s=p.exped; if(!s||typeof s!=='object') s=p.exped={}; for(const [k,v] of [['fame',{}],['cond',{}],['jobs',{}],['offers',{}],['streak',{}],['lib',[]]]) if(!s[k]||typeof s[k]!=='object') s[k]=v; if(!s.biz||typeof s.biz!=='object') s.biz={assign:{},at:0,rep:0}; if(!s.libAt) s.libAt=Date.now(); return s; }
-function exBizOf(id){ const a=EXS().biz.assign; return Object.keys(a).find(k=>(a[k]||[]).includes(id))||null; }
-function exCond(id){ const s=EXS(), now=Date.now(), st=s.cond[id]; if(exMode()==='business'&&exBizOf(id)&&st){ const h=Math.max(0,(now-st.at)/3600e3); return Math.max(0,Math.round(st.v-h*EXC().cond.drain)); } return Math.round(GGMExpedition.condNow(st,now,EXC())); }
-function exSetCond(id,v,at,rest){ EXS().cond[id]=Object.assign({v:Math.max(0,Math.min(100,v)),at:at||Date.now()},rest?{rest}:{}); }
-function exJobOf(id){ const J=EXS().jobs; return Object.keys(J).find(k=>J[k].chars.includes(id))||null; }
-function exResting(id){ const st=EXS().cond[id]; return !!(st&&st.rest&&st.rest>Date.now()); }
+/* 원정 칸 형식 맞춤(빠진 하위 칸: 인지도·컨디션·일정·제안·연속·기록·경영, 기록 시작 시각) + 방송 출연 모드면 오늘의 출연 제안(보유 캐릭터마다 하루 한 번, 무작위라 만들어 저장) — 진행 칸 exped의 정의(0070 PROG_SLOTS)가 그리기 전에 부름 */
+function expedFill(s){ for(const [k,v] of [['fame',{}],['cond',{}],['jobs',{}],['offers',{}],['streak',{}],['lib',[]]]) if(!s[k]||typeof s[k]!=='object') s[k]=v; if(!s.biz||typeof s.biz!=='object') s.biz={assign:{},at:0,rep:0}; if(!s.libAt) s.libAt=Date.now();
+  if(exMode()==='idol'){ const day=today(); for(const c of G.chars) if(own(c.id)){ const o=s.offers[c.id]; if(!o||o.day!==day) s.offers[c.id]={day,...GGMExpedition.idolOffers(s.fame[c.id]||0,EXC())}; } } return s; }
+/* 원정 칸을 늘 둘 때: 전투형이 아닌 원정 모드(방송 출연·스트리머·경영) */
+function expedOn(){ return exMode()!=='combat'; }
+function exBizOf(id){ const a=progRead('exped').biz.assign; return Object.keys(a).find(k=>(a[k]||[]).includes(id))||null; }
+function exCond(id){ const s=progRead('exped'), now=Date.now(), st=s.cond[id]; if(exMode()==='business'&&exBizOf(id)&&st){ const h=Math.max(0,(now-st.at)/3600e3); return Math.max(0,Math.round(st.v-h*EXC().cond.drain)); } return Math.round(GGMExpedition.condNow(st,now,EXC())); }
+function exSetCond(id,v,at,rest){ progSlot('exped').cond[id]=Object.assign({v:Math.max(0,Math.min(100,v)),at:at||Date.now()},rest?{rest}:{}); }
+function exJobOf(id){ const J=progRead('exped').jobs; return Object.keys(J).find(k=>J[k].chars.includes(id))||null; }
+function exResting(id){ const st=progRead('exped').cond[id]; return !!(st&&st.rest&&st.rest>Date.now()); }
 // 전투에 못 나가는 캐릭터(일하는 중·쉬는 중·경영 배치). busyIds(0090)가 함께 써요
-function exBusyIds(){ if(exMode()==='combat'||!P().exped) return []; const s=EXS(); return [...Object.values(s.jobs).flatMap(j=>j.chars),...Object.values(s.biz.assign).flat(),...Object.keys(s.cond).filter(exResting)]; }
+function exBusyIds(){ if(exMode()==='combat'||!P().exped) return []; const s=progSlot('exped'); return [...Object.values(s.jobs).flatMap(j=>j.chars),...Object.values(s.biz.assign).flat(),...Object.keys(s.cond).filter(exResting)]; }
 function exGive(gold,label){ if(seasonIs('train')) gold*=1.5; /* 훈련 시즌 보너스 — 전투형 파견(dispClaim)과 같게 */ const r={gold:Math.max(0,Math.round(gold))}; if(conOn()){ const ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2); ks.forEach(k=>{ r[k]=Math.max(10,Math.round(gold/20/10)*10); }); } giveReward(r); return r; }
 function exFameName(){ const m=exMode(); return m==='streamer'?EXC().streamer.fameName:EXC().idol.fameName; }
 
 /* 방송 출연(idol): 하루 단위로 캐릭터마다 일정이 들어와요. 등급이 낮으면 배정된 1건뿐이고, 높으면 골라서·거절도 자유 */
-function exOffers(id){ const s=EXS(), day=today(); let o=s.offers[id]; if(!o||o.day!==day){ o=s.offers[id]={day,...GGMExpedition.idolOffers(s.fame[id]||0,EXC())}; } return o; }
+function exOffers(id){ const s=progSlot('exped'), day=today(); let o=s.offers[id]; if(!o||o.day!==day){ o=s.offers[id]={day,...GGMExpedition.idolOffers(s.fame[id]||0,EXC())}; } return o; }
 function exStart(id,job){ const c=charById(id), cur=exCond(id), k=EXC().cond; if(!c||exJobOf(id)||exResting(id)||exBizOf(id)) return;
   if(cur<k.min){ toast(`${c.name}의 컨디션이 너무 낮아요. 쉬게 해 주세요`); return; }
-  const end=Date.now()+job.hours*3600e3, jid='x'+uid(); EXS().jobs[jid]={chars:[id],start:Date.now(),hours:job.hours,job,mode:exMode()};
+  const end=Date.now()+job.hours*3600e3, jid='x'+uid(); progSlot('exped').jobs[jid]={chars:[id],start:Date.now(),hours:job.hours,job,mode:exMode()};
   exSetCond(id,cur-job.cond,end); bump('dispatch'); mark('prog'); render(); } // 일일 미션 "파견"은 원정 방식과 상관없이 셈
-function exRest(id,hours){ const cur=exCond(id), now=Date.now(); exSetCond(id,cur,now,now+hours*3600e3); EXS().streak[id]=0; mark('prog'); render(); }
-function exClaim(jid){ const s=EXS(), j=s.jobs[jid]; if(!j||Date.now()<j.start+j.hours*3600e3) return null; const id=j.chars[0], c=charById(id), cfg=EXC(), condV=(s.cond[id]||{}).v??100; let res, msg;
+function exRest(id,hours){ const cur=exCond(id), now=Date.now(); exSetCond(id,cur,now,now+hours*3600e3); progSlot('exped').streak[id]=0; mark('prog'); render(); }
+function exClaim(jid){ const s=progSlot('exped'), j=s.jobs[jid]; if(!j||Date.now()<j.start+j.hours*3600e3) return null; const id=j.chars[0], c=charById(id), cfg=EXC(), condV=(s.cond[id]||{}).v??100; let res, msg;
   if(j.mode==='streamer'){ res=GGMExpedition.streamResult(j.job,s.fame[id]||0,condV+j.job.cond,cfg); if(res.lib) s.lib.push({at:Date.now(),base:res.lib,id}); msg=res.viral?'🔥 영상이 터졌어요! ':''; }
   else { res=GGMExpedition.idolResult(j.job,condV+j.job.cond,s.streak[id]||0,cfg); if((s.streak[id]||0)>=cfg.burnout) exSetCond(id,exCond(id)-j.job.cond*0.5,Date.now()); }
   s.fame[id]=(s.fame[id]||0)+res.fame; s.streak[id]=(s.streak[id]||0)+1; const before=GGMExpedition.tierOf((s.fame[id]||0)-res.fame,cfg).i, t=GGMExpedition.tierOf(s.fame[id],cfg);
   const r=exGive(res.gold); if(c) addAff(c,5); delete s.jobs[jid]; if(j.mode==='idol') delete s.offers[id];
   mark('prog'); toast(`${msg||''}${c?c.name:''} ${j.job.name}: ${rewardText(r)} · ${exFameName()} +${res.fame}${t.i>before?` · 「${t.name}」 등급!`:''}`); return r; }
 /* 스트리머: 영상 라이브러리 수익 정산 */
-function exLibSettle(){ const s=EXS(), now=Date.now(), g=GGMExpedition.libIncome(s.lib,s.libAt,now,EXC()); s.libAt=now; s.lib=s.lib.filter(v=>now-v.at<90*864e5); if(g>0){ const r=exGive(g); toast(`영상 수익 정산: ${rewardText(r)}`); } else toast('정산할 영상 수익이 아직 없어요'); mark('prog'); render(); }
+function exLibSettle(){ const s=progSlot('exped'), now=Date.now(), g=GGMExpedition.libIncome(s.lib,s.libAt,now,EXC()); s.libAt=now; s.lib=s.lib.filter(v=>now-v.at<90*864e5); if(g>0){ const r=exGive(g); toast(`영상 수익 정산: ${rewardText(r)}`); } else toast('정산할 영상 수익이 아직 없어요'); mark('prog'); render(); }
 /* 경영: 배치 바꾸기·정산. 배치를 바꾸기 전에 지금까지의 영업을 먼저 정산해요 */
-function exBizState(){ const s=EXS(), chars={}, conds={}; Object.values(s.biz.assign).flat().forEach(id=>{ const c=charById(id); if(c){ chars[id]=c; conds[id]=exCond(id); } }); return GGMExpedition.bizPerformance(s.biz.assign,chars,conds,EXC()); }
-function exBizSettle(quiet){ const s=EXS(), now=Date.now(), b=s.biz; if(!b.at){ b.at=now; return null; } const h=(now-b.at)/3600e3, p=exBizState(), r0=GGMExpedition.bizSettle(p.perf,b.rep,h,EXC());
+function exBizState(){ const s=progRead('exped'), chars={}, conds={}; Object.values(s.biz.assign).flat().forEach(id=>{ const c=charById(id); if(c){ chars[id]=c; conds[id]=exCond(id); } }); return GGMExpedition.bizPerformance(s.biz.assign,chars,conds,EXC()); }
+function exBizSettle(quiet){ const s=progSlot('exped'), now=Date.now(), b=s.biz; if(!b.at){ b.at=now; return null; } const h=(now-b.at)/3600e3, p=exBizState(), r0=GGMExpedition.bizSettle(p.perf,b.rep,h,EXC());
   Object.values(b.assign).flat().forEach(id=>exSetCond(id,exCond(id),now)); b.rep=r0.rep; b.at=now; const r=r0.gold>0?exGive(r0.gold):null; if(!quiet) toast(r?`정산: ${rewardText(r)} · ${EXC().business.repName} ${Math.round(b.rep)}`:'정산할 수익이 아직 없어요'); mark('prog'); return r; }
-function exAssign(part,slot,id){ const b=EXS().biz; exBizSettle(true); Object.keys(b.assign).forEach(k=>{ b.assign[k]=(b.assign[k]||[]).filter(x=>x&&x!==id); }); const a=b.assign[part]=b.assign[part]||[]; if(id){ a[slot]=id; b.assign[part]=a.filter(Boolean); exSetCond(id,exCond(id),Date.now()); bump('dispatch'); } else { a.splice(slot,1); } if(!b.at) b.at=Date.now(); mark('prog'); render(); }
+function exAssign(part,slot,id){ const b=progSlot('exped').biz; exBizSettle(true); Object.keys(b.assign).forEach(k=>{ b.assign[k]=(b.assign[k]||[]).filter(x=>x&&x!==id); }); const a=b.assign[part]=b.assign[part]||[]; if(id){ a[slot]=id; b.assign[part]=a.filter(Boolean); exSetCond(id,exCond(id),Date.now()); bump('dispatch'); } else { a.splice(slot,1); } if(!b.at) b.at=Date.now(); mark('prog'); render(); }
 
 const exIco=k=>`<span style="display:inline-flex;width:1em;height:1em;vertical-align:-.15em">${rIco(k)}</span>`; // 아이콘 그림을 글자 크기로
 const exBar=v=>`<span style="display:inline-block;width:60px;height:6px;background:var(--line);border-radius:3px;vertical-align:middle;overflow:hidden"><i style="display:block;height:100%;width:${v}%;background:${v>=60?'#4fd18b':v>=30?'#ffd35a':'#ff5a5a'}"></i></span> ${v}`;
-function exStatus(id){ const j=exJobOf(id), s=EXS(); if(j){ const J=s.jobs[j], end=J.start+J.hours*3600e3, left=Math.max(0,Math.ceil((end-Date.now())/60000)); return left?`${esc(J.job.name)} · ${Math.floor(left/60)}시간 ${left%60}분`:`${esc(J.job.name)} 완료`; } if(exResting(id)){ const m=Math.ceil((s.cond[id].rest-Date.now())/60000); return `휴식 중 · ${Math.floor(m/60)}시간 ${m%60}분`; } const b=exBizOf(id); if(b) return '배치: '+esc((EXC().business.parts.find(p=>p.id===b)||{}).name||b); return '대기'; }
-function exCharRow(c,actions){ const s=EXS(), f=s.fame[c.id]||0, t=GGMExpedition.tierOf(f,EXC()), m=exMode();
+function exStatus(id){ const j=exJobOf(id), s=progRead('exped'); if(j){ const J=s.jobs[j], end=J.start+J.hours*3600e3, left=Math.max(0,Math.ceil((end-Date.now())/60000)); return left?`${esc(J.job.name)} · ${Math.floor(left/60)}시간 ${left%60}분`:`${esc(J.job.name)} 완료`; } if(exResting(id)){ const m=Math.ceil((s.cond[id].rest-Date.now())/60000); return `휴식 중 · ${Math.floor(m/60)}시간 ${m%60}분`; } const b=exBizOf(id); if(b) return '배치: '+esc((EXC().business.parts.find(p=>p.id===b)||{}).name||b); return '대기'; }
+function exCharRow(c,actions){ const s=progRead('exped'), f=s.fame[c.id]||0, t=GGMExpedition.tierOf(f,EXC()), m=exMode();
   return `<div class="ep disp"><span class="t"><b>${esc(c.name)}</b><span class="muted">컨디션 ${exBar(exCond(c.id))}${m!=='business'?` · ${esc(exFameName())} ${nf(f)} 「${esc(t.name)}」${t.next?` <span style="font-size:.75rem">(다음 ${nf(t.next.fame)})</span>`:''}`:''} · ${exStatus(c.id)}</span>${actions||''}</span></div>`; }
-function exHTML(){ const m=exMode(), cfg=EXC(), s=EXS(), owned=G.chars.filter(c=>own(c.id)), [title,desc]=EX_MODE_LABEL[m], now=Date.now();
+function exHTML(){ const m=exMode(), cfg=EXC(), s=progRead('exped'), owned=G.chars.filter(c=>own(c.id)), [title,desc]=EX_MODE_LABEL[m], now=Date.now();
   const done=Object.entries(s.jobs).filter(([,j])=>now>=j.start+j.hours*3600e3);
   let body='';
-  if(m==='idol'){ body=owned.map(c=>{ const busy=exJobOf(c.id)||exResting(c.id); if(busy) return exCharRow(c); const o=exOffers(c.id), low=exCond(c.id)<cfg.cond.min;
+  if(m==='idol'){ body=owned.map(c=>{ const busy=exJobOf(c.id)||exResting(c.id); if(busy) return exCharRow(c); const o=progRead('exped').offers[c.id]||{offers:[]}, low=exCond(c.id)<cfg.cond.min;
       return exCharRow(c,`<span class="muted" style="font-size:.78rem">${o.choice?'들어온 일정 중에서 골라요':'배정된 일정이에요 (등급이 오르면 고를 수 있어요)'}</span><div class="row" style="flex-wrap:wrap;gap:4px;margin-top:4px">${o.offers.map(x=>`<button class="btn sm${o.choice?' ghost':''}" data-act="exjob" data-id="${c.id}" data-job="${x.id}" ${low?'disabled':''}>${esc(x.kind)} · ${esc(x.name)} ${x.hours}h · ${exIco('gold')}${nf(x.pay)} · +${x.fame}</button>`).join('')}<button class="btn sm ghost" data-act="exrest" data-id="${c.id}">휴식 4h</button></div>`); }).join(''); }
   else if(m==='streamer'){ const pend=GGMExpedition.libIncome(s.lib,s.libAt,now,cfg);
     body=`<div class="panel"><b>영상 라이브러리</b> <span class="muted">${s.lib.length}개 · 쌓인 수익 ${exIco('gold')}${nf(pend)}</span> <button class="btn sm" data-act="exlib" ${pend>0?'':'disabled'}>수익 정산</button></div>`+owned.map(c=>{ const busy=exJobOf(c.id)||exResting(c.id); if(busy) return exCharRow(c); const low=exCond(c.id)<cfg.cond.min;
@@ -11083,7 +11106,7 @@ document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); 
   else if(a==='exstream'){ const pf=EXC().streamer.platforms.find(p=>p.id===el.dataset.pf); if(pf) exStart(id,pf); }
   else if(a==='exrest') exRest(id,4);
   else if(a==='exclaim'){ exClaim(id); render(); }
-  else if(a==='exclaimall'){ Object.keys(EXS().jobs).forEach(exClaim); render(); }
+  else if(a==='exclaimall'){ Object.keys(progSlot('exped').jobs).forEach(exClaim); render(); }
   else if(a==='exlib') exLibSettle();
   else if(a==='exsettle'){ exBizSettle(); render(); }
   else if(a==='exset') openExSet();
@@ -11337,20 +11360,20 @@ function cxEntries(){
   const N=cxNotes(); out.forEach(e=>{ e.notes=(N[e.key]||[]); e.open=cxUnlocked(e.unlock); });
   return out;
 }
-function cxSeenSet(){ const p=P(); if(!p.cxSeen||typeof p.cxSeen!=='object') p.cxSeen={}; return p.cxSeen; }
+
 let CXMEMO=null;
-function cxNewFast(){ const p=P(), sig=[Object.keys(p.cleared).length,Object.keys(p.owned).length,cxStore().length,G.lib.length,G.chapters.length,Object.keys(cxSeenSet()).length,Object.keys(p.cxBadge||{}).length].join('|'); if(CXMEMO&&CXMEMO.sig===sig) return CXMEMO.n; cxNew(); const s=cxSeenSet(), bd=p.cxBadge||{}; const n=cxEntries().filter(e=>e.open&&!s[e.key]&&!bd[e.key]).length; CXMEMO={sig,n}; return n; }
-function cxNew(list){ const p=P(); if(!p.cxSeen||typeof p.cxSeen!=='object'){ p.cxSeen={}; (list||cxEntries()).forEach(e=>{ if(e.open&&!e.stored) p.cxSeen[e.key]=1; }); mark('prog'); } const s=cxSeenSet(); return (list||cxEntries()).filter(e=>e.open&&!s[e.key]).length; }
-function cxCard(e){ const isNew=e.open&&!cxSeenSet()[e.key];
+function cxNewFast(){ const p=P(), sig=[Object.keys(p.cleared).length,Object.keys(p.owned).length,cxStore().length,G.lib.length,G.chapters.length,Object.keys(progRead('cxSeen')).length,Object.keys(p.cxBadge||{}).length].join('|'); if(CXMEMO&&CXMEMO.sig===sig) return CXMEMO.n; cxNew(); const s=progRead('cxSeen'), bd=p.cxBadge||{}; const n=cxEntries().filter(e=>e.open&&!s[e.key]&&!bd[e.key]).length; CXMEMO={sig,n}; return n; }
+function cxNew(list){ const p=P(); if(!p.cxSeen||typeof p.cxSeen!=='object'){ p.cxSeen={}; (list||cxEntries()).forEach(e=>{ if(e.open&&!e.stored) p.cxSeen[e.key]=1; }); mark('prog'); } const s=progRead('cxSeen'); return (list||cxEntries()).filter(e=>e.open&&!s[e.key]).length; }
+function cxCard(e){ const isNew=e.open&&!progRead('cxSeen')[e.key];
   const pic=e.open?(e.char?art(e.char,'cx-ch'):e.img?`<img src="${esc(e.img)}" alt="" class="${e.contain?'ct':''}" loading="lazy">`:`<span class="cx-glyph">${esc((e.title||'?').slice(0,1))}</span>`):'<span class="cx-glyph">?</span>';
   const snip=e.open?String(e.body||(e.notes[0]&&e.notes[0].text)||'아직 기록이 없어요').replace(/\n+/g,' ').slice(0,70):cxLockText(e.unlock);
   return `<button class="cx-card ${e.open?'':'lock'} c-${esc(e.cat)}" data-act="cxview" data-k="${esc(e.key)}"><span class="cx-pic">${pic}</span><span class="cx-tx"><i>${esc(CX_LABEL[e.cat]||'')}</i><b>${e.open?esc(e.title):'???'}</b><span>${esc(snip)}</span></span>${isNew?'<em>NEW</em>':''}</button>`; }
 function codexHTML(){
-  const all=cxEntries(), cat=CXCAT, list=all.filter(e=>cat==='all'||e.cat===cat), un=all.filter(e=>e.open).length; cxNew(all); { const p=P(), s=cxSeenSet(); p.cxBadge=p.cxBadge||{}; let ch=false; all.forEach(e=>{ if(e.open&&!s[e.key]&&!p.cxBadge[e.key]){ p.cxBadge[e.key]=1; ch=true; } }); if(ch){ CXMEMO=null; mark('prog'); } }
+  const all=cxEntries(), cat=CXCAT, list=all.filter(e=>cat==='all'||e.cat===cat), un=all.filter(e=>e.open).length; cxNew(all); { const p=P(), s=progRead('cxSeen'); p.cxBadge=p.cxBadge||{}; let ch=false; all.forEach(e=>{ if(e.open&&!s[e.key]&&!p.cxBadge[e.key]){ p.cxBadge[e.key]=1; ch=true; } }); if(ch){ CXMEMO=null; mark('prog'); } }
   const cnt=k=>k==='all'?all.length:all.filter(e=>e.cat===k).length;
   return `${pageHead('도감','LORE BOOK','lobby')}
   <div class="cx-head"><div class="cx-meter"><b>${un}</b><span>/ ${all.length} 기록 해금</span></div><div class="cx-bar"><i style="width:${all.length?un/all.length*100:0}%"></i></div>
-    <div class="cx-acts">${SAMPLE?`<button class="btn sm" data-act="cxdisc">✦ AI로 로어북 채우기</button>`:''}<button class="btn sm ghost" data-act="cxadd">＋ 직접 쓰기</button><button class="btn sm ghost" data-act="relopen" data-r="me">🕸 인물 관계도</button>${all.some(e=>e.open&&!cxSeenSet()[e.key])?'<button class="btn sm ghost" data-act="cxreadall">NEW 모두 지우기</button>':''}</div></div>
+    <div class="cx-acts">${SAMPLE?`<button class="btn sm" data-act="cxdisc">✦ AI로 로어북 채우기</button>`:''}<button class="btn sm ghost" data-act="cxadd">＋ 직접 쓰기</button><button class="btn sm ghost" data-act="relopen" data-r="me">🕸 인물 관계도</button>${all.some(e=>e.open&&!progRead('cxSeen')[e.key])?'<button class="btn sm ghost" data-act="cxreadall">NEW 모두 지우기</button>':''}</div></div>
   <div class="cx-cats">${CX_CATS.filter(([k])=>cnt(k)).map(([k,l])=>`<button class="${k===cat?'on':''}" data-act="cxcat" data-v="${k}">${l}<em>${cnt(k)}</em></button>`).join('')}</div>
   ${!cxStore().length&&SAMPLE?`<div class="panel cx-hint"><b>세계를 더 깊게</b><p class="muted" style="margin:4px 0 0">AI가 세계관과 메인 플롯을 바탕으로 장소, 용어, 역사, 숨은 인물 같은 기록을 써요. 비밀이 담긴 기록은 해당 스테이지를 깨야 열려요.</p></div>`:''}
   <div class="cx-list">${list.map(cxCard).join('')||'<p class="muted">항목이 없어요</p>'}</div>`;
@@ -11358,7 +11381,7 @@ function codexHTML(){
 function openCx(key){
   const e=cxEntries().find(x=>x.key===key); if(!e) return;
   if(!e.open){ toast(cxLockText(e.unlock)||'아직 잠겨 있어요'); return; }
-  cxSeenSet()[key]=1; CXMEMO=null; mark('prog'); document.querySelectorAll('.cx-card[data-k]').forEach(el=>{ if(el.dataset.k===key){ const em=el.querySelector('em'); if(em) em.remove(); } });
+  progSlot('cxSeen')[key]=1; CXMEMO=null; mark('prog'); document.querySelectorAll('.cx-card[data-k]').forEach(el=>{ if(el.dataset.k===key){ const em=el.querySelector('em'); if(em) em.remove(); } });
   const para=t=>String(t||'').split(/\n{2,}/).map(x=>`<p>${esc(x).replace(/\n/g,'<br>')}</p>`).join('');
   openModal(`<div class="cx-view c-${esc(e.cat)}">
     ${e.img||e.char?`<div class="cx-hero">${e.char?art(e.char,'cx-ch'):`<img src="${esc(e.img)}" alt="" class="${e.contain?'ct':''}">`}</div>`:''}
@@ -13308,17 +13331,20 @@ const CON_RES=GGMConstruct.RES;
 function variantsFromAI(list,ng){ return GGMConstruct.variantsFrom(list,{factions:((ng.world||{}).factions||[]).map(f=>f.name),elems:(ng.meta.elems||DEFAULT_META.elems).map(e=>e.n)}).map(v=>Object.assign({id:'v_'+uid()},v)); }
 // 특수 레시피(소속·특정 캐릭터 확률 업). 분류 확률은 groups가 정해서 기본은 비워 둬요. 예: {id:'rc_x',name:'새벽 설계',min:[400,400,400,600],effect:{type:'faction',value:'새벽등대',up:3},hint:'부품을 넉넉히'}
 const CON_RECIPES=[];
-function conMeta(){ const m=G.meta; if(!m.construct||typeof m.construct!=='object') m.construct={on:false}; if(!Array.isArray(m.construct.recipes)) m.construct.recipes=clone(CON_RECIPES); return m.construct; }
+/* 건조 설정 읽기(없으면 꺼짐·기본 레시피 — 상태는 그대로, 바꿀 때는 conSave·contoggle이 G.meta.construct에 씀) */
+function conMeta(){ const c=G.meta.construct, m=c&&typeof c==='object'?c:{on:false}; return Array.isArray(m.recipes)?m:Object.assign({},m,{recipes:clone(CON_RECIPES)}); }
 function CON(){ const c=GGMConstruct.config(conMeta()); c.groups=c.groups.map(g=>{ const d=GGMConstruct.DEFAULTS.groups.find(x=>x.id===g.id); return d&&g.name===d.name&&g.match&&ROLE[g.match.role]?Object.assign({},g,{name:ROLE[g.match.role]}):g; }); return c; } // 저장된 분류는 그대로 두고 보여 줄 때만 /* 기본 분류 이름(지원·공격·방어)은 이 게임의 역할 이름으로 보여요 */
 /* 새 게임을 건조/영입이 켜진 채로 시작: 시작 자원 지급(설정에서 켤 때와 같은 양) */
 function conStartNew(ng){ ng.meta.construct=Object.assign({},ng.meta.construct||{},{on:true}); const s=GGMConstruct.config(ng.meta.construct).start; ng.prog.cres=Object.fromEntries(CON_RES.map(k=>[k,s])); ng.prog.cbuild={n:0,found:{},log:[],input:null,started:Date.now()}; }
 function conOn(){ return !!(G.meta.construct&&G.meta.construct.on); }
-function VARIANTS(){ if(!Array.isArray(G.meta.variants)) G.meta.variants=clone(GGMConstruct.VARIANT_DEFAULTS); return G.meta.variants; }
-function CRES(){ const p=P(); if(!p.cres||typeof p.cres!=='object') p.cres={}; CON_RES.forEach(k=>{ if(!(p.cres[k]>=0)) p.cres[k]=0; }); return p.cres; }
-function CBUILD(){ const p=P(); if(!p.cbuild||typeof p.cbuild!=='object') p.cbuild={n:0,found:{},log:[],input:null}; return p.cbuild; }
+/* 바리에이션 공통 설정 읽기(없으면 엔진 기본형 — id 고정이라 발견 기록과 맞음, 바꿀 때는 conSave가 G.meta.variants에 씀) */
+function VARIANTS(){ return Array.isArray(G.meta.variants)?G.meta.variants:clone(GGMConstruct.VARIANT_DEFAULTS); }
+/* 건조/영입 자원 칸 형식 맞춤(자원 4종 — 없거나 음수면 0) — 진행 칸 cres의 정의(0070 PROG_SLOTS)가 부름 */
+function cresFill(c){ CON_RES.forEach(k=>{ if(!(c[k]>=0)) c[k]=0; }); return c; }
+
 const conGem=()=>`<span style="display:inline-flex;width:1em;height:1em;vertical-align:-.15em">${rIco('gems')}</span>`;
 const conResIcon=k=>`<i class="ricon-t" style="font-style:normal">${['⛽','✴','⬢','⚙'][CON_RES.indexOf(k)]}</i>`;
-function conResBar(){ const r=CRES(); return `<div class="row" style="gap:6px;flex-wrap:wrap">${CON_RES.map(k=>`<span class="chip">${conResIcon(k)} ${esc(T(k))} <b>${nf(r[k])}</b></span>`).join('')}<span class="chip">${conGem()} <b>${nf(P().gems)}</b></span></div>`; }
+function conResBar(){ const r=progRead('cres'); return `<div class="row" style="gap:6px;flex-wrap:wrap">${CON_RES.map(k=>`<span class="chip">${conResIcon(k)} ${esc(T(k))} <b>${nf(r[k])}</b></span>`).join('')}<span class="chip">${conGem()} <b>${nf(P().gems)}</b></span></div>`; }
 
 /* 원정(파견) 보상: 시간·인원에 비례해서 건조 자원 2종 */
 function conDispReward(hours,need){ const pts=Math.pow(hours,0.85)*(1+0.35*(need-1)), ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2), r={}; ks.forEach(k=>{ r[k]=Math.max(10,Math.round(pts*60/10)*10); }); return r; }
@@ -13344,12 +13370,12 @@ async function conMakeVariant(b,tpl){
 let CONJOB=false;
 /* 처음(아직 건조한 적 없음) 투입: 최소 투입으로 나올 대원이 없으면(열린 분류에 지금 나오는 희귀도의 대원이 없음) 나올 수 있는 가장 적은 투입 — 첫 건조가 빈손이 되지 않게 */
 function conDefaultInput(){ const cfg=CON(), v=[cfg.min,cfg.min,cfg.min,cfg.min], s=GGMConstruct.suggest(v,cfg,conPool()); return s?s.input:v; }
-function conReadInput(){ const B=CBUILD(), d=B.input||conDefaultInput(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:d[i]; }); }
+function conReadInput(){ const B=progRead('cbuild'), d=B.input||conDefaultInput(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:d[i]; }); }
 /* 나올 대원이 없는 까닭(엔진 suggest의 why) — 화면·확인 창 글 */
 function conEmptyWhy(why){ if(!why) return ''; const rr=a=>a.map(k=>RL[k]).join('·'); return why.open.length?`열린 분류 ${why.open.map(g=>`「${g.name}」(${g.rarity.length?rr(g.rarity):'대원 없음'})`).join(', ')}에 지금 투입으로 나오는 희귀도(${rr(why.allowed)})의 ${T('crew')}이(가) 없어요`:'이 투입으로 열리는 분류가 없어요'; }
 async function conBuild(){
   if(CONJOB||NEW_GAME_SOURCE||!conOn()) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
-  const cfg=CON(), r=CRES(); let input=GGMConstruct.normalize(conReadInput(),cfg);
+  const cfg=CON(), r=progSlot('cres'); let input=GGMConstruct.normalize(conReadInput(),cfg);
   /* 나올 대원이 없는 투입이면 멈추지 않고 나올 수 있게 맞춘 투입을 권해요(PL1 — 예: 최소 투입은 R만인데 열린 분류에 SR만 있음) */
   const sg=GGMConstruct.suggest(input,cfg,conPool()); if(!sg){ toast(`${T('construct')}로 나올 ${T('crew')}이(가) 없어요(건조 대상 대원이 없음)`); return; }
   if(sg.changed){ if(!(await appConfirm(`${conEmptyWhy(sg.why)}.\n투입을 ${sg.input.join(' / ')}(으)로 올려 ${T('construct')}할까요?`))) return; input=sg.input; }
@@ -13359,7 +13385,7 @@ async function conBuild(){
   if(res.kind==='none'){ toast(`${T('construct')}로 나올 ${T('crew')}이(가) 없어요`); return; }
   CONJOB=true;
   try{
-    CON_RES.forEach((k,i)=>{ r[k]-=input[i]; }); const B=CBUILD(); B.n++; B.input=input;
+    CON_RES.forEach((k,i)=>{ r[k]-=input[i]; }); const B=progSlot('cbuild'); B.n++; B.input=input;
     res.info.recipes.forEach(x=>{ if(!B.found[x.id]) { B.found[x.id]=Date.now(); toast(`새 레시피 발견: ${x.name}`); } });
     res.info.groups.filter(g=>g.open&&!B.found['g:'+g.id]).forEach(g=>{ B.found['g:'+g.id]=Date.now(); });
     let c;
@@ -13374,11 +13400,11 @@ async function conBuild(){
     if(res.kind==='variant'&&imgReady()&&!imgSrc(c)) setTimeout(()=>runPrep(['char'],it=>it.c&&it.c.id===c.id),1500);
   } finally{ CONJOB=false; }
 }
-async function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems&&!(await cashTopUp({gems:cfg.buy.gems-p.gems},'자원 보급에 '))) return; pay({gems:cfg.buy.gems}); CRES()[k]+=cfg.buy.amt; mark('prog'); render(); }
+async function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems&&!(await cashTopUp({gems:cfg.buy.gems-p.gems},'자원 보급에 '))) return; pay({gems:cfg.buy.gems}); progSlot('cres')[k]+=cfg.buy.amt; mark('prog'); render(); }
 
 function conNeedText(n){ const out=[]; (n.min||[]).forEach((v,i)=>{ if(v>GGMConstruct.DEFAULTS.min&&v>CON().min) out.push(`${T(CON_RES[i])} ${nf(v)}↑`); }); (n.max||[]).forEach((v,i)=>{ if(v!=null) out.push(`${T(CON_RES[i])} ${nf(v)}↓`); }); if(n.total) out.push(`총 ${nf(n.total)}↑`); Object.entries(n.share||{}).forEach(([i,[lo,hi]])=>out.push(`${T(CON_RES[i])} 비율 ${Math.round((lo||0)*100)}~${Math.round((hi==null?1:hi)*100)}%`)); return out.join(' · ')||'조건 없음'; }
 function conInfoHTML(input){
-  const cfg=CON(), t=GGMConstruct.table(input,cfg,conPool()), i=t.info, B=CBUILD(), vs=conVariantChoices(i.input).filter(v=>v.bases.length), pct=v=>(Math.round(v*10)/10)+'%', sg=t.rows.length?null:GGMConstruct.suggest(input,cfg,conPool());
+  const cfg=CON(), t=GGMConstruct.table(input,cfg,conPool()), i=t.info, B=progRead('cbuild'), vs=conVariantChoices(i.input).filter(v=>v.bases.length), pct=v=>(Math.round(v*10)/10)+'%', sg=t.rows.length?null:GGMConstruct.suggest(input,cfg,conPool());
   return `<p style="margin:0 0 6px">총 <b>${nf(i.total)}</b> · 희귀도 캡: SR ${i.open[2]?`<b>개방 ${pct(i.rarity[2])}</b>`:`잠김 <span class="muted">(총 ${nf(cfg.sr.open)}↑)</span>`} · SSR ${i.open[3]?`<b>개방 ${pct(i.rarity[3])}</b>`:`잠김 <span class="muted">(총 ${nf(cfg.ssr.open)}↑)</span>`}</p>
     <div style="font-size:.85rem;margin:0 0 6px">${i.groups.map(g=>`<div style="display:flex;justify-content:space-between;gap:8px;${g.open?'':'opacity:.55'}"><span>${g.open?'🔓':'🔒'} <b>${esc(g.name)}</b> <span class="muted">${esc(conNeedText(g.need))}</span></span><b>${g.open?pct(g.p):'—'}</b></div>`).join('')}</div>
     ${sg&&sg.changed?`<p style="margin:4px 0 6px;color:#ffb347">⚠ ${esc(conEmptyWhy(sg.why))}. <button class="btn sm" data-act="conpreset" data-v="${esc(sg.input.join(','))}">나올 수 있게 맞추기 (${esc(sg.input.join(' / '))})</button></p>`:''}
@@ -13388,7 +13414,7 @@ function conInfoHTML(input){
 function conEntryHTML(){ if(!conOn()) return ''; return `<div class="panel" style="margin-bottom:10px;display:flex;gap:10px;align-items:center;justify-content:space-between"><div><b>${esc(T('construct'))}</b><div class="muted" style="font-size:.8rem">${CON_RES.map(k=>esc(T(k))).join('·')}을(를) 넣어 ${esc(T('crew'))}·바리에이션 영입</div></div><button class="btn sm" data-act="go" data-to="construct">열기</button></div>`; }
 function constructHTML(){
   if(!conOn()) return pageHead(T('construct'),'CONSTRUCT','contract')+`<div class="panel"><p>설정 → 게임에서 ${esc(T('construct'))}을(를) 켜 주세요.</p></div>`;
-  const cfg=CON(), B=CBUILD(), input=GGMConstruct.normalize(B.input||conDefaultInput(),cfg), found=(cfg.recipes||[]).filter(x=>B.found[x.id]), vfound=VARIANTS().filter(t=>B.found['v:'+t.id]);
+  const cfg=CON(), B=progRead('cbuild'), input=GGMConstruct.normalize(B.input||conDefaultInput(),cfg), found=(cfg.recipes||[]).filter(x=>B.found[x.id]), vfound=VARIANTS().filter(t=>B.found['v:'+t.id]);
   const presets=[['최소',[cfg.min,cfg.min,cfg.min,cfg.min]],['균형',[300,300,300,300]],['고급',[999,999,999,999]],...cfg.groups.filter(g=>B.found['g:'+g.id]).map(g=>[g.name+' 개방',(g.min||[]).map((v,i)=>Math.max(v,cfg.min))]),...found.map(x=>[x.name,x.min]),...vfound.map(t=>['✦'+t.name,t.recipe.min])];
   return `${pageHead(T('construct'),'CONSTRUCT','contract')}${conResBar()}
   <div class="panel" style="margin-top:10px"><h3>자원 투입 <span class="muted" style="font-size:.8rem">(${cfg.min}~${cfg.max})</span></h3>
@@ -13437,22 +13463,22 @@ function conReadVariants(){ return [...document.querySelectorAll('#con_vars [dat
   const cond={factions:list('factions'),roles:[...d.querySelectorAll('[data-vrole]:checked')].map(x=>x.dataset.vrole),elems:list('elems'),stats:v('stk')?[{k:v('stk'),op:v('stop')||'>=',v:+v('stv')||0}]:[],lv:+v('lv')||0,dup:+v('dup')||0,aff:+v('aff')||0,cleared:list('cleared')};
   return {id:old.id||'v_'+uid(),name:v('name')||'바리에이션',prompt:v('prompt'),brief:v('brief'),chance:Math.min(100,Math.max(0,+v('chance')||0)),recipe:{min:nums.slice(0,4)},rarity:v('rarity')||'same',on:!!f('on')?.checked,cond}; }); }
 async function conSave(){ let adv; try{ adv=JSON.parse($('#con_adv').value); }catch(e){ toast('고급 설정 JSON을 확인해 주세요: '+e.message); return; }
-  const m=conMeta(), wasOn=m.on; Object.assign(m,adv,{on:$('#con_on').checked,buy:{gems:Math.max(1,+$('#con_bg').value||60),amt:Math.max(1,+$('#con_ba').value||300)}});
+  const m=G.meta.construct=conMeta(), wasOn=m.on; Object.assign(m,adv,{on:$('#con_on').checked,buy:{gems:Math.max(1,+$('#con_bg').value||60),amt:Math.max(1,+$('#con_ba').value||300)}});
   G.meta.variants=conReadVariants();
-  if(m.on&&!wasOn&&!CBUILD().started){ CBUILD().started=Date.now(); const r=CRES(), s=CON().start; CON_RES.forEach(k=>{ r[k]+=s; }); toast(`${T('construct')}을(를) 켰어요. 시작 자원 ${nf(s)}씩 드려요`); }
+  if(m.on&&!wasOn&&!progRead('cbuild').started){ progSlot('cbuild').started=Date.now(); const r=progSlot('cres'), s=CON().start; CON_RES.forEach(k=>{ r[k]+=s; }); toast(`${T('construct')}을(를) 켰어요. 시작 자원 ${nf(s)}씩 드려요`); }
   mark('meta','prog'); closeModal(); render(); }
 
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
   if(a==='conbuild') conBuild();
   else if(a==='conbuy') conBuy(el.dataset.k);
-  else if(a==='conpreset'){ const v=el.dataset.v.split(',').map(Number); v.forEach((x,i)=>{ const n=$('#con_'+i), r=$('#con_r'+i); if(n) n.value=x; if(r) r.value=x; }); const info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(GGMConstruct.normalize(v,CON())); CBUILD().input=GGMConstruct.normalize(v,CON()); }
-  else if(a==='contoggle'){ if(conOn()){ conMeta().on=false; mark('meta'); render(); } else openConSet(); }
+  else if(a==='conpreset'){ const v=el.dataset.v.split(',').map(Number); v.forEach((x,i)=>{ const n=$('#con_'+i), r=$('#con_r'+i); if(n) n.value=x; if(r) r.value=x; }); const info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(GGMConstruct.normalize(v,CON())); progSlot('cbuild').input=GGMConstruct.normalize(v,CON()); }
+  else if(a==='contoggle'){ if(conOn()){ G.meta.construct.on=false; mark('meta'); render(); } else openConSet(); }
   else if(a==='conset') openConSet();
   else if(a==='consave') conSave();
   else if(a==='convadd'){ CONV=[...conReadVariants(),{id:'v_'+uid(),name:'새 바리에이션',prompt:'',brief:'',chance:30,recipe:{min:[200,200,200,400]},rarity:'same',on:true,cond:{}}]; $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); }
   else if(a==='convdel'){ CONV=conReadVariants(); CONV.splice(+el.dataset.i,1); $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); } });
 document.addEventListener('input',e=>{ const i=e.target.dataset&&e.target.dataset.con; if(i==null) return; const v=e.target.value; const el=$('#con_'+i), r=$('#con_r'+i); if(el&&el!==e.target) el.value=v; if(r&&r!==e.target) r.value=v;
-  const input=GGMConstruct.normalize(conReadInput(),CON()), info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(input); CBUILD().input=input; });
+  const input=GGMConstruct.normalize(conReadInput(),CON()), info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(input); progSlot('cbuild').input=input; });
 /* =========================================================
    이벤트
    ========================================================= */
@@ -13491,7 +13517,7 @@ async function handleNavigationAndToolsAction(a,t,id,p,e){
 case 'prepopen': openPrep(false); break;
 case 'rebal': await v2RebalanceAll(t); break;
 case 'a2hs': openA2HS(); break;
-case 'cdart': { const run=RG().run; if(run) drawCardArts(run.deck,t); else if(RF&&rfIds().length) drawCardArts(rgDeck(rfIds()),t).then(()=>{ if(RF&&document.querySelector('.rf-tee')) openRgForm(); }); break; }
+case 'cdart': { const run=progSlot('rogue').run; if(run) drawCardArts(run.deck,t); else if(RF&&rfIds().length) drawCardArts(rgDeck(rfIds()),t).then(()=>{ if(RF&&document.querySelector('.rf-tee')) openRgForm(); }); break; }
 case 'bswipe': bannerStep(+t.dataset.d); break;
 case 'lktake': lkTake(t); break;
 case 'artgo': { const k=ART_ASK; ART_ASK=null; closeModal(); if(k) artRun(k); break; }
@@ -13536,7 +13562,7 @@ case 'ailogclear': AILOG.length=0; try{ appStorage.removeItem('ggm-ailog'); }cat
 case 'artcopy': { const c=naiCfg(), el=c.styles.find(x=>x.id===c.styleId)||c.styles[0]||{tags:'',neg:''}; if(!String(el.tags||'').trim()&&!String(el.neg||'').trim()){ toast('설정의 그림 AI에 그림체가 비어 있어요'); break; } $('#mt_art').value=el.tags||''; $('#mt_artn').value=el.neg||''; toast(`「${el.name||'기본 그림체'}」 태그·네거티브를 넣었어요. 저장하면 이 게임에 고정돼요`); break; }
 case 'artclear': $('#mt_art').value=''; $('#mt_artn').value=''; toast('비웠어요. 저장하면 설정의 기본 그림체를 따라가요'); break;
 case 'pthumbset': uploadFor={kind:'pthumb',id:t.dataset.v}; $('#file').click(); break;
-case 'avdel': { const av=avatarObj(); if(!av||!av.img||!(await appConfirm('프로필 그림을 지울까요?'))) break; await imgClear(av); mark('prog'); refreshPlayerForm(); toast('프로필 그림을 지웠어요'); break; }
+case 'avdel': { const av=progSlot('avatar'); if(!av||!av.img||!(await appConfirm('프로필 그림을 지울까요?'))) break; await imgClear(av); mark('prog'); refreshPlayerForm(); toast('프로필 그림을 지웠어요'); break; }
 case 'pthumbdel': { const pid=t.dataset.v, up=userPacks(), mine=up.find(x=>x.id===pid); if(mine){ delete mine.thumb; saveUserPacks(up); } const m=pthumbs(); delete m[pid]; try{ appStorage.setItem(PTHUMB,JSON.stringify(m)); }catch(e){} if($('#modal [data-act="packuse"]')) openModal(packHTML()); else if($('#modal [data-act="naipreset"]')) openNaiSet(); toast('썸네일을 지웠어요'); break; }
 case 'addchar-open': openAddChar(); break;
 case 'addchar-hand': { NEWPU=false; window.__ADDOWN=$('#ac_how').value==='own'; closeModal(); openCharEdit(null); break; }
@@ -13633,9 +13659,9 @@ case 'bnsave': { const el=readBanner(); if(!el.id){el.id='b'+uid();G.banners.pus
 case 'bndel': if((await appConfirm('이 배너를 삭제할까요?'))){G.banners=G.banners.filter(bn=>bn.id!==BD.id);P().curBanner='';closeModal();render();} break;
 case 'dsauto': { const d0=dispList().find(x=>x.id===DSEL.id), busy=busyIds(); if(!d0) break; DSEL.ids=G.chars.filter(c=>own(c.id)&&!busy.has(c.id)).sort((a,b)=>own(a.id).lv-own(b.id).lv||charPower(a)-charPower(b)).slice(0,d0.need).map(c=>c.id); openDispSel(DSEL.id); break; }
 case 'dsclr': DSEL.ids=[]; openDispSel(DSEL.id); break;
-case 'pgetall': { const lv=passLv(), tot={}; let n=0; for(let l=1;l<=lv;l++){ if(P().pass.got.includes(l)) continue; P().pass.got.push(l); const r=passReward(l); giveReward(r); Object.entries(r).forEach(([k,v])=>{ if(typeof v==='number') tot[k]=(tot[k]||0)+v; }); n++; } const d=dm(); MISSIONS.forEach(m=>{ if(!d.got[m.k]&&(d.cnt[m.k]||0)>=m.goal){ d.got[m.k]=true; P().pass.xp+=m.xp; giveReward({gems:50}); tot.gems=(tot.gems||0)+50; n++; } }); if(!n){ toast('받을 보상이 없어요'); break; } mark('prog'); sfx('확인'); toast('모두 받았어요: '+rewardText(tot)); render(); break; }
+case 'pgetall': { const lv=passLv(), tot={}; let n=0; for(let l=1;l<=lv;l++){ if(P().pass.got.includes(l)) continue; P().pass.got.push(l); const r=passReward(l); giveReward(r); Object.entries(r).forEach(([k,v])=>{ if(typeof v==='number') tot[k]=(tot[k]||0)+v; }); n++; } const d=progSlot('dm'); MISSIONS.forEach(m=>{ if(!d.got[m.k]&&(d.cnt[m.k]||0)>=m.goal){ d.got[m.k]=true; P().pass.xp+=m.xp; giveReward({gems:50}); tot.gems=(tot.gems||0)+50; n++; } }); if(!n){ toast('받을 보상이 없어요'); break; } mark('prog'); sfx('확인'); toast('모두 받았어요: '+rewardText(tot)); render(); break; }
 case 'dsel': { const a=DSEL.ids, d0=dispList().find(x=>x.id===DSEL.id); if(a.includes(id)) a.splice(a.indexOf(id),1); else { if(d0&&a.length>=d0.need){ toast(`${d0.need}명까지만 보낼 수 있어요`); break; } a.push(id); } openDispSel(DSEL.id); break; }
-case 'mget': { const m=MISSIONS.find(x=>x.k===t.dataset.k), d=dm(); if(d.got[m.k]||(d.cnt[m.k]||0)<m.goal) break; d.got[m.k]=true; P().pass.xp+=m.xp; giveReward({gems:50}); sfx('확인'); render(); break; }
+case 'mget': { const m=MISSIONS.find(x=>x.k===t.dataset.k), d=progSlot('dm'); if(d.got[m.k]||(d.cnt[m.k]||0)<m.goal) break; d.got[m.k]=true; P().pass.xp+=m.xp; giveReward({gems:50}); sfx('확인'); render(); break; }
 case 'pget': { const l=+t.dataset.lv; if(l>passLv()||P().pass.got.includes(l)) break; P().pass.got.push(l); const r=passReward(l); giveReward(r); sfx('확인'); toast(`패스 ${l}단계: ${rewardText(r)}`); render(); break; }
 case 'logoprev': { const keep=G.meta.logoStyle; G.meta.logoStyle=$('#mt_logo').value; showTitle(); G.meta.logoStyle=keep; const t=$('.title'); if(t){ t.dataset.act='logoprevclose'; const tt=t.querySelector('.t-touch'); if(tt) tt.textContent='눌러서 설정으로 돌아가기'; }
       $('#modal').hidden=true; break; }
@@ -13674,13 +13700,13 @@ case 'cachewipe': { if(!(await appConfirm('캐시 삭제: 이 기기의 모든 �
 async function handleMailAction(a,t,id,p,e){
   switch(a){
 case 'mailopen': openMail(); break;
-case 'mailview': { if(e.target.closest('[data-act=mailget]')) break; const x=mailBox().find(q=>q.id===id); if(!x) break; x.read=true; mark('prog'); const has=Object.keys(x.reward||{}).length;
+case 'mailview': { if(e.target.closest('[data-act=mailget]')) break; const x=progRead('mail').find(q=>q.id===id); if(!x) break; x.read=true; mark('prog'); const has=Object.keys(x.reward||{}).length;
       openModal(`${head(esc(x.title),`<span class="muted">${esc(x.from)} · ${new Date(x.at).toLocaleDateString()}</span>`)}<div class="mbody">${esc(x.body).replace(/\n/g,'<br>')}</div>${has?`<div class="mreward">${rIcon(x.reward)}<b>${rewardText(x.reward)}</b></div>`:''}
         <div class="row" style="margin-top:12px">${has&&mailLive(x)?`<button class="btn" data-act="mailget" data-id="${x.id}" data-back="1">받기</button>`:`<button class="btn ghost" data-act="maildel" data-id="${x.id}">지우기</button>`}<button class="btn ghost" data-act="mailopen">목록</button></div>`); break; }
-case 'mailget': { const x=mailBox().find(q=>q.id===id); const r=claimMail(x); if(!r){toast('받을 수 없는 우편이에요');break;} sfx('확인'); render(); openMail(); buyFx(rewardText(r)||'수령 완료',x.title); break; }
-case 'mailall': { let tot={}; mailBox().forEach(x=>{ if(mailLive(x)&&Object.keys(x.reward||{}).length){ const r=claimMail(x); Object.entries(r).forEach(([k,v])=>tot[k]=(tot[k]||0)+v); } }); if(!Object.keys(tot).length){toast('받을 우편이 없어요');break;} render(); openMail(); buyFx('모두 받기',rewardText(tot)); break; }
-case 'mailclean': { const p2=P(), n0=mailBox().length; p2.mail=mailBox().filter(x=>!mailDone(x)); mark('prog'); openMail(); render(); toast(`우편 ${n0-p2.mail.length}개를 지웠어요`); break; }
-case 'maildel': { const x=mailBox().find(q=>q.id===id); if(!x) break; if(mailHas(x)&&mailLive(x)&&!(await appConfirm('아직 받지 않은 보상이 있어요. 그래도 지울까요?'))) break; mailRemove(x); mark('prog'); openMail(); render(); break; }
+case 'mailget': { const x=progRead('mail').find(q=>q.id===id); const r=claimMail(x); if(!r){toast('받을 수 없는 우편이에요');break;} sfx('확인'); render(); openMail(); buyFx(rewardText(r)||'수령 완료',x.title); break; }
+case 'mailall': { let tot={}; progRead('mail').forEach(x=>{ if(mailLive(x)&&Object.keys(x.reward||{}).length){ const r=claimMail(x); Object.entries(r).forEach(([k,v])=>tot[k]=(tot[k]||0)+v); } }); if(!Object.keys(tot).length){toast('받을 우편이 없어요');break;} render(); openMail(); buyFx('모두 받기',rewardText(tot)); break; }
+case 'mailclean': { const p2=P(), n0=progRead('mail').length; p2.mail=progRead('mail').filter(x=>!mailDone(x)); mark('prog'); openMail(); render(); toast(`우편 ${n0-p2.mail.length}개를 지웠어요`); break; }
+case 'maildel': { const x=progRead('mail').find(q=>q.id===id); if(!x) break; if(mailHas(x)&&mailLive(x)&&!(await appConfirm('아직 받지 않은 보상이 있어요. 그래도 지울까요?'))) break; mailRemove(x); mark('prog'); openMail(); render(); break; }
   }
 }
 
@@ -13708,7 +13734,7 @@ case 'cxdel': { if(!(await appConfirm('이 기록을 지울까요?'))) break; G.
 case 'cxnote': { const k=t.dataset.k, v=prompt('메모로 덧붙일 내용'); if(!v||!v.trim()) break; const N=cxNotes(); (N[k]=N[k]||[]).push({text:v.trim(),at:'메모'}); mark('world'); openCx(k); pcSoon(); break; }
 case 'cxdisc': { if(!SAMPLE){toast('설정의 글 AI에서 AI를 먼저 등록해 주세요');break;} t.disabled=true; const o0=t.textContent; t.textContent='쓰는 중… 1분쯤 걸려요'; const n=await cxDiscover(t); t.disabled=false; t.textContent=o0; if(n){ render(); toast(`새 기록 ${n}개를 실었어요`); } break; }
 case 'cxdeep': { const k=t.dataset.k; t.disabled=true; t.textContent='기록을 찾는 중…'; const ok=await cxDeepen(k,t); if(ok){ openCx(k); toast('새 기록을 덧붙였어요'); } else { t.disabled=false; t.textContent='✦ 더 알아보기'; } break; }
-case 'cxreadall': { const s=cxSeenSet(); cxEntries().forEach(e=>{ if(e.open) s[e.key]=1; }); CXMEMO=null; mark('prog'); render(); break; }
+case 'cxreadall': { const s=progSlot('cxSeen'); cxEntries().forEach(e=>{ if(e.open) s[e.key]=1; }); CXMEMO=null; mark('prog'); render(); break; }
 case 'opening-play': closeModal(); playOpening(); break;
 case 'char': openChar(id); break;
 case 'evspoke': { const c=charById(id); if(!c) break; const o=own(c.id), lv=o?affLv(o):1, r=t.getBoundingClientRect(), y=el.clientY||r.top+r.height/2, zone=(y-r.top)/r.height<0.3?'head':'body';
@@ -13732,7 +13758,7 @@ case 'evreroll': { const ev=G.events.find(x=>x.id===id); if(!ev) break; const ol
         G.events=G.events.filter(x=>x!==ne); G.banners=G.banners.filter(bn=>bn.id!==ne.bannerId); markAll(); mark('prog');
         return {title:`이벤트 스토리 「${ev.title}」로 다시 썼어요`,body:`${T('event')} 화면에서 처음부터 플레이할 수 있어요.`}; }); break; }
 case 'stamopen': openStam(0); break;
-case 'stamfill': { if(P().gems<STAM_FILL[0]) break; pay({gems:STAM_FILL[0]}); const s=stam(); s.v+=STAM_FILL[1]; mark('prog'); closeModal(); render(); toast(`⚡ ${STAM_FILL[1]} 회복 (${s.v}/${STAM_MAX})`); break; }
+case 'stamfill': { if(P().gems<STAM_FILL[0]) break; pay({gems:STAM_FILL[0]}); const s=progSlot('stam'); s.v+=STAM_FILL[1]; mark('prog'); closeModal(); render(); toast(`⚡ ${STAM_FILL[1]} 회복 (${s.v}/${STAM_MAX})`); break; }
 case 'stamtog': { const st=P().settings; st.stamina=!t.checked?false:true; mark('prog'); updStam(); toast(st.stamina?'행동력을 켰어요':'행동력을 껐어요(전투 무제한)'); break; }
 case 'scimg': { const ta=$('#'+t.dataset.ta); if(!ta) break; uploadFor={kind:'scimg',ta:ta.id,pos:ta.selectionStart}; $('#file').click(); break; }
 case 'charedit': openCharEdit(id); break;
@@ -13804,7 +13830,7 @@ case 'evsave': { const ev=G.events.find(e=>e.id===id); ev.title=$('#ev_t').value
       if(sh.length) ev.shop=sh; const bn=G.banners.find(x=>x.id===ev.bannerId); if(bn) bn.active=ev.active; mark('prog'); closeModal(); render(); break; }
 case 'evdel': { const ev=G.events.find(e=>e.id===id); if(!ev) break; const ch0=G.chapters.find(c=>c.id===ev.chapterId);
       openStoryDel({title:'이벤트 「'+ev.title+'」',ids:ch0?ch0.stages.map(s=>s.id):[],ch:ch0,ev,back:()=>openEvEdit(id),after:()=>{ tab='event'; },run:()=>{ G.events=G.events.filter(e=>e.id!==id); G.chapters=G.chapters.filter(c=>c.id!==ev.chapterId); mark('ch:'+ev.chapterId); G.banners=G.banners.filter(b=>b.id!==ev.bannerId); }}); break; }
-case 'dreroll': { const bn=DBOARD(); if(bn.rr){ if(P().gold<2000){ toast('크레딧이 부족해요'); break; } P().gold-=2000; } bn.rr=(bn.rr||0)+1; bn.list=bn.list.map(o=>P().disp[o.id]?o:null); bn.list=bn.list.map(o=>o||dispOffer(bn.list.filter(Boolean).map(x=>x.name))); mark('prog'); render(); toast('새 의뢰가 올라왔어요'); break; }
+case 'dreroll': { const bn=progSlot('dboard'); if(bn.rr){ if(P().gold<2000){ toast('크레딧이 부족해요'); break; } P().gold-=2000; } bn.rr=(bn.rr||0)+1; bn.list=bn.list.map(o=>P().disp[o.id]?o:null); bn.list=bn.list.map(o=>o||dispOffer(bn.list.filter(Boolean).map(x=>x.name))); mark('prog'); render(); toast('새 의뢰가 올라왔어요'); break; }
 case 'meta-open': openMeta(); break;
 case 'metasave': { if($('#ng_story')&&$('#ng_story').value.trim().length>100000){toast('스토리는 최대 100,000자입니다. 초과 내용은 자르지 않았습니다.');break;}const m=G.meta, old=m.elems.map(e=>e.n); if($('#mt_logo')) m.logoStyle=$('#mt_logo').value; if($('#ng_story')) m.story=readStoryForm(); if($('#mt_cast')) m.castSex=$('#mt_cast').value; if($('#mt_tone')) m.tone=$('#mt_tone').value.trim(); if($('#mt_art')){ m.artTags=$('#mt_art').value.trim(); m.artNeg=$('#mt_artn').value.trim(); }
       m.title=$('#mt_title').value.trim()||m.title; m.sub=$('#mt_sub').value.trim(); m.theme=$('#mt_theme').value; m.accent=$('#mt_acc').value;
@@ -14003,7 +14029,7 @@ function rerollDraft(g,title){ const w=g.world||{}, pr=g.prog||{};
 async function handleCombatAndFormationAction(a,t,id,p,e){
   switch(a){
 case 'raidgo': { if(!raidTriesLeft()){ toast('오늘 도전 횟수를 다 썼어요'); break; } const b=raidBoss(); squadSel=null; FORM=null; openFormation({id:'raid',title:'레이드 · '+b.name,enemies:[b],reward:0,pre:'',post:''},{kind:'raid'},'raidstart'); break; }
-case 'raidstart': { P().squad=[...squadSel]; const r=RAID(); r.tries[today()]=(r.tries[today()]||0)+1; mark('prog'); closeModal(); const b=raidBoss(), hp0=Math.max(1,b.total-r.dmg);
+case 'raidstart': { P().squad=[...squadSel]; const r=progSlot('raid'); r.tries[today()]=(r.tries[today()]||0)+1; mark('prog'); closeModal(); const b=raidBoss(), hp0=Math.max(1,b.total-r.dmg);
       startStage({id:'raid',title:'레이드 · '+b.name,enemies:[b],reward:0,pre:'',post:''},{kind:'raid',total:b.total,hp0,prep:(al,en)=>{ en[0].maxhp=b.total; en[0].hp=hp0; }}); break; }
 case 'rgnew': { RGMODE='card'; RF=null; openRgForm(); break; }
 case 'rfslot': RF.sel=+t.dataset.i; openRgForm(); break;
@@ -14011,20 +14037,20 @@ case 'rffil': RF.filter=t.dataset.v; openRgForm(); break;
 case 'rfauto': RF.s=rfAuto(); RF.sel=0; openRgForm(); break;
 case 'rfclr': RF.s=[null,null,null,null]; RF.sel=0; openRgForm(); break;
 case 'rfpick': { const k=RF.s.indexOf(id), i=RF.sel; if(k===i) RF.s[i]=null; else { if(k>=0) RF.s[k]=RF.s[i]; RF.s[i]=id; } if(!RF.s[0]) RF.sel=0; else { const e=RF.s.indexOf(null); RF.sel=e>=0?e:RF.sel; } openRgForm(); break; }
-case 'rfgo': { const ids=rfIds(); if(!ids.length) break; RG().lastSquad=ids; P().squad=[...ids]; closeModal(); try{ rgStart(ids,'card'); }catch(err){ console.error(err); RG().run=null; mark('prog'); toast('탐사를 시작하지 못했어요: '+(err&&err.message||err)); render(); } RF=null; setTimeout(()=>{ const el=document.querySelector('.ch-card.rog'); if(el) el.scrollIntoView({block:'start',behavior:'smooth'}); },60); break; }
-case 'rgnode': { const run=RG().run; if(!run) break; run.msg=''; rgNode(t.dataset.v); break; }
-case 'rgskip': { const run=RG().run; if(!run) break; run.pick=null; run.squad.forEach(id=>{ if(run.hp[id]>0) run.hp[id]=Math.min(1,run.hp[id]+0.1); }); run.msg='유물 대신 숨을 돌렸어요. 체력 10% 회복'; mark('prog'); render(); break; }
-case 'rgrelic': { const run=RG().run; if(!run) break; run.relics.push(t.dataset.v); run.pick=null; run.msg=RELICS[t.dataset.v][0]+'을(를) 얻었어요'; mark('prog'); render(); break; }
+case 'rfgo': { const ids=rfIds(); if(!ids.length) break; progSlot('rogue').lastSquad=ids; P().squad=[...ids]; closeModal(); try{ rgStart(ids,'card'); }catch(err){ console.error(err); progSlot('rogue').run=null; mark('prog'); toast('탐사를 시작하지 못했어요: '+(err&&err.message||err)); render(); } RF=null; setTimeout(()=>{ const el=document.querySelector('.ch-card.rog'); if(el) el.scrollIntoView({block:'start',behavior:'smooth'}); },60); break; }
+case 'rgnode': { const run=progSlot('rogue').run; if(!run) break; run.msg=''; rgNode(t.dataset.v); break; }
+case 'rgskip': { const run=progSlot('rogue').run; if(!run) break; run.pick=null; run.squad.forEach(id=>{ if(run.hp[id]>0) run.hp[id]=Math.min(1,run.hp[id]+0.1); }); run.msg='유물 대신 숨을 돌렸어요. 체력 10% 회복'; mark('prog'); render(); break; }
+case 'rgrelic': { const run=progSlot('rogue').run; if(!run) break; run.relics.push(t.dataset.v); run.pick=null; run.msg=RELICS[t.dataset.v][0]+'을(를) 얻었어요'; mark('prog'); render(); break; }
 case 'dgmove': dgMove(+t.dataset.v); break;
-case 'dgdown': { const run=RG().run; if(run&&run.v===2&&run.map.cells[run.pos].t==='stairs') dgDescend(run); break; }
-case 'rgcard': { const run=RG().run; if(!run||!run.cpick) break; const i=+t.dataset.i; if(i>=0&&run.cpick[i]){ run.deck.push(run.cpick[i]); run.msg=`「${cardName(run.cpick[i])}」 카드를 덱에 넣었어요`; } run.cpick=null; mark('prog'); render(); break; }
-case 'rgrest': { const run=RG().run; if(!run) break; const v=t.dataset.v; run.rest=false;
+case 'dgdown': { const run=progSlot('rogue').run; if(run&&run.v===2&&run.map.cells[run.pos].t==='stairs') dgDescend(run); break; }
+case 'rgcard': { const run=progSlot('rogue').run; if(!run||!run.cpick) break; const i=+t.dataset.i; if(i>=0&&run.cpick[i]){ run.deck.push(run.cpick[i]); run.msg=`「${cardName(run.cpick[i])}」 카드를 덱에 넣었어요`; } run.cpick=null; mark('prog'); render(); break; }
+case 'rgrest': { const run=progSlot('rogue').run; if(!run) break; const v=t.dataset.v; run.rest=false;
       if(v==='heal'){ run.squad.forEach(id=>{ run.hp[id]=Math.min(1,(run.hp[id]>0?run.hp[id]+0.35:0.25)); }); run.msg='모닥불 곁에서 푹 쉬었어요. 쓰러진 대원도 일어났어요.'; }
       else if(v==='upg') run.upg=true; else if(v==='rm') run.rm=true; else { run.relics.push('train'); run.msg='훈련으로 공격 +5%'; }
       mark('prog'); render(); break; }
-case 'rgupg': { const run=RG().run; if(!run) break; const i=+t.dataset.i; run.upg=false; if(i<0) run.rest=true; else if(run.deck[i]){ run.deck[i].up=true; run.msg=`「${cardName(run.deck[i])}」(으)로 강화했어요`; } mark('prog'); render(); break; }
-case 'rgrm': { const run=RG().run; if(!run) break; const i=+t.dataset.i; if(i>=0&&run.deck.length<=8){ toast('덱은 8장보다 적게 줄일 수 없어요'); break; } run.rm=false; if(i<0) run.rest=true; else if(run.deck[i]){ const cd=run.deck.splice(i,1)[0]; run.msg=`「${cardName(cd)}」 카드를 뺐어요`; } mark('prog'); render(); break; }
-case 'rgdeck': { const run=RG().run; if(run&&run.deck) rgDeckModal(run.deck); break; }
+case 'rgupg': { const run=progSlot('rogue').run; if(!run) break; const i=+t.dataset.i; run.upg=false; if(i<0) run.rest=true; else if(run.deck[i]){ run.deck[i].up=true; run.msg=`「${cardName(run.deck[i])}」(으)로 강화했어요`; } mark('prog'); render(); break; }
+case 'rgrm': { const run=progSlot('rogue').run; if(!run) break; const i=+t.dataset.i; if(i>=0&&run.deck.length<=8){ toast('덱은 8장보다 적게 줄일 수 없어요'); break; } run.rm=false; if(i<0) run.rest=true; else if(run.deck[i]){ const cd=run.deck.splice(i,1)[0]; run.msg=`「${cardName(cd)}」 카드를 뺐어요`; } mark('prog'); render(); break; }
+case 'rgdeck': { const run=progSlot('rogue').run; if(run&&run.deck) rgDeckModal(run.deck); break; }
 case 'cbplay': cbPlay(+t.dataset.i); break;
 case 'cbsel': if(CB&&!CB.busy&&!CB.over){ const i=+t.dataset.i; if(i>=0&&CB.sel===i){ const cd=CB.hand[i]; if(cd&&cardCost(cd)<=CB.energy&&!(cd.k==='echo'&&!CB.last)) cbPlay(i); } else { CB.sel=i; cbRender(); } } break;
 case 'cbult': cbUlt(); break;
@@ -14032,8 +14058,8 @@ case 'cbend': cbEndTurn(); break;
 case 'cbtgt': if(CB&&!CB.busy){ const e=CB.enemies[+t.dataset.i]; if(e&&e.hp>0){ CB.tgt=e.i; cbRender(); } } break;
 case 'cbdeck': if(CB) rgDeckModal(CB.run.deck); break;
 case 'cbquit': if(CB&&!CB.over&&(await appConfirm('후퇴하면 이번 탐사가 끝나요. 지금까지의 보상은 받아요.'))) cbEnd(false); break;
-case 'rgsave': { const run=RG().run; if(!run||!run.rest) break; run.saved=Date.now(); delete run.left; run.wk=run.wk||weekKey(); run.msg='야영지에서 쉬다가 탐사를 이어가요.'; mark('prog'); tab='challenge'; render(); toast(`탐사를 저장했어요. 도전 → ${T('abyss')}에서 이어서 할 수 있어요`); break; }
-case 'rgleave': { const run=RG().run; if(!run){ tab='challenge'; render(); break; } if(!(await appConfirm('지금 나가면 이번 탐사가 끝나요(지금까지 간 만큼 보상은 받아요).\n저장은 야영지의 \'저장하고 나가기\'로만 할 수 있어요. 나갈까요?'))) break; const html=rgFinish(false); tab='challenge'; render(); openModal(`<div class="result" style="position:static">${html.replace('data-act="bdone"','data-act="close"')}</div>`); break; }
+case 'rgsave': { const run=progSlot('rogue').run; if(!run||!run.rest) break; run.saved=Date.now(); delete run.left; run.wk=run.wk||weekKey(); run.msg='야영지에서 쉬다가 탐사를 이어가요.'; mark('prog'); tab='challenge'; render(); toast(`탐사를 저장했어요. 도전 → ${T('abyss')}에서 이어서 할 수 있어요`); break; }
+case 'rgleave': { const run=progSlot('rogue').run; if(!run){ tab='challenge'; render(); break; } if(!(await appConfirm('지금 나가면 이번 탐사가 끝나요(지금까지 간 만큼 보상은 받아요).\n저장은 야영지의 \'저장하고 나가기\'로만 할 수 있어요. 나갈까요?'))) break; const html=rgFinish(false); tab='challenge'; render(); openModal(`<div class="result" style="position:static">${html.replace('data-act="bdone"','data-act="close"')}</div>`); break; }
 case 'rgquit': { if(!(await appConfirm('탐사를 끝낼까요? 지금까지의 진척에 따라 보상을 받아요.'))) break; const html=rgFinish(false); openModal(`<div class="result" style="position:static">${html.replace('data-act="bdone"','data-act="close"')}</div>`); render(); break; }
 case 'opskip': e.stopPropagation(); opEnd(); break;
 case 'stage': { const ch0=G.chapters.find(x=>x.id===t.dataset.ch), s0=ch0&&ch0.stages.find(x=>x.id===t.dataset.st); if(s0&&s0.story){ openStoryStage(ch0,s0); break; } if(s0&&(s0.mode==='debate'||s0.mode==='contest')){ openModeStage(ch0,s0); break; } if(s0&&SORTIE()&&SORTIE().st===s0.id){ sortieMap('진행 중인 출격을 이어 가요'); break; } squadSel=null; FORM=null; openStage(t.dataset.ch,t.dataset.st); break; }
@@ -14041,7 +14067,7 @@ case 'sortie': { p.squad=[...squadSel]; mark('prog'); const ch=G.chapters.find(x
       if(!p.cleared[s.id]&&s.pre) playStory(s.title,s.pre,()=>startBattle(ch.id,s.id)); else startBattle(ch.id,s.id); break; }
 case 'bauto': B.auto=!B.auto; t.classList.toggle('on',B.auto); break;
 case 'bspeed': if(B?.ctx.kind==='practice'){B.speed=B.speed>=3?1:B.speed+1;t.textContent=B.speed+'x';t.classList.toggle('on',B.speed>1);bRun();break;}B.speed=B.speed>=3?1:B.speed+1; P().settings.bspeed=B.speed; mark('prog'); t.textContent=B.speed+'x'; t.classList.toggle('on',B.speed>1); bRun(); break;
-case 'bdone': { if(B&&(B.ctx.kind==='raid'||B.ctx.kind==='rogue')){ const rg=B.ctx.kind==='rogue'; B=null; closeOv(); tab=rg&&RG().run?'abyss':'challenge'; render(); break; }
+case 'bdone': { if(B&&(B.ctx.kind==='raid'||B.ctx.kind==='rogue')){ const rg=B.ctx.kind==='rogue'; B=null; closeOv(); tab=rg&&progRead('rogue').run?'abyss':'challenge'; render(); break; }
       const win=t.dataset.win==='1',first=t.dataset.first==='1',s=B.s; B=null; closeOv(); render();
       if(win&&first&&s.post) playStory(s.title,s.post,()=>{render();checkTriggers();}); else checkTriggers(); break; }
 case 'opsch': OPS_CH=t.dataset.ch; render(); $('#view').scrollTop=0; break;
@@ -14094,7 +14120,7 @@ case 'cstab': { CS_TAB=t.dataset.k; document.querySelectorAll('.cs-tabs button')
 case 'upgen': { const c=charById(id); if(!c) break; if(!String(c.naiPrompt||'').trim()){toast('먼저 설정 편집에서 NAI 스탠딩 프롬프트를 채워 주세요');break;} if(!imgReady()){toast(imgNeed());break;} t.disabled=true; t.textContent='그리는 중…';
       try{ const b=await naiDrawItem({k:'upper',o:c.upper,c,generationMode:'manual'}); await storeImage(c.upper,b,''); mark('c:'+c.id); toast('상반신을 그렸어요'); openChar(c.id); }catch(err){ toast(naiErr(err,'상반신 실패')); t.disabled=false; t.textContent='NAI로 상반신'; } break; }
 case 'gift': openGift(id); break;
-case 'giftgive': { const c=charById(id), g=giftById(t.dataset.v), inv=GI(); if(!c||!g||!(inv[g[0]]>0)) break; if(affFull(own(c.id))){ toast(`${c.name}의 호감도가 이미 가득 찼어요. 선물은 아껴 두세요`); break; } inv[g[0]]--; const like=giftLikes(c).has(g[0]), val=g[3]*(like?2:1);
+case 'giftgive': { const c=charById(id), g=giftById(t.dataset.v), inv=progSlot('gifts'); if(!c||!g||!(inv[g[0]]>0)) break; if(affFull(own(c.id))){ toast(`${c.name}의 호감도가 이미 가득 찼어요. 선물은 아껴 두세요`); break; } inv[g[0]]--; const like=giftLikes(c).has(g[0]), val=g[3]*(like?2:1);
       p.giftSeen=p.giftSeen||{}; (p.giftSeen[c.id]=p.giftSeen[c.id]||{})[g[0]]=like?2:1; addAff(c,val); mark('prog'); sfx(like?'SSR':'확인');
       const line=like?rand((c.affLines&&Object.values(c.affLines).flat().length?Object.values(c.affLines).flat():c.lines)):rand(c.lines); if(line) linePop(c,line,like?'웃음':'');
       if(like) hearts(innerWidth/2,innerHeight/2,4); toast(`${g[1]} → ${c.name} 호감도 +${val}${like?' (정말 좋아해요!)':''}`); openGift(id); break; }
@@ -14321,7 +14347,7 @@ case 'dispgo': { const d=dispList().find(x=>x.id===DSEL.id); if(!d||DSEL.ids.len
 case 'dispget': { const d=dispList().find(x=>x.id===id); if(!d||!P().disp[id]) break; const dr=dispClaim(d); mark('prog'); sfx('확인'); toast(`${d.name} 완료: ${rewardText(dr)}`); render(); break; }
 case 'dispcancel': if((await appConfirm('파견을 취소할까요? 보상은 받지 못해요.'))){ delete P().disp[id]; mark('prog'); render(); } break;
 case 'passreset': if((await appConfirm('새 시즌을 시작할까요? 패스 단계가 처음으로 돌아가요.'))){ P().pass={xp:0,got:[]}; mark('prog'); render(); } break;
-case 'shopbuy': { const it=SHOP_ITEMS().find(x=>x.id===id), sd=shopDay(), m=G.meta.shop; if(!it) break;
+case 'shopbuy': { const it=SHOP_ITEMS().find(x=>x.id===id), sd=progSlot('shop'), m=G.meta.shop; if(!it) break;
       if((sd.buy[it.id]||0)>=it.limit){toast('오늘은 매진이에요');break;}
       if(!canPay(it.cost)){ SHOP_LINE=rand(m.poor)||'조금 모자라요.'; render(); break; }
       pay(it.cost); sd.buy[it.id]=(sd.buy[it.id]||0)+1; giveReward(it.give); SHOP_LINE=rand(m.buy)||'고마워요!'; sfx('확인'); render(); toast(rewardText(it.give)+' 획득'); break; }
@@ -14371,7 +14397,7 @@ case 'phselend': { const cid=PH&&PH.fc; if(cid) openRoom(cid); else phoneList();
 case 'phdel': { const cid=PH&&PH.fc; if(!cid) break; const x=roomItems(cid)[+t.dataset.i]; if(!x) break; roomDel(cid,[x]); const st=$('#phChat').scrollTop; openRoom(cid,{sel:true}); $('#phChat').scrollTop=st; toast('메시지를 지웠어요'); break; }
 case 'phdelblock': { const b=roomLastBlock(id); if(!b.length) break; if(!(await appConfirm(`최근 대화 ${b.length}개 메시지를 지울까요?\n(호감도는 그대로예요)`))) break; roomDel(id,b); openRoom(id); toast('이번 대화를 지웠어요'); break; }
 case 'phdelall': { const c=charById(id); if(!c) break; if(!(await appConfirm(`${c.name}와(과)의 대화방을 모두 지울까요?\n(이야기로 받은 대화도 기록만 지워지고, 호감도는 그대로예요)`))) break;
-      roomThreads(id).forEach(({s})=>{ s.log.length=0; }); delete FC()[id]; mark('prog'); openRoom(id); toast('대화방을 비웠어요'); break; }
+      roomThreads(id).forEach(({s})=>{ s.log.length=0; }); delete progSlot('fchat')[id]; mark('prog'); openRoom(id); toast('대화방을 비웠어요'); break; }
 case 'phmode': phMode(t.dataset.v); break;
 case 'phsay': { if(!PH) break; const tid=t.dataset.tid||PH.tid, th=threadById(tid), s=th&&p.inbox[tid]; if(!th||!s) break; const c=threadChar(th), L=parseScript(th.script)[s.pos]; if(!L||L.type!=='say'||!isMe(L.who)) { openRoom(c.id); break; }
       const en={w:'me',t:sub(L.text),at:Date.now()}; s.pos++; s.log.push(en); s.at=en.at; PH.tid=tid; $('#phIn').innerHTML=''; phMode('free'); $('#phChat').insertAdjacentHTML('beforeend',bubbleHTML(en,c)); phScroll(); mark('prog'); phPlay(th,c,s,PH.token); break; }
@@ -14879,7 +14905,7 @@ function liveFillNotes(notes,fill){ if(notes.length) notes.push(...fill); else i
    ========================================================= */
 render(); loadIdbImages(); if(orientPref()!=='auto') applyOrient();
 if(G.__curveNew){ delete G.__curveNew; markAll(); }
-applyMeta(); (async()=>{ if(PCS()||syReady()){ if(await bootSync()) return; } const lost=pcLostKey(); if(needSetup()&&!lost) showSetup(); else showStart(); if(lost) setTimeout(()=>openPcSet(true),700); })(); dm();
+applyMeta(); (async()=>{ if(PCS()||syReady()){ if(await bootSync()) return; } const lost=pcLostKey(); if(needSetup()&&!lost) showSetup(); else showStart(); if(lost) setTimeout(()=>openPcSet(true),700); })(); progTick();
 
 /* =========================================================
    독립 앱 전용: AI 연결, 백업 파일, 안드로이드 뒤로가기

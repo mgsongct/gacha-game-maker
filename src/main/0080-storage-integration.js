@@ -153,7 +153,7 @@ document.getElementById('afile').addEventListener('change',async e=>{
 });
 $('#file').addEventListener('change',async e=>{
   const f=e.target.files[0]; e.target.value=''; if(!f||!uploadFor) return;
-  if(uploadFor.kind==='avatar'){ try{ await storeImage(avatarObj(),await shrink(f,1200),''); mark('prog'); refreshPlayerForm(); toast('프로필 그림을 등록했어요'); }catch(err){ toast('이미지를 올리지 못했어요'); } return; }
+  if(uploadFor.kind==='avatar'){ try{ await storeImage(progSlot('avatar'),await shrink(f,1200),''); mark('prog'); refreshPlayerForm(); toast('프로필 그림을 등록했어요'); }catch(err){ toast('이미지를 올리지 못했어요'); } return; }
   if(uploadFor.kind==='skinpart'){ const c=charById(uploadFor.id), k=c&&(c.skins||[]).find(x=>x.id===uploadFor.s); if(!k) return; const x=uploadFor.x; toast('그림을 등록하는 중이에요');
     try{ let ub=await shrink(f,2200); if(x==='stand'||x==='upper'){ try{ const ai=await alphaInfo(ub); if(ai.border<0.5) ub=await cutoutWhite(ub); }catch(e){ quietErr(e,'0080-storage-integration.js:158'); } } await storeImage(x==='stand'?k:skinPart(k,x),ub,''); mark('c:'+c.id); render(); skinRefresh(c.id); toast(`${k.name} ${x==='stand'?'스탠딩':SKP[x]}을(를) 등록했어요`); }catch(err){ toast('이미지를 올리지 못했어요'); } return; }
   if(uploadFor.kind==='pthumb'){ try{ const d=await thumbData(f), id=uploadFor.id, up=userPacks(), mine=up.find(x=>x.id===id); if(mine){ mine.thumb=d; saveUserPacks(up); } else { const m=pthumbs(); m[id]=d; appStorage.setItem(PTHUMB,JSON.stringify(m)); } if($('#modal .ep [data-act="packuse"]')) openModal(packHTML()); toast('썸네일을 넣었어요'); }catch(err){ toast('썸네일을 넣지 못했어요'); } return; }

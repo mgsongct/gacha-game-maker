@@ -101,25 +101,23 @@ function duckParams(fns, PT, fieldTypes) { let n = 0;
   return n; }
 // 단계 시작점: 생성·실행 중 AI·불러오기·사용자(액션 처리기·main 리스너 — lib/lifecycle.mjs) + 모듈 안 클릭 리스너가 부르는 함수(전투 편집기 등)도 사용자
 //   + 시작: 앱을 열 때 도는 최상위 문장(부팅·게임 열기 — setTimeout(()=>skillResume()) 등)과 load·저장소 준비 리스너가 부르는 함수 → 실행기
-// 진행 접근 함수: P()의 한 칸을 돌려줌 — return p.cres 처럼 바로, 또는 let b=p.dboard … return b 처럼 그 칸을 담은 변수로 → 칸 이름
-const PROG_BASE = /^(P\(\)|G\.prog)$/;
-export function progAccessors(fns) { const out = new Map();
-  for (const f of fns.values()) { if (!f.top) continue; const alias = new Set(), slot = new Map(), keyOf = t => { const m = /^([\w$]+|P\(\))\.(\w+)\b/.exec(String(t || '')); return m && (PROG_BASE.test(m[1]) || alias.has(m[1])) ? m[2] : null; };
-    walk(f.node, n => { if (n.type === 'variable_declarator' && PROG_BASE.test(n.childForFieldName('value')?.text || '')) alias.add(n.childForFieldName('name')?.text); });
-    walk(f.node, n => { const decl = n.type === 'variable_declarator', asg = n.type === 'assignment_expression' && n.childForFieldName('left')?.type === 'identifier'; if (!decl && !asg) return; const nm = n.childForFieldName(decl ? 'name' : 'left')?.text, k = keyOf(n.childForFieldName(decl ? 'value' : 'right')?.text); if (nm && k) slot.set(nm, k); });
-    walk(f.node, n => { if (n.type !== 'return_statement') return; const r = n.namedChildren[0]; const k = r?.type === 'member_expression' ? keyOf(r.text) : r?.type === 'identifier' ? slot.get(r.text) : null; if (k) out.set(f.name, k); }); }
-  return out; }
+// 진행 접근 함수(칸 하나를 돌려주는 함수)는 상태 흐름의 일이라 lib/flow.mjs에 있음
+export { progAccessors } from './flow.mjs';
+import { progAccessors, PROG_BASE } from './flow.mjs';
 // 쓰기인가(멤버·첨자 사슬): x.a = … · x[k] -= … · x.a.push(…) · x.n++ · delete x.a
 function writtenAt(n) { let m = n;
   for (let up = m.parent; up && (up.type === 'member_expression' || up.type === 'subscript_expression') && same(up.childForFieldName('object'), m); up = up.parent) { if (up.type === 'member_expression' && up.parent?.type === 'call_expression' && same(up.parent.childForFieldName('function'), up) && MUT.test(up.childForFieldName('property')?.text || '')) return true; m = up; }
   const par = m.parent; if (!par || same(m, n)) return false; /* 받은 객체 자체를 바꿔 끼우는 것(r=…)은 진행 쓰기가 아님 */
   if ((par.type === 'assignment_expression' || par.type === 'augmented_assignment_expression') && same(par.childForFieldName('left'), m)) return true;
   return par.type === 'update_expression' || (par.type === 'unary_expression' && /^delete\b/.test(par.text)); }
-// 함수마다 진행 접근 함수(CRES·CBUILD 등)로 받은 객체에 쓰는 칸과 읽는 칸 — 받아 둔 변수의 칸을 바꾸거나 늘리거나, 접근 함수 결과에 바로 쓰는 것 → 함수 키별 쓰기·읽기 칸 모음
+// 함수마다 진행 접근 함수로 받은 객체에 쓰는 칸과 읽는 칸: 접근 함수 호출(CRES() …) · 칸 이름을 받는 진행 접근(progSlot('cres')·progRead('cres')) ·
+//   그 결과의 하위 칸 사슬(RG().run · const run=RG().run)을 받아 둔 변수 — 그 변수의 칸을 바꾸거나 늘리면 쓰기 → 함수 키별 쓰기·읽기 칸 모음
+export const PROG_BY_NAME = /^(progSlot|progRead)$/;
+function accSlot(n, acc) { for (let x = n; x; x = x.childForFieldName('object')) { if (x.type === 'call_expression') { const fn = x.childForFieldName('function')?.text, as = x.childForFieldName('arguments')?.namedChildren || []; if (acc.has(fn) && !as.length) return acc.get(fn); if (PROG_BY_NAME.test(fn || '') && as[0]?.type === 'string') return as[0].text.slice(1, -1); return null; } if (x.type !== 'member_expression' && x.type !== 'subscript_expression') return null; } return null; }
 export function accessorUse(fns, acc) { const out = new Map();
   for (const f of fns.values()) { if (!f.top || acc.has(f.name)) continue; const bound = new Map(), rec = { w: new Set(), r: new Set() };
-    walk(f.node, n => { if (n.type !== 'variable_declarator') return; const v = n.childForFieldName('value'), cal = v?.type === 'call_expression' ? v.childForFieldName('function')?.text : null; if (acc.has(cal)) bound.set(n.childForFieldName('name')?.text, acc.get(cal)); });
-    walk(f.node, n => { const k = n.type === 'identifier' ? bound.get(n.text) : n.type === 'call_expression' && n.childForFieldName('arguments')?.namedChildren.length === 0 ? acc.get(n.childForFieldName('function')?.text) : null; if (!k) return;
+    walk(f.node, n => { if (n.type !== 'variable_declarator') return; const v = n.childForFieldName('value'), k = v ? accSlot(v, acc) : null; if (k && n.childForFieldName('name')?.type === 'identifier') bound.set(n.childForFieldName('name').text, k); });
+    walk(f.node, n => { const k = n.type === 'identifier' ? bound.get(n.text) : n.type === 'call_expression' ? accSlot(n, acc) : null; if (!k) return;
       if (n.type === 'identifier' && (n.parent?.type === 'variable_declarator' && same(n.parent.childForFieldName('name'), n))) return; rec[writtenAt(n) ? 'w' : 'r'].add(k); });
     if (rec.w.size || rec.r.size) out.set(f.key, rec); }
   return out; }
@@ -127,7 +125,9 @@ export function accessorUse(fns, acc) { const out = new Map();
 //   칸마다 기본값 자리(DEFAULT_PROG · 불러오기 보정 fix·defaults · 진행 접근 함수의 없을 때 만들기)와 그 모듈, 접근 함수, 칸을 쓰는 모듈(직접 + 접근 함수로 — 칸 속을 바꾸는 깊은 쓰기 포함)
 export function progSlots(units, fns, sf) { const acc = progAccessors(fns), use = accessorUse(fns, acc), DP = constLiterals(units, ['DEFAULT_PROG']).DEFAULT_PROG || {}, mod = k => moduleOf(fileOf(fns.get(k)?.loc)), slots = new Map(), S = k => { if (!slots.has(k)) slots.set(k, { defs: new Set(), acc: [], w: new Set(), r: new Set() }); return slots.get(k); };
   const dpFile = (() => { for (const u of units) for (const fl of u.files || []) if (fl.path && u.text.split('\n').slice(fl.start, fl.end).some(l => /\bDEFAULT_PROG\s*=/.test(l))) return moduleOf(fl.path); return 'DEFAULT_PROG'; })();
-  Object.keys(DP).forEach(k => S(k).defs.add(dpFile)); for (const [n, k] of acc) { const f = [...fns.values()].find(x => x.top && x.name === n); S(k).acc.push(n); S(k).defs.add(mod(f.key)); }
+  Object.keys(DP).forEach(k => S(k).defs.add(dpFile));
+  /* 진행 칸 정의 표(PROG_SLOTS — 없을 때 만들기·하루/주 새로 만들기·형식 맞춤)의 칸도 정의 자리 */ for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'variable_declarator' || n.childForFieldName('name')?.text !== 'PROG_SLOTS' || n.childForFieldName('value')?.type !== 'object') return; const m = moduleOf(u.at(n.startPosition.row).file); for (const pr of n.childForFieldName('value').namedChildren) if (pr.type === 'pair') S(pr.childForFieldName('key').text).defs.add(m); return false; });
+  for (const [n, k] of acc) { const f = [...fns.values()].find(x => x.top && x.name === n); S(k).acc.push(n); S(k).defs.add(mod(f.key)); }
   for (const f of fns.values()) { if (!f.top) continue; const alias = new Set(['P()', 'G.prog']), m = mod(f.key), loadFix = /^(fix|defaults)$/.test(f.name); walk(f.node, n => { if (n.type === 'variable_declarator' && PROG_BASE.test(n.childForFieldName('value')?.text || '')) alias.add(n.childForFieldName('name')?.text); else if (n.type === 'variable_declarator' && /^(g|game)\.prog$/.test(n.childForFieldName('value')?.text || '') && loadFix) alias.add(n.childForFieldName('name')?.text); });
     walk(f.node, n => { if (n.type !== 'member_expression') return; const o = n.childForFieldName('object')?.text, k = n.childForFieldName('property')?.text; if (!k || !(alias.has(o) || (loadFix && /^(g|game|d)\.prog$/.test(o)))) return; const w = writtenAt(n) || ((n.parent?.type === 'assignment_expression' || n.parent?.type === 'augmented_assignment_expression') && same(n.parent.childForFieldName('left'), n));
       if (loadFix && w) S(k).defs.add(m); else if (!acc.has(f.name)) S(k)[w ? 'w' : 'r'].add(m); }); }

@@ -13,7 +13,7 @@ const DOM_WRITE = /^(innerHTML|outerHTML|textContent|innerText|className|hidden|
 // 화면이 아닌 DOM 객체(그림 처리 canvas·이미지·소리·내려받기 링크·파일 고르기) — 만들어도 View가 아님
 const NONUI_EL = /^['"`](canvas|img|audio|video|a|input|script|link|source)['"`]$/;
 const STYLE = /^(classList|style|dataset)$/;
-const TRIGGER = new Set(['render', 'toast', 'openModal', 'closeModal']);
+const TRIGGER = new Set(['render', 'renderView', 'toast', 'openModal', 'closeModal']); // 화면 갱신(render = 그리기 전 처리 + renderView)
 // 저장·외부 서비스(직접 쓰면 Model): 읽기(저장소·IndexedDB 읽기) · 쓰기(저장소 쓰기·IndexedDB 쓰기·저장 표시) · 서비스(네트워크·글 AI·그림 AI — 부작용·비용)
 const IO_READ = new Set(['idbGet', 'idbKeys', 'idbGetNS']), IO_WRITE = new Set(['idbPut', 'idbDel', 'storeImage', 'storeAudio', 'mark', 'markAll', 'flush']), SERVICE = new Set(['fetch', 'aiOne', 'aiCall', 'aiJSON', 'naiDraw', 'naiGenerate']);
 const STORE = /^(appStorage|localStorage|sessionStorage)$/, STORE_W = /^(setItem|removeItem|clear|mediaWrite)$/;
@@ -43,7 +43,7 @@ export function layers(fns, writers) { const top = [...fns.values()].filter(f =>
   for (const f of top) { const s = sig.get(f.key); out.set(f.key, { layer: layerOf(s), ...s }); }
   /* 방향 위반: View → 상태를 쓰거나 저장하는 함수(그리다가 바꿈) · Model → 화면을 만드는 함수 */
   const bad = []; for (const f of top) { const me = out.get(f.key); for (const k of f.calls.keys()) { const o = out.get(k); if (!o) continue;
-    if (me.layer === 'View' && (o.write || o.store || o.service) && o.layer !== 'View') bad.push({ fn: f.key, to: k, kind: 'View가 상태를 바꾸거나 저장·외부 서비스를 부르는 함수를 부름' });
+    if (me.layer === 'View' && (o.write || o.store || o.service) && o.layer !== 'View' && !TRIGGER.has(fns.get(k)?.name)) bad.push({ fn: f.key, to: k, kind: 'View가 상태를 바꾸거나 저장·외부 서비스를 부르는 함수를 부름' }); /* 화면 갱신 통로(render 등)를 부르는 것은 갱신 요청이지 상태 변경이 아님 */
     else if (me.layer === 'Model' && (o.layer === 'View' || o.layer === '섞임') && !me.handler) bad.push({ fn: f.key, to: k, kind: 'Model이 화면을 만드는 함수를 부름' }); } }
   return { layer: out, bad }; }
 
@@ -54,16 +54,18 @@ export function storeKeys(fns, consts = new Map()) { const out = new Map();
   return out; }
 
 // 기능(Model·Controller 쪽): 화면이 아니라 같은 데이터와 처리로 묶음 — Model·Controller 함수만으로 그래프(호출 + 같은 상태 키·저장소 키를 쓰는 사이)를 만들어
-//   모듈성 최대화(Louvain, 순서를 바꿔 SEEDS+1번 — 과반이 같은 묶음인 것만)로 묶음. View 함수와 화면·창은 이 기능에 잇기만 함(viewLinks)
+//   모듈성 최대화(Louvain, 순서를 바꿔 SEEDS+1번 — 과반이 같은 묶음인 것만)로 묶음. 키는 가상 노드(아래). View 함수와 화면·창은 이 기능에 잇기만 함(viewLinks)
 //   keyUse: 함수 → Map(상태 키 → 'r'|'w') · hub: 공용 기반(허브) 함수 키 · louvain: lib/modules.mjs
-const SEEDS = 5;
+const SEEDS = 5, KEY_HUB = 25; // 이만큼 많은 함수가 쓰는 키는 공용 기반(묶는 근거가 아님)
 export function features(fns, L, keyUse, hub, louvain) { const mc = [...fns.values()].filter(f => f.top && !f.table && f.unit === 'main' && !hub.has(f.key) && ['Model', 'Controller', '섞임'].includes(L.get(f.key)?.layer) && !L.get(f.key)?.handler), keys = new Set(mc.map(f => f.key)), adj = new Map(mc.map(f => [f.key, new Map()]));
   const add = (a, b, w) => { if (a === b || !keys.has(a) || !keys.has(b)) return; adj.get(a).set(b, (adj.get(a).get(b) || 0) + w); adj.get(b).set(a, (adj.get(b).get(a) || 0) + w); };
   for (const f of mc) for (const [ck, n] of f.calls) add(f.key, ck, Math.min(n, 3) / Math.log2(2 + (fns.get(ck)?.callers.size || 1)));
+  /* 같은 데이터: 상태 키·data 경로·저장소 키마다 가상 노드 하나 — 그 키를 쓰는 함수가 "그 키를 부르는" 것처럼 잇고(무게는 호출과 같이 쓰는 함수가 많을수록 가볍게),
+     공용 기반처럼 HUB개 이상이 쓰는 키는 뺌. 접근 함수(예전 CRES()·EXS())를 칸 이름 접근(progSlot('cres'))으로 바꿔도 같은 데이터로 묶임 */
   const byKey = new Map(); for (const [fk, m] of keyUse) { if (!keys.has(fk)) continue; for (const k of m.keys()) { if (!byKey.has(k)) byKey.set(k, []); byKey.get(k).push(fk); } }
-  for (const [, fs] of byKey) { if (fs.length < 2 || fs.length > 8) continue; const w = 1 / (fs.length - 1); for (let i = 0; i < fs.length; i++) for (let j = i + 1; j < fs.length; j++) add(fs[i], fs[j], w); }
+  for (const [k, fs] of byKey) { if (fs.length < 2 || fs.length >= KEY_HUB) continue; const v = 'key:' + k, w = 1 / Math.log2(2 + fs.length); keys.add(v); adj.set(v, new Map()); for (const f of fs) add(f, v, w); }
   for (const [n, nb] of [...adj]) if (!nb.size) adj.delete(n);
-  const runs = Array.from({ length: SEEDS + 1 }, (_, sd) => louvain(adj, sd)), base = runs[0], comm = new Map();
+  const runs = Array.from({ length: SEEDS + 1 }, (_, sd) => louvain(adj, sd)), base = new Map([...runs[0]].filter(([n]) => !n.startsWith('key:'))), comm = new Map();
   /* 흔들리지 않는 묶음: 기준 묶음에서 같은 묶음이던 함수와 다른 순서에서도 과반이 같이 묶인 함수만 그 묶음에 — 아니면 묶음 없음(경계) */
   for (const [n, c] of base) { const peers = [...base].filter(([m, d]) => d === c && m !== n).map(([m]) => m); if (!peers.length) { comm.set(n, c); continue; } const agree = runs.slice(1).filter(r => peers.filter(m => r.get(m) === r.get(n)).length * 2 >= peers.length).length; comm.set(n, agree * 2 >= SEEDS ? c : null); }
   return { comm, adj }; }

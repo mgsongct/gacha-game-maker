@@ -12,7 +12,7 @@ const RICON={
 function iconLib(k){return G.lib.find(l=>l.kind==='icon'&&l.key===k);}
 function rIco(k){const l=iconLib(k), s=l&&imgSrc(l); return s?`<img class="ricon" src="${esc(s)}" alt="">`:(RICON[k]||RICON.gold);}
 function rIcon(r){const k=['gems','transcMat','gearMat','core','wmat','exp','gold'].find(k=>r[k]); return rIco(k||'gold');}
-function shopDay(){const p=P(); if(p.shop.day!==today()) p.shop={day:today(),buy:{}}; return p.shop;}
+
 const SHOP_ITEMS=()=>[
   {id:'free',name:'오늘의 무료 보급',give:{gold:3000,exp:10},cost:{},limit:1,tag:'FREE'},
   {id:'exp',name:T('expMat')+' ×20',give:{exp:20},cost:{gold:4000},limit:10},
@@ -32,7 +32,7 @@ let SHOP_LINE='';
 function shopkeeper(){const m=G.meta.shop||DEFAULT_META.shop;return {m,c:m.charId&&m.charId!=='__self'?charById(m.charId):null,self:m.charId==='__self'&&m.self&&imgSrc(m.self)?imgSrc(m.self):null};}
 function shkSelf(){ const m=G.meta.shop; m.self=m.self||{id:'shk_self',kind:'char',name:'상점 주인',naiPrompt:'',img:null}; return m.self; }
 function shopHTML(){
-  const p=P(), sd=shopDay(), {m,c,self}=shopkeeper(); if(!SHOP_LINE) SHOP_LINE=rand(m.hello)||'어서 와요.';
+  const p=P(), sd=progRead('shop'), {m,c,self}=shopkeeper(); if(!SHOP_LINE) SHOP_LINE=rand(m.hello)||'어서 와요.';
   const sil='<div class="sil"><svg viewBox="0 0 100 120" fill="currentColor"><circle cx="50" cy="34" r="20"/><path d="M14 120c2-34 16-52 36-52s34 18 36 52z"/></svg></div>';
   return `${pageHead('상점','SUPPLY SHOP','lobby')}
   <div class="shk fr-upper"><div class="shk-bg" style="${bgStyle(P().lobbyBg||'새벽등대 사무소')}"></div>

@@ -23,7 +23,7 @@ case 'dispgo': { const d=dispList().find(x=>x.id===DSEL.id); if(!d||DSEL.ids.len
 case 'dispget': { const d=dispList().find(x=>x.id===id); if(!d||!P().disp[id]) break; const dr=dispClaim(d); mark('prog'); sfx('확인'); toast(`${d.name} 완료: ${rewardText(dr)}`); render(); break; }
 case 'dispcancel': if((await appConfirm('파견을 취소할까요? 보상은 받지 못해요.'))){ delete P().disp[id]; mark('prog'); render(); } break;
 case 'passreset': if((await appConfirm('새 시즌을 시작할까요? 패스 단계가 처음으로 돌아가요.'))){ P().pass={xp:0,got:[]}; mark('prog'); render(); } break;
-case 'shopbuy': { const it=SHOP_ITEMS().find(x=>x.id===id), sd=shopDay(), m=G.meta.shop; if(!it) break;
+case 'shopbuy': { const it=SHOP_ITEMS().find(x=>x.id===id), sd=progSlot('shop'), m=G.meta.shop; if(!it) break;
       if((sd.buy[it.id]||0)>=it.limit){toast('오늘은 매진이에요');break;}
       if(!canPay(it.cost)){ SHOP_LINE=rand(m.poor)||'조금 모자라요.'; render(); break; }
       pay(it.cost); sd.buy[it.id]=(sd.buy[it.id]||0)+1; giveReward(it.give); SHOP_LINE=rand(m.buy)||'고마워요!'; sfx('확인'); render(); toast(rewardText(it.give)+' 획득'); break; }

@@ -160,17 +160,17 @@ try {
   const r8 = await p8.evaluate(async () => {
     const out = {}; tab = 'studio'; STTAB = 'game'; render(); out.panel = !!document.querySelector('[data-act="contoggle"]');
     openConSet(); document.querySelector('#con_on').checked = true; const fac = document.querySelector('[data-vi="0"] [data-vf="factions"]'); fac.value = G.chars[0].faction; await conSave();
-    out.on = conOn(); out.start = { ...CRES() }; out.cond = VARIANTS()[0].cond.factions;
-    P().gems = 10000; conBuy('res1'); out.bought = CRES().res1 - out.start.res1; out.gems = P().gems;
+    out.on = conOn(); out.start = { ...progSlot('cres') }; out.cond = VARIANTS()[0].cond.factions;
+    P().gems = 10000; conBuy('res1'); out.bought = progSlot('cres').res1 - out.start.res1; out.gems = P().gems;
     out.disp = Object.keys(dispOffer([]).reward).filter(k => /^res/.test(k)).length;
     const base = G.chars[0]; if (!own(base.id)) grantOwned(base, 't'); conMeta().recipes = []; // 레시피 편향 없이
     tab = 'construct'; render(); out.page = !!document.querySelector('[data-act="conbuild"]');
     Math.random = (() => { let s = 42; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
-    const before = CRES().res2; [30, 30, 30, 30].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild(); out.spent = before - CRES().res2; out.n1 = CBUILD().n;
-    VARIANTS().forEach(t => { t.chance = t.id === 'v_swim' ? 100 : 0; }); CRES().res1 += 1000; CRES().res4 += 1000;
+    const before = progSlot('cres').res2; [30, 30, 30, 30].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild(); out.spent = before - progSlot('cres').res2; out.n1 = progSlot('cbuild').n;
+    VARIANTS().forEach(t => { t.chance = t.id === 'v_swim' ? 100 : 0; }); progSlot('cres').res1 += 1000; progSlot('cres').res4 += 1000;
     [400, 100, 100, 400].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild();
     const v = G.chars.find(x => x.cvar === 'v_swim'), vb = v && charById(v.alt); out.variant = v && { base: vb && vb.name, baseOwned: !!(vb && own(vb.id)), name: v.name, owned: !!own(v.id), prompt: v.naiPrompt, inGacha: bannerPool(G.banners[0]).includes(v) };
-    out.found = !!CBUILD().found['v:v_swim']; out.log = CBUILD().log.length;
+    out.found = !!progSlot('cbuild').found['v:v_swim']; out.log = progSlot('cbuild').log.length;
     if (v) { vb.profile = String(vb.profile || '') + ' 상속확인'; mark('c:' + vb.id); const v2 = charById(v.id); out.inherit = String(v2.profile).endsWith(' 상속확인') && !('profile' in (v2.over || {})); } // 규칙 경로 이격은 기본 캐릭터 프로필을 물려받음
     // 분류 이름은 게임의 역할 이름으로
     const r0 = ROLE.atk; ROLE.atk = '돌격'; out.groupName = CON().groups.find(g => g.id === 'g_atk').name; out.groupStored = !JSON.stringify(G.meta.construct || {}).includes('돌격'); ROLE.atk = r0;
@@ -224,18 +224,18 @@ try {
   await p11.waitForFunction(() => typeof exSave === 'function' && typeof G === 'object', null, { timeout: 15000 });
   const r11 = await p11.evaluate(async () => {
     const o = {}, setMode = async m => { openExSet(); document.querySelector(`[name=ex_mode][value=${m}]`).checked = true; appConfirm = async () => true; await exSave(); };
-    const c = G.chars.filter(x => !x.alt)[0]; if (!own(c.id)) grantOwned(c, 't'); const id = c.id, back = (jid, h) => { EXS().jobs[jid].start -= h * 3600e3; };
+    const c = G.chars.filter(x => !x.alt)[0]; if (!own(c.id)) grantOwned(c, 't'); const id = c.id, back = (jid, h) => { progSlot('exped').jobs[jid].start -= h * 3600e3; };
     await setMode('idol'); tab = 'disp'; render(); o.idolPage = !!document.querySelector('[data-act="exjob"]');
     const off = exOffers(id); o.assigned = off.offers.length === 1 && !off.choice; const g0 = P().gold, c0 = exCond(id);
-    const dm0 = (dm().cnt || {}).dispatch || 0; exStart(id, off.offers[0]); o.busy = busyIds().has(id); o.mission = ((dm().cnt || {}).dispatch || 0) === dm0 + 1; /* 일일 미션 "파견"이 다른 방식에서도 오름 */ o.condDrop = c0 - (EXS().cond[id].v); const jid = Object.keys(EXS().jobs)[0]; back(jid, 10); o.badge = dispDone() >= 1; exClaim(jid);
-    o.gold = P().gold > g0; o.fame = EXS().fame[id] > 0; exRest(id, 4); o.resting = exResting(id) && busyIds().has(id);
-    EXS().fame[id] = 5000; delete EXS().offers[id]; EXS().cond[id] = { v: 90, at: Date.now() }; const top = exOffers(id); o.top = top.choice && top.offers.length > 1; render(); o.topPage = document.querySelectorAll('[data-act="exjob"]').length > 1;
+    const dm0 = (progSlot('dm').cnt || {}).dispatch || 0; exStart(id, off.offers[0]); o.busy = busyIds().has(id); o.mission = ((progSlot('dm').cnt || {}).dispatch || 0) === dm0 + 1; /* 일일 미션 "파견"이 다른 방식에서도 오름 */ o.condDrop = c0 - (progSlot('exped').cond[id].v); const jid = Object.keys(progSlot('exped').jobs)[0]; back(jid, 10); o.badge = dispDone() >= 1; exClaim(jid);
+    o.gold = P().gold > g0; o.fame = progSlot('exped').fame[id] > 0; exRest(id, 4); o.resting = exResting(id) && busyIds().has(id);
+    progSlot('exped').fame[id] = 5000; delete progSlot('exped').offers[id]; progSlot('exped').cond[id] = { v: 90, at: Date.now() }; const top = exOffers(id); o.top = top.choice && top.offers.length > 1; render(); o.topPage = document.querySelectorAll('[data-act="exjob"]').length > 1;
     await setMode('streamer'); render(); o.streamPage = !!document.querySelector('[data-act="exstream"]');
-    exStart(id, EXC().streamer.platforms.find(p => p.kind === 'vod')); const j2 = Object.keys(EXS().jobs)[0]; back(j2, 10); exClaim(j2); o.lib = EXS().lib.length;
-    EXS().libAt -= 24 * 3600e3; EXS().lib.forEach(v => { v.at -= 24 * 3600e3; }); const g1 = P().gold; exLibSettle(); o.libGold = P().gold > g1;
+    exStart(id, EXC().streamer.platforms.find(p => p.kind === 'vod')); const j2 = Object.keys(progSlot('exped').jobs)[0]; back(j2, 10); exClaim(j2); o.lib = progSlot('exped').lib.length;
+    progSlot('exped').libAt -= 24 * 3600e3; progSlot('exped').lib.forEach(v => { v.at -= 24 * 3600e3; }); const g1 = P().gold; exLibSettle(); o.libGold = P().gold > g1;
     await setMode('business'); render(); o.bizPage = !!document.querySelector('[data-exassign]');
-    exAssign('floor', 0, id); o.bizBusy = busyIds().has(id); EXS().biz.at -= 5 * 3600e3; EXS().cond[id].at -= 5 * 3600e3; EXS().biz.rep = 500; const g2 = P().gold, rep0 = EXS().biz.rep;
-    exBizSettle(true); o.bizGold = P().gold > g2; o.repMoved = EXS().biz.rep !== rep0; o.bizCond = exCond(id) < 100;
+    exAssign('floor', 0, id); o.bizBusy = busyIds().has(id); progSlot('exped').biz.at -= 5 * 3600e3; progSlot('exped').cond[id].at -= 5 * 3600e3; progSlot('exped').biz.rep = 500; const g2 = P().gold, rep0 = progSlot('exped').biz.rep;
+    exBizSettle(true); o.bizGold = P().gold > g2; o.repMoved = progSlot('exped').biz.rep !== rep0; o.bizCond = exCond(id) < 100;
     P().disp = { dz: { chars: [id], start: Date.now(), hours: 2 } }; appConfirm = async () => true; await setMode('idol'); o.dispCleared = !Object.keys(P().disp).length; // 방식을 바꾸면 전투형 파견도 끝남
     await setMode('combat'); render(); o.combatPage = !!document.querySelector('[data-act="dispset"],[data-act="dispredo"]'); o.freed = !busyIds().has(id);
     return o; });
@@ -427,7 +427,7 @@ try {
     const e0 = ELEMS[0], et = towerById('e:' + e0); towerGo('e:' + e0); await wait(50); o.restrict = !!FORM && [...document.querySelectorAll('.froster [data-act="fpick"]')].every(b => charById(b.dataset.id).elem === e0); closeModal();
     const gems = P().gems; tab = 'challenge'; render(); o.page = !!document.querySelector('[data-act="towergo"][data-v="all"]');
     towerGo('all'); await wait(50); document.querySelector('[data-act="towerstart"]').click(); await wait(50); o.tower = B && B.ctx.kind === 'tower' && B.ctx.floor === 1;
-    bEnd(true); o.towerWin = TOWER().all.best === 1 && P().gems > gems && document.querySelector('.result').innerHTML.includes('1층 돌파'); document.querySelector('.result [data-act="bdone"]').click(); o.closed = !B;
+    bEnd(true); o.towerWin = progSlot('tower').all.best === 1 && P().gems > gems && document.querySelector('.result').innerHTML.includes('1층 돌파'); document.querySelector('.result [data-act="bdone"]').click(); o.closed = !B;
     return o; });
   assert.ok(Object.values(r18).every(v => v === true), JSON.stringify(r18)); assert.deepEqual(err18, [], '페이지 오류');
   console.log('ok 18 전투 개선·탑: 전장 규칙(능력치·시간 제한)·별 조건·편성 화면 안내, 집중 지시, 새 장 규칙(AI 지정·자동)·예전 스테이지 점검, 시련의 탑(제한 탑·보스층·첫 돌파 보상)');
@@ -445,8 +445,8 @@ try {
     o.tpl = spotTemplate(G.chars[1], spots()[1]).startsWith('[배경: 옥상 정원]') && parseScript(spotTemplate(G.chars[1], spots()[1])).some(l => l.type === 'choice');
     tab = 'sched'; render(); o.page = !!document.querySelector(`[data-act="scvisit"][data-c="${c.id}"]`); const aff = own(c.id).aff || 0, gold = P().gold;
     document.querySelector(`[data-act="scvisit"][data-c="${c.id}"]`).click(); for (let i = 0; i < 30 && S; i++) { document.querySelector('#vn') && document.querySelector('#vn').click(); const pk = document.querySelector('[data-act="vnpick"]'); if (pk) pk.click(); await wait(40); }
-    o.visit = !S && (own(c.id).aff || 0) === aff + 30 && P().gold > gold && SCHED().left === 2 && SCHED().done.includes(cafe.id);
-    schedVisit(cafe.id, c.id); o.once = !S && SCHED().left === 2; tab = 'lobby'; render(); o.lobby = !!document.querySelector('[data-act="go"][data-to="sched"]');
+    o.visit = !S && (own(c.id).aff || 0) === aff + 30 && P().gold > gold && progSlot('sched').left === 2 && progSlot('sched').done.includes(cafe.id);
+    schedVisit(cafe.id, c.id); o.once = !S && progSlot('sched').left === 2; tab = 'lobby'; render(); o.lobby = !!document.querySelector('[data-act="go"][data-to="sched"]');
     return o; });
   assert.ok(Object.values(r19).every(v => v === true), JSON.stringify(r19)); assert.deepEqual(err19, [], '페이지 오류');
   console.log('ok 19 일정: 장소(자동·AI)·좋아하는 장소(호감도 1.5배)·하루 3번·보상, 장면(AI·기본 대본), 점검 규칙(장소·장면), 로비 진입');
@@ -518,7 +518,7 @@ try {
     const sera = charById('sera'); o.charRange = ['melee', 'ranged', 'support'].includes(charRange(sera)) && (sera.range = 'melee', charRange(sera) === 'melee') && rowWarn(sera, 3, 4).includes('후열 근접') && (delete sera.range, true);
     o.opts = v2Options().formation === true; G.meta.rules = Object.assign({}, G.meta.rules, { formation: false }); o.optOff = v2Options().formation === false; G.meta.rules.formation = true;
     G.chars.slice(0, 5).forEach(c => { if (!own(c.id)) grantOwned(c, 't'); }); const ch = G.chapters.find(c => c.kind === 'main'), s = ch.stages.find(x => !x.story && x.enemies.length); P().cleared[s.id] = true;
-    P().squad = G.chars.filter(c => own(c.id) && c.role !== 'sup').slice(0, 3).map(c => c.id); const stam0 = stam().v;
+    P().squad = G.chars.filter(c => own(c.id) && c.role !== 'sup').slice(0, 3).map(c => c.id); const stam0 = progSlot('stam').v;
     startBattle(ch.id, s.id); for (let i = 0; i < 50 && !SORTIE(); i++) await wait(100); await wait(100);
     o.begin = !!SORTIE() && SORTIE().node === 'n1' && !!document.querySelector('.so-map') && !B;
     document.querySelector('[data-act="sogo"]').click(); for (let i = 0; i < 60 && !B; i++) await wait(100);
@@ -532,7 +532,7 @@ try {
     o.carry = B && B.ctx.node !== 'x' && Math.abs(B.allies.find(u => u.c.id === hurt).hp / B.allies.find(u => u.c.id === hurt).maxhp - .2) < .02 && B.s.enemies.length === 3;
     bEnd(true); document.querySelector('[data-act="somap"]').click(); await wait(50); document.querySelector('[data-act="sonext"][data-v="n3"]').click(); await wait(30); document.querySelector('[data-act="sogo"]').click(); for (let i = 0; i < 60 && !B; i++) await wait(100);
     o.boss = B && B.ctx.boss && B.s === s; bEnd(true); o.cleared = !SORTIE() && !!document.querySelector('.rs-stars'); document.querySelector('.result [data-act="bdone"]').click(); await wait(50);
-    o.stam = stam().v === stam0 - stamCost('main');
+    o.stam = progSlot('stam').v === stam0 - stamCost('main');
     startBattle(ch.id, s.id); for (let i = 0; i < 50 && !SORTIE(); i++) await wait(100); await wait(50); const g0 = P().gold; document.querySelector('[data-act="soretreat"]').click(); o.retreat = !SORTIE() && P().gold === g0;
     const st = buildStages([{ title: 'a', enemies: [{ name: 'x' }], route: { n1: '항구 전초', a: '정면 부두', b: '뒷골목', fork: '안개 낀 갈림길', boss: '선창 본대' } }], { max: 3, reward: () => 1, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
     const R = routeOf(st[0]); o.route = R.nodes[0].name === '항구 전초' && R.nodes[1].name === '정면 부두' && R.fork === '안개 낀 갈림길' && stageSchema(false).includes('"route"');
@@ -674,9 +674,14 @@ try {
     const n0 = QUIET.length; quietErr(new Error('테스트 오류'), 'test:1'); o.quiet = QUIET.length === n0 + 1 && QUIET[0].msg === '테스트 오류';
     P().gems = 1000; pay({ gems: 300 }); giveReward({ gems: 50 }); o.gems = P().gems === 750;
     o.registry = !['gateyes', 'cheat', 'reset', 'naiall', 'styopen'].some(k => APP_ACTION_HANDLERS[k]) && !!APP_ACTION_HANDLERS.imgx && !!APP_ACTION_HANDLERS.pjreroll;
+    /* 진행 칸 정의(0070 PROG_SLOTS — CLAUDE.md §0-2): 그리기(renderView)는 상태를 바꾸지 않고, 그리기 전 처리(render → progTick)가 날이 바뀐 칸을 새로 만들어 저장 · 원정 방송 출연이면 오늘의 출연 제안을 그리기 전에 저장 */
+    P().dm = { date: '2000-01-01', cnt: { battle: 9 }, got: {} }; const before = JSON.stringify(P().dm); tab = 'lobby'; renderView(); o.viewPure = JSON.stringify(P().dm) === before && progRead('dm').date === today() && P().dm.date === '2000-01-01';
+    render(); o.tickSaves = P().dm.date === today() && !P().dm.cnt.battle;
+    const mode0 = G.meta.expedition; G.meta.expedition = Object.assign({}, mode0 || {}, { mode: 'idol' }); delete P().exped; const own0 = G.chars[0]; const had0 = P().owned[own0.id]; P().owned[own0.id] = had0 || { levelCapVersion: 1, transc: 0, growthCostVersion: 1, lv: 1, exp: 0, dup: 0, aff: 0, seen: [], wlv: 0, skin: '' }; render();
+    o.expedTick = !!(P().exped && own0 && P().exped.offers[own0.id] && P().exped.offers[own0.id].day === today()); G.meta.expedition = mode0; if (!had0) delete P().owned[own0.id];
     return o; });
   assert.ok(Object.values(r26).every(v => v === true), JSON.stringify(r26)); assert.deepEqual(err26, [], '페이지 오류');
-  console.log('ok 26 정리 후 동작: 그림 지우기 대상·리롤 초안 함수, 조용한 오류 기록, 재화 단일 경로, 지운 액션이 분배 표에서 빠짐');
+  console.log('ok 26 정리 후 동작: 그림 지우기 대상·리롤 초안 함수, 조용한 오류 기록, 재화 단일 경로, 지운 액션이 분배 표에서 빠짐 · 진행 칸 정의(그리기는 상태 그대로, 그리기 전 처리가 하루 새로 만들기·출연 제안 저장)');
 
   // 27) 자기점검 보강(tools: HTML 주입·DOM id)으로 고친 것: 용어 T()는 HTML 안전, 대화 배지는 화면에 없는 #phBadge 대신 로비 아이콘을 바로 고침
   const p27 = await browser.newPage(), err27 = []; p27.on('pageerror', e => err27.push(String(e)));

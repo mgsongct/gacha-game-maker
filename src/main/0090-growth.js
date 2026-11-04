@@ -11,33 +11,23 @@ const expR=x=>Math.round(x*((P().settings.expRate||100)/100));
 /* 행동력: 메인·이벤트 전투 10, 재료 던전 8. 5분마다 1씩 차서 최대 240. ◆로 채울 수 있어요. 설정 → 게임에서 끌 수 있어요 */
 const STAM_MAX=240, STAM_MS=5*60e3, STAM_FILL=[60,60];
 function stamOn(){ return P().settings.stamina!==false; }
-function stam(){ const p=P();
-  if(p.staminaCapVersion!==2){
-    if(p.stam&&typeof p.stam==='object'){
-      const previous=p.stam,now=Date.now(),n=Math.max(0,Math.floor((now-previous.at)/STAM_MS));
-      if(previous.v>=120)previous.at=now;
-      else if(n>0){previous.v=Math.min(120,previous.v+n);previous.at=previous.v>=120?now:previous.at+n*STAM_MS;}
-    }
-    p.staminaCapVersion=2;mark('prog');
-  }
-  if(!p.stam||typeof p.stam!=='object') p.stam={v:STAM_MAX,at:Date.now()}; const s=p.stam, now=Date.now();
-  if(s.v>=STAM_MAX) s.at=now; else { const n=Math.floor((now-s.at)/STAM_MS); if(n>0){ s.v=Math.min(STAM_MAX,s.v+n); s.at=s.v>=STAM_MAX?now:s.at+n*STAM_MS; } } return s; }
+/* 행동력 회복 규칙: 마지막 회복 뒤 STAM_MS마다 1씩 cap까지, 가득 차 있으면 시각만 지금으로 — 진행 칸 stam의 정의(0070 PROG_SLOTS)가 부름 */
+function stamRegen(s,cap){ const now=Date.now(); if(s.v>=cap){ s.at=now; return s; } const n=Math.floor((now-s.at)/STAM_MS); if(n>0){ s.v=Math.min(cap,s.v+n); s.at=s.v>=cap?now:s.at+n*STAM_MS; } return s; }
 function stamCost(kind){ return kind==='main'||kind==='event'?10:kind==='farm'?8:0; }
-function updStam(){ const el=document.getElementById('stamBox'); if(!el) return; el.hidden=!stamOn(); if(!stamOn()) return; const s=stam(); const v=document.getElementById('stamV'); if(v) v.textContent=s.v+'/'+STAM_MAX; }
-function stamUse(n){ if(!stamOn()||!n) return true; const s=stam(); if(s.v<n){ openStam(n); return false; } s.v-=n; mark('prog'); updStam(); return true; }
-function openStam(need){ const s=stam(), left=s.v>=STAM_MAX?0:Math.ceil((STAM_MS-(Date.now()-s.at))/60000), full=s.v>=STAM_MAX?0:Math.ceil(((STAM_MAX-s.v-1)*STAM_MS+(STAM_MS-(Date.now()-s.at)))/60000);
+function updStam(){ const el=document.getElementById('stamBox'); if(!el) return; el.hidden=!stamOn(); if(!stamOn()) return; const s=progRead('stam'); const v=document.getElementById('stamV'); if(v) v.textContent=s.v+'/'+STAM_MAX; }
+function stamUse(n){ if(!stamOn()||!n) return true; const s=progSlot('stam'); if(s.v<n){ openStam(n); return false; } s.v-=n; mark('prog'); updStam(); return true; }
+function openStam(need){ const s=progRead('stam'), left=s.v>=STAM_MAX?0:Math.ceil((STAM_MS-(Date.now()-s.at))/60000), full=s.v>=STAM_MAX?0:Math.ceil(((STAM_MAX-s.v-1)*STAM_MS+(STAM_MS-(Date.now()-s.at)))/60000);
   openModal(`${head('⚡ 행동력',`<span class="muted">${s.v} / ${STAM_MAX}</span>`)}${need?`<p style="margin:0 0 8px">행동력이 모자라요. 필요 <b>${need}</b> · 지금 <b>${s.v}</b></p>`:''}
     <p class="muted" style="margin:0 0 10px;font-size:.85rem">5분마다 1씩 차요.${s.v<STAM_MAX?` 다음 1 회복까지 ${left}분 · 가득 차기까지 약 ${full}분`:' 지금 가득 찼어요.'}<br>메인·이벤트 전투 10, 재료 던전 8을 써요.</p>
     <div class="row"><button class="btn" data-act="stamfill" ${P().gems>=STAM_FILL[0]?'':'disabled'}>${rIco('gems')} ${STAM_FILL[0]}로 ⚡${STAM_FILL[1]} 회복</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
-setInterval(()=>{ try{ if(typeof G!=='undefined'&&G) updStam(); }catch(e){} },30000);
-function giveReward(r,evId){const p=P();if(r.gift)addGifts(r.gift);if(r.gems)p.gems+=r.gems;if(r.gold)p.gold+=r.gold;['exp','wmat','core','gearMat','transcMat'].forEach(k=>{if(r[k])p.mat[k]=(p.mat[k]||0)+r[k];});['res1','res2','res3','res4'].forEach(k=>{if(r[k]){const c=CRES();c[k]=(c[k]||0)+r[k];}});if(r.token&&evId)p.tokens[evId]=(p.tokens[evId]||0)+r.token;mark('prog');}
+setInterval(()=>{ try{ if(typeof G!=='undefined'&&G){ progTick(); updStam(); } }catch(e){} },30000); /* 주기 타이머(Controller): 날이 바뀐 칸 새로 만들기·행동력 표시 */
+function giveReward(r,evId){const p=P();if(r.gift)addGifts(r.gift);if(r.gems)p.gems+=r.gems;if(r.gold)p.gold+=r.gold;['exp','wmat','core','gearMat','transcMat'].forEach(k=>{if(r[k])p.mat[k]=(p.mat[k]||0)+r[k];});['res1','res2','res3','res4'].forEach(k=>{if(r[k]){const c=progSlot('cres');c[k]=(c[k]||0)+r[k];}});if(r.token&&evId)p.tokens[evId]=(p.tokens[evId]||0)+r.token;mark('prog');}
 const MISSIONS=[{k:'login',name:'출석하기',goal:1,xp:100},{k:'battle',name:'전투 3회',goal:3,xp:150},{k:'pull',name:'뽑기 1회',goal:1,xp:100},{k:'dispatch',name:'파견 보내기',goal:1,xp:100},{k:'touch',name:'로비 터치 5회',goal:5,xp:60},{k:'enhance',name:'강화 1회',goal:1,xp:100}];
-function dm(){const p=P();if(p.dm.date!==today())p.dm={date:today(),cnt:{login:1},got:{}};return p.dm;}
-function bump(k,n){const d=dm();d.cnt[k]=(d.cnt[k]||0)+(n||1);mark('prog');}
+function bump(k,n){const d=progSlot('dm');d.cnt[k]=(d.cnt[k]||0)+(n||1);mark('prog');}
 const PASS_MAX=30, PASS_PER=500;
 const passLv=()=>Math.min(PASS_MAX,Math.floor(P().pass.xp/PASS_PER));
 function passReward(l){return l%10===0?{gems:1000}:l%5===0?{core:10}:l%3===0?{wmat:15}:l%2===0?{exp:30}:{gold:8000};}
-function passClaimable(){const n=passLv();let k=0;for(let l=1;l<=n;l++)if(!P().pass.got.includes(l))k++;return k+MISSIONS.filter(m=>(dm().cnt[m.k]||0)>=m.goal&&!dm().got[m.k]).length;}
+function passClaimable(){const n=passLv();let k=0;for(let l=1;l<=n;l++)if(!P().pass.got.includes(l))k++;return k+MISSIONS.filter(m=>(progRead('dm').cnt[m.k]||0)>=m.goal&&!progRead('dm').got[m.k]).length;}
 const dispDone=()=>[...Object.values(P().disp),...Object.values((P().exped||{}).jobs||{})].filter(d=>Date.now()>=d.start+d.hours*3600e3).length; // 로비 배지: 전투형 파견 + 다른 원정 방식의 끝난 일정
 const busyIds=()=>new Set([...Object.values(P().disp).flatMap(d=>d.chars),...exBusyIds()]); // 원정 모드(방송·스트리머·경영)에서 일하는·쉬는·배치된 캐릭터 포함
 function linePop(c,text,face){

@@ -274,9 +274,10 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 파일: `src/main/0090-growth.js` `src/main/0240-growth-curve.js` `src/main/0190-shop.js` 레이드 `src/main/0110-challenge-raid.js` · 심연 탐사(런·던전·카드 전투) `src/main/0120-abyss.js` · 라이브 운영 `src/main/0280-live-ops.js` `src/main/0290-season-rotation.js`
 
 - 성장(성장·성장 곡선 섹션): 레벨(최대 120, 71~ 초월승급), 돌파, 스킬 강화, 전용 무기, 호감도(`addAff`, 레벨별 대사·에피소드 해금). 비용 공식은 `GGMCombat.growthCost/limitBreakCost` 등.
-- 일일/주간 카운터: `dm()` / `bump(key)`(미션·패스 진행).
+- 일일/주간 카운터: 진행 칸 `dm` / `bump(key)`(미션·패스 진행).
+- **진행 칸 정의(G.prog)** — 한곳 `src/main/0070-save.js` 머리(`DEFAULT_PROG` · `PROG_SLOTS`: 칸마다 만들기 `make` · 형식 `ok` · 날/주 바뀜 `stale` · 형식 보정 `fill` · 매번 맞춤 `now` · 그리기 전 갱신 `tick`). 기능 규칙은 제 모듈 함수로 이 표에 걸어요(`stamRegen` 0090 · `raidNew` 0110 · `dispBoardFill` 0274 · `expedFill`·`expedOn` 0275 · `cresFill` 0505). 접근(CLAUDE.md §0-2 계층): Model·Controller는 `progSlot(칸)`(맞춰 저장하고 돌려줌), View는 `progRead(칸)`(상태 그대로 — 없거나 지난 칸은 새 값을 만들어 보여 주기만), `progTick()`은 그리기 전(`render`)·30초 타이머·부팅에서 날 바뀐 칸 등을 저장. 새 진행 칸은 이 표에 넣어요(기능 파일에 접근 함수를 따로 두지 않음).
 - 상점: 보급 상점(일일), 캐시 상점(전부 무료 재화 — 자원 보급 `CASH_RES`: 건조 자원·성장 재료 ₩0, 모자라면 멈추지 않고 ₩0 보충 `cashTopUp` — `src/main/0190-shop.js` — 화면 `cashHTML`도 같은 파일), 이벤트 상점, 자동 스킨 상점.
-- 파견(`dispatches`), 재료 던전(`meta.farms`), 레이드, 심연 탐사(로그라이크·카드 전투, `RG()`).
+- 파견(`dispatches`), 재료 던전(`meta.farms`), 레이드, 심연 탐사(로그라이크·카드 전투, 진행 칸 `rogue`).
 - **라이브 운영** `liveTick()`: 켤 때·화면 복귀 때 주기(`LIVE_CYC`)마다 AI로 새 톡/이벤트/챕터/픽업/스킨을 자동 생성, 시즌 로테이션(`SEASONS`). 구독 게임은 자동 생성 안 함.
 
 ## 10. 메신저(등대톡) · 갠톡

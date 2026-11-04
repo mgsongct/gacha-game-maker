@@ -10,7 +10,6 @@ const num=(v,a,b,d)=>{v=Number(v);if(!isFinite(v))v=d;return Math.min(b,Math.max
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const today=()=>new Date().toDateString();
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-const P=()=>G.prog;
 const charById=id=>G.chars.find(c=>c.id===id);
 const libById=id=>G.lib.find(l=>l.id===id);
 const playerName=()=>P().player||T('player');

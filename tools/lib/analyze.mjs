@@ -28,7 +28,7 @@ export async function analyze(ROOT) {
   R.pure = pureModules(units); // 순수 모듈(규칙 엔진)이 DOM·앱 상태를 참조
   R.frag = fragmentFiles(units); // 프롬프트 조각이 스튜디오 한곳에 모였는지
   R.mod = moduleMap(units, fns, sf, { modOf: moduleOf, layer: R.frag.home });
-  { const N = naturalBoundaries(fns, sf, R.mod, moduleOf, R.frag.home); R.nat = { overSplit: N.overSplit, mixed: N.mixed.map(x => ({ mod: x.mod, fns: x.fns, parts: x.parts.map(p => p.n) })), displaced: N.displaced, Qfile: N.Qfile, Qnat: N.Qnat }; } // 자연 경계: 과잉 분할·기능 섞임·기능 분산(늘면 실패) // 모듈 경계: 영역 침범·남의 상태 쓰기·파편화
+  { const N = naturalBoundaries(fns, sf, R.mod, moduleOf, R.frag.home, new Set([...tops].filter(([, v]) => v.kind !== 'function').map(([k]) => k))); R.nat = { overSplit: N.overSplit, mixed: N.mixed.map(x => ({ mod: x.mod, fns: x.fns, parts: x.parts.map(p => p.n) })), displaced: N.displaced, Qfile: N.Qfile, Qnat: N.Qnat }; } // 자연 경계: 과잉 분할·기능 섞임·기능 분산(늘면 실패) // 모듈 경계: 영역 침범·남의 상태 쓰기·파편화
   R.promptAll = inlinePrompts(units, { pred: promptText, home: R.frag.home, shared }); R.promptImg = inlinePrompts(units, { sinks: IMAGE_SINKS, pred: tagText, home: R.frag.home, shared, tables: true }); // 스튜디오 밖 LLM 프롬프트 글 전체·이미지 프롬프트 조각
   // 메타 점검: 도구 코드 자체의 위반(쓸데없는 예외 처리·복잡도·다중화·되풀이 문자열·안 쓰는 함수)
   const tu = await loadToolUnits(ROOT), tg = buildGraph(tu), tText = tu.map(u => u.text).join('\n');

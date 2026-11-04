@@ -76,10 +76,10 @@ for (const dir of dirs) {
       DSEL = { id: d.id, ids: free.slice(0, d.need || 1) }; await handleEconomyAction('dispgo', document.createElement('button'), d.id, p, {}); const sent = (p.disp[d.id] || {}).chars || [];
       ok('파견', '보낸 대원 기록', sent.length === (d.need || 1), `${d.name}: ${names(sent)}`);
       ok('파견 ↔ 전투 편성', '파견 중인 대원은 편성에서 빠짐', sent.every(id => busyIds().has(id)), `busyIds ${busyIds().size}명`);
-      const cres0 = conOn() ? JSON.stringify(CRES()) : '', gold0 = p.gold; p.disp[d.id].start -= (p.disp[d.id].hours || d.hours) * 3600e3 + 1000; // 시간이 지난 것으로
+      const cres0 = conOn() ? JSON.stringify(progSlot('cres')) : '', gold0 = p.gold; p.disp[d.id].start -= (p.disp[d.id].hours || d.hours) * 3600e3 + 1000; // 시간이 지난 것으로
       await handleEconomyAction('dispget', document.createElement('button'), d.id, p, {});
-      ok('파견', '완료 보상', !p.disp[d.id] && (p.gold !== gold0 || JSON.stringify(CRES ? CRES() : {}) !== cres0), `골드 ${gold0}→${p.gold}`);
-      ok('파견 ↔ 건조', '건조가 켜져 있으면 파견 보상에 건조 자원', conOn() ? JSON.stringify(CRES()) !== cres0 : null, conOn() ? `${cres0} → ${JSON.stringify(CRES())}` : '건조 꺼짐');
+      ok('파견', '완료 보상', !p.disp[d.id] && (p.gold !== gold0 || JSON.stringify(CRES ? progSlot('cres') : {}) !== cres0), `골드 ${gold0}→${p.gold}`);
+      ok('파견 ↔ 건조', '건조가 켜져 있으면 파견 보상에 건조 자원', conOn() ? JSON.stringify(progSlot('cres')) !== cres0 : null, conOn() ? `${cres0} → ${JSON.stringify(progSlot('cres'))}` : '건조 꺼짐');
       ok('파견', '끝나면 다시 편성 가능', sent.every(id => !busyIds().has(id)), ''); });
     // ⑤ 원정(전투가 아닌 방식)
     await step('원정', async () => { const forced = exMode() === 'combat'; if (forced) G.meta.expedition = { mode: 'idol' }; const mode = exMode(), tag = forced ? ' (상황: 원정 아이돌로 켬)' : '';
@@ -88,20 +88,20 @@ for (const dir of dirs) {
       const o = exOffers(id), job = (Object.values(o).find(Array.isArray) || [])[0]; if (!job) return ok('원정', '의뢰', null, '오늘 의뢰 없음');
       exStart(id, job); const jid = exJobOf(id); ok('원정', '일 시작' + tag, !!jid, `${(charById(id) || {}).name} · ${job.name || job.id}`);
       ok('원정 ↔ 전투 편성', '일하는 대원은 편성에서 빠짐' + tag, busyIds().has(id), '');
-      if (jid) { EXS().jobs[jid].start -= job.hours * 3600e3 + 1000; const fame0 = EXS().fame[id] || 0, r = exClaim(jid); ok('원정', '끝나면 결과·인기' + tag, !!r && (EXS().fame[id] || 0) >= fame0, `인기 ${fame0}→${EXS().fame[id] || 0}`); } if (forced) G.meta.expedition = { mode: 'combat' }; });
+      if (jid) { progSlot('exped').jobs[jid].start -= job.hours * 3600e3 + 1000; const fame0 = progSlot('exped').fame[id] || 0, r = exClaim(jid); ok('원정', '끝나면 결과·인기' + tag, !!r && (progSlot('exped').fame[id] || 0) >= fame0, `인기 ${fame0}→${progSlot('exped').fame[id] || 0}`); } if (forced) G.meta.expedition = { mode: 'combat' }; });
     // ⑥ 건조
     await step('건조', async () => { const forced = !conOn(); if (forced) conMeta().on = true; const tag = forced ? ' (상황: 건조 켬)' : '';
-      CON_RES.forEach(k => { CRES()[k] = 99999; }); const cfg = CON(), pool = conPool(), inp = GGMConstruct.normalize(conReadInput(), cfg), info = GGMConstruct.roll(inp, cfg, pool, conVariantChoices(inp)).info || {}, mem = gr => pool.filter(c => Object.entries(gr.match || {}).every(([k, v]) => c[k] === v)).length;
+      CON_RES.forEach(k => { progSlot('cres')[k] = 99999; }); const cfg = CON(), pool = conPool(), inp = GGMConstruct.normalize(conReadInput(), cfg), info = GGMConstruct.roll(inp, cfg, pool, conVariantChoices(inp)).info || {}, mem = gr => pool.filter(c => Object.entries(gr.match || {}).every(([k, v]) => c[k] === v)).length;
       ok('건조 ↔ 생성된 대원', '분류마다 나올 대원이 있음' + tag, cfg.groups.every(gr => mem(gr) > 0), cfg.groups.map(gr => `${gr.name} ${mem(gr)}명`).join(' · '));
       const tb = GGMConstruct.table(inp, cfg, pool), rar = Object.entries(info.rarity || {}).filter(([, v]) => v > 0).map(([k]) => ['', 'R', 'SR', 'SSR'][k]).join('·');
       ok('건조 ↔ 생성된 대원', '기본 투입으로 나올 대원이 있음(열린 분류·허용 희귀도 안 — 첫 건조가 빈손이 아님)' + tag, tb.rows.length > 0, `투입 ${inp.join('/')} → 열림 ${(info.groups || []).filter(gr => gr.open).map(gr => `${gr.name} ${pool.filter(c => Object.entries(gr.match || {}).every(([k, v]) => c[k] === v)).map(c => ['', 'R', 'SR', 'SSR'][c.rarity]).join('') || '없음'}`).join(', ')} · 허용 희귀도 ${rar} · 나올 대원 ${tb.rows.length}명`);
-      CON_RES.forEach(k => { CRES()[k] = 0; }); /* 자원이 모자라도 멈추지 않음: 캐시 상점 ₩0 보충으로 건조(PL1) */
-      const h0 = (p.hist2 || []).length, owned0 = new Set(Object.keys(p.owned)), chars0 = G.chars.length, r0 = JSON.stringify(CRES()), t0 = toasts.length; await conBuild(); for (let i = 0; i < 40 && CONJOB; i++) await new Promise(r => setTimeout(r, 50));
+      CON_RES.forEach(k => { progSlot('cres')[k] = 0; }); /* 자원이 모자라도 멈추지 않음: 캐시 상점 ₩0 보충으로 건조(PL1) */
+      const h0 = (p.hist2 || []).length, owned0 = new Set(Object.keys(p.owned)), chars0 = G.chars.length, r0 = JSON.stringify(progSlot('cres')), t0 = toasts.length; await conBuild(); for (let i = 0; i < 40 && CONJOB; i++) await new Promise(r => setTimeout(r, 50));
       const gotOwn = Object.keys(p.owned).filter(id => !owned0.has(id)), made = G.chars.slice(chars0);
       ok('건조', '자원이 0이어도 캐시 상점 ₩0 보충으로 대원을 얻음' + tag, (p.hist2 || []).length > h0, `얻음 ${(p.hist2 || []).length > h0 ? names([p.hist2[0].id]) + (p.hist2[0].n ? '(새 대원)' : '(중복)') : '없음'} · 새 캐릭터 ${made.length}${toasts.length > t0 ? ' · 알림: ' + toasts.slice(t0).join(' / ') : ''}`);
-      { const B = CBUILD(), mn = [cfg.min, cfg.min, cfg.min, cfg.min], empty = !GGMConstruct.table(mn, cfg, pool).rows.length; B.input = mn; CON_RES.forEach(k => { CRES()[k] = 0; }); const h1 = (p.hist2 || []).length; await conBuild(); for (let i = 0; i < 40 && CONJOB; i++) await new Promise(r => setTimeout(r, 50));
+      { const B = progSlot('cbuild'), mn = [cfg.min, cfg.min, cfg.min, cfg.min], empty = !GGMConstruct.table(mn, cfg, pool).rows.length; B.input = mn; CON_RES.forEach(k => { progSlot('cres')[k] = 0; }); const h1 = (p.hist2 || []).length; await conBuild(); for (let i = 0; i < 40 && CONJOB; i++) await new Promise(r => setTimeout(r, 50));
         ok('건조', `최소 투입(${mn.join('/')}${empty ? ' — 나올 대원 없음' : ''})이어도 빈손으로 끝나지 않음(나올 수 있게 맞춘 투입으로)` + tag, (p.hist2 || []).length > h1, `${empty ? '맞춘 투입 ' + (B.input || []).join('/') : '최소 투입으로 나옴'} · 얻음 ${(p.hist2 || []).length > h1 ? names([p.hist2[0].id]) : '없음'}`); }
-      { const r1 = JSON.stringify(CRES()), k = CASH_RES().find(x => x.id === 'cr_con'); if (k) await handleEconomyAction('cashpkg', { dataset: {} }, k.id, P(), {}); /* 앱의 캐시 상점 구매 액션 그대로 */ ok('캐시 상점 ↔ 건조', '자원 보급(₩0)에 건조 자원 꾸러미' + tag, !!k && JSON.stringify(CRES()) !== r1 && /자원 보급/.test(cashHTML()), k ? rewardText(k.give) : '없음'); }
+      { const r1 = JSON.stringify(progSlot('cres')), k = CASH_RES().find(x => x.id === 'cr_con'); if (k) await handleEconomyAction('cashpkg', { dataset: {} }, k.id, P(), {}); /* 앱의 캐시 상점 구매 액션 그대로 */ ok('캐시 상점 ↔ 건조', '자원 보급(₩0)에 건조 자원 꾸러미' + tag, !!k && JSON.stringify(progSlot('cres')) !== r1 && /자원 보급/.test(cashHTML()), k ? rewardText(k.give) : '없음'); }
       const v = G.chars.find(c => c.alt && c.base && charById(c.base)); if (!v) return ok('건조 ↔ 바리에이션', '이격 상속' + tag, null, '이격 없음(건조 결과에 이격이 안 나옴)');
       const base = charById(v.base), k = ['speech', 'profile'].find(x => !(v.inh && v.inh.own && v.inh.own.includes(x))) || 'speech', mark0 = '연계검증_' + Date.now(); base[k] = mark0; mark('c:' + base.id); inheritAll && inheritAll();
       ok('건조 ↔ 바리에이션', `기본 대원을 고치면 이격에 반영(${k})` + tag, charById(v.id)[k] === mark0, `${base.name} → ${v.name}`); });

@@ -4,10 +4,11 @@
 //   node tools/map.mjs                 입력(src 파일·www/index.html·시험 게임 data)이 바뀌었으면 맵을 다시 만들고 바뀐 연결을 "최근 변화"에 남김(증분 갱신), 안 바뀌었으면 그대로
 //   node tools/map.mjs --check         맵이 지금 입력과 맞나(안 맞으면 exit 1 — CI)
 //   node tools/map.mjs --why <말>      거꾸로 따라가기: data 경로·함수·모듈 이름 또는 docs/modules.md 절 제목의 말(시나리오·스킬·이격 …) → 만드는 곳(역할) → index.html 줄 → src 모듈 → 점검 규칙·프롬프트 조각·연계 모듈
-//   node tools/map.mjs --strict        아키텍처 판정(섞인 함수·방향 위반·조각·흩어짐·슈퍼 모듈·갈래 없는 저장 키)이 기준선보다 늘면 exit 1 · --update-baseline(줄 때만, 새 판정 종류는 처음 잰 값)
+//   node tools/map.mjs --rebase <git 기준>  판정 도구가 바뀌었을 때: 바뀐 도구로 그 커밋 코드를 재서 아키텍처 기준선으로(지금 코드로 올리지 않음)
+//   node tools/map.mjs --strict        아키텍처 판정(섞인 함수·방향 위반·갈래 없는 저장 키)이 기준선보다 늘면 exit 1 — 기능 판정은 후보라 맵에만 · --update-baseline(줄 때만, 새 판정 종류는 처음 잰 값)
 //   node tools/map.mjs --game <폴더>    게임 하나(tools/play/games/<이름> 또는 pc/data/<게임id>)의 data 경로마다 값이 있나와 만드는 곳
 //   [--force] 바뀐 게 없어도 다시 만듦 → docs/map.md(사람이 따라가는 맵) · docs/map.json(질의·차이 비교)
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdirSync } from 'node:fs';
 import { join, dirname, resolve, relative, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -122,12 +123,18 @@ if (ch || argv.includes('--force') || !old) { const m = await make(), diff = map
   writeFileSync(JSONF, JSON.stringify(m, null, 1) + '\n'); writeFileSync(MDF, md(m)); map = m;
   console.log(`연관 맵 갱신: data 경로 ${Object.keys(m.data).length} · 함수 ${Object.keys(m.fns).length} · 모듈 ${Object.keys(m.modules).length} · 바뀐 연결: 함수 +${diff.fns.added.length} −${diff.fns.removed.length} 옮김 ${diff.fns.moved.length} · data ${diff.data.length}경로 → docs/map.md · docs/map.json`); }
 else if (!arg('--why') && !arg('--game')) console.log('변화 없음 — 맵 그대로(docs/map.md)');
-/* 래칫(기준선 tools/baseline.json의 arch): 모듈마다 섞인 함수·방향 위반 수, 기능 판정(슈퍼·조각·흩어짐), 갈래 없는 저장 키가 늘면 --strict 실패. 판정 종류가 새로 생기면 그 종류는 처음 잰 값을 기준선으로 */
-if (argv.includes('--strict') || argv.includes('--update-baseline')) { const A = map.arch || { verdicts: [], store: { keys: [] } }, F = [...A.verdicts.filter(v => v.layers['섞임']).map(v => ({ key: `계층 섞임|${v.mod}`, num: { 함수: v.layers['섞임'] }, text: `섞인 함수 ${short(v.mod)} ${v.layers['섞임']}` })),
-    ...A.verdicts.filter(v => v.bad).map(v => ({ key: `계층 방향|${v.mod}`, num: { 위반: v.bad }, text: `방향 위반 ${short(v.mod)} ${v.bad}` })), ...A.verdicts.filter(v => ['슈퍼', '조각', '흩어짐'].includes(v.kind)).map(v => ({ key: `기능 ${v.kind}|${v.mod}`, num: { 함수: v.n }, text: `${v.kind} ${short(v.mod)}` })),
-    ...(A.store?.keys || []).filter(k => !k.kind).map(k => ({ key: `저장 정책 갈래 없음|${k.key}`, num: { 키: 1 }, text: `갈래 없는 저장 키 ${k.key}` }))], B = readBaseline(ROOT, 'arch'), D = B ? compare(B, F) : null;
+/* 래칫(기준선 tools/baseline.json의 arch): 모듈마다 섞인 함수·방향 위반 수, 갈래 없는 저장 키가 늘면 --strict 실패.
+   도구(판정 규칙)가 바뀌면 --rebase <git 기준>: 바뀐 도구로 그 커밋의 코드를 재서 기준선으로 — 지금 코드로 기준선을 올려 퇴보를 숨기지 않게(그 뒤 --strict는 코드 변화만 봄) */
+const archF = A => [...A.verdicts.filter(v => v.layers['섞임']).map(v => ({ key: `계층 섞임|${v.mod}`, num: { 함수: v.layers['섞임'] }, text: `섞인 함수 ${short(v.mod)} ${v.layers['섞임']}` })),
+  ...A.verdicts.filter(v => v.bad).map(v => ({ key: `계층 방향|${v.mod}`, num: { 위반: v.bad }, text: `방향 위반 ${short(v.mod)} ${v.bad}` })), /* 기능 판정(슈퍼·조각·흩어짐)은 후보 — 묶음이 코드 변화에 흔들려서(접근 함수만 바꿔도 뒤집힘) 래칫에 넣지 않음(docs/problems.md S5) */
+  ...(A.store?.keys || []).filter(k => !k.kind).map(k => ({ key: `저장 정책 갈래 없음|${k.key}`, num: { 키: 1 }, text: `갈래 없는 저장 키 ${k.key}` }))];
+if (arg('--rebase')) { const sha = execSync(`git rev-parse --verify ${JSON.stringify(arg('--rebase') + '^{commit}')}`, { cwd: ROOT, encoding: 'utf8' }).trim(), dir = join(ROOT, 'tools/out/ref-tree', sha);
+  if (!existsSync(join(dir, 'src'))) { mkdirSync(dir, { recursive: true }); execSync(`git archive ${sha} src www/index.html | tar -x -C ${JSON.stringify(dir)}`, { cwd: ROOT }); }
+  const u0 = await loadUnits(dir), f0 = buildGraph(u0).fns, m0 = buildMap(u0, f0, stateFlow(u0, f0), readFileSync(join(dir, 'www/index.html'), 'utf8')), F0 = archF(m0.arch), D = compare(F0, archF(map.arch));
+  writeBaseline(ROOT, F0, 'arch'); console.log(`아키텍처 기준선을 ${sha.slice(0, 7)}의 코드(지금 도구로 잼)로: ${F0.length}개 · 지금 코드는 그 대비 새로 생김 ${D.added.length} · 나빠짐 ${D.worse.length} · 해결 ${D.fixed.length} · 좋아짐 ${D.better.length}`); [...D.added, ...D.worse].forEach(f => console.log('  + ' + f.text)); }
+if (argv.includes('--strict') || argv.includes('--update-baseline')) { const F = archF(map.arch || { verdicts: [], store: { keys: [] } }), B = readBaseline(ROOT, 'arch'), D = B ? compare(B, F) : null;
   const kindOf = k => k.split('|')[0], had = new Set((B || []).map(f => kindOf(f.key))), fresh = f => !had.has(kindOf(f.key));
-  if (argv.includes('--update-baseline')) { if (D && ([...D.added.filter(f => !fresh(f)), ...D.worse].length)) { console.log('기준선을 올리는 갱신은 하지 않아요 — 코드를 고치세요'); process.exit(1); } writeBaseline(ROOT, F, 'arch'); console.log(`아키텍처 기준선: ${F.length}개${D && D.added.some(fresh) ? ` (새 판정 종류 처음 잼: ${[...new Set(D.added.filter(fresh).map(f => kindOf(f.key)))].join(', ')})` : ''}`); }
+  if (argv.includes('--update-baseline')) { if (D && ([...D.added.filter(f => !fresh(f)), ...D.worse].length)) { console.log('기준선을 올리는 갱신은 하지 않아요 — 코드를 고치세요(도구가 바뀌었으면 --rebase <직전 커밋>)'); process.exit(1); } writeBaseline(ROOT, F, 'arch'); console.log(`아키텍처 기준선: ${F.length}개${D && D.added.some(fresh) ? ` (새 판정 종류 처음 잼: ${[...new Set(D.added.filter(fresh).map(f => kindOf(f.key)))].join(', ')})` : ''}`); }
   else if (D) { console.log(`아키텍처 판정 기준선 대비: 새로 생김 ${D.added.length} · 나빠짐 ${D.worse.length} · 해결 ${D.fixed.length} · 좋아짐 ${D.better.length}`); [...D.added, ...D.worse].forEach(f => console.log('  + ' + f.text)); if (D.added.length || D.worse.length) process.exit(1); }
   else console.log('아키텍처 기준선 없음 — node tools/map.mjs --update-baseline'); }
 if (arg('--why')) console.log(why(map, arg('--why')));

@@ -5,17 +5,20 @@ const CON_RES=GGMConstruct.RES;
 function variantsFromAI(list,ng){ return GGMConstruct.variantsFrom(list,{factions:((ng.world||{}).factions||[]).map(f=>f.name),elems:(ng.meta.elems||DEFAULT_META.elems).map(e=>e.n)}).map(v=>Object.assign({id:'v_'+uid()},v)); }
 // 특수 레시피(소속·특정 캐릭터 확률 업). 분류 확률은 groups가 정해서 기본은 비워 둬요. 예: {id:'rc_x',name:'새벽 설계',min:[400,400,400,600],effect:{type:'faction',value:'새벽등대',up:3},hint:'부품을 넉넉히'}
 const CON_RECIPES=[];
-function conMeta(){ const m=G.meta; if(!m.construct||typeof m.construct!=='object') m.construct={on:false}; if(!Array.isArray(m.construct.recipes)) m.construct.recipes=clone(CON_RECIPES); return m.construct; }
+/* 건조 설정 읽기(없으면 꺼짐·기본 레시피 — 상태는 그대로, 바꿀 때는 conSave·contoggle이 G.meta.construct에 씀) */
+function conMeta(){ const c=G.meta.construct, m=c&&typeof c==='object'?c:{on:false}; return Array.isArray(m.recipes)?m:Object.assign({},m,{recipes:clone(CON_RECIPES)}); }
 function CON(){ const c=GGMConstruct.config(conMeta()); c.groups=c.groups.map(g=>{ const d=GGMConstruct.DEFAULTS.groups.find(x=>x.id===g.id); return d&&g.name===d.name&&g.match&&ROLE[g.match.role]?Object.assign({},g,{name:ROLE[g.match.role]}):g; }); return c; } // 저장된 분류는 그대로 두고 보여 줄 때만 /* 기본 분류 이름(지원·공격·방어)은 이 게임의 역할 이름으로 보여요 */
 /* 새 게임을 건조/영입이 켜진 채로 시작: 시작 자원 지급(설정에서 켤 때와 같은 양) */
 function conStartNew(ng){ ng.meta.construct=Object.assign({},ng.meta.construct||{},{on:true}); const s=GGMConstruct.config(ng.meta.construct).start; ng.prog.cres=Object.fromEntries(CON_RES.map(k=>[k,s])); ng.prog.cbuild={n:0,found:{},log:[],input:null,started:Date.now()}; }
 function conOn(){ return !!(G.meta.construct&&G.meta.construct.on); }
-function VARIANTS(){ if(!Array.isArray(G.meta.variants)) G.meta.variants=clone(GGMConstruct.VARIANT_DEFAULTS); return G.meta.variants; }
-function CRES(){ const p=P(); if(!p.cres||typeof p.cres!=='object') p.cres={}; CON_RES.forEach(k=>{ if(!(p.cres[k]>=0)) p.cres[k]=0; }); return p.cres; }
-function CBUILD(){ const p=P(); if(!p.cbuild||typeof p.cbuild!=='object') p.cbuild={n:0,found:{},log:[],input:null}; return p.cbuild; }
+/* 바리에이션 공통 설정 읽기(없으면 엔진 기본형 — id 고정이라 발견 기록과 맞음, 바꿀 때는 conSave가 G.meta.variants에 씀) */
+function VARIANTS(){ return Array.isArray(G.meta.variants)?G.meta.variants:clone(GGMConstruct.VARIANT_DEFAULTS); }
+/* 건조/영입 자원 칸 형식 맞춤(자원 4종 — 없거나 음수면 0) — 진행 칸 cres의 정의(0070 PROG_SLOTS)가 부름 */
+function cresFill(c){ CON_RES.forEach(k=>{ if(!(c[k]>=0)) c[k]=0; }); return c; }
+
 const conGem=()=>`<span style="display:inline-flex;width:1em;height:1em;vertical-align:-.15em">${rIco('gems')}</span>`;
 const conResIcon=k=>`<i class="ricon-t" style="font-style:normal">${['⛽','✴','⬢','⚙'][CON_RES.indexOf(k)]}</i>`;
-function conResBar(){ const r=CRES(); return `<div class="row" style="gap:6px;flex-wrap:wrap">${CON_RES.map(k=>`<span class="chip">${conResIcon(k)} ${esc(T(k))} <b>${nf(r[k])}</b></span>`).join('')}<span class="chip">${conGem()} <b>${nf(P().gems)}</b></span></div>`; }
+function conResBar(){ const r=progRead('cres'); return `<div class="row" style="gap:6px;flex-wrap:wrap">${CON_RES.map(k=>`<span class="chip">${conResIcon(k)} ${esc(T(k))} <b>${nf(r[k])}</b></span>`).join('')}<span class="chip">${conGem()} <b>${nf(P().gems)}</b></span></div>`; }
 
 /* 원정(파견) 보상: 시간·인원에 비례해서 건조 자원 2종 */
 function conDispReward(hours,need){ const pts=Math.pow(hours,0.85)*(1+0.35*(need-1)), ks=[...CON_RES].sort(()=>Math.random()-.5).slice(0,2), r={}; ks.forEach(k=>{ r[k]=Math.max(10,Math.round(pts*60/10)*10); }); return r; }
@@ -41,12 +44,12 @@ async function conMakeVariant(b,tpl){
 let CONJOB=false;
 /* 처음(아직 건조한 적 없음) 투입: 최소 투입으로 나올 대원이 없으면(열린 분류에 지금 나오는 희귀도의 대원이 없음) 나올 수 있는 가장 적은 투입 — 첫 건조가 빈손이 되지 않게 */
 function conDefaultInput(){ const cfg=CON(), v=[cfg.min,cfg.min,cfg.min,cfg.min], s=GGMConstruct.suggest(v,cfg,conPool()); return s?s.input:v; }
-function conReadInput(){ const B=CBUILD(), d=B.input||conDefaultInput(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:d[i]; }); }
+function conReadInput(){ const B=progRead('cbuild'), d=B.input||conDefaultInput(); return CON_RES.map((k,i)=>{ const el=$('#con_'+i); return el?+el.value:d[i]; }); }
 /* 나올 대원이 없는 까닭(엔진 suggest의 why) — 화면·확인 창 글 */
 function conEmptyWhy(why){ if(!why) return ''; const rr=a=>a.map(k=>RL[k]).join('·'); return why.open.length?`열린 분류 ${why.open.map(g=>`「${g.name}」(${g.rarity.length?rr(g.rarity):'대원 없음'})`).join(', ')}에 지금 투입으로 나오는 희귀도(${rr(why.allowed)})의 ${T('crew')}이(가) 없어요`:'이 투입으로 열리는 분류가 없어요'; }
 async function conBuild(){
   if(CONJOB||NEW_GAME_SOURCE||!conOn()) return; if(appStorage.failed||document.getElementById('save-warning')){ storageWarning('저장을 먼저 복구해 주세요.'); return; }
-  const cfg=CON(), r=CRES(); let input=GGMConstruct.normalize(conReadInput(),cfg);
+  const cfg=CON(), r=progSlot('cres'); let input=GGMConstruct.normalize(conReadInput(),cfg);
   /* 나올 대원이 없는 투입이면 멈추지 않고 나올 수 있게 맞춘 투입을 권해요(PL1 — 예: 최소 투입은 R만인데 열린 분류에 SR만 있음) */
   const sg=GGMConstruct.suggest(input,cfg,conPool()); if(!sg){ toast(`${T('construct')}로 나올 ${T('crew')}이(가) 없어요(건조 대상 대원이 없음)`); return; }
   if(sg.changed){ if(!(await appConfirm(`${conEmptyWhy(sg.why)}.\n투입을 ${sg.input.join(' / ')}(으)로 올려 ${T('construct')}할까요?`))) return; input=sg.input; }
@@ -56,7 +59,7 @@ async function conBuild(){
   if(res.kind==='none'){ toast(`${T('construct')}로 나올 ${T('crew')}이(가) 없어요`); return; }
   CONJOB=true;
   try{
-    CON_RES.forEach((k,i)=>{ r[k]-=input[i]; }); const B=CBUILD(); B.n++; B.input=input;
+    CON_RES.forEach((k,i)=>{ r[k]-=input[i]; }); const B=progSlot('cbuild'); B.n++; B.input=input;
     res.info.recipes.forEach(x=>{ if(!B.found[x.id]) { B.found[x.id]=Date.now(); toast(`새 레시피 발견: ${x.name}`); } });
     res.info.groups.filter(g=>g.open&&!B.found['g:'+g.id]).forEach(g=>{ B.found['g:'+g.id]=Date.now(); });
     let c;
@@ -71,11 +74,11 @@ async function conBuild(){
     if(res.kind==='variant'&&imgReady()&&!imgSrc(c)) setTimeout(()=>runPrep(['char'],it=>it.c&&it.c.id===c.id),1500);
   } finally{ CONJOB=false; }
 }
-async function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems&&!(await cashTopUp({gems:cfg.buy.gems-p.gems},'자원 보급에 '))) return; pay({gems:cfg.buy.gems}); CRES()[k]+=cfg.buy.amt; mark('prog'); render(); }
+async function conBuy(k){ const cfg=CON(), p=P(); if(p.gems<cfg.buy.gems&&!(await cashTopUp({gems:cfg.buy.gems-p.gems},'자원 보급에 '))) return; pay({gems:cfg.buy.gems}); progSlot('cres')[k]+=cfg.buy.amt; mark('prog'); render(); }
 
 function conNeedText(n){ const out=[]; (n.min||[]).forEach((v,i)=>{ if(v>GGMConstruct.DEFAULTS.min&&v>CON().min) out.push(`${T(CON_RES[i])} ${nf(v)}↑`); }); (n.max||[]).forEach((v,i)=>{ if(v!=null) out.push(`${T(CON_RES[i])} ${nf(v)}↓`); }); if(n.total) out.push(`총 ${nf(n.total)}↑`); Object.entries(n.share||{}).forEach(([i,[lo,hi]])=>out.push(`${T(CON_RES[i])} 비율 ${Math.round((lo||0)*100)}~${Math.round((hi==null?1:hi)*100)}%`)); return out.join(' · ')||'조건 없음'; }
 function conInfoHTML(input){
-  const cfg=CON(), t=GGMConstruct.table(input,cfg,conPool()), i=t.info, B=CBUILD(), vs=conVariantChoices(i.input).filter(v=>v.bases.length), pct=v=>(Math.round(v*10)/10)+'%', sg=t.rows.length?null:GGMConstruct.suggest(input,cfg,conPool());
+  const cfg=CON(), t=GGMConstruct.table(input,cfg,conPool()), i=t.info, B=progRead('cbuild'), vs=conVariantChoices(i.input).filter(v=>v.bases.length), pct=v=>(Math.round(v*10)/10)+'%', sg=t.rows.length?null:GGMConstruct.suggest(input,cfg,conPool());
   return `<p style="margin:0 0 6px">총 <b>${nf(i.total)}</b> · 희귀도 캡: SR ${i.open[2]?`<b>개방 ${pct(i.rarity[2])}</b>`:`잠김 <span class="muted">(총 ${nf(cfg.sr.open)}↑)</span>`} · SSR ${i.open[3]?`<b>개방 ${pct(i.rarity[3])}</b>`:`잠김 <span class="muted">(총 ${nf(cfg.ssr.open)}↑)</span>`}</p>
     <div style="font-size:.85rem;margin:0 0 6px">${i.groups.map(g=>`<div style="display:flex;justify-content:space-between;gap:8px;${g.open?'':'opacity:.55'}"><span>${g.open?'🔓':'🔒'} <b>${esc(g.name)}</b> <span class="muted">${esc(conNeedText(g.need))}</span></span><b>${g.open?pct(g.p):'—'}</b></div>`).join('')}</div>
     ${sg&&sg.changed?`<p style="margin:4px 0 6px;color:#ffb347">⚠ ${esc(conEmptyWhy(sg.why))}. <button class="btn sm" data-act="conpreset" data-v="${esc(sg.input.join(','))}">나올 수 있게 맞추기 (${esc(sg.input.join(' / '))})</button></p>`:''}
@@ -85,7 +88,7 @@ function conInfoHTML(input){
 function conEntryHTML(){ if(!conOn()) return ''; return `<div class="panel" style="margin-bottom:10px;display:flex;gap:10px;align-items:center;justify-content:space-between"><div><b>${esc(T('construct'))}</b><div class="muted" style="font-size:.8rem">${CON_RES.map(k=>esc(T(k))).join('·')}을(를) 넣어 ${esc(T('crew'))}·바리에이션 영입</div></div><button class="btn sm" data-act="go" data-to="construct">열기</button></div>`; }
 function constructHTML(){
   if(!conOn()) return pageHead(T('construct'),'CONSTRUCT','contract')+`<div class="panel"><p>설정 → 게임에서 ${esc(T('construct'))}을(를) 켜 주세요.</p></div>`;
-  const cfg=CON(), B=CBUILD(), input=GGMConstruct.normalize(B.input||conDefaultInput(),cfg), found=(cfg.recipes||[]).filter(x=>B.found[x.id]), vfound=VARIANTS().filter(t=>B.found['v:'+t.id]);
+  const cfg=CON(), B=progRead('cbuild'), input=GGMConstruct.normalize(B.input||conDefaultInput(),cfg), found=(cfg.recipes||[]).filter(x=>B.found[x.id]), vfound=VARIANTS().filter(t=>B.found['v:'+t.id]);
   const presets=[['최소',[cfg.min,cfg.min,cfg.min,cfg.min]],['균형',[300,300,300,300]],['고급',[999,999,999,999]],...cfg.groups.filter(g=>B.found['g:'+g.id]).map(g=>[g.name+' 개방',(g.min||[]).map((v,i)=>Math.max(v,cfg.min))]),...found.map(x=>[x.name,x.min]),...vfound.map(t=>['✦'+t.name,t.recipe.min])];
   return `${pageHead(T('construct'),'CONSTRUCT','contract')}${conResBar()}
   <div class="panel" style="margin-top:10px"><h3>자원 투입 <span class="muted" style="font-size:.8rem">(${cfg.min}~${cfg.max})</span></h3>
@@ -134,19 +137,19 @@ function conReadVariants(){ return [...document.querySelectorAll('#con_vars [dat
   const cond={factions:list('factions'),roles:[...d.querySelectorAll('[data-vrole]:checked')].map(x=>x.dataset.vrole),elems:list('elems'),stats:v('stk')?[{k:v('stk'),op:v('stop')||'>=',v:+v('stv')||0}]:[],lv:+v('lv')||0,dup:+v('dup')||0,aff:+v('aff')||0,cleared:list('cleared')};
   return {id:old.id||'v_'+uid(),name:v('name')||'바리에이션',prompt:v('prompt'),brief:v('brief'),chance:Math.min(100,Math.max(0,+v('chance')||0)),recipe:{min:nums.slice(0,4)},rarity:v('rarity')||'same',on:!!f('on')?.checked,cond}; }); }
 async function conSave(){ let adv; try{ adv=JSON.parse($('#con_adv').value); }catch(e){ toast('고급 설정 JSON을 확인해 주세요: '+e.message); return; }
-  const m=conMeta(), wasOn=m.on; Object.assign(m,adv,{on:$('#con_on').checked,buy:{gems:Math.max(1,+$('#con_bg').value||60),amt:Math.max(1,+$('#con_ba').value||300)}});
+  const m=G.meta.construct=conMeta(), wasOn=m.on; Object.assign(m,adv,{on:$('#con_on').checked,buy:{gems:Math.max(1,+$('#con_bg').value||60),amt:Math.max(1,+$('#con_ba').value||300)}});
   G.meta.variants=conReadVariants();
-  if(m.on&&!wasOn&&!CBUILD().started){ CBUILD().started=Date.now(); const r=CRES(), s=CON().start; CON_RES.forEach(k=>{ r[k]+=s; }); toast(`${T('construct')}을(를) 켰어요. 시작 자원 ${nf(s)}씩 드려요`); }
+  if(m.on&&!wasOn&&!progRead('cbuild').started){ progSlot('cbuild').started=Date.now(); const r=progSlot('cres'), s=CON().start; CON_RES.forEach(k=>{ r[k]+=s; }); toast(`${T('construct')}을(를) 켰어요. 시작 자원 ${nf(s)}씩 드려요`); }
   mark('meta','prog'); closeModal(); render(); }
 
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act;
   if(a==='conbuild') conBuild();
   else if(a==='conbuy') conBuy(el.dataset.k);
-  else if(a==='conpreset'){ const v=el.dataset.v.split(',').map(Number); v.forEach((x,i)=>{ const n=$('#con_'+i), r=$('#con_r'+i); if(n) n.value=x; if(r) r.value=x; }); const info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(GGMConstruct.normalize(v,CON())); CBUILD().input=GGMConstruct.normalize(v,CON()); }
-  else if(a==='contoggle'){ if(conOn()){ conMeta().on=false; mark('meta'); render(); } else openConSet(); }
+  else if(a==='conpreset'){ const v=el.dataset.v.split(',').map(Number); v.forEach((x,i)=>{ const n=$('#con_'+i), r=$('#con_r'+i); if(n) n.value=x; if(r) r.value=x; }); const info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(GGMConstruct.normalize(v,CON())); progSlot('cbuild').input=GGMConstruct.normalize(v,CON()); }
+  else if(a==='contoggle'){ if(conOn()){ G.meta.construct.on=false; mark('meta'); render(); } else openConSet(); }
   else if(a==='conset') openConSet();
   else if(a==='consave') conSave();
   else if(a==='convadd'){ CONV=[...conReadVariants(),{id:'v_'+uid(),name:'새 바리에이션',prompt:'',brief:'',chance:30,recipe:{min:[200,200,200,400]},rarity:'same',on:true,cond:{}}]; $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); }
   else if(a==='convdel'){ CONV=conReadVariants(); CONV.splice(+el.dataset.i,1); $('#con_vars').innerHTML=CONV.map(conVariantRow).join(''); } });
 document.addEventListener('input',e=>{ const i=e.target.dataset&&e.target.dataset.con; if(i==null) return; const v=e.target.value; const el=$('#con_'+i), r=$('#con_r'+i); if(el&&el!==e.target) el.value=v; if(r&&r!==e.target) r.value=v;
-  const input=GGMConstruct.normalize(conReadInput(),CON()), info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(input); CBUILD().input=input; });
+  const input=GGMConstruct.normalize(conReadInput(),CON()), info=$('#conInfo'); if(info) info.innerHTML=conInfoHTML(input); progSlot('cbuild').input=input; });

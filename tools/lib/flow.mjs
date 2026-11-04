@@ -65,14 +65,27 @@ export function mutations(units, fns) {
   return { mut, unsaved };
 }
 
+// 진행 접근 함수: P()의 한 칸을 돌려줌 — return p.cres 처럼 바로, 또는 let b=p.dboard … return b 처럼 그 칸을 담은 변수로 → 칸 이름
+export const PROG_BASE = /^(P\(\)|G\.prog)$/;
+export function progAccessors(fns) { const out = new Map();
+  for (const f of fns.values()) { if (!f.top) continue; const alias = new Set(), slot = new Map(), keyOf = t => { const m = /^([\w$]+|P\(\))\.(\w+)\b/.exec(String(t || '')); return m && (PROG_BASE.test(m[1]) || alias.has(m[1])) ? m[2] : null; };
+    walk(f.node, n => { if (n.type === 'variable_declarator' && PROG_BASE.test(n.childForFieldName('value')?.text || '')) alias.add(n.childForFieldName('name')?.text); });
+    walk(f.node, n => { const decl = n.type === 'variable_declarator', asg = n.type === 'assignment_expression' && n.childForFieldName('left')?.type === 'identifier'; if (!decl && !asg) return; const nm = n.childForFieldName(decl ? 'name' : 'left')?.text, k = keyOf(n.childForFieldName(decl ? 'value' : 'right')?.text); if (nm && k) slot.set(nm, k); });
+    walk(f.node, n => { if (n.type !== 'return_statement') return; const r = n.namedChildren[0]; const k = r?.type === 'member_expression' ? keyOf(r.text) : r?.type === 'identifier' ? slot.get(r.text) : null; if (k) out.set(f.name, k); }); }
+  return out; }
 // ③ 상태 키 흐름: G.meta.x · G.world.x · G.x · P().x 를 쓰는 함수와 읽는 함수(화면 함수 표시)
 const SCREEN = /HTML$|Panel$|^render|^open[A-Z]|Draw$|^draw[A-Z]|^show[A-Z]/;
-export function stateFlow(units, fns) {
+export function stateFlow(units, fns) { const acc = progAccessors(fns);
   const keys = new Map(), K = k => { if (!keys.has(k)) keys.set(k, { w: new Set(), r: new Set(), wl: [] }); return keys.get(k); };
   const BASES = { 'G.meta': 'G.meta', 'G.world': 'G.world', 'G': 'G', 'P()': 'P()', 'G.prog': 'P()' } /* G.prog는 P()와 같은 객체 */, fnAt = n => { for (let x = n.parent; x; x = x.parent) if (/function|arrow_function|method_definition/.test(x.type)) return x; return null; };
   for (const u of units) { if (u.name !== 'main') continue; const alias = new Map(); // '함수시작:이름' → 'P()' 등 (const p=P(), w=G.world …)
     walk(u.tree.rootNode, n => { if (n.type === 'variable_declarator') { const v = n.childForFieldName('value')?.text, nm = n.childForFieldName('name'); if (nm?.type === 'identifier' && BASES[v] && v !== 'G') alias.set(`${fnAt(n)?.startIndex}:${nm.text}`, BASES[v]); } });
     const aliasOf = id => { for (let f = fnAt(id); f; f = fnAt(f)) { const b = alias.get(`${f.startIndex}:${id.text}`); if (b) return b; } return null; };
+    /* 진행 칸 접근: progSlot('x')·예전 접근 함수(RG() 같은 칸 하나를 돌려주는 함수 — 없으면 만들어 저장) = 진행 칸 P().x를 맞춰 쓰고 읽음 · progRead('x') = 읽기만.
+       접근 함수 뒤에 숨은 칸 쓰기도 보이게 — 접근 함수를 칸 이름 접근으로 바꿔도 같은 흐름으로 잼 */
+    walk(u.tree.rootNode, n => { if (n.type !== 'call_expression') return; const fn = n.childForFieldName('function')?.text, as = n.childForFieldName('arguments')?.namedChildren || [], f = ownerFn(fns, u, n);
+      const slot = /^prog(Slot|Read)$/.test(fn || '') && as[0]?.type === 'string' ? as[0].text.slice(1, -1) : !as.length && acc.has(fn) && f?.name !== fn ? acc.get(fn) : null; if (!slot) return;
+      const rec = K('P().' + slot); if (fn !== 'progRead') { if (f) rec.w.add(f.key); rec.wl.push(u.loc(n)); } if (f) rec.r.add(f.key); });
     walk(u.tree.rootNode, n => { if (n.type !== 'member_expression') return; const o = n.childForFieldName('object'), p = n.childForFieldName('property'); if (!o || !p) return;
     const base = BASES[o.text] || (o.type === 'identifier' ? aliasOf(o) : null); if (!base || n.parent?.type === 'member_expression' && n.parent.childForFieldName('object')?.startIndex === n.startIndex && base === 'G' && /^(meta|world)$/.test(p.text)) return;
     const key = `${base}.${p.text}`, f = ownerFn(fns, u, n), par = n.parent, write = (par?.type === 'assignment_expression' || par?.type === 'augmented_assignment_expression') && par.childForFieldName('left')?.startIndex === n.startIndex; /* tree-sitter 노드는 매번 새 객체라 위치로 비교 */

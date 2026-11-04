@@ -5,7 +5,7 @@
    - 장면 c.spotTalk={[spot id]:대본} : AI로(spotTalkAI) 만들고, 없으면 개성 시트로 짧은 기본 장면(spotTemplate)
    - 생성 연계: 점검 규칙 g_spots(장소 없음 → 글 AI가 있으면 AI, 없으면 자료실 배경), c_spot(장면 없음 → AI) · 문서 docs/research/combat-content.md */
 const SCHED_N=3;
-function SCHED(){ const p=P(); if(!p.sched||p.sched.day!==today()) p.sched={day:today(),left:SCHED_N,done:[]}; return p.sched; }
+
 function spots(){ return Array.isArray(G.meta.spots)?G.meta.spots:[]; }
 function spotsAuto(){ const L=[]; G.lib.filter(l=>l.kind==='bg'&&l.name).slice(0,7).forEach(l=>L.push({id:uid(),name:l.name,desc:'',bg:l.name,tags:[]}));
   if(!L.length) ['광장','카페','훈련장','도서관'].forEach(n=>L.push({id:uid(),name:n,desc:'',bg:'',tags:[n]})); G.meta.spots=L; mark('meta'); return L.length; }
@@ -22,9 +22,9 @@ async function spotsAI(btn){ const r=await aiJSON(spotsAIPrompt(),btn,'complex')
 async function spotTalkAI(c,btn){ const S=spots(); if(!S.length) return false;
   const r=await aiJSON(spotTalkAIPrompt({c,S}),btn,'complex');
   let n=0; (r&&Array.isArray(r.scenes)?r.scenes:[]).forEach(x=>{ const s=S.find(y=>y.name===String(x.spot||'').trim()), t=nl(x.script); if(s&&t){ c.spotTalk=c.spotTalk||{}; c.spotTalk[s.id]=t; n++; } }); if(n) mark('c:'+c.id); return n>0; }
-function schedVisit(sid,cid){ const sc=SCHED(), s=spots().find(x=>x.id===sid), c=charById(cid); if(!s||!c||!own(c.id)) return; if(sc.left<=0){ toast('오늘 일정을 다 썼어요. 내일 다시 와요'); return; } if(sc.done.includes(sid)){ toast('오늘 이미 다녀온 장소예요'); return; }
-  const fav=spotFav(c,s); playStory(`${s.name} · ${c.name}`,(c.spotTalk&&c.spotTalk[s.id])||spotTemplate(c,s),()=>{ const k=SCHED(); k.left--; k.done.push(sid); addAff(c,fav?30:20); const r=rateR({gold:800}); giveReward(r); mark('prog'); toast(`${c.name} 호감도 +${fav?30:20}${fav?' (좋아하는 장소)':''} · ${rewardText(r)}`); render(); }); }
-function schedHTML(){ const sc=SCHED(), S=spots();
+function schedVisit(sid,cid){ const sc=progRead('sched'), s=spots().find(x=>x.id===sid), c=charById(cid); if(!s||!c||!own(c.id)) return; if(sc.left<=0){ toast('오늘 일정을 다 썼어요. 내일 다시 와요'); return; } if(sc.done.includes(sid)){ toast('오늘 이미 다녀온 장소예요'); return; }
+  const fav=spotFav(c,s); playStory(`${s.name} · ${c.name}`,(c.spotTalk&&c.spotTalk[s.id])||spotTemplate(c,s),()=>{ const k=progSlot('sched'); k.left--; k.done.push(sid); addAff(c,fav?30:20); const r=rateR({gold:800}); giveReward(r); mark('prog'); toast(`${c.name} 호감도 +${fav?30:20}${fav?' (좋아하는 장소)':''} · ${rewardText(r)}`); render(); }); }
+function schedHTML(){ const sc=progRead('sched'), S=spots();
   return `${pageHead('일정','SCHEDULE','lobby')}<p class="muted">하루 ${SCHED_N}번, 장소에 나와 있는 ${T('crew')}을(를) 만나요. 좋아하는 장소에서 만나면 호감도를 더 많이 얻어요. 오늘 남은 일정 <b>${sc.left}/${SCHED_N}</b></p>
   ${S.length?`<div class="sc-spots">${S.map(s=>{ const done=sc.done.includes(s.id), who=spotWho(s); return `<div class="sc-spot" style="${bgStyle(s.bg||s.name)}"><b>${esc(s.name)}</b>${s.desc?`<div class="muted" style="font-size:.75rem">${esc(s.desc)}</div>`:''}
     <div class="sc-who">${done?'<span class="badge">다녀옴</span>':who.length?who.map(c=>`<button class="btn sm" data-act="scvisit" data-s="${s.id}" data-c="${c.id}" ${sc.left?'':'disabled'}>${esc(c.name)}${spotFav(c,s)?' ♥':''}</button>`).join(''):'<span class="muted">아무도 없어요</span>'}</div></div>`; }).join('')}</div>`:`<p>아직 장소가 없어요.</p><button class="btn" data-act="scauto">자료실 배경으로 장소 만들기</button>`}

@@ -133,7 +133,7 @@ async function drawCardArts(deck,btn){ if(!imgReady()){ toast(imgNeed()); return
       if(cd.k==='skill'){ scgOf(c); await storeImage(c.scg,b,''); } else { c.cards=c.cards||{}; const o=c.cards[cd.k]||(c.cards[cd.k]={id:'cd_'+c.id+'_'+cd.k,kind:'illust',name:c.name+' '+cardName({k:cd.k,o:c.id}),prompt:tags,img:null}); await storeImage(o,b,''); }
       mark('c:'+c.id); n++; }
     catch(e){ toast(naiErr(e)); break; } }
-  if(btn&&btn.isConnected){ btn.disabled=false; btn.textContent=lab; } if(n) toast(`카드 일러스트 ${n}장을 그렸어요`); const run=RG().run; if($('#modal .cd-row')&&run) rgDeckModal(run.deck); if(CB) cbRender(); }
+  if(btn&&btn.isConnected){ btn.disabled=false; btn.textContent=lab; } if(n) toast(`카드 일러스트 ${n}장을 그렸어요`); const run=progSlot('rogue').run; if($('#modal .cd-row')&&run) rgDeckModal(run.deck); if(CB) cbRender(); }
 
 /* --- 카드 전투 엔진 --- */
 let CB=null;
@@ -147,7 +147,7 @@ function rgUnits(run,ids){ const m=id=>rgCount(id), fb=factionBonus(ids);
     u.maxhp=Math.round(st.hp*(1+0.2*m('hp')+0.08*m('res'))); u.atk=Math.round(st.atk*(1+(fb[c.faction]||0)/100)*(1+0.15*m('atk')+0.08*m('res')+0.05*m('train'))); u.def=Math.round(st.def*(1+0.25*m('def'))); u.hp=Math.round(u.maxhp*(fr==null?1:fr)); return u; }); }
 function cbLead(){ return CB.units[0]; }
 function cbUnit(id){ return CB.units.find(u=>u.c.id===id)||CB.units[0]; }
-function cbStart(kind){ const run=RG().run; const en=rgEnemies({k:run.k,floor:rgEq(run,kind)},kind);
+function cbStart(kind){ const run=progRead('rogue').run; const en=rgEnemies({k:run.k,floor:rgEq(run,kind)},kind);
   const units=rgUnits(run,run.squad), L=units[0]; L.maxhp=Math.round(L.maxhp*2.2); const fr=run.hp[L.c.id]; L.hp=Math.round(L.maxhp*(fr==null?1:fr));
   const bs=run.squad.map(charById).filter(Boolean).map(stats), avg=k=>bs.reduce((s,x)=>s+x[k],0)/Math.max(1,bs.length);
   // 적의 세기는 리더를 기준으로 정해요(체력 = 리더 공격 몇 번, 공격 = 리더 최대 체력 몇 %). 층이 깊을수록 강해지고, 탐사대가 강하면 조금만 약해져요.
@@ -296,7 +296,7 @@ function dgHTML(run){ const map=run.map, here=run.pos, W=map.w;
   const hx=here%W, hy=Math.floor(here/W);
   return `<div class="dg-wrap"><div class="dg" id="dgMap" style="--w:${W};--h:${map.h}">${cells}<div class="dg-hero" id="dgHero" style="--x:${hx};--y:${hy}">${lead?`<img data-pix="${lead.id}" alt=""><span class="dg-fb">${esc(lead.name.slice(0,1))}</span>`:''}</div></div>
     <div class="dg-leg">${['battle','elite','treasure','rest','event',run.floor>=DG_FLOORS?'boss':'stairs'].map(k=>`<span><i class="r-${k}">${DG_ROOM[k][0]}</i>${DG_ROOM[k][1]}</span>`).join('')}</div></div>`; }
-function dgMove(to){ const run=RG().run; if(!run||run.busy) return; const path=dgPath(run.map,run.pos,to); if(!path) return; run.busy=true; const W=run.map.w, hero=$('#dgHero'); let k=1;
+function dgMove(to){ const run=progSlot('rogue').run; if(!run||run.busy) return; const path=dgPath(run.map,run.pos,to); if(!path) return; run.busy=true; const W=run.map.w, hero=$('#dgHero'); let k=1;
   const go=()=>{ if(k<path.length){ const i=path[k++]; if(hero){ hero.style.setProperty('--x',i%W); hero.style.setProperty('--y',Math.floor(i/W)); } sfx('확인'); setTimeout(go,170); return; }
     run.busy=false; run.pos=to; dgReveal(run.map,to); dgEnter(run); };
   go(); }
@@ -323,7 +323,7 @@ function rgMessage(run){
  const m=msg.match(/^지하 (\d+)층에 내려왔어요\.( 이 층 어딘가에 보스가 있어요\.)?$/);
  return m?`제${m[1]}구역에 진입했어요.${m[2]?' 이 구역 어딘가에 보스가 있어요.':''}`:msg;
 }
-function rgRunHTML2(run){ const g=RG(); const c=run.map.cells[run.pos];
+function rgRunHTML2(run){ const g=progRead('rogue'); const c=run.map.cells[run.pos];
   let body;
   let ov='';
   if(run.pick){ ov=`<div class="rg-ov"><div class="rg-ban">유물을 선택하십시오</div><div class="rg-picks rg-ovp">`+run.pick.filter(k=>RELICS[k]).map((k,j)=>{ const n=rgCount(k); return `<button class="rg-relic" style="animation-delay:${j*0.09}s" data-act="rgrelic" data-v="${k}"><b>${esc(RELICS[k][0])}${n?` <small>×${n+1}</small>`:''}</b><span>${esc(RELICS[k][1])}</span></button>`; }).join('')+`</div><button class="btn rg-skipb" data-act="rgskip">넘기기 <small>(체력 10% 회복)</small></button></div>`; }
@@ -347,7 +347,7 @@ function rfAuto(){ const busy=busyIds(), pool=G.chars.filter(c=>own(c.id)&&!busy
   ['sup','def','atk'].forEach(r=>{ const c=pool.find(x=>x.role===r&&!out.includes(x.id)); if(c&&out.length<4) out.push(c.id); }); pool.forEach(c=>{ if(out.length<4&&!out.includes(c.id)) out.push(c.id); });
   return [0,1,2,3].map(i=>out[i]||null); }
 function openRgForm(){ const busy=busyIds();
-  if(!RF){ const prev=(RG().lastSquad||P().squad||[]).filter(id=>own(id)&&charById(id)&&!busy.has(id)).slice(0,4); RF={s:prev.length?[0,1,2,3].map(i=>prev[i]||null):rfAuto(),sel:0,filter:'all'}; }
+  if(!RF){ const prev=(progRead('rogue').lastSquad||P().squad||[]).filter(id=>own(id)&&charById(id)&&!busy.has(id)).slice(0,4); RF={s:prev.length?[0,1,2,3].map(i=>prev[i]||null):rfAuto(),sel:0,filter:'all'}; }
   const L=charById(RF.s[0]), ids=rfIds(), deck=ids.length?rgDeck(ids):[];
   const chip=cd=>`<span class="rf-cd t-${cardType(cd)}">${esc(cardName(cd))}</span>`;
   const lead=L?`<button class="rf-lead ${RF.sel===0?'sel':''}" data-act="rfslot" data-i="0" style="--ec:${ECOL[L.elem]}"><div class="rf-la">${art(L)}</div><div class="rf-lt"><i>LEADER · 직접 싸워요</i><b>${esc(L.name)}</b><span class="el" style="--ec:${ECOL[L.elem]}">${esc(L.elem)}</span> <small>${esc(ROLE[L.role])} · Lv.${own(L.id).lv}</small>
@@ -367,16 +367,16 @@ function openRgForm(){ const busy=busyIds();
 
 // 심연 탐사 전용 화면(진행 중일 때 화면 전체를 써요)
 function rgAbandon(why){ const html=rgFinish(false); setTimeout(()=>openModal(`<div class="result" style="position:static"><p style="margin:0 0 6px"><b>탐사가 끝났어요</b><br><span class="muted">${esc(why)}</span></p>${html.replace('data-act="bdone"','data-act="close"')}</div>`),0); }
-function abyssHTML(){ const g=RG(), run=g.run; if(!run||run.v!==2){ tab='challenge'; return challengeHTML(); }
+function abyssHTML(){ const g=progSlot('rogue'), run=g.run; if(!run||run.v!==2){ tab='challenge'; return challengeHTML(); }
   if(run.left||(!RG_LIVE&&!run.saved)){ rgAbandon('야영지에서 저장하지 않고 나가서 탐사가 끝났어요. 저장은 야영지의 \'저장하고 나가기\'로만 할 수 있어요.'); tab='challenge'; return challengeHTML(); }
   RG_LIVE=true;
   if(!run.wk){ run.wk=weekKey(); mark('prog'); }
-  if(run.wk!==weekKey()){ const sq=run.squad.slice(), html=rgFinish(false); setTimeout(()=>{ rgStart(sq,'card'); RG().run.msg='탐사 경로가 바뀌어 제1구역으로 돌아왔어요. 같은 탐사대로 처음부터 다시 시작해요.'; mark('prog'); render(); openModal(`<div class="result" style="position:static"><p style="margin:0 0 6px"><b>탐사 경로가 바뀌었어요</b><br><span class="muted">지난주 탐사는 여기까지예요. 제1구역부터 다시 시작해요.</span></p>${html.replace('data-act="bdone"','data-act="close"')}</div>`); },0); return pageHead(T('abyss'),'EXPEDITION','challenge'); }
+  if(run.wk!==weekKey()){ const sq=run.squad.slice(), html=rgFinish(false); setTimeout(()=>{ rgStart(sq,'card'); progSlot('rogue').run.msg='탐사 경로가 바뀌어 제1구역으로 돌아왔어요. 같은 탐사대로 처음부터 다시 시작해요.'; mark('prog'); render(); openModal(`<div class="result" style="position:static"><p style="margin:0 0 6px"><b>탐사 경로가 바뀌었어요</b><br><span class="muted">지난주 탐사는 여기까지예요. 제1구역부터 다시 시작해요.</span></p>${html.replace('data-act="bdone"','data-act="close"')}</div>`); },0); return pageHead(T('abyss'),'EXPEDITION','challenge'); }
   if(run.saved){ delete run.saved; mark('prog'); }
   setTimeout(pixFill,30);
   return `<div class="phead"><button class="back" data-act="rgleave" aria-label="나가기">‹</button><div><i>EXPEDITION</i><h2>${esc(T('abyss'))}</h2></div></div>${rgRunHTML2(run)}`; }
 function challengeHTML(){
-  const r=RAID(), b=raidBoss(), ratio=r.dmg/b.total, left=raidTriesLeft(), g=RG(), run=g.run;
+  const r=progRead('raid'), b=raidBoss(), ratio=r.dmg/b.total, left=raidTriesLeft(), g=progRead('rogue'), run=g.run;
   const raid=`<section class="ch-card raid"><div class="ch-h"><i>WEEKLY RAID · Lv.${r.lv}</i><h3>${esc(b.name)}</h3><span>이번 주 함께 깎는 보스예요. 한 번에 ${Math.ceil(RAID_TICKS*GGMCombat.DT)}초 동안 싸우고, 준 피해가 쌓여요.</span></div>
     <div class="rd-hero ${r.killed?'dead':''}" style="--ec:${ECOL[b.elem]}"><div class="rd-bg" style="${b.bg?bgStyle(b.bg):bgStyle(P().lobbyBg||'')}"></div><div class="rd-glow"></div>
       <div class="rd-boss">${enemyArt(b,'rd-img')}</div><div class="rd-shade"></div>
@@ -404,10 +404,10 @@ function challengeHTML(){
 }
 /* 심연 탐사 런: 층·유물·노드 고르기·적·시작·전투·끝·보상(도전 레이드 파일에서 모음) */
 const RG_FLOORS=12;
-function RG(){ const p=P(); if(!p.rogue||typeof p.rogue!=='object') p.rogue={run:null,best:0,day:'',n:0}; const r=p.rogue.run; if(r&&r.v===3){ r.v=2; r.c3=1; } return p.rogue; }
+
 const RELICS={chain4:['연쇄 반응','한 턴에 카드를 4장째 쓰면 에너지 +1'],brandplus:['피의 낙인','낙인을 걸 때 1개 더'],phoenix:['불사의 깃털','전투마다 한 번, 쓰러질 때 체력 30%로 버텨요'],thorns:['가시 갑옷','보호막으로 막은 피해의 30%를 공격한 적에게 돌려줘요'],opener:['선제 낙인','전투 시작 때 모든 적에게 낙인 2'],lastcard:['마지막 한 장','손에 남은 마지막 카드는 위력 2배'],ultcharge:['필살 충전기','필살 게이지를 2칸 채운 채 전투 시작'],vamp:['흡혈 송곳니','적을 쓰러뜨릴 때마다 리더 체력 8% 회복'],ashes:['잿불','카드가 소멸할 때마다 모든 적에게 피해'],deepcut:['깊은 상처','출혈 피해 +50%'],tempo:['리듬','한 턴에 카드를 6장째 쓰면 카드 2장 뽑기'],markburst:['각인 전염','낙인이 남은 적이 쓰러지면 그 낙인이 다른 적 모두에게 옮겨 붙어요'],ultecho:['잔영','필살을 쓰면 에너지 +1, 카드 2장 뽑기'],capacitor:['축전기','전투 시작 때 충전 3'],firstfree:['첫 수','매 턴 첫 카드 비용 -1'],atk:['날카로운 칼날','공격 +15%'],def:['강화 장갑','방어 +25%'],hp:['생명의 결정','최대 체력 +20%'],spd:['가속 장치','속도 +10%'],burst:['오버드라이브','전투 시작 BURST +40%'],heal:['응급 키트','전투가 끝날 때마다 체력 15% 회복'],loot:['전리품 자석','탐사 보상 +30%'],res:['공명 코어','공격 +8% · 체력 +8%'],train:['실전 훈련','공격 +5% (겹쳐요)']};
 const RG_NODE={battle:['⚔','전투','일반 적'],elite:['☠','정예','강한 적 · 이기면 유물'],rest:['⛺','휴식','체력 35% 회복, 쓰러진 대원 부활'],treasure:['✦','보물','유물 1개 고르기'],event:['?','사건','무슨 일이 생길지 몰라요'],boss:['♛','보스','마지막 전투']};
-function rgCount(id){ const run=RG().run; return run?run.relics.filter(x=>x===id).length:0; }
+function rgCount(id){ const run=progRead('rogue').run; return run?run.relics.filter(x=>x===id).length:0; }
 function rgOpts(run){ if(run.floor>=RG_FLOORS) return ['boss']; const w=[['battle',45],['elite',15],['rest',15],['treasure',10],['event',15]]; const out=[]; let guard=0;
   while(out.length<3&&guard++<40){ let x=Math.random()*100; const k=w.find(([_,p])=>(x-=p)<0)[0]; if(!out.includes(k)) out.push(k); } if(!out.includes('battle')&&!out.includes('elite')) out[0]='battle'; return out; }
 const CRELICS=['chain4','brandplus','phoenix','thorns','opener','lastcard','ultcharge','vamp','firstfree','ashes','deepcut','tempo','markburst','ultecho','capacitor','atk','hp','loot'];
@@ -425,12 +425,12 @@ function rgEnemies(run,kind){ const pool=[]; G.chapters.filter(ch=>ch.kind==='ma
   else { en=Array.from({length:2+(Math.random()<0.5?1:0)},()=>pick(false)); en.forEach(e=>fitEnemy(e,enemyTarget(k,i,false)*0.85)); }
   return en; }
 let RGMODE='card';
-function rgStart(ids,mode){ const g=RG(); mode=mode||'card'; const map=dgGen(1); RG_LIVE=true; g.run={v:2,c3:1,wk:weekKey(),mode:'card',floor:1,fw:0,squad:ids,hp:Object.fromEntries(ids.map(id=>[id,1])),relics:[],deck:mode==='card'?rgDeck(ids):[],map,pos:map.start,pick:null,cpick:null,k:progK(),at:Date.now(),msg:mode==='card'?'카드 전투 탐사를 시작해요. 매 턴 에너지 3으로 카드를 써요. 적 머리 위의 표시가 다음 행동이에요.':'탐사를 시작해요.'}; mark('prog'); tab='abyss'; render(); }
-function rgBattle(kind){ const run=RG().run; const en=rgEnemies(run.v===2?{k:run.k,floor:rgEq(run,kind)}:run,kind); const s={id:'rg_'+run.floor,title:`${T('abyss')} · ${run.floor}구역 · ${RG_NODE[kind][1]}`,enemies:en,pre:'',post:''};
+function rgStart(ids,mode){ const g=progSlot('rogue'); mode=mode||'card'; const map=dgGen(1); RG_LIVE=true; g.run={v:2,c3:1,wk:weekKey(),mode:'card',floor:1,fw:0,squad:ids,hp:Object.fromEntries(ids.map(id=>[id,1])),relics:[],deck:mode==='card'?rgDeck(ids):[],map,pos:map.start,pick:null,cpick:null,k:progK(),at:Date.now(),msg:mode==='card'?'카드 전투 탐사를 시작해요. 매 턴 에너지 3으로 카드를 써요. 적 머리 위의 표시가 다음 행동이에요.':'탐사를 시작해요.'}; mark('prog'); tab='abyss'; render(); }
+function rgBattle(kind){ const run=progSlot('rogue').run; const en=rgEnemies(run.v===2?{k:run.k,floor:rgEq(run,kind)}:run,kind); const s={id:'rg_'+run.floor,title:`${T('abyss')} · ${run.floor}구역 · ${RG_NODE[kind][1]}`,enemies:en,pre:'',post:''};
   const m=id=>rgCount(id);
   startStage(s,{kind:'rogue',node:kind,squad:run.squad,burst0:m('burst')?40:0,prep:(al)=>{ al.forEach(u=>{ const fr=run.hp[u.c.id]; const hpM=1+0.2*m('hp')+0.08*m('res');
       u.maxhp=Math.round(u.maxhp*hpM); u.atk=Math.round(u.atk*(1+0.15*m('atk')+0.08*m('res')+0.05*m('train'))); u.def=Math.round(u.def*(1+0.25*m('def'))); u.spd=Math.round(u.spd*(1+0.1*m('spd'))); u.hp=Math.round(u.maxhp*(fr==null?1:fr)); }); }}); }
-function rogueEnd(win){ const g=RG(), run=g.run; if(!run) return '<button class="btn" data-act="bdone">계속</button>';
+function rogueEnd(win){ const g=progSlot('rogue'), run=g.run; if(!run) return '<button class="btn" data-act="bdone">계속</button>';
   const heal=0.15*rgCount('heal'); B.allies.forEach(u=>{ run.hp[u.c.id]=u.hp>0?Math.min(1,u.hp/u.maxhp+heal):0; const o=own(u.c.id); if(o&&win) gainExp(o,expR(40)); });
   const node=B.ctx.node;
   if(win&&node==='boss'){ const html=rgFinish(true); return html; }
@@ -439,10 +439,10 @@ function rogueEnd(win){ const g=RG(), run=g.run; if(!run) return '<button class=
     return `<h2 class="disp" style="color:var(--rose);margin:0">전투 승리</h2><p>${node==='elite'?'정예를 쓰러뜨렸어요. 유물을 고를 수 있어요.<br>':''}${run.mode==='card'?'새 카드를 하나 고를 수 있어요.':'계속 탐사해요.'}${heal?'<br>응급 키트로 체력을 회복했어요.':''}</p><button class="btn" data-act="bdone">계속</button>`; }
   run.floor++; run.opts=rgOpts(run); if(node==='elite') run.pick=rgPick3(run); mark('prog'); sfx('승리');
   return `<h2 class="disp" style="color:var(--rose);margin:0">${run.floor-1}구역 돌파</h2><p>${node==='elite'?'정예를 쓰러뜨렸어요. 유물을 하나 고를 수 있어요.':'다음 구역으로 가요.'}${heal?'<br>응급 키트로 체력을 회복했어요.':''}</p><button class="btn" data-act="bdone">계속</button>`; }
-function rgReward(f,done,prev,won){ prev=prev||0; const nf2=Math.max(0,f-prev); let r={gold:1200*f,exp:3*f,wmat:2*f,core:Math.floor(f/3)+(done?5:0),gift:Math.floor(f/4)+(done?2:0)}; const m=(1+0.3*rgCount('loot'))*(RG().n>=2?0.25:1); Object.keys(r).forEach(k=>r[k]=Math.round(r[k]*m)); const gm=40*nf2+(done&&!won?500:0); if(gm) r.gems=gm; return r; }
-function rgFinish(done){ const g=RG(), run=g.run, f=done?RG_FLOORS:run.v===2?rgScore(run):run.floor-1; if(g.day!==today()){ g.day=today(); g.n=0; } const r=rgReward(f,done,g.best||0,!!g.won); giveReward(r); g.n++; g.best=Math.max(g.best||0,f); if(done) g.won=true; g.run=null; mark('prog'); sfx(done?'SSR':'확인');
+function rgReward(f,done,prev,won){ prev=prev||0; const nf2=Math.max(0,f-prev); let r={gold:1200*f,exp:3*f,wmat:2*f,core:Math.floor(f/3)+(done?5:0),gift:Math.floor(f/4)+(done?2:0)}; const m=(1+0.3*rgCount('loot'))*(progRead('rogue').n>=2?0.25:1); Object.keys(r).forEach(k=>r[k]=Math.round(r[k]*m)); const gm=40*nf2+(done&&!won?500:0); if(gm) r.gems=gm; return r; }
+function rgFinish(done){ const g=progSlot('rogue'), run=g.run, f=done?RG_FLOORS:run.v===2?rgScore(run):run.floor-1; if(g.day!==today()){ g.day=today(); g.n=0; } const r=rgReward(f,done,g.best||0,!!g.won); giveReward(r); g.n++; g.best=Math.max(g.best||0,f); if(done) g.won=true; g.run=null; mark('prog'); sfx(done?'SSR':'확인');
   return `<h2 class="disp" style="color:${done?'var(--rose)':'#ff5277'};margin:0">${esc(T('abyss'))} · ${done?'탐사 완료!':'탐사 종료'}</h2><p>${run.v===2?`제${run.floor}구역까지 탐사했어요 (진척 ${f}/${RG_FLOORS})`:f+'구역까지 갔어요'}.${g.n>2?' (오늘 3번째부터는 보상 25%)':''}<br>${rewardText(r)}${r.gems?'':`<br><small class="muted">${esc(T('currency'))}은(는) 최고 진척 기록을 갱신할 때만 받아요</small>`}</p><button class="btn" data-act="bdone">계속</button>`; }
-function rgNode(kind){ const g=RG(), run=g.run; if(!run) return;
+function rgNode(kind){ const g=progSlot('rogue'), run=g.run; if(!run) return;
   if(kind==='battle'||kind==='elite'||kind==='boss'){ rgBattle(kind); return; }
   let msg='';
   if(kind==='rest'){ run.squad.forEach(id=>{ run.hp[id]=Math.min(1,(run.hp[id]>0?run.hp[id]+0.35:0.25)); }); msg='모두 숨을 돌렸어요. 체력을 회복하고 쓰러진 대원이 일어났어요.'; }
