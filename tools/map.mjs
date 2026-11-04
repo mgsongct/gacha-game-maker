@@ -19,6 +19,8 @@ import { stateFlow } from './lib/flow.mjs';
 import { buildMap, mapDiff, valuesAt } from './lib/map.mjs';
 import { readGame, gidOf } from './play/lib/data.mjs';
 import { compare, readBaseline, writeBaseline } from './lib/ratchet.mjs';
+import { stageRoots } from './lib/lifecycle.mjs';
+import { surfaceOf, fullLabel } from './lib/surface.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..'), argv = process.argv.slice(2), arg = k => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : null; };
 const JSONF = join(ROOT, 'docs/map.json'), MDF = join(ROOT, 'docs/map.md'), PC = join(ROOT, 'pc'), GAMES = join(ROOT, 'tools/play/games');
@@ -133,14 +135,32 @@ else if (!arg('--why') && !arg('--game')) console.log('변화 없음 — 맵 그
 const archF = A => [...A.verdicts.filter(v => v.layers['섞임']).map(v => ({ key: `계층 섞임|${v.mod}`, num: { 함수: v.layers['섞임'] }, text: `섞인 함수 ${short(v.mod)} ${v.layers['섞임']}` })),
   ...A.verdicts.filter(v => v.bad).map(v => ({ key: `계층 방향|${v.mod}`, num: { 위반: v.bad }, text: `방향 위반 ${short(v.mod)} ${v.bad}` })), /* 기능 판정(슈퍼·조각·흩어짐)은 후보 — 묶음이 코드 변화에 흔들려서(접근 함수만 바꿔도 뒤집힘) 래칫에 넣지 않음(docs/problems.md S5) */
   ...(A.store?.keys || []).filter(k => !k.kind).map(k => ({ key: `저장 정책 갈래 없음|${k.key}`, num: { 키: 1 }, text: `갈래 없는 저장 키 ${k.key}` }))];
-if (arg('--rebase')) { const sha = execSync(`git rev-parse --verify ${JSON.stringify(arg('--rebase') + '^{commit}')}`, { cwd: ROOT, encoding: 'utf8' }).trim(), dir = join(ROOT, 'tools/out/ref-tree', sha);
+// git 기준 커밋의 코드(src·www/index.html)를 tools/out/ref-tree/<sha>에 풀어 지금 도구로 맵을 만듦(--rebase 기준선 · --split 원안 대조)
+async function refMap(ref) { const sha = execSync(`git rev-parse --verify ${JSON.stringify(ref + '^{commit}')}`, { cwd: ROOT, encoding: 'utf8' }).trim(), dir = join(ROOT, 'tools/out/ref-tree', sha);
   if (!existsSync(join(dir, 'src'))) { mkdirSync(dir, { recursive: true }); execSync(`git archive ${sha} src www/index.html | tar -x -C ${JSON.stringify(dir)}`, { cwd: ROOT }); }
-  const u0 = await loadUnits(dir), f0 = buildGraph(u0).fns, m0 = buildMap(u0, f0, stateFlow(u0, f0), readFileSync(join(dir, 'www/index.html'), 'utf8')), F0 = archF(m0.arch), D = compare(F0, archF(map.arch));
+  const u0 = await loadUnits(dir), f0 = buildGraph(u0).fns; return { sha, units: u0, fns: f0, map: buildMap(u0, f0, stateFlow(u0, f0), readFileSync(join(dir, 'www/index.html'), 'utf8')) }; }
+if (arg('--rebase')) { const { sha, map: m0 } = await refMap(arg('--rebase')), F0 = archF(m0.arch), D = compare(F0, archF(map.arch));
   writeBaseline(ROOT, F0, 'arch'); console.log(`아키텍처 기준선을 ${sha.slice(0, 7)}의 코드(지금 도구로 잼)로: ${F0.length}개 · 지금 코드는 그 대비 새로 생김 ${D.added.length} · 나빠짐 ${D.worse.length} · 해결 ${D.fixed.length} · 좋아짐 ${D.better.length}`); [...D.added, ...D.worse].forEach(f => console.log('  + ' + f.text)); }
 if (argv.includes('--strict') || argv.includes('--update-baseline')) { const F = archF(map.arch || { verdicts: [], store: { keys: [] } }), B = readBaseline(ROOT, 'arch'), D = B ? compare(B, F) : null;
   const kindOf = k => k.split('|')[0], had = new Set((B || []).map(f => kindOf(f.key))), fresh = f => !had.has(kindOf(f.key));
   if (argv.includes('--update-baseline')) { if (D && ([...D.added.filter(f => !fresh(f)), ...D.worse].length)) { console.log('기준선을 올리는 갱신은 하지 않아요 — 코드를 고치세요(도구가 바뀌었으면 --rebase <직전 커밋>)'); process.exit(1); } writeBaseline(ROOT, F, 'arch'); console.log(`아키텍처 기준선: ${F.length}개${D && D.added.some(fresh) ? ` (새 판정 종류 처음 잼: ${[...new Set(D.added.filter(fresh).map(f => kindOf(f.key)))].join(', ')})` : ''}`); }
   else if (D) { console.log(`아키텍처 판정 기준선 대비: 새로 생김 ${D.added.length} · 나빠짐 ${D.worse.length} · 해결 ${D.fixed.length} · 좋아짐 ${D.better.length} · 옮김 ${(D.moved || []).length}(모듈만 바뀜 — 합계 그대로)`); [...D.added, ...D.worse].forEach(f => console.log('  + ' + f.text)); if (D.added.length || D.worse.length) process.exit(1); }
   else console.log('아키텍처 기준선 없음 — node tools/map.mjs --update-baseline'); }
+/* 섞인 함수 나누기 계획(--split [원안 커밋, 기본 tools/fork-features.json의 upstreamSrc]): 함수마다 ① 단계 그래프(lib/lifecycle.mjs — 생성·실행 중 AI·사용자·불러오기 시작점)에서 어느 시작점이 어떤 호출 경로로 닿는지
+   ② 원안 트리를 같은 도구로 재서 그때도 있었고 섞였는지 ③ 기능과 그 기능의 집 모듈 ④ 섞인 꼴과 꼴에 맞는 나눔 — 손으로 코드를 읽어 정하지 않게 → tools/out/split.md */
+const SPLIT_HOW = { '정산+결과': '정산(…Settle, Model — 집 모듈)과 결과(…ResultHTML, View)로 나누고 이 함수는 둘을 잇는 Controller로', '그리면서 상태 씀': '상태 변경을 그리기 전 처리(render 앞 …Tick)나 처리기로 옮기고 이 함수는 읽기(progRead 등)만', '창+처리': '처리(Model)와 창(open…, View)으로 나누고 부르는 처리기가 잇기', '작업+진행 표시': '작업(저장·네트워크·AI — Model)은 진행을 콜백·창 이벤트로 알리고 단추·막대 표시는 View가 받기', '화면 조작+상태': '상태 변경을 Model 함수로 떼고 이 함수는 View로' };
+function stagePaths(units, fns) { const out = new Map(); for (const [st, roots] of Object.entries(stageRoots(units, fns))) { const prev = new Map(roots.filter(r => fns.has(r)).map(r => [r, null])), q = [...prev.keys()];
+  while (q.length) { const k = q.shift(); for (const c of fns.get(k)?.calls.keys() || []) if (fns.has(c) && !prev.has(c)) { prev.set(c, k); q.push(c); } }
+  for (const k of prev.keys()) { if (!out.has(k)) out.set(k, []); const p = []; for (let x = k; x; x = prev.get(x)) p.unshift(fns.get(x)?.name || x); out.get(k).push({ st, path: p }); } } return out; }
+async function splitPlan(ref) { const units = await loadUnits(ROOT), { fns } = buildGraph(units), SP = stagePaths(units, fns), SF = surfaceOf(units, fns, readFileSync(join(ROOT, 'src/index.html'), 'utf8')), O = await refMap(ref), oMixed = new Set(Object.values(O.map.arch.mixed || {}).map(x => x.name)), oNames = new Set([...O.fns.values()].filter(f => f.top).map(f => f.name));
+  const A = map.arch, fl = id => A.feats[id] ? `${id} ${A.feats[id].label}` : '—', rows = Object.entries(A.mixed || {}).filter(([, x]) => !x.mix.cases).map(([k, x]) => { const feat = Object.values(map.fns).find(y => y.name === x.name)?.feat || null, ps = SP.get(k) || [];
+    return { ...x, feat, home: feat && A.homes?.[feat], orig: !oNames.has(x.name) ? '포크가 더함' : oMixed.has(x.name) ? '원안부터 섞임' : '원안엔 안 섞임', screens: [...(SF.any.get(k) || [])].slice(0, 2).map(u => fullLabel(SF, u)), stages: ps.map(p => p.st), path: ps.sort((a, b) => a.path.length - b.path.length)[0]?.path || [] }; });
+  const by = k => rows.filter(r => r.mix.kind === k), md = [`# 섞인 함수 나누기 계획`, '', `생성: \`node tools/map.mjs --split\` · 원안 \`${O.sha.slice(0, 7)}\`(같은 도구로 잼) · 섞인 함수 ${rows.length}(액션 처리기 제외) — 원안부터 섞임 ${rows.filter(r => r.orig === '원안부터 섞임').length} · 원안엔 안 섞임 ${rows.filter(r => r.orig === '원안엔 안 섞임').length} · 포크가 더함 ${rows.filter(r => r.orig === '포크가 더함').length}`, '',
+    '단계 경로 = 생애주기 도구의 단계 시작점(생성·실행 중 AI·사용자 처리기·불러오기)에서 이 함수까지 가장 짧은 호출 경로 — 이 함수를 부르는 Controller 자리. 집 모듈 = 그 기능 함수가 가장 많은 모듈(Model을 둘 곳)', ''];
+  for (const k of Object.keys(SPLIT_HOW)) { const rs = by(k); if (!rs.length) continue; md.push(`## ${k} ${rs.length} — ${SPLIT_HOW[k]}`, '', '| 함수 | 자리 | 원안 | 단계 · 가장 짧은 경로 | 닿는 화면 | 기능 · 집 모듈 | 화면 줄 / 처리 줄 |', '|---|---|---|---|---|---|---|');
+    for (const r of rs) md.push(`| ${r.name} | ${r.file.replace('src/main/', '')}:${r.line} | ${r.orig} | ${[...new Set(r.stages)].join('·') || '닿지 않음'}${r.path.length ? ' · ' + r.path.join(' → ') : ''} | ${r.screens.join(' / ') || '—'} | ${fl(r.feat)}${r.home ? ' · ' + short(r.home) : ''} | ${r.mix.view.slice(0, 6).join(',')} / ${r.mix.model.slice(0, 6).join(',')} |`); md.push(''); }
+  mkdirSync(join(ROOT, 'tools/out'), { recursive: true }); writeFileSync(join(ROOT, 'tools/out/split.md'), md.join('\n'));
+  console.log(`섞인 함수 나누기 계획: ${rows.length}개 — ${Object.keys(SPLIT_HOW).map(k => `${k} ${by(k).length}`).join(' · ')} → tools/out/split.md`); }
+if (argv.includes('--split')) await splitPlan(arg('--split') && !arg('--split').startsWith('--') ? arg('--split') : JSON.parse(readFileSync(join(ROOT, 'tools/fork-features.json'), 'utf8')).upstreamSrc);
 if (arg('--why')) console.log(why(map, arg('--why')));
 if (arg('--game')) console.log(gameView(map, arg('--game')));

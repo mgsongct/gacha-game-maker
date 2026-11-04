@@ -1,6 +1,6 @@
 # 연관 맵 — 모듈 → 빌드 → index.html(생성기·실행기·편집기) → data 게임 파일
 
-생성: `node tools/map.mjs` · 2026-11-04T02:45 · git 5fd5650 · 입력: src 128파일 · www/index.html f7bc3293dd72 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
+생성: `node tools/map.mjs` · 2026-11-04T02:52 · git eabcc1c · 입력: src 128파일 · www/index.html f7bc3293dd72 · 시험 게임 2 — 입력이 바뀌면 다시 만들고 바뀐 연결은 맨 아래 "최근 변화"에(증분 갱신, CI `--check`가 맵이 낡았는지 봄)
 
 ## 읽는 법 — 거꾸로 따라가기
 
@@ -832,6 +832,8 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 
 ## 7. 최근 변화(증분 갱신 기록)
 
+- 2026-11-04T02:52 · git eabcc1c
+- 2026-11-04T02:51 · git eabcc1c
 - 2026-11-04T02:45 · git 5fd5650 · src 10: 0070-save, 0080-storage-integration, 0110-challenge-raid, 0120-abyss, 0125-tower, 0180-ui-scroll, 0480-battle, 0487-formation-sortie … · index.html 다시 빌드
   - 함수: 추가 8 (raidSettle, rogueTick, rgRunNew, rogueSettle, rgFinishSettle, towerSettle) · 삭제 7 (raidEnd, rgStart, rogueEnd, rgFinish, towerEnd, bEnd) · 옮김 0
   - prog.json › raid: +실행기:raidSettle −실행기:raidEnd
@@ -846,9 +848,3 @@ index.html은 **생성기**(새 게임을 만듦)·**실행기**(만든 게임�
 - 2026-11-04T02:22 · git a02b53d · src 7: +src/main/0160-player-profile, −src/main/0160-free-chat, 0015-prompt-studio/020-requests, 0015-prompt-studio/030-builders, 0100-messenger, 0220-mail, 0510-actions/030-mail · index.html 다시 빌드
   - 함수: 추가 2 (mailOpen, mailClean) · 삭제 0 · 옮김 8 (fcOf: src/main/0160-free-chat.js → src/main/0100-messenger.js; fcSend: src/main/0160-free-chat.js → src/main/0100-messenger.js; fcPhotoOn: src/main/0160-free-chat.js → src/main/0100-messenger.js; fcNpcPhoto: src/main/0160-free-chat.js → src/main/0100-messenger.js)
   - prog.json › mail: +실행기:mailClean +실행기:mailOpen −실행기:handleMailAction
-- 2026-11-04T02:15 · git a02b53d
-- 2026-11-04T02:14 · git a02b53d · src 30: 0020-ai-connect, 0030-image/010-engine, 0040-sound, 0060-util, 0100-messenger, 0120-abyss, 0180-ui-scroll, 0190-shop … · index.html 다시 빌드
-  - 함수: 추가 5 (openFaceView, bgmPickShow, lobbyPokeShow, worldFormFill, formJoinShow) · 삭제 0 · 옮김 0
-  - banners.json › [].textContent:  −편집기:handleNavigationAndToolsAction
-  - chapters.json › [].stages[].textContent:  −편집기:handleStoryAndAuthoringAction
-  - meta.json › logoStyle:  −편집기:handleNavigationAndToolsAction

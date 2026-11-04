@@ -17122,7 +17122,8 @@
     "view": [
      508
     ],
-    "model": []
+    "model": [],
+    "kind": "화면 조작+상태"
    }
   },
   "naiSkinBase": {
@@ -17221,7 +17222,8 @@
      92,
      94,
      98
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "charImgItems": {
@@ -17410,7 +17412,8 @@
     ],
     "model": [
      770
-    ]
+    ],
+    "kind": "창+처리"
    }
   },
   "faceDrawOne": {
@@ -17507,7 +17510,8 @@
     ],
     "model": [
      898
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "imageCandidateEligible": {
@@ -18508,7 +18512,8 @@
     ],
     "model": [
      93
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "phMenu": {
@@ -18571,7 +18576,8 @@
      124,
      130,
      140
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "fcPhotoOn": {
@@ -18604,7 +18610,8 @@
     "model": [
      146,
      147
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "phPlay": {
@@ -18630,7 +18637,8 @@
     "model": [
      177,
      181
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "progK": {
@@ -18784,7 +18792,8 @@
      132,
      133,
      134
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "rgUnits": {
@@ -18845,7 +18854,8 @@
     "view": [
      300
     ],
-    "model": []
+    "model": [],
+    "kind": "화면 조작+상태"
    }
   },
   "rgRunHTML2": {
@@ -19313,7 +19323,8 @@
     ],
     "model": [
      29
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "subLocked": {
@@ -19565,7 +19576,8 @@
     ],
     "model": [
      240
-    ]
+    ],
+    "kind": "그리면서 상태 씀"
    }
   },
   "passHTML": {
@@ -20385,7 +20397,8 @@
     ],
     "model": [
      185
-    ]
+    ],
+    "kind": "창+처리"
    }
   },
   "openCharEdit": {
@@ -20974,7 +20987,8 @@
      102,
      109,
      113
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "aiEvent": {
@@ -21039,7 +21053,8 @@
      143,
      149,
      151
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "readBanner": {
@@ -21291,7 +21306,8 @@
      143,
      146,
      148
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "buildManualGameDraft": {
@@ -21311,7 +21327,8 @@
     "model": [
      187,
      188
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "openSkinProp": {
@@ -21955,7 +21972,8 @@
     ],
     "model": [
      174
-    ]
+    ],
+    "kind": "그리면서 상태 씀"
    }
   },
   "cxStore": {
@@ -22100,7 +22118,8 @@
     ],
     "model": [
      40
-    ]
+    ],
+    "kind": "그리면서 상태 씀"
    }
   },
   "openCx": {
@@ -22127,7 +22146,8 @@
     ],
     "model": [
      52
-    ]
+    ],
+    "kind": "창+처리"
    }
   },
   "cxDeepen": {
@@ -22258,7 +22278,8 @@
     ],
     "model": [
      9
-    ]
+    ],
+    "kind": "창+처리"
    }
   },
   "syPush": {
@@ -22277,7 +22298,8 @@
     ],
     "model": [
      15
-    ]
+    ],
+    "kind": "창+처리"
    }
   },
   "syCheckOnStart": {
@@ -22423,7 +22445,8 @@
     "model": [
      30,
      45
-    ]
+    ],
+    "kind": "창+처리"
    }
   },
   "openPub": {
@@ -22454,7 +22477,8 @@
     ],
     "model": [
      83
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "subCheck": {
@@ -22486,7 +22510,8 @@
     "model": [
      101,
      105
-    ]
+    ],
+    "kind": "작업+진행 표시"
    }
   },
   "applyDesk": {
@@ -22518,7 +22543,8 @@
     ],
     "model": [
      65
-    ]
+    ],
+    "kind": "창+처리"
    }
   },
   "checkNoticeWeb": {
@@ -23963,7 +23989,8 @@
     ],
     "model": [
      72
-    ]
+    ],
+    "kind": "창+처리"
    }
   },
   "conBuy": {
@@ -24497,7 +24524,8 @@
     ],
     "model": [
      108
-    ]
+    ],
+    "kind": "창+처리"
    }
   },
   "auditPanel": {
@@ -38061,6 +38089,42 @@
    ],
    "stale": []
   },
+  "homes": {
+   "F01": "src/main/0450-relations-memory.js",
+   "F02": "src/main/0030-image/",
+   "F03": "src/main/0185-game-rules.js",
+   "F04": "src/main/0360-sync/",
+   "F05": "src/main/0260-new-game/",
+   "F06": "src/main/0290-season-rotation.js",
+   "F07": "src/main/0020-ai-connect.js",
+   "F08": "src/main/0487-formation-sortie.js",
+   "F09": "src/main/0100-messenger.js",
+   "F10": "src/main/0520-backup-storage.js",
+   "F11": "src/main/0120-abyss.js",
+   "F12": "src/main/0120-abyss.js",
+   "F13": "src/main/0275-expedition.js",
+   "F14": "src/main/0300-codex.js",
+   "F15": "src/main/0420-app-update.js",
+   "F16": "src/main/0445-factions.js",
+   "F17": "src/main/0505-construct.js",
+   "F18": "src/main/0040-sound.js",
+   "F19": "src/main/0455-persona.js",
+   "F20": "src/main/0020-ai-connect.js",
+   "F21": "src/main/0030-image/",
+   "F22": "src/main/0065-inherit.js",
+   "F23": "src/main/0180-ui-scroll.js",
+   "F24": "src/main/0020-ai-connect.js",
+   "F25": "src/main/0030-image/",
+   "F26": "src/main/0015-prompt-studio/",
+   "F27": "src/main/0120-abyss.js",
+   "F28": "src/main/0470-title-opening.js",
+   "F29": "src/main/0260-new-game/",
+   "F30": "src/main/0030-image/",
+   "F31": "src/main/0410-desktop.js",
+   "F32": "src/main/0490-boss-patterns.js",
+   "F33": "src/main/0120-abyss.js",
+   "F34": "src/main/0525-data-folder.js"
+  },
   "mixed": {
    "naiBlocksOwner": {
     "name": "naiBlocksOwner",
@@ -38070,7 +38134,8 @@
      "view": [
       508
      ],
-     "model": []
+     "model": [],
+     "kind": "화면 조작+상태"
     }
    },
    "regenApply": {
@@ -38086,7 +38151,8 @@
       92,
       94,
       98
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "openNaiGen": {
@@ -38101,7 +38167,8 @@
      ],
      "model": [
       744
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "naiBatch": {
@@ -38115,7 +38182,8 @@
      ],
      "model": [
       770
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "skinPartGen": {
@@ -38129,7 +38197,8 @@
      ],
      "model": [
       898
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "petTick": {
@@ -38143,7 +38212,8 @@
      ],
      "model": [
       50
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "chatPhotoPick": {
@@ -38156,7 +38226,8 @@
      ],
      "model": [
       79
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "openRoom": {
@@ -38172,7 +38243,8 @@
      ],
      "model": [
       93
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "fcSend": {
@@ -38194,7 +38266,8 @@
       124,
       130,
       140
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "fcNpcPhoto": {
@@ -38210,7 +38283,8 @@
      "model": [
       146,
       147
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "phPlay": {
@@ -38230,7 +38304,8 @@
      "model": [
       177,
       181
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "drawCardArts": {
@@ -38246,7 +38321,8 @@
       132,
       133,
       134
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "dgMove": {
@@ -38257,7 +38333,8 @@
      "view": [
       300
      ],
-     "model": []
+     "model": [],
+     "kind": "화면 조작+상태"
     }
    },
    "playerDraw": {
@@ -38272,7 +38349,8 @@
      ],
      "model": [
       29
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "farmHTML": {
@@ -38287,7 +38365,8 @@
      ],
      "model": [
       240
-     ]
+     ],
+     "kind": "그리면서 상태 씀"
     }
    },
    "openChar": {
@@ -38370,7 +38449,8 @@
      ],
      "model": [
       185
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "aiChapterGen0": {
@@ -38386,7 +38466,8 @@
       102,
       109,
       113
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "aiEventGen0": {
@@ -38405,7 +38486,8 @@
       143,
       149,
       151
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "drAvatarDraw": {
@@ -38419,7 +38501,8 @@
      ],
      "model": [
       94
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "runNewGameBuild": {
@@ -38432,7 +38515,8 @@
      ],
      "model": [
       59
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "buildNewGameDraft": {
@@ -38460,7 +38544,8 @@
       143,
       146,
       148
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "buildManualGameDraft": {
@@ -38474,7 +38559,8 @@
      "model": [
       187,
       188
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "skinPropDraw": {
@@ -38488,7 +38574,8 @@
      ],
      "model": [
       6
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "noticeHTML": {
@@ -38503,7 +38590,8 @@
      ],
      "model": [
       174
-     ]
+     ],
+     "kind": "그리면서 상태 씀"
     }
    },
    "codexHTML": {
@@ -38521,7 +38609,8 @@
      ],
      "model": [
       40
-     ]
+     ],
+     "kind": "그리면서 상태 씀"
     }
    },
    "openCx": {
@@ -38542,7 +38631,8 @@
      ],
      "model": [
       52
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "pcPush": {
@@ -38555,7 +38645,8 @@
      ],
      "model": [
       9
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "syPush": {
@@ -38568,7 +38659,8 @@
      ],
      "model": [
       15
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "pubUpload": {
@@ -38587,7 +38679,8 @@
      "model": [
       30,
       45
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "subscribe": {
@@ -38601,7 +38694,8 @@
      ],
      "model": [
       83
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "subApply": {
@@ -38616,7 +38710,8 @@
      "model": [
       101,
       105
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "openA2HS": {
@@ -38630,7 +38725,8 @@
      ],
      "model": [
       34
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "checkUpdate": {
@@ -38645,7 +38741,8 @@
      ],
      "model": [
       65
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "applyUpdate": {
@@ -38659,7 +38756,8 @@
      "model": [
       84,
       86
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "checkWebUpdate": {
@@ -38673,7 +38771,8 @@
      ],
      "model": [
       117
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "applyWebUpdate": {
@@ -38687,7 +38786,8 @@
      "model": [
       128,
       132
-     ]
+     ],
+     "kind": "작업+진행 표시"
     }
    },
    "conBuild": {
@@ -38700,7 +38800,8 @@
      ],
      "model": [
       72
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "backupExport": {
@@ -38715,7 +38816,8 @@
      ],
      "model": [
       14
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "shareExport": {
@@ -38729,7 +38831,8 @@
      ],
      "model": [
       110
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "dataExport": {
@@ -38742,7 +38845,8 @@
      ],
      "model": [
       64
-     ]
+     ],
+     "kind": "창+처리"
     }
    },
    "openAudit": {
@@ -38763,14 +38867,15 @@
      ],
      "model": [
       108
-     ]
+     ],
+     "kind": "창+처리"
     }
    }
   }
  },
  "gamesN": 2,
- "at": "2026-11-04T02:45",
- "head": "5fd5650",
+ "at": "2026-11-04T02:52",
+ "head": "eabcc1c",
  "inputs": {
   "src": {
    "src/boot/durable-storage.js": "9e1fdc434852",
@@ -38907,9 +39012,57 @@
    "idol-audition": "a443d928bb99",
    "sky-knights": "c782aafba942"
   },
-  "tool": "39b55e03b815"
+  "tool": "2b5fd7243e91"
  },
  "changes": [
+  {
+   "at": "2026-11-04T02:52",
+   "head": "eabcc1c",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-04T02:51",
+   "head": "eabcc1c",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
   {
    "at": "2026-11-04T02:45",
    "head": "5fd5650",
@@ -39818,54 +39971,6 @@
      ]
     }
    ]
-  },
-  {
-   "at": "2026-11-04T01:11",
-   "head": "d2b44df",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "www": false,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": true
-   },
-   "fns": {
-    "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": []
-  },
-  {
-   "at": "2026-11-04T01:11",
-   "head": "d2b44df",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "www": false,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": true
-   },
-   "fns": {
-    "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": []
   }
  ]
 }

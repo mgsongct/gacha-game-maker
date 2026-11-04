@@ -94,10 +94,16 @@ function storePolicy(units, fns, str) { const P = constLiterals(units, ['STORE_P
 
 // 아키텍처 요약(연관 맵이 부름): 계층(함수마다·모듈마다·방향 위반) · 기능(Model·Controller 묶음 ↔ 화면 단위) · 모듈 판정 · 저장 정책
 //   writers: 게임 상태를 쓰는 함수 키 · keyUse: 함수 → Map(상태 키·data 경로 → r|w) · sf: lib/surface.mjs surfaceOf 결과 · layer: 설계상 층(프롬프트 스튜디오)
+// 섞인 꼴(나누는 방법이 꼴마다 다름 — map.mjs --split): 결과 HTML을 돌려주며 정산 · 그리면서 상태 씀(…HTML·…Panel) · 창을 열며 처리 · 작업(저장·네트워크·AI)하며 진행 표시 · 그 밖의 화면 조작+상태
+const NESTED = new Set(['function_declaration', 'function_expression', 'arrow_function', 'method_definition']);
+function retMarkup(f) { let hit = false; const go = n => { if (hit || (n !== f.node && NESTED.has(n.type))) return; if (n.type === 'return_statement' && MARKUP.test(n.text)) hit = true; for (const c of n.namedChildren) go(c); }; go(f.node); return hit; }
+function mixKind(f, x) { const ret = retMarkup(f), modal = [...f.calls.keys()].some(k => /(^|:)openModal$/.test(k));
+  if (/(HTML|Panel)$/.test(f.name)) return '그리면서 상태 씀'; if (ret && (x.write || x.store)) return '정산+결과'; if (ret) return '그리면서 상태 씀';
+  if (modal) return '창+처리'; if (x.service || x.store) return '작업+진행 표시'; return '화면 조작+상태'; }
 // 섞인 함수를 나눌 자리: View 신호 줄(마크업·DOM 바꿈)과 Model 신호 줄(상태 쓰기·저장·서비스) — 액션 처리기는 case마다(처리기는 Controller라 상태 쓰기는 괜찮고, 창 HTML·DOM이 든 case가 섞임)
 function mixAt(f, x, u, muts) { const line = n => +u.loc(n).split(':').pop(), uniq = a => [...new Set(a)].sort((p, q) => p - q), caseOf = n => { for (let p = n; p && p !== f.node; p = p.parent) if (p.type === 'switch_case') return p; return null; };
   const v = uniq(x.atV.map(line)), m = uniq([...x.atM.map(line), ...muts.map(w => +w.loc.split(':').pop())]);
-  if (!x.handler) return { view: v, model: m };
+  if (!x.handler) return { view: v, model: m, kind: mixKind(f, x) };
   const cs = new Map(); for (const n of x.atV) { const c = caseOf(n); if (!c) continue; const k = c.childForFieldName('value')?.text.slice(1, -1) || 'default'; if (!cs.has(k)) cs.set(k, { act: k, line: line(c), view: 0 }); cs.get(k).view++; }
   return { view: v, model: m, cases: [...cs.values()].sort((p, q) => p.line - q.line) }; }
 export function archMap(units, fns, { writers, keyUse, sf, louvain, layer, modOf }) {
@@ -126,7 +132,7 @@ export function archMap(units, fns, { writers, keyUse, sf, louvain, layer, modOf
   const bad = new Map(); for (const b of L.bad) { const m = mod(fns.get(b.fn)); if (!bad.has(m)) bad.set(m, []); bad.get(m).push(b); }
   const verdicts = [...byMod].map(([m, fs]) => moduleVerdict(m, fs, { L: L.layer, hub, featOf, idOf, home, feats, bad: bad.get(m) || [], layer })).sort((a, b) => a.mod.localeCompare(b.mod));
   const fnLayer = {}, mut = mutations(units, fns).mut, U = new Map(units.map(u => [u.name, u])); for (const f of main) { const x = L.layer.get(f.key); fnLayer[f.key] = { layer: x?.layer, feat: idOf.get(featOf.get(f.key)) || null }; if (x?.layer === '섞임') fnLayer[f.key].mix = mixAt(f, x, U.get(f.unit), mut.get(f.key) || []); }
-  return { feats, verdicts, fnLayer, bad: L.bad.filter(b => fns.get(b.fn)?.unit === 'main').map(b => ({ fn: fns.get(b.fn).name, to: fns.get(b.to)?.name, kind: b.kind, mod: mod(fns.get(b.fn)) })), store: storePolicy(units, fns, consts) }; }
+  return { feats, verdicts, fnLayer, homes: Object.fromEntries(home), bad: L.bad.filter(b => fns.get(b.fn)?.unit === 'main').map(b => ({ fn: fns.get(b.fn).name, to: fns.get(b.to)?.name, kind: b.kind, mod: mod(fns.get(b.fn)) })), store: storePolicy(units, fns, consts) }; }
 
 // 모듈 하나 판정: 분배(액션 분배기 층) · 층(프롬프트 스튜디오 — 사용자 지시로 모든 기능의 프롬프트를 취합) · 기반(허브 함수 중심)
 //   기능 축 — 슈퍼(관계없는 기능 둘 이상이 각각 max(3, 20%)↑ — 발산적 변경) · 조각(중심 기능의 함수가 다른 모듈에 2배↑ — 게으른 모듈) · 흩어짐(어느 기능도 절반이 안 되고 셋 이상에 나뉨 — 함수마다 제 기능 모듈로) · 고유

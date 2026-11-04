@@ -215,7 +215,7 @@ export function buildMap(units, fns, sf, html = '') { const types = constLiteral
   for (const [k, d] of data) { for (const fk of d.w.keys()) K(fk, k, 'w'); for (const fk of d.r) K(fk, k, 'r'); }
   const A = archMap(units, fns, { writers: new Set([...data.values()].flatMap(d => [...d.w.keys()])), keyUse, sf: SO, louvain, layer: fragmentFiles(units).home, modOf: moduleOf });
   for (const [k, p] of Object.entries(S.place)) if (FN[k]) FN[k].place = p; for (const [k, x] of Object.entries(A.fnLayer)) if (FN[k]) Object.assign(FN[k], x);
-  return { types, data: DATA, fns: FN, modules: MODS, surface: { tabs: S.tabs, feats: S.feats }, arch: { feats: A.feats, verdicts: A.verdicts, bad: A.bad, store: A.store, mixed: Object.fromEntries(Object.entries(A.fnLayer).filter(([, x]) => x.mix).map(([k, x]) => { const f = fns.get(k), [file, line] = f.loc.split(':'); return [k, { name: f.name, file, line: +line, mix: x.mix }]; })) } }; }
+  return { types, data: DATA, fns: FN, modules: MODS, surface: { tabs: S.tabs, feats: S.feats }, arch: { feats: A.feats, verdicts: A.verdicts, bad: A.bad, store: A.store, homes: A.homes, mixed: Object.fromEntries(Object.entries(A.fnLayer).filter(([, x]) => x.mix).map(([k, x]) => { const f = fns.get(k), [file, line] = f.loc.split(':'); return [k, { name: f.name, file, line: +line, mix: x.mix }]; })) } }; }
 
 // 두 맵의 차이(증분 갱신 기록): 함수 추가·삭제·옮김, data 경로의 만드는 곳 추가·삭제
 export function mapDiff(a, b) { const out = { fns: { added: [], removed: [], moved: [] }, data: [] }; if (!a) return out;
