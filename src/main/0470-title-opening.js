@@ -14,13 +14,13 @@ function logoHTML(st){ const t=String(G.meta.title||''), w=t.split(/\s+/).filter
   if(st==='stroke') kr=tlSpan(w.join(' '));
   const en=!sub?'':st==='star'?`<div class="t-en">${sub.split(/\s+/).map(esc).join('<br>')}</div>`:st==='stroke'?`<div class="t-en"><span>-&nbsp;&nbsp;${esc(sub)}&nbsp;&nbsp;-</span></div>`:`<div class="t-en"><span>${esc(sub)}</span></div>`;
   return `<div class="t-logo ls-${st}">${st==='star'?'<i class="t-spire"></i>':''}${st==='orbitline'?'<i class="t-planet"></i>':''}<div class="t-kr">${kr}${st==='orbitline'||st==='stroke'?'<i class="t-line"></i>':''}</div>${en}</div>`; }
-function logoStyle(){ const v=G.meta.logoStyle||'auto'; if(v!=='auto'&&LOGO_STYLES.some(x=>x[0]===v)) return v; return ({fantasy:'star',noir:'stroke',neon:'orbitline',pastel:'cute',tactical:'stencil'})[G.meta.theme]||'stencil'; }
-function showTitle(){
+function logoStyle(v0){ const v=v0||G.meta.logoStyle||'auto'; if(v!=='auto'&&LOGO_STYLES.some(x=>x[0]===v)) return v; return ({fantasy:'star',noir:'stroke',neon:'orbitline',pastel:'cute',tactical:'stencil'})[G.meta.theme]||'stencil'; }
+function showTitle(logo){
   const c=charById(P().titleChar)||charById(P().sec)||G.chars.find(x=>x.rarity===3&&(charIllust(x)||imgSrc(x)))||G.chars.find(x=>x.rarity===3)||G.chars[0];
   const oc=c&&own(c.id), ill=c&&P().lobbyMode!=='stand'&&((oc&&oc.useCg&&oc.dup>=5&&lbcgSrc(c))||charIllust(c));
   $('#ov').innerHTML=`<div class="title" data-act="titletap">${ill?`<div class="t-bg t-ill"><img src="${esc(ill)}" alt="" draggable="false"></div>`:`<div class="t-bg" style="${bgStyle(P().titleBg||'낙성 분화구')}"></div>${c?`<div class="t-char">${art(c)}</div>`:''}`}<div class="t-shade"></div>${shootHTML(7)}
-    ${logoHTML(logoStyle())}
-    <button class="t-snd" id="tsnd" data-act="titlesnd" aria-label="${SND().bgmOn?'배경음 끄기':'배경음 켜기'}">${SND().bgmOn?'🔊':'🔇'}</button>
+    ${logoHTML(logoStyle(logo))}
+    <button class="t-snd" id="tsnd" data-act="titlesnd" aria-label="${titleSndLabel(SND().bgmOn)}">${SND().bgmOn?'🔊':'🔇'}</button>
     <div class="t-touch">화면을 터치하세요</div><div class="t-ver">GACHA GAME MAKER · ${esc(APP_BUILD)}</div></div>`;
   $('#ov').hidden=false; bgm(sceneOf().title);
 }
@@ -51,4 +51,9 @@ function afterPrologue(){ setTimeout(()=>{ if(typeof prepAsk==='function') prepA
   setTimeout(()=>liveTick(false),2500);
   if(G.meta.subscr) setTimeout(()=>{ if($('#modal').hidden&&$('#ov').hidden) subCheck(false); },4500);
 }
-
+/* 타이틀 배경음 단추(View) — 켜짐/꺼짐 표시만 */
+function titleSndLabel(on){ return on?'배경음 끄기':'배경음 켜기'; }
+function titleSndShow(on){ const el=$('#tsnd'); if(el){ el.textContent=on?'🔊':'🔇'; el.setAttribute('aria-label',titleSndLabel(on)); } }
+/* 로고 미리 보기(View): 설정 창 위에 고른 로고로 타이틀을 띄우고, 누르면 설정으로 돌아감 */
+function logoPreview(style){ showTitle(style); const t=$('.title'); if(t){ t.dataset.act='logoprevclose'; const tt=t.querySelector('.t-touch'); if(tt) tt.textContent='눌러서 설정으로 돌아가기'; } $('#modal').hidden=true; }
+function logoPreviewClose(){ closeOv(); if($('#modal').innerHTML) $('#modal').hidden=false; }

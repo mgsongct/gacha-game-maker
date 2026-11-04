@@ -95,6 +95,11 @@ function openRoom(cid,opt){
   if(act){ act.s.t0=act.s.t0||Date.now(); phPlay(act.t,c,act.s,token); }
   else setTimeout(()=>{ const i=$('#fcIn'); if(i&&!IS_NATIVE&&!i.disabled) i.focus({preventScroll:true}); },50);
 }
+/* 메신저 부분 갱신(View): 알림 비우기 · 메뉴 닫기 · 내가 보낸 말 붙이기 · 다시 그려도 대화 스크롤 유지 */
+function notifClear(){ $('#notif').innerHTML=''; }
+function phMenuClose(){ $('.ph-menu')?.remove(); }
+function phSentShow(en,c){ $('#phIn').innerHTML=''; phMode('free'); $('#phChat').insertAdjacentHTML('beforeend',bubbleHTML(en,c)); phScroll(); }
+function phKeep(open){ const st=$('#phChat').scrollTop; open(); $('#phChat').scrollTop=st; }
 function phMenu(cid){ const c=charById(cid); if(!c) return; const old=$('.ph-menu'); if(old){ old.remove(); return; }
   const n=roomItems(cid).length, nb=roomLastBlock(cid).length;
   $('.phone').insertAdjacentHTML('beforeend',`<div class="ph-menu" data-act="phmenuclose"><div class="ph-sheet">
@@ -108,3 +113,72 @@ function phMenu(cid){ const c=charById(cid); if(!c) return; const old=$('.ph-men
     <button data-act="phmenuclose" class="ph-cancel">닫기</button></div></div>`); }
 function phMode(m){ if(!PH) return; PH.mode=m; const a=$('#phIn'), el=$('#phFree'); if(!a||!el) return; const hasPick=!!a.querySelector('[data-act=phpick],[data-act=phsay]');
   if(m==='pick'&&hasPick){ a.hidden=false; el.hidden=true; } else { a.hidden=true; el.hidden=false; const sw=el.querySelector('.ph-sw'); if(sw) sw.hidden=!hasPick; } phScroll(); }
+let FCBUSY=false;
+function fcOf(cid){ const f=progSlot('fchat'); return f[cid]||(f[cid]={log:[],sum:'',sumTo:0,at:0}); }
+function openFree(cid){ openRoom(cid); }
+async function fcSend(opt){
+  opt=opt||{}; if(FCBUSY||!PH||!PH.fc) return; const cid=PH.fc, c=charById(cid), inp=$('#fcIn'); if(!c||!inp) return; if(!opt.img&&PH.pendImg) opt.img=PH.pendImg; const text=inp.value.trim(); if(!text&&!opt.img) return; if(!opt.img&&PH.lastSend&&PH.lastSend.t===text&&Date.now()-PH.lastSend.at<2500){ inp.value=''; return; } PH.lastSend={t:text,at:Date.now()}; if(opt.img){ PH.pendImg=null; phPendRender(); inp.placeholder='메시지 보내기'; }
+  if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; }
+  const f=fcOf(cid), token=PH.token, alive=()=>PH&&PH.token===token&&$('#phChat'); inp.value=''; inp.style.height=''; [0,60,200].forEach(ms=>setTimeout(()=>{ const v=inp.value.trim(); if(v&&text.endsWith(v)&&v.length<=Math.max(2,text.length)) inp.value=''; },ms));
+  if(PH.tid){ const th=threadById(PH.tid), s0=th&&P().inbox[PH.tid]; if(th&&s0&&!s0.done){ s0.done=true; s0.freed=true; s0.pos=parseScript(th.script).length; s0.at=Date.now(); if(own(c.id)) addAff(c,10); updateBadge(); } PH.tid=null; const pi=$('#phIn'); if(pi) pi.innerHTML=''; phMode('free'); const sw=$('.ph-sw'); if(sw) sw.hidden=true; }
+  const me={w:'me',t:text,at:Date.now()}; if(opt.img) me.img=opt.img; f.log.push(me); f.at=me.at; if(alive()){ const el=$('#phChat'); if(el.children.length===1&&el.querySelector('.sys')&&roomLog(cid).length===1) el.innerHTML=''; el.insertAdjacentHTML('beforeend',bubbleHTML(me,c)); phScroll(); } mark('prog');
+  FCBUSY=true; const ty=document.createElement('div'); ty.className='msg'; ty.innerHTML=`<div class="av sm">${art(c)}</div><div class="bub typing"><i></i><i></i><i></i></div>`; if(alive()){ $('#phChat').appendChild(ty); phScroll(); }
+  try{
+    const o=own(c.id), lv=affLv(o), files=(c.files||[]).filter(x=>o&&o.dup>=(x.dup||0)).map(x=>x.text).filter(Boolean);
+    const pool=typeof affLinePool==='function'?affLinePool(c).slice(0,8):(c.lines||[]).slice(0,6);
+    const recent=fcSendRecentText({cid,c});
+    const r=await aiJSON(fcSendPrompt({c,pool,lv,files,recent,text,f,opt}),null,'default',opt.img?await chatImgB64(opt.img):undefined);
+    ty.remove(); const pn=playerName(), reps=(r&&Array.isArray(r.replies)?r.replies:r&&r.reply?[r.reply]:[]).map(x=>String(x||'').trim()).map(x=>x.replace(new RegExp('^'+c.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*[:：]\\s*'),'')).filter(x=>x&&!new RegExp('^(나|'+pn.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'|'+T('player')+')\\s*[:：]').test(x)).slice(0,4);
+    if(!reps.length){ if(r) toast('답장을 받지 못했어요. 다시 보내 주세요'); return; }
+    for(let i=0;i<reps.length;i++){
+      if(i){ const t2=document.createElement('div'); t2.className='msg'; t2.innerHTML=ty.innerHTML; if(alive()){ $('#phChat').appendChild(t2); phScroll(); } await wait(Math.min(1600,400+reps[i].length*30)); t2.remove(); }
+      const m={w:'c',t:reps[i],at:Date.now()}; f.log.push(m); f.at=m.at; if(alive()){ $('#phChat').insertAdjacentHTML('beforeend',bubbleHTML(m,c)); phScroll(); } else f.unread=(f.unread||0)+1;
+    }
+    const ptags=fcPhotoOn()&&r&&typeof r.photo==='string'?r.photo.trim():''; if(ptags) fcNpcPhoto(c,f,ptags,alive,ty);
+    if(f.log.length>400) { const cut=f.log.length-400; f.log.splice(0,cut); f.sumTo=Math.max(0,(f.sumTo||0)-cut); }
+    const p=P(), d=today(); if(!p.fcAff||p.fcAff.d!==d) p.fcAff={d,n:0}; const add=Math.max(0,Math.min(2,Math.round(+((r&&r.aff)||0)))); if(add&&o&&p.fcAff.n<20){ const a=Math.min(add,20-p.fcAff.n); p.fcAff.n+=a; addAff(c,a); }
+    mark('prog'); if(f.log.length-(f.sumTo||0)>70) fcSummarize(cid);
+  }finally{ FCBUSY=false; ty.remove(); }
+}
+function fcPhotoOn(){ return P().fcPhoto!==false&&imgReady(); }
+async function fcNpcPhoto(c,f,tags,alive,ty){
+  const t2=document.createElement('div'); t2.className='msg'; t2.innerHTML=`<div class="av sm">${art(c)}</div><div class="bub typing"><i></i><i></i><i></i></div>`; if(alive()){ $('#phChat').appendChild(t2); phScroll(); }
+  try{ const b=await naiDraw('illust',joinTags(c.naiPrompt,tags),{styleId:c.naiStyle,frame:'cowboy shot',pose:''}), k='chat_'+uid(); await idbPut(IMGNS+k,b); chatImgCache[k]=URL.createObjectURL(b);
+    const m={w:'p',t:'',img:k,at:Date.now()}; f.log.push(m); f.at=m.at; mark('prog'); if(alive()){ t2.remove(); $('#phChat').insertAdjacentHTML('beforeend',bubbleHTML(m,c)); phScroll(); } else f.unread=(f.unread||0)+1;
+  }catch(e){ }finally{ t2.remove(); } }
+async function fcSummarize(cid){
+  const c=charById(cid), f=fcOf(cid); const end=f.log.length-24, part=f.log.slice(f.sumTo||0,end); if(part.length<20) return;
+  try{ const r=await aiJSON(fcSummarizePrompt({c,f,part}),null,'quick'); if(r&&r.summary){ f.sum=String(r.summary).slice(0,1200); f.sumTo=end; mark('prog'); } }catch(e){ quietErr(e,'0100-messenger.js:151'); }
+}
+function phScroll(){const el=$('#phChat'); if(el){ el.scrollTop=el.scrollHeight; if(el.querySelector('[data-chatimg]')) hydrateChatImgs(); }}
+async function phPlay(t,c,s,token){
+  const lines=parseScript(t.script);
+  const alive=()=>PH&&PH.token===token&&$('#phChat');
+  while(s.pos<lines.length){
+    if(!alive()) return;
+    const L=lines[s.pos];
+    if(L.cond&&L.cond!==s.pick){s.pos++;continue;}
+    if(L.type==='choice'){ $('#phIn').innerHTML=L.opts.map((o,i)=>`<button type="button" class="btn ghost block" data-act="phpick" data-tid="${esc(t.id)}" data-n="${i+1}">${esc(sub(o))}</button>`).join('')+`<button class="linkb ph-sw2" data-act="phmode" data-v="free">⌨ 직접 입력으로 전환</button>`; phMode('pick'); return; }
+    let entry=null;
+    if(L.type==='say'){
+      if(isMe(L.who)&&s.lastPick){ const nz=x=>sub(String(x||'')).replace(/[\s.,!?~…'"「」]/g,''), a=nz(L.text), b=nz(s.lastPick); if(a===b||(a.length>3&&b.length>3&&(a.includes(b)||b.includes(a)))){ s.pos++; s.lastPick=''; continue; } } // 고른 선택지를 대본이 한 번 더 말하면 건너뛰기
+      if(isMe(L.who)){ $('#phIn').innerHTML=`<button type="button" class="btn ghost block" data-act="phsay" data-tid="${esc(t.id)}">▶ ${esc(sub(L.text))}</button><button class="linkb ph-sw2" data-act="phmode" data-v="free">⌨ 직접 입력으로 전환</button>`; phMode('pick'); return; }
+      else{
+        const ty=document.createElement('div'); ty.className='msg'; ty.innerHTML=`<div class="av sm">${art(c)}</div><div class="bub typing"><i></i><i></i><i></i></div>`;
+        $('#phChat').appendChild(ty); phScroll();
+        await wait(Math.min(1800,500+L.text.length*35)); ty.remove(); if(!alive()) return;
+        entry={w:'c',t:sub(L.text)};
+      }
+    } else if(L.type==='cmd'&&L.cmd==='스티커'&&emoKey(L.arg)){ await wait(600); if(!alive()) return; entry={w:'k',t:emoKey(L.arg)}; } // 스티커(0462)
+    else if(L.type==='cmd'&&['사진','소품','배경'].includes(L.cmd)){ await wait(800); if(!alive()) return; entry={w:'p',t:L.arg}; }
+    else if(L.type==='nar'||L.type==='place'){ entry={w:'s',t:sub(L.text)}; }
+    if(!alive()) return;
+    s.pos++; if(entry) s.lastPick='';
+    if(entry){ entry.at=Date.now(); s.log.push(entry); s.at=entry.at; $('#phChat').insertAdjacentHTML('beforeend',bubbleHTML(entry,c)); phScroll(); mark('prog'); }
+  }
+  if(!s.done){
+    s.done=true; s.at=Date.now();
+    mark('prog'); if(own(c.id)) addAff(c,10); updateBadge(); checkTriggers();
+    if(alive()){ $('#phIn').innerHTML=''; const nx=roomThreads(c.id).find(x=>!x.s.done&&x.t); if(nx){ PH.tid=nx.t.id; nx.s.t0=nx.s.t0||Date.now(); phMode('free'); phPlay(nx.t,c,nx.s,token); } else { PH.tid=null; phMode('free'); } }
+  }
+}

@@ -452,3 +452,6 @@ function rgNode(kind){ const g=progSlot('rogue'), run=g.run; if(!run) return;
     else if(x<0.67){ if(Math.random()<0.5){ run.pick=rgPick3(run); msg='수상한 상자에서 유물이 나왔어요!'; } else { run.squad.forEach(id=>{ if(run.hp[id]>0) run.hp[id]=Math.max(0.05,run.hp[id]-0.2); }); msg='수상한 상자가 폭발했어요. 모두 체력 -20%.'; } }
     else { run.relics.push('train'); msg='잠깐의 실전 훈련. 공격 +5%.'; } }
   run.floor++; run.opts=rgOpts(run); run.msg=msg; mark('prog'); render(); }
+/* 심연 탐사 화면 보조(View): 탐사 카드로 스크롤 · 탐사 결과 창 */
+function abyssCardFocus(){ setTimeout(()=>{ const el=document.querySelector('.ch-card.rog'); if(el) el.scrollIntoView({block:'start',behavior:'smooth'}); },60); }
+function openRgResult(html){ openModal(`<div class="result" style="position:static">${html.replace('data-act="bdone"','data-act="close"')}</div>`); }

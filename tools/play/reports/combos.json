@@ -1,5 +1,5 @@
 {
- "at": "2026-11-04T01:59:41.270Z",
+ "at": "2026-11-04T02:24:25.135Z",
  "ref": null,
  "sites": [
   {
@@ -927,7 +927,7 @@
    ]
   },
   {
-   "key": "0160-free-chat.js heroTags",
+   "key": "0160-player-profile.js heroTags",
    "n": 2,
    "situations": [
     "idol-audition · 기본",
@@ -1739,7 +1739,7 @@
      "no": [
       "THREAD_FMT"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:33",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
      "seen": {
       "yes": 0,
       "no": 0
@@ -1756,7 +1756,7 @@
      "no": [
       "CH_HOW_FAST"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:33",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
      "seen": {
       "yes": 2,
       "no": 0
@@ -1773,7 +1773,7 @@
       "「각 스테이지 pre는」",
       "「줄. 스테이지마다 선택지 1개 이상.」"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:33",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
      "seen": {
       "yes": 0,
       "no": 0
@@ -1790,7 +1790,7 @@
      "no": [
       "CG_MARK_SCRIPT"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:33",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
      "seen": {
       "yes": 2,
       "no": 0
@@ -1807,7 +1807,7 @@
       "THREAD_DUP_RULE",
       "REL_RULE"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:33",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
      "seen": {
       "yes": 0,
       "no": 0
@@ -1823,7 +1823,7 @@
       "「,\"threads\":[{\"char\":\"」",
       "「이름\",\"title\":\"\",\"afterStage\":1,\"script\":\"」"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:33",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
      "seen": {
       "yes": 0,
       "no": 0
@@ -2570,7 +2570,7 @@
      "no": [
       "THREAD_FMT"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:35",
      "seen": {
       "yes": 0,
       "no": 0
@@ -2587,7 +2587,7 @@
      "no": [
       "EV_HOW_FAST"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:35",
      "seen": {
       "yes": 1,
       "no": 0
@@ -2603,7 +2603,7 @@
       "EV_LINES",
       "DETAIL_RULE"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:35",
      "seen": {
       "yes": 0,
       "no": 0
@@ -2620,7 +2620,7 @@
      "no": [
       "EV_CG_MARK_SCRIPT"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:35",
      "seen": {
       "yes": 1,
       "no": 0
@@ -2635,7 +2635,7 @@
       "EV_GIFT_FIRST"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:35",
      "seen": {
       "yes": 0,
       "no": 0
@@ -2652,7 +2652,7 @@
       "THREAD_DUP_RULE",
       "REL_RULE"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:35",
      "seen": {
       "yes": 0,
       "no": 0
@@ -2667,7 +2667,7 @@
      "no": [
       "「,\"threads\":[{\"char\":\"\",\"title\":\"\",\"after」"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:34",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:35",
      "seen": {
       "yes": 0,
       "no": 0
@@ -3030,7 +3030,7 @@
      "no": [
       "EV_ALT_STORY"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:35",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
      "seen": {
       "yes": 0,
       "no": 0
@@ -3045,7 +3045,7 @@
       "EV_ALT_STORY"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:35",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
      "seen": {
       "yes": 0,
       "no": 0
@@ -3629,7 +3629,7 @@
       "PLAN_WRITE_RULE"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:30",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:31",
      "seen": {
       "yes": 8,
       "no": 0
@@ -3644,7 +3644,7 @@
       "PREV_TAIL"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:30",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:31",
      "seen": {
       "yes": 11,
       "no": 0
@@ -3661,7 +3661,7 @@
      "no": [
       "BATTLE_FLOW"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:30",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:31",
      "seen": {
       "yes": 0,
       "no": 6
@@ -3676,7 +3676,7 @@
      "no": [
       "BATTLE_FLOW"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:30",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:31",
      "seen": {
       "yes": 0,
       "no": 6
@@ -3689,7 +3689,7 @@
       "STAGE_LAST_ENDING"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:30",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:31",
      "seen": {
       "yes": 3,
       "no": 0
@@ -4203,7 +4203,7 @@
      "no": [
       "DR_HARMONY_TONE"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:51",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:52",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4220,7 +4220,7 @@
       "DR_HARMONY_TONE"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:51",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:52",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4472,7 +4472,7 @@
       "NG_AUTO_HINT"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:37",
      "seen": {
       "yes": 1,
       "no": 0
@@ -4487,7 +4487,7 @@
       "NG_HERO_ASK"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:37",
      "seen": {
       "yes": 1,
       "no": 0
@@ -4502,7 +4502,7 @@
       "NG_PLAYER_TERM"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:37",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4520,7 +4520,7 @@
      "no": [
       "NG_TERMS_NEW"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:37",
      "seen": {
       "yes": 0,
       "no": 1
@@ -4540,7 +4540,7 @@
       "「, 성별·성 정체성」"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:37",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4555,7 +4555,7 @@
      "no": [
       "「(세계관 호칭)」"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:37",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4573,7 +4573,7 @@
       "TITLE_RULE",
       "NG_TITLE_KEYWORD"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:37",
      "seen": {
       "yes": 0,
       "no": 1
@@ -4588,7 +4588,7 @@
       "「tactical, fantasy, neon, pastel, noir 중 」"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:36",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:37",
      "seen": {
       "yes": 1,
       "no": 0
@@ -4603,7 +4603,7 @@
       "NG_FANFIC"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:38",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:39",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4618,7 +4618,7 @@
       "NG_PLAYER_PLOT"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:39",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:40",
      "seen": {
       "yes": 0,
       "no": 0
@@ -4631,7 +4631,7 @@
       "NG_AUTHOR_BIBLE"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:40",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:41",
      "seen": {
       "yes": 0,
       "no": 0
@@ -5191,7 +5191,7 @@
      "no": [
       "ALT_SIDE"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:62",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:63",
      "seen": {
       "yes": 0,
       "no": 1
@@ -5206,7 +5206,7 @@
      "no": [
       "ALT_THEME_AUTO"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:62",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:63",
      "seen": {
       "yes": 0,
       "no": 1
@@ -5643,7 +5643,7 @@
       "「원작 설정 그대로」",
       "「지금 세계관과 이야기 흐름에 어울리는 새 얼굴. 기존 인물과 다른 매력」"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:60",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:61",
      "seen": {
       "yes": 0,
       "no": 1
@@ -5660,7 +5660,7 @@
      "no": [
       "「지금 세계관과 이야기 흐름에 어울리는 새 얼굴. 기존 인물과 다른 매력」"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:60",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:61",
      "seen": {
       "yes": 0,
       "no": 1
@@ -5877,7 +5877,7 @@
       "「의 인상적인 성인 캐릭터 1명」"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:61",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:62",
      "seen": {
       "yes": 0,
       "no": 0
@@ -5892,7 +5892,7 @@
      "no": [
       "「의 인상적인 성인 캐릭터 1명」"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:61",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:62",
      "seen": {
       "yes": 0,
       "no": 0
@@ -8255,7 +8255,7 @@
      "no": [
       "PERSONA_FILL"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:78",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:79",
      "seen": {
       "yes": 0,
       "no": 0
@@ -8270,7 +8270,7 @@
       "「lines는 이 말투로 다시 쓴 평소 대사 5개. affLines는 호감」"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:84",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:85",
      "seen": {
       "yes": 0,
       "no": 0
@@ -8285,7 +8285,7 @@
       "「,\"lines\":[\"5개\"],\"affLines\":{\"3\":[\"\"],\"5\"」"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:85",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:86",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10359,7 +10359,7 @@
       "EPISODE_AFTER"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:102",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:103",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10374,7 +10374,7 @@
       "EPISODE_SECRET"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:102",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:103",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10792,7 +10792,7 @@
       "「이고 프로필은 다음과 같다:」"
      ],
      "no": [],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:121",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:122",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10910,7 +10910,7 @@
      "no": [
       "「요청: 지금 이 캐릭터가 보낼 법한 일상적인 메신저 대화」"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:124",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:125",
      "seen": {
       "yes": 0,
       "no": 0
@@ -10930,7 +10930,7 @@
      "no": [
       "「(아직 대화 없음)」"
      ],
-     "loc": "src/main/0015-prompt-studio/020-requests.js:124",
+     "loc": "src/main/0015-prompt-studio/020-requests.js:125",
      "seen": {
       "yes": 0,
       "no": 1
@@ -11857,7 +11857,7 @@
       "「이 게임 그림체」"
      ],
      "no": [],
-     "loc": "src/main/0020-ai-connect.js:383",
+     "loc": "src/main/0020-ai-connect.js:385",
      "seen": {
       "yes": 0,
       "no": 0
@@ -11931,7 +11931,7 @@
    ]
   },
   {
-   "key": "0160-free-chat.js heroTags",
+   "key": "0160-player-profile.js heroTags",
    "kind": "정보",
    "code": "형식 견본 뒤 글",
    "msg": "견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」",
@@ -12675,8 +12675,8 @@
   "0030-image/010-engine.js regenRun",
   "0030-image/010-engine.js requestUltimateScene",
   "0030-image/010-engine.js illustrationScenePreparation",
-  "0160-free-chat.js fcSend",
-  "0160-free-chat.js fcSummarize",
+  "0100-messenger.js fcSend",
+  "0100-messenger.js fcSummarize",
   "0185-game-rules.js posAI",
   "0200-skin-shop.js skinAuto",
   "0260-new-game/010-draft.js drPolish",
@@ -12795,7 +12795,7 @@
    "game": "idol-audition",
    "sit": "기본",
    "flow": "handleStoryAndAuthoringAction:aiworld",
-   "err": "Cannot set properties of null (setting 'textContent')"
+   "err": "Cannot set properties of null (setting 'value')"
   },
   {
    "game": "idol-audition",

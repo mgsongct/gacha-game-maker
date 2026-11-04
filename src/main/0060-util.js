@@ -19,6 +19,14 @@ const isMe=w=>w==='나'||w==='관리관'||w===T('player')||(!!P().player&&w===P(
 const QUIET=[];
 function quietErr(e,where){ QUIET.unshift({at:Date.now(),where:String(where||''),msg:String(e&&e.message||e||'오류').slice(0,200)}); if(QUIET.length>60) QUIET.length=60; try{ console.debug('[quiet]',where,e); }catch(_){ /* 콘솔이 없어도 괜찮음 */ } }
 function toast(m){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
+/* 버튼 처리 중 표시(View): 잠그고 글자를 주면 바꿈 — 돌려준 함수로 되돌림(버튼이 화면에 남아 있을 때만). 액션 처리기(Controller)가 처리 앞뒤로 부름 */
+function busy(t,label){ const lb=t.textContent; t.disabled=true; if(label!=null) t.textContent=label; return ()=>{ if(t.isConnected){ t.disabled=false; if(label!=null) t.textContent=lb; } }; }
+/* 고르기 칩 켜짐 표시(View) · 켜짐/꺼짐 스위치 뒤집기(aria-checked — 새 값을 돌려줌) */
+function chipOn(el,on){ el.classList.toggle('on',!!on); }
+function chipIsOn(el){ return el.classList.contains('on'); }
+function switchFlip(el){ const on=el.getAttribute('aria-checked')!=='true'; el.setAttribute('aria-checked',String(on)); return on; }
+/* 화면 한 칸에 글 표시(View — 선택자나 요소, 있을 때만) */
+function say(el,msg){ const x=typeof el==='string'?$(el):el; if(x) x.textContent=msg; return x; }
 function ripple(x,y,big){const r=document.createElement('div');r.className='ripple'+(big?' big':'');r.style.left=x+'px';r.style.top=y+'px';r.innerHTML='<i></i><i></i><i></i>';document.body.appendChild(r);setTimeout(()=>r.remove(),1000);}
 function hearts(x,y,n){for(let i=0;i<n;i++){const h=document.createElement('div');h.className='hrt';h.textContent='♥';h.style.left=(x-8)+'px';h.style.top=(y-10)+'px';h.style.setProperty('--dx',(Math.random()*70-35).toFixed(0)+'px');h.style.animationDelay=(i*0.08)+'s';document.body.appendChild(h);setTimeout(()=>h.remove(),1300);}}
 // 만든 표정을 쓰는 곳: 터치 반응, 스토리 대사(표정 지정이 없을 때 대사로 짐작)

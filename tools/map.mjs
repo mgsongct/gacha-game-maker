@@ -90,6 +90,11 @@ function verdictWhy(m, q) { const A = m.arch; if (!A) return []; const lq = q.to
     const fs = Object.entries(m.fns).filter(([, x]) => x.module === v.mod && x.layer); if (fs.length) out.push(`  data를 쓰는 함수의 계층·기능: ${fs.slice(0, 12).map(([, x]) => `${x.name}(${x.layer}${x.feat ? '·' + fl(x.feat) : ''})`).join(', ')}${fs.length > 12 ? ' …' : ''}`); }
   return out; }
 
+// 섞인 함수 나눌 자리(--why <함수 이름>): View 줄 · Model 줄, 액션 처리기는 창 HTML·DOM이 든 case
+function mixWhy(m, q) { const hit = Object.values(m.fns).filter(x => x.name === q && x.mix); if (!hit.length) return []; const ln = a => a.length ? a.slice(0, 30).join(', ') + (a.length > 30 ? ` …외 ${a.length - 30}` : '') : '없음';
+  return hit.flatMap(x => ['', `■ 섞인 함수 ${x.name} (${x.file}:${x.line}) — View(마크업·DOM) 줄 ${x.mix.view.length} · Model(상태 쓰기·저장·서비스) 줄 ${x.mix.model.length}`, `  View 줄: ${ln(x.mix.view)}`, `  Model 줄: ${ln(x.mix.model)}`,
+    ...(x.mix.cases ? [`  창 HTML·DOM이 든 case ${x.mix.cases.length}: ${x.mix.cases.map(c => `${c.act}(${c.line}줄·${c.view})`).join(', ')}`] : [])]); }
+
 // ── 거꾸로 따라가기 ──
 // docs/modules.md에서 그 말이 든 절(제목이면 절 전체, 본문이면 그 줄): src 경로 · `이름`(함수) · `c.alt` 같은 필드
 function sections(q) { const p = join(ROOT, 'docs/modules.md'), out = { paths: new Set(), names: new Set(), fields: new Set() }; if (!existsSync(p)) return out; let on = false;
@@ -108,7 +113,7 @@ function why(m, q) { const lq = q.toLowerCase(), sec = sections(q), mods = new S
   const wm = new Set(hitData.flatMap(([, d]) => Object.values(d.writers).flat().map(f => m.fns[f]?.module).filter(Boolean)));
   if (wm.size) { out.push('', '■ 관련 모듈(index.html 줄 · 연계 모듈)'); for (const x of [...wm].slice(0, 12)) { const v = m.modules[x]; if (v) out.push(`  ${short(x)}: index.html ${v.files.filter(f => f.www).map(f => `${f.www[0]}~${f.www[1]}`).join(', ')} · 연계 ${v.neighbors.slice(0, 5).map(([n, c]) => `${short(n)} ${c}`).join(', ')}`); } }
   if (hitData.length > 20) out.push('', `…외 ${hitData.length - 20}개 경로 — 말을 더 좁혀 보세요`);
-  out.push(...verdictWhy(m, q));
+  out.push(...verdictWhy(m, q), ...mixWhy(m, q));
   const hitF = Object.entries(m.surface?.feats || {}).filter(([, f]) => f.label.toLowerCase().includes(lq) || f.windows.some(w => w.toLowerCase().includes(lq)));
   if (hitF.length) { out.push('', `■ index.html 기능 단위 ${hitF.length}`); for (const [u, f] of hitF.slice(0, 8)) { const fs = Object.entries(m.fns).filter(([, x]) => x.place === u).map(([, x]) => `${x.name}<${short(x.module)}>`); out.push(`  ${f.label} (${KIND[f.kind] || f.kind} · ${f.menu}) — 함수 ${f.n} · 모듈 ${f.mods.slice(0, 6).map(([x, n]) => `${short(x)} ${n}`).join(', ')}${f.windows.length ? ` · 창 ${f.windows.slice(0, 5).join(' · ')}` : ''}`); if (fs.length) out.push(`    data를 쓰는 함수: ${fs.slice(0, 10).join(', ')}${fs.length > 10 ? ` …외 ${fs.length - 10}` : ''}`); } }
   return out.join('\n'); }
@@ -135,7 +140,7 @@ if (arg('--rebase')) { const sha = execSync(`git rev-parse --verify ${JSON.strin
 if (argv.includes('--strict') || argv.includes('--update-baseline')) { const F = archF(map.arch || { verdicts: [], store: { keys: [] } }), B = readBaseline(ROOT, 'arch'), D = B ? compare(B, F) : null;
   const kindOf = k => k.split('|')[0], had = new Set((B || []).map(f => kindOf(f.key))), fresh = f => !had.has(kindOf(f.key));
   if (argv.includes('--update-baseline')) { if (D && ([...D.added.filter(f => !fresh(f)), ...D.worse].length)) { console.log('기준선을 올리는 갱신은 하지 않아요 — 코드를 고치세요(도구가 바뀌었으면 --rebase <직전 커밋>)'); process.exit(1); } writeBaseline(ROOT, F, 'arch'); console.log(`아키텍처 기준선: ${F.length}개${D && D.added.some(fresh) ? ` (새 판정 종류 처음 잼: ${[...new Set(D.added.filter(fresh).map(f => kindOf(f.key)))].join(', ')})` : ''}`); }
-  else if (D) { console.log(`아키텍처 판정 기준선 대비: 새로 생김 ${D.added.length} · 나빠짐 ${D.worse.length} · 해결 ${D.fixed.length} · 좋아짐 ${D.better.length}`); [...D.added, ...D.worse].forEach(f => console.log('  + ' + f.text)); if (D.added.length || D.worse.length) process.exit(1); }
+  else if (D) { console.log(`아키텍처 판정 기준선 대비: 새로 생김 ${D.added.length} · 나빠짐 ${D.worse.length} · 해결 ${D.fixed.length} · 좋아짐 ${D.better.length} · 옮김 ${(D.moved || []).length}(모듈만 바뀜 — 합계 그대로)`); [...D.added, ...D.worse].forEach(f => console.log('  + ' + f.text)); if (D.added.length || D.worse.length) process.exit(1); }
   else console.log('아키텍처 기준선 없음 — node tools/map.mjs --update-baseline'); }
 if (arg('--why')) console.log(why(map, arg('--why')));
 if (arg('--game')) console.log(gameView(map, arg('--game')));

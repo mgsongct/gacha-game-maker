@@ -678,10 +678,22 @@ try {
     P().dm = { date: '2000-01-01', cnt: { battle: 9 }, got: {} }; const before = JSON.stringify(P().dm); tab = 'lobby'; renderView(); o.viewPure = JSON.stringify(P().dm) === before && progRead('dm').date === today() && P().dm.date === '2000-01-01';
     render(); o.tickSaves = P().dm.date === today() && !P().dm.cnt.battle;
     const mode0 = G.meta.expedition; G.meta.expedition = Object.assign({}, mode0 || {}, { mode: 'idol' }); delete P().exped; const own0 = G.chars[0]; const had0 = P().owned[own0.id]; P().owned[own0.id] = had0 || { levelCapVersion: 1, transc: 0, growthCostVersion: 1, lv: 1, exp: 0, dup: 0, aff: 0, seen: [], wlv: 0, skin: '' }; render();
-    o.expedTick = !!(P().exped && own0 && P().exped.offers[own0.id] && P().exped.offers[own0.id].day === today()); G.meta.expedition = mode0; if (!had0) delete P().owned[own0.id];
+    o.expedTick = !!(P().exped && own0 && P().exped.offers[own0.id] && P().exped.offers[own0.id].day === today()); G.meta.expedition = mode0;
+    /* 액션 처리기(Controller)에서 화면 조작을 기능 모듈 View로 뺀 case가 실제 클릭 분배로 오류 없이 돎(처리 중 예외는 분배기가 '작업을 완료하지 못했습니다'로 알림) */
+    const said = [], toast0 = window.toast; window.toast = m => { said.push(String(m)); toast0(m); };
+    const act = async (a, data = {}, inner = '') => { const b = document.createElement('button'); b.dataset.act = a; Object.assign(b.dataset, data); b.innerHTML = inner; document.body.appendChild(b); b.click(); await new Promise(r => setTimeout(r, 40)); b.remove(); };
+    P().owned[own0.id] = P().owned[own0.id] || { levelCapVersion: 1, transc: 0, growthCostVersion: 1, lv: 1, exp: 0, dup: 0, aff: 0, seen: [], wlv: 0, skin: '' }; P().sec = own0.id; tab = 'lobby'; render();
+    await act('lbhide'); const hid = document.body.classList.contains('lb-hidden'); await act('lbshow'); o.lobbyMenu = hid && !document.body.classList.contains('lb-hidden');
+    const aff0 = P().owned[own0.id].aff; await act('poke', {}, '<div class="lb-stage"></div>'); await act('evspoke', { id: own0.id }, '<div class="art"></div>'); o.poke = P().owned[own0.id].aff > aff0;
+    openChar(own0.id); await act('cstab', { k: 'info' }); o.csTab = CS_TAB === 'info'; await act('cspoke', { id: own0.id }, '<div class="art"></div>'); await act('csframe'); P().csFull = !P().csFull; closeModal();
+    openFeedback(); await act('fbstar', { n: '3' }); o.fbStar = FB_STAR === 3 && !!document.querySelector('#fbStars .chip.on'); closeModal();
+    P().mail = [{ id: 'mt1', title: '시험 우편', from: '운영', body: '본문', at: Date.now(), reward: {} }]; await act('mailview', { id: 'mt1' }); o.mailView = P().mail[0].read === true && document.querySelector('#modal').textContent.includes('시험 우편'); closeModal();
+    openModal('<select id="mt_logo"><option value="star">s</option></select>'); await act('logoprev'); const prev = !!document.querySelector('#ov .title[data-act="logoprevclose"]') && $('#modal').hidden; await act('logoprevclose'); o.logoPrev = prev && $('#ov').hidden && !$('#modal').hidden; closeModal();
+    await act('go', { to: 'shop' }); o.go = tab === 'shop';
+    o.noFail = !said.some(m => m.includes('작업을 완료하지 못했습니다')) || said.join(' / '); window.toast = toast0; if (!had0) delete P().owned[own0.id];
     return o; });
   assert.ok(Object.values(r26).every(v => v === true), JSON.stringify(r26)); assert.deepEqual(err26, [], '페이지 오류');
-  console.log('ok 26 정리 후 동작: 그림 지우기 대상·리롤 초안 함수, 조용한 오류 기록, 재화 단일 경로, 지운 액션이 분배 표에서 빠짐 · 진행 칸 정의(그리기는 상태 그대로, 그리기 전 처리가 하루 새로 만들기·출연 제안 저장)');
+  console.log('ok 26 정리 후 동작: 그림 지우기 대상·리롤 초안 함수, 조용한 오류 기록, 재화 단일 경로, 지운 액션이 분배 표에서 빠짐 · 진행 칸 정의(그리기는 상태 그대로, 그리기 전 처리가 하루 새로 만들기·출연 제안 저장) · 처리기에서 View로 뺀 case가 클릭 분배로 오류 없이 돎');
 
   // 27) 자기점검 보강(tools: HTML 주입·DOM id)으로 고친 것: 용어 T()는 HTML 안전, 대화 배지는 화면에 없는 #phBadge 대신 로비 아이콘을 바로 고침
   const p27 = await browser.newPage(), err27 = []; p27.on('pageerror', e => err27.push(String(e)));

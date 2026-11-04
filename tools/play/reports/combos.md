@@ -27,7 +27,7 @@
 | 0040-sound.js toJa | 1 | 1 | 1 | 201~201 | 0 | 0 | 0 | 0 |
 | 0135-schedule.js spotsAI | 2 | 1 | 1 | 7388~7388 | 25 | 0 | 5 | 20 |
 | 0135-schedule.js spotTalkAI | 1 | 1 | 1 | 8588~8588 | 25 | 0 | 5 | 20 |
-| 0160-free-chat.js heroTags | 2 | 2 | 1 | 534~578 | 0 | 0 | 0 | 0 |
+| 0160-player-profile.js heroTags | 2 | 2 | 1 | 534~578 | 0 | 0 | 0 | 0 |
 | 0185-game-rules.js rulesAIData | 1 | 1 | 1 | 7308~7308 | 25 | 0 | 5 | 20 |
 | 0185-game-rules.js rulesPosAI | 1 | 1 | 1 | 7521~7521 | 25 | 0 | 5 | 20 |
 | 0250-story-factory.js aiChapterGen0 | 2 | 1 | 1 | 30402~30413 | 54 | 0 | 16 | 38 |
@@ -77,7 +77,7 @@
 | 형식 견본 뒤 글 | 0040-sound.js toJa | 견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」 |
 | 형식 견본 뒤 글 | 0135-schedule.js spotsAI | 견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」 |
 | 형식 견본 뒤 글 | 0135-schedule.js spotTalkAI | 견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」 |
-| 형식 견본 뒤 글 | 0160-free-chat.js heroTags | 견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」 |
+| 형식 견본 뒤 글 | 0160-player-profile.js heroTags | 견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」 |
 | 형식 견본 뒤 글 | 0185-game-rules.js rulesAIData | 견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」 |
 | 형식 견본 뒤 글 | 0185-game-rules.js rulesPosAI | 견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」 |
 | 형식 견본 뒤 글 | 0250-story-factory.js ensureLibPrompts | 견본 뒤에 「다른 설명이나 코드 블록 없이 JSON만 출력한다. 문자열 값 안에서 따옴표가 필요하면 큰」 |
@@ -167,12 +167,12 @@
 | 0030-image/010-engine.js regenRun | src/main/0030-image/010-engine.js:48 | 6 |
 | 0030-image/010-engine.js requestUltimateScene | src/main/0030-image/010-engine.js:118 | 7 |
 | 0030-image/010-engine.js illustrationScenePreparation | src/main/0030-image/010-engine.js:143 | 7 |
-| 0160-free-chat.js fcSend | src/main/0160-free-chat.js:46 | 41 |
-| 0160-free-chat.js fcSummarize | src/main/0160-free-chat.js:67 | 0 |
+| 0100-messenger.js fcSend | src/main/0100-messenger.js:130 | 41 |
+| 0100-messenger.js fcSummarize | src/main/0100-messenger.js:151 | 0 |
 | 0185-game-rules.js posAI | src/main/0185-game-rules.js:129 | 25 |
 | 0200-skin-shop.js skinAuto | src/main/0200-skin-shop.js:16 | 7 |
-| 0260-new-game/010-draft.js drPolish | src/main/0260-new-game/010-draft.js:141 | 9 |
-| 0260-new-game/010-draft.js drFillChar | src/main/0260-new-game/010-draft.js:160 | 6 |
+| 0260-new-game/010-draft.js drPolish | src/main/0260-new-game/010-draft.js:148 | 9 |
+| 0260-new-game/010-draft.js drFillChar | src/main/0260-new-game/010-draft.js:167 | 6 |
 | 0260-new-game/020-build.js buildNewGameDraft#2 | src/main/0260-new-game/020-build.js:94 | 22 |
 | 0260-new-game/020-build.js buildNewGameDraft#3 | src/main/0260-new-game/020-build.js:101 | 8 |
 | 0260-new-game/020-build.js buildNewGameDraft#4 | src/main/0260-new-game/020-build.js:107 | 0 |
@@ -180,20 +180,20 @@
 | 0260-new-game/020-build.js buildNewGameDraft#6 | src/main/0260-new-game/020-build.js:119 | 32 |
 | 0280-live-ops.js dailyTalks | src/main/0280-live-ops.js:33 | 33 |
 | 0445-factions.js stanceAI | src/main/0445-factions.js:40 | 25 |
-| 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#2 | src/main/0510-actions/020-navigation-and-tools.js:94 | 0 |
-| 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#3 | src/main/0510-actions/020-navigation-and-tools.js:96 | 0 |
-| 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#4 | src/main/0510-actions/020-navigation-and-tools.js:97 | 0 |
-| 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#5 | src/main/0510-actions/020-navigation-and-tools.js:98 | 1 |
-| 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#6 | src/main/0510-actions/020-navigation-and-tools.js:133 | 1 |
-| 0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction#2 | src/main/0510-actions/040-story-and-authoring.js:73 | 25 |
-| 0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction#3 | src/main/0510-actions/040-story-and-authoring.js:89 | 34 |
-| 0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction#4 | src/main/0510-actions/040-story-and-authoring.js:99 | 6 |
+| 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#2 | src/main/0510-actions/020-navigation-and-tools.js:91 | 0 |
+| 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#3 | src/main/0510-actions/020-navigation-and-tools.js:93 | 0 |
+| 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#4 | src/main/0510-actions/020-navigation-and-tools.js:94 | 0 |
+| 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#5 | src/main/0510-actions/020-navigation-and-tools.js:95 | 1 |
+| 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#6 | src/main/0510-actions/020-navigation-and-tools.js:130 | 1 |
+| 0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction#2 | src/main/0510-actions/040-story-and-authoring.js:72 | 25 |
+| 0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction#3 | src/main/0510-actions/040-story-and-authoring.js:88 | 34 |
+| 0510-actions/040-story-and-authoring.js handleStoryAndAuthoringAction#4 | src/main/0510-actions/040-story-and-authoring.js:98 | 6 |
 | 0510-actions/050-settings-and-audio.js handleSettingsAndAudioAction | src/main/0510-actions/050-settings-and-audio.js:59 | 0 |
 | 0510-actions/050-settings-and-audio.js handleSettingsAndAudioAction#2 | src/main/0510-actions/050-settings-and-audio.js:66 | 0 |
-| 0510-actions/090-characters.js handleCharactersAction | src/main/0510-actions/090-characters.js:17 | 6 |
-| 0510-actions/090-characters.js handleCharactersAction#2 | src/main/0510-actions/090-characters.js:19 | 25 |
-| 0510-actions/090-characters.js handleCharactersAction#3 | src/main/0510-actions/090-characters.js:22 | 6 |
-| 0510-actions/090-characters.js handleCharactersAction#5 | src/main/0510-actions/090-characters.js:43 | 0 |
+| 0510-actions/090-characters.js handleCharactersAction | src/main/0510-actions/090-characters.js:16 | 6 |
+| 0510-actions/090-characters.js handleCharactersAction#2 | src/main/0510-actions/090-characters.js:18 | 25 |
+| 0510-actions/090-characters.js handleCharactersAction#3 | src/main/0510-actions/090-characters.js:21 | 6 |
+| 0510-actions/090-characters.js handleCharactersAction#5 | src/main/0510-actions/090-characters.js:42 | 0 |
 | 0510-actions/100-images-and-assets.js handleImagesAndAssetsAction | src/main/0510-actions/100-images-and-assets.js:29 | 0 |
 | 0510-actions/100-images-and-assets.js handleImagesAndAssetsAction#2 | src/main/0510-actions/100-images-and-assets.js:92 | 25 |
 | 0530-story-memory.js smExtract#2 | src/main/0530-story-memory.js:14 | 0 |
@@ -207,8 +207,8 @@
 | modules/combat/060-generation.js v2GenerateSelected#2 | src/modules/combat/060-generation.js:188 | 4 |
 | modules/combat/070-equipment.js v2GearGenerate | src/modules/combat/070-equipment.js:73 | 0 |
 | 그림 0030-image/010-engine.js naiDraw#2 | src/main/0030-image/010-engine.js:178 | 1 |
-| 그림 0030-image/010-engine.js openNaiGen | src/main/0030-image/010-engine.js:740 | 0 |
-| 그림 0030-image/010-engine.js faceDrawOne | src/main/0030-image/010-engine.js:827 | 1 |
+| 그림 0030-image/010-engine.js openNaiGen | src/main/0030-image/010-engine.js:744 | 0 |
+| 그림 0030-image/010-engine.js faceDrawOne | src/main/0030-image/010-engine.js:831 | 1 |
 
 ## 흐름 오류 (15)
 
@@ -226,7 +226,7 @@
 | idol-audition | 기본 | 그림: CG | (500) combos: image request recorded |
 | idol-audition | 기본 | handleNavigationAndToolsAction:aiskin | AI가 태그를 누락하거나 바꿔서 적용하지 않았어요. 기존 입력은 유지했어요. |
 | idol-audition | 기본 | handleStoryAndAuthoringAction:stdetail | Cannot read properties of null (reading 'value') |
-| idol-audition | 기본 | handleStoryAndAuthoringAction:aiworld | Cannot set properties of null (setting 'textContent') |
+| idol-audition | 기본 | handleStoryAndAuthoringAction:aiworld | Cannot set properties of null (setting 'value') |
 | idol-audition | 기본 | handleCharactersAction:ailinesmore | Cannot read properties of null (reading 'value') |
 | idol-audition | 기본 | handleEconomyAction:shkai | Cannot set properties of null (setting 'value') |
 

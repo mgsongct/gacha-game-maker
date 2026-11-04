@@ -58,6 +58,8 @@
 
 ## 2. 액션 디스패치
 
+처리기(`handle*Action`)는 **Controller**(CLAUDE.md §0-2): 입력을 읽고 Model을 부르고 다시 그리게 할 뿐, 창 HTML·DOM은 직접 만지지 않아요 — 그 기능 모듈의 View 함수(예: 우편 `openMailView`, 로비 `lobbyPokeShow`, 초안 `drTabShow`)나 공용 View 도우미를 불러요. 공용 View 도우미: `busy(t,글)`(버튼 처리 중 표시 — 되돌리는 함수를 돌려줌) · `say(칸,글)` · `chipOn(칩,켜짐)`·`chipIsOn` · `switchFlip(스위치)`(0060-util) · `modalKeep(다시 그리기)`(창 스크롤 유지 — 0230-modal). 처리기 시험: 브라우저 시험 26(실제 클릭 분배).
+
 ```js
 // 클릭 위임 (이벤트 섹션 끝)
 document.addEventListener('click', async e => {
@@ -282,7 +284,7 @@ DOM 없는 순수 코어와 UI 어댑터로 분리돼 있습니다.
 
 ## 10. 메신저(등대톡) · 갠톡
 
-파일: `src/main/0100-messenger.js` `src/main/0160-free-chat.js`
+파일: `src/main/0100-messenger.js`(등대톡 스레드·갠톡 자유 채팅) · 플레이어 프로필 `src/main/0160-player-profile.js`
 
 - `threads[]`의 대본을 `trigger` 조건(스테이지 클리어 등)에 따라 `prog.inbox`로 배달, `openPhone(tid)`.
 - 갠톡: 캐릭터와 AI 자유 채팅. 결과는 스토리 기억에 반영될 수 있음.

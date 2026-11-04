@@ -95,3 +95,5 @@ function buyFx(big,sub2){
   d.innerHTML=`<div class="rays"></div><div class="ring"></div>${sp}<div class="core">${RICON.gems}<b>${big}</b><span>${sub2||''}</span></div>`;
   d.addEventListener('click',()=>d.remove()); document.body.appendChild(d); sfx('확인'); setTimeout(()=>d.remove(),1800);
 }
+/* 상점 주인 편집 창: 새로 그린 그림 미리 보기·고른 주인 표시(View) */
+function shopKeeperShow(o){ const pv=document.querySelector('.sk-prev'); if(pv) pv.innerHTML=`<img src="${esc(imgSrc(o))}" alt="">`; $('#sk_char').value='__self'; }

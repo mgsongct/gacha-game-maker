@@ -329,6 +329,10 @@ function cutBlob(){const j=CUTJOB;return new Promise(r=>j.cv.toBlob(b=>r(b),'ima
 function cutMap(){const j=CUTJOB, R=j.cv.getBoundingClientRect(), s=Math.min(R.width/j.W,R.height/j.H); return {s,ox:R.left+(R.width-j.W*s)/2,oy:R.top+(R.height-j.H*s)/2};}
 function cutMode(){const m=$('#ct_pmode');return m?m.value:'wand';}
 function cutBrush(){const el=$('#ct_brush');return el?+el.value:10;}
+/* 배경 지우기 편집기(View): 확대 단계 표시(커서 자리를 화면 가운데로) · 되돌리기 단추 */
+function cutZoomShow(t,j){ const view=$('#cutPrev'), z=j.zoom, fx=j.cx>=0?j.cx/j.W:.5, fy=j.cy>=0?j.cy/j.H:.5; view.classList.toggle('zoom',z>1); j.cv.style.width=z>1?(z*100)+'%':''; t.textContent='확대 ×'+z; chipOn(t,z>1);
+  requestAnimationFrame(()=>{ if(z>1){ view.scrollLeft=j.cv.offsetWidth*fx-view.clientWidth/2; view.scrollTop=j.cv.offsetHeight*fy-view.clientHeight/2; } cutPlaceCursor(); cutDrawLoupe(); }); }
+function cutUndoShow(j){ $('#ct_undo').disabled=!j.undo.length; cutDrawLoupe(); }
 function cutPlaceCursor(){
   const j=CUTJOB, el=$('#cutCur'), view=$('#cutPrev'); if(!j||!el||!view||j.cx<0) return;
   const m=cutMap(), V=view.getBoundingClientRect(), X=m.ox+j.cx*m.s, Y=m.oy+j.cy*m.s;
@@ -832,6 +836,9 @@ async function faceDrawOne(c,F,f,ko,b,O,x,generationMode='automatic'){const game
   if(b==='up'){ f.up=f.up||{id:'fu'+f.id,name:ko+' 상반신',img:null}; await storeImage(f.up,blob,''); } else await storeImage(f,blob,'');
   mark('c:'+c.id); }
 function faceUpperObj(c,F){ return F===c?(c.upper&&imgSrc(c.upper)?c.upper:null):(F.upper&&imgSrc(F.upper)?F.upper:null); }
+/* 표정 하나 크게 보기 창 · 표정 칩 다시 표시(View) */
+function openFaceView(c,f){ openModal(`${head(esc(c.name)+' · '+esc(f.name))}<div class="naiprev char done">${imgSrc(f)?`<img src="${esc(imgSrc(f))}" alt="">`:''}</div><div class="row" style="margin-top:12px"><button class="btn ghost" data-act="facedel" data-id="${c.id}" data-f="${f.id}">삭제</button><button class="btn" data-act="char" data-id="${c.id}">돌아가기</button></div>`); }
+function faceChipsShow(){ document.querySelectorAll('[data-act=facesel]').forEach(b=>chipOn(b,FACESEL.has(b.dataset.v))); }
 function openFaces(id,sid){
   const c=charById(id); if(!c) return; if($('#ov').hidden) MBACK=()=>openChar(id); if(sid!==undefined) FACET={cid:id,sid:sid||''}; else if(FACET.cid!==id) FACET={cid:id,sid:''};
   const F=faceTgt(c), names=[...new Set([...FACE_BASIC,...F.faces.map(f=>f.name)])], up=faceUpperObj(c,F), mk=F.faceMask||{}, cm=naiCfg().model||NAI_DEF.model;

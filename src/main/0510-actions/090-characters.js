@@ -1,14 +1,13 @@
 async function handleCharactersAction(a,t,id,p,e){
   switch(a){
-case 'csframe': { const p2=P(); p2.csFull=!p2.csFull; mark('prog'); const a2=$('.cs-art'); if(a2){ a2.classList.toggle('up',!p2.csFull); const cc=charById(a2.dataset.id); if(cc) a2.innerHTML=characterDetailArt(cc,!p2.csFull); } t.textContent=p2.csFull?'상반신':'전신'; break; }
+case 'csframe': { const p2=P(); p2.csFull=!p2.csFull; mark('prog'); csFrameShow(t,p2.csFull); break; }
 case 'cspoke': { const c=charById(id); if(!c) break; const o=own(c.id), lv=o?affLv(o):1, x=e.clientX||innerWidth/2, y=e.clientY||innerHeight/2, r=t.getBoundingClientRect(), zone=(y-r.top)/r.height<0.3?'head':'body';
-      ripple(x,y,lv>=7); if(o&&lv>=5&&zone==='head') hearts(x,y,Math.min(5,lv-3)); charReact(t.querySelector('.art'),lv,zone); faceSwap(c,t.querySelector('.art'),touchFace(c,zone,lv));
-      const pool=spoilFree(c,o?(zone==='head'&&c.touch?.head?.length?c.touch.head:zone==='body'&&c.touch?.body?.length?c.touch.body:affLinePool(c)):c.lines); const sy=$('#csSay'), l=pickTouchLine(pool,sy?.textContent);
-      if(l&&sy){ sy.textContent=sub(l); sy.hidden=false; sy.classList.remove('pop'); void sy.offsetWidth; sy.classList.add('pop'); clearTimeout(window._csT); window._csT=setTimeout(()=>{if(sy.isConnected)sy.hidden=true;},3200); if(c.voiceId&&SND().voiceLobby) speak(c,l); }
+      const pool=spoilFree(c,o?(zone==='head'&&c.touch?.head?.length?c.touch.head:zone==='body'&&c.touch?.body?.length?c.touch.body:affLinePool(c)):c.lines), l=pickTouchLine(pool,csSayText());
+      if(csPokeShow(t,c,l,!!o,lv,zone,x,y)&&c.voiceId&&SND().voiceLobby) speak(c,l);
       if(o){ addAff(c,1); mark('prog'); } break; }
-case 'cstab': { CS_TAB=t.dataset.k; document.querySelectorAll('.cs-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.k===CS_TAB)); document.querySelectorAll('[data-cs]').forEach(s=>s.hidden=s.dataset.cs!==CS_TAB); break; }
-case 'upgen': { const c=charById(id); if(!c) break; if(!String(c.naiPrompt||'').trim()){toast('먼저 설정 편집에서 NAI 스탠딩 프롬프트를 채워 주세요');break;} if(!imgReady()){toast(imgNeed());break;} t.disabled=true; t.textContent='그리는 중…';
-      try{ const b=await naiDrawItem({k:'upper',o:c.upper,c,generationMode:'manual'}); await storeImage(c.upper,b,''); mark('c:'+c.id); toast('상반신을 그렸어요'); openChar(c.id); }catch(err){ toast(naiErr(err,'상반신 실패')); t.disabled=false; t.textContent='NAI로 상반신'; } break; }
+case 'cstab': CS_TAB=t.dataset.k; csTabShow(); break;
+case 'upgen': { const c=charById(id); if(!c) break; if(!String(c.naiPrompt||'').trim()){toast('먼저 설정 편집에서 NAI 스탠딩 프롬프트를 채워 주세요');break;} if(!imgReady()){toast(imgNeed());break;} const done=busy(t,'그리는 중…');
+      try{ const b=await naiDrawItem({k:'upper',o:c.upper,c,generationMode:'manual'}); await storeImage(c.upper,b,''); mark('c:'+c.id); toast('상반신을 그렸어요'); openChar(c.id); }catch(err){ toast(naiErr(err,'상반신 실패')); done(); } break; }
 case 'gift': openGift(id); break;
 case 'giftgive': { const c=charById(id), g=giftById(t.dataset.v), inv=progSlot('gifts'); if(!c||!g||!(inv[g[0]]>0)) break; if(affFull(own(c.id))){ toast(`${c.name}의 호감도가 이미 가득 찼어요. 선물은 아껴 두세요`); break; } inv[g[0]]--; const like=giftLikes(c).has(g[0]), val=g[3]*(like?2:1);
       p.giftSeen=p.giftSeen||{}; (p.giftSeen[c.id]=p.giftSeen[c.id]||{})[g[0]]=like?2:1; addAff(c,val); mark('prog'); sfx(like?'SSR':'확인');
@@ -27,8 +26,8 @@ case 'wai': { const c=charById(id); if(!c) break; const ed=a==='wai';
       const nm=(ed&&$('#f_wn')&&$('#f_wn').value.trim())||String(c.weapon.name||''), ds=(ed&&$('#f_wd')&&$('#f_wd').value.trim())||String(c.weapon.desc||''), cur=(ed&&$('#f_wp')&&$('#f_wp').value.trim())||String(c.weapon.prompt||'');
       const p2=await weaponPromptAI([{c,name:nm,desc:ds,cur}],t); if(!p2[0]){ toast('쓰지 못했어요. AI 기록을 확인해 주세요'); break; }
       if(ed){ if($('#f_wp')) $('#f_wp').value=p2[0]; toast(T('weapon')+' 프롬프트를 썼어요. 저장을 눌러 주세요'); } else { c.weapon.prompt=p2[0]; mark('c:'+c.id); toast(T('weapon')+' 프롬프트를 썼어요'); } break; }
-case 'wfixall': { const wb=G.chars.filter(c=>c.weapon&&wpBad(c.weapon.prompt)); if(!wb.length){ toast('정리할 '+T('weapon')+' 프롬프트가 없어요'); break; } const lb=t.textContent; t.disabled=true; t.textContent='AI로 정리하는 중…';
-      try{ const n=await fixWeaponPrompts(G.chars); toast(n>0?`${T('weapon')} 프롬프트 ${n}개를 ${T('weapon')}만 나오게 정리했어요`:'정리하지 못했어요. AI 기록을 확인해 주세요'); }finally{ if(t.isConnected){ t.disabled=false; t.textContent=lb; } } openPrep(false); break; }
+case 'wfixall': { const wb=G.chars.filter(c=>c.weapon&&wpBad(c.weapon.prompt)); if(!wb.length){ toast('정리할 '+T('weapon')+' 프롬프트가 없어요'); break; } const done=busy(t,'AI로 정리하는 중…');
+      try{ const n=await fixWeaponPrompts(G.chars); toast(n>0?`${T('weapon')} 프롬프트 ${n}개를 ${T('weapon')}만 나오게 정리했어요`:'정리하지 못했어요. AI 기록을 확인해 주세요'); }finally{ done(); } openPrep(false); break; }
 case 'regengo': { const c=charById(id); if(!c) break; const sel={}, reqs={}; document.querySelectorAll('#modal [data-rgsel]').forEach(ch=>{ if(ch.checked) sel[ch.dataset.rgsel]=true; }); document.querySelectorAll('#modal [data-rgreqi]').forEach(i=>{ const v=i.value.trim(); if(v) reqs[i.dataset.rgreqi]=v; });
       if(!Object.keys(sel).length){ toast('바꿀 항목을 하나 이상 켜 주세요'); break; } await regenRun(c,sel,reqs,($('#rg_all')&&$('#rg_all').value.trim())||'',$('#rg_skill_slot')?.value||'active'); break; }
 case 'regenapply': await regenApply(); break;

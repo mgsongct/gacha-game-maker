@@ -80,7 +80,7 @@
     "줄": 75,
     "중첩": 4
    },
-   "text": "fix (src/main/0070-save.js:41) 복잡도 78 · 75줄 · 중첩 4"
+   "text": "fix (src/main/0070-save.js:71) 복잡도 78 · 75줄 · 중첩 4"
   },
   {
    "key": "복잡한 함수|damage",
@@ -116,7 +116,7 @@
     "줄": 81,
     "중첩": 1
    },
-   "text": "studioHTML (src/main/0180-ui-scroll.js:357) 복잡도 68 · 81줄 · 중첩 1"
+   "text": "studioHTML (src/main/0180-ui-scroll.js:361) 복잡도 68 · 81줄 · 중첩 1"
   },
   {
    "key": "복잡한 함수|liveTick",
@@ -143,7 +143,7 @@
     "줄": 43,
     "중첩": 0
    },
-   "text": "lobbyHTML (src/main/0180-ui-scroll.js:71) 복잡도 62 · 43줄 · 중첩 0"
+   "text": "lobbyHTML (src/main/0180-ui-scroll.js:75) 복잡도 62 · 43줄 · 중첩 0"
   },
   {
    "key": "복잡한 함수|fcSend",
@@ -206,7 +206,7 @@
     "줄": 38,
     "중첩": 1
    },
-   "text": "contractHTML0 (src/main/0180-ui-scroll.js:151) 복잡도 52 · 38줄 · 중첩 1"
+   "text": "contractHTML0 (src/main/0180-ui-scroll.js:155) 복잡도 52 · 38줄 · 중첩 1"
   },
   {
    "key": "복잡한 함수|bEnd",
@@ -449,7 +449,7 @@
     "줄": 10,
     "중첩": 9
    },
-   "text": "(최상위)→document.addEventListener @src/main/0275-expedition.js (src/main/0275-expedition.js:75) 복잡도 13 · 10줄 · 중첩 9"
+   "text": "(최상위)→document.addEventListener @src/main/0275-expedition.js (src/main/0275-expedition.js:79) 복잡도 13 · 10줄 · 중첩 9"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener @src/main/0505-construct.js",
@@ -458,7 +458,7 @@
     "줄": 9,
     "중첩": 8
    },
-   "text": "(최상위)→document.addEventListener @src/main/0505-construct.js (src/main/0505-construct.js:142) 복잡도 12 · 9줄 · 중첩 8"
+   "text": "(최상위)→document.addEventListener @src/main/0505-construct.js (src/main/0505-construct.js:145) 복잡도 12 · 9줄 · 중첩 8"
   },
   {
    "key": "복잡한 분배기 case|handleImagesAndAssetsAction facego",
@@ -674,9 +674,9 @@
   {
    "key": "빈 catch|src/main/0180-ui-scroll.js 동기 대체",
    "num": {
-    "개수": 3
+    "개수": 2
    },
-   "text": "src/main/0180-ui-scroll.js 동기 대체 3개"
+   "text": "src/main/0180-ui-scroll.js 동기 대체 2개"
   },
   {
    "key": "빈 catch|src/main/0210-setup.js 파싱 대체",
@@ -1024,16 +1024,16 @@
   {
    "key": "흩어진 상태 쓰기|P().rogue",
    "num": {
-    "쓰는곳": 19
+    "쓰는곳": 11
    },
-   "text": "P().rogue — 19곳에서 씀"
+   "text": "P().rogue — 11곳에서 씀"
   },
   {
    "key": "흩어진 상태 쓰기|P().exped",
    "num": {
-    "쓰는곳": 18
+    "쓰는곳": 9
    },
-   "text": "P().exped — 18곳에서 씀"
+   "text": "P().exped — 9곳에서 씀"
   },
   {
    "key": "흩어진 상태 쓰기|P().curBanner",
@@ -1238,11 +1238,6 @@
    "text": "openMeta (src/main/0250-story-factory.js) — 참조 75%가 src/main/0510-actions/"
   },
   {
-   "key": "영역 침범 후보|src/main/0180-ui-scroll.js passHTML",
-   "num": {},
-   "text": "passHTML (src/main/0180-ui-scroll.js) — 참조 71%가 src/main/0090-growth.js"
-  },
-  {
    "key": "영역 침범 후보|src/main/0010-rules.js applyMeta",
    "num": {},
    "text": "applyMeta (src/main/0010-rules.js) — 참조 67%가 src/main/0510-actions/"
@@ -1308,32 +1303,18 @@
    "text": "src/main/0090-growth.js가 P().cres(주인 src/main/0505-construct.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0180-ui-scroll.js P().dm",
-   "num": {
-    "곳": 2
-   },
-   "text": "src/main/0180-ui-scroll.js가 P().dm(주인 src/main/0090-growth.js)를 씀 2곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/ P().dm",
-   "num": {
-    "곳": 2
-   },
-   "text": "src/main/0510-actions/가 P().dm(주인 src/main/0090-growth.js)를 씀 2곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0540-start.js P().dm",
+   "key": "남의 상태 쓰기|src/main/0090-growth.js P().dm",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0540-start.js가 P().dm(주인 src/main/0090-growth.js)를 씀 1곳"
+   "text": "src/main/0090-growth.js가 P().dm(주인 src/main/0510-actions/)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0160-free-chat.js P().fchat",
    "num": {
-    "곳": 2
+    "곳": 1
    },
-   "text": "src/main/0160-free-chat.js가 P().fchat(주인 src/main/0100-messenger.js)를 씀 2곳"
+   "text": "src/main/0160-free-chat.js가 P().fchat(주인 src/main/0100-messenger.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0510-actions/ P().fchat",
@@ -1343,20 +1324,6 @@
    "text": "src/main/0510-actions/가 P().fchat(주인 src/main/0100-messenger.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0120-abyss.js P().raid",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0120-abyss.js가 P().raid(주인 src/main/0110-challenge-raid.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0180-ui-scroll.js P().raid",
-   "num": {
-    "곳": 1
-   },
-   "text": "src/main/0180-ui-scroll.js가 P().raid(주인 src/main/0110-challenge-raid.js)를 씀 1곳"
-  },
-  {
    "key": "남의 상태 쓰기|src/main/0510-actions/ P().raid",
    "num": {
     "곳": 1
@@ -1364,18 +1331,18 @@
    "text": "src/main/0510-actions/가 P().raid(주인 src/main/0110-challenge-raid.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0180-ui-scroll.js P().rogue",
+   "key": "남의 상태 쓰기|src/main/0120-abyss.js P().rogue",
    "num": {
-    "곳": 2
+    "곳": 9
    },
-   "text": "src/main/0180-ui-scroll.js가 P().rogue(주인 src/main/0120-abyss.js)를 씀 2곳"
+   "text": "src/main/0120-abyss.js가 P().rogue(주인 src/main/0510-actions/)를 씀 9곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0510-actions/ P().rogue",
+   "key": "남의 상태 쓰기|src/main/0180-ui-scroll.js P().rogue",
    "num": {
-    "곳": 15
+    "곳": 1
    },
-   "text": "src/main/0510-actions/가 P().rogue(주인 src/main/0120-abyss.js)를 씀 15곳"
+   "text": "src/main/0180-ui-scroll.js가 P().rogue(주인 src/main/0510-actions/)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0510-actions/ P().gifts",
@@ -1385,25 +1352,11 @@
    "text": "src/main/0510-actions/가 P().gifts(주인 src/main/0130-gift.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/0180-ui-scroll.js P().sched",
-   "num": {
-    "곳": 2
-   },
-   "text": "src/main/0180-ui-scroll.js가 P().sched(주인 src/main/0135-schedule.js)를 씀 2곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/ P().shop",
+   "key": "남의 상태 쓰기|src/main/0510-actions/ P().mail",
    "num": {
     "곳": 1
    },
-   "text": "src/main/0510-actions/가 P().shop(주인 src/main/0190-shop.js)를 씀 1곳"
-  },
-  {
-   "key": "남의 상태 쓰기|src/main/0510-actions/ P().mail",
-   "num": {
-    "곳": 7
-   },
-   "text": "src/main/0510-actions/가 P().mail(주인 src/main/0220-mail.js)를 씀 7곳"
+   "text": "src/main/0510-actions/가 P().mail(주인 src/main/0220-mail.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/0510-actions/ P().dboard",
@@ -1677,20 +1630,6 @@
     "모듈": 4
    },
    "text": "P().avatar — 4개 모듈이 씀"
-  },
-  {
-   "key": "파편화 상태|P().dm",
-   "num": {
-    "모듈": 4
-   },
-   "text": "P().dm — 4개 모듈이 씀"
-  },
-  {
-   "key": "파편화 상태|P().raid",
-   "num": {
-    "모듈": 4
-   },
-   "text": "P().raid — 4개 모듈이 씀"
   },
   {
    "key": "파편화 상태|G.world.codex",
@@ -2295,13 +2234,6 @@
    "text": "섞인 함수 0080-storage-integration 1"
   },
   {
-   "key": "계층 섞임|src/main/0090-growth.js",
-   "num": {
-    "함수": 2
-   },
-   "text": "섞인 함수 0090-growth 2"
-  },
-  {
    "key": "계층 섞임|src/main/0100-messenger.js",
    "num": {
     "함수": 2
@@ -2318,30 +2250,16 @@
   {
    "key": "계층 섞임|src/main/0120-abyss.js",
    "num": {
-    "함수": 9
+    "함수": 5
    },
-   "text": "섞인 함수 0120-abyss 9"
+   "text": "섞인 함수 0120-abyss 5"
   },
   {
    "key": "계층 섞임|src/main/0125-tower.js",
    "num": {
-    "함수": 2
-   },
-   "text": "섞인 함수 0125-tower 2"
-  },
-  {
-   "key": "계층 섞임|src/main/0130-gift.js",
-   "num": {
     "함수": 1
    },
-   "text": "섞인 함수 0130-gift 1"
-  },
-  {
-   "key": "계층 섞임|src/main/0135-schedule.js",
-   "num": {
-    "함수": 1
-   },
-   "text": "섞인 함수 0135-schedule 1"
+   "text": "섞인 함수 0125-tower 1"
   },
   {
    "key": "계층 섞임|src/main/0160-free-chat.js",
@@ -2353,23 +2271,9 @@
   {
    "key": "계층 섞임|src/main/0180-ui-scroll.js",
    "num": {
-    "함수": 4
-   },
-   "text": "섞인 함수 0180-ui-scroll 4"
-  },
-  {
-   "key": "계층 섞임|src/main/0190-shop.js",
-   "num": {
     "함수": 1
    },
-   "text": "섞인 함수 0190-shop 1"
-  },
-  {
-   "key": "계층 섞임|src/main/0220-mail.js",
-   "num": {
-    "함수": 1
-   },
-   "text": "섞인 함수 0220-mail 1"
+   "text": "섞인 함수 0180-ui-scroll 1"
   },
   {
    "key": "계층 섞임|src/main/0230-modal.js",
@@ -2400,20 +2304,6 @@
    "text": "섞인 함수 0270-skin-proposal 1"
   },
   {
-   "key": "계층 섞임|src/main/0274-dispatch.js",
-   "num": {
-    "함수": 1
-   },
-   "text": "섞인 함수 0274-dispatch 1"
-  },
-  {
-   "key": "계층 섞임|src/main/0275-expedition.js",
-   "num": {
-    "함수": 2
-   },
-   "text": "섞인 함수 0275-expedition 2"
-  },
-  {
    "key": "계층 섞임|src/main/0290-season-rotation.js",
    "num": {
     "함수": 1
@@ -2423,9 +2313,9 @@
   {
    "key": "계층 섞임|src/main/0300-codex.js",
    "num": {
-    "함수": 3
+    "함수": 2
    },
-   "text": "섞인 함수 0300-codex 3"
+   "text": "섞인 함수 0300-codex 2"
   },
   {
    "key": "계층 섞임|src/main/0360-sync/",
@@ -2472,9 +2362,9 @@
   {
    "key": "계층 섞임|src/main/0505-construct.js",
    "num": {
-    "함수": 4
+    "함수": 1
    },
-   "text": "섞인 함수 0505-construct 4"
+   "text": "섞인 함수 0505-construct 1"
   },
   {
    "key": "계층 섞임|src/main/0510-actions/",
@@ -2507,16 +2397,16 @@
   {
    "key": "계층 방향|src/main/0020-ai-connect.js",
    "num": {
-    "위반": 7
+    "위반": 6
    },
-   "text": "방향 위반 0020-ai-connect 7"
+   "text": "방향 위반 0020-ai-connect 6"
   },
   {
    "key": "계층 방향|src/main/0030-image/",
    "num": {
-    "위반": 8
+    "위반": 3
    },
-   "text": "방향 위반 0030-image/ 8"
+   "text": "방향 위반 0030-image/ 3"
   },
   {
    "key": "계층 방향|src/main/0070-save.js",
@@ -2528,9 +2418,9 @@
   {
    "key": "계층 방향|src/main/0080-storage-integration.js",
    "num": {
-    "위반": 3
+    "위반": 2
    },
-   "text": "방향 위반 0080-storage-integration 3"
+   "text": "방향 위반 0080-storage-integration 2"
   },
   {
    "key": "계층 방향|src/main/0090-growth.js",
@@ -2549,9 +2439,9 @@
   {
    "key": "계층 방향|src/main/0120-abyss.js",
    "num": {
-    "위반": 13
+    "위반": 5
    },
-   "text": "방향 위반 0120-abyss 13"
+   "text": "방향 위반 0120-abyss 5"
   },
   {
    "key": "계층 방향|src/main/0135-schedule.js",
@@ -2570,9 +2460,9 @@
   {
    "key": "계층 방향|src/main/0180-ui-scroll.js",
    "num": {
-    "위반": 4
+    "위반": 3
    },
-   "text": "방향 위반 0180-ui-scroll 4"
+   "text": "방향 위반 0180-ui-scroll 3"
   },
   {
    "key": "계층 방향|src/main/0185-game-rules.js",
@@ -2591,9 +2481,9 @@
   {
    "key": "계층 방향|src/main/0190-shop.js",
    "num": {
-    "위반": 3
+    "위반": 1
    },
-   "text": "방향 위반 0190-shop 3"
+   "text": "방향 위반 0190-shop 1"
   },
   {
    "key": "계층 방향|src/main/0210-setup.js",
@@ -2605,16 +2495,16 @@
   {
    "key": "계층 방향|src/main/0230-modal.js",
    "num": {
-    "위반": 3
+    "위반": 1
    },
-   "text": "방향 위반 0230-modal 3"
+   "text": "방향 위반 0230-modal 1"
   },
   {
    "key": "계층 방향|src/main/0240-growth-curve.js",
    "num": {
-    "위반": 5
+    "위반": 2
    },
-   "text": "방향 위반 0240-growth-curve 5"
+   "text": "방향 위반 0240-growth-curve 2"
   },
   {
    "key": "계층 방향|src/main/0250-story-factory.js",
@@ -2636,20 +2526,6 @@
     "위반": 1
    },
    "text": "방향 위반 0270-skin-proposal 1"
-  },
-  {
-   "key": "계층 방향|src/main/0274-dispatch.js",
-   "num": {
-    "위반": 1
-   },
-   "text": "방향 위반 0274-dispatch 1"
-  },
-  {
-   "key": "계층 방향|src/main/0275-expedition.js",
-   "num": {
-    "위반": 2
-   },
-   "text": "방향 위반 0275-expedition 2"
   },
   {
    "key": "계층 방향|src/main/0280-live-ops.js",
@@ -2682,16 +2558,16 @@
   {
    "key": "계층 방향|src/main/0360-sync/",
    "num": {
-    "위반": 16
+    "위반": 13
    },
-   "text": "방향 위반 0360-sync/ 16"
+   "text": "방향 위반 0360-sync/ 13"
   },
   {
    "key": "계층 방향|src/main/0370-game-picker.js",
    "num": {
-    "위반": 5
+    "위반": 1
    },
-   "text": "방향 위반 0370-game-picker 5"
+   "text": "방향 위반 0370-game-picker 1"
   },
   {
    "key": "계층 방향|src/main/0420-app-update.js",
@@ -2724,16 +2600,16 @@
   {
    "key": "계층 방향|src/main/0460-script-engine.js",
    "num": {
-    "위반": 4
+    "위반": 1
    },
-   "text": "방향 위반 0460-script-engine 4"
+   "text": "방향 위반 0460-script-engine 1"
   },
   {
    "key": "계층 방향|src/main/0462-direction.js",
    "num": {
-    "위반": 5
+    "위반": 1
    },
-   "text": "방향 위반 0462-direction 5"
+   "text": "방향 위반 0462-direction 1"
   },
   {
    "key": "계층 방향|src/main/0465-story-plan.js",
@@ -2759,16 +2635,9 @@
   {
    "key": "계층 방향|src/main/0488-stage-modes.js",
    "num": {
-    "위반": 3
+    "위반": 2
    },
-   "text": "방향 위반 0488-stage-modes 3"
-  },
-  {
-   "key": "계층 방향|src/main/0505-construct.js",
-   "num": {
-    "위반": 3
-   },
-   "text": "방향 위반 0505-construct 3"
+   "text": "방향 위반 0488-stage-modes 2"
   },
   {
    "key": "계층 방향|src/main/0510-actions/",
@@ -2783,13 +2652,6 @@
     "위반": 3
    },
    "text": "방향 위반 0520-backup-storage 3"
-  },
-  {
-   "key": "계층 방향|src/main/0525-data-folder.js",
-   "num": {
-    "위반": 1
-   },
-   "text": "방향 위반 0525-data-folder 1"
   },
   {
    "key": "계층 방향|src/main/0530-story-memory.js",

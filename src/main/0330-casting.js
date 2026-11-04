@@ -84,6 +84,5 @@ async function castRun(){ if(!CAST||CAST.busy) return; if(PREPJOB){ setTimeout(c
   castStat(); }
 document.addEventListener('click',e=>{ const im=e.target.closest&&e.target.closest('.cast-im img,.cast-fc img,.fc-it img,.fc-two img,.sk-slot img,.sk-face img,.skp-img img,.skinpkg .wthumb img'); if(im) imgViewer(im.src); });
 setInterval(()=>{ if(CAST&&$('#castGrid')&&$('#modal').hidden&&!CAST.busy) castRefresh(); },4000);
-
-
-
+/* 캐스팅 창 캐릭터 칩 모두 켜기/끄기(View) */
+function castCharChipsShow(on){ document.querySelectorAll('#modal [data-act="cfsel"][data-k="c"]').forEach(b=>chipOn(b,on)); }

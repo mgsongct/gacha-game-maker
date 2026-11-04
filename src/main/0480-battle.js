@@ -119,3 +119,5 @@ function bEnd(win){
   } else { sfx('패배'); html=`<h2 class="disp" style="color:#ff5277">작전 실패</h2><p>${T('enhance')}로 레벨을 올리거나 편성과 속성을 바꿔 보세요.<br>${esc(elemLine())}.</p><div class="row"><button class="btn ghost" data-act="bdone">돌아가기</button><button class="btn" data-act="bretry">다시 도전</button></div>`; }
   const d=document.createElement('div');d.className='result';d.innerHTML=html;$('#ov > .bt').appendChild(d);
 }
+/* 전투 배속 단추 표시(View) */
+function bSpeedShow(t){ t.textContent=B.speed+'x'; chipOn(t,B.speed>1); }

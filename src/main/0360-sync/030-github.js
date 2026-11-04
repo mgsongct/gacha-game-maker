@@ -78,3 +78,6 @@ function openSync(){
 }
 // 앱을 내릴 때(화면이 숨겨질 때) 자동 올리기를 켰고 마지막 올린 뒤 바뀐 게 있으면 올려요(한 기기만 플레이 모드가 아닐 때)
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'&&!LKMODE()){ const o=SY(); if(syReady()&&o.autoUp&&!SYJOB&&(G.prog.savedAt||0)>(o.localAt||0)+5000) syPush(false); } });
+/* GitHub 연결 확인 뒤 창(View): 다른 기기가 올린 데이터가 있으면 받기/올리기를 고르고, 없으면 지금 올릴지 물음 */
+function openSyLinked(st){ if(st) openModal(`${head('연결됐어요')}<p>클라우드에 <b>${esc(st.device)}</b>에서 ${esc(new Date(st.at).toLocaleString())}에 올린 데이터가 있어요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="sypull">그 데이터 받기</button><button class="btn ghost" data-act="sypushf">이 기기 데이터 올리기</button></div>`);
+  else openModal(`${head('연결됐어요')}<p>이 기기의 게임을 클라우드에 올려 둘까요? 그다음 다른 기기에서 같은 저장소로 연결하고 '받기'를 누르면 돼요.</p><div class="row" style="margin-top:12px"><button class="btn" data-act="sypush">지금 올리기</button><button class="btn ghost" data-act="close">나중에</button></div>`); }

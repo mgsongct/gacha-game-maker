@@ -6,7 +6,7 @@ case 'webupdskip': { const o=LV(); if(WEBUPD) o.webSkip=WEBUPD.build; saveLV(o);
 case 'updel': { const c=charById(id); if(!c||!c.upper) break; c.upper.img=null; mark('c:'+c.id); openChar(c.id); break; }
 case 'upd-open': openUpdSet(); break;
 case 'updcheck': checkUpdate(true); break;
-case 'updget': { const lb=t.textContent; t.disabled=true; t.textContent='받는 중…'; await applyUpdate(false); if(t.isConnected){t.disabled=false;t.textContent=lb;} break; }
+case 'updget': { const done=busy(t,'받는 중…'); await applyUpdate(false); done(); break; }
 case 'updskip': { const o=LV(); if(UPD) o.skip=UPD.man.build; saveLV(o); closeModal(); toast('이 버전은 다시 묻지 않아요. 설정에서 직접 확인할 수 있어요'); break; }
 case 'apkget': openUrl(t.dataset.url); break;
 case 'relnotes': openUrl('https://github.com/'+updRepo(LV())+'/releases/latest'); break;

@@ -7,6 +7,7 @@
 import { walk } from './source.mjs';
 import { constLiterals } from './wiring.mjs';
 import { fullLabel } from './surface.mjs';
+import { mutations } from './flow.mjs';
 
 const MARKUP = /<\/?[a-zA-Z][\w-]*(\s|>|\/>)/;
 const DOM_WRITE = /^(innerHTML|outerHTML|textContent|innerText|className|hidden|scrollTop|scrollLeft|disabled|checked|selectedIndex)$/, DOM_CALL = /^(appendChild|insertAdjacentHTML|insertBefore|replaceChildren|removeChild|remove|setAttribute|removeAttribute|toggleAttribute|scrollIntoView|focus|blur|showModal|animate|createTextNode)$/;
@@ -21,16 +22,17 @@ const STORE = /^(appStorage|localStorage|sessionStorage)$/, STORE_W = /^(setItem
 // 함수마다 직접 신호: markup · dom(바꿈) · trigger(화면 갱신 호출) · write(게임 상태 씀 — writers) · read(저장소 읽기) · store(저장소 쓰기·저장 표시) · service(네트워크·AI) · handler
 const propOf = m => m?.type === 'member_expression' ? m.childForFieldName('property')?.text || '' : '';
 // 대입: DOM 속성 바꾸기(innerHTML·hidden …) 또는 el.style.x = … · el.classList… 
-function assignSig(n, s) { const l = n.childForFieldName('left'); if (l?.type !== 'member_expression') return; if (DOM_WRITE.test(propOf(l)) || STYLE.test(propOf(l.childForFieldName('object')))) s.dom = true; }
+function assignSig(n, s) { const l = n.childForFieldName('left'); if (l?.type !== 'member_expression') return; if (DOM_WRITE.test(propOf(l)) || STYLE.test(propOf(l.childForFieldName('object')))) { s.dom = true; s.atV.push(n); } }
 // 이름 호출: 화면 갱신·저장소·서비스 기본 함수
-function nameSig(c, s) { if (TRIGGER.has(c.text)) s.trigger = true; if (IO_READ.has(c.text)) s.read = true; if (IO_WRITE.has(c.text)) s.store = true; if (SERVICE.has(c.text)) s.service = true; }
+function nameSig(c, s) { if (TRIGGER.has(c.text)) s.trigger = true; if (IO_READ.has(c.text)) s.read = true; if (IO_WRITE.has(c.text)) { s.store = true; s.atM.push(c); } if (SERVICE.has(c.text)) { s.service = true; s.atM.push(c); } }
 // 멤버 호출: DOM 바꾸기(화면이 아닌 canvas·이미지 등 만들기는 뺌) · el.classList.add … · 저장소 읽기/쓰기
 function memberSig(n, c, s) { const p = propOf(c), o = c.childForFieldName('object'), arg = n.childForFieldName('arguments')?.namedChildren[0];
-  if (p === 'createElement') { if (!NONUI_EL.test(arg?.text || '')) s.dom = true; } else if (DOM_CALL.test(p) && !/^(appStorage|localStorage|sessionStorage|Object|Array|JSON|Math|Promise|URL|Set|Map)$/.test(o?.text || '')) s.dom = true;
-  if (STYLE.test(propOf(o))) s.dom = true; if (STORE.test(o?.text || '')) { if (STORE_W.test(p)) s.store = true; else s.read = true; } }
-function signals(f, writers) { const s = { markup: false, dom: false, trigger: false, write: writers.has(f.key), read: false, store: false, service: false, handler: /^handle\w+Action$/.test(f.name) };
+  const dom0 = s.dom; s.dom = false; if (p === 'createElement') { if (!NONUI_EL.test(arg?.text || '')) s.dom = true; } else if (DOM_CALL.test(p) && !/^(appStorage|localStorage|sessionStorage|Object|Array|JSON|Math|Promise|URL|Set|Map)$/.test(o?.text || '')) s.dom = true;
+  if (STYLE.test(propOf(o)) && !/^(contains|item|getPropertyValue)$/.test(p)) s.dom = true; /* classList.contains 같은 읽기는 바꿈이 아님 */ if (s.dom) s.atV.push(n); s.dom = s.dom || dom0; if (STORE.test(o?.text || '')) { if (STORE_W.test(p)) { s.store = true; s.atM.push(n); } else s.read = true; } }
+/* atV·atM: View·Model 신호가 난 자리(노드) — 섞인 함수를 나눌 때 어느 줄이 화면이고 어느 줄이 처리인지(archMap mix) */
+function signals(f, writers) { const s = { markup: false, dom: false, trigger: false, write: writers.has(f.key), read: false, store: false, service: false, handler: /^handle\w+Action$/.test(f.name), atV: [], atM: [] };
   walk(f.node, n => { const t = n.type;
-    if (t === 'string' || t === 'template_string' || t === 'string_fragment') { if (MARKUP.test(n.text)) s.markup = true; }
+    if (t === 'string' || t === 'template_string' || t === 'string_fragment') { if (MARKUP.test(n.text)) { s.markup = true; s.atV.push(n); } }
     else if (t === 'assignment_expression' || t === 'augmented_assignment_expression') assignSig(n, s);
     else if (t === 'call_expression') { const c = n.childForFieldName('function'); if (c?.type === 'identifier') nameSig(c, s); else if (c?.type === 'member_expression') memberSig(n, c, s); } });
   return s; }
@@ -41,6 +43,10 @@ function layerOf(s) { const view = s.markup || s.dom, model = s.write || s.store
 // fns: buildGraph 함수 표 · writers: 게임 상태를 직접 쓰는 함수 키(lib/flow.mjs mutations + 연관 맵 data 쓰기)
 export function layers(fns, writers) { const top = [...fns.values()].filter(f => f.top && !f.table), sig = new Map(top.map(f => [f.key, signals(f, writers)])), out = new Map();
   for (const f of top) { const s = sig.get(f.key); out.set(f.key, { layer: layerOf(s), ...s }); }
+  /* 직접 신호 없이 View 함수만 부르고 상태·저장·서비스를 바꾸는 함수는 부르지 않으면 View(화면 조각을 엮는 함수 — 예: 칩 여럿을 chipOn으로 켬) — 더 바뀌지 않을 때까지 */
+  const quiet = s => !(s.markup || s.dom || s.write || s.store || s.service || s.handler || s.trigger), changes = o => o && (o.write || o.store || o.service || o.layer === '섞임' || o.layer === 'Controller');
+  for (let more = true; more;) { more = false; for (const f of top) { const me = out.get(f.key); if (me.layer !== 'Model' || !quiet(me)) continue; const cs = [...f.calls.keys()].map(k => out.get(k)).filter(Boolean);
+    if (cs.some(o => o.layer === 'View') && !cs.some(changes)) { me.layer = 'View'; more = true; } } }
   /* 방향 위반: View → 상태를 쓰거나 저장하는 함수(그리다가 바꿈) · Model → 화면을 만드는 함수 */
   const bad = []; for (const f of top) { const me = out.get(f.key); for (const k of f.calls.keys()) { const o = out.get(k); if (!o) continue;
     if (me.layer === 'View' && (o.write || o.store || o.service) && o.layer !== 'View' && !TRIGGER.has(fns.get(k)?.name)) bad.push({ fn: f.key, to: k, kind: 'View가 상태를 바꾸거나 저장·외부 서비스를 부르는 함수를 부름' }); /* 화면 갱신 통로(render 등)를 부르는 것은 갱신 요청이지 상태 변경이 아님 */
@@ -85,6 +91,12 @@ function storePolicy(units, fns, str) { const P = constLiterals(units, ['STORE_P
 
 // 아키텍처 요약(연관 맵이 부름): 계층(함수마다·모듈마다·방향 위반) · 기능(Model·Controller 묶음 ↔ 화면 단위) · 모듈 판정 · 저장 정책
 //   writers: 게임 상태를 쓰는 함수 키 · keyUse: 함수 → Map(상태 키·data 경로 → r|w) · sf: lib/surface.mjs surfaceOf 결과 · layer: 설계상 층(프롬프트 스튜디오)
+// 섞인 함수를 나눌 자리: View 신호 줄(마크업·DOM 바꿈)과 Model 신호 줄(상태 쓰기·저장·서비스) — 액션 처리기는 case마다(처리기는 Controller라 상태 쓰기는 괜찮고, 창 HTML·DOM이 든 case가 섞임)
+function mixAt(f, x, u, muts) { const line = n => +u.loc(n).split(':').pop(), uniq = a => [...new Set(a)].sort((p, q) => p - q), caseOf = n => { for (let p = n; p && p !== f.node; p = p.parent) if (p.type === 'switch_case') return p; return null; };
+  const v = uniq(x.atV.map(line)), m = uniq([...x.atM.map(line), ...muts.map(w => +w.loc.split(':').pop())]);
+  if (!x.handler) return { view: v, model: m };
+  const cs = new Map(); for (const n of x.atV) { const c = caseOf(n); if (!c) continue; const k = c.childForFieldName('value')?.text.slice(1, -1) || 'default'; if (!cs.has(k)) cs.set(k, { act: k, line: line(c), view: 0 }); cs.get(k).view++; }
+  return { view: v, model: m, cases: [...cs.values()].sort((p, q) => p.line - q.line) }; }
 export function archMap(units, fns, { writers, keyUse, sf, louvain, layer, modOf }) {
   const consts = new Map(); for (const u of units) walk(u.tree.rootNode, n => { if (n.type === 'variable_declarator' && n.childForFieldName('value')?.type === 'string') consts.set(n.childForFieldName('name')?.text, n.childForFieldName('value').text.slice(1, -1)); });
   const L = layers(fns, writers), hub = new Set([...fns.values()].filter(f => f.top && f.callers.size >= 25).map(f => f.key)), SK = storeKeys(fns, consts);
@@ -110,7 +122,7 @@ export function archMap(units, fns, { writers, keyUse, sf, louvain, layer, modOf
   const home = new Map(); for (const [id, x] of Object.entries(feats)) home.set(id, (x.mods.find(([m2]) => !notHome.has(m2)) || x.mods[0])[0]);
   const bad = new Map(); for (const b of L.bad) { const m = mod(fns.get(b.fn)); if (!bad.has(m)) bad.set(m, []); bad.get(m).push(b); }
   const verdicts = [...byMod].map(([m, fs]) => moduleVerdict(m, fs, { L: L.layer, hub, featOf, idOf, home, feats, bad: bad.get(m) || [], layer })).sort((a, b) => a.mod.localeCompare(b.mod));
-  const fnLayer = {}; for (const f of main) fnLayer[f.key] = { layer: L.layer.get(f.key)?.layer, feat: idOf.get(featOf.get(f.key)) || null };
+  const fnLayer = {}, mut = mutations(units, fns).mut, U = new Map(units.map(u => [u.name, u])); for (const f of main) { const x = L.layer.get(f.key); fnLayer[f.key] = { layer: x?.layer, feat: idOf.get(featOf.get(f.key)) || null }; if (x?.layer === '섞임') fnLayer[f.key].mix = mixAt(f, x, U.get(f.unit), mut.get(f.key) || []); }
   return { feats, verdicts, fnLayer, bad: L.bad.filter(b => fns.get(b.fn)?.unit === 'main').map(b => ({ fn: fns.get(b.fn).name, to: fns.get(b.to)?.name, kind: b.kind, mod: mod(fns.get(b.fn)) })), store: storePolicy(units, fns, consts) }; }
 
 // 모듈 하나 판정: 분배(액션 분배기 층) · 층(프롬프트 스튜디오 — 사용자 지시로 모든 기능의 프롬프트를 취합) · 기반(허브 함수 중심)

@@ -107,4 +107,5 @@ async function fishSearch(q,lang,n){
   const j=okJSON(await http(u.toString(),{headers:{Authorization:'Bearer '+s.fishKey},timeout:30000}));
   return (j.items||[]).filter(m=>!m.state||m.state==='trained');
 }
-
+/* 배경음 한꺼번에 만들기 창: 고르기 칩 모두/없는 것만(View) */
+function bgmPickShow(v){ document.querySelectorAll('#modal [data-act="bgmpick"]').forEach(b=>{ const l=libById(b.dataset.id); chipOn(b,v==='all'||(v==='miss'&&l&&!l.audio)); }); }

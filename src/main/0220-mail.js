@@ -4,6 +4,9 @@
 
 /* 우편 하나 지우기 — 우편 칸은 이 모듈이 맡음(액션 처리기가 칸을 직접 바꿔 끼우지 않게) */
 function mailRemove(x){ P().mail=progRead('mail').filter(q=>q!==x); }
+/* 우편 열기(읽음 표시) · 다 받은·지난 우편 정리(지운 수) */
+function mailOpen(id){ const x=progSlot('mail').find(q=>q.id===id); if(x){ x.read=true; mark('prog'); } return x; }
+function mailClean(){ const p=P(), n0=progRead('mail').length; p.mail=progRead('mail').filter(x=>!mailDone(x)); mark('prog'); return n0-p.mail.length; }
 function sendMail(m){ let box=progSlot('mail'); const now=Date.now(); if(m.kind){ const p0=P(); p0.mail=box=box.filter(x=>x.kind!==m.kind); } box.unshift({id:'m'+uid(),kind:m.kind||'',from:m.from||'운영팀',title:m.title||'우편',body:m.body||'',reward:m.reward||{},at:now,exp:m.days===0?0:now+(m.days||30)*864e5,got:false,read:false}); if(box.length>100) box.length=100; mark('prog'); }
 function mailLive(x){return !x.got&&(!x.exp||Date.now()<x.exp);}
 const mailHas=x=>Object.keys(x.reward||{}).length>0;
@@ -24,4 +27,8 @@ function openMail(){
     <div class="mlist">${box.length?box.map(mailRow).join(''):'<p class="muted" style="text-align:center;padding:30px 0">우편이 없어요.</p>'}</div>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="mailall" ${n?'':'disabled'}>모두 받기</button><button class="btn ghost" data-act="mailclean" ${box.some(mailDone)?'':'disabled'}>받은·읽은 우편 지우기</button></div>`);
 }
+/* 우편 한 통 보기 창(View) */
+function openMailView(x){ const has=Object.keys(x.reward||{}).length;
+  openModal(`${head(esc(x.title),`<span class="muted">${esc(x.from)} · ${new Date(x.at).toLocaleDateString()}</span>`)}<div class="mbody">${esc(x.body).replace(/\n/g,'<br>')}</div>${has?`<div class="mreward">${rIcon(x.reward)}<b>${rewardText(x.reward)}</b></div>`:''}
+        <div class="row" style="margin-top:12px">${has&&mailLive(x)?`<button class="btn" data-act="mailget" data-id="${x.id}" data-back="1">받기</button>`:`<button class="btn ghost" data-act="maildel" data-id="${x.id}">지우기</button>`}<button class="btn ghost" data-act="mailopen">목록</button></div>`); }
 function claimMail(x){ if(!x||!mailLive(x)) return null; x.got=true; x.read=true; giveReward(x.reward||{}); return x.reward||{}; }

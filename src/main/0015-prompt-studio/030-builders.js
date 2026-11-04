@@ -73,7 +73,7 @@ function storyMemo(){const all=G.chapters.filter(ch=>ch.kind==='main'),recent=al
  const unresolved=older.filter(ch=>ch.memory?.unresolved).map(ch=>ch.title+': '+ch.memory.unresolved);let total=0;const carry=unresolved.filter(x=>{total+=x.length;return total<=8000;});
  const ev=G.chapters.filter(ch=>ch.kind==='event'&&ch.summary&&!loreOf(ch)).slice(-3).map(c=>c.title+': '+String(c.summary).slice(0,1000));
  return rows.length||ev.length?pf('SM_MEMO')+rows.join('\n\n')+(carry.length?'\n오래된 장의 미회수 사항:\n'+carry.join('\n'):'')+(ev.length?'\n최근 정사 외전:\n'+ev.join('\n'):'')+'\n':'';}
-/* src/main/0160-free-chat.js */
+/* src/main/0100-messenger.js — 갠톡 */
 function fcProgress(){ const st=(typeof mainStages==='function'?mainStages():[]).filter(s=>P().cleared[s.id]); return st.length?st.map(s=>s.code+' '+s.title).join(', '):'아직 이야기를 시작하지 않았다'; }
 /* src/main/0450-relations-memory.js */
 // 로어북: text에 이름이 나온 인물(+extra)의 관계를 골라요. 바로 닿은 관계 먼저, 남으면 한 다리 건너(마인드맵처럼)

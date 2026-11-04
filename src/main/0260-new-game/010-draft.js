@@ -120,7 +120,14 @@ function openDraft(tab){ DR2=drLoad(); if(tab) DRTAB=tab;
     <div class="chips dr-tabs">${DR_TABS.map(([k,l])=>`<button class="chip ${DRTAB===k?'on':''}" data-act="drtab" data-k="${k}">${l}</button>`).join('')}</div>
     ${DR_TABS.map(([k])=>drTabHTML(k)).join('')}</div>`,false,'cs-sheet dr-sheet'); }
 // 다시 그리기 전에 부르는 쪽에서 drRead()를 먼저 해요(여기서 읽으면 방금 바꾼 값이 옛 입력칸 값으로 덮여요)
-function drRerender(){ const sc=$('#modal .sheet'), y=sc?sc.scrollTop:0; openDraft(); const el=$('#modal .sheet'); if(el) el.scrollTop=y; }
+function drRerender(){ modalKeep(openDraft); }
+/* 초안 화면 부분 갱신(View): 보관함 열고 닫기·다시 그리기 · 탭 · 그림체 칩 · 미리 보기 · 만드는 동안 단추 잠금 */
+function drLibToggle(){ const ex=$('#drLib'); if(ex){ ex.remove(); return; } const top=document.querySelector('#drPage .dr-top'); if(top) top.insertAdjacentHTML('afterend',drLibHTML()); }
+function drLibRefresh(){ const ex=$('#drLib'); if(ex) ex.outerHTML=drLibHTML(); }
+function drTabShow(){ document.querySelectorAll('#drPage [data-dr]').forEach(s=>s.hidden=s.dataset.dr!==DRTAB); document.querySelectorAll('#drPage [data-act=drtab]').forEach(b=>chipOn(b,b.dataset.k===DRTAB)); }
+function drPresetShow(v){ document.querySelectorAll('.dr-pre').forEach(b=>chipOn(b,(b.dataset.v||'')===v)); }
+function drPreviewToggle(tx){ const old=$('#drPrev'); if(old){ old.remove(); return; } $('#drPage').querySelector('.dr-intro').insertAdjacentHTML('beforeend',`<pre id="drPrev" class="code-box" style="white-space:pre-wrap;max-height:50vh;overflow:auto;margin-top:8px">${esc(tx||'아직 적은 설정이 없어요. 테마 탭의 장르와 키워드만으로 만들어요.')}</pre>`); }
+function drBusy(t){ document.querySelectorAll('#drPage button').forEach(b=>{ if(b!==t&&b.dataset.act!=='ailog') b.disabled=true; }); t.textContent='만드는 중… 화면을 끄지 마세요'; return ()=>{ document.querySelectorAll('#drPage button').forEach(b=>b.disabled=false); if(t.isConnected) t.textContent='다시 시도'; }; }
 document.addEventListener('input',e=>{ if(e.target.closest&&e.target.closest('#drPage')){ clearTimeout(drRead._t); drRead._t=setTimeout(drRead,400); } });
 document.addEventListener('change',e=>{ const cy=e.target&&e.target.dataset&&e.target.dataset.cyc; if(cy){ const L=P().live; L.cyc=Object.assign({},L.cyc||{},{[cy]:+e.target.value}); mark('prog'); render(); toast(`${cycLabel(cy)} 주기로 바꿨어요`); return; } });
 document.addEventListener('change',e=>{ if(e.target.closest&&e.target.closest('#drPage')){ drRead(); if(e.target.dataset&&e.target.dataset.dc==='kind') drRerender(); } });

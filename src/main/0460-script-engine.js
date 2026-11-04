@@ -106,4 +106,6 @@ function vnAutoNext(){if(!S||!S.auto||S.typing||S.choice)return;clearTimeout(S.a
 function vnSkip(){ if(!S) return; if(S.choice&&S.branch) return; const k=S.lines.findIndex((L,i)=>i>=S.i&&L.type==='cmd'&&L.cmd==='분기'); if(S.choice||k<0){ vnEnd(); return; } if(S.typing) vnFinish(); S.i=k; vnStep(); }
 function vnEnd(){if(!S)return;clearInterval(S.timer);clearTimeout(S.autoT);stopVoice();const d=S.done;S=null;closeOv();d&&d();}
 function closeOv(){$('#ov').hidden=true;$('#ov').innerHTML='';sceneBgm();}
-
+/* 대본 선택지 지우기 · 대화 기록 창(View) */
+function vnChoiceClear(){ $('#vnCh').innerHTML=''; }
+function openVnLog(){ openModal(`${head('대화 기록')}${S.log.map(L=>`<p style="margin:6px 0">${L.type==='say'?`<b>${esc(isMe(L.who)?playerName():L.who)}</b> ${esc(sub(L.text))}`:L.type==='place'?`<span class="muted">[${esc(L.text)}]</span>`:`<i class="muted">${esc(sub(L.text))}</i>`}</p>`).join('')}`); }
