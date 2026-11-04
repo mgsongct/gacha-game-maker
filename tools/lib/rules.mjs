@@ -3,6 +3,8 @@
 //   규칙마다 판정(어떤 분석이 무엇을 위반으로 보나) · 고치는 법(한 가지) · 막는 정도를 정함. 판정은 SPA에 들어가는 코드 전체(src/main · src/modules · src/boot)에.
 //   결과는 규칙 단위로 처리(규칙의 고치는 법을 그 규칙의 모든 건에) — node tools/rules.mjs → tools/out/rules.md · rules.json
 import { layers, elementParams, LAYER_DEF } from './arch.mjs';
+import { moduleOf } from './scope.mjs';
+import { reachable } from './history.mjs';
 export { LAYER_DEF };
 
 // 함수 키 → 단위(main · modules · boot)
@@ -73,6 +75,33 @@ export const RULES = [
 ];
 
 // 전수검사: analyze(check.mjs와 같은 분석)·buildMap(map.mjs와 같은 계층 판정에 쓰는 data 쓰기)을 받아 규칙마다 건을 모음 — 계층 판정은 모든 단위(main·modules·boot)의 함수에
+// 모듈 판정(사용자 지시: 「SOLID/DRY/KISS/YAGNI로 재면서 위반하는것들을 쳐 내서」「지금 있다고 그냥 유지하는게 아니라. 대다수는 폐기/통합/재구축으로 쳐내야」 — 유지가 기본이 아님)
+//   원칙마다 이 코드에서 재는 것(아래 JUDGE_DEF)과 판정 순서. 모듈 = 파일(폴더 모듈은 폴더 — lib/scope.mjs moduleOf)
+export const JUDGE_DEF = {
+  S: 'SRP 단일 책임 — 관계없는 기능 둘 이상(연관 맵 모듈 판정 슈퍼·흩어짐) · 자연 경계 기능 섞임',
+  O: 'OCP 개방·폐쇄 — 이 모듈의 함수를 다른 모듈의 액션 분배기(handle…Action)가 직접 부름(기능을 고치면 분배기도 고쳐야 함): 부르는 수',
+  D: 'DIP 의존 역전 — Model이 화면을 부름(L3)·Model이 화면 요소를 받음(L4): 건',
+  LI: 'LSP·ISP — 클래스·상속·인터페이스가 없는 함수 모듈이라 재지 않음',
+  DRY: 'DRY — 같은 본문 함수 묶음(check 다중화) + 이 모듈이 다른 모듈과 함께 쓰는 data 경로(D3 창구 갈라짐)',
+  KISS: 'KISS — 복잡한 함수(복잡도 40↑·120줄↑·중첩 7↑) + 계층 섞인 함수(L1)',
+  YAGNI: 'YAGNI — 진입점(부팅·html·화면 조작·생성·실행 중 AI·불러오기 — lib/history.mjs reachable)에서 닿지 않는 함수 + 쓰기만 하고 아무도 안 읽는 상태 키. 브라우저 시험에서 실행 안 된 함수(GGM_COVERAGE=1 node build/test.mjs)는 참고로만',
+  verdict: '폐기: 닿지 않는 함수가 절반↑ · 통합: 게으른 모듈(연관 맵 판정 조각 → 그 기능의 모듈로) · 해체: SRP 위반(기능별로 나눠 각 기능 모듈로) · 재구축: O·D·DRY·KISS 위반이 하나라도 · 유지: 위반 없음 — 앞에서부터 먼저 걸린 것',
+};
+const locOfDup = s => String(s).slice(String(s).lastIndexOf('(') + 1, -1);
+export function judgeModules(c, RS, { units = [], html = '', cov = null } = {}) {
+  const fileMod = loc => moduleOf(String(loc).split(':')[0]), modOf = k => fileMod(c.fns.get(k)?.loc || ''), byMod = new Map();
+  for (const f of c.fns.values()) { if (!f.top || f.table) continue; const m = modOf(f.key); if (!byMod.has(m)) byMod.set(m, []); byMod.get(m).push(f); }
+  const V = new Map((c.M.arch?.verdicts || []).map(v => [v.mod, v])), nat = new Set((c.R.nat?.mixed || []).map(x => x.mod)), items = id => RS.find(r => r.id === id)?.items || [], cnt = (id, m) => items(id).filter(x => fileMod(x.at) === m).length;
+  const reach = units.length ? reachable(units, c.fns, html, new Set((c.R.act?.deadH || []).map(x => x.act))) : null, ran = cov ? new Set(cov.ran) : null, unusedK = new Set(c.R.unused.map(f => f.key)), complexK = new Set(c.R.complex.map(f => f.key));
+  const dupN = m => c.R.dup.filter(g => g.fns.some(x => fileMod(locOfDup(x)) === m)).length, wOnly = m => (c.R.sf?.writeOnly || []).filter(x => [...x.w].some(w => modOf(w) === m)).length;
+  const shared = m => Object.values(c.M.data).filter(d => { const ms = new Set(Object.values(d.writers).flat().map(w => c.M.fns[w]?.module).filter(Boolean)); return ms.size > 1 && ms.has(m); }).length;
+  const disp = new Map(); for (const f of c.fns.values()) if (f.top && /^handle\w+Action$/.test(f.name)) for (const k of f.calls.keys()) { const m = modOf(k); if (m && m !== modOf(f.key)) disp.set(m, (disp.get(m) || 0) + 1); }
+  return [...byMod].map(([m, fs]) => { const v = V.get(m), n = fs.length, dead = fs.filter(f => unusedK.has(f.key) || (reach && !reach.has(f.name))), notRan = ran ? fs.filter(f => !ran.has(f.name)).length : null;
+    const S = (v && ['슈퍼', '흩어짐'].includes(v.kind) ? 1 : 0) + (nat.has(m) ? 1 : 0), O = disp.get(m) || 0, D = cnt('L3', m) + cnt('L4', m), DRY = dupN(m) + shared(m), KISS = fs.filter(f => complexK.has(f.key)).length + cnt('L1', m), YAGNI = dead.length + wOnly(m);
+    const verdict = n && dead.length * 2 >= n ? '폐기' : v?.kind === '조각' ? '통합' : S ? '해체' : (O || D || DRY || KISS) ? '재구축' : '유지';
+    const to = verdict === '통합' ? [v.to] : verdict === '해체' ? [...new Set((v?.split || v?.spread || []).map(x => x.to).filter(Boolean))] : [];
+    return { mod: m, n, kind: v?.kind || null, S, O, D, DRY, KISS, YAGNI, dead: dead.map(f => f.name), notRan, verdict, to }; })
+    .sort((a, b) => ['폐기', '통합', '해체', '재구축', '유지'].indexOf(a.verdict) - ['폐기', '통합', '해체', '재구축', '유지'].indexOf(b.verdict) || a.mod.localeCompare(b.mod)); }
 export function runRules({ A, M }) { const writers = new Set(Object.values(M.data).flatMap(d => Object.values(d.writers).flat())), L = layers(A.fns, writers);
   const EP = elementParams(A.fns).filter(x => !['View', 'Controller'].includes(L.layer.get(x.fn)?.layer) && !L.layer.get(x.fn)?.handler);
   const ctx = { fns: A.fns, R: A.R, mu: A.mu, M, L, EP };

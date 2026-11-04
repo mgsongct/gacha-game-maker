@@ -47,12 +47,15 @@ export function moduleMap(units, fns, sf, opts = {}) { const fileOf = loc => (op
 // 기능 영역(docs/modules.md의 ## 절 — 절마다 적은 파일·함수 이름이 그 기능의 선언): 영역마다
 //   선언과 코드가 맞나(적힌 함수가 영역 파일 밖에 있음 = 흩어짐, 없음 = 문서 낡음) · 영역 상태(영역 파일이 주인인 키)를 영역 밖에서 씀 ·
 //   영역 밖 함수가 영역 일을 함(영역 침범 후보 중 몰린 곳이 영역) · 영역 함수가 남의 일을 함 · 영역이 부르는/불리는 다른 영역
-export function areaMap(doc, units, fns, M) {
-  const top = [...fns.values()].filter(f => f.top && !f.table), byName = new Map(top.map(f => [f.name, f])), fileOf2 = f => fileOf(f.loc), all = new Set(top.map(fileOf2));
-  const secs = String(doc).split(/^## /m).slice(1).map(t => { const title = t.split('\n')[0].trim(), body = t.slice(title.length);
+// docs/modules.md의 ## 절마다 적은 src 파일·함수 이름(그 기능의 선언) — areaMap·모듈 판정(rules.mjs)이 같이 씀
+export function areaSections(doc, fns) { const top = [...fns.values()].filter(f => f.top && !f.table), byName = new Map(top.map(f => [f.name, f])), all = new Set(top.map(f => fileOf(f.loc)));
+  return String(doc).split(/^## /m).slice(1).map(t => { const title = t.split('\n')[0].trim(), body = t.slice(title.length);
     const files = [...new Set([...body.matchAll(/`(src\/[\w\/.-]+?)`/g)].map(m => m[1]).flatMap(p => p.endsWith('.js') ? [p] : [...all].filter(f => f.startsWith(p.replace(/\/?$/, '/')))))].filter(f => all.has(f));
     const names = [...new Set([...body.matchAll(/`([^`\n]+)`/g)].flatMap(m => m[1].match(/[A-Za-z_$][\w$]*(?=\(|$|[`·,\s])/g) || []))].filter(n => byName.has(n));
-    return { title, files, names }; }).filter(s => s.files.length);
+    return { title, files, names }; }).filter(s => s.files.length); }
+export function areaMap(doc, units, fns, M) {
+  const top = [...fns.values()].filter(f => f.top && !f.table), byName = new Map(top.map(f => [f.name, f])), fileOf2 = f => fileOf(f.loc);
+  const secs = areaSections(doc, fns);
   const areaOf = new Map(); secs.forEach(s => s.files.forEach(f => { if (!areaOf.has(f)) areaOf.set(f, s.title); }));
   return secs.map(s => { const F = new Set(s.files), inA = f => F.has(f);
     // 흩어진 함수: 절에 적힌 함수가 영역 파일 밖에 있고, 그 함수의 참조(호출·상태)가 절반 이상 영역 파일로 감(다른 영역을 가리키려고 적은 이름은 뺌)
