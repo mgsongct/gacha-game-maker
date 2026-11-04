@@ -4,7 +4,7 @@ case 'cxcat': CXCAT=t.dataset.v; render(); break;
 case 'cxview': openCx(t.dataset.k); break;
 case 'cxadd': openCxEdit(''); break;
 case 'relopen': case 'relgo': openRel(t.dataset.r||REL_ME); break;
-case 'relseed': { const n=await relSeedAI(t); if(n){ toast(`관계 ${n}개를 정리했어요`); openRel(); } break; }
+case 'relseed': { const n=await relSeedAI(uiProg(t)); if(n){ toast(`관계 ${n}개를 정리했어요`); openRel(); } break; }
 case 'reladd': { const bn=$('#rl_b').value, k=$('#rl_k').value.trim(), nt=$('#rl_n').value.trim(); if(!bn||bn===RELC) break; if(!k&&!nt){ toast('관계나 설명을 적어 주세요'); break; }
       let r=relPair(RELC,bn); if(r){ if(k) r.kind=k; if(nt) r.note=nt; } else { r={id:'r'+uid(),a:RELC,b: bn,kind:k||'아는 사이',note:nt,hist:[]}; RELS().push(r); } r.at=Date.now(); mark('meta'); openRel(); break; }
 case 'reledit': openRelEdit(id); break;
@@ -20,8 +20,8 @@ case 'cxsave': { const id2=t.dataset.id, title=$('#cx_t').value.trim(), body=$('
       mark('world'); closeModal(); render(); toast('기록을 저장했어요'); pcSoon(); break; }
 case 'cxdel': { if(!(await appConfirm('이 기록을 지울까요?'))) break; G.world.codex=cxStore().filter(q=>q.id!==t.dataset.id); mark('world'); closeModal(); render(); pcSoon(); break; }
 case 'cxnote': { const k=t.dataset.k, v=prompt('메모로 덧붙일 내용'); if(!v||!v.trim()) break; const N=cxNotes(); (N[k]=N[k]||[]).push({text:v.trim(),at:'메모'}); mark('world'); openCx(k); pcSoon(); break; }
-case 'cxdisc': { if(!SAMPLE){toast('설정의 글 AI에서 AI를 먼저 등록해 주세요');break;} const done=busy(t,'쓰는 중… 1분쯤 걸려요'); const n=await cxDiscover(t); done(); if(n){ render(); toast(`새 기록 ${n}개를 실었어요`); } break; }
-case 'cxdeep': { const k=t.dataset.k, done=busy(t,'기록을 찾는 중…'); const ok=await cxDeepen(k,t); if(ok){ openCx(k); toast('새 기록을 덧붙였어요'); } else done(); break; }
+case 'cxdisc': { if(!SAMPLE){toast('설정의 글 AI에서 AI를 먼저 등록해 주세요');break;} const done=busy(t,'쓰는 중… 1분쯤 걸려요'); const n=await cxDiscover(uiProg(t)); done(); if(n){ render(); toast(`새 기록 ${n}개를 실었어요`); } break; }
+case 'cxdeep': { const k=t.dataset.k, done=busy(t,'기록을 찾는 중…'); const ok=await cxDeepen(k,uiProg(t)); if(ok){ openCx(k); toast('새 기록을 덧붙였어요'); } else done(); break; }
 case 'cxreadall': { const s=progSlot('cxSeen'); cxEntries().forEach(e=>{ if(e.open) s[e.key]=1; }); CXMEMO=null; mark('prog'); render(); break; }
 case 'opening-play': closeModal(); playOpening(); break;
 case 'char': openChar(id); break;
@@ -60,7 +60,7 @@ case 'delep': { const c=charById(id); if((await appConfirm('이 에피소드를 
 case 'aiep': { const c=charById(id),lv=+$('#ep_lv').value,dup=+$('#ep_dup').value,after=$('#ep_after').value,hint=$('#ep_hint').value.trim();
       const stg=aiepStgText({lv});
       const af=after?G.chapters.flatMap(ch=>ch.stages).find(x=>x.id===after):null;
-      const r=await aiJSON(aiepPrompt({c,dup,af,lv,stg,hint}),t);
+      const r=await aiJSON(aiepPrompt({c,dup,af,lv,stg,hint}),uiProg(t));
       if(r&&$('#ep_script')){ if(r.title)$('#ep_title').value=String(r.title); if(r.script)$('#ep_script').value=nl(r.script); toast('대본을 채웠어요. 확인 후 저장하세요.'); } break; }
 case 'thedit': openThEdit(id,t.dataset.th||null); break;
 case 'saveth': { const v=$('#th_trig').value, trig=v==='start'?{type:'start'}:{type:v.split(':')[0],value:v.split(':')[0]==='aff'?+v.split(':')[1]:v.split(':')[1]};
@@ -69,7 +69,7 @@ case 'saveth': { const v=$('#th_trig').value, trig=v==='start'?{type:'start'}:{t
       mark('t:'+th.id); checkTriggers(); openChar(id); break; }
 case 'delth': if((await appConfirm('이 '+T('talk')+'을(를) 삭제할까요?'))){G.threads=G.threads.filter(x=>x.id!==t.dataset.th);delete p.inbox[t.dataset.th];mark('t:'+t.dataset.th,'prog');openChar(id);} break;
 case 'aithread': { const c=charById(id),hint=$('#th_hint').value.trim(),tv=$('#th_trig').selectedOptions[0].textContent;
-      const r=await aiJSON(aithreadPrompt({c,tv,hint}),t);
+      const r=await aiJSON(aithreadPrompt({c,tv,hint}),uiProg(t));
       if(r&&$('#th_script')){ if(r.title)$('#th_title').value=String(r.title); if(r.script)$('#th_script').value=nl(r.script); toast('대화를 채웠어요. 확인 후 저장하세요.'); } break; }
 case 'ststory': { const ch0=G.chapters.find(x=>x.id===t.dataset.ch), s0=ch0&&ch0.stages.find(x=>x.id===t.dataset.st); if(!s0) break; closeModal(); playStoryStage(ch0,s0); break; }
 case 'story': { const ch=G.chapters.find(x=>x.id===t.dataset.ch),s=ch.stages.find(x=>x.id===t.dataset.st); closeModal(); playStory(s.title,s[t.dataset.k],()=>openStage(ch.id,s.id)); break; }
@@ -85,7 +85,7 @@ case 'savech': { readChForm(); const pg=chDraft.__purge; delete chDraft.__purge;
       const i=G.chapters.findIndex(x=>x.id===chDraft.id); delete chDraft.relScan; G.chapters[i]=chDraft; mark('ch:'+chDraft.id); syncEnemies(); scanScriptAssets(); relFromScripts(chDraft); closeModal(); render(); break; }
 case 'stdetail': { readChForm(); const j=+t.dataset.j, s0=chDraft.stages[j], ch0=chDraft; if(!s0) break; if(!(s0.pre||s0.post)){ toast('먼저 대본이 있어야 해요'); break; }
       const nb=stdetailNbText({ch0,j});
-      const r=await aiJSON(stdetailPrompt({s0,ch0,j,nb}),t,'complex');
+      const r=await aiJSON(stdetailPrompt({s0,ch0,j,nb}),uiProg(t),'complex');
       if(r&&(r.pre||r.post)){ s0.pre=nl(r.pre)||s0.pre; if(!s0.story) s0.post=nl(r.post)||s0.post; modalKeep(openChEdit); toast('디테일을 보강했어요. 마음에 들면 저장을 눌러 주세요'); } break; }
 case 'delch': { const ch0=G.chapters.find(x=>x.id===chDraft.id)||chDraft, back=chDraft, ev0=ch0.eventId&&G.events.find(e=>e.id===ch0.eventId);
       openStoryDel({title:ch0.title,ids:ch0.stages.map(s=>s.id),ch:ch0,ev:ev0,back:()=>{ chDraft=back; openChEdit(); },run:()=>{ G.chapters=G.chapters.filter(x=>x.id!==ch0.id); mark('ch:'+ch0.id); }}); break; }
@@ -95,7 +95,7 @@ case 'saveworld': { const w=G.world; w.name=$('#w_name').value.trim()||w.name; w
       if(WTERMS&&$('#w_tchk')&&$('#w_tchk').checked){ Object.entries(WTERMS).forEach(([k,v])=>{ if(v&&TERM_LABEL[k]) G.meta.terms[k]=String(v).slice(0,12); }); mark('meta'); applyMeta(); } WTERMS=null;
       mark('world'); closeModal(); render(); toast('세계관을 저장했어요'); pcSoon(); break; }
 case 'aiworld': { const kw=$('#w_kw').value.trim(); if(!kw){toast('키워드를 입력해 주세요');break;}
-      const r=await aiJSON(aiworldPrompt({kw}),t);
+      const r=await aiJSON(aiworldPrompt({kw}),uiProg(t));
       if(r&&$('#w_name')){ WTERMS=r.terms&&typeof r.terms==='object'?r.terms:null; worldFormFill(r); toast('입력칸을 채웠어요. 확인 후 저장하세요.'); } break; }
 case 'opening-edit': openOpeningEdit(); break;
 case 'aichapter-open': openAiChapter(); break;
@@ -149,17 +149,17 @@ case 'drcdel': drRead(); DR2.chars.splice(+t.dataset.i,1); drSave(); drRerender(
 case 'drmode': drRead(); DR2.mode=t.dataset.v||''; drSave(); openDraft(); break;
 case 'drpreset': { drRead(); const v=t.dataset.v||''; DR2.preset=v; drSave(); if(v){ const sp=allPresets().find(x=>x.id===v); if(presetToCfg(v)) toast(`「${sp.name}」 그림체를 적용했어요`); } drPresetShow(v); break; }
 case 'drautoex': { const el=$('#dr_auto'); if(el){ el.value=t.dataset.v; drRead(); } break; }
-case 'drpfdraw': drAvatarDraw(t); break;
-case 'drcfill': drFillChar(+t.dataset.i,t); break;
-case 'drpolish': drPolish(t.dataset.k,t); break;
-case 'drharmony': drHarmony(t); break;
+case 'drpfdraw': drAvatarDraw(uiProg(t)); break;
+case 'drcfill': drFillChar(+t.dataset.i,uiProg(t)); break;
+case 'drpolish': drPolish(t.dataset.k,uiProg(t)); break;
+case 'drharmony': drHarmony(uiProg(t)); break;
 case 'drdedup': { drRead(); const n=drDedup(JSON.parse(JSON.stringify(DR2))); if(!n){ toast('겹치는 문장이 없어요'); break; } drSnap('겹치는 문장 정리'); drDedup(); drSave(); drRerender(); toast(`겹치는 문장 ${n}개를 정리했어요. 마음에 안 들면 「되돌리기」`); break; }
 case 'drundo': { if(!DR2.undo) break; drRead(); const u=DR2.undo; if(u.kw!=null) DR2.kw=u.kw; if(u.tone!=null) DR2.tone=u.tone; DR2.world=u.world; DR2.setting=u.setting; DR2.story=u.story; DR2.chars=u.chars; if(u.hero){ const av=DR2.hero.av; DR2.hero=Object.assign({},u.hero,{av}); } else if(u.bio!=null) DR2.hero.bio=u.bio; delete DR2.undo; drSave(); drRerender(); toast('다듬기 전으로 되돌렸어요'); break; }
 case 'drpreview': drRead(); drPreviewToggle(drText()); break;
 case 'drclear': if(!(await appConfirm('초안을 모두 지울까요?'))) break; try{ appStorage.removeItem(DR2KEY); idbDel('draft_avatar').catch(()=>{}); }catch(e){} if(DRAVU){ URL.revokeObjectURL(DRAVU); DRAVU=null; } DRTAB='theme'; openDraft(); break;
-case 'drmanual': { drRead(); if(!(await appConfirm('적은 내용 그대로 새 게임을 만들까요?\n비어 있는 대사·스킬·적은 기본값으로 채워요. 나중에 글 AI를 등록하면 편집 화면에서 다듬을 수 있어요.'))) break; const done=busy(t); try{ await newGameManual(t,DR2); }catch(err){ toast('만들기 실패: '+((err&&err.message)||err)); } done(); break; }
+case 'drmanual': { drRead(); if(!(await appConfirm('적은 내용 그대로 새 게임을 만들까요?\n비어 있는 대사·스킬·적은 기본값으로 채워요. 나중에 글 AI를 등록하면 편집 화면에서 다듬을 수 있어요.'))) break; const done=busy(t); try{ await newGameManual(uiProg(t,'#ng_stat'),DR2); }catch(err){ toast('만들기 실패: '+((err&&err.message)||err)); } done(); break; }
 case 'drmake': { drRead(); if(DR2.mode==='auto'?!String(DR2.auto||'').trim():(!String(DR2.kw||'').trim()&&!String(DR2.world||'').trim())){ toast(DR2.mode==='auto'?'만들고 싶은 게임을 적어 주세요':'테마의 장르와 키워드나 세계관 중 하나는 적어 주세요'); break; }
-      const done=drBusy(t); try{ await newGame(t,DR2); }catch(err){ aiLog({ok:false,stage:'새 게임 만들기',err:'앱 오류: '+String((err&&(err.stack||err.message))||err).slice(0,600)}); say('#ng_stat','만드는 중 오류가 났어요. 아래 \'AI 기록\'에서 내용을 확인해 주세요.'); } AISTAGE=''; done(); break; }
+      const done=drBusy(t); try{ await newGame(uiProg(t,'#ng_stat'),DR2); }catch(err){ aiLog({ok:false,stage:'새 게임 만들기',err:'앱 오류: '+String((err&&(err.stack||err.message))||err).slice(0,600)}); say('#ng_stat','만드는 중 오류가 났어요. 아래 \'AI 기록\'에서 내용을 확인해 주세요.'); } AISTAGE=''; done(); break; }
 case 'charregen': openRegen(id); break;
   }
 }

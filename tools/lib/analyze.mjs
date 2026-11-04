@@ -6,7 +6,7 @@ import { loadUnits, loadToolUnits } from './source.mjs';
 import { buildGraph, unused, unusedVars, cycles, cycleGuard, deepest, hubs, complexAnon } from './graph.mjs';
 import { actions, mutations, stateFlow } from './flow.mjs';
 import { parseErrors, dupBodies, repeatedStrings, sgRules, complexFns, complexCases, commentedCode } from './quality.mjs';
-import { domIds, htmlInject, saveKeys, listenerLeaks, cssCheck, sideFiles, relayHosts, spaCheck, tdzRefs, undefinedNames } from './extra.mjs';
+import { domIds, htmlInject, saveKeys, listenerLeaks, cssCheck, sideFiles, relayHosts, spaCheck, tdzRefs, undefinedNames, freshReaderWrites } from './extra.mjs';
 import { inlinePrompts, pureModules, fragmentFiles, promptText, IMAGE_SINKS, tagText, sharedHelpers, promptBuilders } from './prompts.mjs';
 import { moduleMap, naturalBoundaries } from './modules.mjs';
 import { moduleOf } from './scope.mjs';
@@ -21,6 +21,7 @@ export async function analyze(ROOT) {
   R.relay = relayHosts(units, R.side.hosts);
   R.cmt = commentedCode(units); // 주석 속 코드(한 줄 코드 중간 // 주석으로 뒤 문장이 빠졌을 수 있음)
   R.tdz = tdzRefs(units); // 불러올 때 아직 없는 이름(코드를 옮겨 생기는 앱 시작 실패)
+  R.freshW = freshReaderWrites(units, fns, mu.mut); // 읽기 결과(없으면 새 값)에 쓰기 — 쓴 것이 사라짐
   R.undef = undefinedNames(units, existsSync(join(ROOT, 'tools/browser-globals.json')) ? JSON.parse(readFileSync(join(ROOT, 'tools/browser-globals.json'), 'utf8')) : {}); // 정의 안 된 이름(부르면 ReferenceError)
   R.spa = spaCheck(ROOT, units); // SPA 단일 파일 전제(www/index.html이 로컬 파일을 따로 불러오지 않음, 분석한 src = 빌드가 SPA에 넣은 코드)
   const shared = sharedHelpers(ROOT); R.prompts = inlinePrompts(units, { shared }); // 프롬프트 스튜디오 밖(코드에 직접 쓴) 지시문
@@ -39,7 +40,7 @@ export async function analyze(ROOT) {
     ...[...R.promptAll, ...R.promptImg].map(x => ({ kind: '프롬프트 글이 스튜디오 모듈 밖(스튜디오로 옮기거나, 화면과 같이 쓰는 글 도구면 tools/prompt-shared.json에 이유와 함께)', msg: `${x.key} ${x.chars}자 (${x.loc})` })),
     ...R.sharedStale.map(n => ({ kind: '공용 글 도구 목록(tools/prompt-shared.json)에 있는데 코드에 없는 함수', msg: n })),
     ...R.builders.builders.map(x => ({ kind: '프롬프트 조립 함수(조각을 고르고 이음)가 스튜디오 모듈 밖', msg: `${x.fn} (${x.loc})` })), ...R.builders.loadTime.map(x => ({ kind: '불러올 때 조각을 읽음(게임별 수정이 반영 안 됨 — 쓸 때 읽게)', msg: `${x.text} (${x.loc})` })),
-    ...R.tdz.map(x => ({ kind: '불러올 때 아직 없는 이름(TDZ — 앱이 뜨지 않음)', msg: `${x.name} ${x.loc} — 선언 ${x.decl}` })), ...R.undef.map(x => ({ kind: '정의 안 된 이름(부르면 ReferenceError — 지역·맨 위 선언·전역·브라우저 전역 어디에도 없음)', msg: `${x.name} ${x.loc}` })), ...R.css.errors.map(e => ({ kind: 'CSS 파싱 오류', msg: `${e.loc} ${e.text} — 뒤 규칙이 무시될 수 있음` })), ...R.side.parse.map(e => ({ kind: '부속 파일 파싱 오류', msg: `${e.loc} ${e.text}` })), ...R.spa.errors.map(e => ({ kind: 'SPA 단일 파일 전제 깨짐', msg: `${e.loc} ${e.text}` })), ...R.frag.stray.map(x => ({ kind: '프롬프트 조각이 스튜디오 밖에 흩어짐', msg: `${x.file} — pfDef ${x.n}개(조각은 ${R.frag.home} 한곳에 모음)` })), ...R.pure.map(x => ({ kind: '순수 모듈이 DOM·앱 상태를 참조', msg: `${x.loc} ${x.name} — 규칙 엔진은 DOM·G 없이(docs/build.md §3)` }))];
+    ...R.tdz.map(x => ({ kind: '불러올 때 아직 없는 이름(TDZ — 앱이 뜨지 않음)', msg: `${x.name} ${x.loc} — 선언 ${x.decl}` })), ...R.freshW.map(x => ({ kind: '읽기 함수가 돌려준 값에 씀(저장 칸이 없으면 새 값이라 사라짐 — progSlot·G.meta.x = …로)', msg: `${x.fn}() ${x.loc} ${x.text}` })), ...R.undef.map(x => ({ kind: '정의 안 된 이름(부르면 ReferenceError — 지역·맨 위 선언·전역·브라우저 전역 어디에도 없음)', msg: `${x.name} ${x.loc}` })), ...R.css.errors.map(e => ({ kind: 'CSS 파싱 오류', msg: `${e.loc} ${e.text} — 뒤 규칙이 무시될 수 있음` })), ...R.side.parse.map(e => ({ kind: '부속 파일 파싱 오류', msg: `${e.loc} ${e.text}` })), ...R.spa.errors.map(e => ({ kind: 'SPA 단일 파일 전제 깨짐', msg: `${e.loc} ${e.text}` })), ...R.frag.stray.map(x => ({ kind: '프롬프트 조각이 스튜디오 밖에 흩어짐', msg: `${x.file} — pfDef ${x.n}개(조각은 ${R.frag.home} 한곳에 모음)` })), ...R.pure.map(x => ({ kind: '순수 모듈이 DOM·앱 상태를 참조', msg: `${x.loc} ${x.name} — 규칙 엔진은 DOM·G 없이(docs/build.md §3)` }))];
   const warns = [...R.cycles.filter(c => !cycleGuard(fns, c)).map(c => ({ kind: '멈춤 조건 없는 동기 순환', msg: c.slice(0, 6).join(' ↔ ') })), ...R.sg.emptyCatch.filter(x => x.cat === '비동기 작업').map(x => ({ kind: '비동기 작업의 빈 catch(실패 원인을 잃음)', msg: `${x.loc} — catch(e){ quietErr(e,'위치'); }` })), ...act.regOrphan.map(m => ({ kind: '분배 표에 없는 case(실행 안 됨)', msg: `${m.act} — ${m.fn} (${m.loc})${m.to ? ` · 표는 ${m.to}로 보냄` : ''}` })), ...act.multi.map(m => ({ kind: '여러 곳에서 처리하는 액션', msg: `${m.act}: ${m.locs.slice(0, 3).join(', ')}` })), ...R.unsaved.map(x => ({ kind: '저장 표시 없는 상태 변경', msg: `${x.fn.name} (${x.fn.loc}) — ${x.ex.what} 외 ${x.n - 1}곳, 자신·호출자 모두 mark() 없음` })), ...R.dup.map(d => ({ kind: '같은 본문 함수', msg: d.fns.join(' = ') })),
     ...R.cmt.map(x => ({ kind: '주석 속 코드(한 줄 코드 중간 // 주석으로 뒤 문장이 빠졌을 수 있음)', msg: `${x.loc} ${x.text}` })), ...R.dom.missing.map(m => ({ kind: '없는 요소를 찾는 코드(늘 null)', msg: `#${m.id} (${m.at.join(', ')})` })), ...R.inj.out.map(x => ({ kind: 'esc() 없이 HTML에 넣는 글', msg: `${x.loc} \${${x.what}}` })),
     ...(R.keys?.bad || []).map(x => ({ kind: 'writeKey가 모르는 저장 키', msg: `mark('${x.key}') ${x.loc} — PC·클라우드 문서 저장에서 빠짐` })), ...R.leaks.map(x => ({ kind: '떼지 않는 전역 리스너(누수)', msg: `'${x.ev}' ${x.loc} — ${x.why} 붙음, once·signal·removeEventListener 없음` })),

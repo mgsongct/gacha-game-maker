@@ -367,7 +367,7 @@ document.addEventListener('click',async e=>{ const b=e.target.closest('[data-act
   else if(a==='psttab') openStudio(b.dataset.k);
   else if(a==='pstsave'){ pfSet(id,{text:v('text').trim(),add:v('add').trim()}); toast('조각을 저장했어요'); openStudio(); }
   else if(a==='pstreset'){ pfSet(id,null); toast('기본으로 되돌렸어요'); openStudio(); }
-  else if(a==='pstai') await pstPolish(b,id);
+  else if(a==='pstai') await pstPolish(uiProg(b),id);
   else if(a==='pstimgfix'){ const n=imgAuditFix(imgAuditScan()); toast(`그림 프롬프트 ${n}개를 정리하고 교훈으로 기록했어요`); openStudio(); }
   else if(a==='pstundo'){ auditUndo(); G.lib.forEach(l=>mark('l:'+l.id)); openStudio(); }
   else if(a==='pstltog'){ const L=plList(), x=L.find(l=>l.id===id); if(x){ x.on=b.checked; plSave(L); } }

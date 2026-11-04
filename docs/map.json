@@ -17472,18 +17472,8 @@
    "www": 6866,
    "prompts": [],
    "place": "공용",
-   "layer": "섞임",
-   "feat": "F01",
-   "mix": {
-    "view": [
-     903,
-     905
-    ],
-    "model": [
-     904
-    ],
-    "kind": "작업+진행 표시"
-   }
+   "layer": "Controller",
+   "feat": "F01"
   },
   "imageCandidateEligible": {
    "name": "imageCandidateEligible",
@@ -17665,8 +17655,8 @@
    "name": "skinFaces",
    "file": "src/main/0060-util.js",
    "module": "src/main/0060-util.js",
-   "line": 34,
-   "www": 7601,
+   "line": 37,
+   "www": 7604,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -17677,7 +17667,7 @@
    "file": "src/main/0065-inherit.js",
    "module": "src/main/0065-inherit.js",
    "line": 14,
-   "www": 7654,
+   "www": 7657,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
@@ -17688,7 +17678,7 @@
    "file": "src/main/0065-inherit.js",
    "module": "src/main/0065-inherit.js",
    "line": 20,
-   "www": 7660,
+   "www": 7663,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
@@ -17699,7 +17689,7 @@
    "file": "src/main/0065-inherit.js",
    "module": "src/main/0065-inherit.js",
    "line": 26,
-   "www": 7666,
+   "www": 7669,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -17710,7 +17700,7 @@
    "file": "src/main/0065-inherit.js",
    "module": "src/main/0065-inherit.js",
    "line": 29,
-   "www": 7669,
+   "www": 7672,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -17721,7 +17711,7 @@
    "file": "src/main/0065-inherit.js",
    "module": "src/main/0065-inherit.js",
    "line": 34,
-   "www": 7674,
+   "www": 7677,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -17732,7 +17722,7 @@
    "file": "src/main/0065-inherit.js",
    "module": "src/main/0065-inherit.js",
    "line": 38,
-   "www": 7678,
+   "www": 7681,
    "prompts": [],
    "place": "창:openChar",
    "layer": "View",
@@ -17743,7 +17733,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 12,
-   "www": 7694,
+   "www": 7697,
    "prompts": [],
    "place": "공용 기반",
    "layer": "Model",
@@ -17754,7 +17744,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 29,
-   "www": 7711,
+   "www": 7714,
    "prompts": [],
    "place": "공용 기반",
    "layer": "Model",
@@ -17765,7 +17755,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 30,
-   "www": 7712,
+   "www": 7715,
    "prompts": [],
    "place": "공용 기반",
    "layer": "Model",
@@ -17776,7 +17766,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 33,
-   "www": 7715,
+   "www": 7718,
    "prompts": [],
    "place": "배경.앱 시작",
    "layer": "Model",
@@ -17787,7 +17777,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 38,
-   "www": 7720,
+   "www": 7723,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -17798,7 +17788,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 41,
-   "www": 7723,
+   "www": 7726,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -17809,7 +17799,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 52,
-   "www": 7734,
+   "www": 7737,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
@@ -17820,7 +17810,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 68,
-   "www": 7750,
+   "www": 7753,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
@@ -17831,7 +17821,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 71,
-   "www": 7753,
+   "www": 7756,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
@@ -17842,7 +17832,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 154,
-   "www": 7836,
+   "www": 7839,
    "prompts": [],
    "place": "배경.앱 시작",
    "layer": "Model",
@@ -17853,7 +17843,7 @@
    "file": "src/main/0070-save.js",
    "module": "src/main/0070-save.js",
    "line": 157,
-   "www": 7839,
+   "www": 7842,
    "prompts": [],
    "place": "공용 기반",
    "layer": "Model",
@@ -17864,7 +17854,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 36,
-   "www": 7883,
+   "www": 7886,
    "prompts": [],
    "place": "창:openBackup",
    "layer": "Controller",
@@ -17875,7 +17865,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 52,
-   "www": 7899,
+   "www": 7902,
    "prompts": [],
    "place": "창:openPub",
    "layer": "Model",
@@ -17886,7 +17876,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 59,
-   "www": 7906,
+   "www": 7909,
    "prompts": [],
    "place": "공용 기반",
    "layer": "Model",
@@ -17897,7 +17887,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 63,
-   "www": 7910,
+   "www": 7913,
    "prompts": [],
    "place": "메뉴:공용",
    "layer": "Model",
@@ -17908,7 +17898,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 67,
-   "www": 7914,
+   "www": 7917,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -17919,7 +17909,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 70,
-   "www": 7917,
+   "www": 7920,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -17930,7 +17920,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 71,
-   "www": 7918,
+   "www": 7921,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -17941,7 +17931,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 74,
-   "www": 7921,
+   "www": 7924,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -17952,7 +17942,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 75,
-   "www": 7922,
+   "www": 7925,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -17963,7 +17953,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 82,
-   "www": 7929,
+   "www": 7932,
    "prompts": [],
    "place": "공용 기반",
    "layer": "View",
@@ -17974,7 +17964,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 97,
-   "www": 7944,
+   "www": 7947,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -17985,7 +17975,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 98,
-   "www": 7945,
+   "www": 7948,
    "prompts": [],
    "place": "공용",
    "layer": "View",
@@ -17996,7 +17986,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 99,
-   "www": 7946,
+   "www": 7949,
    "prompts": [],
    "place": "공용",
    "layer": "View",
@@ -18007,7 +17997,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 120,
-   "www": 7967,
+   "www": 7970,
    "prompts": [],
    "place": "공용 기반",
    "layer": "View",
@@ -18018,7 +18008,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 133,
-   "www": 7980,
+   "www": 7983,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18029,7 +18019,7 @@
    "file": "src/main/0080-storage-integration.js",
    "module": "src/main/0080-storage-integration.js",
    "line": 145,
-   "www": 7992,
+   "www": 7995,
    "prompts": [],
    "place": "메뉴:공용",
    "layer": "Model",
@@ -18040,7 +18030,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 4,
-   "www": 8036,
+   "www": 8039,
    "prompts": [],
    "place": "공용 기반",
    "layer": "Model",
@@ -18051,7 +18041,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 8,
-   "www": 8040,
+   "www": 8043,
    "prompts": [],
    "place": "farm",
    "layer": "Model",
@@ -18062,7 +18052,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 10,
-   "www": 8042,
+   "www": 8045,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18073,7 +18063,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 13,
-   "www": 8045,
+   "www": 8048,
    "prompts": [],
    "place": "studio.game.17",
    "layer": "Model",
@@ -18084,7 +18074,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 17,
-   "www": 8049,
+   "www": 8052,
    "prompts": [],
    "place": "studio.game.17",
    "layer": "View",
@@ -18095,7 +18085,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 18,
-   "www": 8050,
+   "www": 8053,
    "prompts": [],
    "place": "farm",
    "layer": "Model",
@@ -18106,7 +18096,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 19,
-   "www": 8051,
+   "www": 8054,
    "prompts": [],
    "place": "창:openStam",
    "layer": "View",
@@ -18117,7 +18107,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 24,
-   "www": 8056,
+   "www": 8059,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -18128,7 +18118,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 26,
-   "www": 8058,
+   "www": 8061,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18139,7 +18129,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 28,
-   "www": 8060,
+   "www": 8063,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -18150,7 +18140,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 30,
-   "www": 8062,
+   "www": 8065,
    "prompts": [],
    "place": "lobby",
    "layer": "Model",
@@ -18161,7 +18151,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 31,
-   "www": 8063,
+   "www": 8066,
    "prompts": [],
    "place": "lobby",
    "layer": "Model",
@@ -18172,7 +18162,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 32,
-   "www": 8064,
+   "www": 8067,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18183,7 +18173,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 33,
-   "www": 8065,
+   "www": 8068,
    "prompts": [],
    "place": "창:openGift",
    "layer": "View",
@@ -18194,7 +18184,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 38,
-   "www": 8070,
+   "www": 8073,
    "prompts": [],
    "place": "창:openUpConfirm",
    "layer": "Controller",
@@ -18205,7 +18195,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 44,
-   "www": 8076,
+   "www": 8079,
    "prompts": [],
    "place": "창:openUpConfirm",
    "layer": "Controller",
@@ -18216,7 +18206,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 53,
-   "www": 8085,
+   "www": 8088,
    "prompts": [],
    "place": "창:openUpConfirm",
    "layer": "Controller",
@@ -18227,7 +18217,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 54,
-   "www": 8086,
+   "www": 8089,
    "prompts": [],
    "place": "창:openUpConfirm",
    "layer": "Controller",
@@ -18238,7 +18228,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 61,
-   "www": 8093,
+   "www": 8096,
    "prompts": [],
    "place": "창:openUpConfirm",
    "layer": "Model",
@@ -18249,7 +18239,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 73,
-   "www": 8105,
+   "www": 8108,
    "prompts": [],
    "place": "창:openUpConfirm",
    "layer": "View",
@@ -18260,7 +18250,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 82,
-   "www": 8114,
+   "www": 8117,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18271,7 +18261,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 85,
-   "www": 8117,
+   "www": 8120,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18282,7 +18272,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 96,
-   "www": 8128,
+   "www": 8131,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18293,7 +18283,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 100,
-   "www": 8132,
+   "www": 8135,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -18304,7 +18294,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 102,
-   "www": 8134,
+   "www": 8137,
    "prompts": [],
    "place": "공용",
    "layer": "Controller",
@@ -18315,7 +18305,7 @@
    "file": "src/main/0090-growth.js",
    "module": "src/main/0090-growth.js",
    "line": 106,
-   "www": 8138,
+   "www": 8141,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18326,7 +18316,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 4,
-   "www": 8143,
+   "www": 8146,
    "prompts": [],
    "place": "창:openThEdit",
    "layer": "Model",
@@ -18337,7 +18327,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 5,
-   "www": 8144,
+   "www": 8147,
    "prompts": [],
    "place": "lobby",
    "layer": "Model",
@@ -18348,7 +18338,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 6,
-   "www": 8145,
+   "www": 8148,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18359,7 +18349,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 15,
-   "www": 8154,
+   "www": 8157,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18370,7 +18360,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 21,
-   "www": 8160,
+   "www": 8163,
    "prompts": [],
    "place": "lobby",
    "layer": "Model",
@@ -18381,7 +18371,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 31,
-   "www": 8170,
+   "www": 8173,
    "prompts": [],
    "place": "창:openChar",
    "layer": "View",
@@ -18392,7 +18382,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 39,
-   "www": 8178,
+   "www": 8181,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -18403,7 +18393,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 43,
-   "www": 8182,
+   "www": 8185,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -18414,7 +18404,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 44,
-   "www": 8183,
+   "www": 8186,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -18425,7 +18415,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 49,
-   "www": 8188,
+   "www": 8191,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -18436,7 +18426,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 51,
-   "www": 8190,
+   "www": 8193,
    "prompts": [],
    "place": "창:openChar",
    "layer": "View",
@@ -18447,7 +18437,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 55,
-   "www": 8194,
+   "www": 8197,
    "prompts": [],
    "place": "창:openChar",
    "layer": "View",
@@ -18458,7 +18448,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 83,
-   "www": 8222,
+   "www": 8225,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -18469,7 +18459,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 84,
-   "www": 8223,
+   "www": 8226,
    "prompts": [],
    "place": "창:openChar",
    "layer": "섞임",
@@ -18492,7 +18482,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 103,
-   "www": 8242,
+   "www": 8245,
    "prompts": [],
    "place": "창:openChar",
    "layer": "View",
@@ -18503,7 +18493,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 117,
-   "www": 8256,
+   "www": 8259,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -18514,7 +18504,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 119,
-   "www": 8258,
+   "www": 8261,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -18556,7 +18546,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 143,
-   "www": 8282,
+   "www": 8285,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -18567,7 +18557,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 144,
-   "www": 8283,
+   "www": 8286,
    "prompts": [],
    "place": "창:openChar",
    "layer": "섞임",
@@ -18590,7 +18580,7 @@
    "file": "src/main/0100-messenger.js",
    "module": "src/main/0100-messenger.js",
    "line": 154,
-   "www": 8293,
+   "www": 8296,
    "prompts": [],
    "place": "창:openChar",
    "layer": "섞임",
@@ -18617,7 +18607,7 @@
    "file": "src/main/0110-challenge-raid.js",
    "module": "src/main/0110-challenge-raid.js",
    "line": 4,
-   "www": 8327,
+   "www": 8330,
    "prompts": [],
    "place": "challenge",
    "layer": "Model",
@@ -18628,7 +18618,7 @@
    "file": "src/main/0110-challenge-raid.js",
    "module": "src/main/0110-challenge-raid.js",
    "line": 8,
-   "www": 8331,
+   "www": 8334,
    "prompts": [],
    "place": "challenge",
    "layer": "Model",
@@ -18639,7 +18629,7 @@
    "file": "src/main/0110-challenge-raid.js",
    "module": "src/main/0110-challenge-raid.js",
    "line": 13,
-   "www": 8336,
+   "www": 8339,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18650,7 +18640,7 @@
    "file": "src/main/0110-challenge-raid.js",
    "module": "src/main/0110-challenge-raid.js",
    "line": 17,
-   "www": 8340,
+   "www": 8343,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18661,7 +18651,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 30,
-   "www": 8377,
+   "www": 8380,
    "prompts": [],
    "place": "abyss",
    "layer": "Model",
@@ -18672,7 +18662,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 94,
-   "www": 8441,
+   "www": 8444,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -18683,7 +18673,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 99,
-   "www": 8446,
+   "www": 8449,
    "prompts": [],
    "place": "challenge",
    "layer": "Model",
@@ -18694,7 +18684,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 101,
-   "www": 8448,
+   "www": 8451,
    "prompts": [],
    "place": "challenge",
    "layer": "Model",
@@ -18705,7 +18695,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 102,
-   "www": 8449,
+   "www": 8452,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "View",
@@ -18716,7 +18706,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 113,
-   "www": 8460,
+   "www": 8463,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -18727,7 +18717,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 115,
-   "www": 8462,
+   "www": 8465,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "View",
@@ -18738,7 +18728,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 118,
-   "www": 8465,
+   "www": 8468,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "View",
@@ -18749,30 +18739,18 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 126,
-   "www": 8473,
+   "www": 8476,
    "prompts": [],
    "place": "메뉴:lobby",
-   "layer": "섞임",
-   "feat": "F11",
-   "mix": {
-    "view": [
-     130,
-     136
-    ],
-    "model": [
-     132,
-     133,
-     134
-    ],
-    "kind": "작업+진행 표시"
-   }
+   "layer": "Controller",
+   "feat": "F11"
   },
   "rgUnits": {
    "name": "rgUnits",
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 145,
-   "www": 8492,
+   "www": 8495,
    "prompts": [],
    "place": "abyss",
    "layer": "Model",
@@ -18783,7 +18761,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 150,
-   "www": 8497,
+   "www": 8500,
    "prompts": [],
    "place": "abyss",
    "layer": "View",
@@ -18794,7 +18772,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 210,
-   "www": 8557,
+   "www": 8560,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "View",
@@ -18805,7 +18783,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 289,
-   "www": 8636,
+   "www": 8639,
    "prompts": [],
    "place": "abyss",
    "layer": "View",
@@ -18816,7 +18794,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 299,
-   "www": 8646,
+   "www": 8649,
    "prompts": [],
    "place": "abyss",
    "layer": "섞임",
@@ -18834,7 +18812,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 326,
-   "www": 8673,
+   "www": 8676,
    "prompts": [],
    "place": "abyss",
    "layer": "View",
@@ -18845,7 +18823,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 340,
-   "www": 8687,
+   "www": 8690,
    "prompts": [],
    "place": "창:rgDeckModal",
    "layer": "View",
@@ -18856,7 +18834,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 346,
-   "www": 8693,
+   "www": 8696,
    "prompts": [],
    "place": "challenge",
    "layer": "Model",
@@ -18867,7 +18845,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 349,
-   "www": 8696,
+   "www": 8699,
    "prompts": [],
    "place": "challenge",
    "layer": "View",
@@ -18878,7 +18856,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 372,
-   "www": 8719,
+   "www": 8722,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -18889,7 +18867,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 379,
-   "www": 8726,
+   "www": 8729,
    "prompts": [],
    "place": "abyss",
    "layer": "View",
@@ -18900,7 +18878,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 382,
-   "www": 8729,
+   "www": 8732,
    "prompts": [],
    "place": "challenge",
    "layer": "View",
@@ -18911,7 +18889,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 413,
-   "www": 8760,
+   "www": 8763,
    "prompts": [],
    "place": "challenge",
    "layer": "Model",
@@ -18922,7 +18900,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 423,
-   "www": 8770,
+   "www": 8773,
    "prompts": [],
    "place": "challenge",
    "layer": "Model",
@@ -18933,7 +18911,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 432,
-   "www": 8779,
+   "www": 8782,
    "prompts": [],
    "place": "challenge",
    "layer": "Model",
@@ -18944,7 +18922,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 435,
-   "www": 8782,
+   "www": 8785,
    "prompts": [],
    "place": "challenge",
    "layer": "Model",
@@ -18955,7 +18933,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 442,
-   "www": 8789,
+   "www": 8792,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -18966,7 +18944,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 451,
-   "www": 8798,
+   "www": 8801,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -18977,7 +18955,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 455,
-   "www": 8802,
+   "www": 8805,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -18988,7 +18966,7 @@
    "file": "src/main/0120-abyss.js",
    "module": "src/main/0120-abyss.js",
    "line": 458,
-   "www": 8805,
+   "www": 8808,
    "prompts": [],
    "place": "challenge",
    "layer": "Controller",
@@ -18999,7 +18977,7 @@
    "file": "src/main/0125-tower.js",
    "module": "src/main/0125-tower.js",
    "line": 11,
-   "www": 8828,
+   "www": 8831,
    "prompts": [],
    "place": "challenge",
    "layer": "Model",
@@ -19010,7 +18988,7 @@
    "file": "src/main/0125-tower.js",
    "module": "src/main/0125-tower.js",
    "line": 19,
-   "www": 8836,
+   "www": 8839,
    "prompts": [],
    "place": "challenge",
    "layer": "Controller",
@@ -19021,7 +18999,7 @@
    "file": "src/main/0125-tower.js",
    "module": "src/main/0125-tower.js",
    "line": 25,
-   "www": 8842,
+   "www": 8845,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19032,7 +19010,7 @@
    "file": "src/main/0125-tower.js",
    "module": "src/main/0125-tower.js",
    "line": 29,
-   "www": 8846,
+   "www": 8849,
    "prompts": [],
    "place": "challenge",
    "layer": "View",
@@ -19043,7 +19021,7 @@
    "file": "src/main/0130-gift.js",
    "module": "src/main/0130-gift.js",
    "line": 5,
-   "www": 8856,
+   "www": 8859,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -19054,7 +19032,7 @@
    "file": "src/main/0130-gift.js",
    "module": "src/main/0130-gift.js",
    "line": 6,
-   "www": 8857,
+   "www": 8860,
    "prompts": [],
    "place": "창:openGift",
    "layer": "Model",
@@ -19065,7 +19043,7 @@
    "file": "src/main/0130-gift.js",
    "module": "src/main/0130-gift.js",
    "line": 7,
-   "www": 8858,
+   "www": 8861,
    "prompts": [],
    "place": "창:openGift",
    "layer": "View",
@@ -19076,7 +19054,7 @@
    "file": "src/main/0130-gift.js",
    "module": "src/main/0130-gift.js",
    "line": 16,
-   "www": 8867,
+   "www": 8870,
    "prompts": [],
    "place": "contract",
    "layer": "Controller",
@@ -19087,7 +19065,7 @@
    "file": "src/main/0135-schedule.js",
    "module": "src/main/0135-schedule.js",
    "line": 9,
-   "www": 8905,
+   "www": 8908,
    "prompts": [],
    "place": "sched",
    "layer": "Model",
@@ -19098,7 +19076,7 @@
    "file": "src/main/0135-schedule.js",
    "module": "src/main/0135-schedule.js",
    "line": 10,
-   "www": 8906,
+   "www": 8909,
    "prompts": [],
    "place": "sched",
    "layer": "Model",
@@ -19109,7 +19087,7 @@
    "file": "src/main/0135-schedule.js",
    "module": "src/main/0135-schedule.js",
    "line": 12,
-   "www": 8908,
+   "www": 8911,
    "prompts": [],
    "place": "sched",
    "layer": "Model",
@@ -19120,7 +19098,7 @@
    "file": "src/main/0135-schedule.js",
    "module": "src/main/0135-schedule.js",
    "line": 13,
-   "www": 8909,
+   "www": 8912,
    "prompts": [],
    "place": "sched",
    "layer": "Model",
@@ -19131,7 +19109,7 @@
    "file": "src/main/0135-schedule.js",
    "module": "src/main/0135-schedule.js",
    "line": 16,
-   "www": 8912,
+   "www": 8915,
    "prompts": [],
    "place": "sched",
    "layer": "Model",
@@ -19142,7 +19120,7 @@
    "file": "src/main/0135-schedule.js",
    "module": "src/main/0135-schedule.js",
    "line": 19,
-   "www": 8915,
+   "www": 8918,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -19160,7 +19138,7 @@
    "file": "src/main/0135-schedule.js",
    "module": "src/main/0135-schedule.js",
    "line": 25,
-   "www": 8921,
+   "www": 8924,
    "prompts": [],
    "place": "sched",
    "layer": "Controller",
@@ -19171,7 +19149,7 @@
    "file": "src/main/0135-schedule.js",
    "module": "src/main/0135-schedule.js",
    "line": 27,
-   "www": 8923,
+   "www": 8926,
    "prompts": [],
    "place": "sched",
    "layer": "View",
@@ -19182,7 +19160,7 @@
    "file": "src/main/0140-pickup-new.js",
    "module": "src/main/0140-pickup-new.js",
    "line": 3,
-   "www": 8935,
+   "www": 8938,
    "prompts": [],
    "place": "창:openNewPickup",
    "layer": "View",
@@ -19193,7 +19171,7 @@
    "file": "src/main/0150-pickup-existing.js",
    "module": "src/main/0150-pickup-existing.js",
    "line": 5,
-   "www": 8957,
+   "www": 8960,
    "prompts": [],
    "place": "창:openPickExisting",
    "layer": "View",
@@ -19204,7 +19182,7 @@
    "file": "src/main/0150-pickup-existing.js",
    "module": "src/main/0150-pickup-existing.js",
    "line": 15,
-   "www": 8967,
+   "www": 8970,
    "prompts": [],
    "place": "창:openPickExisting",
    "layer": "Model",
@@ -19215,7 +19193,7 @@
    "file": "src/main/0150-pickup-existing.js",
    "module": "src/main/0150-pickup-existing.js",
    "line": 26,
-   "www": 8978,
+   "www": 8981,
    "prompts": [],
    "place": "공용",
    "layer": "Controller",
@@ -19226,7 +19204,7 @@
    "file": "src/main/0150-pickup-existing.js",
    "module": "src/main/0150-pickup-existing.js",
    "line": 39,
-   "www": 8991,
+   "www": 8994,
    "prompts": [],
    "place": "공용",
    "layer": "Controller",
@@ -19237,7 +19215,7 @@
    "file": "src/main/0150-pickup-existing.js",
    "module": "src/main/0150-pickup-existing.js",
    "line": 42,
-   "www": 8994,
+   "www": 8997,
    "prompts": [],
    "place": "창:openModeStage",
    "layer": "Model",
@@ -19248,7 +19226,7 @@
    "file": "src/main/0150-pickup-existing.js",
    "module": "src/main/0150-pickup-existing.js",
    "line": 43,
-   "www": 8995,
+   "www": 8998,
    "prompts": [],
    "place": "메뉴:공용",
    "layer": "Model",
@@ -19259,7 +19237,7 @@
    "file": "src/main/0160-player-profile.js",
    "module": "src/main/0160-player-profile.js",
    "line": 4,
-   "www": 9003,
+   "www": 9006,
    "prompts": [],
    "place": "studio.player",
    "layer": "View",
@@ -19270,7 +19248,7 @@
    "file": "src/main/0160-player-profile.js",
    "module": "src/main/0160-player-profile.js",
    "line": 14,
-   "www": 9013,
+   "www": 9016,
    "prompts": [],
    "place": "studio.player",
    "layer": "Model",
@@ -19281,29 +19259,18 @@
    "file": "src/main/0160-player-profile.js",
    "module": "src/main/0160-player-profile.js",
    "line": 25,
-   "www": 9024,
+   "www": 9027,
    "prompts": [],
    "place": "studio.player",
-   "layer": "섞임",
-   "feat": "F05",
-   "mix": {
-    "view": [
-     26,
-     28,
-     30
-    ],
-    "model": [
-     29
-    ],
-    "kind": "작업+진행 표시"
-   }
+   "layer": "Controller",
+   "feat": "F05"
   },
   "subLocked": {
    "name": "subLocked",
    "file": "src/main/0170-render.js",
    "module": "src/main/0170-render.js",
    "line": 7,
-   "www": 9043,
+   "www": 9046,
    "prompts": [],
    "place": "studio.game.12",
    "layer": "Model",
@@ -19314,7 +19281,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 29,
-   "www": 9074,
+   "www": 9077,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -19325,7 +19292,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 34,
-   "www": 9079,
+   "www": 9082,
    "prompts": [],
    "place": "공용 기반",
    "layer": "Controller",
@@ -19336,7 +19303,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 42,
-   "www": 9087,
+   "www": 9090,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -19347,7 +19314,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 55,
-   "www": 9100,
+   "www": 9103,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19358,7 +19325,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 69,
-   "www": 9114,
+   "www": 9117,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19369,7 +19336,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 70,
-   "www": 9115,
+   "www": 9118,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19380,7 +19347,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 71,
-   "www": 9116,
+   "www": 9119,
    "prompts": [],
    "place": "공용",
    "layer": "View",
@@ -19391,7 +19358,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 76,
-   "www": 9121,
+   "www": 9124,
    "prompts": [],
    "place": "lobby",
    "layer": "View",
@@ -19402,7 +19369,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 119,
-   "www": 9164,
+   "www": 9167,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19413,7 +19380,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 120,
-   "www": 9165,
+   "www": 9168,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19424,7 +19391,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 123,
-   "www": 9168,
+   "www": 9171,
    "prompts": [],
    "place": "ops",
    "layer": "Model",
@@ -19435,7 +19402,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 124,
-   "www": 9169,
+   "www": 9172,
    "prompts": [],
    "place": "ops",
    "layer": "View",
@@ -19446,7 +19413,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 126,
-   "www": 9171,
+   "www": 9174,
    "prompts": [],
    "place": "ops",
    "layer": "View",
@@ -19457,7 +19424,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 133,
-   "www": 9178,
+   "www": 9181,
    "prompts": [],
    "place": "ops",
    "layer": "View",
@@ -19468,7 +19435,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 156,
-   "www": 9201,
+   "www": 9204,
    "prompts": [],
    "place": "contract",
    "layer": "View",
@@ -19479,7 +19446,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 194,
-   "www": 9239,
+   "www": 9242,
    "prompts": [],
    "place": "crew",
    "layer": "View",
@@ -19490,7 +19457,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 199,
-   "www": 9244,
+   "www": 9247,
    "prompts": [],
    "place": "event",
    "layer": "View",
@@ -19501,7 +19468,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 206,
-   "www": 9251,
+   "www": 9254,
    "prompts": [],
    "place": "evd",
    "layer": "View",
@@ -19512,7 +19479,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 223,
-   "www": 9268,
+   "www": 9271,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -19523,7 +19490,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 224,
-   "www": 9269,
+   "www": 9272,
    "prompts": [],
    "place": "evshop",
    "layer": "View",
@@ -19534,7 +19501,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 237,
-   "www": 9282,
+   "www": 9285,
    "prompts": [],
    "place": "farm",
    "layer": "View",
@@ -19545,7 +19512,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 243,
-   "www": 9288,
+   "www": 9291,
    "prompts": [],
    "place": "pass",
    "layer": "View",
@@ -19556,7 +19523,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 254,
-   "www": 9299,
+   "www": 9302,
    "prompts": [],
    "place": "studio.view.1",
    "layer": "View",
@@ -19567,7 +19534,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 309,
-   "www": 9354,
+   "www": 9357,
    "prompts": [],
    "place": "창:openSound",
    "layer": "View",
@@ -19578,7 +19545,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 346,
-   "www": 9391,
+   "www": 9394,
    "prompts": [],
    "place": "창:openSkin",
    "layer": "View",
@@ -19589,7 +19556,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 360,
-   "www": 9405,
+   "www": 9408,
    "prompts": [],
    "place": "studio",
    "layer": "View",
@@ -19600,7 +19567,7 @@
    "file": "src/main/0180-ui-scroll.js",
    "module": "src/main/0180-ui-scroll.js",
    "line": 448,
-   "www": 9493,
+   "www": 9496,
    "prompts": [],
    "place": "lobby",
    "layer": "View",
@@ -19611,7 +19578,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 8,
-   "www": 9506,
+   "www": 9509,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19622,7 +19589,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 22,
-   "www": 9520,
+   "www": 9523,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19633,7 +19600,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 25,
-   "www": 9523,
+   "www": 9526,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19644,7 +19611,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 26,
-   "www": 9524,
+   "www": 9527,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19655,7 +19622,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 27,
-   "www": 9525,
+   "www": 9528,
    "prompts": [],
    "place": "studio.game.4",
    "layer": "Model",
@@ -19666,7 +19633,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 36,
-   "www": 9534,
+   "www": 9537,
    "prompts": [],
    "place": "studio.game.4",
    "layer": "Model",
@@ -19677,7 +19644,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 38,
-   "www": 9536,
+   "www": 9539,
    "prompts": [],
    "place": "studio.game.4",
    "layer": "Model",
@@ -19688,7 +19655,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 45,
-   "www": 9543,
+   "www": 9546,
    "prompts": [],
    "place": "창:openChar",
    "layer": "View",
@@ -19699,7 +19666,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 52,
-   "www": 9550,
+   "www": 9553,
    "prompts": [],
    "place": "studio.game.4",
    "layer": "View",
@@ -19710,7 +19677,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 57,
-   "www": 9555,
+   "www": 9558,
    "prompts": [],
    "place": "studio.game.4",
    "layer": "Model",
@@ -19721,7 +19688,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 61,
-   "www": 9559,
+   "www": 9562,
    "prompts": [],
    "place": "studio.game.4",
    "layer": "View",
@@ -19732,7 +19699,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 94,
-   "www": 9592,
+   "www": 9595,
    "prompts": [],
    "place": "studio.game.4",
    "layer": "Controller",
@@ -19743,7 +19710,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 111,
-   "www": 9609,
+   "www": 9612,
    "prompts": [],
    "place": "studio.game.4",
    "layer": "Controller",
@@ -19754,7 +19721,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 119,
-   "www": 9617,
+   "www": 9620,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -19773,7 +19740,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 121,
-   "www": 9619,
+   "www": 9622,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19784,7 +19751,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 123,
-   "www": 9621,
+   "www": 9624,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -19795,7 +19762,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 124,
-   "www": 9622,
+   "www": 9625,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -19806,7 +19773,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 129,
-   "www": 9627,
+   "www": 9630,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -19825,7 +19792,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 131,
-   "www": 9629,
+   "www": 9632,
    "prompts": [],
    "place": "studio.game.4",
    "layer": "Controller",
@@ -19836,7 +19803,7 @@
    "file": "src/main/0185-game-rules.js",
    "module": "src/main/0185-game-rules.js",
    "line": 134,
-   "www": 9632,
+   "www": 9635,
    "prompts": [],
    "place": "studio.game.4",
    "layer": "Model",
@@ -19847,7 +19814,7 @@
    "file": "src/main/0187-balance.js",
    "module": "src/main/0187-balance.js",
    "line": 6,
-   "www": 9655,
+   "www": 9658,
    "prompts": [],
    "place": "studio.game.6",
    "layer": "Model",
@@ -19858,7 +19825,7 @@
    "file": "src/main/0187-balance.js",
    "module": "src/main/0187-balance.js",
    "line": 9,
-   "www": 9658,
+   "www": 9661,
    "prompts": [],
    "place": "studio.game.6",
    "layer": "Model",
@@ -19869,7 +19836,7 @@
    "file": "src/main/0187-balance.js",
    "module": "src/main/0187-balance.js",
    "line": 14,
-   "www": 9663,
+   "www": 9666,
    "prompts": [],
    "place": "studio.game.6",
    "layer": "Model",
@@ -19880,7 +19847,7 @@
    "file": "src/main/0187-balance.js",
    "module": "src/main/0187-balance.js",
    "line": 16,
-   "www": 9665,
+   "www": 9668,
    "prompts": [],
    "place": "studio.game.6",
    "layer": "Model",
@@ -19891,7 +19858,7 @@
    "file": "src/main/0187-balance.js",
    "module": "src/main/0187-balance.js",
    "line": 19,
-   "www": 9668,
+   "www": 9671,
    "prompts": [],
    "place": "studio.game.6",
    "layer": "Model",
@@ -19902,7 +19869,7 @@
    "file": "src/main/0187-balance.js",
    "module": "src/main/0187-balance.js",
    "line": 23,
-   "www": 9672,
+   "www": 9675,
    "prompts": [],
    "place": "studio.game.6",
    "layer": "Model",
@@ -19913,7 +19880,7 @@
    "file": "src/main/0187-balance.js",
    "module": "src/main/0187-balance.js",
    "line": 28,
-   "www": 9677,
+   "www": 9680,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -19924,7 +19891,7 @@
    "file": "src/main/0187-balance.js",
    "module": "src/main/0187-balance.js",
    "line": 48,
-   "www": 9697,
+   "www": 9700,
    "prompts": [],
    "place": "studio.game.6",
    "layer": "Model",
@@ -19935,7 +19902,7 @@
    "file": "src/main/0187-balance.js",
    "module": "src/main/0187-balance.js",
    "line": 49,
-   "www": 9698,
+   "www": 9701,
    "prompts": [],
    "place": "studio.game.6",
    "layer": "Controller",
@@ -19946,7 +19913,7 @@
    "file": "src/main/0190-shop.js",
    "module": "src/main/0190-shop.js",
    "line": 12,
-   "www": 9719,
+   "www": 9722,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -19957,7 +19924,7 @@
    "file": "src/main/0190-shop.js",
    "module": "src/main/0190-shop.js",
    "line": 29,
-   "www": 9736,
+   "www": 9739,
    "prompts": [],
    "place": "shop",
    "layer": "Model",
@@ -19968,7 +19935,7 @@
    "file": "src/main/0190-shop.js",
    "module": "src/main/0190-shop.js",
    "line": 30,
-   "www": 9737,
+   "www": 9740,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Model",
@@ -19979,7 +19946,7 @@
    "file": "src/main/0190-shop.js",
    "module": "src/main/0190-shop.js",
    "line": 32,
-   "www": 9739,
+   "www": 9742,
    "prompts": [],
    "place": "shop",
    "layer": "Model",
@@ -19990,7 +19957,7 @@
    "file": "src/main/0190-shop.js",
    "module": "src/main/0190-shop.js",
    "line": 33,
-   "www": 9740,
+   "www": 9743,
    "prompts": [],
    "place": "shop",
    "layer": "Model",
@@ -20001,7 +19968,7 @@
    "file": "src/main/0190-shop.js",
    "module": "src/main/0190-shop.js",
    "line": 34,
-   "www": 9741,
+   "www": 9744,
    "prompts": [],
    "place": "shop",
    "layer": "View",
@@ -20012,7 +19979,7 @@
    "file": "src/main/0190-shop.js",
    "module": "src/main/0190-shop.js",
    "line": 50,
-   "www": 9757,
+   "www": 9760,
    "prompts": [],
    "place": "shop",
    "layer": "View",
@@ -20023,7 +19990,7 @@
    "file": "src/main/0190-shop.js",
    "module": "src/main/0190-shop.js",
    "line": 75,
-   "www": 9782,
+   "www": 9785,
    "prompts": [],
    "place": "cash",
    "layer": "Controller",
@@ -20034,7 +20001,7 @@
    "file": "src/main/0190-shop.js",
    "module": "src/main/0190-shop.js",
    "line": 79,
-   "www": 9786,
+   "www": 9789,
    "prompts": [],
    "place": "cash",
    "layer": "View",
@@ -20045,7 +20012,7 @@
    "file": "src/main/0200-skin-shop.js",
    "module": "src/main/0200-skin-shop.js",
    "line": 3,
-   "www": 9809,
+   "www": 9812,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -20056,7 +20023,7 @@
    "file": "src/main/0200-skin-shop.js",
    "module": "src/main/0200-skin-shop.js",
    "line": 4,
-   "www": 9810,
+   "www": 9813,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20067,7 +20034,7 @@
    "file": "src/main/0200-skin-shop.js",
    "module": "src/main/0200-skin-shop.js",
    "line": 5,
-   "www": 9811,
+   "www": 9814,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
@@ -20078,7 +20045,7 @@
    "file": "src/main/0200-skin-shop.js",
    "module": "src/main/0200-skin-shop.js",
    "line": 6,
-   "www": 9812,
+   "www": 9815,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Controller",
@@ -20089,7 +20056,7 @@
    "file": "src/main/0200-skin-shop.js",
    "module": "src/main/0200-skin-shop.js",
    "line": 26,
-   "www": 9832,
+   "www": 9835,
    "prompts": [],
    "place": "cash",
    "layer": "View",
@@ -20100,7 +20067,7 @@
    "file": "src/main/0210-setup.js",
    "module": "src/main/0210-setup.js",
    "line": 24,
-   "www": 9859,
+   "www": 9862,
    "prompts": [],
    "place": "studio.img",
    "layer": "View",
@@ -20111,7 +20078,7 @@
    "file": "src/main/0220-mail.js",
    "module": "src/main/0220-mail.js",
    "line": 6,
-   "www": 9912,
+   "www": 9915,
    "prompts": [],
    "place": "창:openMailView",
    "layer": "Model",
@@ -20122,7 +20089,7 @@
    "file": "src/main/0220-mail.js",
    "module": "src/main/0220-mail.js",
    "line": 8,
-   "www": 9914,
+   "www": 9917,
    "prompts": [],
    "place": "창:openMailView",
    "layer": "Model",
@@ -20133,7 +20100,7 @@
    "file": "src/main/0220-mail.js",
    "module": "src/main/0220-mail.js",
    "line": 9,
-   "www": 9915,
+   "www": 9918,
    "prompts": [],
    "place": "창:openMailView",
    "layer": "Model",
@@ -20144,7 +20111,7 @@
    "file": "src/main/0220-mail.js",
    "module": "src/main/0220-mail.js",
    "line": 10,
-   "www": 9916,
+   "www": 9919,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20155,7 +20122,7 @@
    "file": "src/main/0220-mail.js",
    "module": "src/main/0220-mail.js",
    "line": 15,
-   "www": 9921,
+   "www": 9924,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20166,7 +20133,7 @@
    "file": "src/main/0220-mail.js",
    "module": "src/main/0220-mail.js",
    "line": 16,
-   "www": 9922,
+   "www": 9925,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -20177,7 +20144,7 @@
    "file": "src/main/0220-mail.js",
    "module": "src/main/0220-mail.js",
    "line": 24,
-   "www": 9930,
+   "www": 9933,
    "prompts": [],
    "place": "창:openMailView",
    "layer": "View",
@@ -20188,7 +20155,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 12,
-   "www": 9952,
+   "www": 9955,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -20199,7 +20166,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 14,
-   "www": 9954,
+   "www": 9957,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -20210,7 +20177,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 26,
-   "www": 9966,
+   "www": 9969,
    "prompts": [],
    "place": "창:openChar",
    "layer": "View",
@@ -20221,7 +20188,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 36,
-   "www": 9976,
+   "www": 9979,
    "prompts": [],
    "place": "창:openShare",
    "layer": "View",
@@ -20232,7 +20199,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 64,
-   "www": 10004,
+   "www": 10007,
    "prompts": [],
    "place": "창:openFeedback",
    "layer": "Model",
@@ -20243,7 +20210,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 69,
-   "www": 10009,
+   "www": 10012,
    "prompts": [],
    "place": "studio.info.4",
    "layer": "Model",
@@ -20254,7 +20221,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 79,
-   "www": 10019,
+   "www": 10022,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -20265,7 +20232,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 81,
-   "www": 10021,
+   "www": 10024,
    "prompts": [],
    "place": "창:openChar",
    "layer": "View",
@@ -20276,7 +20243,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 94,
-   "www": 10034,
+   "www": 10037,
    "prompts": [],
    "place": "창:openChar",
    "layer": "섞임",
@@ -20366,7 +20333,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 187,
-   "www": 10127,
+   "www": 10130,
    "prompts": [],
    "place": "창:openCharEdit",
    "layer": "View",
@@ -20377,7 +20344,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 220,
-   "www": 10160,
+   "www": 10163,
    "prompts": [],
    "place": "창:openCharEdit",
    "layer": "Model",
@@ -20388,7 +20355,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 228,
-   "www": 10168,
+   "www": 10171,
    "prompts": [],
    "place": "창:openCharEdit",
    "layer": "Controller",
@@ -20399,7 +20366,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 243,
-   "www": 10183,
+   "www": 10186,
    "prompts": [],
    "place": "창:openEpEdit",
    "layer": "View",
@@ -20410,7 +20377,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 244,
-   "www": 10184,
+   "www": 10187,
    "prompts": [],
    "place": "창:openEpEdit",
    "layer": "View",
@@ -20421,7 +20388,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 257,
-   "www": 10197,
+   "www": 10200,
    "prompts": [],
    "place": "창:openThEdit",
    "layer": "View",
@@ -20432,7 +20399,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 264,
-   "www": 10204,
+   "www": 10207,
    "prompts": [],
    "place": "창:openThEdit",
    "layer": "View",
@@ -20443,7 +20410,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 278,
-   "www": 10218,
+   "www": 10221,
    "prompts": [],
    "place": "창:openFormation",
    "layer": "Model",
@@ -20454,7 +20421,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 279,
-   "www": 10219,
+   "www": 10222,
    "prompts": [],
    "place": "창:openFormation",
    "layer": "Model",
@@ -20465,7 +20432,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 280,
-   "www": 10220,
+   "www": 10223,
    "prompts": [],
    "place": "창:openFormation",
    "layer": "Model",
@@ -20476,7 +20443,7 @@
    "file": "src/main/0230-modal.js",
    "module": "src/main/0230-modal.js",
    "line": 281,
-   "www": 10221,
+   "www": 10224,
    "prompts": [],
    "place": "창:openFormation",
    "layer": "Model",
@@ -20487,7 +20454,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 5,
-   "www": 10227,
+   "www": 10230,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20498,7 +20465,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 7,
-   "www": 10229,
+   "www": 10232,
    "prompts": [],
    "place": "메뉴:배경",
    "layer": "Model",
@@ -20509,7 +20476,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 9,
-   "www": 10231,
+   "www": 10234,
    "prompts": [],
    "place": "창:openFormation",
    "layer": "Model",
@@ -20520,7 +20487,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 11,
-   "www": 10233,
+   "www": 10236,
    "prompts": [],
    "place": "창:openFormation",
    "layer": "Model",
@@ -20531,7 +20498,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 13,
-   "www": 10235,
+   "www": 10238,
    "prompts": [],
    "place": "창:openFormation",
    "layer": "View",
@@ -20542,7 +20509,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 44,
-   "www": 10266,
+   "www": 10269,
    "prompts": [],
    "place": "창:openFormation",
    "layer": "Model",
@@ -20553,7 +20520,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 53,
-   "www": 10275,
+   "www": 10278,
    "prompts": [],
    "place": "공용",
    "layer": "View",
@@ -20564,7 +20531,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 61,
-   "www": 10283,
+   "www": 10286,
    "prompts": [],
    "place": "창:openChEdit",
    "layer": "View",
@@ -20575,7 +20542,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 79,
-   "www": 10301,
+   "www": 10304,
    "prompts": [],
    "place": "창:openChEdit",
    "layer": "Model",
@@ -20586,7 +20553,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 85,
-   "www": 10307,
+   "www": 10310,
    "prompts": [],
    "place": "창:openWorld",
    "layer": "View",
@@ -20597,7 +20564,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 100,
-   "www": 10322,
+   "www": 10325,
    "prompts": [],
    "place": "창:openOpeningEdit",
    "layer": "View",
@@ -20608,7 +20575,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 108,
-   "www": 10330,
+   "www": 10333,
    "prompts": [],
    "place": "창:openLib",
    "layer": "View",
@@ -20619,7 +20586,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 130,
-   "www": 10352,
+   "www": 10355,
    "prompts": [],
    "place": "창:openLibItem",
    "layer": "View",
@@ -20630,7 +20597,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 165,
-   "www": 10387,
+   "www": 10390,
    "prompts": [],
    "place": "contract",
    "layer": "View",
@@ -20641,7 +20608,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 182,
-   "www": 10404,
+   "www": 10407,
    "prompts": [],
    "place": "contract",
    "layer": "View",
@@ -20652,7 +20619,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 201,
-   "www": 10423,
+   "www": 10426,
    "prompts": [],
    "place": "창:openWorld",
    "layer": "View",
@@ -20663,7 +20630,7 @@
    "file": "src/main/0240-growth-curve.js",
    "module": "src/main/0240-growth-curve.js",
    "line": 203,
-   "www": 10425,
+   "www": 10428,
    "prompts": [],
    "place": "창:openFormation",
    "layer": "View",
@@ -20674,7 +20641,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 4,
-   "www": 10429,
+   "www": 10432,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20685,7 +20652,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 5,
-   "www": 10430,
+   "www": 10433,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20696,7 +20663,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 6,
-   "www": 10431,
+   "www": 10434,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20707,7 +20674,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 7,
-   "www": 10432,
+   "www": 10435,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20718,7 +20685,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 9,
-   "www": 10434,
+   "www": 10437,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20729,7 +20696,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 17,
-   "www": 10442,
+   "www": 10445,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20740,7 +20707,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 18,
-   "www": 10443,
+   "www": 10446,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20751,7 +20718,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 31,
-   "www": 10456,
+   "www": 10459,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20762,7 +20729,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 39,
-   "www": 10464,
+   "www": 10467,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20773,7 +20740,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 45,
-   "www": 10470,
+   "www": 10473,
    "prompts": [],
    "place": "창:openStoryDel",
    "layer": "View",
@@ -20784,7 +20751,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 53,
-   "www": 10478,
+   "www": 10481,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -20795,7 +20762,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 54,
-   "www": 10479,
+   "www": 10482,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -20806,7 +20773,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 55,
-   "www": 10480,
+   "www": 10483,
    "prompts": [],
    "place": "창:openStoryStage",
    "layer": "Controller",
@@ -20817,7 +20784,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 66,
-   "www": 10491,
+   "www": 10494,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -20842,7 +20809,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 74,
-   "www": 10499,
+   "www": 10502,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -20853,7 +20820,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 75,
-   "www": 10500,
+   "www": 10503,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20864,7 +20831,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 79,
-   "www": 10504,
+   "www": 10507,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -20875,7 +20842,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 84,
-   "www": 10509,
+   "www": 10512,
    "prompts": [],
    "place": "메뉴:공용",
    "layer": "Model",
@@ -20886,7 +20853,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 89,
-   "www": 10514,
+   "www": 10517,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -20905,7 +20872,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 94,
-   "www": 10519,
+   "www": 10522,
    "prompts": [
     "CG_MARK_BEATS",
     "CG_MARK_SCRIPT",
@@ -20956,7 +20923,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 118,
-   "www": 10543,
+   "www": 10546,
    "prompts": [],
    "place": "창:openAiEvent",
    "layer": "Controller",
@@ -20967,7 +20934,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 126,
-   "www": 10551,
+   "www": 10554,
    "prompts": [
     "CG_MARK_BEATS",
     "CTX_ALT_CANON",
@@ -21022,7 +20989,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 154,
-   "www": 10579,
+   "www": 10582,
    "prompts": [],
    "place": "contract",
    "layer": "Model",
@@ -21033,7 +21000,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 156,
-   "www": 10581,
+   "www": 10584,
    "prompts": [],
    "place": "evd",
    "layer": "Model",
@@ -21044,7 +21011,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 160,
-   "www": 10585,
+   "www": 10588,
    "prompts": [],
    "place": "evd",
    "layer": "View",
@@ -21055,7 +21022,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 173,
-   "www": 10598,
+   "www": 10601,
    "prompts": [],
    "place": "창:openMeta",
    "layer": "View",
@@ -21066,7 +21033,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 203,
-   "www": 10628,
+   "www": 10631,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -21077,7 +21044,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 207,
-   "www": 10632,
+   "www": 10635,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -21088,7 +21055,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 208,
-   "www": 10633,
+   "www": 10636,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -21099,7 +21066,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 211,
-   "www": 10636,
+   "www": 10639,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -21110,7 +21077,7 @@
    "file": "src/main/0250-story-factory.js",
    "module": "src/main/0250-story-factory.js",
    "line": 214,
-   "www": 10639,
+   "www": 10642,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -21121,7 +21088,7 @@
    "file": "src/main/0260-new-game/010-draft.js",
    "module": "src/main/0260-new-game/",
    "line": 46,
-   "www": 10697,
+   "www": 10700,
    "prompts": [],
    "place": "창:openDraft",
    "layer": "Model",
@@ -21132,7 +21099,7 @@
    "file": "src/main/0260-new-game/010-draft.js",
    "module": "src/main/0260-new-game/",
    "line": 52,
-   "www": 10703,
+   "www": 10706,
    "prompts": [],
    "place": "창:openDraft",
    "layer": "View",
@@ -21143,7 +21110,7 @@
    "file": "src/main/0260-new-game/010-draft.js",
    "module": "src/main/0260-new-game/",
    "line": 156,
-   "www": 10807,
+   "www": 10810,
    "prompts": [
     "DR_HARMONY",
     "DR_HARMONY_TONE"
@@ -21157,7 +21124,7 @@
    "file": "src/main/0260-new-game/020-build.js",
    "module": "src/main/0260-new-game/",
    "line": 5,
-   "www": 10828,
+   "www": 10831,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -21168,7 +21135,7 @@
    "file": "src/main/0260-new-game/020-build.js",
    "module": "src/main/0260-new-game/",
    "line": 9,
-   "www": 10832,
+   "www": 10835,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -21179,7 +21146,7 @@
    "file": "src/main/0260-new-game/020-build.js",
    "module": "src/main/0260-new-game/",
    "line": 18,
-   "www": 10841,
+   "www": 10844,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -21190,7 +21157,7 @@
    "file": "src/main/0260-new-game/020-build.js",
    "module": "src/main/0260-new-game/",
    "line": 39,
-   "www": 10862,
+   "www": 10865,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -21201,7 +21168,7 @@
    "file": "src/main/0260-new-game/020-build.js",
    "module": "src/main/0260-new-game/",
    "line": 62,
-   "www": 10885,
+   "www": 10888,
    "prompts": [
     "CAST_SEX_F",
     "CAST_SEX_M",
@@ -21243,60 +21210,26 @@
     "TALK_ONLY_RULE"
    ],
    "place": "배경.새 게임 생성",
-   "layer": "섞임",
-   "feat": "F05",
-   "mix": {
-    "view": [
-     66,
-     81,
-     83,
-     95,
-     117,
-     121
-    ],
-    "model": [
-     76,
-     82,
-     94,
-     101,
-     107,
-     116,
-     119,
-     142,
-     143,
-     146,
-     148
-    ],
-    "kind": "작업+진행 표시"
-   }
+   "layer": "Controller",
+   "feat": "F05"
   },
   "buildManualGameDraft": {
    "name": "buildManualGameDraft",
    "file": "src/main/0260-new-game/020-build.js",
    "module": "src/main/0260-new-game/",
    "line": 152,
-   "www": 10975,
+   "www": 10978,
    "prompts": [],
    "place": "배경.새 게임 생성",
-   "layer": "섞임",
-   "feat": "F05",
-   "mix": {
-    "view": [
-     153
-    ],
-    "model": [
-     187,
-     188
-    ],
-    "kind": "작업+진행 표시"
-   }
+   "layer": "Controller",
+   "feat": "F05"
   },
   "openSkinProp": {
    "name": "openSkinProp",
    "file": "src/main/0270-skin-proposal.js",
    "module": "src/main/0270-skin-proposal.js",
    "line": 10,
-   "www": 11024,
+   "www": 11027,
    "prompts": [],
    "place": "창:openSkinProp",
    "layer": "View",
@@ -21307,7 +21240,7 @@
    "file": "src/main/0270-skin-proposal.js",
    "module": "src/main/0270-skin-proposal.js",
    "line": 19,
-   "www": 11033,
+   "www": 11036,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -21326,7 +21259,7 @@
    "file": "src/main/0270-skin-proposal.js",
    "module": "src/main/0270-skin-proposal.js",
    "line": 21,
-   "www": 11035,
+   "www": 11038,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Controller",
@@ -21337,7 +21270,7 @@
    "file": "src/main/0270-skin-proposal.js",
    "module": "src/main/0270-skin-proposal.js",
    "line": 27,
-   "www": 11041,
+   "www": 11044,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "View",
@@ -21348,7 +21281,7 @@
    "file": "src/main/0270-skin-proposal.js",
    "module": "src/main/0270-skin-proposal.js",
    "line": 29,
-   "www": 11043,
+   "www": 11046,
    "prompts": [],
    "place": "cash",
    "layer": "View",
@@ -21359,7 +21292,7 @@
    "file": "src/main/0270-skin-proposal.js",
    "module": "src/main/0270-skin-proposal.js",
    "line": 42,
-   "www": 11056,
+   "www": 11059,
    "prompts": [],
    "place": "메뉴:lobby",
    "layer": "Controller",
@@ -21370,7 +21303,7 @@
    "file": "src/main/0270-skin-proposal.js",
    "module": "src/main/0270-skin-proposal.js",
    "line": 54,
-   "www": 11068,
+   "www": 11071,
    "prompts": [],
    "place": "창:openAiEvent",
    "layer": "View",
@@ -21381,7 +21314,7 @@
    "file": "src/main/0274-dispatch.js",
    "module": "src/main/0274-dispatch.js",
    "line": 3,
-   "www": 11083,
+   "www": 11086,
    "prompts": [],
    "place": "disp",
    "layer": "View",
@@ -21392,7 +21325,7 @@
    "file": "src/main/0274-dispatch.js",
    "module": "src/main/0274-dispatch.js",
    "line": 17,
-   "www": 11097,
+   "www": 11100,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21403,7 +21336,7 @@
    "file": "src/main/0274-dispatch.js",
    "module": "src/main/0274-dispatch.js",
    "line": 25,
-   "www": 11105,
+   "www": 11108,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -21414,7 +21347,7 @@
    "file": "src/main/0274-dispatch.js",
    "module": "src/main/0274-dispatch.js",
    "line": 31,
-   "www": 11111,
+   "www": 11114,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21425,7 +21358,7 @@
    "file": "src/main/0274-dispatch.js",
    "module": "src/main/0274-dispatch.js",
    "line": 33,
-   "www": 11113,
+   "www": 11116,
    "prompts": [],
    "place": "studio.game.2",
    "layer": "Model",
@@ -21436,7 +21369,7 @@
    "file": "src/main/0274-dispatch.js",
    "module": "src/main/0274-dispatch.js",
    "line": 34,
-   "www": 11114,
+   "www": 11117,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21447,7 +21380,7 @@
    "file": "src/main/0274-dispatch.js",
    "module": "src/main/0274-dispatch.js",
    "line": 35,
-   "www": 11115,
+   "www": 11118,
    "prompts": [],
    "place": "disp",
    "layer": "View",
@@ -21458,7 +21391,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 5,
-   "www": 11128,
+   "www": 11131,
    "prompts": [],
    "place": "studio.game.2",
    "layer": "Model",
@@ -21469,7 +21402,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 7,
-   "www": 11130,
+   "www": 11133,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -21480,7 +21413,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 9,
-   "www": 11132,
+   "www": 11135,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -21491,7 +21424,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 13,
-   "www": 11136,
+   "www": 11139,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21502,7 +21435,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 14,
-   "www": 11137,
+   "www": 11140,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21513,7 +21446,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 15,
-   "www": 11138,
+   "www": 11141,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21524,7 +21457,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 16,
-   "www": 11139,
+   "www": 11142,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21535,7 +21468,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 17,
-   "www": 11140,
+   "www": 11143,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21546,7 +21479,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 19,
-   "www": 11142,
+   "www": 11145,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -21557,7 +21490,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 24,
-   "www": 11147,
+   "www": 11150,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21568,7 +21501,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 25,
-   "www": 11148,
+   "www": 11151,
    "prompts": [],
    "place": "disp",
    "layer": "Controller",
@@ -21579,7 +21512,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 29,
-   "www": 11152,
+   "www": 11155,
    "prompts": [],
    "place": "disp",
    "layer": "Controller",
@@ -21590,7 +21523,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 30,
-   "www": 11153,
+   "www": 11156,
    "prompts": [],
    "place": "disp",
    "layer": "Controller",
@@ -21601,7 +21534,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 37,
-   "www": 11160,
+   "www": 11163,
    "prompts": [],
    "place": "disp",
    "layer": "Controller",
@@ -21612,7 +21545,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 39,
-   "www": 11162,
+   "www": 11165,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21623,7 +21556,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 40,
-   "www": 11163,
+   "www": 11166,
    "prompts": [],
    "place": "disp",
    "layer": "Controller",
@@ -21634,7 +21567,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 42,
-   "www": 11165,
+   "www": 11168,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -21645,7 +21578,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 46,
-   "www": 11169,
+   "www": 11172,
    "prompts": [],
    "place": "disp",
    "layer": "Model",
@@ -21656,7 +21589,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 47,
-   "www": 11170,
+   "www": 11173,
    "prompts": [],
    "place": "disp",
    "layer": "View",
@@ -21667,7 +21600,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 49,
-   "www": 11172,
+   "www": 11175,
    "prompts": [],
    "place": "disp",
    "layer": "View",
@@ -21678,7 +21611,7 @@
    "file": "src/main/0275-expedition.js",
    "module": "src/main/0275-expedition.js",
    "line": 73,
-   "www": 11196,
+   "www": 11199,
    "prompts": [],
    "place": "studio.game.2",
    "layer": "Controller",
@@ -21689,7 +21622,7 @@
    "file": "src/main/0280-live-ops.js",
    "module": "src/main/0280-live-ops.js",
    "line": 20,
-   "www": 11232,
+   "www": 11235,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
@@ -21700,7 +21633,7 @@
    "file": "src/main/0280-live-ops.js",
    "module": "src/main/0280-live-ops.js",
    "line": 29,
-   "www": 11241,
+   "www": 11244,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -21723,7 +21656,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 5,
-   "www": 11254,
+   "www": 11257,
    "prompts": [],
    "place": "studio.live",
    "layer": "Model",
@@ -21734,7 +21667,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 10,
-   "www": 11259,
+   "www": 11262,
    "prompts": [],
    "place": "studio.live",
    "layer": "Model",
@@ -21745,7 +21678,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 13,
-   "www": 11262,
+   "www": 11265,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -21756,7 +21689,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 14,
-   "www": 11263,
+   "www": 11266,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -21776,7 +21709,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 19,
-   "www": 11268,
+   "www": 11271,
    "prompts": [
     "ALT_CANON",
     "ALT_CHAR",
@@ -21798,7 +21731,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 25,
-   "www": 11274,
+   "www": 11277,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -21809,7 +21742,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 26,
-   "www": 11275,
+   "www": 11278,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -21820,7 +21753,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 27,
-   "www": 11276,
+   "www": 11279,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
@@ -21831,7 +21764,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 34,
-   "www": 11283,
+   "www": 11286,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
@@ -21842,7 +21775,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 61,
-   "www": 11310,
+   "www": 11313,
    "prompts": [],
    "place": "창:openSeasonInfo",
    "layer": "View",
@@ -21853,7 +21786,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 69,
-   "www": 11318,
+   "www": 11321,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Controller",
@@ -21864,7 +21797,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 112,
-   "www": 11361,
+   "www": 11364,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "View",
@@ -21875,7 +21808,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 118,
-   "www": 11367,
+   "www": 11370,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -21886,7 +21819,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 121,
-   "www": 11370,
+   "www": 11373,
    "prompts": [],
    "place": "studio.img",
    "layer": "Model",
@@ -21897,7 +21830,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 138,
-   "www": 11387,
+   "www": 11390,
    "prompts": [],
    "place": "studio.view.1",
    "layer": "Model",
@@ -21908,7 +21841,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 139,
-   "www": 11388,
+   "www": 11391,
    "prompts": [],
    "place": "창:openPrep",
    "layer": "View",
@@ -21919,7 +21852,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 174,
-   "www": 11423,
+   "www": 11426,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -21930,7 +21863,7 @@
    "file": "src/main/0290-season-rotation.js",
    "module": "src/main/0290-season-rotation.js",
    "line": 175,
-   "www": 11424,
+   "www": 11427,
    "prompts": [],
    "place": "notice",
    "layer": "View",
@@ -21941,7 +21874,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 5,
-   "www": 11437,
+   "www": 11440,
    "prompts": [],
    "place": "codex",
    "layer": "Model",
@@ -21952,7 +21885,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 6,
-   "www": 11438,
+   "www": 11441,
    "prompts": [],
    "place": "codex",
    "layer": "Model",
@@ -21963,7 +21896,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 7,
-   "www": 11439,
+   "www": 11442,
    "prompts": [],
    "place": "codex",
    "layer": "Model",
@@ -21974,7 +21907,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 8,
-   "www": 11440,
+   "www": 11443,
    "prompts": [],
    "place": "codex",
    "layer": "Model",
@@ -21985,7 +21918,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 10,
-   "www": 11442,
+   "www": 11445,
    "prompts": [],
    "place": "codex",
    "layer": "Model",
@@ -21996,7 +21929,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 11,
-   "www": 11443,
+   "www": 11446,
    "prompts": [],
    "place": "codex",
    "layer": "Model",
@@ -22007,7 +21940,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 13,
-   "www": 11445,
+   "www": 11448,
    "prompts": [],
    "place": "codex",
    "layer": "Model",
@@ -22018,7 +21951,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 15,
-   "www": 11447,
+   "www": 11450,
    "prompts": [],
    "place": "codex",
    "layer": "Model",
@@ -22029,7 +21962,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 33,
-   "www": 11465,
+   "www": 11468,
    "prompts": [],
    "place": "lobby",
    "layer": "Model",
@@ -22040,7 +21973,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 37,
-   "www": 11469,
+   "www": 11472,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -22051,7 +21984,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 38,
-   "www": 11470,
+   "www": 11473,
    "prompts": [],
    "place": "codex",
    "layer": "View",
@@ -22062,7 +21995,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 42,
-   "www": 11474,
+   "www": 11477,
    "prompts": [],
    "place": "codex",
    "layer": "View",
@@ -22073,7 +22006,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 59,
-   "www": 11491,
+   "www": 11494,
    "prompts": [],
    "place": "codex",
    "layer": "Model",
@@ -22084,7 +22017,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 90,
-   "www": 11522,
+   "www": 11525,
    "prompts": [
     "CODEX_DEEPEN",
     "CTX_ALT_CANON",
@@ -22103,7 +22036,7 @@
    "file": "src/main/0300-codex.js",
    "module": "src/main/0300-codex.js",
    "line": 96,
-   "www": 11528,
+   "www": 11531,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22114,7 +22047,7 @@
    "file": "src/main/0330-casting.js",
    "module": "src/main/0330-casting.js",
    "line": 3,
-   "www": 11553,
+   "www": 11556,
    "prompts": [],
    "place": "studio.img",
    "layer": "Model",
@@ -22125,7 +22058,7 @@
    "file": "src/main/0330-casting.js",
    "module": "src/main/0330-casting.js",
    "line": 16,
-   "www": 11566,
+   "www": 11569,
    "prompts": [],
    "place": "창:openNpcs",
    "layer": "View",
@@ -22136,7 +22069,7 @@
    "file": "src/main/0330-casting.js",
    "module": "src/main/0330-casting.js",
    "line": 21,
-   "www": 11571,
+   "www": 11574,
    "prompts": [],
    "place": "창:openNpcs",
    "layer": "View",
@@ -22147,7 +22080,7 @@
    "file": "src/main/0330-casting.js",
    "module": "src/main/0330-casting.js",
    "line": 28,
-   "www": 11578,
+   "www": 11581,
    "prompts": [
     "AUTO_NPCS",
     "CAST_SEX_F",
@@ -22163,7 +22096,7 @@
    "file": "src/main/0330-casting.js",
    "module": "src/main/0330-casting.js",
    "line": 34,
-   "www": 11584,
+   "www": 11587,
    "prompts": [],
    "place": "창:openCastFaces",
    "layer": "Model",
@@ -22174,7 +22107,7 @@
    "file": "src/main/0330-casting.js",
    "module": "src/main/0330-casting.js",
    "line": 35,
-   "www": 11585,
+   "www": 11588,
    "prompts": [],
    "place": "창:openCastFaces",
    "layer": "Model",
@@ -22185,7 +22118,7 @@
    "file": "src/main/0330-casting.js",
    "module": "src/main/0330-casting.js",
    "line": 42,
-   "www": 11592,
+   "www": 11595,
    "prompts": [],
    "place": "studio.img",
    "layer": "View",
@@ -22196,7 +22129,7 @@
    "file": "src/main/0360-sync/020-pc-server.js",
    "module": "src/main/0360-sync/",
    "line": 9,
-   "www": 11731,
+   "www": 11734,
    "prompts": [],
    "place": "창:pcPush",
    "layer": "Controller",
@@ -22207,7 +22140,7 @@
    "file": "src/main/0360-sync/030-github.js",
    "module": "src/main/0360-sync/",
    "line": 14,
-   "www": 11815,
+   "www": 11818,
    "prompts": [],
    "place": "창:syPush",
    "layer": "Controller",
@@ -22218,7 +22151,7 @@
    "file": "src/main/0360-sync/030-github.js",
    "module": "src/main/0360-sync/",
    "line": 56,
-   "www": 11857,
+   "www": 11860,
    "prompts": [],
    "place": "창:syCheckOnStart",
    "layer": "View",
@@ -22229,7 +22162,7 @@
    "file": "src/main/0360-sync/040-boot.js",
    "module": "src/main/0360-sync/",
    "line": 2,
-   "www": 11888,
+   "www": 11891,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -22240,7 +22173,7 @@
    "file": "src/main/0360-sync/040-boot.js",
    "module": "src/main/0360-sync/",
    "line": 49,
-   "www": 11935,
+   "www": 11938,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22251,7 +22184,7 @@
    "file": "src/main/0360-sync/050-single-device.js",
    "module": "src/main/0360-sync/",
    "line": 23,
-   "www": 11960,
+   "www": 11963,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22262,7 +22195,7 @@
    "file": "src/main/0370-game-picker.js",
    "module": "src/main/0370-game-picker.js",
    "line": 3,
-   "www": 12003,
+   "www": 12006,
    "prompts": [],
    "place": "studio.img",
    "layer": "View",
@@ -22273,7 +22206,7 @@
    "file": "src/main/0370-game-picker.js",
    "module": "src/main/0370-game-picker.js",
    "line": 11,
-   "www": 12011,
+   "www": 12014,
    "prompts": [],
    "place": "studio.img",
    "layer": "View",
@@ -22284,7 +22217,7 @@
    "file": "src/main/0370-game-picker.js",
    "module": "src/main/0370-game-picker.js",
    "line": 25,
-   "www": 12025,
+   "www": 12028,
    "prompts": [],
    "place": "studio.img",
    "layer": "Model",
@@ -22295,7 +22228,7 @@
    "file": "src/main/0370-game-picker.js",
    "module": "src/main/0370-game-picker.js",
    "line": 27,
-   "www": 12027,
+   "www": 12030,
    "prompts": [],
    "place": "studio.img",
    "layer": "View",
@@ -22306,7 +22239,7 @@
    "file": "src/main/0370-game-picker.js",
    "module": "src/main/0370-game-picker.js",
    "line": 42,
-   "www": 12042,
+   "www": 12045,
    "prompts": [],
    "place": "studio.img",
    "layer": "Model",
@@ -22317,7 +22250,7 @@
    "file": "src/main/0400-publish-subscribe.js",
    "module": "src/main/0400-publish-subscribe.js",
    "line": 7,
-   "www": 12052,
+   "www": 12055,
    "prompts": [],
    "place": "창:openPub",
    "layer": "Model",
@@ -22328,7 +22261,7 @@
    "file": "src/main/0400-publish-subscribe.js",
    "module": "src/main/0400-publish-subscribe.js",
    "line": 18,
-   "www": 12063,
+   "www": 12066,
    "prompts": [],
    "place": "창:openPub",
    "layer": "Model",
@@ -22339,7 +22272,7 @@
    "file": "src/main/0400-publish-subscribe.js",
    "module": "src/main/0400-publish-subscribe.js",
    "line": 28,
-   "www": 12073,
+   "www": 12076,
    "prompts": [],
    "place": "창:openPub",
    "layer": "View",
@@ -22350,7 +22283,7 @@
    "file": "src/main/0400-publish-subscribe.js",
    "module": "src/main/0400-publish-subscribe.js",
    "line": 33,
-   "www": 12078,
+   "www": 12081,
    "prompts": [],
    "place": "창:openPub",
    "layer": "Controller",
@@ -22361,7 +22294,7 @@
    "file": "src/main/0400-publish-subscribe.js",
    "module": "src/main/0400-publish-subscribe.js",
    "line": 55,
-   "www": 12100,
+   "www": 12103,
    "prompts": [],
    "place": "창:openPub",
    "layer": "View",
@@ -22372,28 +22305,18 @@
    "file": "src/main/0400-publish-subscribe.js",
    "module": "src/main/0400-publish-subscribe.js",
    "line": 78,
-   "www": 12123,
+   "www": 12126,
    "prompts": [],
    "place": "창:openSubAdd",
-   "layer": "섞임",
-   "feat": "F06",
-   "mix": {
-    "view": [
-     79,
-     88
-    ],
-    "model": [
-     85
-    ],
-    "kind": "작업+진행 표시"
-   }
+   "layer": "Controller",
+   "feat": "F06"
   },
   "subCheck": {
    "name": "subCheck",
    "file": "src/main/0400-publish-subscribe.js",
    "module": "src/main/0400-publish-subscribe.js",
    "line": 91,
-   "www": 12136,
+   "www": 12139,
    "prompts": [],
    "place": "창:subCheck",
    "layer": "View",
@@ -22404,29 +22327,18 @@
    "file": "src/main/0400-publish-subscribe.js",
    "module": "src/main/0400-publish-subscribe.js",
    "line": 101,
-   "www": 12146,
+   "www": 12149,
    "prompts": [],
    "place": "창:subCheck",
-   "layer": "섞임",
-   "feat": "F06",
-   "mix": {
-    "view": [
-     101,
-     109
-    ],
-    "model": [
-     103,
-     107
-    ],
-    "kind": "작업+진행 표시"
-   }
+   "layer": "Controller",
+   "feat": "F06"
   },
   "applyDesk": {
    "name": "applyDesk",
    "file": "src/main/0410-desktop.js",
    "module": "src/main/0410-desktop.js",
    "line": 8,
-   "www": 12163,
+   "www": 12166,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "View",
@@ -22437,7 +22349,7 @@
    "file": "src/main/0420-app-update.js",
    "module": "src/main/0420-app-update.js",
    "line": 60,
-   "www": 12262,
+   "www": 12265,
    "prompts": [],
    "place": "창:checkUpdate",
    "layer": "Controller",
@@ -22448,7 +22360,7 @@
    "file": "src/main/0420-app-update.js",
    "module": "src/main/0420-app-update.js",
    "line": 142,
-   "www": 12344,
+   "www": 12347,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -22459,7 +22371,7 @@
    "file": "src/main/0420-app-update.js",
    "module": "src/main/0420-app-update.js",
    "line": 166,
-   "www": 12368,
+   "www": 12371,
    "prompts": [],
    "place": "창:openAiChapter",
    "layer": "View",
@@ -22470,7 +22382,7 @@
    "file": "src/main/0440-ai-context.js",
    "module": "src/main/0440-ai-context.js",
    "line": 5,
-   "www": 12388,
+   "www": 12391,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22481,7 +22393,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 12,
-   "www": 12411,
+   "www": 12414,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22492,7 +22404,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 13,
-   "www": 12412,
+   "www": 12415,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22503,7 +22415,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 14,
-   "www": 12413,
+   "www": 12416,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22514,7 +22426,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 15,
-   "www": 12414,
+   "www": 12417,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22525,7 +22437,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 16,
-   "www": 12415,
+   "www": 12418,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22536,7 +22448,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 19,
-   "www": 12418,
+   "www": 12421,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22547,7 +22459,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 20,
-   "www": 12419,
+   "www": 12422,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22558,7 +22470,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 21,
-   "www": 12420,
+   "www": 12423,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22569,7 +22481,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 24,
-   "www": 12423,
+   "www": 12426,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22580,7 +22492,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 26,
-   "www": 12425,
+   "www": 12428,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22591,7 +22503,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 30,
-   "www": 12429,
+   "www": 12432,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22602,7 +22514,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 39,
-   "www": 12438,
+   "www": 12441,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -22621,7 +22533,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 44,
-   "www": 12443,
+   "www": 12446,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -22639,7 +22551,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 54,
-   "www": 12453,
+   "www": 12456,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22650,7 +22562,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 56,
-   "www": 12455,
+   "www": 12458,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22661,7 +22573,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 61,
-   "www": 12460,
+   "www": 12463,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "View",
@@ -22672,7 +22584,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 79,
-   "www": 12478,
+   "www": 12481,
    "prompts": [],
    "place": "studio.game.8",
    "layer": "Model",
@@ -22683,7 +22595,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 96,
-   "www": 12495,
+   "www": 12498,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22694,7 +22606,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 98,
-   "www": 12497,
+   "www": 12500,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -22705,7 +22617,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 106,
-   "www": 12505,
+   "www": 12508,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -22716,7 +22628,7 @@
    "file": "src/main/0445-factions.js",
    "module": "src/main/0445-factions.js",
    "line": 109,
-   "www": 12508,
+   "www": 12511,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22727,7 +22639,7 @@
    "file": "src/main/0450-relations-memory.js",
    "module": "src/main/0450-relations-memory.js",
    "line": 4,
-   "www": 12512,
+   "www": 12515,
    "prompts": [],
    "place": "창:openRelEdit",
    "layer": "Model",
@@ -22738,7 +22650,7 @@
    "file": "src/main/0450-relations-memory.js",
    "module": "src/main/0450-relations-memory.js",
    "line": 5,
-   "www": 12513,
+   "www": 12516,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -22749,7 +22661,7 @@
    "file": "src/main/0450-relations-memory.js",
    "module": "src/main/0450-relations-memory.js",
    "line": 10,
-   "www": 12518,
+   "www": 12521,
    "prompts": [],
    "place": "메뉴:공용",
    "layer": "Model",
@@ -22760,7 +22672,7 @@
    "file": "src/main/0450-relations-memory.js",
    "module": "src/main/0450-relations-memory.js",
    "line": 12,
-   "www": 12520,
+   "www": 12523,
    "prompts": [],
    "place": "창:openChEdit",
    "layer": "Model",
@@ -22771,7 +22683,7 @@
    "file": "src/main/0450-relations-memory.js",
    "module": "src/main/0450-relations-memory.js",
    "line": 22,
-   "www": 12530,
+   "www": 12533,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22782,7 +22694,7 @@
    "file": "src/main/0450-relations-memory.js",
    "module": "src/main/0450-relations-memory.js",
    "line": 31,
-   "www": 12539,
+   "www": 12542,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22793,7 +22705,7 @@
    "file": "src/main/0450-relations-memory.js",
    "module": "src/main/0450-relations-memory.js",
    "line": 36,
-   "www": 12544,
+   "www": 12547,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22804,7 +22716,7 @@
    "file": "src/main/0450-relations-memory.js",
    "module": "src/main/0450-relations-memory.js",
    "line": 40,
-   "www": 12548,
+   "www": 12551,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -22815,7 +22727,7 @@
    "file": "src/main/0450-relations-memory.js",
    "module": "src/main/0450-relations-memory.js",
    "line": 43,
-   "www": 12551,
+   "www": 12554,
    "prompts": [],
    "place": "창:openRelEdit",
    "layer": "Model",
@@ -22826,7 +22738,7 @@
    "file": "src/main/0450-relations-memory.js",
    "module": "src/main/0450-relations-memory.js",
    "line": 51,
-   "www": 12559,
+   "www": 12562,
    "prompts": [],
    "place": "창:openRelEdit",
    "layer": "View",
@@ -22837,7 +22749,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 11,
-   "www": 12589,
+   "www": 12592,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22848,7 +22760,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 15,
-   "www": 12593,
+   "www": 12596,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -22859,7 +22771,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 18,
-   "www": 12596,
+   "www": 12599,
    "prompts": [],
    "place": "studio.game.7",
    "layer": "Model",
@@ -22870,7 +22782,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 36,
-   "www": 12614,
+   "www": 12617,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -22890,7 +22802,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 47,
-   "www": 12625,
+   "www": 12628,
    "prompts": [
     "AFF_TALK",
     "CTX_ALT_CANON",
@@ -22909,7 +22821,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 55,
-   "www": 12633,
+   "www": 12636,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -22920,7 +22832,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 56,
-   "www": 12634,
+   "www": 12637,
    "prompts": [],
    "place": "창:openChar",
    "layer": "Model",
@@ -22931,7 +22843,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 57,
-   "www": 12635,
+   "www": 12638,
    "prompts": [],
    "place": "공용",
    "layer": "Controller",
@@ -22942,7 +22854,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 60,
-   "www": 12638,
+   "www": 12641,
    "prompts": [],
    "place": "창:openChar",
    "layer": "View",
@@ -22953,7 +22865,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 73,
-   "www": 12651,
+   "www": 12654,
    "prompts": [],
    "place": "창:openPersona",
    "layer": "View",
@@ -22964,7 +22876,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 79,
-   "www": 12657,
+   "www": 12660,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -22975,7 +22887,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 81,
-   "www": 12659,
+   "www": 12662,
    "prompts": [],
    "place": "studio.game.7",
    "layer": "View",
@@ -22986,7 +22898,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 84,
-   "www": 12662,
+   "www": 12665,
    "prompts": [],
    "place": "studio.game.7",
    "layer": "View",
@@ -22997,7 +22909,7 @@
    "file": "src/main/0455-persona.js",
    "module": "src/main/0455-persona.js",
    "line": 98,
-   "www": 12676,
+   "www": 12679,
    "prompts": [],
    "place": "studio.game.7",
    "layer": "Model",
@@ -23008,7 +22920,7 @@
    "file": "src/main/0460-script-engine.js",
    "module": "src/main/0460-script-engine.js",
    "line": 29,
-   "www": 12721,
+   "www": 12724,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23019,7 +22931,7 @@
    "file": "src/main/0460-script-engine.js",
    "module": "src/main/0460-script-engine.js",
    "line": 30,
-   "www": 12722,
+   "www": 12725,
    "prompts": [],
    "place": "메뉴:공용",
    "layer": "Model",
@@ -23030,7 +22942,7 @@
    "file": "src/main/0460-script-engine.js",
    "module": "src/main/0460-script-engine.js",
    "line": 33,
-   "www": 12725,
+   "www": 12728,
    "prompts": [],
    "place": "공용",
    "layer": "View",
@@ -23041,7 +22953,7 @@
    "file": "src/main/0462-direction.js",
    "module": "src/main/0462-direction.js",
    "line": 30,
-   "www": 12833,
+   "www": 12836,
    "prompts": [],
    "place": "studio.game.10",
    "layer": "View",
@@ -23052,7 +22964,7 @@
    "file": "src/main/0462-direction.js",
    "module": "src/main/0462-direction.js",
    "line": 35,
-   "www": 12838,
+   "www": 12841,
    "prompts": [],
    "place": "lobby",
    "layer": "Model",
@@ -23063,7 +22975,7 @@
    "file": "src/main/0462-direction.js",
    "module": "src/main/0462-direction.js",
    "line": 37,
-   "www": 12840,
+   "www": 12843,
    "prompts": [],
    "place": "공용",
    "layer": "View",
@@ -23074,7 +22986,7 @@
    "file": "src/main/0465-story-plan.js",
    "module": "src/main/0465-story-plan.js",
    "line": 6,
-   "www": 12872,
+   "www": 12875,
    "prompts": [],
    "place": "studio.game.9",
    "layer": "Model",
@@ -23085,7 +22997,7 @@
    "file": "src/main/0465-story-plan.js",
    "module": "src/main/0465-story-plan.js",
    "line": 7,
-   "www": 12873,
+   "www": 12876,
    "prompts": [],
    "place": "studio.game.9",
    "layer": "Model",
@@ -23096,7 +23008,7 @@
    "file": "src/main/0465-story-plan.js",
    "module": "src/main/0465-story-plan.js",
    "line": 9,
-   "www": 12875,
+   "www": 12878,
    "prompts": [],
    "place": "공용",
    "layer": "Controller",
@@ -23107,7 +23019,7 @@
    "file": "src/main/0465-story-plan.js",
    "module": "src/main/0465-story-plan.js",
    "line": 11,
-   "www": 12877,
+   "www": 12880,
    "prompts": [],
    "place": "studio.game.9",
    "layer": "Model",
@@ -23118,7 +23030,7 @@
    "file": "src/main/0465-story-plan.js",
    "module": "src/main/0465-story-plan.js",
    "line": 18,
-   "www": 12884,
+   "www": 12887,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -23137,7 +23049,7 @@
    "file": "src/main/0465-story-plan.js",
    "module": "src/main/0465-story-plan.js",
    "line": 31,
-   "www": 12897,
+   "www": 12900,
    "prompts": [],
    "place": "studio.game.9",
    "layer": "View",
@@ -23148,7 +23060,7 @@
    "file": "src/main/0465-story-plan.js",
    "module": "src/main/0465-story-plan.js",
    "line": 32,
-   "www": 12898,
+   "www": 12901,
    "prompts": [],
    "place": "studio.game.9",
    "layer": "View",
@@ -23159,7 +23071,7 @@
    "file": "src/main/0470-title-opening.js",
    "module": "src/main/0470-title-opening.js",
    "line": 11,
-   "www": 12938,
+   "www": 12941,
    "prompts": [],
    "place": "studio.view.1",
    "layer": "View",
@@ -23170,7 +23082,7 @@
    "file": "src/main/0470-title-opening.js",
    "module": "src/main/0470-title-opening.js",
    "line": 17,
-   "www": 12944,
+   "www": 12947,
    "prompts": [],
    "place": "studio.view.1",
    "layer": "Model",
@@ -23181,7 +23093,7 @@
    "file": "src/main/0470-title-opening.js",
    "module": "src/main/0470-title-opening.js",
    "line": 18,
-   "www": 12945,
+   "www": 12948,
    "prompts": [],
    "place": "studio.view.1",
    "layer": "View",
@@ -23192,7 +23104,7 @@
    "file": "src/main/0470-title-opening.js",
    "module": "src/main/0470-title-opening.js",
    "line": 28,
-   "www": 12955,
+   "www": 12958,
    "prompts": [],
    "place": "studio.view.1",
    "layer": "View",
@@ -23203,7 +23115,7 @@
    "file": "src/main/0470-title-opening.js",
    "module": "src/main/0470-title-opening.js",
    "line": 40,
-   "www": 12967,
+   "www": 12970,
    "prompts": [],
    "place": "창:opEnd",
    "layer": "View",
@@ -23214,7 +23126,7 @@
    "file": "src/main/0470-title-opening.js",
    "module": "src/main/0470-title-opening.js",
    "line": 48,
-   "www": 12975,
+   "www": 12978,
    "prompts": [],
    "place": "창:opEnd",
    "layer": "Controller",
@@ -23225,7 +23137,7 @@
    "file": "src/main/0480-battle.js",
    "module": "src/main/0480-battle.js",
    "line": 5,
-   "www": 12991,
+   "www": 12994,
    "prompts": [],
    "place": "창:openStoryStage",
    "layer": "Model",
@@ -23236,7 +23148,7 @@
    "file": "src/main/0480-battle.js",
    "module": "src/main/0480-battle.js",
    "line": 7,
-   "www": 12993,
+   "www": 12996,
    "prompts": [],
    "place": "창:openStoryStage",
    "layer": "View",
@@ -23247,7 +23159,7 @@
    "file": "src/main/0480-battle.js",
    "module": "src/main/0480-battle.js",
    "line": 12,
-   "www": 12998,
+   "www": 13001,
    "prompts": [],
    "place": "창:openStoryStage",
    "layer": "Controller",
@@ -23258,7 +23170,7 @@
    "file": "src/main/0480-battle.js",
    "module": "src/main/0480-battle.js",
    "line": 15,
-   "www": 13001,
+   "www": 13004,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -23269,7 +23181,7 @@
    "file": "src/main/0480-battle.js",
    "module": "src/main/0480-battle.js",
    "line": 21,
-   "www": 13007,
+   "www": 13010,
    "prompts": [],
    "place": "공용",
    "layer": "View",
@@ -23280,7 +23192,7 @@
    "file": "src/main/0480-battle.js",
    "module": "src/main/0480-battle.js",
    "line": 64,
-   "www": 13050,
+   "www": 13053,
    "prompts": [],
    "place": "창:openChar",
    "layer": "View",
@@ -23291,7 +23203,7 @@
    "file": "src/main/0480-battle.js",
    "module": "src/main/0480-battle.js",
    "line": 103,
-   "www": 13089,
+   "www": 13092,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23302,7 +23214,7 @@
    "file": "src/main/0485-battle-rules.js",
    "module": "src/main/0485-battle-rules.js",
    "line": 25,
-   "www": 13140,
+   "www": 13143,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -23313,7 +23225,7 @@
    "file": "src/main/0485-battle-rules.js",
    "module": "src/main/0485-battle-rules.js",
    "line": 32,
-   "www": 13147,
+   "www": 13150,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -23324,7 +23236,7 @@
    "file": "src/main/0485-battle-rules.js",
    "module": "src/main/0485-battle-rules.js",
    "line": 38,
-   "www": 13153,
+   "www": 13156,
    "prompts": [],
    "place": "창:openFormation",
    "layer": "View",
@@ -23335,7 +23247,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 12,
-   "www": 13170,
+   "www": 13173,
    "prompts": [],
    "place": "메뉴:공용",
    "layer": "Model",
@@ -23346,7 +23258,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 13,
-   "www": 13171,
+   "www": 13174,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23357,7 +23269,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 14,
-   "www": 13172,
+   "www": 13175,
    "prompts": [],
    "place": "studio.game.5",
    "layer": "Model",
@@ -23368,7 +23280,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 20,
-   "www": 13178,
+   "www": 13181,
    "prompts": [],
    "place": "창:sortieMap",
    "layer": "Model",
@@ -23379,7 +23291,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 28,
-   "www": 13186,
+   "www": 13189,
    "prompts": [],
    "place": "창:sortieMap",
    "layer": "Model",
@@ -23390,7 +23302,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 31,
-   "www": 13189,
+   "www": 13192,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23401,7 +23313,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 32,
-   "www": 13190,
+   "www": 13193,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -23412,7 +23324,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 36,
-   "www": 13194,
+   "www": 13197,
    "prompts": [],
    "place": "창:sortieMap",
    "layer": "Model",
@@ -23423,7 +23335,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 37,
-   "www": 13195,
+   "www": 13198,
    "prompts": [],
    "place": "창:sortieMap",
    "layer": "View",
@@ -23434,7 +23346,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 44,
-   "www": 13202,
+   "www": 13205,
    "prompts": [],
    "place": "창:sortieMap",
    "layer": "View",
@@ -23445,7 +23357,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 55,
-   "www": 13213,
+   "www": 13216,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23456,7 +23368,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 61,
-   "www": 13219,
+   "www": 13222,
    "prompts": [],
    "place": "창:sortieMap",
    "layer": "Model",
@@ -23467,7 +23379,7 @@
    "file": "src/main/0487-formation-sortie.js",
    "module": "src/main/0487-formation-sortie.js",
    "line": 66,
-   "www": 13224,
+   "www": 13227,
    "prompts": [],
    "place": "studio.game.5",
    "layer": "View",
@@ -23478,7 +23390,7 @@
    "file": "src/main/0488-stage-modes.js",
    "module": "src/main/0488-stage-modes.js",
    "line": 19,
-   "www": 13250,
+   "www": 13253,
    "prompts": [],
    "place": "studio.game.5",
    "layer": "Model",
@@ -23489,7 +23401,7 @@
    "file": "src/main/0488-stage-modes.js",
    "module": "src/main/0488-stage-modes.js",
    "line": 32,
-   "www": 13263,
+   "www": 13266,
    "prompts": [],
    "place": "ops",
    "layer": "Model",
@@ -23500,7 +23412,7 @@
    "file": "src/main/0488-stage-modes.js",
    "module": "src/main/0488-stage-modes.js",
    "line": 36,
-   "www": 13267,
+   "www": 13270,
    "prompts": [],
    "place": "창:openModeStage",
    "layer": "View",
@@ -23511,7 +23423,7 @@
    "file": "src/main/0488-stage-modes.js",
    "module": "src/main/0488-stage-modes.js",
    "line": 42,
-   "www": 13273,
+   "www": 13276,
    "prompts": [],
    "place": "창:openModeStage",
    "layer": "Controller",
@@ -23522,7 +23434,7 @@
    "file": "src/main/0488-stage-modes.js",
    "module": "src/main/0488-stage-modes.js",
    "line": 48,
-   "www": 13279,
+   "www": 13282,
    "prompts": [],
    "place": "창:openModeStage",
    "layer": "View",
@@ -23533,7 +23445,7 @@
    "file": "src/main/0488-stage-modes.js",
    "module": "src/main/0488-stage-modes.js",
    "line": 60,
-   "www": 13291,
+   "www": 13294,
    "prompts": [],
    "place": "창:openModeStage",
    "layer": "Controller",
@@ -23544,7 +23456,7 @@
    "file": "src/main/0490-boss-patterns.js",
    "module": "src/main/0490-boss-patterns.js",
    "line": 13,
-   "www": 13331,
+   "www": 13334,
    "prompts": [],
    "place": "farm",
    "layer": "Model",
@@ -23555,7 +23467,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 10,
-   "www": 13352,
+   "www": 13355,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23566,7 +23478,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 11,
-   "www": 13353,
+   "www": 13356,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23577,7 +23489,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 12,
-   "www": 13354,
+   "www": 13357,
    "prompts": [],
    "place": "contract",
    "layer": "Model",
@@ -23588,7 +23500,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 13,
-   "www": 13355,
+   "www": 13358,
    "prompts": [],
    "place": "창:openModeStage",
    "layer": "Controller",
@@ -23599,7 +23511,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 17,
-   "www": 13359,
+   "www": 13362,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23610,7 +23522,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 18,
-   "www": 13360,
+   "www": 13363,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23621,7 +23533,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 33,
-   "www": 13375,
+   "www": 13378,
    "prompts": [],
    "place": "contract",
    "layer": "Model",
@@ -23632,7 +23544,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 34,
-   "www": 13376,
+   "www": 13379,
    "prompts": [],
    "place": "contract",
    "layer": "Model",
@@ -23643,7 +23555,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 37,
-   "www": 13379,
+   "www": 13382,
    "prompts": [],
    "place": "contract",
    "layer": "Model",
@@ -23654,7 +23566,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 38,
-   "www": 13380,
+   "www": 13383,
    "prompts": [],
    "place": "contract",
    "layer": "Model",
@@ -23665,7 +23577,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 40,
-   "www": 13382,
+   "www": 13385,
    "prompts": [],
    "place": "배경.실행 중 AI",
    "layer": "Model",
@@ -23676,7 +23588,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 43,
-   "www": 13385,
+   "www": 13388,
    "prompts": [],
    "place": "contract",
    "layer": "Model",
@@ -23687,7 +23599,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 64,
-   "www": 13406,
+   "www": 13409,
    "prompts": [],
    "place": "construct",
    "layer": "Model",
@@ -23698,7 +23610,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 72,
-   "www": 13414,
+   "www": 13417,
    "prompts": [],
    "place": "contract",
    "layer": "View",
@@ -23709,7 +23621,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 79,
-   "www": 13421,
+   "www": 13424,
    "prompts": [],
    "place": "contract",
    "layer": "View",
@@ -23720,7 +23632,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 84,
-   "www": 13426,
+   "www": 13429,
    "prompts": [],
    "place": "contract",
    "layer": "Controller",
@@ -23731,7 +23643,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 93,
-   "www": 13435,
+   "www": 13438,
    "prompts": [],
    "place": "메뉴:contract",
    "layer": "View",
@@ -23742,7 +23654,7 @@
    "file": "src/main/0500-gacha.js",
    "module": "src/main/0500-gacha.js",
    "line": 120,
-   "www": 13462,
+   "www": 13465,
    "prompts": [],
    "place": "메뉴:contract",
    "layer": "View",
@@ -23753,7 +23665,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 5,
-   "www": 13480,
+   "www": 13483,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -23764,7 +23676,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 9,
-   "www": 13484,
+   "www": 13487,
    "prompts": [],
    "place": "studio.game.1",
    "layer": "Model",
@@ -23775,7 +23687,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 12,
-   "www": 13487,
+   "www": 13490,
    "prompts": [],
    "place": "배경.새 게임 생성",
    "layer": "Model",
@@ -23786,7 +23698,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 13,
-   "www": 13488,
+   "www": 13491,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23797,7 +23709,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 15,
-   "www": 13490,
+   "www": 13493,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23808,7 +23720,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 21,
-   "www": 13496,
+   "www": 13499,
    "prompts": [],
    "place": "construct",
    "layer": "View",
@@ -23819,7 +23731,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 27,
-   "www": 13502,
+   "www": 13505,
    "prompts": [],
    "place": "construct",
    "layer": "Model",
@@ -23830,7 +23742,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 28,
-   "www": 13503,
+   "www": 13506,
    "prompts": [],
    "place": "공용",
    "layer": "Model",
@@ -23841,7 +23753,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 30,
-   "www": 13505,
+   "www": 13508,
    "prompts": [],
    "place": "construct",
    "layer": "Model",
@@ -23852,7 +23764,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 32,
-   "www": 13507,
+   "www": 13510,
    "prompts": [],
    "place": "construct",
    "layer": "Model",
@@ -23863,7 +23775,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 47,
-   "www": 13522,
+   "www": 13525,
    "prompts": [],
    "place": "construct",
    "layer": "Model",
@@ -23874,7 +23786,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 52,
-   "www": 13527,
+   "www": 13530,
    "prompts": [],
    "place": "construct",
    "layer": "Controller",
@@ -23885,7 +23797,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 79,
-   "www": 13554,
+   "www": 13557,
    "prompts": [],
    "place": "construct",
    "layer": "Controller",
@@ -23896,7 +23808,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 82,
-   "www": 13557,
+   "www": 13560,
    "prompts": [],
    "place": "construct",
    "layer": "View",
@@ -23907,7 +23819,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 91,
-   "www": 13566,
+   "www": 13569,
    "prompts": [],
    "place": "construct",
    "layer": "View",
@@ -23918,7 +23830,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 110,
-   "www": 13585,
+   "www": 13588,
    "prompts": [],
    "place": "studio.game.1",
    "layer": "View",
@@ -23929,7 +23841,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 128,
-   "www": 13603,
+   "www": 13606,
    "prompts": [],
    "place": "studio.game.1",
    "layer": "View",
@@ -23940,7 +23852,7 @@
    "file": "src/main/0505-construct.js",
    "module": "src/main/0505-construct.js",
    "line": 141,
-   "www": 13616,
+   "www": 13619,
    "prompts": [],
    "place": "studio.game.1",
    "layer": "Controller",
@@ -23951,7 +23863,7 @@
    "file": "src/main/0510-actions/010-setup.js",
    "module": "src/main/0510-actions/",
    "line": 4,
-   "www": 13636,
+   "www": 13639,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -23962,7 +23874,7 @@
    "file": "src/main/0510-actions/020-navigation-and-tools.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 13666,
+   "www": 13669,
    "prompts": [
     "BGM_PROMPT",
     "CG_ART",
@@ -23988,7 +23900,7 @@
    "file": "src/main/0510-actions/030-mail.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 13847,
+   "www": 13850,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -23999,7 +23911,7 @@
    "file": "src/main/0510-actions/040-story-and-authoring.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 13858,
+   "www": 13861,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -24029,7 +23941,7 @@
    "file": "src/main/0510-actions/050-settings-and-audio.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 14024,
+   "www": 14027,
    "prompts": [
     "VOICE_PICK",
     "VOICE_SEARCH"
@@ -24043,7 +23955,7 @@
    "file": "src/main/0510-actions/060-storage-and-sharing.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 14107,
+   "www": 14110,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -24054,7 +23966,7 @@
    "file": "src/main/0510-actions/060-storage-and-sharing.js",
    "module": "src/main/0510-actions/",
    "line": 60,
-   "www": 14166,
+   "www": 14169,
    "prompts": [],
    "place": "창:openProjects",
    "layer": "Model",
@@ -24065,7 +23977,7 @@
    "file": "src/main/0510-actions/070-combat-and-formation.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 14173,
+   "www": 14176,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -24076,7 +23988,7 @@
    "file": "src/main/0510-actions/080-updates.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 14234,
+   "www": 14237,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -24087,7 +23999,7 @@
    "file": "src/main/0510-actions/090-characters.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 14255,
+   "www": 14258,
    "prompts": [
     "CHAR_LINES",
     "CHAR_LINES_MORE",
@@ -24110,7 +24022,7 @@
    "file": "src/main/0510-actions/100-images-and-assets.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 14301,
+   "www": 14304,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -24130,7 +24042,7 @@
    "file": "src/main/0510-actions/100-images-and-assets.js",
    "module": "src/main/0510-actions/",
    "line": 158,
-   "www": 14458,
+   "www": 14461,
    "prompts": [],
    "place": "공용",
    "layer": "View",
@@ -24141,7 +24053,7 @@
    "file": "src/main/0510-actions/110-economy.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 14466,
+   "www": 14469,
    "prompts": [
     "SHOP_LINES"
    ],
@@ -24154,7 +24066,7 @@
    "file": "src/main/0510-actions/120-messenger.js",
    "module": "src/main/0510-actions/",
    "line": 1,
-   "www": 14508,
+   "www": 14511,
    "prompts": [
     "CTX_ALT_CANON",
     "CTX_ALT_SIDE",
@@ -24173,7 +24085,7 @@
    "file": "src/main/0520-backup-storage.js",
    "module": "src/main/0520-backup-storage.js",
    "line": 6,
-   "www": 14586,
+   "www": 14589,
    "prompts": [],
    "place": "창:backupExport",
    "layer": "Model",
@@ -24184,7 +24096,7 @@
    "file": "src/main/0520-backup-storage.js",
    "module": "src/main/0520-backup-storage.js",
    "line": 9,
-   "www": 14589,
+   "www": 14592,
    "prompts": [],
    "place": "메뉴:studio",
    "layer": "Model",
@@ -24195,7 +24107,7 @@
    "file": "src/main/0520-backup-storage.js",
    "module": "src/main/0520-backup-storage.js",
    "line": 77,
-   "www": 14657,
+   "www": 14660,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -24206,7 +24118,7 @@
    "file": "src/main/0520-backup-storage.js",
    "module": "src/main/0520-backup-storage.js",
    "line": 96,
-   "www": 14676,
+   "www": 14679,
    "prompts": [],
    "place": "창:openShare",
    "layer": "Model",
@@ -24217,7 +24129,7 @@
    "file": "src/main/0520-backup-storage.js",
    "module": "src/main/0520-backup-storage.js",
    "line": 130,
-   "www": 14710,
+   "www": 14713,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -24228,7 +24140,7 @@
    "file": "src/main/0530-story-memory.js",
    "module": "src/main/0530-story-memory.js",
    "line": 5,
-   "www": 14859,
+   "www": 14862,
    "prompts": [],
    "place": "창:openStoryMemory",
    "layer": "Model",
@@ -24239,7 +24151,7 @@
    "file": "src/main/0530-story-memory.js",
    "module": "src/main/0530-story-memory.js",
    "line": 6,
-   "www": 14860,
+   "www": 14863,
    "prompts": [],
    "place": "창:openStoryMemory",
    "layer": "Model",
@@ -24250,7 +24162,7 @@
    "file": "src/main/0530-story-memory.js",
    "module": "src/main/0530-story-memory.js",
    "line": 9,
-   "www": 14863,
+   "www": 14866,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -24261,7 +24173,7 @@
    "file": "src/main/0530-story-memory.js",
    "module": "src/main/0530-story-memory.js",
    "line": 10,
-   "www": 14864,
+   "www": 14867,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Model",
@@ -24272,7 +24184,7 @@
    "file": "src/main/0530-story-memory.js",
    "module": "src/main/0530-story-memory.js",
    "line": 11,
-   "www": 14865,
+   "www": 14868,
    "prompts": [],
    "place": "창:smRebuild",
    "layer": "Model",
@@ -24283,7 +24195,7 @@
    "file": "src/main/0530-story-memory.js",
    "module": "src/main/0530-story-memory.js",
    "line": 17,
-   "www": 14871,
+   "www": 14874,
    "prompts": [
     "SM_WRAPUP"
    ],
@@ -24296,7 +24208,7 @@
    "file": "src/main/0530-story-memory.js",
    "module": "src/main/0530-story-memory.js",
    "line": 19,
-   "www": 14873,
+   "www": 14876,
    "prompts": [],
    "place": "창:openStoryMemory",
    "layer": "View",
@@ -24307,7 +24219,7 @@
    "file": "src/main/0530-story-memory.js",
    "module": "src/main/0530-story-memory.js",
    "line": 21,
-   "www": 14875,
+   "www": 14878,
    "prompts": [],
    "place": "창:smRebuild",
    "layer": "View",
@@ -24318,7 +24230,7 @@
    "file": "src/main/0530-story-memory.js",
    "module": "src/main/0530-story-memory.js",
    "line": 22,
-   "www": 14876,
+   "www": 14879,
    "prompts": [],
    "place": "창:smRebuild",
    "layer": "View",
@@ -24329,7 +24241,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 50,
-   "www": 14947,
+   "www": 14950,
    "prompts": [],
    "place": "studio.game.3",
    "layer": "Model",
@@ -24340,7 +24252,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 51,
-   "www": 14948,
+   "www": 14951,
    "prompts": [],
    "place": "studio.game.3",
    "layer": "Model",
@@ -24351,7 +24263,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 57,
-   "www": 14954,
+   "www": 14957,
    "prompts": [],
    "place": "메뉴:studio",
    "layer": "Controller",
@@ -24362,7 +24274,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 58,
-   "www": 14955,
+   "www": 14958,
    "prompts": [],
    "place": "studio.game.3",
    "layer": "Model",
@@ -24373,7 +24285,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 71,
-   "www": 14968,
+   "www": 14971,
    "prompts": [
     "AUDIT_STAGE",
     "CTX_ALT_CANON",
@@ -24392,7 +24304,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 109,
-   "www": 15006,
+   "www": 15009,
    "prompts": [],
    "place": "studio.game.3",
    "layer": "View",
@@ -24403,7 +24315,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 121,
-   "www": 15018,
+   "www": 15021,
    "prompts": [],
    "place": "studio.game.3",
    "layer": "Controller",
@@ -24414,7 +24326,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 125,
-   "www": 15022,
+   "www": 15025,
    "prompts": [],
    "place": "studio.game.3",
    "layer": "View",
@@ -24425,7 +24337,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 127,
-   "www": 15024,
+   "www": 15027,
    "prompts": [],
    "place": "닿지 않음",
    "layer": "Controller",
@@ -24436,7 +24348,7 @@
    "file": "src/main/0565-asset-library.js",
    "module": "src/main/0565-asset-library.js",
    "line": 13,
-   "www": 15120,
+   "www": 15123,
    "prompts": [],
    "place": "studio.game.10",
    "layer": "Model",
@@ -24447,7 +24359,7 @@
    "file": "src/main/0565-asset-library.js",
    "module": "src/main/0565-asset-library.js",
    "line": 15,
-   "www": 15122,
+   "www": 15125,
    "prompts": [],
    "place": "studio.game.10",
    "layer": "Model",
@@ -24458,7 +24370,7 @@
    "file": "src/main/0565-asset-library.js",
    "module": "src/main/0565-asset-library.js",
    "line": 18,
-   "www": 15125,
+   "www": 15128,
    "prompts": [],
    "place": "studio.game.10",
    "layer": "Model",
@@ -24469,7 +24381,7 @@
    "file": "src/main/0565-asset-library.js",
    "module": "src/main/0565-asset-library.js",
    "line": 23,
-   "www": 15130,
+   "www": 15133,
    "prompts": [],
    "place": "studio.game.10",
    "layer": "Model",
@@ -24480,7 +24392,7 @@
    "file": "src/main/0565-asset-library.js",
    "module": "src/main/0565-asset-library.js",
    "line": 26,
-   "www": 15133,
+   "www": 15136,
    "prompts": [],
    "place": "studio.game.10",
    "layer": "Model",
@@ -24491,7 +24403,7 @@
    "file": "src/main/0565-asset-library.js",
    "module": "src/main/0565-asset-library.js",
    "line": 30,
-   "www": 15137,
+   "www": 15140,
    "prompts": [],
    "place": "studio.game.10",
    "layer": "View",
@@ -24938,7 +24850,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 12,
-   "www": 14909,
+   "www": 14912,
    "prompts": []
   },
   "AUDIT_RULES.run": {
@@ -24946,7 +24858,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 12,
-   "www": 14909,
+   "www": 14912,
    "prompts": []
   },
   "AUDIT_RULES.ai": {
@@ -24954,7 +24866,7 @@
    "file": "src/main/0535-content-audit.js",
    "module": "src/main/0535-content-audit.js",
    "line": 12,
-   "www": 14909,
+   "www": 14912,
    "prompts": []
   }
  },
@@ -24996,8 +24908,8 @@
     {
      "file": "src/boot/storage-boot.js",
      "www": [
-      15228,
-      15262
+      15231,
+      15265
      ]
     }
    ],
@@ -25320,11 +25232,11 @@
      "file": "src/main/0060-util.js",
      "www": [
       7568,
-      7640
+      7643
      ]
     }
    ],
-   "fns": 36,
+   "fns": 37,
    "roles": {},
    "writes": [],
    "reads": 8,
@@ -25360,8 +25272,8 @@
     {
      "file": "src/main/0065-inherit.js",
      "www": [
-      7641,
-      7682
+      7644,
+      7685
      ]
     }
    ],
@@ -25391,8 +25303,8 @@
     {
      "file": "src/main/0070-save.js",
      "www": [
-      7683,
-      7847
+      7686,
+      7850
      ]
     }
    ],
@@ -25485,8 +25397,8 @@
     {
      "file": "src/main/0080-storage-integration.js",
      "www": [
-      7848,
-      8032
+      7851,
+      8035
      ]
     }
    ],
@@ -25529,8 +25441,8 @@
     {
      "file": "src/main/0090-growth.js",
      "www": [
-      8033,
-      8139
+      8036,
+      8142
      ]
     }
    ],
@@ -25586,8 +25498,8 @@
     {
      "file": "src/main/0100-messenger.js",
      "www": [
-      8140,
-      8323
+      8143,
+      8326
      ]
     }
    ],
@@ -25640,8 +25552,8 @@
     {
      "file": "src/main/0110-challenge-raid.js",
      "www": [
-      8324,
-      8347
+      8327,
+      8350
      ]
     }
    ],
@@ -25693,8 +25605,8 @@
     {
      "file": "src/main/0120-abyss.js",
      "www": [
-      8348,
-      8817
+      8351,
+      8820
      ]
     }
    ],
@@ -25748,8 +25660,8 @@
     {
      "file": "src/main/0125-tower.js",
      "www": [
-      8818,
-      8851
+      8821,
+      8854
      ]
     }
    ],
@@ -25801,8 +25713,8 @@
     {
      "file": "src/main/0130-gift.js",
      "www": [
-      8852,
-      8896
+      8855,
+      8899
      ]
     }
    ],
@@ -25855,8 +25767,8 @@
     {
      "file": "src/main/0135-schedule.js",
      "www": [
-      8897,
-      8932
+      8900,
+      8935
      ]
     }
    ],
@@ -25910,8 +25822,8 @@
     {
      "file": "src/main/0140-pickup-new.js",
      "www": [
-      8933,
-      8952
+      8936,
+      8955
      ]
     }
    ],
@@ -25939,8 +25851,8 @@
     {
      "file": "src/main/0150-pickup-existing.js",
      "www": [
-      8953,
-      8999
+      8956,
+      9002
      ]
     }
    ],
@@ -26008,8 +25920,8 @@
     {
      "file": "src/main/0160-player-profile.js",
      "www": [
-      9000,
-      9036
+      9003,
+      9039
      ]
     }
    ],
@@ -26067,8 +25979,8 @@
     {
      "file": "src/main/0170-render.js",
      "www": [
-      9037,
-      9045
+      9040,
+      9048
      ]
     }
    ],
@@ -26083,8 +25995,8 @@
     {
      "file": "src/main/0180-ui-scroll.js",
      "www": [
-      9046,
-      9498
+      9049,
+      9501
      ]
     }
    ],
@@ -26138,8 +26050,8 @@
     {
      "file": "src/main/0185-game-rules.js",
      "www": [
-      9499,
-      9649
+      9502,
+      9652
      ]
     }
    ],
@@ -26203,8 +26115,8 @@
     {
      "file": "src/main/0187-balance.js",
      "www": [
-      9650,
-      9707
+      9653,
+      9710
      ]
     }
    ],
@@ -26262,8 +26174,8 @@
     {
      "file": "src/main/0190-shop.js",
      "www": [
-      9708,
-      9806
+      9711,
+      9809
      ]
     }
    ],
@@ -26316,8 +26228,8 @@
     {
      "file": "src/main/0200-skin-shop.js",
      "www": [
-      9807,
-      9835
+      9810,
+      9838
      ]
     }
    ],
@@ -26365,8 +26277,8 @@
     {
      "file": "src/main/0210-setup.js",
      "www": [
-      9836,
-      9906
+      9839,
+      9909
      ]
     }
    ],
@@ -26414,8 +26326,8 @@
     {
      "file": "src/main/0220-mail.js",
      "www": [
-      9907,
-      9940
+      9910,
+      9943
      ]
     }
    ],
@@ -26462,8 +26374,8 @@
     {
      "file": "src/main/0230-modal.js",
      "www": [
-      9941,
-      10222
+      9944,
+      10225
      ]
     }
    ],
@@ -26539,8 +26451,8 @@
     {
      "file": "src/main/0240-growth-curve.js",
      "www": [
-      10223,
-      10425
+      10226,
+      10428
      ]
     }
    ],
@@ -26603,8 +26515,8 @@
     {
      "file": "src/main/0250-story-factory.js",
      "www": [
-      10426,
-      10651
+      10429,
+      10654
      ]
     }
    ],
@@ -26703,15 +26615,15 @@
     {
      "file": "src/main/0260-new-game/010-draft.js",
      "www": [
-      10652,
-      10823
+      10655,
+      10826
      ]
     },
     {
      "file": "src/main/0260-new-game/020-build.js",
      "www": [
-      10824,
-      11014
+      10827,
+      11017
      ]
     }
    ],
@@ -26839,8 +26751,8 @@
     {
      "file": "src/main/0270-skin-proposal.js",
      "www": [
-      11015,
-      11080
+      11018,
+      11083
      ]
     }
    ],
@@ -26888,8 +26800,8 @@
     {
      "file": "src/main/0274-dispatch.js",
      "www": [
-      11081,
-      11123
+      11084,
+      11126
      ]
     }
    ],
@@ -26942,8 +26854,8 @@
     {
      "file": "src/main/0275-expedition.js",
      "www": [
-      11124,
-      11212
+      11127,
+      11215
      ]
     }
    ],
@@ -26997,8 +26909,8 @@
     {
      "file": "src/main/0280-live-ops.js",
      "www": [
-      11213,
-      11249
+      11216,
+      11252
      ]
     }
    ],
@@ -27054,8 +26966,8 @@
     {
      "file": "src/main/0290-season-rotation.js",
      "www": [
-      11250,
-      11432
+      11253,
+      11435
      ]
     }
    ],
@@ -27127,8 +27039,8 @@
     {
      "file": "src/main/0300-codex.js",
      "www": [
-      11433,
-      11529
+      11436,
+      11532
      ]
     }
    ],
@@ -27185,8 +27097,8 @@
     {
      "file": "src/main/0310-art-after-ai.js",
      "www": [
-      11530,
-      11550
+      11533,
+      11553
      ]
     }
    ],
@@ -27218,8 +27130,8 @@
     {
      "file": "src/main/0330-casting.js",
      "www": [
-      11551,
-      11638
+      11554,
+      11641
      ]
     }
    ],
@@ -27275,8 +27187,8 @@
     {
      "file": "src/main/0335-github-api.js",
      "www": [
-      11639,
-      11681
+      11642,
+      11684
      ]
     }
    ],
@@ -27312,36 +27224,36 @@
     {
      "file": "src/main/0360-sync/010-common.js",
      "www": [
-      11682,
-      11722
+      11685,
+      11725
      ]
     },
     {
      "file": "src/main/0360-sync/020-pc-server.js",
      "www": [
-      11723,
-      11801
+      11726,
+      11804
      ]
     },
     {
      "file": "src/main/0360-sync/030-github.js",
      "www": [
-      11802,
-      11886
+      11805,
+      11889
      ]
     },
     {
      "file": "src/main/0360-sync/040-boot.js",
      "www": [
-      11887,
-      11937
+      11890,
+      11940
      ]
     },
     {
      "file": "src/main/0360-sync/050-single-device.js",
      "www": [
-      11938,
-      12000
+      11941,
+      12003
      ]
     }
    ],
@@ -27389,8 +27301,8 @@
     {
      "file": "src/main/0370-game-picker.js",
      "www": [
-      12001,
-      12042
+      12004,
+      12045
      ]
     }
    ],
@@ -27444,8 +27356,8 @@
     {
      "file": "src/main/0380-ios-web.js",
      "www": [
-      12043,
-      12045
+      12046,
+      12048
      ]
     }
    ],
@@ -27460,8 +27372,8 @@
     {
      "file": "src/main/0400-publish-subscribe.js",
      "www": [
-      12046,
-      12155
+      12049,
+      12158
      ]
     }
    ],
@@ -27516,8 +27428,8 @@
     {
      "file": "src/main/0410-desktop.js",
      "www": [
-      12156,
-      12202
+      12159,
+      12205
      ]
     }
    ],
@@ -27553,8 +27465,8 @@
     {
      "file": "src/main/0420-app-update.js",
      "www": [
-      12203,
-      12383
+      12206,
+      12386
      ]
     }
    ],
@@ -27602,8 +27514,8 @@
     {
      "file": "src/main/0440-ai-context.js",
      "www": [
-      12384,
-      12399
+      12387,
+      12402
      ]
     }
    ],
@@ -27635,8 +27547,8 @@
     {
      "file": "src/main/0445-factions.js",
      "www": [
-      12400,
-      12508
+      12403,
+      12511
      ]
     }
    ],
@@ -27699,8 +27611,8 @@
     {
      "file": "src/main/0450-relations-memory.js",
      "www": [
-      12509,
-      12578
+      12512,
+      12581
      ]
     }
    ],
@@ -27756,8 +27668,8 @@
     {
      "file": "src/main/0455-persona.js",
      "www": [
-      12579,
-      12692
+      12582,
+      12695
      ]
     }
    ],
@@ -27777,7 +27689,7 @@
    "neighbors": [
     [
      "src/main/0060-util.js",
-     16
+     17
     ],
     [
      "src/main/0070-save.js",
@@ -27814,8 +27726,8 @@
     {
      "file": "src/main/0460-script-engine.js",
      "www": [
-      12693,
-      12803
+      12696,
+      12806
      ]
     }
    ],
@@ -27859,8 +27771,8 @@
     {
      "file": "src/main/0462-direction.js",
      "www": [
-      12804,
-      12866
+      12807,
+      12869
      ]
     }
    ],
@@ -27908,8 +27820,8 @@
     {
      "file": "src/main/0465-story-plan.js",
      "www": [
-      12867,
-      12927
+      12870,
+      12930
      ]
     }
    ],
@@ -27955,8 +27867,8 @@
     {
      "file": "src/main/0470-title-opening.js",
      "www": [
-      12928,
-      12986
+      12931,
+      12989
      ]
     }
    ],
@@ -28008,8 +27920,8 @@
     {
      "file": "src/main/0480-battle.js",
      "www": [
-      12987,
-      13115
+      12990,
+      13118
      ]
     }
    ],
@@ -28061,8 +27973,8 @@
     {
      "file": "src/main/0485-battle-rules.js",
      "www": [
-      13116,
-      13158
+      13119,
+      13161
      ]
     }
    ],
@@ -28101,8 +28013,8 @@
     {
      "file": "src/main/0487-formation-sortie.js",
      "www": [
-      13159,
-      13231
+      13162,
+      13234
      ]
     }
    ],
@@ -28154,8 +28066,8 @@
     {
      "file": "src/main/0488-stage-modes.js",
      "www": [
-      13232,
-      13318
+      13235,
+      13321
      ]
     }
    ],
@@ -28207,8 +28119,8 @@
     {
      "file": "src/main/0490-boss-patterns.js",
      "www": [
-      13319,
-      13342
+      13322,
+      13345
      ]
     }
    ],
@@ -28232,8 +28144,8 @@
     {
      "file": "src/main/0500-gacha.js",
      "www": [
-      13343,
-      13475
+      13346,
+      13478
      ]
     }
    ],
@@ -28294,8 +28206,8 @@
     {
      "file": "src/main/0505-construct.js",
      "www": [
-      13476,
-      13632
+      13479,
+      13635
      ]
     }
    ],
@@ -28365,92 +28277,92 @@
     {
      "file": "src/main/0510-actions/010-setup.js",
      "www": [
-      13633,
-      13665
+      13636,
+      13668
      ]
     },
     {
      "file": "src/main/0510-actions/020-navigation-and-tools.js",
      "www": [
-      13666,
-      13846
+      13669,
+      13849
      ]
     },
     {
      "file": "src/main/0510-actions/030-mail.js",
      "www": [
-      13847,
-      13857
+      13850,
+      13860
      ]
     },
     {
      "file": "src/main/0510-actions/040-story-and-authoring.js",
      "www": [
-      13858,
-      14023
+      13861,
+      14026
      ]
     },
     {
      "file": "src/main/0510-actions/050-settings-and-audio.js",
      "www": [
-      14024,
-      14106
+      14027,
+      14109
      ]
     },
     {
      "file": "src/main/0510-actions/060-storage-and-sharing.js",
      "www": [
-      14107,
-      14172
+      14110,
+      14175
      ]
     },
     {
      "file": "src/main/0510-actions/070-combat-and-formation.js",
      "www": [
-      14173,
-      14233
+      14176,
+      14236
      ]
     },
     {
      "file": "src/main/0510-actions/080-updates.js",
      "www": [
-      14234,
-      14254
+      14237,
+      14257
      ]
     },
     {
      "file": "src/main/0510-actions/090-characters.js",
      "www": [
-      14255,
-      14300
+      14258,
+      14303
      ]
     },
     {
      "file": "src/main/0510-actions/100-images-and-assets.js",
      "www": [
-      14301,
-      14465
+      14304,
+      14468
      ]
     },
     {
      "file": "src/main/0510-actions/110-economy.js",
      "www": [
-      14466,
-      14507
+      14469,
+      14510
      ]
     },
     {
      "file": "src/main/0510-actions/120-messenger.js",
      "www": [
-      14508,
-      14550
+      14511,
+      14553
      ]
     },
     {
      "file": "src/main/0510-actions/130-dispatch.js",
      "www": [
-      14551,
-      14580
+      14554,
+      14583
      ]
     }
    ],
@@ -28555,7 +28467,7 @@
    "neighbors": [
     [
      "src/main/0060-util.js",
-     87
+     97
     ],
     [
      "src/main/0030-image/",
@@ -28592,8 +28504,8 @@
     {
      "file": "src/main/0520-backup-storage.js",
      "www": [
-      14581,
-      14765
+      14584,
+      14768
      ]
     }
    ],
@@ -28646,8 +28558,8 @@
     {
      "file": "src/main/0525-data-folder.js",
      "www": [
-      14766,
-      14854
+      14769,
+      14857
      ]
     }
    ],
@@ -28695,8 +28607,8 @@
     {
      "file": "src/main/0530-story-memory.js",
      "www": [
-      14855,
-      14897
+      14858,
+      14900
      ]
     }
    ],
@@ -28744,8 +28656,8 @@
     {
      "file": "src/main/0535-content-audit.js",
      "www": [
-      14898,
-      15033
+      14901,
+      15036
      ]
     }
    ],
@@ -28797,8 +28709,8 @@
     {
      "file": "src/main/0537-live-fill.js",
      "www": [
-      15034,
-      15053
+      15037,
+      15056
      ]
     }
    ],
@@ -28838,8 +28750,8 @@
     {
      "file": "src/main/0540-start.js",
      "www": [
-      15054,
-      15060
+      15057,
+      15063
      ]
     }
    ],
@@ -28854,8 +28766,8 @@
     {
      "file": "src/main/0550-standalone-app.js",
      "www": [
-      15061,
-      15107
+      15064,
+      15110
      ]
     }
    ],
@@ -28895,8 +28807,8 @@
     {
      "file": "src/main/0565-asset-library.js",
      "www": [
-      15108,
-      15161
+      15111,
+      15164
      ]
     }
    ],
@@ -28951,8 +28863,8 @@
     {
      "file": "src/main/0570-modal-nav.js",
      "www": [
-      15162,
-      15225
+      15165,
+      15228
      ]
     }
    ],
@@ -31970,8 +31882,8 @@
     ],
     "layers": {
      "Model": 87,
-     "Controller": 17,
-     "섞임": 6,
+     "Controller": 20,
+     "섞임": 3,
      "View": 29
     }
    },
@@ -32389,8 +32301,7 @@
      ]
     ],
     "layers": {
-     "Model": 60,
-     "섞임": 1,
+     "Model": 61,
      "Controller": 11,
      "View": 17
     }
@@ -32513,9 +32424,8 @@
     ],
     "layers": {
      "Model": 60,
-     "섞임": 3,
-     "View": 13,
-     "Controller": 4
+     "Controller": 7,
+     "View": 13
     }
    },
    "F06": {
@@ -32632,8 +32542,7 @@
     ],
     "layers": {
      "Model": 42,
-     "Controller": 12,
-     "섞임": 2,
+     "Controller": 14,
      "View": 21
     }
    },
@@ -33224,8 +33133,8 @@
     ],
     "layers": {
      "Model": 31,
-     "섞임": 2,
-     "Controller": 2,
+     "Controller": 3,
+     "섞임": 1,
      "View": 29
     }
    },
@@ -34157,7 +34066,7 @@
     ],
     "layers": {
      "Model": 2,
-     "섞임": 1
+     "Controller": 1
     }
    },
    "F30": {
@@ -34411,12 +34320,11 @@
     "layers": {
      "Model": 76,
      "View": 33,
-     "섞임": 2,
-     "Controller": 6
+     "섞임": 1,
+     "Controller": 7
     },
     "mixed": [
-     "regenApply",
-     "skinPartGen"
+     "regenApply"
     ],
     "bad": 2,
     "badEx": [
@@ -34510,10 +34418,10 @@
    },
    {
     "mod": "src/main/0060-util.js",
-    "n": 36,
+    "n": 37,
     "layers": {
      "Model": 26,
-     "View": 9,
+     "View": 10,
      "섞임": 1
     },
     "mixed": [
@@ -34891,11 +34799,10 @@
     "layers": {
      "Model": 40,
      "View": 27,
-     "섞임": 2,
-     "Controller": 7
+     "Controller": 8,
+     "섞임": 1
     },
     "mixed": [
-     "drawCardArts",
      "dgMove"
     ],
     "bad": 4,
@@ -35069,11 +34976,9 @@
     "layers": {
      "View": 2,
      "Model": 3,
-     "섞임": 1
+     "Controller": 1
     },
-    "mixed": [
-     "playerDraw"
-    ],
+    "mixed": [],
     "bad": 0,
     "badEx": [],
     "feats": [
@@ -35552,21 +35457,13 @@
     "n": 55,
     "layers": {
      "Model": 27,
-     "Controller": 8,
-     "View": 16,
-     "섞임": 4
+     "Controller": 12,
+     "View": 16
     },
-    "mixed": [
-     "drAvatarDraw",
-     "runNewGameBuild",
-     "buildNewGameDraft",
-     "buildManualGameDraft"
-    ],
-    "bad": 3,
+    "mixed": [],
+    "bad": 1,
     "badEx": [
-     "drRead→drSave",
-     "newGame→runNewGameBuild",
-     "newGameManual→runNewGameBuild"
+     "drRead→drSave"
     ],
     "feats": [
      [
@@ -35601,14 +35498,11 @@
     "mod": "src/main/0270-skin-proposal.js",
     "n": 11,
     "layers": {
-     "섞임": 1,
+     "Controller": 4,
      "View": 4,
-     "Model": 3,
-     "Controller": 3
+     "Model": 3
     },
-    "mixed": [
-     "skinPropDraw"
-    ],
+    "mixed": [],
     "bad": 0,
     "badEx": [],
     "feats": [
@@ -35996,13 +35890,9 @@
     "layers": {
      "Model": 9,
      "View": 4,
-     "Controller": 1,
-     "섞임": 2
+     "Controller": 3
     },
-    "mixed": [
-     "subscribe",
-     "subApply"
-    ],
+    "mixed": [],
     "bad": 0,
     "badEx": [],
     "feats": [
@@ -36077,14 +35967,13 @@
     "mod": "src/main/0420-app-update.js",
     "n": 28,
     "layers": {
-     "Model": 12,
+     "Model": 13,
      "View": 11,
      "Controller": 3,
-     "섞임": 2
+     "섞임": 1
     },
     "mixed": [
-     "checkWebUpdate",
-     "applyWebUpdate"
+     "checkWebUpdate"
     ],
     "bad": 2,
     "badEx": [
@@ -36208,8 +36097,10 @@
      "View": 4
     },
     "mixed": [],
-    "bad": 0,
-    "badEx": [],
+    "bad": 1,
+    "badEx": [
+     "personaAI→uiProg"
+    ],
     "feats": [
      [
       "F08",
@@ -37178,18 +37069,6 @@
     "mod": "src/main/0260-new-game/"
    },
    {
-    "fn": "newGame",
-    "to": "runNewGameBuild",
-    "kind": "Model이 화면을 만드는 함수를 부름",
-    "mod": "src/main/0260-new-game/"
-   },
-   {
-    "fn": "newGameManual",
-    "to": "runNewGameBuild",
-    "kind": "Model이 화면을 만드는 함수를 부름",
-    "mod": "src/main/0260-new-game/"
-   },
-   {
     "fn": "seasonStart",
     "to": "liveBar",
     "kind": "Model이 화면을 만드는 함수를 부름",
@@ -37338,6 +37217,12 @@
     "to": "RELS",
     "kind": "View가 상태를 바꾸거나 저장·외부 서비스를 부르는 함수를 부름",
     "mod": "src/main/0450-relations-memory.js"
+   },
+   {
+    "fn": "personaAI",
+    "to": "uiProg",
+    "kind": "Model이 화면을 만드는 함수를 부름",
+    "mod": "src/main/0455-persona.js"
    },
    {
     "fn": "playStory",
@@ -37810,32 +37695,17 @@
      "kind": "작업+진행 표시"
     }
    },
-   "skinPartGen": {
-    "name": "skinPartGen",
-    "file": "src/main/0030-image/010-engine.js",
-    "line": 902,
-    "mix": {
-     "view": [
-      903,
-      905
-     ],
-     "model": [
-      904
-     ],
-     "kind": "작업+진행 표시"
-    }
-   },
    "petTick": {
     "name": "petTick",
     "file": "src/main/0060-util.js",
-    "line": 44,
+    "line": 47,
     "mix": {
      "view": [
-      45,
-      49
+      48,
+      52
      ],
      "model": [
-      50
+      53
      ],
      "kind": "작업+진행 표시"
     }
@@ -37932,23 +37802,6 @@
      "kind": "작업+진행 표시"
     }
    },
-   "drawCardArts": {
-    "name": "drawCardArts",
-    "file": "src/main/0120-abyss.js",
-    "line": 126,
-    "mix": {
-     "view": [
-      130,
-      136
-     ],
-     "model": [
-      132,
-      133,
-      134
-     ],
-     "kind": "작업+진행 표시"
-    }
-   },
    "dgMove": {
     "name": "dgMove",
     "file": "src/main/0120-abyss.js",
@@ -37959,22 +37812,6 @@
      ],
      "model": [],
      "kind": "화면 조작+상태"
-    }
-   },
-   "playerDraw": {
-    "name": "playerDraw",
-    "file": "src/main/0160-player-profile.js",
-    "line": 25,
-    "mix": {
-     "view": [
-      26,
-      28,
-      30
-     ],
-     "model": [
-      29
-     ],
-     "kind": "작업+진행 표시"
     }
    },
    "openChar": {
@@ -38098,125 +37935,6 @@
      "kind": "작업+진행 표시"
     }
    },
-   "drAvatarDraw": {
-    "name": "drAvatarDraw",
-    "file": "src/main/0260-new-game/010-draft.js",
-    "line": 92,
-    "mix": {
-     "view": [
-      93,
-      95
-     ],
-     "model": [
-      94
-     ],
-     "kind": "작업+진행 표시"
-    }
-   },
-   "runNewGameBuild": {
-    "name": "runNewGameBuild",
-    "file": "src/main/0260-new-game/020-build.js",
-    "line": 55,
-    "mix": {
-     "view": [
-      60
-     ],
-     "model": [
-      59
-     ],
-     "kind": "작업+진행 표시"
-    }
-   },
-   "buildNewGameDraft": {
-    "name": "buildNewGameDraft",
-    "file": "src/main/0260-new-game/020-build.js",
-    "line": 62,
-    "mix": {
-     "view": [
-      66,
-      81,
-      83,
-      95,
-      117,
-      121
-     ],
-     "model": [
-      76,
-      82,
-      94,
-      101,
-      107,
-      116,
-      119,
-      142,
-      143,
-      146,
-      148
-     ],
-     "kind": "작업+진행 표시"
-    }
-   },
-   "buildManualGameDraft": {
-    "name": "buildManualGameDraft",
-    "file": "src/main/0260-new-game/020-build.js",
-    "line": 152,
-    "mix": {
-     "view": [
-      153
-     ],
-     "model": [
-      187,
-      188
-     ],
-     "kind": "작업+진행 표시"
-    }
-   },
-   "skinPropDraw": {
-    "name": "skinPropDraw",
-    "file": "src/main/0270-skin-proposal.js",
-    "line": 3,
-    "mix": {
-     "view": [
-      4,
-      9
-     ],
-     "model": [
-      6
-     ],
-     "kind": "작업+진행 표시"
-    }
-   },
-   "subscribe": {
-    "name": "subscribe",
-    "file": "src/main/0400-publish-subscribe.js",
-    "line": 78,
-    "mix": {
-     "view": [
-      79,
-      88
-     ],
-     "model": [
-      85
-     ],
-     "kind": "작업+진행 표시"
-    }
-   },
-   "subApply": {
-    "name": "subApply",
-    "file": "src/main/0400-publish-subscribe.js",
-    "line": 101,
-    "mix": {
-     "view": [
-      101,
-      109
-     ],
-     "model": [
-      103,
-      107
-     ],
-     "kind": "작업+진행 표시"
-    }
-   },
    "checkWebUpdate": {
     "name": "checkWebUpdate",
     "file": "src/main/0420-app-update.js",
@@ -38231,27 +37949,12 @@
      ],
      "kind": "작업+진행 표시"
     }
-   },
-   "applyWebUpdate": {
-    "name": "applyWebUpdate",
-    "file": "src/main/0420-app-update.js",
-    "line": 133,
-    "mix": {
-     "view": [
-      133
-     ],
-     "model": [
-      134,
-      138
-     ],
-     "kind": "작업+진행 표시"
-    }
    }
   }
  },
  "gamesN": 2,
- "at": "2026-11-04T03:31",
- "head": "dda89e7",
+ "at": "2026-11-04T03:46",
+ "head": "5b06d05",
  "inputs": {
   "src": {
    "src/boot/durable-storage.js": "9e1fdc434852",
@@ -38259,31 +37962,31 @@
    "src/boot/storage-boot.js": "c656f98ac50e",
    "src/index.html": "185912fd6a1f",
    "src/main/0010-rules.js": "37c048db861d",
-   "src/main/0015-prompt-studio/010-studio.js": "eff65769d45c",
+   "src/main/0015-prompt-studio/010-studio.js": "eb1ce4b4b958",
    "src/main/0015-prompt-studio/020-requests.js": "41aa9b262d29",
    "src/main/0015-prompt-studio/030-builders.js": "cdab1cdfc00d",
-   "src/main/0020-ai-connect.js": "1c48948f8ddb",
-   "src/main/0030-image/010-engine.js": "3c056390539d",
+   "src/main/0020-ai-connect.js": "c76a6110d019",
+   "src/main/0030-image/010-engine.js": "808debbd2a75",
    "src/main/0030-image/020-candidates.js": "95acdadb0d8a",
    "src/main/0040-sound.js": "d6354b95c7ba",
    "src/main/0050-default-content.js": "f30bffbf158e",
-   "src/main/0060-util.js": "8a7d8585e3ee",
+   "src/main/0060-util.js": "3fb27d4eec0b",
    "src/main/0065-inherit.js": "389cf4953934",
    "src/main/0070-save.js": "2abcdfe9d69d",
    "src/main/0080-storage-integration.js": "ccbf2ea7b920",
    "src/main/0090-growth.js": "bdb3f3de2fd8",
    "src/main/0100-messenger.js": "e3f8c5ee52bb",
    "src/main/0110-challenge-raid.js": "fcd2eeccf0d5",
-   "src/main/0120-abyss.js": "3eb141acbd13",
+   "src/main/0120-abyss.js": "32f09b255a92",
    "src/main/0125-tower.js": "1d1c08080e4f",
    "src/main/0130-gift.js": "dc46dabcf467",
-   "src/main/0135-schedule.js": "f966d90dbc0c",
+   "src/main/0135-schedule.js": "64fcf2fa3fc7",
    "src/main/0140-pickup-new.js": "7c11a9d7cd73",
    "src/main/0150-pickup-existing.js": "f0c72004eac0",
-   "src/main/0160-player-profile.js": "255746aff7c9",
+   "src/main/0160-player-profile.js": "20c28f787312",
    "src/main/0170-render.js": "18f5fc0c6dde",
    "src/main/0180-ui-scroll.js": "961861a68c56",
-   "src/main/0185-game-rules.js": "a5fa9debb90c",
+   "src/main/0185-game-rules.js": "8b59054bddae",
    "src/main/0187-balance.js": "054cdcbaabb7",
    "src/main/0190-shop.js": "efed5a7cd749",
    "src/main/0200-skin-shop.js": "4a8c72563594",
@@ -38292,16 +37995,16 @@
    "src/main/0230-modal.js": "6a45c745ad4e",
    "src/main/0240-growth-curve.js": "f00868073c1a",
    "src/main/0250-story-factory.js": "784ece4a7445",
-   "src/main/0260-new-game/010-draft.js": "28b58dd084b8",
-   "src/main/0260-new-game/020-build.js": "cfe993d885c7",
-   "src/main/0270-skin-proposal.js": "cb82a637ab81",
+   "src/main/0260-new-game/010-draft.js": "70ac43ab92ba",
+   "src/main/0260-new-game/020-build.js": "8682a3618ce9",
+   "src/main/0270-skin-proposal.js": "72e0bb2a24cc",
    "src/main/0274-dispatch.js": "47a5b7453baa",
    "src/main/0275-expedition.js": "737596d99951",
    "src/main/0280-live-ops.js": "665f0b9aed28",
-   "src/main/0290-season-rotation.js": "3293b203efac",
+   "src/main/0290-season-rotation.js": "5019877573f8",
    "src/main/0300-codex.js": "e592b0f63888",
    "src/main/0310-art-after-ai.js": "909735fa2127",
-   "src/main/0330-casting.js": "62baac51c9c9",
+   "src/main/0330-casting.js": "a8ffd96ab30d",
    "src/main/0335-github-api.js": "31001997cb0c",
    "src/main/0360-sync/010-common.js": "f28dd22eea67",
    "src/main/0360-sync/020-pc-server.js": "a68cb3adae91",
@@ -38310,16 +38013,16 @@
    "src/main/0360-sync/050-single-device.js": "4b4953b34bac",
    "src/main/0370-game-picker.js": "69084bc8f387",
    "src/main/0380-ios-web.js": "e093d02357d5",
-   "src/main/0400-publish-subscribe.js": "05ee4a1277f7",
+   "src/main/0400-publish-subscribe.js": "3c4d56452fde",
    "src/main/0410-desktop.js": "abf34a391f88",
-   "src/main/0420-app-update.js": "868525b9ce47",
+   "src/main/0420-app-update.js": "8e786b14bc97",
    "src/main/0440-ai-context.js": "87427090620a",
-   "src/main/0445-factions.js": "f148ba8a23fb",
-   "src/main/0450-relations-memory.js": "9e6b04ce0d1e",
-   "src/main/0455-persona.js": "95f5704bb551",
+   "src/main/0445-factions.js": "be6033bfc4e4",
+   "src/main/0450-relations-memory.js": "31c3bd5a034a",
+   "src/main/0455-persona.js": "a7d2229d9dcd",
    "src/main/0460-script-engine.js": "2ec51b8ddb69",
-   "src/main/0462-direction.js": "589bd956dcac",
-   "src/main/0465-story-plan.js": "21a6e343ab95",
+   "src/main/0462-direction.js": "a94de0800310",
+   "src/main/0465-story-plan.js": "bf3d2117aefd",
    "src/main/0470-title-opening.js": "040d9293d623",
    "src/main/0480-battle.js": "7db4d7bd1f70",
    "src/main/0485-battle-rules.js": "d3a5ab0be99c",
@@ -38328,18 +38031,18 @@
    "src/main/0490-boss-patterns.js": "8514e0f0a0ab",
    "src/main/0500-gacha.js": "aa67da7fdd37",
    "src/main/0505-construct.js": "24fe6acb0cd2",
-   "src/main/0510-actions/010-setup.js": "a91e99be9c78",
-   "src/main/0510-actions/020-navigation-and-tools.js": "c71defe6748c",
+   "src/main/0510-actions/010-setup.js": "93f9b6d2c316",
+   "src/main/0510-actions/020-navigation-and-tools.js": "5489a15ff33c",
    "src/main/0510-actions/030-mail.js": "b9211909cadb",
-   "src/main/0510-actions/040-story-and-authoring.js": "82c447016ed8",
-   "src/main/0510-actions/050-settings-and-audio.js": "4253d9a4844d",
-   "src/main/0510-actions/060-storage-and-sharing.js": "f840c2aea81e",
+   "src/main/0510-actions/040-story-and-authoring.js": "d6561f4b8ed0",
+   "src/main/0510-actions/050-settings-and-audio.js": "1bf5621b0a38",
+   "src/main/0510-actions/060-storage-and-sharing.js": "9ca49c75e4c5",
    "src/main/0510-actions/070-combat-and-formation.js": "6be41ae4006e",
-   "src/main/0510-actions/080-updates.js": "1c090f2c41b3",
-   "src/main/0510-actions/090-characters.js": "b1d7b7f96901",
-   "src/main/0510-actions/100-images-and-assets.js": "267d58562645",
-   "src/main/0510-actions/110-economy.js": "f921ec8ca834",
-   "src/main/0510-actions/120-messenger.js": "e8184e2c617f",
+   "src/main/0510-actions/080-updates.js": "7560f59214f2",
+   "src/main/0510-actions/090-characters.js": "5d007114e8bf",
+   "src/main/0510-actions/100-images-and-assets.js": "cb7c862384a4",
+   "src/main/0510-actions/110-economy.js": "7eb82962a1b3",
+   "src/main/0510-actions/120-messenger.js": "fe20b4980d3e",
    "src/main/0510-actions/130-dispatch.js": "fbab258b8eac",
    "src/main/0520-backup-storage.js": "0b49ad688f1e",
    "src/main/0525-data-folder.js": "3893b9526cfb",
@@ -38383,14 +38086,117 @@
    "src/style/0190-formation-sortie.css": "7673b215d35f",
    "src/style/0200-stage-modes.css": "4b0337d1ad04"
   },
-  "www": "6c93d020da4a",
+  "www": "a9e8eaf986a8",
   "games": {
    "idol-audition": "a443d928bb99",
    "sky-knights": "c782aafba942"
   },
-  "tool": "df17b59c659e"
+  "tool": "b56804b0220d"
  },
  "changes": [
+  {
+   "at": "2026-11-04T03:46",
+   "head": "5b06d05",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": [
+      "src/main/0015-prompt-studio/010-studio.js",
+      "src/main/0020-ai-connect.js",
+      "src/main/0030-image/010-engine.js",
+      "src/main/0060-util.js",
+      "src/main/0120-abyss.js",
+      "src/main/0135-schedule.js",
+      "src/main/0160-player-profile.js",
+      "src/main/0185-game-rules.js",
+      "src/main/0260-new-game/010-draft.js",
+      "src/main/0260-new-game/020-build.js",
+      "src/main/0270-skin-proposal.js",
+      "src/main/0290-season-rotation.js",
+      "src/main/0330-casting.js",
+      "src/main/0400-publish-subscribe.js",
+      "src/main/0420-app-update.js",
+      "src/main/0445-factions.js",
+      "src/main/0450-relations-memory.js",
+      "src/main/0455-persona.js",
+      "src/main/0462-direction.js",
+      "src/main/0465-story-plan.js",
+      "src/main/0510-actions/010-setup.js",
+      "src/main/0510-actions/020-navigation-and-tools.js",
+      "src/main/0510-actions/040-story-and-authoring.js",
+      "src/main/0510-actions/050-settings-and-audio.js",
+      "src/main/0510-actions/060-storage-and-sharing.js",
+      "src/main/0510-actions/080-updates.js",
+      "src/main/0510-actions/090-characters.js",
+      "src/main/0510-actions/100-images-and-assets.js",
+      "src/main/0510-actions/110-economy.js",
+      "src/main/0510-actions/120-messenger.js"
+     ]
+    },
+    "www": true,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": false
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-04T03:39",
+   "head": "5b06d05",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
+  {
+   "at": "2026-11-04T03:38",
+   "head": "5b06d05",
+   "inputs": {
+    "src": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "www": false,
+    "games": {
+     "added": [],
+     "removed": [],
+     "changed": []
+    },
+    "tool": true
+   },
+   "fns": {
+    "added": [],
+    "removed": [],
+    "moved": []
+   },
+   "data": []
+  },
   {
    "at": "2026-11-04T03:31",
    "head": "dda89e7",
@@ -39068,179 +38874,6 @@
   },
   {
    "at": "2026-11-04T01:55",
-   "head": "b36fbca",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "www": false,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": true
-   },
-   "fns": {
-    "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": []
-  },
-  {
-   "at": "2026-11-04T01:54",
-   "head": "b36fbca",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": [
-      "src/main/0070-save.js",
-      "src/main/0274-dispatch.js",
-      "src/main/0275-expedition.js",
-      "src/main/0300-codex.js"
-     ]
-    },
-    "www": true,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": false
-   },
-   "fns": {
-    "added": [
-     "expedFill"
-    ],
-    "removed": [],
-    "moved": []
-   },
-   "data": [
-    {
-     "path": "prog.json › cxSeen",
-     "added": [],
-     "removed": [
-      "기타:cxNewFast"
-     ]
-    },
-    {
-     "path": "prog.json › dboard",
-     "added": [],
-     "removed": [
-      "실행기:dispList"
-     ]
-    },
-    {
-     "path": "prog.json › exped",
-     "added": [],
-     "removed": [
-      "실행기:exBizOf",
-      "실행기:exBizState",
-      "실행기:exCond",
-      "실행기:exJobOf",
-      "기타:exStatus"
-     ]
-    }
-   ]
-  },
-  {
-   "at": "2026-11-04T01:43",
-   "head": "b36fbca",
-   "inputs": {
-    "src": {
-     "added": [],
-     "removed": [],
-     "changed": [
-      "src/main/0125-tower.js"
-     ]
-    },
-    "www": true,
-    "games": {
-     "added": [],
-     "removed": [],
-     "changed": []
-    },
-    "tool": true
-   },
-   "fns": {
-    "added": [],
-    "removed": [],
-    "moved": []
-   },
-   "data": [
-    {
-     "path": "chars.json › [].cards",
-     "added": [
-      "실행기:drawCardArts"
-     ],
-     "removed": [
-      "편집기:drawCardArts"
-     ]
-    },
-    {
-     "path": "prog.json › avatar",
-     "added": [
-      "실행기:handleNavigationAndToolsAction",
-      "실행기:naiBlocksOwner",
-      "실행기:readPlayerForm"
-     ],
-     "removed": []
-    },
-    {
-     "path": "prog.json › cxSeen",
-     "added": [
-      "기타:cxNewFast",
-      "실행기:handleStoryAndAuthoringAction"
-     ],
-     "removed": []
-    },
-    {
-     "path": "prog.json › dboard",
-     "added": [
-      "실행기:dispList"
-     ],
-     "removed": []
-    },
-    {
-     "path": "prog.json › exped",
-     "added": [
-      "실행기:exBizOf",
-      "실행기:exBizSettle",
-      "실행기:exBizState",
-      "실행기:exBusyIds",
-      "실행기:exCond",
-      "실행기:exJobOf",
-      "기타:exStatus"
-     ],
-     "removed": []
-    },
-    {
-     "path": "prog.json › fchat",
-     "added": [
-      "실행기:phRooms",
-      "실행기:roomItems"
-     ],
-     "removed": []
-    },
-    {
-     "path": "prog.json › rogue",
-     "added": [
-      "실행기:drawCardArts",
-      "실행기:handleNavigationAndToolsAction",
-      "실행기:rgBattle",
-      "실행기:rgNode",
-      "실행기:rogueEnd"
-     ],
-     "removed": []
-    }
-   ]
-  },
-  {
-   "at": "2026-11-04T01:32",
    "head": "b36fbca",
    "inputs": {
     "src": {

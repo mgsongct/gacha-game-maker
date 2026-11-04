@@ -159,15 +159,15 @@ function openDesign(){ const d=G.meta.design||{}, facs=designFacs();
     <p class="muted" style="margin:8px 0 0;font-size:.78rem">스킨(의상)·NPC·다른 세계에서 온 콜라보 캐릭터에는 붙지 않아요. 캐릭터 한 명만 빼려면 그 캐릭터 편집에서 '공통 디자인 태그 쓰지 않기'를 켜요.</p>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="dssave">저장</button>${SAMPLE?'<button class="btn ghost" data-act="dsai">✦ AI로 제안 받기</button>':''}</div>`); }
 function designRead(){ const fac={}; document.querySelectorAll('#modal [data-fac]').forEach(e=>{ const v=stripMinor(stripAge(e.value.trim())); if(v) fac[e.dataset.fac]=v; }); return {all:stripMinor(stripAge(($('#ds_all')||{}).value?$('#ds_all').value.trim():'')),fac}; }
-async function designAI(btn){ const facs=designFacs(), w=G.world||{};
-  const r=await aiJSON(designAIPrompt({w,facs}),btn,'quick');
+async function designAI(rep){ const facs=designFacs(), w=G.world||{};
+  const r=await aiJSON(designAIPrompt({w,facs}),rep,'quick');
   if(!r||typeof r!=='object') return; if(r.all&&$('#ds_all')) $('#ds_all').value=stripMinor(String(r.all));
   (Array.isArray(r.factions)?r.factions:[]).forEach(x=>{ const el=[...document.querySelectorAll('#modal [data-fac]')].find(e=>e.dataset.fac===String(x&&x.name||'').trim()); if(el&&x.tags) el.value=stripMinor(String(x.tags)); });
   toast('제안을 채웠어요. 고친 뒤 저장을 눌러 주세요'); }
 // 무기 프롬프트 검사: 사람 태그가 섞였거나 '물건 사진'으로 시작하지 않으면 정리가 필요해요 (PR #3 LTXY12님 아이디어)
 function wpBad(p){ const s=String(p||'').trim(); if(!s) return false; return /\b(1girl|1boy|1other|2girls|2boys|solo|holding)\b/i.test(s)||!/^(no humans|object focus)/i.test(s); }
-async function weaponPromptAI(list,btn,world){ const w=world||G.world; const v=weaponPromptAIVText({list});
-  const r=await aiJSON(weaponPromptAIPrompt({w,v}),btn||null,'quick');
+async function weaponPromptAI(list,rep,world){ const w=world||G.world; const v=weaponPromptAIVText({list});
+  const r=await aiJSON(weaponPromptAIPrompt({w,v}),rep||null,'quick');
   const out=list.map(()=>''); (r&&Array.isArray(r.weapons)?r.weapons:[]).forEach(x=>{ const i=list.findIndex(y=>y.c.name===String(x&&x.name||'').trim()), p=String((x&&x.prompt)||'').trim(); const k=i>=0?i:(list.length===1?0:-1); if(k>=0&&p&&!wpBad(p)) out[k]=p; }); return out; }
 async function fixWeaponPrompts(chars,world){ try{ const bad=(chars||[]).filter(c=>c&&c.weapon&&wpBad(c.weapon.prompt)); if(!bad.length) return 0; const out=await weaponPromptAI(bad.map(c=>({c,name:c.weapon.name,desc:c.weapon.desc,cur:c.weapon.prompt})),null,world); let n=0; bad.forEach((c,i)=>{ if(out[i]){ c.weapon.prompt=out[i]; try{ mark('c:'+c.id); }catch(e){} n++; } }); return n; }catch(e){ return 0; } }
 function allyTags(s){ const L=tagList(s), en=L.some(t=>/^faceless$/i.test(tagKey(t))); return en?L.filter(t=>!/^(faceless|1other|no humans)$/i.test(tagKey(t))).join(', '):String(s||''); }
@@ -899,7 +899,7 @@ function skinPartDraw(c,k,x,generationMode='automatic'){ const inp=$('#skscene_'
   if(x==='stand') return naiDraw('char',k.prompt,{candidateEligible,originalSrc,styleId:c.naiStyle,frame:c.naiFrame});
   if(x==='upper') return naiDraw('char',k.prompt,{candidateEligible,originalSrc,frame:'cowboy shot',pose:'looking at viewer, smile',styleId:c.naiStyle});
   return naiDraw(x,joinTags(k.prompt,scene||(x==='lbcg'?(c.lbcg&&c.lbcg.prompt)||'dramatic lighting, sparkles, smile, wind':(c.illust&&c.illust.prompt)||'')),{candidateEligible,originalSrc,styleId:c.naiStyle}); }
-async function skinPartGen(c,k,xs,btn,generationMode='manual'){ if(!imgReady()){ toast(imgNeed()); return; } if(!k.prompt){ toast('이 '+T('skin')+'은 프롬프트가 없어서 그릴 수 없어요. 올리기를 써 주세요'); return; }
-  const game=G,project=PJ().active,label=btn?.textContent;if(btn){btn.disabled=true;btn.textContent='그리는 중…';}let n=0;
+async function skinPartGen(c,k,xs,rep,generationMode='manual'){ if(!imgReady()){ toast(imgNeed()); return; } if(!k.prompt){ toast('이 '+T('skin')+'은 프롬프트가 없어서 그릴 수 없어요. 올리기를 써 주세요'); return; }
+  const game=G,project=PJ().active;if(rep)rep('그리는 중…');let n=0;
   for(const x of xs){ try{ const b=await skinPartDraw(c,k,x,generationMode);if(G!==game||PJ().active!==project||charById(c.id)!==c||!c.skins.includes(k))throw Error('대상이 바뀌어 스킨 생성을 중단했습니다');await storeImage(x==='stand'?k:skinPart(k,x),b,''); n++; mark('c:'+c.id); }catch(e){ toast(naiErr(e)); break; } }
-  if(btn?.isConnected){btn.disabled=false;btn.textContent=label;}if(n)toast(`${k.name}: ${n}장 완성`);skinRefresh(c.id);render(); }
+  if(rep)rep.end();if(n)toast(`${k.name}: ${n}장 완성`);skinRefresh(c.id);render(); }

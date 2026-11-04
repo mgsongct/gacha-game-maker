@@ -25,6 +25,9 @@ function busy(t,label){ const lb=t.textContent; t.disabled=true; if(label!=null)
 function chipOn(el,on){ el.classList.toggle('on',!!on); }
 function chipIsOn(el){ return el.classList.contains('on'); }
 function switchFlip(el){ const on=el.getAttribute('aria-checked')!=='true'; el.setAttribute('aria-checked',String(on)); return on; }
+/* 진행 알림(View가 만들어 작업(Model)에 넘김 — 작업은 단추·칸 요소를 직접 만지지 않음, CLAUDE.md §0-2): 만들 때 단추를 잠그고, rep(글)로 진행 글(to 칸, 없으면 단추 글자),
+   rep.lock()으로 다시 잠금, rep.end()로 단추를 되돌림(단추 글자를 바꿨으면 원래 글자로). 단추가 없으면 null — 작업은 rep&&rep(…) */
+function uiProg(el,to){ if(!el) return null; const lb=el.textContent, rep=m=>{ say(to||el,m); }; rep.lock=()=>{ el.disabled=true; }; rep.end=()=>{ if(el.isConnected){ el.disabled=false; if(!to) el.textContent=lb; } }; rep.lock(); return rep; }
 /* 화면 한 칸에 글 표시(View — 선택자나 요소, 있을 때만) */
 function say(el,msg){ const x=typeof el==='string'?$(el):el; if(x) x.textContent=msg; return x; }
 function ripple(x,y,big){const r=document.createElement('div');r.className='ripple'+(big?' big':'');r.style.left=x+'px';r.style.top=y+'px';r.innerHTML='<i></i><i></i><i></i>';document.body.appendChild(r);setTimeout(()=>r.remove(),1000);}

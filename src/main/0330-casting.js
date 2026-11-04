@@ -25,11 +25,11 @@ async function npcDraw(n,k){ if(!imgReady()){ toast(imgNeed()); return; } if(!St
   try{ const it=k==='upper'?{k:'upper',o:n.upper,c:n}:{k:'char',o:n,c:n}; const b=await naiDrawItem({...it,generationMode:'manual'}); await storeImage(it.o,b,k==='upper'?'':'c:'); mark('meta'); toast(`${n.name} ${k==='upper'?'상반신':'스탠딩'}을(를) 그렸어요`); }
   catch(e){ toast(naiErr(e)); } finally{ NPCBUSY.delete(n.id); npcRefresh(n.id); } }
 /* 중요한 NPC 자동 추가: 대본에 대사가 3줄 이상인데 ${'캐릭터'}·NPC가 아닌 인물을 NPC로 만들고 그림 프롬프트를 써요(그림 목록에 들어가요) */
-async function autoNpcs(chs,btn){ if(!SAMPLE) return 0; const cnt={}; const skip=n=>!n||isMe(n)||findSpeaker(n)||npcBy(n)||enemyLib(n)||/^(나레이션|내레이션|해설|모두|일동|\?\?\?|목소리|소리|방송|안내)$/.test(n);
+async function autoNpcs(chs,rep){ if(!SAMPLE) return 0; const cnt={}; const skip=n=>!n||isMe(n)||findSpeaker(n)||npcBy(n)||enemyLib(n)||/^(나레이션|내레이션|해설|모두|일동|\?\?\?|목소리|소리|방송|안내)$/.test(n);
   (chs||[]).forEach(ch=>(ch.stages||[]).forEach(st=>[st.pre,st.post].forEach(t=>parseScript(t||'').forEach(L=>{ if(L.type==='say'&&!skip(L.who)) cnt[L.who]=(cnt[L.who]||0)+1; }))));
   const names=Object.entries(cnt).filter(([,n])=>n>=3).sort((a,b)=>b[1]-a[1]).map(x=>x[0]).slice(0,6); if(!names.length) return 0;
   const lines=n=>{ const out=[]; (chs||[]).forEach(ch=>(ch.stages||[]).forEach(st=>[st.pre,st.post].forEach(t=>parseScript(t||'').forEach(L=>{ if(L.type==='say'&&L.who===n&&out.length<4) out.push(L.text); })))); return out.join(' / '); };
-  const r=await aiJSON(autoNpcsPrompt({names,lines}),btn||null,'quick');
+  const r=await aiJSON(autoNpcsPrompt({names,lines}),rep||null,'quick');
   let n=0; (r&&Array.isArray(r.npcs)?r.npcs:[]).forEach(x=>{ const nm=String((x&&x.name)||'').trim(); if(!names.includes(nm)||npcBy(nm)) return; const o=npcNew(nm); Object.assign(o,{role:String(x.role||''),look:String(x.look||''),naiPrompt:stripMinor(stripAge(String(x.naiPrompt||'')))}); G.npcs=G.npcs||[]; G.npcs.push(o); n++; }); if(n) mark('meta'); return n; }
 function castChars(){ return [...G.chars.filter(c=>c.naiPrompt&&!(c.alt)),...(G.npcs||[]).filter(n=>n.naiPrompt)]; }
 const castById=id=>charById(id)||(G.npcs||[]).find(n=>n.id===id);

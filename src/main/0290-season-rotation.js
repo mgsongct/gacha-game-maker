@@ -11,13 +11,13 @@ function seasonNow(){ const L=P().live, s=L.season; return L.on.season&&s&&Date.
 function seasonIs(t){ const s=seasonNow(); return !!s&&s.type===t; }
 function seasonMeta(t){ return SEASONS.find(x=>x[0]===t)||SEASONS[0]; }
 function seasonNext(){ const L=P().live, en=SEASONS.filter(x=>L.seasons[x[0]]!==false).map(x=>x[0]); if(!en.length) return null; const cur=L.season&&L.season.type, i=en.indexOf(cur); return en[(i+1)%en.length]; }
-async function aiNewPickupChar(con,rr,btn,col,alt){
-  if(alt) return aiAltChar(alt,con,rr,btn);
+async function aiNewPickupChar(con,rr,rep,col,alt){
+  if(alt) return aiAltChar(alt,con,rr,rep);
   const COL=aiNewPickupCharCOLText({col});
-  const r=await aiJSON(aiNewPickupCharPrompt({COL,con,rr}),btn);
+  const r=await aiJSON(aiNewPickupCharPrompt({COL,con,rr}),rep);
   if(!r) return null; const c=cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr; if(!c.name) c.name='이름 없음'; if(col&&col.src){ c.collab=col.src; if(!c.faction) c.faction='콜라보'; } G.chars.push(c); mark('c:'+c.id); return c; }
-async function aiAltChar(b,con,rr,btn){ const canon=!!b.__canon; b=charById(b.id)||b;
-  const r=await aiJSON(aiAltCharPrompt({b,canon,con,rr}),btn);
+async function aiAltChar(b,con,rr,rep){ const canon=!!b.__canon; b=charById(b.id)||b;
+  const r=await aiJSON(aiAltCharPrompt({b,canon,con,rr}),rep);
   if(!r) return null; const c=cleanChar(r); if(rr&&rr!=='ai') c.rarity=+rr;
   if(!c.name||c.name.indexOf(b.name)!==0) c.name=`${b.name}(${String(con||'이격').replace(/[()]/g,'').slice(0,6)})`;
   c.alt=b.id; c.altCanon=canon; c.faction=b.faction||c.faction; if(b.voiceId) c.voiceId=b.voiceId; if(b.naiStyle) c.naiStyle=b.naiStyle; if(b.age&&!c.age) c.age=b.age; if(!c.lines||!c.lines.length) c.lines=(b.lines||[]).slice(0,3);

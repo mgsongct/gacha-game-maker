@@ -163,7 +163,7 @@ try {
     out.on = conOn(); out.start = { ...progSlot('cres') }; out.cond = VARIANTS()[0].cond.factions;
     P().gems = 10000; conBuy('res1'); out.bought = progSlot('cres').res1 - out.start.res1; out.gems = P().gems;
     out.disp = Object.keys(dispOffer([]).reward).filter(k => /^res/.test(k)).length;
-    const base = G.chars[0]; if (!own(base.id)) grantOwned(base, 't'); conMeta().recipes = []; // 레시피 편향 없이
+    const base = G.chars[0]; if (!own(base.id)) grantOwned(base, 't'); G.meta.construct = Object.assign(conMeta(), { recipes: [] }); // 레시피 편향 없이 (conMeta()는 읽기 — 쓸 때는 G.meta.construct에)
     tab = 'construct'; render(); out.page = !!document.querySelector('[data-act="conbuild"]');
     Math.random = (() => { let s = 42; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
     const before = progSlot('cres').res2; [30, 30, 30, 30].forEach((v, i) => { document.querySelector('#con_' + i).value = v; }); await conBuild(); out.spent = before - progSlot('cres').res2; out.n1 = progSlot('cbuild').n;
@@ -594,7 +594,7 @@ try {
       return {}; } };
     let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [k, v] of Object.entries(recs)) if (/"chapters"/.test(v)) saved = JSON.parse(v); return orig(recs); };
     window.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
-    await buildNewGameDraft(btn, { mode: 'auto', auto: '등불섬 판타지', n: 6, con: true }, PJ().active);
+    await buildNewGameDraft(uiProg(btn, '#ng_stat'), { mode: 'auto', auto: '등불섬 판타지', n: 6, con: true }, PJ().active);
     const g = saved; o.built = !!g && g.meta.title === '심연등불';
     if (!g) return o;
     const F = g.world.factions; o.factions = F.length >= 3 && F.find(f => f.name === '검은 조류').kind === 'hostile' && F.find(f => f.name === '검은 조류').stance.some(s => s.ch === 3 && s.s === 'ally') && F.find(f => f.name === '심해의 것').weakness === '불' && !!F.find(f => f.name === '등불단').rel['검은 조류'];

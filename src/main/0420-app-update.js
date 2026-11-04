@@ -130,7 +130,7 @@ async function checkWebUpdate(manual){ if(IS_NATIVE) return; const o=LV(); let m
       ${srvOld?'<p class="muted" style="font-size:.82rem">PC 서버 프로그램(ggm-server.py)도 바뀌었어요. Releases의 gacha-game-maker-pc.zip을 새로 받아 덮어쓰면 좋아요.</p>':''}
       <div class="row" style="margin-top:12px"><button class="btn" data-act="webupdgo">지금 업데이트</button><button class="btn ghost" data-act="webupdskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`); };
   show(); }
-async function applyWebUpdate(btn){ if(btn){ btn.disabled=true; btn.textContent='받는 중…'; }
+async function applyWebUpdate(rep){ if(rep) rep('받는 중…');
   try{ await flush(); }catch(e){ quietErr(e,'0420-app-update.js:128'); }
   try{ if(LKMODE()&&LK.claimed&&!LK.locked) await lkSave(true); }catch(e){ quietErr(e,'0420-app-update.js:129'); }
   try{ if(onPcServer()) await pcApi('/api/update',{method:'POST',body:{},timeout:90000}); }catch(e){ quietErr(e,'0420-app-update.js:130'); }

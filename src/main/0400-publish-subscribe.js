@@ -75,8 +75,8 @@ async function subPullImages(base,game,ns,had,st,prefix){
   if(prefix)await appStorage.stage(prefix+x.id,{key:x.id,blob});else await idbPut(ns+x.id,blob);x.img={idb:true};
  }return imap;
 }
-async function subscribe(addr,btn){const base=subParse(addr);if(!base){toast('게임 구독 주소를 읽지 못했습니다');return;}
- const prefix='subscribe-'+uid()+'::',source=G,project=PJ().active,lbl=btn?.textContent,st=m=>{syBar(m);if(btn?.isConnected)btn.textContent=m;};if(btn)btn.disabled=true;
+async function subscribe(addr,rep){const base=subParse(addr);if(!base){toast('게임 구독 주소를 읽지 못했습니다');return;}
+ const prefix='subscribe-'+uid()+'::',source=G,project=PJ().active,st=m=>{syBar(m);if(rep)rep(m);};
  try{st('게임 정보 받는 중…');const man=JSON.parse(await subGet(base,'manifest.json'));if(man?.kind!=='pub')throw Error('게임 구독 주소가 아닙니다');
   const dup=PJ().list.find(x=>x.sub===base);if(dup&&!(await appConfirm(`「${man.title}」은(는) 이미 구독 중이에요. 하나 더 추가할까요?`)))return;
   const game=JSON.parse(await subGet(base,'game.json'));if(!Array.isArray(game?.chars))throw Error('캐릭터 자료가 올바르지 않습니다');const id2='g'+uid(),ns=id2+'::';const imap=await subPullImages(base,game,ns,null,st,prefix);delete game.images;
@@ -85,7 +85,7 @@ async function subscribe(addr,btn){const base=subParse(addr);if(!base){toast('�
   if(G!==source||PJ().active!==project)throw Error('작업 중 게임이 바뀌어 구독 적용을 취소했습니다');await flush();const pj=PJ();pj.list.push({id:id2,title:man.title||'구독 게임',sub:base});pj.active=id2;
   await appStorage.commitImport(prefix,pjKey(id2),JSON.stringify(game),ns,{[PJKEY]:JSON.stringify(pj)});toast('구독 게임을 저장했어요. 다시 시작할게요');setTimeout(()=>reloadGame(),900);
  }catch(e){toast('구독 실패. '+(e.message||e));}
- finally{await appStorage.discard(prefix).catch(()=>{});syBar('');if(btn?.isConnected){btn.disabled=false;btn.textContent=lbl;}}
+ finally{await appStorage.discard(prefix).catch(()=>{});syBar('');if(rep)rep.end();}
 }
 let SUBCHK=null;
 async function subCheck(manual){ const S=G.meta.subscr; if(!S||!S.base) { if(manual) toast('구독한 게임이 아니에요'); return null; }
@@ -98,7 +98,7 @@ async function subCheck(manual){ const S=G.meta.subscr; if(!S||!S.base) { if(man
       <div class="row" style="margin-top:12px"><button class="btn" data-act="subapply">지금 받기</button><button class="btn ghost" data-act="subskip" data-v="${man.ver}">나중에</button></div>`);
     return man; }
   catch(e){ if(manual) toast('업데이트 확인 실패. '+((e&&e.message)||'')); return null; } }
-async function subApply(btn){const S=G.meta.subscr;if(!S)return;const prefix='sub-update-'+uid()+'::',source=G,project=PJ().active,lbl=btn?.textContent,st=m=>{syBar(m);if(btn?.isConnected)btn.textContent=m;};if(btn)btn.disabled=true;
+async function subApply(rep){const S=G.meta.subscr;if(!S)return;const prefix='sub-update-'+uid()+'::',source=G,project=PJ().active,st=m=>{syBar(m);if(rep)rep(m);};
  try{st('새 버전 받는 중…');const man=SUBCHK?.ver?SUBCHK:JSON.parse(await subGet(S.base,'manifest.json'));const game=JSON.parse(await subGet(S.base,'game.json'));if(!Array.isArray(game?.chars))throw Error('캐릭터 자료가 올바르지 않습니다');
   const imap=await subPullImages(S.base,game,IMGNS,S.imgs||{},st,prefix);delete game.images;if(G!==source||PJ().active!==project)throw Error('작업 중 게임이 바뀌어 업데이트를 취소했습니다');await flush();
   game.prog=clone(source.prog);game.meta=game.meta||{};game.meta.subscr=Object.assign({},S,{ver:man.ver,at:Date.now(),imgs:imap,notes:man.notes||'',skip:0});delete game.meta.pub;
@@ -106,5 +106,5 @@ async function subApply(btn){const S=G.meta.subscr;if(!S)return;const prefix='su
   await appStorage.commitImport(prefix,LKEY,JSON.stringify(next),IMGNS,{[PJKEY]:JSON.stringify(pj)});
   const oldKeys=[...source.chars.map(c=>'c:'+c.id),...source.chapters.map(ch=>'ch:'+ch.id),...source.lib.map(l=>'l:'+l.id),...source.threads.map(x=>'t:'+x.id)];G=next;dirty.clear();clearTimeout(flushT);for(const id of Object.keys(imgCache)){try{URL.revokeObjectURL(imgCache[id]);}catch(e){}delete imgCache[id];}mark(...oldKeys);markAll();await flush();applyMeta();await loadIdbImages();closeModal();sendMail({from:next.meta.title||'만든 사람',title:`v${man.ver} 업데이트를 받았어요`,body:man.notes||'새 버전으로 바뀌었어요.',days:14});toast(`v${man.ver}(으)로 업데이트했어요`);render();checkTriggers&&checkTriggers();
  }catch(e){toast('업데이트 실패. '+(e.message||e)+' 다시 시도해 주세요');}
- finally{await appStorage.discard(prefix).catch(()=>{});syBar('');if(btn?.isConnected){btn.disabled=false;btn.textContent=lbl;}}
+ finally{await appStorage.discard(prefix).catch(()=>{});syBar('');if(rep)rep.end();}
 }

@@ -181,3 +181,14 @@ export function undefinedNames(units, globals) { const known = new Set([...(glob
   for (const [u] of R) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression' || !definers.has(n.childForFieldName('function')?.text)) return; const a = n.childForFieldName('arguments')?.namedChildren[definers.get(n.childForFieldName('function').text)]; if (a?.type === 'string') known.add(a.text.slice(1, -1)); });
   const out = new Map(); for (const [u, r] of R) for (const n of r.refs) { const x = n.text; if (x === 'await' || known.has(x) || guarded.has(x)) continue; const k = x + ' ' + u.loc(n); if (!out.has(k)) out.set(k, { name: x, loc: u.loc(n) }); }
   return [...out.values()]; }
+// 읽기 결과에 쓰기(쓴 것이 사라짐): 상태를 쓰지 않고 어떤 길에서는 새 값(객체·배열 글자·clone·Object.assign({}…))을 돌려주는 읽기 함수(예: progRead·conMeta·VARIANTS)의
+//   결과에 바로 대입·push·delete — 저장 칸이 없을 때는 새 값에 써서 사라짐. 바꿀 때는 progSlot·G.meta.x = … 처럼 상태에 씀
+const FRESH = /^(\{|\[|clone\(|structuredClone\(|Object\.assign\(\{\}|\[\.\.\.)/;
+export function freshReaderWrites(units, fns, mut) { const readers = new Set(['progRead']), ret = n => { const v = n.namedChildren[0]; if (!v) return false; const t = v.type === 'ternary_expression' ? [v.childForFieldName('consequence'), v.childForFieldName('alternative')] : [v]; return t.some(x => x && FRESH.test(x.text)); };
+  for (const f of fns.values()) { if (!f.top || f.unit !== 'main' || mut.has(f.key)) continue; let hit = false; walk(f.node, n => { if (n.type === 'return_statement' && ret(n)) hit = true; if (n !== f.node && /function|arrow/.test(n.type)) return false; }); if (hit) readers.add(f.name); }
+  const rootCall = t => { let x = t; while (x && (x.type === 'member_expression' || x.type === 'subscript_expression')) x = x.childForFieldName('object'); return x?.type === 'call_expression' && readers.has(x.childForFieldName('function')?.text) ? x.childForFieldName('function').text : null; };
+  const out = []; for (const u of units) { if (u.name !== 'main') continue; walk(u.tree.rootNode, n => { let t = null;
+    if (n.type === 'assignment_expression' || n.type === 'augmented_assignment_expression') t = n.childForFieldName('left'); else if (n.type === 'update_expression') t = n.childForFieldName('argument'); else if (n.type === 'unary_expression' && n.child(0)?.type === 'delete') t = n.childForFieldName('argument');
+    else if (n.type === 'call_expression') { const g = n.childForFieldName('function'); if (g?.type === 'member_expression' && /^(push|splice|unshift|pop|shift)$/.test(g.childForFieldName('property')?.text || '')) t = g.childForFieldName('object'); }
+    if (!t || (t.type !== 'member_expression' && t.type !== 'subscript_expression' && t.type !== 'call_expression')) return; const r = rootCall(t.type === 'call_expression' ? t : t); if (r) out.push({ fn: r, loc: u.loc(n), text: n.text.slice(0, 80) }); }); }
+  return out; }

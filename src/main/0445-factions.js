@@ -41,8 +41,8 @@ async function stanceAI(){ const F=factions().filter(f=>f.kind!=='monster'), mai
   (Array.isArray(r.stance)?r.stance:[]).forEach(x=>{ const f=facByName(String(x&&x.faction||'').trim()), ch=Math.max(1,Math.min(main.length,Math.round(+(x&&x.ch)||1))); if(!f||f.kind==='monster'||!FSTANCE[x.s]) return; f.stance=(f.stance||[]).filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); });
   F.forEach(f=>{ if(!Array.isArray(f.stance)) f.stance=[]; if(!f.stance.length) f.stance.push({ch:1,s:stanceAt(f,1),why:''}); f.stance.sort((a,b)=>a.ch-b.ch); });
   mark('world'); return true; }
-async function factionAI(btn,instruction){ const F=factions(), M=monsterNames();
-  const r=await aiJSON(factionAIPrompt({F,instruction,M}),btn,'complex');
+async function factionAI(rep,instruction){ const F=factions(), M=monsterNames();
+  const r=await aiJSON(factionAIPrompt({F,instruction,M}),rep,'complex');
   if(!r) return false; const S=(v,n)=>String(v||'').trim().slice(0,n||300);
   (Array.isArray(r.factions)?r.factions:[]).slice(0,8).forEach(x=>{ const name=S(x.name,30); if(!name) return; let f=facByName(name); if(!f){ f={name,desc:''}; F.push(f); }
     if(FKIND[x.kind]) f.kind=x.kind; [...F_FIELDS,...M_FIELDS].forEach(([k])=>{ const v=S(x[k]); if(v&&(!f[k]||String(f[k]).length<v.length||instruction)) f[k]=v; });
@@ -92,7 +92,7 @@ document.addEventListener('click',async e=>{ const el=e.target.closest('[data-ac
   else if(a==='fwsave'){ fwRead(); toast('세력·등장 설정을 저장했어요'); openWorldDesign(); }
   else if(a==='fwadd'){ fwRead(); factions().push({name:'새 세력 '+(factions().length+1),desc:'',kind:'neutral',rel:{},stance:[]}); openWorldDesign('fac'); }
   else if(a==='fwmon'){ const c=charById(el.dataset.id); if(c&&(await appConfirm(`「${c.name}」을(를) 몬스터(적)로 바꿀까요? ${T('gacha')}·톡·일정·인연에서 빠져요.`))){ charToMonster(c); toast('몬스터로 바꿨어요'); openWorldDesign('cast'); } }
-  else if(a==='fwai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } fwRead(); if(await factionAI(el,($('#fw_ins')||{}).value||'')){ toast('세력·몬스터 설정을 채웠어요'); openWorldDesign(); } } });
+  else if(a==='fwai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } fwRead(); if(await factionAI(uiProg(el),($('#fw_ins')||{}).value||'')){ toast('세력·몬스터 설정을 채웠어요'); openWorldDesign(); } } });
 function monsterFromGen(x){ const name=String(x.name||'').trim(); if(!name||G.lib.some(l=>l.kind==='enemy'&&l.name===name)) return; G.lib.push({id:'l'+uid(),kind:'enemy',name,prompt:String(x.naiPrompt||x.look||''),img:null,desc:String(x.profile||x.desc||'').slice(0,200),faction:String(x.faction||'')}); }
 // 메인 스토리에서 처음 말하는 스테이지 {k: 장 순서(0부터), s}
 function firstSpeak(c){ const re=new RegExp('(^|\\n)'+String(c.name).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(\\s*\\[[^\\]]*\\])?\\s*[:：]'), M=G.chapters.filter(ch=>ch.kind==='main'); for(let k=0;k<M.length;k++) for(const s of M[k].stages||[]) if(re.test((s.pre||'')+'\n'+(s.post||''))) return {k,s}; return null; }

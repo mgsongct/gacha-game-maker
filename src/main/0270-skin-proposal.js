@@ -1,12 +1,12 @@
 /* ===== 스킨 제안: 스탠딩을 먼저 보여 주고, 수락하면 나머지를 한꺼번에 만들어요 ===== */
 let SKPROP=null;
-async function skinPropDraw(btn){ const P0=SKPROP, c=P0&&charById(P0.cid); if(!c) return; if(!imgReady()){ toast(imgNeed()); return; }
-  if(btn){ btn.disabled=true; btn.textContent='그리는 중…'; }
+async function skinPropDraw(rep){ const P0=SKPROP, c=P0&&charById(P0.cid); if(!c) return; if(!imgReady()){ toast(imgNeed()); return; }
+  if(rep) rep('그리는 중…');
   try{ const src=imgSrc(c), ref=src&&P0.ref.on?await refImage(src):null;
     const b=await naiDraw('char',P0.prompt,Object.assign({candidateEligible:true,pose:P0.pose||undefined,styleId:c.naiStyle,frame:c.naiFrame},ref?{refs:[{image:ref,type:P0.ref.style?'character&style':'character',strength:P0.ref.str,fidelity:P0.ref.fid}]}:{}));
     const cfg=b.__candidateConfig;if(cfg?.promptParts&&cfg.promptParts.combined===cfg.prompt){P0.prompt=cfg.prompt;P0.naiBlocks={...P0.naiBlocks,prompt:cfg.promptParts};}
     if(P0.url) URL.revokeObjectURL(P0.url); P0.blob=b; P0.url=URL.createObjectURL(b); openSkinProp(); }
-  catch(err){ toast(naiErr(err)); if(btn&&btn.isConnected){ btn.disabled=false; btn.textContent=P0.url?'다시 그리기':'그리기'; } } }
+  catch(err){ toast(naiErr(err)); if(rep){ rep.end(); rep(P0.url?'다시 그리기':'그리기'); } } }
 function openSkinProp(){ const P0=SKPROP; if(!P0||!P0.url) return; const c=charById(P0.cid); if(!c) return; const sel=P0.sel||{upper:1,illust:1,lbcg:1,faces:0,lines:SAMPLE?1:0};
   openModal(`${head(`「${esc(P0.name)}」 제안`,`<span class="muted">${esc(c.name)}의 새 ${esc(T('skin'))} · 이 모습으로 만들까요?</span>`)}
     <div class="skp-img"><img src="${esc(P0.url)}" alt="${esc(P0.name)}"></div><p class="muted" style="text-align:center;font-size:.78rem;margin:4px 0 0">그림을 누르면 크게 봐요</p>
@@ -16,7 +16,7 @@ function openSkinProp(){ const P0=SKPROP; if(!P0||!P0.url) return; const c=charB
     <p class="muted" style="font-size:.78rem">수락하면 뒤에서 차례로 그려요(위쪽 막대에 진행이 보여요). 표정은 얼굴 범위를 칠한 뒤 전신·상반신 모두 얼굴만 다시 그려요.</p>
     <div class="row" style="margin-top:10px"><button class="btn" data-act="skpok">수락 · 이 모습으로 만들기</button><button class="btn ghost" data-act="skpredo">다시 그리기</button><button class="btn ghost" data-act="skpcancel">취소</button></div>`); }
 function skinPropRead(){ const P0=SKPROP; if(!P0) return; P0.sel={}; document.querySelectorAll('[data-skp]').forEach(i=>{ P0.sel[i.dataset.skp]=i.checked?1:0; }); const sc=$('#skp_scene'); if(sc){P0.scene=sc.value.trim();naiBlocksSave(P0,'scene',sc);} }
-async function skinLinesAI(c,k,btn){ const r=await aiJSON(skinLinesAIPrompt({c,k}),btn,'quick');
+async function skinLinesAI(c,k,rep){ const r=await aiJSON(skinLinesAIPrompt({c,k}),rep,'quick');
   if(r&&Array.isArray(r.lines)){ k.lines=r.lines.map(x=>String(x||'').trim()).filter(Boolean).slice(0,8); if(r.intro) k.intro=String(r.intro).slice(0,120); mark('c:'+c.id); return k.lines.length; } return 0; }
 function skinMakeRest(c,k,sel){ if(['upper','illust','lbcg','faces'].some(x=>sel[x])&&!imgReady()){ toast(imgNeed()); ['upper','illust','lbcg','faces'].forEach(x=>sel[x]=0); }
   if(c.useStanding===false&&!skinDisplayReady(c,k)&&imgReady())sel.upper=1;const go=()=>skinAcceptRun(c,k,sel);

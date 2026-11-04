@@ -21,12 +21,12 @@ case 'imgx': { const k=t.dataset.k, {o,what,after}=imgTarget(k,id,t);
       if(!o||!o.img) break; if(!(await appConfirm(`${what||'그림'}을(를) 지울까요? (항목은 남아요)`))) break;
       await imgClear(o); if(k==='char'){ (o.faces||[]).forEach(f=>{ if(f.img&&f.auto) imgClear(f); }); delete o.faceMask; mark('c:'+id); } else if(k==='lib') mark('l:'+id); else if(k==='skinpart'||k==='weapon') mark('c:'+id); else mark('meta');
       after(); toast('그림을 지웠어요'); break; }
-case 'npcscan': { const snap=artSnap(); const n=await autoNpcs(G.chapters,t); if(n){ openNpcs(); toast(`NPC ${n}명을 추가했어요`); artAfterAI(snap,'NPC '+n+'명'); } else toast('새로 추가할 인물이 없어요(대사 3줄 이상인 조연만 찾아요)'); break; }
+case 'npcscan': { const snap=artSnap(); const n=await autoNpcs(G.chapters,uiProg(t)); if(n){ openNpcs(); toast(`NPC ${n}명을 추가했어요`); artAfterAI(snap,'NPC '+n+'명'); } else toast('새로 추가할 인물이 없어요(대사 3줄 이상인 조연만 찾아요)'); break; }
 case 'npcopen': openNpcs(); break;
 case 'npcsave': { const n=(G.npcs||[]).find(x=>x.id===id); if(!n) break; const old=npcRead(n); if(old&&old!==n.name&&old.length>=2&&(await appConfirm(`이름이 「${old}」에서 「${n.name}」(으)로 바뀌어요. 스토리·${T('talk')}에 나온 「${old}」도 모두 바꿀까요?`))){ const c=renameEverywhere(old,n.name); toast(`이름을 ${c}곳에서 바꿨어요`); } else toast('저장했어요'); npcRefresh(id); break; }
 case 'npcdraw': { const n=(G.npcs||[]).find(x=>x.id===id); if(!n||NPCBUSY.has(id)) break; npcRead(n); npcDraw(n,t.dataset.k==='upper'?'upper':'char'); break; }
 case 'npctags': { const n=(G.npcs||[]).find(x=>x.id===id); if(!n) break; npcRead(n); if(!String(n.look||n.profile||'').trim()){ toast('외모를 먼저 적어 주세요'); break; }
-      const r=await aiJSON(npctagsPrompt({n}),t,'quick');
+      const r=await aiJSON(npctagsPrompt({n}),uiProg(t),'quick');
       if(r&&r.naiPrompt){ n.naiPrompt=allyTags(stripMinor(stripAge(String(r.naiPrompt)))); mark('meta'); npcRefresh(id); toast('태그를 썼어요. 확인하고 다시 그려 보세요'); } break; }
 case 'npcdel': { const n=(G.npcs||[]).find(x=>x.id===id); if(!n||!(await appConfirm(`NPC 「${n.name}」을(를) 지울까요? 스토리에는 이름만 나와요.`))) break; G.npcs=G.npcs.filter(npc=>npc!==n); mark('meta'); openNpcs(); break; }
 case 'npcadd': { const nm=($('#npc_new').value||'').trim(); if(!nm){ toast('이름을 적어 주세요'); break; } if(npcBy(nm)||findSpeaker(nm)){ toast('이미 있는 이름이에요'); break; } G.npcs=G.npcs||[]; G.npcs.push(npcNew(nm)); mark('meta'); openNpcs(); break; }
@@ -89,15 +89,15 @@ case 'facego': { const c=charById(id), list=[...FACESEL]; if(!c) break; const F=
 case 'skinpromptsave': {const c=charById(id),k=c?.skins?.find(k=>k.id===t.dataset.s);if(k){naiBlocksSave(k,'prompt','skin_prompt_'+k.id);mark('c:'+c.id);toast('프롬프트를 저장했어요. 이후 생성부터 적용돼요.');}break;}
 case 'skin-open': openSkin(id); break;
 case 'skinlines': { const c=charById(id), k=c&&(c.skins||[]).find(x=>x.id===t.dataset.s); if(!k) break; if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); break; }
-      const r=await aiJSON(skinlinesPrompt({c,k}),t,'quick');
+      const r=await aiJSON(skinlinesPrompt({c,k}),uiProg(t),'quick');
       if(r&&Array.isArray(r.lines)){ k.lines=r.lines.map(x=>String(x||'').trim()).filter(Boolean).slice(0,8); if(r.intro) k.intro=String(r.intro).slice(0,120); mark('c:'+c.id); toast(`「${k.name}」 대사 ${k.lines.length}개를 썼어요`); skinRefresh(id); } break; }
-case 'skpartgen': { const c=charById(id), k=c&&(c.skins||[]).find(x=>x.id===t.dataset.s); if(k) skinPartGen(c,k,[t.dataset.x],t); break; }
-case 'skpartall': { const c=charById(id), k=c&&(c.skins||[]).find(x=>x.id===t.dataset.s); if(!k) break; const xs=['stand','upper','illust','lbcg'].filter(x=>!imgSrcRaw(x==='stand'?k:k[x])); if(!xs.length){ toast('네 칸 모두 그림이 있어요'); break; } skinPartGen(c,k,xs,t,'batch'); break; }
+case 'skpartgen': { const c=charById(id), k=c&&(c.skins||[]).find(x=>x.id===t.dataset.s); if(k) skinPartGen(c,k,[t.dataset.x],uiProg(t)); break; }
+case 'skpartall': { const c=charById(id), k=c&&(c.skins||[]).find(x=>x.id===t.dataset.s); if(!k) break; const xs=['stand','upper','illust','lbcg'].filter(x=>!imgSrcRaw(x==='stand'?k:k[x])); if(!xs.length){ toast('네 칸 모두 그림이 있어요'); break; } skinPartGen(c,k,xs,uiProg(t),'batch'); break; }
 case 'skpartup': uploadFor={kind:'skinpart',id,s:t.dataset.s,x:t.dataset.x}; $('#file').click(); break;
 case 'skingo': { const c=charById(id), pr=$('#sk_prompt').value.trim(), nm=$('#sk_name').value.trim()||'새 '+T('skin'); if(!pr){toast('프롬프트를 채워 주세요');break;} if(!imgReady()){toast(imgNeed());break;}
       if(SKPROP&&SKPROP.url) URL.revokeObjectURL(SKPROP.url);
       SKPROP={cid:id,name:nm,prompt:pr,naiBlocks:{prompt:naiBlocksFieldParts('sk_prompt')},idea:$('#sk_idea').value.trim(),pose:$('#sk_pose')?$('#sk_pose').value:'',ref:{on:!!(imgSrc(c)&&$('#sk_ref')&&$('#sk_ref').checked),style:$('#sk_style').value==='1',str:+$('#sk_str').value,fid:+$('#sk_fid').value},blob:null,url:null};
-      skinPropDraw(t); break; }
+      skinPropDraw(uiProg(t)); break; }
 case 'skindel': { const c=charById(id); c.skins=c.skins.filter(k=>k.id!==t.dataset.s); Object.values(P().owned).forEach(o=>{if(o.skin===t.dataset.s)o.skin='';}); mark('c:'+id,'prog'); skinRefresh(id); break; }
 case 'wnai': { const c=charById(id); if(!c) break; const pr=($('#f_wp')?$('#f_wp').value:'').trim(); if(pr&&pr!==String(c.weapon.prompt||'')){ c.weapon.prompt=pr; mark('c:'+id); } if(!String(c.weapon.prompt||'').trim()){toast(T('weapon')+' 프롬프트를 채워 주세요');break;} openNaiPrep('weapon',id); break; }
 case 'imglib': openImgLib(id); break;

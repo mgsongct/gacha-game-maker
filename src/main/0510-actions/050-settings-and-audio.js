@@ -56,7 +56,7 @@ case 'vsearch': { VS.q=$('#vs_q').value.trim(); VS.lang=$('#vs_lang').value; con
       try{ VS.results=await fishSearch(VS.q,VS.lang,30); VS.picks={}; renderVoice(VS.results.length?'':'검색 결과가 없어요. 다른 단어나 언어 전체로 다시 찾아보세요.'); }catch(e){ toast(AIERR[e&&e.code]||('검색 실패. '+((e&&e.message)||''))); done(); } break; }
 case 'vsai': { const c=charById(VS.cid); VS.lang=$('#vs_lang').value;
       if(!SND().fishKey){toast('설정의 소리에서 Fish Audio 키를 먼저 넣어 주세요');break;}
-      const q=await aiJSON(vsaiPrompt({c}),t,'quick');
+      const q=await aiJSON(vsaiPrompt({c}),uiProg(t),'quick');
       if(!q) break; renderVoice('목소리를 찾는 중이에요…');
       const seen=new Map();
       try{ for(const w of strs(q.queries).slice(0,6)){ for(const m of await fishSearch(w,VS.lang,10)) if(!seen.has(m._id)) seen.set(m._id,m); } }catch(e){ toast(AIERR[e&&e.code]||('검색 실패. '+((e&&e.message)||''))); }

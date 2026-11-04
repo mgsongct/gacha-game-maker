@@ -21,6 +21,7 @@ import { readGame, gidOf } from './play/lib/data.mjs';
 import { compare, readBaseline, writeBaseline } from './lib/ratchet.mjs';
 import { stageRoots } from './lib/lifecycle.mjs';
 import { surfaceOf, fullLabel } from './lib/surface.mjs';
+import { elementParams, layers } from './lib/arch.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..'), argv = process.argv.slice(2), arg = k => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : null; };
 const JSONF = join(ROOT, 'docs/map.json'), MDF = join(ROOT, 'docs/map.md'), PC = join(ROOT, 'pc'), GAMES = join(ROOT, 'tools/play/games');
@@ -159,8 +160,12 @@ async function splitPlan(ref) { const units = await loadUnits(ROOT), { fns } = b
     '단계 경로 = 생애주기 도구의 단계 시작점(생성·실행 중 AI·사용자 처리기·불러오기)에서 이 함수까지 가장 짧은 호출 경로 — 이 함수를 부르는 Controller 자리. 집 모듈 = 그 기능 함수가 가장 많은 모듈(Model을 둘 곳)', ''];
   for (const k of Object.keys(SPLIT_HOW)) { const rs = by(k); if (!rs.length) continue; md.push(`## ${k} ${rs.length} — ${SPLIT_HOW[k]}`, '', '| 함수 | 자리 | 원안 | 단계 · 가장 짧은 경로 | 닿는 화면 | 기능 · 집 모듈 | 화면 줄 / 처리 줄 |', '|---|---|---|---|---|---|---|');
     for (const r of rs) md.push(`| ${r.name} | ${r.file.replace('src/main/', '')}:${r.line} | ${r.orig} | ${[...new Set(r.stages)].join('·') || '닿지 않음'}${r.path.length ? ' · ' + r.path.join(' → ') : ''} | ${r.screens.join(' / ') || '—'} | ${fl(r.feat)}${r.home ? ' · ' + short(r.home) : ''} | ${r.mix.view.slice(0, 6).join(',')} / ${r.mix.model.slice(0, 6).join(',')} |`); md.push(''); }
+  /* 요소 매개변수: 화면이 아닌 함수(Model·섞임)가 단추·칸 요소를 받아 만지거나(직접) 그런 자리로 넘김(거쳐 감) — 처리기가 uiProg(요소)로 만든 진행 알림 함수를 넘기게 */
+  const L = layers(fns, new Set(Object.keys(map.fns).filter(k => Object.values(map.data).some(d => Object.values(d.writers).flat().includes(k))))).layer, EP = elementParams(fns).filter(x => fns.get(x.fn)?.unit === 'main' && !['View', 'Controller'].includes(L.get(x.fn)?.layer));
+  md.push(`## 요소 매개변수 ${EP.length} — 화면이 아닌 함수가 단추·칸 요소를 받음(직접 만짐 ${EP.filter(x => x.direct).length} · 넘기기만 ${EP.filter(x => !x.direct).length}) — 처리기가 uiProg(요소)로 만든 진행 알림을 넘기고 작업은 그 함수만 부르게`, '', '| 함수 | 매개변수 | 계층 | 직접 만짐 / 넘기는 곳 | 자리 |', '|---|---|---|---|---|',
+    ...EP.map(x => { const f = fns.get(x.fn); return `| ${f.name} | ${x.param} | ${L.get(x.fn)?.layer || ''} | ${x.direct ? '직접' : '→ ' + x.via} | ${f.loc.replace('src/main/', '')} |`; }), '');
   mkdirSync(join(ROOT, 'tools/out'), { recursive: true }); writeFileSync(join(ROOT, 'tools/out/split.md'), md.join('\n'));
-  console.log(`섞인 함수 나누기 계획: ${rows.length}개 — ${Object.keys(SPLIT_HOW).map(k => `${k} ${by(k).length}`).join(' · ')} → tools/out/split.md`); }
+  console.log(`섞인 함수 나누기 계획: ${rows.length}개 — ${Object.keys(SPLIT_HOW).map(k => `${k} ${by(k).length}`).join(' · ')} · 요소 매개변수 ${EP.length}(직접 ${EP.filter(x => x.direct).length}) → tools/out/split.md`); }
 if (argv.includes('--split')) await splitPlan(arg('--split') && !arg('--split').startsWith('--') ? arg('--split') : JSON.parse(readFileSync(join(ROOT, 'tools/fork-features.json'), 'utf8')).upstreamSrc);
 if (arg('--why')) console.log(why(map, arg('--why')));
 if (arg('--game')) console.log(gameView(map, arg('--game')));

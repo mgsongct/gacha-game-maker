@@ -21,7 +21,7 @@ case 'phmenuclose': { if(t.classList.contains('ph-menu')&&e.target!==t) break; p
 case 'phadd': phAddView(id,PH&&PH.fc?'room':'list'); break;
 case 'phaddback': { const a=PH&&PH.add, fr=PH&&PH.from; if(a&&fr==='room') openRoom(a); else phNewList(); break; }
 case 'phaddai': { const c=charById(id); if(!c) break; const hint=$('#pa_hint').value.trim();
-      const r=await aiJSON(phaddaiPrompt({c,hint}),t);
+      const r=await aiJSON(phaddaiPrompt({c,hint}),uiProg(t));
       if(r&&$('#pa_script')){ if(r.title) $('#pa_title').value=String(r.title); if(r.script) $('#pa_script').value=nl(r.script); toast('대화를 채웠어요. 고칠 곳이 있으면 고치고 받기를 누르세요'); } break; }
 case 'phaddsend': { const c=charById(id); if(!c) break; const sc=$('#pa_script').value.trim(); if(!sc){ toast(SAMPLE?'대화를 쓰거나 AI로 대화 쓰기를 눌러 주세요':'대화를 써 주세요'); break; }
       const now=Date.now(), th={id:uid(),charId:c.id,title:$('#pa_title').value.trim()||'메시지',trigger:{type:'start'},needOwn:!!own(c.id),script:sc,added:true};

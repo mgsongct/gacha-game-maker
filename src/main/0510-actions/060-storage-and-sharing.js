@@ -41,9 +41,9 @@ case 'pubopen': openPub(); break;
 case 'pubgo': { const P0=PUB(); P0.repo=$('#pb_repo').value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/$/,''); P0.branch=$('#pb_branch').value.trim()||'main'; P0.token=$('#pb_tok').value.trim(); savePUB(P0); await pubUpload($('#pb_notes').value.trim(),t); break; }
 case 'pubcopy': case 'pubcopy2': { const v=t.dataset.v||($('#pub_addr')&&$('#pub_addr').value)||''; try{ await navigator.clipboard.writeText(v); toast('주소를 복사했어요'); }catch(e){ prompt('복사해 주세요',v); } break; }
 case 'subadd': openSubAdd(); break;
-case 'subgo': await subscribe($('#sb_addr').value,t); break;
+case 'subgo': await subscribe($('#sb_addr').value,uiProg(t)); break;
 case 'subcheck': await subCheck(true); break;
-case 'subapply': await subApply(t); break;
+case 'subapply': await subApply(uiProg(t)); break;
 case 'subskip': { if(G.meta.subscr){ G.meta.subscr.skip=+t.dataset.v||0; mark('meta'); } closeModal(); toast('설정 → 게임 → 업데이트 확인에서 언제든 받을 수 있어요'); break; }
 case 'subcopy': { const b=G.meta.subscr&&G.meta.subscr.base, m=b&&b.match(/raw\.githubusercontent\.com\/([\w.-]+\/[\w.-]+)\/([\w.-]+)\/(.+?)\/$/), v=m?subAddr(m[1],m[2],m[3]):b; try{ await navigator.clipboard.writeText(v); toast('구독 주소를 복사했어요'); }catch(e){ prompt('복사해 주세요',v); } break; }
 case 'subleave': { if(!(await appConfirm('구독을 끊을까요? 지금 게임은 그대로 남고, 앞으로 업데이트를 받지 않아요. 이 게임을 내 게임처럼 직접 고치고 만들 수 있어요.'))) break; delete G.meta.subscr; mark('meta'); const pj=PJ(), row=pj.list.find(x=>x.id===pj.active); if(row){ delete row.sub; appStorage.setItem(PJKEY,JSON.stringify(pj)); } render(); toast('구독을 끊었어요'); break; }

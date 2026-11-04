@@ -89,10 +89,10 @@ function drHeroHTML(){ const hr=DR2.hero; return `<p class="muted dr-help">플�
     <label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="dr_h_hide" ${hr.hide?'checked':''}><span>앞머리로 눈 가리기 <span class="muted" style="font-size:.8rem">(미연시 주인공처럼)</span></span></label>
     <button class="btn sm ghost" data-act="drpolish" data-k="hero" style="margin-top:8px">✦ AI로 다듬기</button>
     ${imgReady()?`<div class="pf-av"><span id="drAvBox">${hr.av&&DRAVU?`<img src="${esc(DRAVU)}" alt="프로필">`:'<span>프로필 그림 없음</span>'}</span><div class="col"><button class="btn sm" data-act="drpfdraw" ${SAMPLE?'':'disabled'}>${hr.av?'다시 그리기':'외모로 프로필 그리기'}</button><span class="muted" style="font-size:.72rem">안 그리면 게임을 만들 때 외모로 같이 그려요</span></div></div>`:''}`; }
-async function drAvatarDraw(btn){ drRead(); const hr=DR2.hero; if(!String(hr.look||'').trim()){ toast('외모를 먼저 적어 주세요'); return; } if(!imgReady()){ toast(imgNeed()); return; }
-  const lab=btn.textContent; btn.disabled=true; btn.textContent='그리는 중…';
+async function drAvatarDraw(rep){ drRead(); const hr=DR2.hero; if(!String(hr.look||'').trim()){ toast('외모를 먼저 적어 주세요'); return; } if(!imgReady()){ toast(imgNeed()); return; }
+  if(rep) rep('그리는 중…');
   try{ const tags=await heroTags(hr); if(!tags){ toast('태그를 만들지 못했어요. 다시 눌러 주세요'); return; } const b=await naiDraw('char',tags,{candidateEligible:true,originalSrc:DRAVU||'',frame:'cowboy shot',pose:'looking at viewer'}); await idbPut('draft_avatar',b); if(DRAVU) URL.revokeObjectURL(DRAVU); DRAVU=URL.createObjectURL(b); drRead(); DR2.hero.av=tags; drSave(); drRerender(); toast('프로필 그림을 만들었어요'); }
-  catch(e){ toast(naiErr(e)); } finally{ if(btn.isConnected){ btn.disabled=false; btn.textContent=lab; } } }
+  catch(e){ toast(naiErr(e)); } finally{ if(rep) rep.end(); } }
 function drModeHTML(){ return `<div class="dr-modes"><button class="dr-mode" data-act="drmode" data-v="auto"><em>1</em><b>자율주행</b><span>한 줄만 적으면 AI가 세계관·인물·이야기를 모두 만들어요.<br><i>예: 미소녀들만 있는 이세계 판타지.</i></span></button>
     <button class="dr-mode" data-act="drmode" data-v="detail"><em>2</em><b>디테일</b><span>테마·세계관·설정·인물·주인공을 직접 자세히 적어요. 적은 건 그대로 살리고 빈 곳만 AI가 채워요.</span></button></div>`; }
 function drAutoHTML(){ const d=DR2; return `<div class="dr-intro"><p><b>자율주행</b> · 만들고 싶은 게임을 한두 줄로 적어요. 나머지는 AI가 알아서 채워요.</p></div>
@@ -143,18 +143,18 @@ function drDedup(d){ d=d||DR2; const seen=[]; let n=0; const run=(o,k)=>{ if(!o|
   if(dupTxt(d.kw,d.tone)){ d.tone=''; n++; } run(d,'kw'); run(d,'tone'); run(d,'world'); run(d,'setting'); run(d,'story'); run(d.hero,'bio'); (d.chars||[]).forEach(c=>{ run(c,'role'); run(c,'profile'); });
   return n; }
 function drSnap(label){ const d=DR2; d.undo={label,kw:d.kw,tone:d.tone,world:d.world,setting:d.setting,story:d.story,chars:JSON.parse(JSON.stringify(d.chars)),hero:JSON.parse(JSON.stringify(Object.assign({},d.hero,{av:undefined})))}; }
-async function drPolish(k,btn){ drRead(); if(k==='hero') return drPolishHero(btn); const cur=String(DR2[k]||'').trim(); if(!cur){ toast('먼저 내용을 조금 적어 주세요'); return; }
+async function drPolish(k,rep){ drRead(); if(k==='hero') return drPolishHero(rep); const cur=String(DR2[k]||'').trim(); if(!cur){ toast('먼저 내용을 조금 적어 주세요'); return; }
   const what=drPolishWhatText({k});
-  const r=await aiJSON(drPolishPrompt({what,k,cur}),btn,'default');
+  const r=await aiJSON(drPolishPrompt({what,k,cur}),rep,'default');
   if(r&&r.text){ drRead(); drSnap(what); DR2[k]=String(r.text); const dn=drDedup(); drSave(); drRerender(); toast('다른 항목에 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); } }
-async function drPolishHero(btn){ const h=DR2.hero;
-  const r=await aiJSON(drPolishHeroPrompt({h}),btn,'default');
+async function drPolishHero(rep){ const h=DR2.hero;
+  const r=await aiJSON(drPolishHeroPrompt({h}),rep,'default');
   if(!r||typeof r!=='object') return; drRead(); drSnap('주인공'); const S=v=>typeof v==='string'?v.trim():''; const H=DR2.hero;
   if(S(r.call)) H.call=S(r.call).slice(0,12); if(S(r.name)&&!String(H.name||'').trim()) H.name=S(r.name).slice(0,12); if(S(r.look)) H.look=S(r.look).slice(0,400); if(S(r.bio)) H.bio=S(r.bio).slice(0,1500);
   drDedup(); drSave(); drRerender(); toast('주인공을 다듬었어요. 마음에 안 들면 「되돌리기」'); }
 /* 전체 맞추기: 세계관·설정·스토리·인물·주인공 설정을 한꺼번에 보고, 서로 어긋난 곳을 고치고 관계를 엮어요. 적힌 내용은 살리고, 한 번 되돌릴 수 있어요 */
-async function drHarmony(btn){ drRead(); const d=DR2; if(!drText(d).trim()){ toast('먼저 세계관이나 인물을 조금 적어 주세요'); return; }
-  const r=await aiJSON(drHarmonyPrompt({d}),btn,'complex');
+async function drHarmony(rep){ drRead(); const d=DR2; if(!drText(d).trim()){ toast('먼저 세계관이나 인물을 조금 적어 주세요'); return; }
+  const r=await aiJSON(drHarmonyPrompt({d}),rep,'complex');
   if(!r||typeof r!=='object'){ return; } drRead();
   drSnap('전체 맞추기');
   const S=v=>typeof v==='string'?v.trim():'';
@@ -163,8 +163,8 @@ async function drHarmony(btn){ drRead(); const d=DR2; if(!drText(d).trim()){ toa
   const rc=Array.isArray(r.chars)?r.chars:[]; d.chars.forEach((c,i)=>{ const o=rc[i]||rc.find(x=>x&&x.name&&x.name===c.name); if(!o) return; ['role','profile','speech','look'].forEach(k=>{ if(S(o[k])) c[k]=S(o[k]); }); if(!String(c.name||'').trim()&&S(o.name)) c.name=S(o.name); });
   if(String(d.hero.bio||'').trim()&&S(r.heroBio)) d.hero.bio=S(r.heroBio);
   const dn=drDedup(d); drSave(); drRerender(); toast('서로 맞춰 다듬었어요'+(dn?` (겹치는 문장 ${dn}개 정리)`:'')+'. 마음에 안 들면 「되돌리기」'); }
-async function drFillChar(i,btn){ drRead(); const c=DR2.chars[i]; if(!c) return;
-  const r=await aiJSON(drFillCharPrompt({i,c}),btn,'default');
+async function drFillChar(i,rep){ drRead(); const c=DR2.chars[i]; if(!c) return;
+  const r=await aiJSON(drFillCharPrompt({i,c}),rep,'default');
   if(!r) return; let o=Array.isArray(r)?r[0]:r; if(o&&!o.profile&&!o.role){ const v=Object.values(o).find(x=>x&&typeof x==='object'&&!Array.isArray(x)); if(v) o=v; } if(!o||typeof o!=='object'){ toast('AI 응답을 읽지 못했어요. 다시 눌러 주세요'); return; }
   drRead(); const c2=DR2.chars[i]||c; drSnap((c2.name||'인물')+' 다듬기'); const S=v=>Array.isArray(v)?v.join(' ').trim():typeof v==='string'?v.trim():'';
   const RK=/\s*[\[(【]\s*(SSR|SR|R)\s*[\])】]\s*/gi; let rk=''; ['role','profile','speech','look'].forEach(k=>{ let v=S(o[k]); if(!v) return; v=v.replace(RK,(m,g)=>{ rk=rk||g.toUpperCase(); return ' '; }).replace(/\s{2,}/g,' ').trim(); if(v) c2[k]=v; }); if(rk&&!c2.rank&&c2.kind!=='npc') c2.rank=({SSR:3,SR:2,R:1})[rk]; if(!String(c2.name||'').trim()&&S(o.name)) c2.name=S(o.name).replace(RK,' ').trim();

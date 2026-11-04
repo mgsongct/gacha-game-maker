@@ -116,8 +116,8 @@ function rulesCodex(){ const w=G.world; if(!Array.isArray(w.codex)) w.codex=[]; 
   if(r.synergy&&+r.synergy.n>1) up('[규칙] 진영 시너지',`같은 진영 ${r.synergy.n}명 이상이 함께 싸우면 공격 +${r.synergy.atk||0}%, 방어 +${r.synergy.def||0}%.`);
   if((r.rel||[]).length) up('[규칙] 관계',r.rel.map(x=>`${x.by==='pos'?(posById(x.a)||{}).name||x.a:x.a} → ${x.by==='pos'?(posById(x.b)||{}).name||x.b:x.b} ${rulesPct(+x.mul||1)}`).join(', '));
   mark('world'); toast('도감에 규칙을 기록했어요'); }
-async function rulesAIData(btn){ const m=G.meta; return aiJSON(rulesAIDataPrompt({m}),btn,'quick'); }
-async function rulesAI(btn){ rulesRead(); const res=await rulesAIData(btn); if(!res||!RD) return; (res.elems||[]).forEach((d,i)=>{ if(d&&RD.elems[i]) RD.elems[i].d=String(d).slice(0,80); }); Object.entries(res.roles||{}).forEach(([k,d])=>{ if(d&&ROLE[k]) RD.roleDesc[k]=String(d).slice(0,80); }); openRules(true); toast('설명을 채웠어요. 저장을 눌러 주세요'); }
+async function rulesAIData(rep){ const m=G.meta; return aiJSON(rulesAIDataPrompt({m}),rep,'quick'); }
+async function rulesAI(rep){ rulesRead(); const res=await rulesAIData(rep); if(!res||!RD) return; (res.elems||[]).forEach((d,i)=>{ if(d&&RD.elems[i]) RD.elems[i].d=String(d).slice(0,80); }); Object.entries(res.roles||{}).forEach(([k,d])=>{ if(d&&ROLE[k]) RD.roleDesc[k]=String(d).slice(0,80); }); openRules(true); toast('설명을 채웠어요. 저장을 눌러 주세요'); }
 async function rulesAIFill(){ const res=await rulesAIData(null); if(!res) return false; const r=RULESM(); r.roleDesc=r.roleDesc||{};
   (res.elems||[]).forEach((d,i)=>{ if(d&&G.meta.elems[i]&&!G.meta.elems[i].d) G.meta.elems[i].d=String(d).slice(0,80); }); Object.entries(res.roles||{}).forEach(([k,d])=>{ if(d&&ROLE[k]&&!r.roleDesc[k]) r.roleDesc[k]=String(d).slice(0,80); }); mark('meta'); return true; }
 function rulesMissingDesc(){ return G.meta.elems.some(e=>!e.d)||Object.keys(ROLE).some(k=>!((G.meta.rules||{}).roleDesc||{})[k]); }
@@ -127,7 +127,7 @@ function posClean(list){ return (Array.isArray(list)?list:[]).slice(0,10).map(p=
 function posValid(L){ return L.length>=2&&['atk','def','sup'].every(k=>L.some(p=>p.base===k)); }
 /* 포지션 자동 설계(점검 g_pos·실행 중 자동 채움): 포지션 없이 기본 3개로 돌던 예전 게임에 세계관에 맞춘 포지션을 만들어 저장하고 캐릭터를 고루 배정 */
 async function posAI(){ const r=await aiJSON(rulesPosAIPrompt(),null,'default'), L=posClean(r&&r.positions); if(!posValid(L)) return false; G.meta.positions=L; posSpread(L); mark('meta'); return true; }
-async function rulesPosAI(btn){ rulesRead(); const r=await aiJSON(rulesPosAIPrompt(),btn,'default'); const L=posClean(r&&r.positions); if(!L.length) return; RD.positions=L; openRules(true); toast(`포지션 ${L.length}개를 설계했어요. 저장을 눌러 주세요`); }
+async function rulesPosAI(rep){ rulesRead(); const r=await aiJSON(rulesPosAIPrompt(),rep,'default'); const L=posClean(r&&r.positions); if(!L.length) return; RD.positions=L; openRules(true); toast(`포지션 ${L.length}개를 설계했어요. 저장을 눌러 주세요`); }
 async function rulesRecalc(){ if(!(await appConfirm(`기본형·희귀도 기준으로 모든 ${T('crew')}의 체력·공격·방어·속도를 다시 계산할까요? 직접 고친 능력치도 바뀌어요(이격은 원본 비율을 따라가요).`))) return; if(!rulesSave()) return;
   let n=0; for(const c of G.chars){ if(c.alt) continue; const s=GGMCombat.generateBaseStats(c); Object.assign(c,{hp:s.hp,atk:s.atk,def:s.def,spd:s.spd}); mark('c:'+c.id); n++; } toast(`${n}명의 능력치를 다시 계산했어요`); openRules(); }
 /* 기본형이 같은 포지션 중에서 고루 배정(포지션이 목록에 없는 캐릭터만) — 규칙 화면의 배정 버튼과 포지션 자동 설계(posAI)가 같이 씀. 배정한 수 */
@@ -137,8 +137,8 @@ document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); 
   if(a==='rulesopen') openRules();
   else if(a==='rulessave'){ if(rulesSave()){ closeModal(); render(); toast('게임 규칙을 저장했어요'); } }
   else if(a==='rulescodex'){ if(rulesSave()){ rulesCodex(); openRules(); } }
-  else if(a==='rulesai') rulesAI(el);
-  else if(a==='rulesposai') rulesPosAI(el);
+  else if(a==='rulesai') rulesAI(uiProg(el));
+  else if(a==='rulesposai') rulesPosAI(uiProg(el));
   else if(a==='rulesrecalc') rulesRecalc();
   else if(a==='rulesposassign'){ rulesPosAssign(); }
   else if(a==='rulespreset'){ rulesRead(); RD.positions=POS_PRESETS[el.dataset.k].map(([name,base,desc,t])=>({id:'p_'+uid(),name:el.dataset.k==='basic'?ROLE[base]:name,base,desc,t:{...t},range:POS_RANGE[el.dataset.k==='basic'?ROLE[base]:name]||''})); openRules(true); }

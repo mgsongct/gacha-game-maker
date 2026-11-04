@@ -90,7 +90,7 @@ for (const dir of dirs) {
       ok('원정 ↔ 전투 편성', '일하는 대원은 편성에서 빠짐' + tag, busyIds().has(id), '');
       if (jid) { progSlot('exped').jobs[jid].start -= job.hours * 3600e3 + 1000; const fame0 = progSlot('exped').fame[id] || 0, r = exClaim(jid); ok('원정', '끝나면 결과·인기' + tag, !!r && (progSlot('exped').fame[id] || 0) >= fame0, `인기 ${fame0}→${progSlot('exped').fame[id] || 0}`); } if (forced) G.meta.expedition = { mode: 'combat' }; });
     // ⑥ 건조
-    await step('건조', async () => { const forced = !conOn(); if (forced) conMeta().on = true; const tag = forced ? ' (상황: 건조 켬)' : '';
+    await step('건조', async () => { const forced = !conOn(); if (forced) G.meta.construct = Object.assign(conMeta(), { on: true }); /* conMeta()는 읽기(없으면 새 값) — 켤 때는 conSave처럼 G.meta.construct에 씀 */ const tag = forced ? ' (상황: 건조 켬)' : '';
       CON_RES.forEach(k => { progSlot('cres')[k] = 99999; }); const cfg = CON(), pool = conPool(), inp = GGMConstruct.normalize(conReadInput(), cfg), info = GGMConstruct.roll(inp, cfg, pool, conVariantChoices(inp)).info || {}, mem = gr => pool.filter(c => Object.entries(gr.match || {}).every(([k, v]) => c[k] === v)).length;
       ok('건조 ↔ 생성된 대원', '분류마다 나올 대원이 있음' + tag, cfg.groups.every(gr => mem(gr) > 0), cfg.groups.map(gr => `${gr.name} ${mem(gr)}명`).join(' · '));
       const tb = GGMConstruct.table(inp, cfg, pool), rar = Object.entries(info.rarity || {}).filter(([, v]) => v > 0).map(([k]) => ['', 'R', 'SR', 'SSR'][k]).join('·');

@@ -123,17 +123,17 @@ function cardOffer(run){ const pool=CARD_REWARD.slice(), out=[]; const sup=run.s
     out.push({k,o:(rand(pc.length?pc:base)||{}).id,up:Math.random()<0.12+0.06*run.floor}); }
   return out; }
 // 카드 일러스트: 대원마다, 카드 종류마다 한 장 (스킬 카드는 기술 컷인을 써요)
-async function drawCardArts(deck,btn){ if(!imgReady()){ toast(imgNeed()); return; }
+async function drawCardArts(deck,rep){ if(!imgReady()){ toast(imgNeed()); return; }
   const todo=[]; const seen=new Set(); deck.forEach(cd=>{ const c=charById(cd.o), key=cd.o+'|'+cd.k; if(!c||seen.has(key)||cardIllObj(cd)) return; seen.add(key); todo.push(cd); });
   if(!todo.length){ toast('모든 카드에 일러스트가 있어요'); return; }
-  const lab=btn?btn.textContent:''; let n=0;
-  for(const cd of todo){ const c=charById(cd.o); if(btn){ btn.disabled=true; btn.textContent=`그리는 중 ${n+1}/${todo.length}`; }
+  let n=0;
+  for(const cd of todo){ const c=charById(cd.o); if(rep) rep(`그리는 중 ${n+1}/${todo.length}`);
     try{ const tags=cd.k==='skill'?(SKILL_TAGS[c.skill&&c.skill.kind]||'attacking')+', special effects, glowing':CARD_ILL[cd.k]||'dynamic pose';
       const b=await naiDraw('illust',joinTags(c.naiPrompt,tags),{styleId:c.naiStyle,frame:cd.k==='skill'?'upper body':'cowboy shot',pose:'dynamic pose, '+tags});
       if(cd.k==='skill'){ scgOf(c); await storeImage(c.scg,b,''); } else { c.cards=c.cards||{}; const o=c.cards[cd.k]||(c.cards[cd.k]={id:'cd_'+c.id+'_'+cd.k,kind:'illust',name:c.name+' '+cardName({k:cd.k,o:c.id}),prompt:tags,img:null}); await storeImage(o,b,''); }
       mark('c:'+c.id); n++; }
     catch(e){ toast(naiErr(e)); break; } }
-  if(btn&&btn.isConnected){ btn.disabled=false; btn.textContent=lab; } if(n) toast(`카드 일러스트 ${n}장을 그렸어요`); const run=progSlot('rogue').run; if($('#modal .cd-row')&&run) rgDeckModal(run.deck); if(CB) cbRender(); }
+  if(rep) rep.end(); if(n) toast(`카드 일러스트 ${n}장을 그렸어요`); const run=progSlot('rogue').run; if($('#modal .cd-row')&&run) rgDeckModal(run.deck); if(CB) cbRender(); }
 
 /* --- 카드 전투 엔진 --- */
 let CB=null;

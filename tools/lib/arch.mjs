@@ -149,3 +149,15 @@ function moduleVerdict(m, fs, C) { const n = fs.length, lay = {}, by = new Map()
   if (feat.length >= 3 && feat[0][1] * 2 < nf) return { ...v, kind: '흩어짐', spread: feat.map(([id, c]) => ({ feat: id, n: c, to: C.home.get(id) !== m ? C.home.get(id) : null })) };
   const [id, c] = feat[0] || [], hm = id && C.home.get(id), other = hm && hm !== m ? (C.feats[id].mods.find(([x]) => x === hm) || [])[1] || 0 : 0;
   return id && hm !== m && c * 2 <= other ? { ...v, kind: '조각', feat: id, to: hm, n0: c, n1: other } : { ...v, kind: id ? '고유' : '기반', feat: id || null }; }
+// 요소 매개변수(진행 표시 꼴의 뿌리): 함수 매개변수가 DOM 요소로 쓰이거나(글자·잠금·연결 여부·클래스 …) 그런 매개변수 자리로 넘어가면 요소 매개변수 — 호출 그래프에서 더 바뀌지 않을 때까지.
+//   Model 함수가 요소를 받아 직접 만지면(단추를 잠그고 글자를 바꿈) 계층 섞임·방향 위반의 뿌리 → 처리기가 화면에서 만든 진행 알림 함수(uiProg)를 넘기고 작업은 그 함수만 부르게(map.mjs --split)
+const ELEM_PROP = /^(textContent|innerText|innerHTML|disabled|isConnected|classList|dataset|querySelector|querySelectorAll|closest|getBoundingClientRect|scrollIntoView|appendChild|insertAdjacentHTML)$/; /* 데이터 객체에도 흔한 이름(style·hidden·remove)은 뺌 */
+const paramNames = f => { const ps = f.node.childForFieldName('parameters')?.namedChildren || (f.node.childForFieldName('parameter') ? [f.node.childForFieldName('parameter')] : []); return ps.map(p => p.type === 'identifier' ? p.text : p.type === 'assignment_pattern' ? p.childForFieldName('left')?.text : null); };
+export function elementParams(fns) { const top = [...fns.values()].filter(f => f.top && !f.table), P = new Map(top.map(f => [f.key, paramNames(f)])), dom = new Map(), passes = [];
+  for (const f of top) { const ps = P.get(f.key), set = new Set(); walk(f.node, n => {
+    if (n.type === 'member_expression' && ps.includes(n.childForFieldName('object')?.text) && ELEM_PROP.test(n.childForFieldName('property')?.text || '')) set.add(n.childForFieldName('object').text);
+    if (n.type === 'call_expression') { const g = n.childForFieldName('function'); if (g?.type !== 'identifier' || !fns.has(g.text)) return; (n.childForFieldName('arguments')?.namedChildren || []).forEach((a, i) => { const t = a.text.replace(/\|\|null$/, ''); if (ps.includes(t)) passes.push({ f: f.key, p: t, g: g.text, i }); }); } });
+    dom.set(f.key, set); }
+  const el = new Map(top.map(f => [f.key, new Set(dom.get(f.key))])), via = new Map();
+  for (let more = true; more;) { more = false; for (const x of passes) { const gp = P.get(x.g)?.[x.i]; if (gp && el.get(x.g)?.has(gp) && !el.get(x.f).has(x.p)) { el.get(x.f).add(x.p); via.set(`${x.f}|${x.p}`, x.g); more = true; } } }
+  const out = []; for (const f of top) for (const p of el.get(f.key)) out.push({ fn: f.key, param: p, direct: dom.get(f.key).has(p), via: via.get(`${f.key}|${p}`) || null }); return out; }

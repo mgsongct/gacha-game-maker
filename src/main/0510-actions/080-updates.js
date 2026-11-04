@@ -1,7 +1,7 @@
 async function handleUpdatesAction(a,t,id,p,e){
   switch(a){
 case 'webupdcheck': checkWebUpdate(true); break;
-case 'webupdgo': applyWebUpdate(t); break;
+case 'webupdgo': applyWebUpdate(uiProg(t)); break;
 case 'webupdskip': { const o=LV(); if(WEBUPD) o.webSkip=WEBUPD.build; saveLV(o); closeModal(); toast('다음 버전이 나오면 다시 알려 드릴게요'); break; }
 case 'updel': { const c=charById(id); if(!c||!c.upper) break; c.upper.img=null; mark('c:'+c.id); openChar(c.id); break; }
 case 'upd-open': openUpdSet(); break;
