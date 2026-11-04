@@ -6,7 +6,8 @@
 //   줄 전체를 차지하는 선언만 지워요(한 줄에 여러 선언이 섞이면 건너뛰고 알려 줌). 끝나면 node build/build.mjs와 테스트를 돌리세요.
 // 규칙의 고치는 법 적용: node tools/fix.mjs --rule D1 [--apply] — 규칙표(lib/rules.mjs)의 「고치는 법」이 기계적으로 정해지는 규칙만
 //   D1 읽기 결과에 쓰기: 쓰는 대상을 낸 읽기 호출(바로 부른 것·받은 지역 이름의 선언)을 같은 칸의 쓰기 접근으로 — progRead→progSlot, gameRead→gameSlot,
-//      return gameRead('칸')·progRead('칸')만 하는 읽기 함수 → 그 칸의 쓰기 접근. 다른 읽기 함수(길마다 다른 값)는 손으로(목록만)
+//      return gameRead('칸')·progRead('칸')만 하는 읽기 함수 → 그 칸의 쓰기 접근, 읽기 함수가 제 주석에 「바꿀 때는 X」·「고칠 때는 X」로 적은 쓰기 함수 → X(같은 인자).
+//      둘 다 아닌 읽기 함수는 손으로(목록만)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,13 +34,20 @@ async function pass() {
 }
 // D1: 읽기 → 같은 칸의 쓰기 접근(인자 그대로). 칸 하나를 읽기만 하는 함수는 그 칸으로
 const SLOT_W = { progRead: 'progSlot', gameRead: 'gameSlot' };
-export function writerOf(fns, name) { if (SLOT_W[name]) return a => `${SLOT_W[name]}${a}`; const f = [...fns.values()].find(x => x.top && x.name === name && x.unit === 'main'); if (!f) return null;
+/* 읽기 함수가 제 주석에 적은 쓰기 접근(「바꿀 때는 X」·「고칠 때는 X(…)」 — 함수 바로 앞 주석이나 같은 줄 뒤 주석): 소스가 짝을 정함 */
+/* 같은 줄 뒤 주석은 tree-sitter가 본문 블록의 닫는 } 뒤 자식으로 붙임 */
+const afterClose = b => { const close = (b?.children || []).find(c => c.type === '}'); return close ? b.children.filter(c => c.type === 'comment' && c.startIndex > close.startIndex).map(c => c.text) : []; };
+function declaredWriter(f) { let root = f.node; while (root.parent) root = root.parent; const src = root.text, eol = src.indexOf('\n', f.node.endIndex), before = f.node.previousNamedSibling;
+  const notes = [src.slice(f.node.endIndex, eol < 0 ? undefined : eol), before?.type === 'comment' && before.endPosition.row === f.node.startPosition.row - 1 ? before.text : '', ...afterClose(f.node.childForFieldName('body'))];
+  for (const t of notes) { const m = /(?:바꿀|고칠) 때는 ([A-Za-z_$][\w$]*)(\([^)]*\))?/.exec(t); if (m) return a => m[2] && m[2] !== '()' ? m[1] + m[2] : m[1] + a; } return null; }
+export function writerOf(fns, name) { if (SLOT_W[name]) return a => `${SLOT_W[name]}${a}`; const f = [...fns.values()].find(x => x.top && x.name === name); if (!f) return null; const dw = declaredWriter(f); if (dw) return dw;
   let r = null, n = 0; walk(f.node, x => { if (x !== f.node && /function|arrow/.test(x.type)) return false; if (x.type === 'return_statement') { n++; r = x.namedChildren[0]; } });
   const fn = r?.type === 'call_expression' ? r.childForFieldName('function')?.text : null, as = r?.childForFieldName('arguments'); if (n !== 1 || !SLOT_W[fn] || as?.namedChildren.length !== 1 || as.namedChildren[0].type !== 'string') return null;
   const w = `${SLOT_W[fn]}${as.text}`; return () => w; }
-async function ruleD1() { const units = await loadUnits(ROOT), main = units[0], { fns } = buildGraph(units), W = freshReaderWrites(units, fns, mutations(units, fns).mut);
-  let off = 0; const files = main.files.map(f => { const text = readFileSync(join(ROOT, f.path), 'utf8'), r = { path: f.path, start: off, text, subs: new Map() }; off += text.length; return r; }), hand = [];
-  for (const w of W) { const c = w.call, mk = writerOf(fns, w.fn), f = files.findLast(x => x.start <= c.start); if (!mk || c.unit !== 'main' || !f) { hand.push(w); continue; }
+async function ruleD1() { const units = await loadUnits(ROOT), { fns } = buildGraph(units), W = freshReaderWrites(units, fns, mutations(units, fns).mut);
+  /* 단위(main·모듈 블록)마다 파일 글의 시작 자리 — 단위 글 = 파일 글을 이은 것 */
+  const byUnit = new Map(units.map(u => { let off = 0; return [u.name, u.files.map(f => { const text = readFileSync(join(ROOT, f.path), 'utf8'), r = { path: f.path, start: off, text, subs: new Map() }; off += text.length; return r; })]; })), files = [...byUnit.values()].flat(), hand = [];
+  for (const w of W) { const c = w.call, mk = writerOf(fns, w.fn), f = (byUnit.get(c.unit) || []).findLast(x => x.start <= c.start); if (!mk || !f) { hand.push(w); continue; }
     const args = c.text.slice(w.fn.length); f.subs.set(c.start - f.start, { a: c.start - f.start, b: c.end - f.start, to: mk(args), from: c.text, at: c.at }); }
   const subs = files.flatMap(f => [...f.subs.values()].map(x => ({ ...x, f })));
   subs.forEach(x => console.log(`  ${x.at}  ${x.from} → ${x.to}`)); hand.forEach(w => console.log(`  손으로: ${w.loc} ${w.fn}() — ${w.text}`));

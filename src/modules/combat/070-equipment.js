@@ -12,6 +12,7 @@ function v2EnsureEquipment(c){
  if(!c.weapon.passiveOption){const draft=GGMCombat.equipmentDraft(c);if(draft){c.weapon.passiveOption=draft;if(G.chars.includes(c))mark('c:'+c.id);}}
  v2SyncEquipment(c);return c.weapon.passiveOption;
 }
+function v2EquipmentOf(c){return c.weapon?.passiveOption||GGMCombat.equipmentDraft(c);} // 읽기 — 고칠 때는 v2EnsureEquipment
 function v2EquipmentSkillSaved(c,slot,before,after,rerolled=false){
  if(!['passive','active'].includes(slot))return false;
  if(rerolled||GGMCombat.equipmentSkillSignature({[slot]:before},slot)!==GGMCombat.equipmentSkillSignature({[slot]:after},slot)){
@@ -20,7 +21,7 @@ function v2EquipmentSkillSaved(c,slot,before,after,rerolled=false){
  return v2SyncEquipment(c);
 }
 function v2EquipmentCard(c,o){
- const p=v2EnsureEquipment(c),state=GGMCombat.equipmentState(c,o?.wlv||0),warning=state.needsReroll;
+ const p=v2EquipmentOf(c),state=GGMCombat.equipmentState(c.weapon?.passiveOption?c:{...c,weapon:{...(c.weapon||{}),passiveOption:p}},o?.wlv||0),warning=state.needsReroll;
  return `<div class="cs-card v2-equipment-card ${warning?'needs-reroll':''}" data-equipment-card data-cid="${esc(c.id)}">
  <div class="v2-equipment-head"><div class="wthumb">${imgSrc(c.weapon)?`<img src="${esc(imgSrc(c.weapon))}" alt="">`:'<span>⚔</span>'}</div><div class="t"><b>${esc(c.weapon.name||T('weapon')+' 미설정')} ${o?`<span class="muted">${o.wlv?o.wlv+'단계':'잠김'}</span>`:''}</b><div class="muted">${esc(c.weapon.desc||'')}</div></div></div>
  <div class="v2-equipment-upgrade"><button class="btn" data-act="wup" data-id="${esc(c.id)}" ${!o||o.wlv>=5?'disabled':''}>${!o?'장비 해금 — 캐릭터 획득 필요':o.wlv>=5?'장비 최대 강화':o.wlv?'장비 강화':'장비 해금'}</button><p class="muted">${!o?'캐릭터를 획득하면 장비를 해금할 수 있어요.':o.wlv>=5?'최대 5단계입니다.':`${esc(T('wMat'))} ${GGMCombat.equipmentUpgradeCost(o.wlv).materials}개 · ${esc(T('gold'))} ${nf(GGMCombat.equipmentUpgradeCost(o.wlv).gold)}개 필요`}</p></div>

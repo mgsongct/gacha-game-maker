@@ -179,7 +179,7 @@
 | 0260-new-game/020-build.js buildNewGameDraft#5 | src/main/0260-new-game/020-build.js:116 | 29 |
 | 0260-new-game/020-build.js buildNewGameDraft#6 | src/main/0260-new-game/020-build.js:119 | 32 |
 | 0280-live-ops.js dailyTalks | src/main/0280-live-ops.js:33 | 33 |
-| 0445-factions.js stanceAI | src/main/0445-factions.js:40 | 25 |
+| 0445-factions.js stanceAI | src/main/0445-factions.js:48 | 25 |
 | 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#2 | src/main/0510-actions/020-navigation-and-tools.js:91 | 0 |
 | 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#3 | src/main/0510-actions/020-navigation-and-tools.js:93 | 0 |
 | 0510-actions/020-navigation-and-tools.js handleNavigationAndToolsAction#4 | src/main/0510-actions/020-navigation-and-tools.js:94 | 0 |
@@ -200,12 +200,12 @@
 | 0530-story-memory.js smExtract#3 | src/main/0530-story-memory.js:12 | 0 |
 | 0530-story-memory.js smExtract#4 | src/main/0530-story-memory.js:13 | 0 |
 | 0535-content-audit.js auditAIFill | src/main/0535-content-audit.js:62 | 27 |
-| modules/combat/050-bridge.js v2GenerateSkills | src/modules/combat/050-bridge.js:292 | 4 |
-| modules/combat/050-bridge.js v2ConceptPrompt | src/modules/combat/050-bridge.js:365 | 0 |
+| modules/combat/050-bridge.js v2GenerateSkills | src/modules/combat/050-bridge.js:296 | 4 |
+| modules/combat/050-bridge.js v2ConceptPrompt | src/modules/combat/050-bridge.js:369 | 0 |
 | modules/combat/060-generation.js v2ResolvePalette | src/modules/combat/060-generation.js:121 | 2 |
 | modules/combat/060-generation.js v2GenerateSelected | src/modules/combat/060-generation.js:161 | 3 |
 | modules/combat/060-generation.js v2GenerateSelected#2 | src/modules/combat/060-generation.js:188 | 4 |
-| modules/combat/070-equipment.js v2GearGenerate | src/modules/combat/070-equipment.js:73 | 0 |
+| modules/combat/070-equipment.js v2GearGenerate | src/modules/combat/070-equipment.js:74 | 0 |
 | 그림 0030-image/010-engine.js naiDraw#2 | src/main/0030-image/010-engine.js:180 | 1 |
 | 그림 0030-image/010-engine.js openNaiGen | src/main/0030-image/010-engine.js:751 | 0 |
 | 그림 0030-image/010-engine.js faceDrawOne | src/main/0030-image/010-engine.js:839 | 1 |

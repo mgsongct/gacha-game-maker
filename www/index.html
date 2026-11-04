@@ -3796,6 +3796,10 @@ function v2RunJob(type,args,options={}){
  });
 }
 function v2ApplyRoleSpeed(c){if(c.roleSpeedVersion!==1||c.roleSpeedRole!==c.role){if(c.roleSpeedOriginal===undefined)c.roleSpeedOriginal=c.spd;c.spd=GGMCombat.roleSpeed(c);c.roleSpeedVersion=1;c.roleSpeedRole=c.role;c.skillBalance=null;}return c.spd;}
+/* 스킬 묶음 c.skills: 쓰기 v2Ensure(지금 규칙으로 옮겨 저장 — 불러오기 fix·전투 준비·스킬 생성) · 읽기 v2Kit(지금 규칙이면 저장된 것, 아니면 옮긴 모양을 새로 만들어 보여 주기만) */
+function v2KitOk(s){return !!s&&s.ruleset===GGMCombat.RULESET&&!GGMCombat.validate(s).length;}
+function v2KitFresh(c){const s=c.skills&&c.skills.ruleset!==GGMCombat.RULESET?GGMCombat.normalize(GGMCombat.clone(c.skills)):c.skills;return s&&!GGMCombat.validate(s).length?GGMCombat.normalize(GGMCombat.clone(s)):GGMCombat.generationDefaults(c);}
+function v2Kit(c){const s=c.skills;return v2KitOk(s)?s:v2KitFresh(c);} // 읽기 — 고칠 때는 v2Ensure
 function v2Ensure(c){
  if(typeof c.useStanding!=='boolean')c.useStanding=false;
  v2ApplyRoleSpeed(c);
@@ -3825,7 +3829,7 @@ async function v2ReadyChars(chars){for(const c of chars){v2Ensure(c);if(!c.skill
 function v2KeepPlan(state,slot,plan){(state.plans||={})[slot]=plan;}
 function v2SavePlan(c,state,slot){if(!state.plans?.[slot])return;c.skillPlan={...(c.skillPlan||{}),[slot]:v2SkillPlanText(state.plans[slot])};delete state.plans[slot];}
 function v2PlanHTML(c){const p=c.skillPlan||{},rows=[['kit','세트'],...Object.entries(GGMCombat.SLOTS)].filter(([k])=>p[k]);return rows.length?'<details><summary>스킬 설계 의도</summary>'+rows.map(([k,l])=>'<p class="muted" style="margin:2px 0"><b>'+esc(l)+'</b> '+esc(p[k])+'</p>').join('')+'</details>':'';}
-function v2SkillSummary(c){const kit=GGMCombat.trainedKit(v2Ensure(c),v2OwnedTraining(c));return `${v2TrainingSummary(c)}${v2PlanHTML(c)}${c.skillGenerationNotice?'<p class="muted">'+esc(c.skillGenerationNotice)+'</p>':''}${c.skillDesignLog?.length?'<details><summary>최근 스킬 생성 기록</summary><ol>'+c.skillDesignLog.slice(-20).map(x=>'<li>'+esc((x.attempt?x.attempt+'차 · ':'')+x.text)+'</li>').join('')+'</ol></details>':''}${c.skillGenerationWarning?'<p class="muted">'+esc(c.skillGenerationWarning)+'</p>':''}${Object.entries(GGMCombat.SLOTS).map(([key,label])=>`<div class="cs-card" data-skill-card="${key}"><div class="wthumb">${imgSrc(c.skillIcons?.[key])?`<img src="${esc(imgSrc(c.skillIcons[key]))}" alt="${label} 아이콘">`:'<span>✦</span>'}</div><div class="t"><b>${label} · ${esc(kit[key].name)} <span class="badge">${esc(v2TrainingLabel(v2OwnedTraining(c),key))}</span></b><p class="muted">${esc(v2SkillText(kit[key],key))}${key==='ultimate'?' · 전투 시작 SP '+Math.round(GGMCombat.trainingInitialSP(v2OwnedTraining(c))*100)/100:''}</p><button class="btn sm ghost" data-act="v2edit" data-id="${esc(c.id)}" data-slot="${key}">${label} 편집 · AI 생성</button> ${v2MasteryButton(c,key)}</div></div>`).join('')}`;}
+function v2SkillSummary(c){const kit=GGMCombat.trainedKit(v2Kit(c),v2OwnedTraining(c));return `${v2TrainingSummary(c)}${v2PlanHTML(c)}${c.skillGenerationNotice?'<p class="muted">'+esc(c.skillGenerationNotice)+'</p>':''}${c.skillDesignLog?.length?'<details><summary>최근 스킬 생성 기록</summary><ol>'+c.skillDesignLog.slice(-20).map(x=>'<li>'+esc((x.attempt?x.attempt+'차 · ':'')+x.text)+'</li>').join('')+'</ol></details>':''}${c.skillGenerationWarning?'<p class="muted">'+esc(c.skillGenerationWarning)+'</p>':''}${Object.entries(GGMCombat.SLOTS).map(([key,label])=>`<div class="cs-card" data-skill-card="${key}"><div class="wthumb">${imgSrc(c.skillIcons?.[key])?`<img src="${esc(imgSrc(c.skillIcons[key]))}" alt="${label} 아이콘">`:'<span>✦</span>'}</div><div class="t"><b>${label} · ${esc(kit[key].name)} <span class="badge">${esc(v2TrainingLabel(v2OwnedTraining(c),key))}</span></b><p class="muted">${esc(v2SkillText(kit[key],key))}${key==='ultimate'?' · 전투 시작 SP '+Math.round(GGMCombat.trainingInitialSP(v2OwnedTraining(c))*100)/100:''}</p><button class="btn sm ghost" data-act="v2edit" data-id="${esc(c.id)}" data-slot="${key}">${label} 편집 · AI 생성</button> ${v2MasteryButton(c,key)}</div></div>`).join('')}`;}
 function v2TriggerSettings(s){
  const help={always:'전투 중 조건을 계속 확인합니다. 재사용 대기와 발동 제한을 함께 설정하세요.',battle_start:'전투 시작 시 한 번 발동합니다. 첫 사용 대기를 설정하면 그 시간이 지난 뒤 한 번 발동합니다.',interval:'설정한 간격과 재사용 대기를 모두 충족하면 자동 발동합니다.',after_basic:'일반 공격을 지정한 횟수만큼 사용할 때마다 발동합니다.',attack_hit:'공격이 적중한 횟수를 셉니다. 여러 타격은 각각 계산합니다.',hp_below:'자신의 HP가 기준 비율 이하인 동안 재사용 대기마다 발동할 수 있습니다.',mark_threshold:'자신 또는 마지막 대상에게 지정 표식이 쌓일 때 기준 중첩을 확인합니다. 표식은 자동 소모되지 않습니다.'};
  let fields='';
@@ -3865,7 +3869,7 @@ function v2EffectSettings(e){
 function v2Select(name,map,value){return `<select class="in" data-v2-field="${name}">${Object.entries(map).map(([k,v])=>`<option value="${k}" ${k===value?'selected':''}>${esc(Array.isArray(v)?v[0]:v)}</option>`).join('')}</select>`;}
 function v2Number(name,value,min,max,label,step='.1',scale=1){return `<label class="f">${label}<input class="in" type="number" data-v2-field="${name}" value="${Math.round(value*scale*100)/100}" data-v2-scale="${scale}" data-v2-raw="${value}" data-v2-shown="${Math.round(value*scale*100)/100}" min="${min}" max="${max}" step="${+step>=1?step:'.01'}"></label>`;}
 function v2Report(r){if(!r)return '저장 전에 검사해 주세요';return `${r.generation||1}세대 · ${r.trials}개 비교 시나리오 · 기준 대비 ${r.ratio}배 · ${r.status==='within'?'목표 범위':r.status==='strong'?'강한 편 — 검토 권장':'약한 편 — 검토 권장'} (추정치)`;}
-function v2OpenEditor(id,slot="passive"){if(playMode())return;if(typeof v2CloseGearEditor==='function')v2CloseGearEditor();const c=charById(id);if(!c)return;v2CancelEditorGeneration();V2EDIT={id,slot:GGMCombat.SLOTS[slot]?slot:'passive',kit:GGMCombat.clone(v2Ensure(c)),report:null,reports:{},histories:{},fallbacks:{},generation:GGMCombat.generation(c),concept:'',busy:false,status:'',job:null};v2DrawEditor();}
+function v2OpenEditor(id,slot="passive"){if(playMode())return;if(typeof v2CloseGearEditor==='function')v2CloseGearEditor();const c=charById(id);if(!c)return;v2CancelEditorGeneration();V2EDIT={id,slot:GGMCombat.SLOTS[slot]?slot:'passive',kit:GGMCombat.clone(v2Kit(c)),report:null,reports:{},histories:{},fallbacks:{},generation:GGMCombat.generation(c),concept:'',busy:false,status:'',job:null};v2DrawEditor();}
 function v2EffectBlock(e,i,slot,count){return `<div data-v2-effect="${i}" style="padding:10px 0;border-top:1px solid var(--line)"><b>효과 ${i+1}</b><div class="g2"><label class="f">효과 종류${v2EffectTypeSelect(e.type)}</label><label class="f">적용 대상${v2Select('target',GGMCombat.TARGETS,e.target)}</label></div>
  ${v2NeedsPriority(e)?`<label class="f">대상 선택 우선순위${v2ArraySelect('priority',GGMStudio.PRIORITY,e.priority)}</label>`:''}
  ${e.target.includes('random_')?v2Number('targetCount',e.targetCount||e.count,1,e.target==='random_enemies'?5:4,'대상 수',1):e.target==='role_allies'?`<label class="f">역할${v2ArraySelect('role',['공격형','방어형','지원형'],e.role)}</label>`:e.target==='slot_ally'?v2Number('slot',e.slot,1,4,'편성 슬롯 번호',1):''}
@@ -3922,7 +3926,7 @@ async function v2EditorAction(action,button){
  if(['v2add','v2remove','v2up','v2down'].includes(action)){
   const s=state.kit[button.dataset.slot];if(action==='v2add'&&s.effects.length<5){const panel=button.closest('[data-v2-slot]'),sheet=button.closest('.sheet'),scroll=sheet?.scrollTop||0,index=s.effects.length,effect=GGMCombat.defaultEffect();s.effects.push(effect);button.insertAdjacentHTML('beforebegin',v2EffectBlock(effect,index,button.dataset.slot,s.effects.length));panel.querySelectorAll('[data-act=v2remove]').forEach(b=>b.disabled=false);const down=panel.querySelector('[data-act=v2down][data-index="'+(index-1)+'"]');if(down)down.disabled=false;button.disabled=s.effects.length>=5;if(button.nextElementSibling)button.nextElementSibling.textContent=v2SkillText(s,button.dataset.slot);state.report=null;delete state.reports[state.slot];v2RenderGeneration(state);if(sheet)sheet.scrollTop=scroll;return;}if(action==='v2remove'&&s.effects.length>1)s.effects.splice(+button.dataset.index,1);if(action==='v2up'||action==='v2down'){const i=+button.dataset.index,j=i+(action==='v2up'?-1:1);if(j>=0&&j<s.effects.length)[s.effects[i],s.effects[j]]=[s.effects[j],s.effects[i]];}state.report=null;delete state.reports[state.slot];v2DrawEditor(true);return;
  }
- const slot=state.slot,base=GGMCombat.clone(v2Ensure(c)),candidate={...base,[slot]:GGMCombat.clone(state.kit[slot])};
+ const slot=state.slot,base=GGMCombat.clone(v2Kit(c)),candidate={...base,[slot]:GGMCombat.clone(state.kit[slot])};
  const errors=GGMCombat.validate(candidate);if(action!=='v2generate'&&errors.length){setStatus(errors.join(' '));return;}
  const controller=new AbortController(),job={controller,action};state.job=job;state.busy=true;if(action==='v2generate')state.histories[slot]=[];
  const field=$('#v2-fields');if(field)field.disabled=true;
@@ -4080,7 +4084,7 @@ function v2ReleaseIconDraft(d){if(!d)return;for(const x of Object.values(d.items
 function v2OpenIcons(id){const c=charById(id);if(!c)return;if(V2ICONS)v2ReleaseIconDraft(V2ICONS);V2ICONS={id,items:{},preview:null,busy:false};v2DrawIcons();}
 function v2DrawIcons(){const d=V2ICONS,c=d&&charById(d.id);if(!c)return;const el=v2IconLayer(),p=d.preview,previous=el._draft===d?el.querySelector('.sheet'):null,page=p?p.slot:'list';el._draft=d;d.scrolls=d.scrolls||{};if(previous)d.scrolls[previous.dataset.iconPage]=previous.scrollTop;
  const close=p?`<button class="btn ghost" style="margin-left:auto;flex:0 0 32px;width:32px;height:32px;min-width:32px;min-height:32px;padding:0;font-size:22px;line-height:1" data-icon-act="${p?'back':'close'}" aria-label="${p?'이번 이미지 폐기하고 돌아가기':'아이콘 창 닫기'}">×</button>`:'';
- el.innerHTML=`<div class="sheet" data-icon-page="${page}" role="dialog" aria-modal="true" aria-label="스킬 이미지 생성"><div class="row"><h2>${p?'스킬 아이콘 미리보기':'스킬 이미지 생성'}</h2>${close}</div>${p?`<h3>${GGMCombat.SLOTS[p.slot]}</h3><label class="f">NAI 프롬프트 (영어 태그)<textarea class="in" id="v2-icon-prompt" maxlength="2000">${esc(p.prompt)}</textarea></label><button class="btn sm ghost" data-icon-act="concept" ${d.busy?'disabled':''}>캐릭터·스킬 컨셉으로 프롬프트 구성</button><p class="muted">정사각형 스킬 아이콘입니다. 사용 중인 그림 AI 설정을 사용하며, 생성 시 서비스 이용량이 소모될 수 있어요.</p><div class="ill-box">${p.url?`<img src="${esc(p.url)}" alt="생성된 스킬 아이콘" data-original-src="${esc(p.originalSrc||'')}">`:'<span>프롬프트를 입력하고 생성해 주세요</span>'}</div><p id="v2-icon-status" role="status" aria-live="polite"></p><div class="row"><button class="btn" data-icon-act="generate" ${d.busy?'disabled':''}>${p.url?'다시 생성':'이미지 생성'}</button><button class="btn" data-icon-act="accept" ${!p.url||d.busy?'disabled':''}>확인 · 목록에 적용</button></div><p class="muted">확인은 이 창의 임시 목록에 반영합니다. ×를 누르면 이번 미리보기 결과를 폐기해요.</p>`:`<p class="muted">세 아이콘을 각각 만든 뒤 완료를 누르면 캐릭터에 저장합니다. 닫으면 아직 저장하지 않은 결과는 폐기해요.</p>${Object.entries(GGMCombat.SLOTS).map(([slot,label])=>{const src=d.items[slot]?.url||imgSrc(c.skillIcons?.[slot]);return `<div class="v2-icon-row"><div class="v2-icon-caption">${src?`<img src="${esc(src)}" alt="${label} 아이콘">`:'<span class="v2-icon-empty">✦</span>'}<b>${label}</b></div><div class="t">${esc(v2Ensure(c)[slot].name)}${d.items[slot]?'<p class="muted">저장 대기</p>':''}</div><button class="btn sm" data-icon-act="edit" data-slot="${slot}">이미지 생성</button></div>`;}).join('')}<p id="v2-icon-status" role="status" aria-live="polite"></p><div class="row" style="margin-top:16px"><button class="btn" data-icon-act="done">완료</button><button class="btn ghost" data-icon-act="close">닫기</button></div>`}</div>`;
+ el.innerHTML=`<div class="sheet" data-icon-page="${page}" role="dialog" aria-modal="true" aria-label="스킬 이미지 생성"><div class="row"><h2>${p?'스킬 아이콘 미리보기':'스킬 이미지 생성'}</h2>${close}</div>${p?`<h3>${GGMCombat.SLOTS[p.slot]}</h3><label class="f">NAI 프롬프트 (영어 태그)<textarea class="in" id="v2-icon-prompt" maxlength="2000">${esc(p.prompt)}</textarea></label><button class="btn sm ghost" data-icon-act="concept" ${d.busy?'disabled':''}>캐릭터·스킬 컨셉으로 프롬프트 구성</button><p class="muted">정사각형 스킬 아이콘입니다. 사용 중인 그림 AI 설정을 사용하며, 생성 시 서비스 이용량이 소모될 수 있어요.</p><div class="ill-box">${p.url?`<img src="${esc(p.url)}" alt="생성된 스킬 아이콘" data-original-src="${esc(p.originalSrc||'')}">`:'<span>프롬프트를 입력하고 생성해 주세요</span>'}</div><p id="v2-icon-status" role="status" aria-live="polite"></p><div class="row"><button class="btn" data-icon-act="generate" ${d.busy?'disabled':''}>${p.url?'다시 생성':'이미지 생성'}</button><button class="btn" data-icon-act="accept" ${!p.url||d.busy?'disabled':''}>확인 · 목록에 적용</button></div><p class="muted">확인은 이 창의 임시 목록에 반영합니다. ×를 누르면 이번 미리보기 결과를 폐기해요.</p>`:`<p class="muted">세 아이콘을 각각 만든 뒤 완료를 누르면 캐릭터에 저장합니다. 닫으면 아직 저장하지 않은 결과는 폐기해요.</p>${Object.entries(GGMCombat.SLOTS).map(([slot,label])=>{const src=d.items[slot]?.url||imgSrc(c.skillIcons?.[slot]);return `<div class="v2-icon-row"><div class="v2-icon-caption">${src?`<img src="${esc(src)}" alt="${label} 아이콘">`:'<span class="v2-icon-empty">✦</span>'}<b>${label}</b></div><div class="t">${esc(v2Kit(c)[slot].name)}${d.items[slot]?'<p class="muted">저장 대기</p>':''}</div><button class="btn sm" data-icon-act="edit" data-slot="${slot}">이미지 생성</button></div>`;}).join('')}<p id="v2-icon-status" role="status" aria-live="polite"></p><div class="row" style="margin-top:16px"><button class="btn" data-icon-act="done">완료</button><button class="btn ghost" data-icon-act="close">닫기</button></div>`}</div>`;
  const sheet=el.querySelector('.sheet');sheet.style.overflowAnchor='none';sheet.scrollTop=d.scrolls[page]||0;
 }
 async function v2IconClick(event){
@@ -4118,7 +4122,7 @@ function v2StandingHelp(button){const open=button.getAttribute('aria-expanded')=
 document.addEventListener('click',e=>{const button=e.target.closest('[data-act="v2standhelp"]');if(button)v2StandingHelp(button);else if(!e.target.closest('#v2-standing-help'))v2CloseStandingHelp();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')v2CloseStandingHelp();});
 function v2IconPrompt(c,slot){
- const s=v2Ensure(c)[slot];const tags={damage:'energy slash, impact sparks',multi:'multiple slashes, afterimage',scatter:'scattered projectiles',chain:'chain lightning, connected energy',dot:'poison mist',delayed:'glowing time bomb',detonate:'exploding magic sigil',pierce:'piercing energy spear',fixed:'sharp geometric energy',extra:'echoing strike',basic:'glowing blade',heal:'healing light, soft sparkles',regen:'regenerating green aura',support:'healing ring',shield:'protective barrier, hexagonal shield',reduction:'layered armor emblem',block:'blocking shield',invincible:'radiant protective dome',survive:'unbroken heart emblem',buff:'ascending aura, radiant emblem',debuff:'cracked emblem, dark aura',stun:'binding chains',freeze:'ice crystal',noheal:'sealed heart emblem',mark:'glowing rune',consume:'dissolving runes',record:'magic book, luminous runes',mode:'transforming emblem',replace:'shifting sigil',follow:'paired energy trails',lifesteal:'crimson energy tendrils',cooldown:'clock face, rotating magic circle',ready:'radiant clock sigil',gauge:'swirling speed lines'};
+ const s=v2Kit(c)[slot];const tags={damage:'energy slash, impact sparks',multi:'multiple slashes, afterimage',scatter:'scattered projectiles',chain:'chain lightning, connected energy',dot:'poison mist',delayed:'glowing time bomb',detonate:'exploding magic sigil',pierce:'piercing energy spear',fixed:'sharp geometric energy',extra:'echoing strike',basic:'glowing blade',heal:'healing light, soft sparkles',regen:'regenerating green aura',support:'healing ring',shield:'protective barrier, hexagonal shield',reduction:'layered armor emblem',block:'blocking shield',invincible:'radiant protective dome',survive:'unbroken heart emblem',buff:'ascending aura, radiant emblem',debuff:'cracked emblem, dark aura',stun:'binding chains',freeze:'ice crystal',noheal:'sealed heart emblem',mark:'glowing rune',consume:'dissolving runes',record:'magic book, luminous runes',mode:'transforming emblem',replace:'shifting sigil',follow:'paired energy trails',lifesteal:'crimson energy tendrils',cooldown:'clock face, rotating magic circle',ready:'radiant clock sigil',gauge:'swirling speed lines'};
  const concept=String([c.name,c.profile,s.name,s.description,c.weapon?.name,c.weapon?.desc].filter(Boolean).join(' '));
  const motifs=[[/얼음|빙결|서리|냉기/,'ice crystals, frosty blue glow'],[/불꽃|화염|화상|불의/,'flames, fiery orange glow'],[/번개|전격|감전|전기/,'lightning, electric sparks'],[/시간|시공/,'clockwork rings, fractured time'],[/공간|차원/,'spatial rift, fractured space'],[/암살|단검|도적/,'dagger, shadow trails'],[/저격|총|사격/,'crosshair, bullet trail'],[/검|참격/,'sword slash, crescent blade'],[/방패|수호|보호/,'shield emblem, protective light'],[/독|중독/,'poison droplets, violet mist'],[/치유|회복|성녀/,'radiant healing sigil'],[/음악|노래|연주/,'musical notes, resonating rings']].filter(([re])=>re.test(concept)).map(([,v])=>v);
  const appearance=String(c.naiPrompt||'').split(',').map(x=>x.trim()).filter(x=>/sword|dagger|rifle|gun|shield|scythe|staff|bow|clock|rune|flame|ice|lightning|silver|crimson|blue|green|gold|purple/.test(x)&&!/hair|eyes|skin|body|girl|boy|dress|coat/.test(x)).slice(0,5);
@@ -4130,7 +4134,7 @@ async function v2ConceptPrompt(d,c){
  d.busy=true;const fallback=v2IconPrompt(c,p.slot);let status=document.getElementById('v2-icon-status'),dots=0;const tick=()=>{if(status?.isConnected)status.textContent='컨셉에 맞는 프롬프트 구성중'+'.'.repeat(dots++%3+1);};tick();const timer=setInterval(tick,400);
  try{
   let prompt=fallback;
-  if(SAMPLE){const s=v2Ensure(c)[p.slot];const r=await SAMPLE.json(v2ConceptPromptPrompt({c,p,s,fallback}),{modelTier:'quick',cache:false});if(typeof r?.prompt==='string'&&r.prompt.trim())prompt=r.prompt.trim().slice(0,1800)+', no text, no letters, no watermark';}
+  if(SAMPLE){const s=v2Kit(c)[p.slot];const r=await SAMPLE.json(v2ConceptPromptPrompt({c,p,s,fallback}),{modelTier:'quick',cache:false});if(typeof r?.prompt==='string'&&r.prompt.trim())prompt=r.prompt.trim().slice(0,1800)+', no text, no letters, no watermark';}
   if(V2ICONS===d&&d.preview===p){p.prompt=prompt;v2DrawIcons();}
  }catch(e){if(V2ICONS===d&&d.preview===p){p.prompt=fallback;v2DrawIcons();toast('캐릭터·스킬 정보를 바탕으로 기본 프롬프트를 구성했어요.');}}
  finally{clearInterval(timer);if(V2ICONS===d&&d.preview===p){d.busy=false;v2DrawIcons();}}
@@ -4379,6 +4383,7 @@ function v2EnsureEquipment(c){
  if(!c.weapon.passiveOption){const draft=GGMCombat.equipmentDraft(c);if(draft){c.weapon.passiveOption=draft;if(G.chars.includes(c))mark('c:'+c.id);}}
  v2SyncEquipment(c);return c.weapon.passiveOption;
 }
+function v2EquipmentOf(c){return c.weapon?.passiveOption||GGMCombat.equipmentDraft(c);} // 읽기 — 고칠 때는 v2EnsureEquipment
 function v2EquipmentSkillSaved(c,slot,before,after,rerolled=false){
  if(!['passive','active'].includes(slot))return false;
  if(rerolled||GGMCombat.equipmentSkillSignature({[slot]:before},slot)!==GGMCombat.equipmentSkillSignature({[slot]:after},slot)){
@@ -4387,7 +4392,7 @@ function v2EquipmentSkillSaved(c,slot,before,after,rerolled=false){
  return v2SyncEquipment(c);
 }
 function v2EquipmentCard(c,o){
- const p=v2EnsureEquipment(c),state=GGMCombat.equipmentState(c,o?.wlv||0),warning=state.needsReroll;
+ const p=v2EquipmentOf(c),state=GGMCombat.equipmentState(c.weapon?.passiveOption?c:{...c,weapon:{...(c.weapon||{}),passiveOption:p}},o?.wlv||0),warning=state.needsReroll;
  return `<div class="cs-card v2-equipment-card ${warning?'needs-reroll':''}" data-equipment-card data-cid="${esc(c.id)}">
  <div class="v2-equipment-head"><div class="wthumb">${imgSrc(c.weapon)?`<img src="${esc(imgSrc(c.weapon))}" alt="">`:'<span>⚔</span>'}</div><div class="t"><b>${esc(c.weapon.name||T('weapon')+' 미설정')} ${o?`<span class="muted">${o.wlv?o.wlv+'단계':'잠김'}</span>`:''}</b><div class="muted">${esc(c.weapon.desc||'')}</div></div></div>
  <div class="v2-equipment-upgrade"><button class="btn" data-act="wup" data-id="${esc(c.id)}" ${!o||o.wlv>=5?'disabled':''}>${!o?'장비 해금 — 캐릭터 획득 필요':o.wlv>=5?'장비 최대 강화':o.wlv?'장비 강화':'장비 해금'}</button><p class="muted">${!o?'캐릭터를 획득하면 장비를 해금할 수 있어요.':o.wlv>=5?'최대 5단계입니다.':`${esc(T('wMat'))} ${GGMCombat.equipmentUpgradeCost(o.wlv).materials}개 · ${esc(T('gold'))} ${nf(GGMCombat.equipmentUpgradeCost(o.wlv).gold)}개 필요`}</p></div>
@@ -4486,11 +4491,11 @@ function v2TrainingSummary(c){
  const t=v2OwnedTraining(c),o=own(c.id),plan=GGMCombat.trainingPlan(t);
  return `<div class="panel v2-training-panel"><h3>스킬 공통 레벨 · ${t.rank}/7</h3><button class="btn" data-act="v2train" data-id="${esc(c.id)}" ${!o||!plan.allowed?'disabled':''}>${!o?'캐릭터 획득 후 강화 가능':plan.allowed?'스킬 공통 레벨 강화':'공통 레벨 최대'}</button></div>`;
 }
-function v2TrainingHasGain(c,t,plan){return plan.allowed&&GGMCombat.trainingChanges(v2Ensure(c),t,v2TrainingNext(t,plan),plan.slot);}
+function v2TrainingHasGain(c,t,plan){return plan.allowed&&GGMCombat.trainingChanges(v2Kit(c),t,v2TrainingNext(t,plan),plan.slot);}
 function v2MasteryButton(c,slot){const t=v2OwnedTraining(c),o=own(c.id),plan=GGMCombat.trainingPlan(t,slot);return `<button class="btn sm" title="실제 효과가 달라지지 않는 단계는 재료를 사용하지 않습니다." data-act="v2train" data-id="${esc(c.id)}" data-slot="${slot}" ${!o||!plan.allowed||!v2TrainingHasGain(c,t,plan)?'disabled':''}>${t.rank<7?'공통 Lv.7에서 전문화':plan.allowed?(v2TrainingHasGain(c,t,plan)?'전문화 강화':'추가 성장 없음'):'전문화 최대'}</button>`;}
 let V2TRAIN_CONFIRM=null;
 function v2TrainingNext(t,plan){const next=GGMCombat.trainingState(t);if(plan.slot)next.mastery[plan.slot]++;else next.rank++;return next;}
-function v2TrainingSlotText(c,slot,t){const s=GGMCombat.trainedKit(v2Ensure(c),t)[slot],sp=slot==='ultimate'?` · 전투 시작 SP ${Math.round(GGMCombat.trainingInitialSP(t)*100)/100}`:'';return `<b>${esc(GGMCombat.SLOTS[slot])} · ${esc(s.name)} · ${esc(v2TrainingLabel(t,slot))}</b><p>${esc(v2SkillText(s,slot))}${sp}</p>`;}
+function v2TrainingSlotText(c,slot,t){const s=GGMCombat.trainedKit(v2Kit(c),t)[slot],sp=slot==='ultimate'?` · 전투 시작 SP ${Math.round(GGMCombat.trainingInitialSP(t)*100)/100}`:'';return `<b>${esc(GGMCombat.SLOTS[slot])} · ${esc(s.name)} · ${esc(v2TrainingLabel(t,slot))}</b><p>${esc(v2SkillText(s,slot))}${sp}</p>`;}
 function v2OpenTraining(id,slot){
  const c=charById(id),o=c&&own(id);if(!c||!o)return;const t=v2OwnedTraining(c),plan=GGMCombat.trainingPlan(t,slot);if(!plan.allowed)return;if(!v2TrainingHasGain(c,t,plan)){toast('현재 스킬은 다음 단계에서 추가로 성장하지 않아 재료를 사용하지 않습니다.');return;}
  V2TRAIN_CONFIRM={id,slot:plan.slot,snapshot:JSON.stringify(t)};const next=v2TrainingNext(t,plan),aff=plan.slot?[plan.slot]:Object.keys(GGMCombat.SLOTS),enough=P().mat.wmat>=plan.materials&&P().gold>=plan.gold;
@@ -5975,7 +5980,7 @@ const unFaceless=s=>String(s||'').replace(/(^|\s*,\s*)(1other\s*,\s*)?faceless\b
 function charCGs(c){return G.lib.filter(l=>l.kind==='cg'&&(l.cast||[]).some(x=>x.id===c.id));}
 function weaponRenameOk(o,n){o=String(o||'').trim();n=String(n||'').trim();return o.length>=3&&n&&o!==n&&!G.chars.some(c=>c.name===o)&&!(G.npcs||[]).some(x=>x.name===o);}
 function regenSlot(slot){return Object.prototype.hasOwnProperty.call(GGMCombat.SLOTS,slot)?slot:'active';}
-function regenSkillLabel(c,slot){const s=v2Ensure(c)[regenSlot(slot)];return s.name+' — '+v2SkillText(s,regenSlot(slot));}
+function regenSkillLabel(c,slot){const s=v2Kit(c)[regenSlot(slot)];return s.name+' — '+v2SkillText(s,regenSlot(slot));}
 function regenFields(slot='active'){slot=regenSlot(slot);return [
  ['name','이름·소속',c=>c.name+' / '+(c.faction||'무소속')],['profile','프로필·비밀',c=>String(c.profile||'')],['look','외모 태그 (디자인)',c=>String(c.naiPrompt||'')],
  ['skill',GGMCombat.SLOTS[slot]+' 스킬',c=>regenSkillLabel(c,slot)],['weapon',T('weapon'),c=>c.weapon?c.weapon.name+(c.weapon.desc?' — '+c.weapon.desc:''):''],['lines','대사·반응',c=>(c.lines||[]).slice(0,3).join(' / ')]];}
@@ -6082,11 +6087,11 @@ function charImgItems(c){if(!c)return [];const L=[],add=(k,label,o,group='기본
 function openImgLib(cid){const c=charById(cid);if(!c)return;if(!IMGLIB||IMGLIB.cid!==cid)IMGLIB={cid,sel:[]};const items=charImgItems(c),has=items.filter(x=>imgSrcRaw(x.o)),cmp=IMGLIB.sel.length===2?IMGLIB.sel.map(i=>items[i]).filter(x=>x&&imgSrcRaw(x.o)):[];
  openModal(`${head(`${esc(c.name)} · 그림 모아 보기`,`<span class="muted">${has.length}/${items.length}장</span>`)}<p class="muted">누르면 크게 보고, 두 장을 고르면 나란히 비교해요.</p>${cmp.length===2?`<div class="imglib-cmp">${cmp.map(x=>`<div><img src="${esc(imgSrcRaw(x.o))}" alt=""><small>${esc(x.label)}</small></div>`).join('')}</div>`:''}<div class="row">${IMGLIB.sel.length?'<button class="btn sm ghost" data-act="ilbclear">선택 풀기</button>':''}</div><div class="imglib-grid">${items.map((x,i)=>{const src=imgSrcRaw(x.o);return `<div class="imglib-it ${src?'':'empty'} ${IMGLIB.sel.includes(i)?'on':''}" ${src?`data-act="ilbtap" data-i="${i}"`:''}>${src?`<img src="${esc(src)}" alt="">`:'<span>없음</span>'}<b>${esc(x.label)}</b>${src?`<button class="del pm-hide" data-act="ilbdel" data-i="${i}" data-image-id="${esc(x.o.id)}" aria-label="지우기">✕</button>`:''}</div>`;}).join('')}</div>`);
 }
-function ultimateSceneTags(c){const type=v2Ensure(c).ultimate.effects?.[0]?.type;return ['heal','regen','support'].includes(type)?'healing magic, gentle light':['shield','reduction','block','invincible'].includes(type)?'protective barrier, radiant aura':'attacking, special effects';}
-function ultimateSceneSnapshot(c){return JSON.stringify([v2Ensure(c).ultimate,c.name,c.faction,c.profile,c.naiPrompt,c.weapon?.name,c.weapon?.desc,c.weapon?.prompt,c.scg]);}
+function ultimateSceneTags(c){const type=v2Kit(c).ultimate.effects?.[0]?.type;return ['heal','regen','support'].includes(type)?'healing magic, gentle light':['shield','reduction','block','invincible'].includes(type)?'protective barrier, radiant aura':'attacking, special effects';}
+function ultimateSceneSnapshot(c){return JSON.stringify([v2Kit(c).ultimate,c.name,c.faction,c.profile,c.naiPrompt,c.weapon?.name,c.weapon?.desc,c.weapon?.prompt,c.scg]);}
 async function requestUltimateScene(c,instructions='',signal){
  if(!SAMPLE)throw new Error('기술 컷인 장면을 구성하려면 설정 → 글 AI를 먼저 등록해 주세요.');
- const s=v2Ensure(c).ultimate,context={name:c.name,profile:c.profile,appearance:c.naiPrompt,weapon:{name:c.weapon?.name,description:c.weapon?.desc,prompt:c.weapon?.prompt},ultimate:{name:s.name,description:v2SkillText(s,'ultimate'),effects:s.effects,fx:s.fx}};
+ const s=v2Kit(c).ultimate,context={name:c.name,profile:c.profile,appearance:c.naiPrompt,weapon:{name:c.weapon?.name,description:c.weapon?.desc,prompt:c.weapon?.prompt},ultimate:{name:s.name,description:v2SkillText(s,'ultimate'),effects:s.effects,fx:s.fx}};
  const response=await v2SkillRequest(SAMPLE,requestUltimateScenePrompt({context,instructions}),signal);
  if(typeof response?.tags!=='string'||!response.tags.trim())throw new Error('AI가 기술 컷인 장면을 비워서 반환했어요. 다시 뽑기를 눌러 주세요.');
  return response.tags.trim().slice(0,2000);
@@ -7735,6 +7740,8 @@ const GAME_SLOTS={
   'meta.storyMemory':{make:()=>({version:1,notes:''})}, // 스토리 기억(0530)
   'rels':{make:()=>[],ok:Array.isArray}, // 인연(0450)
   'world.codex':{make:()=>[],ok:Array.isArray}, // 도감 기록(0300)
+  'world.codexNotes':{make:()=>({})}, // 도감 항목별 메모(0300)
+  'world.factions':{make:()=>[],ok:Array.isArray}, // 세력(0445 — 읽기 factions가 캐릭터 소속까지 맞춘 모양을 보여 주고, 고칠 때 factionSync가 저장)
   'world.plan':{make:()=>({acts:[],twists:[],branches:[],arcs:[]}),ok:p=>progObj(p)&&['acts','twists','branches','arcs'].every(k=>Array.isArray(p[k]))} // 시나리오 설계(0465)
 };
 const gameAt=(path,g)=>{ const ks=path.split('.'), last=ks.pop(); let o=g; for(const k of ks) o=o[k]; return [o,last]; };
@@ -7781,7 +7788,7 @@ function repairRefs(g){ const ids=new Set((g.chars||[]).map(c=>c.id)), byName=n=
 function fix(g){
   const d=defaults(); g=safeIds(g||{});
   const old=(g.ver||1)<VER;
-  g.world=Object.assign(d.world,g.world||{}); if(!Array.isArray(g.world.factions)) g.world.factions=[];
+  g.world=Object.assign(d.world,g.world||{});
   g.chars=Array.isArray(g.chars)?g.chars:d.chars;
   if(inheritAll(g)) g.__curveNew=true; // 이격 = 원본 + 수정치 (0065-inherit.js)
   g.chars.forEach(c=>{
@@ -7848,7 +7855,7 @@ function fix(g){
   if(!(g.meta.curve>=3)){ g.chapters.filter(ch=>ch.kind==='main').forEach((ch,k)=>rebalanceChapter(ch,k)); g.meta.curve=3; g.__curveNew=true; }
   for(const c of g.chars)if(GGMCombat.migrateBaseStats(c))g.__curveNew=true;
   if(g.chars.some(c=>c.roleSpeedVersion!==1))g.__curveNew=true;g.chars.forEach(c=>v2Ensure(c)); g.meta.combatVersion=2;
-  gameSlotsFix(g); g.ver=VER;
+  gameSlotsFix(g); scgFixAll(g); g.ver=VER;
   try{ repairRefs(g); }catch(e){}
   if(naiBlocksGame(g))g.__curveNew=true;
   return g;
@@ -8047,7 +8054,7 @@ $('#file').addEventListener('change',async e=>{
     catch(err){ toast('이미지를 넣지 못했어요'); } return; }
   if(uploadFor.kind==='face'){ const c=charById(uploadFor.id); if(!c) return; try{ await addFaceFile(c,uploadFor.name,f,uploadFor.b); openFaces(c.id); toast(`표정 「${uploadFor.name}」${uploadFor.b==='up'?' 상반신':''}을(를) 넣었어요`); }catch(err){ toast('이미지를 올리지 못했어요'); } return; }
   if(uploadFor.kind==='weapon'){ const c=charById(uploadFor.id); if(!c||!c.weapon) return; toast('그림을 등록하는 중이에요'); try{ let ub=await shrink(f,2000); try{ const ai=await alphaInfo(ub); if(ai.border<0.5) ub=await cutoutWhite(ub); }catch(e){ quietErr(e,'0080-storage-integration.js:172'); } await storeImage(c.weapon,ub,''); mark('c:'+c.id); render(); openChar(c.id); toast(T('weapon')+' 이미지를 등록했어요'); }catch(err){ toast('이미지를 올리지 못했어요'); } return; }
-  if(ILK(uploadFor.kind)||uploadFor.kind==='upper'||uploadFor.kind==='pose'||uploadFor.kind==='lbbg'||uploadFor.kind==='scg'){ const c=charById(uploadFor.id); if(!c) return; if(uploadFor.kind==='scg') scgOf(c); toast('그림을 등록하는 중이에요'); try{ let ub=await shrink(f,2200); if(uploadFor.kind==='pose'){ try{ const ai=await alphaInfo(ub); if(ai.border<0.5) ub=await cutoutWhite(ub); }catch(e){ quietErr(e,'0080-storage-integration.js:173'); } } await storeImage(c[uploadFor.kind],ub,''); mark('c:'+c.id); render(); openChar(c.id); toast(uploadFor.kind==='upper'?'상반신을 등록했어요':'일러스트를 등록했어요'); }catch(err){ toast('이미지를 올리지 못했어요'); } return; }
+  if(ILK(uploadFor.kind)||uploadFor.kind==='upper'||uploadFor.kind==='pose'||uploadFor.kind==='lbbg'||uploadFor.kind==='scg'){ const c=charById(uploadFor.id); if(!c) return; if(uploadFor.kind==='scg') scgSlot(c); toast('그림을 등록하는 중이에요'); try{ let ub=await shrink(f,2200); if(uploadFor.kind==='pose'){ try{ const ai=await alphaInfo(ub); if(ai.border<0.5) ub=await cutoutWhite(ub); }catch(e){ quietErr(e,'0080-storage-integration.js:173'); } } await storeImage(c[uploadFor.kind],ub,''); mark('c:'+c.id); render(); openChar(c.id); toast(uploadFor.kind==='upper'?'상반신을 등록했어요':'일러스트를 등록했어요'); }catch(err){ toast('이미지를 올리지 못했어요'); } return; }
   const o=uploadFor.kind==='char'?charById(uploadFor.id):libById(uploadFor.id); if(!o) return;
   toast('이미지를 등록하는 중이에요');
   const blob=await shrink(f,uploadFor.kind==='char'?1800:2000);
@@ -8381,8 +8388,7 @@ function hashN(s){ let h=0; for(const ch of String(s)) h=(h*31+ch.charCodeAt(0))
 /* 주간 레이드 새로 만들기(주가 바뀌면): 지난주 결과로 단계 오르내림(처치 +1, 절반 못 깎음 −1, 1~6) — 진행 칸 raid의 정의(0070 PROG_SLOTS)가 부름 */
 function raidNew(r){ r=progObj(r)?r:null; const pr=r&&r.total?r.dmg/r.total:0; const lv=r?Math.max(1,Math.min(6,(r.lv||1)+(r.killed?1:pr<0.5?-1:0))):1; return {wk:weekKey(),lv,dmg:0,killed:false,got:[],tries:{},best:0}; }
 function raidBoss(){ const r=progSlot('raid'), pool=[], bgOf={}; G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(e.boss&&!pool.some(x=>x.name===e.name)){ pool.push(e); bgOf[e.name]=stageBg(s); } })));
-  const src=pool.length?pool[hashN(r.wk)%pool.length]:{name:'거대 잔광',elem:ELEMS[0]}; const b={name:src.name,elem:ELEMS[hashN(r.wk+'e')%ELEMS.length],hp:3000,atk:110,def:50,spd:95,boss:true};
-  fitEnemy(b,enemyTarget(progK()+(r.lv-1)*0.6,6,true)*1.3); b.bg=bgOf[b.name]||'';
+  const src=pool.length?pool[hashN(r.wk)%pool.length]:{name:'거대 잔광',elem:ELEMS[0]}; const b=fitEnemy({name:src.name,elem:ELEMS[hashN(r.wk+'e')%ELEMS.length],hp:3000,atk:110,def:50,spd:95,boss:true,bg:bgOf[src.name]||''},enemyTarget(progK()+(r.lv-1)*0.6,6,true)*1.3);
   if(r.total){ const k=r.total/30/b.hp; b.hp=Math.round(r.total/30); b.atk=Math.round(b.atk*Math.min(1.5,Math.max(0.7,k))); } else { r.total=b.hp*30; mark('prog'); }
   if(r.killed&&r.dmg<r.total) r.killed=false; return Object.assign(b,{total:r.total}); }
 function raidTriesLeft(){ const r=progRead('raid'); return Math.max(0,3-(r.tries[today()]||0)); }
@@ -8529,7 +8535,7 @@ async function drawCardArts(deck,rep){ if(!imgReady()){ toast(imgNeed()); return
   for(const cd of todo){ const c=charById(cd.o); if(rep) rep(`그리는 중 ${n+1}/${todo.length}`);
     try{ const tags=cd.k==='skill'?(SKILL_TAGS[c.skill&&c.skill.kind]||'attacking')+', special effects, glowing':CARD_ILL[cd.k]||'dynamic pose';
       const b=await naiDraw('illust',joinTags(c.naiPrompt,tags),{styleId:c.naiStyle,frame:cd.k==='skill'?'upper body':'cowboy shot',pose:'dynamic pose, '+tags});
-      if(cd.k==='skill'){ scgOf(c); await storeImage(c.scg,b,''); } else { c.cards=c.cards||{}; const o=c.cards[cd.k]||(c.cards[cd.k]={id:'cd_'+c.id+'_'+cd.k,kind:'illust',name:c.name+' '+cardName({k:cd.k,o:c.id}),prompt:tags,img:null}); await storeImage(o,b,''); }
+      if(cd.k==='skill'){ scgSlot(c); await storeImage(c.scg,b,''); } else { c.cards=c.cards||{}; const o=c.cards[cd.k]||(c.cards[cd.k]={id:'cd_'+c.id+'_'+cd.k,kind:'illust',name:c.name+' '+cardName({k:cd.k,o:c.id}),prompt:tags,img:null}); await storeImage(o,b,''); }
       mark('c:'+c.id); n++; }
     catch(e){ toast(naiErr(e)); break; } }
   if(rep) rep.end(); if(n) toast(`카드 일러스트 ${n}장을 그렸어요`); const run=progSlot('rogue').run; if($('#modal .cd-row')&&run) rgDeckModal(run.deck); if(CB) cbRender(); }
@@ -8825,9 +8831,9 @@ function rgPick3(run){ const take=(arr,n)=>{ const a=[...arr], o=[]; while(o.len
 function rgEnemies(run,kind){ const pool=[]; G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(!pool.some(x=>x.name===e.name)) pool.push(e); })));
   const pick=boss=>{ const c=pool.filter(e=>!!e.boss===boss); const src=(c.length?c:pool)[Math.floor(Math.random()*(c.length||pool.length||1))]||{name:'미확인 적',elem:ELEMS[0]}; return {name:src.name,elem:src.elem||ELEMS[0],hp:900,atk:85,def:35,spd:92,boss}; };
   const k=run.k+run.floor*0.12, i=run.floor*0.5; let en;
-  if(kind==='boss'){ en=[pick(true),pick(false)]; fitEnemy(en[0],enemyTarget(k,i,true)*1.4); fitEnemy(en[1],enemyTarget(k,i,false)); }
-  else if(kind==='elite'){ en=[pick(true),pick(false)]; fitEnemy(en[0],enemyTarget(k,i,true)*0.9); fitEnemy(en[1],enemyTarget(k,i,false)*0.9); }
-  else { en=Array.from({length:2+(Math.random()<0.5?1:0)},()=>pick(false)); en.forEach(e=>fitEnemy(e,enemyTarget(k,i,false)*0.85)); }
+  if(kind==='boss') en=[fitEnemy(pick(true),enemyTarget(k,i,true)*1.4),fitEnemy(pick(false),enemyTarget(k,i,false))];
+  else if(kind==='elite') en=[fitEnemy(pick(true),enemyTarget(k,i,true)*0.9),fitEnemy(pick(false),enemyTarget(k,i,false)*0.9)];
+  else en=Array.from({length:2+(Math.random()<0.5?1:0)},()=>fitEnemy(pick(false),enemyTarget(k,i,false)*0.85));
   return en; }
 let RGMODE='card';
 /* 탐사 새로 만들기(Model) */
@@ -9166,7 +9172,11 @@ const ICO={
   shop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9 6 4h12l2 5M4 9v11h16V9M4 9h16M9 20v-6h6v6"/></svg>',
   mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></svg>',
   gem:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l3 18 3-18"/></svg>'};
-function scgOf(c){ if(!c) return null; if(!c.scg||typeof c.scg!=='object') c.scg={id:'sc_'+c.id,kind:'scg',name:c.name+' 기술 컷인',prompt:'',img:null}; c.scg.id=c.scg.id||'sc_'+c.id; c.scg.kind='scg'; return c.scg; }
+/* 캐릭터의 기술 컷인 그림 칸 c.scg: 새 값 · 쓰기(맞춰 저장하고 돌려줌 — 그릴 때·올릴 때·불러오기) · 읽기(없으면 새 값을 보여 주기만) */
+function scgNew(c){ return {id:'sc_'+c.id,kind:'scg',name:c.name+' 기술 컷인',prompt:'',img:null}; }
+function scgSlot(c){ if(!c) return null; if(!c.scg||typeof c.scg!=='object') c.scg=scgNew(c); c.scg.id=c.scg.id||'sc_'+c.id; c.scg.kind='scg'; return c.scg; }
+function scgFixAll(g){ (g.chars||[]).forEach(c=>{ if(c.scg) scgSlot(c); }); } // 불러오기(fix): 있는 칸의 id·종류만 맞춤
+function scgOf(c){ if(!c) return null; return c.scg&&typeof c.scg==='object'?c.scg:scgNew(c); } // 읽기 — 고칠 때는 scgSlot
 function charIllust(c){ if(!c) return null; const k=skinOf(c); if(k&&imgSrc(k)) return skinPartSrc(c,'illust'); return c.illust?imgSrc(c.illust):null; } // 스킨을 입으면 기본 옷 일러스트로 돌아가지 않아요
 function lobbyCharacterArt(c,cls='lobby-art',face=''){
  const sk=skinOf(c),faces=sk?.upper&&imgSrc(sk.upper)?sk.faces:c.faces,f=(faces||[]).find(x=>x.name===face),src=f?.up&&imgSrc(f.up)||sk?.upper&&imgSrc(sk.upper)||c.upper&&imgSrc(c.upper);
@@ -9217,7 +9227,9 @@ function lobbyHTML(){
   </div>`;
 }
 function chMapLib(ch){return G.lib.find(l=>l.kind==='map'&&l.ch===ch.id);}
-function ensureChMap(ch){let l=chMapLib(ch); if(!l){ l={id:'m'+uid(),kind:'map',ch:ch.id,name:ch.title+' 지도',prompt:'ruined city at night, glowing roads, rivers of light, crater, scattered buildings',img:null}; G.lib.push(l); mark('l:'+l.id); } return l;}
+/* 장 작전 지도(자료실 map): 새 값(장마다 id 하나 — 목록에서 미리 보여 줄 때도 같은 열쇠) · 쓰기(없으면 넣고 돌려줌 — 지도 편집·그림 등록) */
+function chMapNew(ch){return {id:'m_'+ch.id,kind:'map',ch:ch.id,name:ch.title+' 지도',prompt:'ruined city at night, glowing roads, rivers of light, crater, scattered buildings',img:null};}
+function ensureChMap(ch){let l=chMapLib(ch); if(!l){ l=chMapNew(ch); G.lib.push(l); mark('l:'+l.id); } return l;}
 // 작전: 장 카드를 가로로 넘겨 고르고, 누르면 그 장의 지도로 들어가요
 let OPS_CH=null;
 function chLogline(ch){ if(ch.logline) return ch.logline; const L=parseScript((ch.stages[0]||{}).pre||'').find(l=>l.type==='nar'&&l.text&&l.text.length>8); return L?sub(L.text).slice(0,70)+(L.text.length>70?'…':''):''; }
@@ -9632,7 +9644,7 @@ function openRules(keep){ if(!keep||!RD) RD=rulesDraft(); const R=RD, D=R.D, E=R
   ${Object.keys(ROLE).map(k=>`<div class="panel" style="padding:8px;margin:6px 0"><div class="row" style="gap:6px;flex-wrap:wrap"><b style="min-width:50px">${esc(ROLE[k])}형</b>${txt(`rd.${k}`,R.roleDesc[k],'설명','flex:1;min-width:140px')}</div><div class="g4" style="margin-top:4px">${RULE_STATS.map(([f,l])=>`<div><label class="f">${l}</label>${num(`rb.${k}.${f}`,(R.roleBase[k]||{})[f],f==='spd'?D.roleSpeed[k]:D.roleBase[k][f])}</div>`).join('')}</div></div>`).join('')}
   <label class="f">희귀도 배율 (R / SR / SSR)</label>${RULE_STATS.slice(0,3).map(([f,l])=>`<div class="g4" style="align-items:center;margin:2px 0"><span>${l}</span>${[0,1,2].map(i=>`<div>${num(`rm.${f}.${i}`,(R.rarityMul[f]||[])[i],D.rarityMul[f][i],'0.01')}</div>`).join('')}</div>`).join('')}
   <div class="row" style="margin-top:6px"><button class="btn sm ghost" data-act="rulesrecalc">기존 ${esc(T('crew'))} 능력치 다시 계산</button></div>
-  <h3 class="sec" style="margin-top:14px">진영 시너지</h3><p class="muted" style="font-size:.8rem;margin:0 0 6px">${(G.world.factions||[]).length?`진영: ${(G.world.factions||[]).map(f=>esc(f.name)).join(', ')}. `:''}같은 진영 n명 이상 편성 시 공격·방어 +% (0이면 끔).</p>
+  <h3 class="sec" style="margin-top:14px">진영 시너지</h3><p class="muted" style="font-size:.8rem;margin:0 0 6px">${factions().length?`진영: ${factions().map(f=>esc(f.name)).join(', ')}. `:''}같은 진영 n명 이상 편성 시 공격·방어 +% (0이면 끔).</p>
   <div class="g4"><div><label class="f">필요 인원</label>${num('syn.n',R.synergy.n,'0')}</div><div><label class="f">공격 +%</label>${num('syn.atk',R.synergy.atk,'0')}</div><div><label class="f">방어 +%</label>${num('syn.def',R.synergy.def,'0')}</div></div>
   <h3 class="sec" style="margin-top:14px">관계 배율</h3><p class="muted" style="font-size:.8rem;margin:0 0 6px">진영·역할·속성·포지션 A가 B를 공격할 때 피해 배율. 포지션은 이름으로 써요.</p>
   ${R.rel.map((x,i)=>`<div class="row" style="gap:4px;margin:4px 0;flex-wrap:wrap">${sel(`l.${i}.by`,x.by||'faction',[['faction','진영'],['role','기본형'],['elem','속성'],['pos','포지션']],90)}${txt(`l.${i}.a`,x.by==='pos'?(R.positions.find(p=>p.id===x.a)||{}).name||x.a:x.a,'공격하는 쪽','max-width:110px')}<span>→</span>${txt(`l.${i}.b`,x.by==='pos'?(R.positions.find(p=>p.id===x.b)||{}).name||x.b:x.b,'맞는 쪽','max-width:110px')}${num(`l.${i}.mul`,x.mul??1.2,'1.2','0.05',80)}<button class="btn sm ghost" data-act="rulesrdel" data-k="rel" data-i="${i}">삭제</button></div>`).join('')}
@@ -10141,10 +10153,10 @@ function charSheetShow(id){
     <div class="row" style="margin-top:8px"><button class="btn sm" data-act="ilgen" data-k="lbcg" data-id="${c.id}">NAI로 ${esc(T('limit'))} CG</button><button class="btn sm ghost" data-act="upload" data-k="lbcg" data-id="${c.id}">올리기</button>${lbs?`<button class="btn sm ghost" data-act="ildel" data-k="lbcg" data-id="${c.id}">지우기</button>`:''}</div>
     ${lbs&&cgOpen?`<label class="f" style="margin-top:8px"><input type="checkbox" data-act="cguse" data-id="${c.id}" ${o.useCg?'checked':''}> 로비와 타이틀에 이 CG 쓰기</label>`:''}
     <h3 class="sec">기술 컷인 (스킬 쓸 때 크게)</h3>
-    <p class="muted" style="margin:0 0 6px">「${esc(v2Ensure(c).ultimate.name)}」 궁극기를 쓸 때 화면을 가로지르며 크게 나오는 그림이에요. 없으면 스탠딩을 크게 써요.</p>
-    <div class="ill-box scg-box">${imgSrcRaw(scgOf(c))?`<img src="${esc(imgSrcRaw(c.scg))}" alt="">`:'<span>아직 없어요 · 없으면 스탠딩으로 나와요</span>'}</div>
-    <label class="f" for="sc_scene">장면 요청 (선택 · 생성 시 AI가 궁극기에 맞게 구성)</label><input class="in" id="sc_scene" value="${esc(c.scg.prompt||'')}" placeholder="${esc(ultimateSceneTags(c))}, motion lines">
-    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="scggen" data-id="${c.id}">NAI로 기술 컷인</button><button class="btn sm ghost" data-act="upload" data-k="scg" data-id="${c.id}">올리기</button><button class="btn sm ghost" data-act="scgtest" data-id="${c.id}">미리 보기</button>${imgSrc(c.scg)?`<button class="btn sm ghost" data-act="scgdel" data-id="${c.id}">지우기</button>`:''}</div>
+    <p class="muted" style="margin:0 0 6px">「${esc(v2Kit(c).ultimate.name)}」 궁극기를 쓸 때 화면을 가로지르며 크게 나오는 그림이에요. 없으면 스탠딩을 크게 써요.</p>
+    <div class="ill-box scg-box">${imgSrcRaw(scgOf(c))?`<img src="${esc(imgSrcRaw(scgOf(c)))}" alt="">`:'<span>아직 없어요 · 없으면 스탠딩으로 나와요</span>'}</div>
+    <label class="f" for="sc_scene">장면 요청 (선택 · 생성 시 AI가 궁극기에 맞게 구성)</label><input class="in" id="sc_scene" value="${esc(scgOf(c).prompt||'')}" placeholder="${esc(ultimateSceneTags(c))}, motion lines">
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="scggen" data-id="${c.id}">NAI로 기술 컷인</button><button class="btn sm ghost" data-act="upload" data-k="scg" data-id="${c.id}">올리기</button><button class="btn sm ghost" data-act="scgtest" data-id="${c.id}">미리 보기</button>${imgSrc(scgOf(c))?`<button class="btn sm ghost" data-act="scgdel" data-id="${c.id}">지우기</button>`:''}</div>
     <h3 class="sec">표정과 ${T('skin')}</h3>
     <div class="facegrid">${c.faces.map(f=>`<button class="fc" data-act="faceview" data-id="${c.id}" data-f="${f.id}">${imgSrc(f)?`<img src="${esc(imgSrc(f))}" alt="">`:''}<span>${esc(f.name)}</span></button>`).join('')}</div>
     <div class="row" style="margin:8px 0"><button class="btn sm ghost" data-act="faces-open" data-id="${c.id}">표정 만들기</button><button class="btn sm ghost" data-act="audopen" data-id="${c.id}">점검·변환</button><button class="btn sm ghost" data-act="skin-open" data-id="${c.id}">${T('skin')} 만들기</button>${c.alt?'':`<button class="btn sm ghost" data-act="altnew" data-id="${c.id}">이격 만들기</button>`}</div>
@@ -10282,9 +10294,10 @@ function teamPower(ids){const fb=factionBonus(ids);return ids.map(charById).filt
 // 10장까지는 직선, 그 뒤로는 레벨 상한이 오르는 만큼만 (조금 덜) 강해져요
 function enemyTarget(k,i,boss){ const CK=9; let base; if(k<=CK) base=645*(1+0.55*k); else { const L=70+5*(k-CK); base=645*(1+0.55*CK)*((1+0.06*(L-1))/(1+0.06*69))*Math.pow(0.99,k-CK); } return base*(1+0.08*i)*(boss?1.8:1); }
 function capExtra(){ try{ return 5*Math.max(0,Math.floor(progK())-9); }catch(e){ return 0; } }
-function fitEnemy(e,target){ if(!e||e.manual) return e; e.hp=+e.hp||800; e.atk=+e.atk||70; e.def=+e.def||0; e.spd=+e.spd||90; const p=e.hp/5+e.atk*3+e.def*2; const want=Math.max(50,target-e.spd); if(p<=0) return e; const f=want/p;
-  e.hp=Math.max(100,Math.round(e.hp*f)); e.atk=Math.max(10,Math.round(e.atk*f)); e.def=Math.max(0,Math.round(e.def*f)); return e; }
-function rebalanceChapter(ch,k){ (ch.stages||[]).forEach((s,i)=>{ const last=i===ch.stages.length-1; (s.enemies||[]).forEach(e=>fitEnemy(e,enemyTarget(k,i,e.boss||(last&&s.enemies.length===1)))); }); }
+/* 적 스탯을 목표 전투력에 맞춘 새 객체(순수 — 받은 적은 그대로, 수동 지정 적은 그 자체를 돌려줌) */
+function fitEnemy(e,target){ if(!e||e.manual) return e; const hp=+e.hp||800, atk=+e.atk||70, def=+e.def||0, spd=+e.spd||90, p=hp/5+atk*3+def*2, f=Math.max(50,target-spd)/p;
+  return p<=0?{...e,hp,atk,def,spd}:{...e,hp:Math.max(100,Math.round(hp*f)),atk:Math.max(10,Math.round(atk*f)),def:Math.max(0,Math.round(def*f)),spd}; }
+function rebalanceChapter(ch,k){ (ch.stages||[]).forEach((s,i)=>{ const last=i===ch.stages.length-1; if(s.enemies) s.enemies=s.enemies.map(e=>fitEnemy(e,enemyTarget(k,i,e.boss||(last&&s.enemies.length===1)))); }); }
 
 function effPower(ids,enemies){ const fb=factionBonus(ids), n=Math.max(1,enemies.length);
   return ids.map(charById).filter(Boolean).reduce((a,c)=>{ const m=matchup(c,enemies); return a+Math.round(charPower(c)*(1+(fb[c.faction]||0)/100)*(1+0.25*(m.good-m.bad)/n)); },0); }
@@ -11425,12 +11438,12 @@ function drawTodo(cats){
     if(on('char')&&c.useStanding!==false&&!c.img) a.push({k:'char',cat:'char',o:c,c,label:c.name+' 스탠딩'});
     if(on('upper')&&c.upper&&!c.upper.img) a.push({k:'upper',cat:'upper',o:c.upper,c,label:c.name+' 상반신'});
     if(cats&&on('pose')&&c.pose&&!c.pose.img) a.push({k:'pose',cat:'pose',o:c.pose,c,label:c.name+' 로비 포즈'});
-    if(cats&&on('scg')&&!scgOf(c).img) a.push({k:'scg',cat:'scg',o:c.scg,c,label:c.name+' 기술 컷인'});
+    const sc=scgOf(c); if(cats&&on('scg')&&!sc.img) a.push({k:'scg',cat:'scg',o:sc,c,label:c.name+' 기술 컷인'}); /* 목록은 읽기 — 그릴 때 runPrep이 scgSlot으로 칸을 맞춤 */
     if(cats&&on('pose')&&c.lbbg&&!c.lbbg.img) a.push({k:'lbbg',cat:'pose',o:c.lbbg,c,label:c.name+' 로비 배경'});
     if(on('illust')&&c.illust&&!c.illust.img) a.push({k:'illust',cat:'illust',o:c.illust,c,label:c.name+' 일러스트'});
     if(on('weapon')&&c.weapon&&!c.weapon.img&&c.weapon.prompt) a.push({k:'weapon',cat:'weapon',o:c.weapon,c,label:c.name+' '+T('weapon')}); });
   (G.npcs||[]).forEach(n=>{ if(!n.naiPrompt) return; if(on('char')&&!n.img) a.push({k:'char',cat:'char',o:n,c:n,label:n.name+' (NPC) 스탠딩'}); if(on('upper')&&n.upper&&!n.upper.img) a.push({k:'upper',cat:'upper',o:n.upper,c:n,label:n.name+' (NPC) 상반신'}); });
-  if(on('map')) G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>{ if(!chMapLib(ch)) ensureChMap(ch); });
+  if(on('map')) G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>{ if(!chMapLib(ch)){ const o=chMapNew(ch); a.push({k:'map',cat:'map',o,ch,label:o.name}); } }); /* 아직 없는 장 지도는 목록에만 — 그릴 때 runPrep이 ensureChMap으로 넣음 */
   G.lib.forEach(l=>{ if(['bg','prop','cg','enemy','icon','map'].includes(l.kind)&&on(l.kind)&&(!l.img||l.redraw)&&(l.prompt||(l.kind==='cg'&&cgCast(l).length)||l.kind==='prop'||(l.kind==='bg'&&l.auto)||(l.kind==='enemy'&&!l.alias&&!l.charId))) a.push({k:l.kind,cat:l.kind,o:l,label:({bg:'배경 ',prop:'소품 ',cg:'CG ',enemy:'적 ',icon:'',map:''})[l.kind]+l.name}); });
   return a;
 }
@@ -11453,6 +11466,8 @@ function prepChip(){
   if(!el){ el=document.createElement('div'); el.id='prepChip'; el.className='prepchip'; document.body.appendChild(el); }
   el.innerHTML=`<span class="pg"><i style="width:${j.total?j.done/j.total*100:0}%"></i></span><b>그림 준비 ${j.done}/${j.total}</b><span class="lb">${esc(j.label||'')}</span><button data-act="prepstop" aria-label="멈추기">${j.stop?'멈추는 중':'■'}</button>`;
 }
+/* 그릴 할 일의 저장 칸(Model — 쓰기): 목록(drawTodo)은 읽기라 아직 없는 칸(기술 컷인·장 지도)은 여기서 맞춰 넣음 */
+function prepTarget(it){ return it.k==='scg'?scgSlot(it.c):it.k==='map'&&it.ch?ensureChMap(it.ch):it.o; }
 async function runPrep(cats,filter,opt){
   opt=opt||{};
   if(PREPJOB){ toast('이미 준비 중이에요'); if(opt.done) opt.done(null); return; }
@@ -11464,7 +11479,7 @@ async function runPrep(cats,filter,opt){
     while(CAST&&CAST.busy) await wait(800);
     try{
       let b; try{ b=await naiDrawItem(it); }catch(e1){ if(e1&&(e1.code==='rate_limited'||/429|concurrent/i.test(String(e1.message||'')))){ await wait(6000); b=await naiDrawItem(it); } else throw e1; }
-      if(it.k==='char'&&it.o.npc){ await storeImage(it.o,b,'c:'); mark('meta'); } else if(it.k==='char'){ await storeImage(it.o,b,'c:'); } else if(it.k==='illust'||it.k==='weapon'||it.k==='upper'||it.k==='pose'||it.k==='lbbg'||it.k==='scg'){ await storeImage(it.o,b,''); mark('c:'+it.c.id); } else await storeImage(it.o,b,'l:');
+      const o=prepTarget(it); if(it.k==='char'&&o.npc){ await storeImage(o,b,'c:'); mark('meta'); } else if(it.k==='char'){ await storeImage(o,b,'c:'); } else if(['illust','weapon','upper','pose','lbbg','scg'].includes(it.k)){ await storeImage(o,b,''); mark('c:'+it.c.id); } else await storeImage(o,b,'l:');
       j.done++; prepChip(); if(opt.step) opt.step(it,j,'done'); if(!$('#modal').hidden||tab==='crew'||tab==='lobby'||tab==='ops'||tab==='shop') { if($('#modal').hidden) render(); }
       await wait(700);
     }catch(e){ toast(naiErr(e,it.label+' 실패')); if(e&&['image_cancelled','image_busy','nai_nokey','bad_key','low_credit','network','nai_locked','comfy_nourl','comfy_nowf'].includes(e.code)){ toast('그림 준비를 멈췄어요. 연결을 확인한 뒤 그림 준비실에서 이어서 그려 주세요'); break; } await wait(1500); }
@@ -11490,8 +11505,9 @@ function cxStore(){ return gameRead('world.codex'); } // 읽기 — 바꿀 때�
 /* 도감 기록 바꾸기(Model — 도감 칸 G.world.codex는 이 모듈만 씀): 넣기 · 조건에 맞는 것만 남기기 · 제목으로 고치거나 넣기 */
 function cxPut(x){ gameSlot('world.codex').push(x); return x; }
 function cxKeep(keep){ G.world.codex=cxStore().filter(keep); }
-function cxUpsert(title,body,cat){ const x=cxStore().find(e=>e.title===title); if(x){ x.body=body; return x; } return cxPut({cat:cat||'term',title,body}); }
-function cxNotes(){ if(!G.world.codexNotes||typeof G.world.codexNotes!=='object') G.world.codexNotes={}; return G.world.codexNotes; }
+function cxUpsert(title,body,cat){ const x=gameSlot('world.codex').find(e=>e.title===title); if(x){ x.body=body; return x; } return cxPut({cat:cat||'term',title,body}); }
+function cxNotes(){ return gameRead('world.codexNotes'); } // 읽기 — 바꿀 때는 cxNoteAdd
+function cxNoteAdd(key,text,at){ const N=gameSlot('world.codexNotes'); (N[key]=N[key]||[]).push({text,at}); mark('world'); }
 function libSrc(kind,name){ const l=G.lib.find(x=>x.kind===kind&&x.name===name); return l?imgSrc(l):null; }
 function mainStages(){ const a=[]; G.chapters.filter(ch=>ch.kind==='main').forEach((ch,ci)=>ch.stages.forEach((s,si)=>a.push({id:s.id,code:(ci+1)+'-'+(si+1),title:s.title,ch}))); return a; }
 function escRe(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
@@ -11579,7 +11595,7 @@ async function cxDeepen(key,t){
   const e=cxEntries().find(x=>x.key===key); if(!e) return false;
   const r=await aiJSON(cxDeepenPrompt({e}),t);
   if(!r||!r.text) return false;
-  const N=cxNotes(); (N[key]=N[key]||[]).push({text:String(r.text),at:mainStages().filter(s=>P().cleared[s.id]).map(s=>s.code).pop()||'시작 전'}); mark('world'); return true;
+  cxNoteAdd(key,String(r.text),mainStages().filter(s=>P().cleared[s.id]).map(s=>s.code).pop()||'시작 전'); return true;
 }
 function cxFromChapter(r,ch){ if(!r||!Array.isArray(r.codex)) return; const last=ch.stages[ch.stages.length-1];
   r.codex.slice(0,3).forEach(x=>{ if(!x||!x.title||!x.body) return; cxPut({id:'cx'+uid(),cat:CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term',title:String(x.title).slice(0,40),body:String(x.body),unlock:last?{type:'clear',value:last.id}:{type:'start'},src:'ai',at:Date.now()}); }); mark('world'); }
@@ -12467,8 +12483,16 @@ function readStoryForm(){ return {plot:($('#ng_story')?$('#ng_story').value.trim
 const FKIND={playable:'플레이어블 소속',hostile:'적대 세력',neutral:'중립',monster:'괴물·마물'}, FSTANCE={ally:'우호',neutral:'중립',hostile:'적대'};
 const F_FIELDS=[['desc','개요'],['goal','목적'],['leader','지도자·핵심 인물'],['base','거점·영역'],['ideology','이념·규칙'],['secret','숨겨진 사실(작가용)']], M_FIELDS=[['origin','정체·기원'],['nature','습성·행동'],['weakness','약점']];
 function castCfg(){ const c=G.meta.cast||{}; return {pickupGate:c.pickupGate!==false,hostileGate:c.hostileGate!==false}; }
-function factions(){ const w=G.world; if(!Array.isArray(w.factions)) w.factions=[]; G.chars.forEach(c=>{ if(c.faction&&!c.monster&&!c.collab&&!w.factions.some(f=>f.name===c.faction)) w.factions.push({name:c.faction,desc:'',kind:'playable',rel:{},stance:[]}); }); /* 캐릭터 소속인데 목록에 없는 세력 */ w.factions.forEach(f=>{ if(!FKIND[f.kind]) f.kind=G.chars.some(c=>c.faction===f.name&&!c.monster)?'playable':G.lib.some(l=>l.kind==='enemy'&&!l.charId&&l.name.includes(f.name))?'monster':'neutral'; if(!Array.isArray(f.stance)) f.stance=[]; if(!f.rel||typeof f.rel!=='object') f.rel={}; }); return w.factions; }
-function facByName(n){ return factions().find(f=>f.name===n); }
+/* 세력 목록 G.world.factions: 캐릭터 소속인데 목록에 없는 세력(플레이어블로) · 종류·장별 태도·관계 칸 보정 — 정의는 이 셋 */
+function factionMissing(g,list){ const out=[]; g.chars.forEach(c=>{ if(c.faction&&!c.monster&&!c.collab&&!list.some(f=>f.name===c.faction)&&!out.some(f=>f.name===c.faction)) out.push({name:c.faction,desc:'',kind:'playable',rel:{},stance:[]}); }); return out; }
+function factionOk(f){ return !!FKIND[f.kind]&&Array.isArray(f.stance)&&!!f.rel&&typeof f.rel==='object'; }
+function factionFixed(f,g){ return {kind:FKIND[f.kind]?f.kind:g.chars.some(c=>c.faction===f.name&&!c.monster)?'playable':g.lib.some(l=>l.kind==='enemy'&&!l.charId&&l.name.includes(f.name))?'monster':'neutral',stance:Array.isArray(f.stance)?f.stance:[],rel:f.rel&&typeof f.rel==='object'?f.rel:{}}; } // 맞춘 칸(종류·장별 태도·관계)만 새로 — 바꾸지 않음
+/* 쓰기(Model): 목록을 맞춰 저장하고 돌려줌 — 세력을 고치는 처리가 부름(읽기는 맞춘 모양을 보여 주므로 불러오기에서 따로 맞추지 않음 — FKIND는 불러올 때 아직 없음) */
+function factionSync(g=G){ const w=gameSlot('world.factions',g); w.push(...factionMissing(g,w)); w.forEach(f=>Object.assign(f,factionFixed(f,g))); return w; }
+/* 읽기: 맞춰져 있으면 저장된 목록 그대로, 아니면 맞춘 모양을 새로 만들어 보여 주기만(상태는 그대로 — 고칠 때는 factionSync) */
+function factions(){ const w=gameRead('world.factions'), miss=factionMissing(G,w); return miss.length||!w.every(factionOk)?[...w.map(f=>factionOk(f)?f:Object.assign({},f,factionFixed(f,G))),...miss]:w; }
+function facByName(n){ return factions().find(f=>f.name===n); } // 읽기 — 고칠 때는 facSlot
+function facSlot(n){ return factionSync().find(f=>f.name===n); }
 function mainNow(){ const main=G.chapters.filter(ch=>ch.kind==='main'), i=main.findIndex(ch=>(ch.stages||[]).some(s=>!P().cleared[s.id])); return i<0?main.length+1:i+1; } // 지금 진행 중인 장(1부터) = 다 깨지 않은 첫 메인 장(예전엔 스테이지 하나만 깨도 다음 장으로 셈)
 function stanceAt(f,ch){ if(!f) return 'neutral'; const L=(f.stance||[]).filter(x=>+x.ch<=ch).sort((a,b)=>a.ch-b.ch); return L.length?L.at(-1).s:f.kind==='playable'?'ally':f.kind==='neutral'?'neutral':'hostile'; }
 // 몬스터: 자료실 적 중 캐릭터·NPC가 아닌 것
@@ -12495,20 +12519,20 @@ function factionReview(){ const out=[], F=factions(); if(F.length<2) out.push({w
    이미 쓴 메인 장 이야기로 세력마다 1장의 처음 관계와 바뀐 장을 정해 넣어요. 답에 없는 세력은 종류 기본값을 1장 태도로 적어 둬요(다시 비었다고 잡히지 않게) */
 async function stanceAI(){ const F=factions().filter(f=>f.kind!=='monster'), main=G.chapters.filter(ch=>ch.kind==='main'); if(!F.length||!main.length) return false;
   const r=await aiJSON(stanceAIPrompt({F,main}),null,'default'); if(!r) return false;
-  (Array.isArray(r.stance)?r.stance:[]).forEach(x=>{ const f=facByName(String(x&&x.faction||'').trim()), ch=Math.max(1,Math.min(main.length,Math.round(+(x&&x.ch)||1))); if(!f||f.kind==='monster'||!FSTANCE[x.s]) return; f.stance=(f.stance||[]).filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); });
+  (Array.isArray(r.stance)?r.stance:[]).forEach(x=>{ const f=facSlot(String(x&&x.faction||'').trim()), ch=Math.max(1,Math.min(main.length,Math.round(+(x&&x.ch)||1))); if(!f||f.kind==='monster'||!FSTANCE[x.s]) return; f.stance=(f.stance||[]).filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); });
   F.forEach(f=>{ if(!Array.isArray(f.stance)) f.stance=[]; if(!f.stance.length) f.stance.push({ch:1,s:stanceAt(f,1),why:''}); f.stance.sort((a,b)=>a.ch-b.ch); });
   mark('world'); return true; }
 async function factionAI(rep,instruction){ const F=factions(), M=monsterNames();
   const r=await aiJSON(factionAIPrompt({F,instruction,M}),rep,'complex');
   if(!r) return false; const S=(v,n)=>String(v||'').trim().slice(0,n||300);
-  (Array.isArray(r.factions)?r.factions:[]).slice(0,8).forEach(x=>{ const name=S(x.name,30); if(!name) return; let f=facByName(name); if(!f){ f={name,desc:''}; F.push(f); }
+  (Array.isArray(r.factions)?r.factions:[]).slice(0,8).forEach(x=>{ const name=S(x.name,30); if(!name) return; let f=facSlot(name); if(!f){ f={name,desc:''}; F.push(f); }
     if(FKIND[x.kind]) f.kind=x.kind; [...F_FIELDS,...M_FIELDS].forEach(([k])=>{ const v=S(x[k]); if(v&&(!f[k]||String(f[k]).length<v.length||instruction)) f[k]=v; });
     if(x.rel&&typeof x.rel==='object') Object.entries(x.rel).forEach(([k,v])=>{ if(k!==name&&facByName(k)) f.rel[k]=S(v,40); });
     if(Array.isArray(x.stance)) x.stance.forEach(s=>{ const ch=Math.max(1,Math.round(+s.ch||0)); if(ch&&FSTANCE[s.s]&&!f.stance.some(y=>+y.ch===ch)) f.stance.push({ch,s:s.s,why:S(s.why,80)}); }); });
   (Array.isArray(r.bestiary)?r.bestiary:[]).forEach(x=>{ const l=M.find(y=>y.name===S(x.name,40)); if(!l) return; ['desc','nature','weak'].forEach(k=>{ const v=S(x[k],200); if(v&&!l[k]) l[k]=v; }); const fn=S(x.faction,30); if(fn&&facByName(fn)) l.faction=fn; mark('l:'+l.id); });
   mark('world'); return true; }
 // 장 생성이 돌려준 관계 변화 반영: [{faction,s,why}] → 그 장부터
-function stanceApply(arr,ch){ (Array.isArray(arr)?arr:[]).forEach(x=>{ const f=facByName(String(x&&x.faction||'').trim()); if(f&&FSTANCE[x.s]&&stanceAt(f,ch)!==x.s){ f.stance=f.stance.filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); mark('world'); } }); }
+function stanceApply(arr,ch){ (Array.isArray(arr)?arr:[]).forEach(x=>{ const f=facSlot(String(x&&x.faction||'').trim()); if(f&&FSTANCE[x.s]&&stanceAt(f,ch)!==x.s){ f.stance=f.stance.filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); mark('world'); } }); }
 // 몬스터를 캐릭터에서 빼기(뽑기·톡·일정·인연에서 제외, 적으로 등록)
 function charToMonster(c){ c.monster=true; c.limited=true; if(!G.lib.some(l=>l.kind==='enemy'&&l.name===c.name)) G.lib.push({id:'l'+uid(),kind:'enemy',name:c.name,prompt:String(c.naiPrompt||''),img:null,desc:String(c.profile||'').slice(0,200)}); mark('c:'+c.id); }
 
@@ -12533,7 +12557,7 @@ function openWorldDesign(tab){ if(tab) FW_TAB=tab; const F=factions(), now=mainN
   <div class="row" style="gap:4px;margin:6px 0">${tabs.map(([k,l])=>`<button class="btn sm ${FW_TAB===k?'':'ghost'}" data-act="fwtab" data-k="${k}">${l}</button>`).join('')}</div>${body}
   <label class="f" style="margin-top:8px">AI 추가 지시 (선택)</label><input class="in" id="fw_ins" placeholder="예: 헬릭스는 3장 이후 내분으로 일부가 우리 편이 된다">
   <div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><button class="btn" data-act="fwsave">저장</button><button class="btn ghost" data-act="fwai">AI로 깊이 채우기</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
-function fwRead(){ const F=factions(), lines=v=>String(v||'').split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(x=>x[0]);
+function fwRead(){ const F=factionSync(), lines=v=>String(v||'').split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(x=>x[0]);
   document.querySelectorAll('#modal [data-fw]').forEach(el=>{ const k=el.dataset.fw.split('.'), v=el.type==='checkbox'?el.checked:el.value;
     if(k[0]==='cast'){ G.meta.cast=Object.assign({},G.meta.cast,{[k[1]]:v}); return; }
     if(k[0]==='m'){ const l=G.lib.find(x=>x.id===k[1]); if(l){ l[k[2]]=String(v).trim(); mark('l:'+l.id); } return; }
@@ -12547,7 +12571,7 @@ document.addEventListener('click',async e=>{ const el=e.target.closest('[data-ac
   if(a==='fwopen') openWorldDesign();
   else if(a==='fwtab'){ fwRead(); openWorldDesign(el.dataset.k); }
   else if(a==='fwsave'){ fwRead(); toast('세력·등장 설정을 저장했어요'); openWorldDesign(); }
-  else if(a==='fwadd'){ fwRead(); factions().push({name:'새 세력 '+(factions().length+1),desc:'',kind:'neutral',rel:{},stance:[]}); openWorldDesign('fac'); }
+  else if(a==='fwadd'){ fwRead(); factionSync().push({name:'새 세력 '+(factions().length+1),desc:'',kind:'neutral',rel:{},stance:[]}); openWorldDesign('fac'); }
   else if(a==='fwmon'){ const c=charById(el.dataset.id); if(c&&(await appConfirm(`「${c.name}」을(를) 몬스터(적)로 바꿀까요? ${T('gacha')}·톡·일정·인연에서 빠져요.`))){ charToMonster(c); toast('몬스터로 바꿨어요'); openWorldDesign('cast'); } }
   else if(a==='fwai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } fwRead(); if(await factionAI(uiProg(el),($('#fw_ins')||{}).value||'')){ toast('세력·몬스터 설정을 채웠어요'); openWorldDesign(); } } });
 function monsterFromGen(x){ const name=String(x.name||'').trim(); if(!name||G.lib.some(l=>l.kind==='enemy'&&l.name===name)) return; G.lib.push({id:'l'+uid(),kind:'enemy',name,prompt:String(x.naiPrompt||x.look||''),img:null,desc:String(x.profile||x.desc||'').slice(0,200),faction:String(x.faction||'')}); }
@@ -13662,7 +13686,7 @@ function conVariantRow(t,i){ const c=t.cond||{}, st=(c.stats||[])[0]||{}, n=conT
   <label class="f">레시피: 최소 투입 (${CON_RES.map(k=>esc(T(k))).join(' / ')})</label><input class="in" data-vf="recipe" value="${esc((t.recipe&&t.recipe.min||[]).join(','))}">
   <label class="f">등급</label><select class="in" data-vf="rarity">${[['same','원래 캐릭터와 같게'],['1','R'],['2','SR'],['3','SSR']].map(([v,l])=>`<option value="${v}" ${String(t.rarity||'same')===v?'selected':''}>${l}</option>`).join('')}</select>
   <h4 style="margin:10px 0 4px">적용 조건 <span class="muted" style="font-size:.8rem">(비우면 조건 없음 · 보유한 ${esc(T('crew'))} 중 맞는 캐릭터에 자동 적용)</span></h4>
-  <div class="g2"><div><label class="f">소속(쉼표)</label><input class="in" data-vf="factions" value="${esc((c.factions||[]).join(','))}" placeholder="${esc((G.world.factions||[]).map(f=>f.name).join(','))}"></div>
+  <div class="g2"><div><label class="f">소속(쉼표)</label><input class="in" data-vf="factions" value="${esc((c.factions||[]).join(','))}" placeholder="${esc(factions().map(f=>f.name).join(','))}"></div>
   <div><label class="f">역할</label><div class="row">${Object.keys(ROLE).map(r=>`<label style="display:flex;gap:4px"><input type="checkbox" data-vrole="${r}" ${(c.roles||[]).includes(r)?'checked':''}>${esc(ROLE[r])}</label>`).join('')}</div></div>
   <div><label class="f">속성(쉼표)</label><input class="in" data-vf="elems" value="${esc((c.elems||[]).join(','))}" placeholder="${esc(ELEMS.join(','))}"></div>
   <div><label class="f">능력치</label><div class="row"><select class="in" data-vf="stk"><option value="">없음</option>${CON_STATS.map(([k,l])=>`<option value="${k}" ${st.k===k?'selected':''}>${l}</option>`).join('')}</select><select class="in" data-vf="stop">${['>=','<=','>','<'].map(o=>`<option ${st.op===o?'selected':''}>${o}</option>`).join('')}</select><input class="in" type="number" data-vf="stv" value="${st.v!=null?+st.v:''}" style="width:80px"></div></div>
@@ -13767,7 +13791,7 @@ case 'poke': { if(lobbyMenuHidden()){ lobbyMenu(true); break; } const c=charById
       const l=pickTouchLine(pool,lobbyBubbleText()); lobbyPokeShow(t,e,c,l,zone,face); if(c.voiceId&&SND().voiceLobby) speak(c,l); break; }
 case 'lbbgdel': { if(playMode())break;const c=charById(id); if(!c?.lbbg||!(await appConfirm('로비 레이어의 배경만 지울까요?'))) break; await imgClear(c.lbbg); mark('c:'+c.id); openChar(c.id); render(); break; }
 case 'altnew': { if(!SAMPLE){ toast('이격을 만들려면 설정 → 글 AI를 먼저 등록해 주세요'); break; } closeModal(); openNewPickup({kind:'alt',base:id}); break; }
-case 'scggen': { const c=charById(id); if(!c) break; if(!String(c.naiPrompt||'').trim()){toast('먼저 설정 편집에서 NAI 스탠딩 프롬프트를 채워 주세요');break;} if(!imgReady()){toast(imgNeed());break;} if(!SAMPLE){toast('기술 컷인 장면을 구성하려면 설정 → 글 AI를 먼저 등록해 주세요.');break;} const o=scgOf(c), done=busy(t,'그리는 중…');
+case 'scggen': { const c=charById(id); if(!c) break; if(!String(c.naiPrompt||'').trim()){toast('먼저 설정 편집에서 NAI 스탠딩 프롬프트를 채워 주세요');break;} if(!imgReady()){toast(imgNeed());break;} if(!SAMPLE){toast('기술 컷인 장면을 구성하려면 설정 → 글 AI를 먼저 등록해 주세요.');break;} const o=scgSlot(c), done=busy(t,'그리는 중…');
       try{ const el=await generateUltimateCutin(c); await storeImage(o,el,''); o.prompt=el.__candidateConfig?.prompt||o.prompt; mark('c:'+c.id); toast('기술 컷인을 그렸어요'); openChar(c.id); }catch(err){ toast(naiErr(err,'기술 컷인 실패')); done(); } break; }
 case 'scgdel': { const c=charById(id); if(!c||!c.scg) break; if(!(await appConfirm('기술 컷인을 지울까요?'))) break; const o=c.scg;await imgClear(o); mark('c:'+c.id); openChar(id); break; }
 case 'scgtest': { const c=charById(id); if(c) skillCut(c,c.skill.name,true,document.body); break; }
@@ -13936,7 +13960,7 @@ case 'relseed': { const n=await relSeedAI(uiProg(t)); if(n){ toast(`관계 ${n}�
 case 'reladd': { const bn=$('#rl_b').value, k=$('#rl_k').value.trim(), nt=$('#rl_n').value.trim(); if(!bn||bn===RELC) break; if(!k&&!nt){ toast('관계나 설명을 적어 주세요'); break; }
       let r=relPair(RELC,bn); if(r){ if(k) r.kind=k; if(nt) r.note=nt; } else { r={id:'r'+uid(),a:RELC,b: bn,kind:k||'아는 사이',note:nt,hist:[]}; relPut(r); } r.at=Date.now(); mark('meta'); openRel(); break; }
 case 'reledit': openRelEdit(id); break;
-case 'relsave': { const r=RELS().find(x=>x.id===id); if(!r) break; r.kind=$('#rle_k').value.trim().slice(0,16)||r.kind; r.note=$('#rle_n').value.trim().slice(0,240);
+case 'relsave': { const r=gameSlot('rels').find(x=>x.id===id); if(!r) break; r.kind=$('#rle_k').value.trim().slice(0,16)||r.kind; r.note=$('#rle_n').value.trim().slice(0,240);
       r.hist=lines($('#rle_h').value).slice(-12).map(l=>{ const m=l.match(/^(.{1,12}?) · (.+)$/); return m?{src:m[1],text:m[2]}:{src:'',text:l}; }); mark('meta'); openRel(); break; }
 case 'reldel': { const r=RELS().find(x=>x.id===id); if(!r||!(await appConfirm(`${relName(r.a,true)} ↔ ${relName(r.b,true)} 관계를 지울까요?`))) break; relKeep(x=>x.id!==id); RELUNDO=r; mark('meta'); openRel(); toast('관계를 지웠어요 · 관계도 위쪽 「되돌리기」로 되살릴 수 있어요'); break; }
 case 'relundo': { if(RELUNDO&&!RELS().some(x=>x.id===RELUNDO.id)){ relPut(RELUNDO); mark('meta'); toast('관계를 되살렸어요'); } RELUNDO=null; openRel(); break; }
@@ -13947,7 +13971,7 @@ case 'cxsave': { const id2=t.dataset.id, title=$('#cx_t').value.trim(), body=$('
       if(x){ Object.assign(x,{cat:$('#cx_cat').value,title,body,unlock:u}); } else { x={id:'cx'+uid(),cat:$('#cx_cat').value,title,body,unlock:u,src:'user',at:Date.now()}; cxPut(x); }
       mark('world'); closeModal(); render(); toast('기록을 저장했어요'); pcSoon(); break; }
 case 'cxdel': { if(!(await appConfirm('이 기록을 지울까요?'))) break; cxKeep(q=>q.id!==t.dataset.id); mark('world'); closeModal(); render(); pcSoon(); break; }
-case 'cxnote': { const k=t.dataset.k, v=prompt('메모로 덧붙일 내용'); if(!v||!v.trim()) break; const N=cxNotes(); (N[k]=N[k]||[]).push({text:v.trim(),at:'메모'}); mark('world'); openCx(k); pcSoon(); break; }
+case 'cxnote': { const k=t.dataset.k, v=prompt('메모로 덧붙일 내용'); if(!v||!v.trim()) break; cxNoteAdd(k,v.trim(),'메모'); openCx(k); pcSoon(); break; }
 case 'cxdisc': { if(!SAMPLE){toast('설정의 글 AI에서 AI를 먼저 등록해 주세요');break;} const done=busy(t,'쓰는 중… 1분쯤 걸려요'); const n=await cxDiscover(uiProg(t)); done(); if(n){ render(); toast(`새 기록 ${n}개를 실었어요`); } break; }
 case 'cxdeep': { const k=t.dataset.k, done=busy(t,'기록을 찾는 중…'); const ok=await cxDeepen(k,uiProg(t)); if(ok){ openCx(k); toast('새 기록을 덧붙였어요'); } else done(); break; }
 case 'cxreadall': { const s=progSlot('cxSeen'); cxEntries().forEach(e=>{ if(e.open) s[e.key]=1; }); CXMEMO=null; mark('prog'); render(); break; }

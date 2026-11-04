@@ -124,12 +124,12 @@ function drawTodo(cats){
     if(on('char')&&c.useStanding!==false&&!c.img) a.push({k:'char',cat:'char',o:c,c,label:c.name+' 스탠딩'});
     if(on('upper')&&c.upper&&!c.upper.img) a.push({k:'upper',cat:'upper',o:c.upper,c,label:c.name+' 상반신'});
     if(cats&&on('pose')&&c.pose&&!c.pose.img) a.push({k:'pose',cat:'pose',o:c.pose,c,label:c.name+' 로비 포즈'});
-    if(cats&&on('scg')&&!scgOf(c).img) a.push({k:'scg',cat:'scg',o:c.scg,c,label:c.name+' 기술 컷인'});
+    const sc=scgOf(c); if(cats&&on('scg')&&!sc.img) a.push({k:'scg',cat:'scg',o:sc,c,label:c.name+' 기술 컷인'}); /* 목록은 읽기 — 그릴 때 runPrep이 scgSlot으로 칸을 맞춤 */
     if(cats&&on('pose')&&c.lbbg&&!c.lbbg.img) a.push({k:'lbbg',cat:'pose',o:c.lbbg,c,label:c.name+' 로비 배경'});
     if(on('illust')&&c.illust&&!c.illust.img) a.push({k:'illust',cat:'illust',o:c.illust,c,label:c.name+' 일러스트'});
     if(on('weapon')&&c.weapon&&!c.weapon.img&&c.weapon.prompt) a.push({k:'weapon',cat:'weapon',o:c.weapon,c,label:c.name+' '+T('weapon')}); });
   (G.npcs||[]).forEach(n=>{ if(!n.naiPrompt) return; if(on('char')&&!n.img) a.push({k:'char',cat:'char',o:n,c:n,label:n.name+' (NPC) 스탠딩'}); if(on('upper')&&n.upper&&!n.upper.img) a.push({k:'upper',cat:'upper',o:n.upper,c:n,label:n.name+' (NPC) 상반신'}); });
-  if(on('map')) G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>{ if(!chMapLib(ch)) ensureChMap(ch); });
+  if(on('map')) G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>{ if(!chMapLib(ch)){ const o=chMapNew(ch); a.push({k:'map',cat:'map',o,ch,label:o.name}); } }); /* 아직 없는 장 지도는 목록에만 — 그릴 때 runPrep이 ensureChMap으로 넣음 */
   G.lib.forEach(l=>{ if(['bg','prop','cg','enemy','icon','map'].includes(l.kind)&&on(l.kind)&&(!l.img||l.redraw)&&(l.prompt||(l.kind==='cg'&&cgCast(l).length)||l.kind==='prop'||(l.kind==='bg'&&l.auto)||(l.kind==='enemy'&&!l.alias&&!l.charId))) a.push({k:l.kind,cat:l.kind,o:l,label:({bg:'배경 ',prop:'소품 ',cg:'CG ',enemy:'적 ',icon:'',map:''})[l.kind]+l.name}); });
   return a;
 }
@@ -152,6 +152,8 @@ function prepChip(){
   if(!el){ el=document.createElement('div'); el.id='prepChip'; el.className='prepchip'; document.body.appendChild(el); }
   el.innerHTML=`<span class="pg"><i style="width:${j.total?j.done/j.total*100:0}%"></i></span><b>그림 준비 ${j.done}/${j.total}</b><span class="lb">${esc(j.label||'')}</span><button data-act="prepstop" aria-label="멈추기">${j.stop?'멈추는 중':'■'}</button>`;
 }
+/* 그릴 할 일의 저장 칸(Model — 쓰기): 목록(drawTodo)은 읽기라 아직 없는 칸(기술 컷인·장 지도)은 여기서 맞춰 넣음 */
+function prepTarget(it){ return it.k==='scg'?scgSlot(it.c):it.k==='map'&&it.ch?ensureChMap(it.ch):it.o; }
 async function runPrep(cats,filter,opt){
   opt=opt||{};
   if(PREPJOB){ toast('이미 준비 중이에요'); if(opt.done) opt.done(null); return; }
@@ -163,7 +165,7 @@ async function runPrep(cats,filter,opt){
     while(CAST&&CAST.busy) await wait(800);
     try{
       let b; try{ b=await naiDrawItem(it); }catch(e1){ if(e1&&(e1.code==='rate_limited'||/429|concurrent/i.test(String(e1.message||'')))){ await wait(6000); b=await naiDrawItem(it); } else throw e1; }
-      if(it.k==='char'&&it.o.npc){ await storeImage(it.o,b,'c:'); mark('meta'); } else if(it.k==='char'){ await storeImage(it.o,b,'c:'); } else if(it.k==='illust'||it.k==='weapon'||it.k==='upper'||it.k==='pose'||it.k==='lbbg'||it.k==='scg'){ await storeImage(it.o,b,''); mark('c:'+it.c.id); } else await storeImage(it.o,b,'l:');
+      const o=prepTarget(it); if(it.k==='char'&&o.npc){ await storeImage(o,b,'c:'); mark('meta'); } else if(it.k==='char'){ await storeImage(o,b,'c:'); } else if(['illust','weapon','upper','pose','lbbg','scg'].includes(it.k)){ await storeImage(o,b,''); mark('c:'+it.c.id); } else await storeImage(o,b,'l:');
       j.done++; prepChip(); if(opt.step) opt.step(it,j,'done'); if(!$('#modal').hidden||tab==='crew'||tab==='lobby'||tab==='ops'||tab==='shop') { if($('#modal').hidden) render(); }
       await wait(700);
     }catch(e){ toast(naiErr(e,it.label+' 실패')); if(e&&['image_cancelled','image_busy','nai_nokey','bad_key','low_credit','network','nai_locked','comfy_nourl','comfy_nowf'].includes(e.code)){ toast('그림 준비를 멈췄어요. 연결을 확인한 뒤 그림 준비실에서 이어서 그려 주세요'); break; } await wait(1500); }

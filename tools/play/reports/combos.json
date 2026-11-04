@@ -1,5 +1,5 @@
 {
- "at": "2026-11-04T05:14:06.599Z",
+ "at": "2026-11-04T05:53:27.929Z",
  "ref": null,
  "sites": [
   {
@@ -6435,7 +6435,7 @@
       "「가 더 공개돼요)」"
      ],
      "no": [],
-     "loc": "src/main/0300-codex.js:24",
+     "loc": "src/main/0300-codex.js:25",
      "seen": {
       "yes": 0,
       "no": 0
@@ -6859,7 +6859,7 @@
       "「가 더 공개돼요)」"
      ],
      "no": [],
-     "loc": "src/main/0300-codex.js:24",
+     "loc": "src/main/0300-codex.js:25",
      "seen": {
       "yes": 0,
       "no": 0

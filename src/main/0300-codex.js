@@ -6,8 +6,9 @@ function cxStore(){ return gameRead('world.codex'); } // 읽기 — 바꿀 때�
 /* 도감 기록 바꾸기(Model — 도감 칸 G.world.codex는 이 모듈만 씀): 넣기 · 조건에 맞는 것만 남기기 · 제목으로 고치거나 넣기 */
 function cxPut(x){ gameSlot('world.codex').push(x); return x; }
 function cxKeep(keep){ G.world.codex=cxStore().filter(keep); }
-function cxUpsert(title,body,cat){ const x=cxStore().find(e=>e.title===title); if(x){ x.body=body; return x; } return cxPut({cat:cat||'term',title,body}); }
-function cxNotes(){ if(!G.world.codexNotes||typeof G.world.codexNotes!=='object') G.world.codexNotes={}; return G.world.codexNotes; }
+function cxUpsert(title,body,cat){ const x=gameSlot('world.codex').find(e=>e.title===title); if(x){ x.body=body; return x; } return cxPut({cat:cat||'term',title,body}); }
+function cxNotes(){ return gameRead('world.codexNotes'); } // 읽기 — 바꿀 때는 cxNoteAdd
+function cxNoteAdd(key,text,at){ const N=gameSlot('world.codexNotes'); (N[key]=N[key]||[]).push({text,at}); mark('world'); }
 function libSrc(kind,name){ const l=G.lib.find(x=>x.kind===kind&&x.name===name); return l?imgSrc(l):null; }
 function mainStages(){ const a=[]; G.chapters.filter(ch=>ch.kind==='main').forEach((ch,ci)=>ch.stages.forEach((s,si)=>a.push({id:s.id,code:(ci+1)+'-'+(si+1),title:s.title,ch}))); return a; }
 function escRe(s){return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
@@ -95,7 +96,7 @@ async function cxDeepen(key,t){
   const e=cxEntries().find(x=>x.key===key); if(!e) return false;
   const r=await aiJSON(cxDeepenPrompt({e}),t);
   if(!r||!r.text) return false;
-  const N=cxNotes(); (N[key]=N[key]||[]).push({text:String(r.text),at:mainStages().filter(s=>P().cleared[s.id]).map(s=>s.code).pop()||'시작 전'}); mark('world'); return true;
+  cxNoteAdd(key,String(r.text),mainStages().filter(s=>P().cleared[s.id]).map(s=>s.code).pop()||'시작 전'); return true;
 }
 function cxFromChapter(r,ch){ if(!r||!Array.isArray(r.codex)) return; const last=ch.stages[ch.stages.length-1];
   r.codex.slice(0,3).forEach(x=>{ if(!x||!x.title||!x.body) return; cxPut({id:'cx'+uid(),cat:CX_LABEL[x.cat]&&x.cat!=='all'?x.cat:'term',title:String(x.title).slice(0,40),body:String(x.body),unlock:last?{type:'clear',value:last.id}:{type:'start'},src:'ai',at:Date.now()}); }); mark('world'); }

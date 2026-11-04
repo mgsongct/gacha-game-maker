@@ -40,6 +40,8 @@ const GAME_SLOTS={
   'meta.storyMemory':{make:()=>({version:1,notes:''})}, // 스토리 기억(0530)
   'rels':{make:()=>[],ok:Array.isArray}, // 인연(0450)
   'world.codex':{make:()=>[],ok:Array.isArray}, // 도감 기록(0300)
+  'world.codexNotes':{make:()=>({})}, // 도감 항목별 메모(0300)
+  'world.factions':{make:()=>[],ok:Array.isArray}, // 세력(0445 — 읽기 factions가 캐릭터 소속까지 맞춘 모양을 보여 주고, 고칠 때 factionSync가 저장)
   'world.plan':{make:()=>({acts:[],twists:[],branches:[],arcs:[]}),ok:p=>progObj(p)&&['acts','twists','branches','arcs'].every(k=>Array.isArray(p[k]))} // 시나리오 설계(0465)
 };
 const gameAt=(path,g)=>{ const ks=path.split('.'), last=ks.pop(); let o=g; for(const k of ks) o=o[k]; return [o,last]; };
@@ -86,7 +88,7 @@ function repairRefs(g){ const ids=new Set((g.chars||[]).map(c=>c.id)), byName=n=
 function fix(g){
   const d=defaults(); g=safeIds(g||{});
   const old=(g.ver||1)<VER;
-  g.world=Object.assign(d.world,g.world||{}); if(!Array.isArray(g.world.factions)) g.world.factions=[];
+  g.world=Object.assign(d.world,g.world||{});
   g.chars=Array.isArray(g.chars)?g.chars:d.chars;
   if(inheritAll(g)) g.__curveNew=true; // 이격 = 원본 + 수정치 (0065-inherit.js)
   g.chars.forEach(c=>{
@@ -153,7 +155,7 @@ function fix(g){
   if(!(g.meta.curve>=3)){ g.chapters.filter(ch=>ch.kind==='main').forEach((ch,k)=>rebalanceChapter(ch,k)); g.meta.curve=3; g.__curveNew=true; }
   for(const c of g.chars)if(GGMCombat.migrateBaseStats(c))g.__curveNew=true;
   if(g.chars.some(c=>c.roleSpeedVersion!==1))g.__curveNew=true;g.chars.forEach(c=>v2Ensure(c)); g.meta.combatVersion=2;
-  gameSlotsFix(g); g.ver=VER;
+  gameSlotsFix(g); scgFixAll(g); g.ver=VER;
   try{ repairRefs(g); }catch(e){}
   if(naiBlocksGame(g))g.__curveNew=true;
   return g;

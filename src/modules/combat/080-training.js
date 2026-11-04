@@ -5,11 +5,11 @@ function v2TrainingSummary(c){
  const t=v2OwnedTraining(c),o=own(c.id),plan=GGMCombat.trainingPlan(t);
  return `<div class="panel v2-training-panel"><h3>스킬 공통 레벨 · ${t.rank}/7</h3><button class="btn" data-act="v2train" data-id="${esc(c.id)}" ${!o||!plan.allowed?'disabled':''}>${!o?'캐릭터 획득 후 강화 가능':plan.allowed?'스킬 공통 레벨 강화':'공통 레벨 최대'}</button></div>`;
 }
-function v2TrainingHasGain(c,t,plan){return plan.allowed&&GGMCombat.trainingChanges(v2Ensure(c),t,v2TrainingNext(t,plan),plan.slot);}
+function v2TrainingHasGain(c,t,plan){return plan.allowed&&GGMCombat.trainingChanges(v2Kit(c),t,v2TrainingNext(t,plan),plan.slot);}
 function v2MasteryButton(c,slot){const t=v2OwnedTraining(c),o=own(c.id),plan=GGMCombat.trainingPlan(t,slot);return `<button class="btn sm" title="실제 효과가 달라지지 않는 단계는 재료를 사용하지 않습니다." data-act="v2train" data-id="${esc(c.id)}" data-slot="${slot}" ${!o||!plan.allowed||!v2TrainingHasGain(c,t,plan)?'disabled':''}>${t.rank<7?'공통 Lv.7에서 전문화':plan.allowed?(v2TrainingHasGain(c,t,plan)?'전문화 강화':'추가 성장 없음'):'전문화 최대'}</button>`;}
 let V2TRAIN_CONFIRM=null;
 function v2TrainingNext(t,plan){const next=GGMCombat.trainingState(t);if(plan.slot)next.mastery[plan.slot]++;else next.rank++;return next;}
-function v2TrainingSlotText(c,slot,t){const s=GGMCombat.trainedKit(v2Ensure(c),t)[slot],sp=slot==='ultimate'?` · 전투 시작 SP ${Math.round(GGMCombat.trainingInitialSP(t)*100)/100}`:'';return `<b>${esc(GGMCombat.SLOTS[slot])} · ${esc(s.name)} · ${esc(v2TrainingLabel(t,slot))}</b><p>${esc(v2SkillText(s,slot))}${sp}</p>`;}
+function v2TrainingSlotText(c,slot,t){const s=GGMCombat.trainedKit(v2Kit(c),t)[slot],sp=slot==='ultimate'?` · 전투 시작 SP ${Math.round(GGMCombat.trainingInitialSP(t)*100)/100}`:'';return `<b>${esc(GGMCombat.SLOTS[slot])} · ${esc(s.name)} · ${esc(v2TrainingLabel(t,slot))}</b><p>${esc(v2SkillText(s,slot))}${sp}</p>`;}
 function v2OpenTraining(id,slot){
  const c=charById(id),o=c&&own(id);if(!c||!o)return;const t=v2OwnedTraining(c),plan=GGMCombat.trainingPlan(t,slot);if(!plan.allowed)return;if(!v2TrainingHasGain(c,t,plan)){toast('현재 스킬은 다음 단계에서 추가로 성장하지 않아 재료를 사용하지 않습니다.');return;}
  V2TRAIN_CONFIRM={id,slot:plan.slot,snapshot:JSON.stringify(t)};const next=v2TrainingNext(t,plan),aff=plan.slot?[plan.slot]:Object.keys(GGMCombat.SLOTS),enough=P().mat.wmat>=plan.materials&&P().gold>=plan.gold;

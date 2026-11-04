@@ -2,9 +2,10 @@
 // 10장까지는 직선, 그 뒤로는 레벨 상한이 오르는 만큼만 (조금 덜) 강해져요
 function enemyTarget(k,i,boss){ const CK=9; let base; if(k<=CK) base=645*(1+0.55*k); else { const L=70+5*(k-CK); base=645*(1+0.55*CK)*((1+0.06*(L-1))/(1+0.06*69))*Math.pow(0.99,k-CK); } return base*(1+0.08*i)*(boss?1.8:1); }
 function capExtra(){ try{ return 5*Math.max(0,Math.floor(progK())-9); }catch(e){ return 0; } }
-function fitEnemy(e,target){ if(!e||e.manual) return e; e.hp=+e.hp||800; e.atk=+e.atk||70; e.def=+e.def||0; e.spd=+e.spd||90; const p=e.hp/5+e.atk*3+e.def*2; const want=Math.max(50,target-e.spd); if(p<=0) return e; const f=want/p;
-  e.hp=Math.max(100,Math.round(e.hp*f)); e.atk=Math.max(10,Math.round(e.atk*f)); e.def=Math.max(0,Math.round(e.def*f)); return e; }
-function rebalanceChapter(ch,k){ (ch.stages||[]).forEach((s,i)=>{ const last=i===ch.stages.length-1; (s.enemies||[]).forEach(e=>fitEnemy(e,enemyTarget(k,i,e.boss||(last&&s.enemies.length===1)))); }); }
+/* 적 스탯을 목표 전투력에 맞춘 새 객체(순수 — 받은 적은 그대로, 수동 지정 적은 그 자체를 돌려줌) */
+function fitEnemy(e,target){ if(!e||e.manual) return e; const hp=+e.hp||800, atk=+e.atk||70, def=+e.def||0, spd=+e.spd||90, p=hp/5+atk*3+def*2, f=Math.max(50,target-spd)/p;
+  return p<=0?{...e,hp,atk,def,spd}:{...e,hp:Math.max(100,Math.round(hp*f)),atk:Math.max(10,Math.round(atk*f)),def:Math.max(0,Math.round(def*f)),spd}; }
+function rebalanceChapter(ch,k){ (ch.stages||[]).forEach((s,i)=>{ const last=i===ch.stages.length-1; if(s.enemies) s.enemies=s.enemies.map(e=>fitEnemy(e,enemyTarget(k,i,e.boss||(last&&s.enemies.length===1)))); }); }
 
 function effPower(ids,enemies){ const fb=factionBonus(ids), n=Math.max(1,enemies.length);
   return ids.map(charById).filter(Boolean).reduce((a,c)=>{ const m=matchup(c,enemies); return a+Math.round(charPower(c)*(1+(fb[c.faction]||0)/100)*(1+0.25*(m.good-m.bad)/n)); },0); }

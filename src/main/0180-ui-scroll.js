@@ -66,7 +66,11 @@ const ICO={
   shop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9 6 4h12l2 5M4 9v11h16V9M4 9h16M9 20v-6h6v6"/></svg>',
   mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></svg>',
   gem:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l3 18 3-18"/></svg>'};
-function scgOf(c){ if(!c) return null; if(!c.scg||typeof c.scg!=='object') c.scg={id:'sc_'+c.id,kind:'scg',name:c.name+' 기술 컷인',prompt:'',img:null}; c.scg.id=c.scg.id||'sc_'+c.id; c.scg.kind='scg'; return c.scg; }
+/* 캐릭터의 기술 컷인 그림 칸 c.scg: 새 값 · 쓰기(맞춰 저장하고 돌려줌 — 그릴 때·올릴 때·불러오기) · 읽기(없으면 새 값을 보여 주기만) */
+function scgNew(c){ return {id:'sc_'+c.id,kind:'scg',name:c.name+' 기술 컷인',prompt:'',img:null}; }
+function scgSlot(c){ if(!c) return null; if(!c.scg||typeof c.scg!=='object') c.scg=scgNew(c); c.scg.id=c.scg.id||'sc_'+c.id; c.scg.kind='scg'; return c.scg; }
+function scgFixAll(g){ (g.chars||[]).forEach(c=>{ if(c.scg) scgSlot(c); }); } // 불러오기(fix): 있는 칸의 id·종류만 맞춤
+function scgOf(c){ if(!c) return null; return c.scg&&typeof c.scg==='object'?c.scg:scgNew(c); } // 읽기 — 고칠 때는 scgSlot
 function charIllust(c){ if(!c) return null; const k=skinOf(c); if(k&&imgSrc(k)) return skinPartSrc(c,'illust'); return c.illust?imgSrc(c.illust):null; } // 스킨을 입으면 기본 옷 일러스트로 돌아가지 않아요
 function lobbyCharacterArt(c,cls='lobby-art',face=''){
  const sk=skinOf(c),faces=sk?.upper&&imgSrc(sk.upper)?sk.faces:c.faces,f=(faces||[]).find(x=>x.name===face),src=f?.up&&imgSrc(f.up)||sk?.upper&&imgSrc(sk.upper)||c.upper&&imgSrc(c.upper);
@@ -117,7 +121,9 @@ function lobbyHTML(){
   </div>`;
 }
 function chMapLib(ch){return G.lib.find(l=>l.kind==='map'&&l.ch===ch.id);}
-function ensureChMap(ch){let l=chMapLib(ch); if(!l){ l={id:'m'+uid(),kind:'map',ch:ch.id,name:ch.title+' 지도',prompt:'ruined city at night, glowing roads, rivers of light, crater, scattered buildings',img:null}; G.lib.push(l); mark('l:'+l.id); } return l;}
+/* 장 작전 지도(자료실 map): 새 값(장마다 id 하나 — 목록에서 미리 보여 줄 때도 같은 열쇠) · 쓰기(없으면 넣고 돌려줌 — 지도 편집·그림 등록) */
+function chMapNew(ch){return {id:'m_'+ch.id,kind:'map',ch:ch.id,name:ch.title+' 지도',prompt:'ruined city at night, glowing roads, rivers of light, crater, scattered buildings',img:null};}
+function ensureChMap(ch){let l=chMapLib(ch); if(!l){ l=chMapNew(ch); G.lib.push(l); mark('l:'+l.id); } return l;}
 // 작전: 장 카드를 가로로 넘겨 고르고, 누르면 그 장의 지도로 들어가요
 let OPS_CH=null;
 function chLogline(ch){ if(ch.logline) return ch.logline; const L=parseScript((ch.stages[0]||{}).pre||'').find(l=>l.type==='nar'&&l.text&&l.text.length>8); return L?sub(L.text).slice(0,70)+(L.text.length>70?'…':''):''; }

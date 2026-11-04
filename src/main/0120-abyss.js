@@ -130,7 +130,7 @@ async function drawCardArts(deck,rep){ if(!imgReady()){ toast(imgNeed()); return
   for(const cd of todo){ const c=charById(cd.o); if(rep) rep(`그리는 중 ${n+1}/${todo.length}`);
     try{ const tags=cd.k==='skill'?(SKILL_TAGS[c.skill&&c.skill.kind]||'attacking')+', special effects, glowing':CARD_ILL[cd.k]||'dynamic pose';
       const b=await naiDraw('illust',joinTags(c.naiPrompt,tags),{styleId:c.naiStyle,frame:cd.k==='skill'?'upper body':'cowboy shot',pose:'dynamic pose, '+tags});
-      if(cd.k==='skill'){ scgOf(c); await storeImage(c.scg,b,''); } else { c.cards=c.cards||{}; const o=c.cards[cd.k]||(c.cards[cd.k]={id:'cd_'+c.id+'_'+cd.k,kind:'illust',name:c.name+' '+cardName({k:cd.k,o:c.id}),prompt:tags,img:null}); await storeImage(o,b,''); }
+      if(cd.k==='skill'){ scgSlot(c); await storeImage(c.scg,b,''); } else { c.cards=c.cards||{}; const o=c.cards[cd.k]||(c.cards[cd.k]={id:'cd_'+c.id+'_'+cd.k,kind:'illust',name:c.name+' '+cardName({k:cd.k,o:c.id}),prompt:tags,img:null}); await storeImage(o,b,''); }
       mark('c:'+c.id); n++; }
     catch(e){ toast(naiErr(e)); break; } }
   if(rep) rep.end(); if(n) toast(`카드 일러스트 ${n}장을 그렸어요`); const run=progSlot('rogue').run; if($('#modal .cd-row')&&run) rgDeckModal(run.deck); if(CB) cbRender(); }
@@ -426,9 +426,9 @@ function rgPick3(run){ const take=(arr,n)=>{ const a=[...arr], o=[]; while(o.len
 function rgEnemies(run,kind){ const pool=[]; G.chapters.filter(ch=>ch.kind==='main').forEach(ch=>ch.stages.forEach(s=>(s.enemies||[]).forEach(e=>{ if(!pool.some(x=>x.name===e.name)) pool.push(e); })));
   const pick=boss=>{ const c=pool.filter(e=>!!e.boss===boss); const src=(c.length?c:pool)[Math.floor(Math.random()*(c.length||pool.length||1))]||{name:'미확인 적',elem:ELEMS[0]}; return {name:src.name,elem:src.elem||ELEMS[0],hp:900,atk:85,def:35,spd:92,boss}; };
   const k=run.k+run.floor*0.12, i=run.floor*0.5; let en;
-  if(kind==='boss'){ en=[pick(true),pick(false)]; fitEnemy(en[0],enemyTarget(k,i,true)*1.4); fitEnemy(en[1],enemyTarget(k,i,false)); }
-  else if(kind==='elite'){ en=[pick(true),pick(false)]; fitEnemy(en[0],enemyTarget(k,i,true)*0.9); fitEnemy(en[1],enemyTarget(k,i,false)*0.9); }
-  else { en=Array.from({length:2+(Math.random()<0.5?1:0)},()=>pick(false)); en.forEach(e=>fitEnemy(e,enemyTarget(k,i,false)*0.85)); }
+  if(kind==='boss') en=[fitEnemy(pick(true),enemyTarget(k,i,true)*1.4),fitEnemy(pick(false),enemyTarget(k,i,false))];
+  else if(kind==='elite') en=[fitEnemy(pick(true),enemyTarget(k,i,true)*0.9),fitEnemy(pick(false),enemyTarget(k,i,false)*0.9)];
+  else en=Array.from({length:2+(Math.random()<0.5?1:0)},()=>fitEnemy(pick(false),enemyTarget(k,i,false)*0.85));
   return en; }
 let RGMODE='card';
 /* 탐사 새로 만들기(Model) */

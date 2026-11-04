@@ -9,6 +9,7 @@ import { walk } from './source.mjs';
 import { constLiterals } from './wiring.mjs';
 import { fullLabel } from './surface.mjs';
 import { mutations } from './flow.mjs';
+import { FRESH, freshFactories } from './extra.mjs';
 
 const MARKUP = /<\/?[a-zA-Z][\w-]*(\s|>|\/>)/;
 const DOM_WRITE = /^(innerHTML|outerHTML|textContent|innerText|className|hidden|scrollTop|scrollLeft|disabled|checked|selectedIndex|value|src|href|placeholder)$/, DOM_CALL = /^(appendChild|insertAdjacentHTML|insertBefore|replaceChildren|replaceWith|removeChild|remove|setAttribute|removeAttribute|toggleAttribute|scrollIntoView|focus|blur|showModal|animate|setProperty)$/;
@@ -40,7 +41,13 @@ function callSig(n, s, tmp) { const c = n.childForFieldName('function'), args = 
 // 없으면 만들어 쓰는 게터(get-or-create — 읽기처럼 쓰이는데 상태를 씀): 어떤 대입의 왼쪽 사슬을 그대로 돌려줌(return x.y / return m.k) — 또는 그 대입 왼쪽의 앞부분 이름을 돌려줌
 function lazyGetter(f) { const lhs = new Set(); let hit = false; walk(f.node, n => { if (n !== f.node && /function|arrow/.test(n.type)) return false; if (n.type === 'assignment_expression') { const l = n.childForFieldName('left'); if (l?.type === 'member_expression' || l?.type === 'subscript_expression') { lhs.add(l.text); let o = l.childForFieldName('object'); while (o) { lhs.add(o.text); o = o.childForFieldName?.('object'); } } } });
   walk(f.node, n => { if (n !== f.node && /function|arrow/.test(n.type)) return false; if (n.type === 'return_statement') { const v = n.namedChildren[0]; if (v && lhs.has(v.text.replace(/^\((.*)\)$/, '$1'))) hit = true; } }); return hit; }
-function signals(f, writers) { const s = { markup: false, dom: false, read: false, channel: false, write: writers.has(f.key), store: false, service: false, adapter: ADAPTERS.has(f.name), handler: /^handle\w+Action$/.test(f.name), atV: [], atM: [] }, tmp = tempEls(f);
+/* 새로 만든 지역 값만 채움(쓰는 대상의 뿌리가 모두 이 함수에서 새 값 — 글자 {…}·[…]·clone·만들기 함수 — 으로 만든 지역 이름): 상태를 바꾸지 않는 조립(cleanChar·응답 해석) */
+function freshOnly(f, fac) { const init = new Map(); walk(f.node, n => { if (n.type === 'variable_declarator' && n.childForFieldName('name')?.type === 'identifier') init.set(n.childForFieldName('name').text, n.childForFieldName('value')); });
+  const fresh = v => !!v && (FRESH.test(v.text) || (v.type === 'call_expression' && fac.has(v.childForFieldName('function')?.text))); let n0 = 0, ok = true;
+  walk(f.node, n => { let t = null; if (n.type === 'assignment_expression' || n.type === 'augmented_assignment_expression') t = n.childForFieldName('left'); else if (n.type === 'update_expression') t = n.childForFieldName('argument'); else if (n.type === 'unary_expression' && n.child(0)?.type === 'delete') t = n.childForFieldName('argument'); else if (n.type === 'call_expression') { const g = n.childForFieldName('function'); if (g?.type === 'member_expression' && /^(push|splice|unshift|pop|shift|sort|reverse)$/.test(g.childForFieldName('property')?.text || '')) t = g.childForFieldName('object'); }
+    if (!t || t.type === 'identifier') return; n0++; let r = t; while (r && (r.type === 'member_expression' || r.type === 'subscript_expression')) r = r.childForFieldName('object'); if (r?.type !== 'identifier' || !fresh(init.get(r.text))) ok = false; });
+  return n0 > 0 && ok; }
+function signals(f, writers, fac = new Set()) { const s = { markup: false, dom: false, read: false, channel: false, write: writers.has(f.key) && !freshOnly(f, fac), store: false, service: false, adapter: ADAPTERS.has(f.name), handler: /^handle\w+Action$/.test(f.name), atV: [], atM: [] }, tmp = tempEls(f);
   walk(f.node, n => { const t = n.type;
     if (t === 'string' || t === 'template_string' || t === 'string_fragment') { if (MARKUP.test(n.text)) { s.markup = true; s.atV.push(n); } }
     else if (t === 'assignment_expression' || t === 'augmented_assignment_expression') assignSig(n, s, f, tmp);
@@ -53,8 +60,8 @@ function layerOf(s) { if (V(s) && S(s) && !s.adapter) return '섞임'; if (V(s) 
   if (S(s)) return s.handler || s.channel || s.read ? 'Controller' : 'Model'; if (s.handler) return 'Controller'; return null; }
 
 // fns: buildGraph 함수 표 · writers: 게임 상태를 직접 쓰는 함수 키(연관 맵 data 쓰기) — LAYER_DEF대로
-export function layers(fns, writers) { const top = [...fns.values()].filter(f => f.top && !f.table), out = new Map();
-  for (const f of top) { const s = signals(f, writers); out.set(f.key, { ...s, layer: layerOf(s), quiet: layerOf(s) === null }); }
+export function layers(fns, writers) { const top = [...fns.values()].filter(f => f.top && !f.table), out = new Map(), fac = freshFactories(fns, writers) /* 상태를 쓰는 함수는 만들기가 아님 */;
+  for (const f of top) { const s = signals(f, writers, fac); out.set(f.key, { ...s, layer: layerOf(s), quiet: layerOf(s) === null }); }
   const calls = f => [...f.calls.keys()].map(k => out.get(k)).filter(Boolean), isView = o => o.layer === 'View' || o.layer === '섞임';
   /* 바꾸는 함수(전이) */ const ch = new Set(top.filter(f => S(out.get(f.key))).map(f => f.key));
   for (let more = true; more;) { more = false; for (const f of top) { if (ch.has(f.key) || out.get(f.key).layer === 'View') continue; if ([...f.calls.keys()].some(k => ch.has(k))) { ch.add(f.key); more = true; } } }

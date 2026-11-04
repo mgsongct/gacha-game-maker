@@ -10,8 +10,16 @@
 const FKIND={playable:'플레이어블 소속',hostile:'적대 세력',neutral:'중립',monster:'괴물·마물'}, FSTANCE={ally:'우호',neutral:'중립',hostile:'적대'};
 const F_FIELDS=[['desc','개요'],['goal','목적'],['leader','지도자·핵심 인물'],['base','거점·영역'],['ideology','이념·규칙'],['secret','숨겨진 사실(작가용)']], M_FIELDS=[['origin','정체·기원'],['nature','습성·행동'],['weakness','약점']];
 function castCfg(){ const c=G.meta.cast||{}; return {pickupGate:c.pickupGate!==false,hostileGate:c.hostileGate!==false}; }
-function factions(){ const w=G.world; if(!Array.isArray(w.factions)) w.factions=[]; G.chars.forEach(c=>{ if(c.faction&&!c.monster&&!c.collab&&!w.factions.some(f=>f.name===c.faction)) w.factions.push({name:c.faction,desc:'',kind:'playable',rel:{},stance:[]}); }); /* 캐릭터 소속인데 목록에 없는 세력 */ w.factions.forEach(f=>{ if(!FKIND[f.kind]) f.kind=G.chars.some(c=>c.faction===f.name&&!c.monster)?'playable':G.lib.some(l=>l.kind==='enemy'&&!l.charId&&l.name.includes(f.name))?'monster':'neutral'; if(!Array.isArray(f.stance)) f.stance=[]; if(!f.rel||typeof f.rel!=='object') f.rel={}; }); return w.factions; }
-function facByName(n){ return factions().find(f=>f.name===n); }
+/* 세력 목록 G.world.factions: 캐릭터 소속인데 목록에 없는 세력(플레이어블로) · 종류·장별 태도·관계 칸 보정 — 정의는 이 셋 */
+function factionMissing(g,list){ const out=[]; g.chars.forEach(c=>{ if(c.faction&&!c.monster&&!c.collab&&!list.some(f=>f.name===c.faction)&&!out.some(f=>f.name===c.faction)) out.push({name:c.faction,desc:'',kind:'playable',rel:{},stance:[]}); }); return out; }
+function factionOk(f){ return !!FKIND[f.kind]&&Array.isArray(f.stance)&&!!f.rel&&typeof f.rel==='object'; }
+function factionFixed(f,g){ return {kind:FKIND[f.kind]?f.kind:g.chars.some(c=>c.faction===f.name&&!c.monster)?'playable':g.lib.some(l=>l.kind==='enemy'&&!l.charId&&l.name.includes(f.name))?'monster':'neutral',stance:Array.isArray(f.stance)?f.stance:[],rel:f.rel&&typeof f.rel==='object'?f.rel:{}}; } // 맞춘 칸(종류·장별 태도·관계)만 새로 — 바꾸지 않음
+/* 쓰기(Model): 목록을 맞춰 저장하고 돌려줌 — 세력을 고치는 처리가 부름(읽기는 맞춘 모양을 보여 주므로 불러오기에서 따로 맞추지 않음 — FKIND는 불러올 때 아직 없음) */
+function factionSync(g=G){ const w=gameSlot('world.factions',g); w.push(...factionMissing(g,w)); w.forEach(f=>Object.assign(f,factionFixed(f,g))); return w; }
+/* 읽기: 맞춰져 있으면 저장된 목록 그대로, 아니면 맞춘 모양을 새로 만들어 보여 주기만(상태는 그대로 — 고칠 때는 factionSync) */
+function factions(){ const w=gameRead('world.factions'), miss=factionMissing(G,w); return miss.length||!w.every(factionOk)?[...w.map(f=>factionOk(f)?f:Object.assign({},f,factionFixed(f,G))),...miss]:w; }
+function facByName(n){ return factions().find(f=>f.name===n); } // 읽기 — 고칠 때는 facSlot
+function facSlot(n){ return factionSync().find(f=>f.name===n); }
 function mainNow(){ const main=G.chapters.filter(ch=>ch.kind==='main'), i=main.findIndex(ch=>(ch.stages||[]).some(s=>!P().cleared[s.id])); return i<0?main.length+1:i+1; } // 지금 진행 중인 장(1부터) = 다 깨지 않은 첫 메인 장(예전엔 스테이지 하나만 깨도 다음 장으로 셈)
 function stanceAt(f,ch){ if(!f) return 'neutral'; const L=(f.stance||[]).filter(x=>+x.ch<=ch).sort((a,b)=>a.ch-b.ch); return L.length?L.at(-1).s:f.kind==='playable'?'ally':f.kind==='neutral'?'neutral':'hostile'; }
 // 몬스터: 자료실 적 중 캐릭터·NPC가 아닌 것
@@ -38,20 +46,20 @@ function factionReview(){ const out=[], F=factions(); if(F.length<2) out.push({w
    이미 쓴 메인 장 이야기로 세력마다 1장의 처음 관계와 바뀐 장을 정해 넣어요. 답에 없는 세력은 종류 기본값을 1장 태도로 적어 둬요(다시 비었다고 잡히지 않게) */
 async function stanceAI(){ const F=factions().filter(f=>f.kind!=='monster'), main=G.chapters.filter(ch=>ch.kind==='main'); if(!F.length||!main.length) return false;
   const r=await aiJSON(stanceAIPrompt({F,main}),null,'default'); if(!r) return false;
-  (Array.isArray(r.stance)?r.stance:[]).forEach(x=>{ const f=facByName(String(x&&x.faction||'').trim()), ch=Math.max(1,Math.min(main.length,Math.round(+(x&&x.ch)||1))); if(!f||f.kind==='monster'||!FSTANCE[x.s]) return; f.stance=(f.stance||[]).filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); });
+  (Array.isArray(r.stance)?r.stance:[]).forEach(x=>{ const f=facSlot(String(x&&x.faction||'').trim()), ch=Math.max(1,Math.min(main.length,Math.round(+(x&&x.ch)||1))); if(!f||f.kind==='monster'||!FSTANCE[x.s]) return; f.stance=(f.stance||[]).filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); });
   F.forEach(f=>{ if(!Array.isArray(f.stance)) f.stance=[]; if(!f.stance.length) f.stance.push({ch:1,s:stanceAt(f,1),why:''}); f.stance.sort((a,b)=>a.ch-b.ch); });
   mark('world'); return true; }
 async function factionAI(rep,instruction){ const F=factions(), M=monsterNames();
   const r=await aiJSON(factionAIPrompt({F,instruction,M}),rep,'complex');
   if(!r) return false; const S=(v,n)=>String(v||'').trim().slice(0,n||300);
-  (Array.isArray(r.factions)?r.factions:[]).slice(0,8).forEach(x=>{ const name=S(x.name,30); if(!name) return; let f=facByName(name); if(!f){ f={name,desc:''}; F.push(f); }
+  (Array.isArray(r.factions)?r.factions:[]).slice(0,8).forEach(x=>{ const name=S(x.name,30); if(!name) return; let f=facSlot(name); if(!f){ f={name,desc:''}; F.push(f); }
     if(FKIND[x.kind]) f.kind=x.kind; [...F_FIELDS,...M_FIELDS].forEach(([k])=>{ const v=S(x[k]); if(v&&(!f[k]||String(f[k]).length<v.length||instruction)) f[k]=v; });
     if(x.rel&&typeof x.rel==='object') Object.entries(x.rel).forEach(([k,v])=>{ if(k!==name&&facByName(k)) f.rel[k]=S(v,40); });
     if(Array.isArray(x.stance)) x.stance.forEach(s=>{ const ch=Math.max(1,Math.round(+s.ch||0)); if(ch&&FSTANCE[s.s]&&!f.stance.some(y=>+y.ch===ch)) f.stance.push({ch,s:s.s,why:S(s.why,80)}); }); });
   (Array.isArray(r.bestiary)?r.bestiary:[]).forEach(x=>{ const l=M.find(y=>y.name===S(x.name,40)); if(!l) return; ['desc','nature','weak'].forEach(k=>{ const v=S(x[k],200); if(v&&!l[k]) l[k]=v; }); const fn=S(x.faction,30); if(fn&&facByName(fn)) l.faction=fn; mark('l:'+l.id); });
   mark('world'); return true; }
 // 장 생성이 돌려준 관계 변화 반영: [{faction,s,why}] → 그 장부터
-function stanceApply(arr,ch){ (Array.isArray(arr)?arr:[]).forEach(x=>{ const f=facByName(String(x&&x.faction||'').trim()); if(f&&FSTANCE[x.s]&&stanceAt(f,ch)!==x.s){ f.stance=f.stance.filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); mark('world'); } }); }
+function stanceApply(arr,ch){ (Array.isArray(arr)?arr:[]).forEach(x=>{ const f=facSlot(String(x&&x.faction||'').trim()); if(f&&FSTANCE[x.s]&&stanceAt(f,ch)!==x.s){ f.stance=f.stance.filter(y=>+y.ch!==ch); f.stance.push({ch,s:x.s,why:String(x.why||'').slice(0,80)}); mark('world'); } }); }
 // 몬스터를 캐릭터에서 빼기(뽑기·톡·일정·인연에서 제외, 적으로 등록)
 function charToMonster(c){ c.monster=true; c.limited=true; if(!G.lib.some(l=>l.kind==='enemy'&&l.name===c.name)) G.lib.push({id:'l'+uid(),kind:'enemy',name:c.name,prompt:String(c.naiPrompt||''),img:null,desc:String(c.profile||'').slice(0,200)}); mark('c:'+c.id); }
 
@@ -76,7 +84,7 @@ function openWorldDesign(tab){ if(tab) FW_TAB=tab; const F=factions(), now=mainN
   <div class="row" style="gap:4px;margin:6px 0">${tabs.map(([k,l])=>`<button class="btn sm ${FW_TAB===k?'':'ghost'}" data-act="fwtab" data-k="${k}">${l}</button>`).join('')}</div>${body}
   <label class="f" style="margin-top:8px">AI 추가 지시 (선택)</label><input class="in" id="fw_ins" placeholder="예: 헬릭스는 3장 이후 내분으로 일부가 우리 편이 된다">
   <div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><button class="btn" data-act="fwsave">저장</button><button class="btn ghost" data-act="fwai">AI로 깊이 채우기</button><button class="btn ghost" data-act="close">닫기</button></div>`); }
-function fwRead(){ const F=factions(), lines=v=>String(v||'').split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(x=>x[0]);
+function fwRead(){ const F=factionSync(), lines=v=>String(v||'').split('\n').map(l=>l.split('|').map(s=>s.trim())).filter(x=>x[0]);
   document.querySelectorAll('#modal [data-fw]').forEach(el=>{ const k=el.dataset.fw.split('.'), v=el.type==='checkbox'?el.checked:el.value;
     if(k[0]==='cast'){ G.meta.cast=Object.assign({},G.meta.cast,{[k[1]]:v}); return; }
     if(k[0]==='m'){ const l=G.lib.find(x=>x.id===k[1]); if(l){ l[k[2]]=String(v).trim(); mark('l:'+l.id); } return; }
@@ -90,7 +98,7 @@ document.addEventListener('click',async e=>{ const el=e.target.closest('[data-ac
   if(a==='fwopen') openWorldDesign();
   else if(a==='fwtab'){ fwRead(); openWorldDesign(el.dataset.k); }
   else if(a==='fwsave'){ fwRead(); toast('세력·등장 설정을 저장했어요'); openWorldDesign(); }
-  else if(a==='fwadd'){ fwRead(); factions().push({name:'새 세력 '+(factions().length+1),desc:'',kind:'neutral',rel:{},stance:[]}); openWorldDesign('fac'); }
+  else if(a==='fwadd'){ fwRead(); factionSync().push({name:'새 세력 '+(factions().length+1),desc:'',kind:'neutral',rel:{},stance:[]}); openWorldDesign('fac'); }
   else if(a==='fwmon'){ const c=charById(el.dataset.id); if(c&&(await appConfirm(`「${c.name}」을(를) 몬스터(적)로 바꿀까요? ${T('gacha')}·톡·일정·인연에서 빠져요.`))){ charToMonster(c); toast('몬스터로 바꿨어요'); openWorldDesign('cast'); } }
   else if(a==='fwai'){ if(!SAMPLE){ toast('설정의 글 AI에서 AI를 먼저 등록해 주세요'); return; } fwRead(); if(await factionAI(uiProg(el),($('#fw_ins')||{}).value||'')){ toast('세력·몬스터 설정을 채웠어요'); openWorldDesign(); } } });
 function monsterFromGen(x){ const name=String(x.name||'').trim(); if(!name||G.lib.some(l=>l.kind==='enemy'&&l.name===name)) return; G.lib.push({id:'l'+uid(),kind:'enemy',name,prompt:String(x.naiPrompt||x.look||''),img:null,desc:String(x.profile||x.desc||'').slice(0,200),faction:String(x.faction||'')}); }
