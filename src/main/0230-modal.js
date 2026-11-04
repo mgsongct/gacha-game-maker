@@ -91,7 +91,12 @@ function characterDetailPreviewTargets(root){
   img.setAttribute('aria-label',(img.alt||'캐릭터 이미지')+' 크게 보기');
  }
 }
-function openChar(id){
+/* 캐릭터 창 열기(Controller): 창을 그리고, 5돌파 CG를 처음 보면 본 것으로 하고 펼침 연출 */
+function openChar(id){ const c=charById(id); if(!c) return; charSheetShow(id); if(cgFirstSeen(c)) setTimeout(()=>lbReveal(c),500); }
+/* 5돌파 CG를 처음 봄(Model) — 처음이면 true */
+function cgFirstSeen(c){ const o=own(c.id); if(!(o&&o.dup>=5&&o.cgNew&&imgSrcRaw(c.lbcg))) return false; o.cgNew=false; mark('prog'); return true; }
+/* 캐릭터 창(View): 장비·스킬 · 스토리 · 외형 · 정보 탭 */
+function charSheetShow(id){
   const c=charById(id); if(!c) return; MBACK=null; const o=own(c.id),st=stats(c);
   const eps=[...c.episodes].sort((a,b)=>a.lv-b.lv), ths=G.threads.filter(t=>t.charId===c.id), cap=o?levelCap(o):20;
   const old=$('#modal .sheet.cs-sheet'), keep=old&&old.dataset.cid===id?old.scrollTop:0;
@@ -182,7 +187,6 @@ function openChar(id){
   </div>`,false,'cs-sheet');
   characterDetailPreviewTargets($('#modal'));
   const el=$('#modal .sheet'); if(el){ el.dataset.cid=id; if(old)el.scrollTop=keep; }
-  if(o&&o.dup>=5&&o.cgNew&&lbs){ o.cgNew=false; mark('prog'); setTimeout(()=>lbReveal(c),500); }
 }
 function openCharEdit(id){
   const c=id?charById(id):cleanChar({name:''});

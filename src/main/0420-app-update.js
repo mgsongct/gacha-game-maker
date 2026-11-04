@@ -119,6 +119,10 @@ async function checkUpdatePrivate(manual){
 /* /UPDATE_GUIDANCE_MODULE */
 function onPcServer(){ const pc=PCS(); return !!(pc&&location.origin===pc.base); }
 let WEBUPD=null;
+/* 웹 업데이트 안내 창 내용(View) */
+function updateWebFoundHTML(man,srvOld){ return `${head('업데이트가 있어요',`<span class="muted">${esc(APP_BUILD)} → <b>${esc(man.build)}</b></span>`)}${notesHTML(man)}
+      ${srvOld?'<p class="muted" style="font-size:.82rem">PC 서버 프로그램(ggm-server.py)도 바뀌었어요. Releases의 gacha-game-maker-pc.zip을 새로 받아 덮어쓰면 좋아요.</p>':''}
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="webupdgo">지금 업데이트</button><button class="btn ghost" data-act="webupdskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`; }
 async function checkWebUpdate(manual){ if(IS_NATIVE) return; const o=LV(); let man=null;
   try{ const r=await fetch(`https://raw.githubusercontent.com/${updRepo(o)}/main/version.json?t=${Date.now()}`,{cache:'no-store'}); if(r.ok) man=await r.json(); }catch(e){ quietErr(e,'0420-app-update.js:117'); }
   if(!man||!man.build){ if(manual) toast('업데이트 정보를 받지 못했어요. 인터넷 연결을 확인해 주세요'); return; }
@@ -126,9 +130,7 @@ async function checkWebUpdate(manual){ if(IS_NATIVE) return; const o=LV(); let m
   if(verCmp(man.build,APP_BUILD)<=0){ if(manual) toast('이미 최신 버전이에요 ('+APP_BUILD+')'+(srvOld?' · PC 서버 프로그램은 새로 받아 주세요':'')); return; }
   if(!manual&&o.webSkip===man.build) return; WEBUPD=man;
   const show=()=>{ if(!manual&&(!$('#modal').hidden||($('#ov')&&!$('#ov').hidden&&!$('#ov').querySelector('.title'))||(typeof B!=='undefined'&&B&&!B.over))) return setTimeout(show,4000);
-    openModal(`${head('업데이트가 있어요',`<span class="muted">${esc(APP_BUILD)} → <b>${esc(man.build)}</b></span>`)}${notesHTML(man)}
-      ${srvOld?'<p class="muted" style="font-size:.82rem">PC 서버 프로그램(ggm-server.py)도 바뀌었어요. Releases의 gacha-game-maker-pc.zip을 새로 받아 덮어쓰면 좋아요.</p>':''}
-      <div class="row" style="margin-top:12px"><button class="btn" data-act="webupdgo">지금 업데이트</button><button class="btn ghost" data-act="webupdskip">이번 버전 건너뛰기</button><button class="btn ghost" data-act="close">나중에</button></div>`); };
+    openModal(updateWebFoundHTML(man,srvOld)); };
   show(); }
 async function applyWebUpdate(rep){ if(rep) rep('받는 중…');
   try{ await flush(); }catch(e){ quietErr(e,'0420-app-update.js:128'); }

@@ -46,8 +46,14 @@ export function compare(base, cur) {
     const up = Object.keys(f.num).filter(n => (+f.num[n] || 0) > (+b.num?.[n] || 0)), down = Object.keys(f.num).filter(n => (+f.num[n] || 0) < (+b.num?.[n] || 0));
     if (up.length) out.worse.push({ ...f, was: b.num, up }); else if (down.length) out.better.push({ ...f, was: b.num, down }); }
   for (const [k, f] of B) if (!C.has(k)) out.fixed.push(f);
-  return moved(out, base, cur);
+  return renamed(moved(out, base, cur));
 }
+// 이름 바꿈: 함수 이름이 정체인 범주(복잡한 함수)에서 같은 파일의 해결 + 새로 생김 짝 — 수치(복잡도·줄·중첩)가 같거나 줄었으면 같은 본문의 이름만 바뀐 것(옮김), 늘었으면 그대로 새로 생김
+const RENAMABLE = new Set(['복잡한 함수', '도구 복잡한 함수']), fileOf = f => (String(f.text || f.key).match(/(?:src|tools|build|pc|www)\/[\w./가-힣-]*?(?=:\d|$|\s|\))/) || [''])[0];
+function renamed(out) { const sig = f => `${String(f.key).split('|')[0]}|${fileOf(f)}|${JSON.stringify(f.num || {})}`;
+  const le = (a, f) => String(a.key).split('|')[0] === String(f.key).split('|')[0] && fileOf(a) === fileOf(f) && Object.keys(a.num || {}).every(k => (+a.num[k] || 0) <= (+f.num?.[k] || 0)); /* 같은 파일에서 수치가 같거나 줄었으면(이름을 바꾸며 조금 덜어 냄) */
+  for (const a of [...out.added]) { if (!RENAMABLE.has(String(a.key).split('|')[0])) continue; let i = out.fixed.findIndex(f => sig(f) === sig(a)); if (i < 0) i = out.fixed.findIndex(f => le(a, f)); if (i < 0) continue; out.fixed.splice(i, 1); out.added.splice(out.added.indexOf(a), 1); (out.moved ||= []).push(a); }
+  return out; }
 // 옮김: 코드를 다른 파일로 옮기면 키의 파일 경로만 바뀌어 같은 항목이 "해결 + 새로 생김"으로 갈림(줄 이동을 무시하듯 파일 이동도 가림).
 //   경로가 위치일 뿐인 범주만(빈 catch·이름 모호는 파일별 개수, 함수·상태 키 항목) — 경로를 뺀 정체(종류·함수 이름·상태 키)로 묶어
 //   그 정체의 합계(개수·복잡도 등, 수치 없으면 항목 수)가 기준보다 늘지 않았고 같은 정체가 기준 쪽에서 줄었으면 옮김(실패 아님, 따로 보고).
