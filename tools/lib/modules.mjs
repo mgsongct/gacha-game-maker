@@ -6,7 +6,7 @@
 //   영역 침범   — 함수가 참조(호출·상태 읽기/쓰기)하는 대상의 대부분이 다른 한 모듈에 있음(그 모듈의 일을 하는 함수)
 // 공용 기반은 영역 판단에서 뺌: 부르는 함수가 많은 허브 함수(T·esc·mark·openModal 같은 공용 도구)와, 모듈의 절반 이상이 부르는 공용 기반 모듈(유틸·저장·모달 등).
 import { progAccessors } from './flow.mjs';
-import { walk } from './source.mjs';
+import { walk, calleeName } from './source.mjs';
 const fileOf = loc => String(loc || '').split(':')[0];
 const SEEDS = 15; // 기능 섞임을 확인할 때 다른 순서로 묶는 횟수(5번이면 과반 경계의 모듈이 다른 곳을 고칠 때마다 생겼다 사라짐 — 21번으로 재 보니 3/5가 14/21 같은 모듈이 있었음)
 const HUB = 25; // 이만큼 많은 함수가 부르면 공용 기반으로 봄
@@ -98,7 +98,7 @@ export function modularity(adj, part) { let m2 = 0, q = 0; const deg = new Map()
 // 맨 위 문장에서 바로 넘긴 콜백(addEventListener 처리기 등)마다 그 안에서 부르는 맨 위 함수 키 묶음
 export function listenerGroups(fns) { const tops = [...fns.values()].filter(f => f.top && !f.table), byName = new Map(), roots = new Map(); for (const f of tops) { if (!byName.has(f.name) || f.unit === 'main') byName.set(f.name, f.key); let r = f.node; while (r.parent) r = r.parent; roots.set(f.unit, r); }
   const out = []; for (const r of roots.values()) for (let i = 0; i < r.childCount; i++) { const st = r.child(i); if (st.type !== 'expression_statement') continue;
-    walk(st, cb => { if (!/^(arrow_function|function_expression)$/.test(cb.type) || cb.parent?.type !== 'arguments') return; const S = new Set(); walk(cb, n => { if (n.type === 'call_expression' && n.childForFieldName('function')?.type === 'identifier' && byName.has(n.childForFieldName('function').text)) S.add(byName.get(n.childForFieldName('function').text)); }); if (S.size) out.push(S); return false; }); }
+    walk(st, cb => { if (!/^(arrow_function|function_expression)$/.test(cb.type) || cb.parent?.type !== 'arguments') return; const S = new Set(); walk(cb, n => { if (n.type === 'call_expression' && byName.has(calleeName(n))) S.add(byName.get(calleeName(n))); /* Class.이름(…)도 */ }); if (S.size) out.push(S); return false; }); }
   return out; }
 function fnGraph(fns, sf, M, modOfFile, consts = new Set(), layer = null) { const acc = progAccessors(fns);
   /* 설계상 층(프롬프트 스튜디오 — 여러 기능의 프롬프트를 조립)은 공용 기반·분배기처럼 노드에서 뺌: 기능마다의 생성 흐름이 스튜디오 조립 함수를 거쳐 한 묶음으로 붙지 않게 */

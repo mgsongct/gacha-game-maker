@@ -5,7 +5,9 @@
 //   동작   — 화면 함수가 내보내는 data-act → 처리기(handle*Action의 case · 리스너의 a==='x') → 그 동작이 부르는 함수 … (닿는 데까지)
 //   배경   — 사용자가 누르지 않아도 index.html이 하는 일: 새 게임 생성·실행 중 AI·불러오기(lib/lifecycle.mjs STAGES)·앱 시작(최상위 문장·load 리스너)
 //   공용 기반(부르는 함수가 많은 허브 함수 — 여러 기능이 같이 씀)은 건너뜀: 거기서 모든 기능이 이어져 버림
-import { walk } from './source.mjs';
+import { walk, APP_CLASSES } from './source.mjs';
+/* 함수를 가리키는 이름: 이름 · Class.이름(앱 class의 메서드 — 부름·값으로 넘김) */
+const refName = n => n.type === 'identifier' ? n.text : n.type === 'property_identifier' && APP_CLASSES.has(n.parent?.childForFieldName?.('object')?.text) ? n.text : null;
 import { STAGES } from './lifecycle.mjs';
 import { constLiterals } from './wiring.mjs';
 import { moduleOf } from './scope.mjs';
@@ -25,10 +27,10 @@ function actsIn(text) { const out = new Set(); for (const m of String(text).matc
 function refsOf(units, fns) { const top = new Map([...fns.values()].filter(f => f.top && !f.table && f.unit === 'main').map(f => [f.name, f.key])), out = new Map();
   for (const u of units) { if (u.name !== 'main') continue; for (const st of u.tree.rootNode.namedChildren) { if (!/^(lexical|variable)_declaration$/.test(st.type)) continue;
     for (const d of st.namedChildren) { const nm = d.childForFieldName?.('name')?.text, v = d.childForFieldName?.('value'); if (!nm || !v || FNT.test(v.type) || top.has(nm) || v.type !== 'call_expression') continue; const ks = new Set(); walk(v.childForFieldName('arguments'), x => { if (FNT.test(x.type)) return false; if (x.type === 'identifier' && top.has(x.text)) ks.add(top.get(x.text)); }); if (ks.size === 1) top.set(nm, [...ks][0]); } } }
-  for (const f of fns.values()) { if (!f.top || f.table) continue; const s = new Set(f.calls.keys()); walk(f.node, n => { if (n.type === 'identifier' && top.has(n.text) && top.get(n.text) !== f.key) s.add(top.get(n.text)); }); out.set(f.key, s); }
+  for (const f of fns.values()) { if (!f.top || f.table) continue; const s = new Set(f.calls.keys()); walk(f.node, n => { const k = refName(n); if (k && top.has(k) && top.get(k) !== f.key) s.add(top.get(k)); }); out.set(f.key, s); }
   return { top, out }; }
 // 동작 처리: data-act 값 → 처리 코드가 부르는·가리키는 최상위 함수(handle*Action의 case 본문, 리스너의 if(a==='x') 본문)
-function handlers(units, top) { const out = new Map(), add = (a, node) => { if (!out.has(a)) out.set(a, new Set()); const s = out.get(a); walk(node, n => { if (n.type === 'identifier' && top.has(n.text)) s.add(top.get(n.text)); }); };
+function handlers(units, top) { const out = new Map(), add = (a, node) => { if (!out.has(a)) out.set(a, new Set()); const s = out.get(a); walk(node, n => { const k = refName(n); if (k && top.has(k)) s.add(top.get(k)); }); };
   for (const u of units) walk(u.tree.rootNode, n => {
     if (n.type === 'switch_case') { const v = str(n.childForFieldName('value')); if (!v || !/^[a-z0-9_-]+$/i.test(v)) return; let sw = n.parent; while (sw && sw.type !== 'switch_statement') sw = sw.parent; const on = sw?.childForFieldName('value')?.text || ''; if (/\b(a|act)\b|dataset\.act/.test(on)) n.namedChildren.slice(1).forEach(c => add(v, c)); }
     else if (n.type === 'if_statement') { const c = n.childForFieldName('condition')?.text || ''; const m = /^\(\s*(?:a|act|\w+\.dataset\.act)\s*===?\s*['"]([a-z0-9_-]+)['"]\s*\)$/.exec(c); if (m) add(m[1], n.childForFieldName('consequence')); } });

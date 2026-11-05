@@ -5,7 +5,7 @@ export const LAYER_DEF = {
   changes: '바꾸는 함수 = S가 있거나 바꾸는 함수를 부르는 View 아닌 함수(호출 그래프로 이어서)',
   direction: 'L2 View가 바꾸는 함수를 부름(화면 갱신 요청 render·renderView만 뺌) · L3 Model이 화면 함수(View·섞임 — 갱신 통로 포함)를 부름',
 };
-import { walk } from './source.mjs';
+import { walk, calleeName, APP_CLASSES } from './source.mjs';
 import { constLiterals } from './wiring.mjs';
 import { fullLabel } from './surface.mjs';
 import { mutations } from './flow.mjs';
@@ -30,7 +30,8 @@ function tempEls(f) { const out = new Set(); walk(f.node, n => { if (n.type !== 
 function assignSig(n, s, f, tmp) { const l = n.childForFieldName('left'); if (l?.type !== 'member_expression') return; const p = propOf(l), o = l.childForFieldName('object'); if (tmp.has(rootName(o))) return;
   if ((DOM_WRITE.test(p) && !(AMBIG.test(p) && notElement(o, f))) || (STYLE.test(propOf(o)) && !tmp.has(rootName(o)))) { s.dom = true; s.atV.push(n); } }
 function callSig(n, s, tmp) { const c = n.childForFieldName('function'), args = n.childForFieldName('arguments')?.namedChildren || [];
-  if (c?.type === 'identifier') { if (CHANNEL.has(c.text)) s.channel = true; if (NET.has(c.text)) { s.service = true; s.atM.push(c); } if (c.text === '$') s.read = true; return; }
+  const cn = c?.type === 'identifier' ? c.text : c?.type === 'member_expression' && APP_CLASSES.has(c.childForFieldName('object')?.text) ? c.childForFieldName('property')?.text : null; /* Class.이름(…)은 이름으로 */
+  if (cn) { if (CHANNEL.has(cn)) s.channel = true; if (NET.has(cn)) { s.service = true; s.atM.push(c); } if (cn === '$') s.read = true; return; }
   if (c?.type !== 'member_expression') return; const p = propOf(c), o = c.childForFieldName('object');
   if (STORE.test(o?.text || '')) { if (STORE_W.test(p)) { s.store = true; s.atM.push(n); } return; }
   if (/^(Object|Array|JSON|Math|Promise|URL|Set|Map|String|Number|Date|navigator|console|crypto)$/.test(o?.text || '')) return;
@@ -181,7 +182,7 @@ const paramNames = f => { const ps = f.node.childForFieldName('parameters')?.nam
 export function elementParams(fns) { const top = [...fns.values()].filter(f => f.top && !f.table), P = new Map(top.map(f => [f.key, paramNames(f)])), dom = new Map(), passes = [];
   for (const f of top) { const ps = P.get(f.key), set = new Set(); walk(f.node, n => {
     if (n.type === 'member_expression' && ps.includes(n.childForFieldName('object')?.text) && ELEM_PROP.test(n.childForFieldName('property')?.text || '')) set.add(n.childForFieldName('object').text);
-    if (n.type === 'call_expression') { const g = n.childForFieldName('function'); if (g?.type !== 'identifier' || !fns.has(g.text)) return; (n.childForFieldName('arguments')?.namedChildren || []).forEach((a, i) => { const t = a.text.replace(/\|\|null$/, ''); if (ps.includes(t)) passes.push({ f: f.key, p: t, g: g.text, i }); }); } });
+    if (n.type === 'call_expression') { const g = { text: calleeName(n) }; if (!fns.has(g.text)) return; (n.childForFieldName('arguments')?.namedChildren || []).forEach((a, i) => { const t = a.text.replace(/\|\|null$/, ''); if (ps.includes(t)) passes.push({ f: f.key, p: t, g: g.text, i }); }); } });
     dom.set(f.key, set); }
   const el = new Map(top.map(f => [f.key, new Set(dom.get(f.key))])), via = new Map();
   for (let more = true; more;) { more = false; for (const x of passes) { const gp = P.get(x.g)?.[x.i]; if (gp && el.get(x.g)?.has(gp) && !el.get(x.f).has(x.p)) { el.get(x.f).add(x.p); via.set(`${x.f}|${x.p}`, x.g); more = true; } } }

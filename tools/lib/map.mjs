@@ -4,7 +4,7 @@
 //   역할: 생성기 = 새 게임 생성 단계가 부르는 함수 · 실행기 = 실행 중 AI(liveTick)·불러오기(fix)·앱을 열 때(부팅·게임 열기)가 부르는 함수, 또는 사용자 조작이 진행(prog.json)을 씀(플레이)
 //         플레이 조작(진행을 쓰는 사용자 함수 — P().x 또는 CRES()·CBUILD() 같은 접근 함수로 받은 객체에 씀)에서 닿는 콘텐츠 쓰기도 실행기(예: 건조 바리에이션)
 //         편집기 = 사용자 조작이 플레이 조작을 거치지 않고 진행 아닌 data(콘텐츠)를 씀(편집 화면·점검·AI 추가 지시) · 기타 = 위 단계 시작점에서 닿지 않음(엔진 안쪽 등)
-import { walk } from './source.mjs';
+import { walk, calleeName } from './source.mjs';
 import { generatorVocab, constLiterals, INFRA } from './wiring.mjs';
 import { stageRoots } from './lifecycle.mjs';
 import { auditRules } from './upgrade.mjs';
@@ -80,14 +80,14 @@ function factories(fns, nameMap) { const fac = new Map();
     for (const [v, ty] of pushed) if (rets.has(v) && !fac.has(f.name)) fac.set(f.name, ty);
     walk(f.node, n => { if (n.type === 'variable_declarator' && n.childForFieldName('value')?.type === 'call_expression') local.set(n.childForFieldName('name')?.text, n.childForFieldName('value').childForFieldName('function')?.text); });
     walk(f.node, n => { if (n.type !== 'call_expression') return; const fn = n.childForFieldName('function'); if (fn?.type !== 'member_expression' || fn.childForFieldName('property')?.text !== 'push') return; const ty = collOf(fn.childForFieldName('object')?.text || ''); if (!ty) return;
-      for (const a of n.childForFieldName('arguments')?.namedChildren || []) { const inner = a.type === 'spread_element' ? a.namedChildren[0] : a, callee = inner?.type === 'call_expression' ? (inner.childForFieldName('function')?.type === 'member_expression' && /\.map$/.test(inner.childForFieldName('function').text) ? inner.childForFieldName('arguments')?.namedChildren[0]?.text : inner.childForFieldName('function')?.text) : inner?.type === 'identifier' ? local.get(inner.text) : null;
+      for (const a of n.childForFieldName('arguments')?.namedChildren || []) { const inner = a.type === 'spread_element' ? a.namedChildren[0] : a, callee = inner?.type === 'call_expression' ? (inner.childForFieldName('function')?.type === 'member_expression' && /\.map$/.test(inner.childForFieldName('function').text) ? inner.childForFieldName('arguments')?.namedChildren[0]?.text : calleeName(inner)) : inner?.type === 'identifier' ? local.get(inner.text) : null;
         if (callee && nameMap.has(callee) && !fac.has(callee)) fac.set(callee, ty); } }); }
   return fac; }
 // 매개변수 종류: 호출 지점의 인자 종류를 받는 쪽 매개변수로(세 번 되풀이 — 여러 단계 넘김)
 function paramTypes(fns, nameMap, fac, PT = new Map()) {
   for (let pass = 0; pass < 3; pass++) { let changed = false;
     for (const f of fns.values()) { if (!f.top) continue; const ctx = bindingsOf(f.node, PT.get(f.key), fac, fac.get(f.name));
-      walk(f.node, n => { if (n.type !== 'call_expression' || n.childForFieldName('function')?.type !== 'identifier') return; const ck = nameMap.get(n.childForFieldName('function').text); if (!ck || ck === f.key) return;
+      walk(f.node, n => { if (n.type !== 'call_expression') return; const ck = nameMap.get(calleeName(n)); if (!ck || ck === f.key) return; /* Class.이름(…)도(lib/source.mjs calleeName) */
         (n.childForFieldName('arguments')?.namedChildren || []).forEach((a, i) => { const t = exprType(a, ctx); if (!t) return; const arr = PT.get(ck) || []; arr[i] = arr[i] || new Set(); if (!arr[i].has(t)) { arr[i].add(t); changed = true; } PT.set(ck, arr); }); }); }
     if (!changed) break; }
   return PT; }
@@ -136,7 +136,7 @@ export function progSlots(units, fns, sf) { const acc = progAccessors(fns), use 
   const accMods = [...new Set(rows.flatMap(r => r.acc.map(n => mod([...fns.values()].find(x => x.top && x.name === n).key))))].sort(), defPlaces = [...new Set(rows.flatMap(r => r.defs))].sort();
   return { rows, accMods, defPlaces, multiDef: rows.filter(r => r.defs.length > 1).length, multiAcc: rows.filter(r => r.acc.length > 1).length }; }
 const LOAD_EV = /^['"](load|DOMContentLoaded|ggm-storage-ok|pageshow)['"]$/;
-function calleesIn(node, nameMap, out) { walk(node, m => { if (m.type === 'call_expression' && m.childForFieldName('function')?.type === 'identifier') { const k = nameMap.get(m.childForFieldName('function').text); if (k) out.add(k); } }); }
+function calleesIn(node, nameMap, out) { walk(node, m => { if (m.type === 'call_expression') { const k = nameMap.get(calleeName(m)); if (k) out.add(k); } }); }
 const declOnly = st => FNT.has(st.type) || ((st.type === 'lexical_declaration' || st.type === 'variable_declaration') && st.namedChildren.every(d => FNT.has(d.childForFieldName('value')?.type)));
 function stagesOf(units, fns, nameMap, sf, progW = new Set()) { const R = stageRoots(units, fns), user = new Set(), start = new Set();
   for (const u of units) walk(u.tree.rootNode, n => { if (n.type !== 'call_expression' || !/addEventListener$/.test(n.childForFieldName('function')?.text || '')) return; const as = n.childForFieldName('arguments')?.namedChildren || [], cb = as.find(a => FNT.has(a.type)); if (cb) calleesIn(cb, nameMap, LOAD_EV.test(as[0]?.text || '') ? start : user); });

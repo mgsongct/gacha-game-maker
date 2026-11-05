@@ -1764,14 +1764,14 @@
   {
    "key": "과잉 분할|src/main/10-newgame.js ↔ src/main/10-story.js",
    "num": {},
-   "text": "서로 강하게 묶임: src/main/10-newgame.js ↔ src/main/10-story.js — 사이 27.51 · 안 22.36/72.35"
+   "text": "서로 강하게 묶임: src/main/10-newgame.js ↔ src/main/10-story.js — 사이 27.51 · 안 22.36/77.85"
   },
   {
    "key": "기능 섞임|src/main/10-world.js",
    "num": {
     "묶음": 3
    },
-   "text": "src/main/10-world.js — 묶음 38·30·10"
+   "text": "src/main/10-world.js — 묶음 36·31·10"
   },
   {
    "key": "기능 섞임|src/modules/combat/030-core.js",
@@ -2346,58 +2346,23 @@
   {
    "key": "규칙 L3|src/main/00-core.js",
    "num": {
-    "건": 4
+    "건": 2
    },
-   "text": "L3 처리가 화면을 부름 main/00-core.js 4"
+   "text": "L3 처리가 화면을 부름 main/00-core.js 2"
   },
   {
    "key": "규칙 L3|src/main/10-acquire.js",
    "num": {
-    "건": 5
+    "건": 2
    },
-   "text": "L3 처리가 화면을 부름 main/10-acquire.js 5"
-  },
-  {
-   "key": "규칙 L3|src/main/10-art.js",
-   "num": {
-    "건": 9
-   },
-   "text": "L3 처리가 화면을 부름 main/10-art.js 9"
-  },
-  {
-   "key": "규칙 L3|src/main/10-characters.js",
-   "num": {
-    "건": 13
-   },
-   "text": "L3 처리가 화면을 부름 main/10-characters.js 13"
-  },
-  {
-   "key": "규칙 L3|src/main/10-liveops.js",
-   "num": {
-    "건": 4
-   },
-   "text": "L3 처리가 화면을 부름 main/10-liveops.js 4"
-  },
-  {
-   "key": "규칙 L3|src/main/10-rules.js",
-   "num": {
-    "건": 3
-   },
-   "text": "L3 처리가 화면을 부름 main/10-rules.js 3"
-  },
-  {
-   "key": "규칙 L3|src/main/10-story.js",
-   "num": {
-    "건": 10
-   },
-   "text": "L3 처리가 화면을 부름 main/10-story.js 10"
+   "text": "L3 처리가 화면을 부름 main/10-acquire.js 2"
   },
   {
    "key": "규칙 L3|src/main/10-system.js",
    "num": {
-    "건": 14
+    "건": 2
    },
-   "text": "L3 처리가 화면을 부름 main/10-system.js 14"
+   "text": "L3 처리가 화면을 부름 main/10-system.js 2"
   },
   {
    "key": "규칙 L3|src/modules/combat/030-core.js",
@@ -2498,6 +2463,13 @@
    "text": "D3 data 창구가 갈라짐 chars.json 1"
   },
   {
+   "key": "규칙 D3|chars.json › [].baseStatsVersion",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].baseStatsVersion 1"
+  },
+  {
    "key": "규칙 D3|chars.json › [].debut",
    "num": {
     "건": 1
@@ -2512,6 +2484,13 @@
    "text": "D3 data 창구가 갈라짐 chars.json › [].debutLater 1"
   },
   {
+   "key": "규칙 D3|chars.json › [].def",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].def 1"
+  },
+  {
    "key": "규칙 D3|chars.json › [].elem",
    "num": {
     "건": 1
@@ -2524,6 +2503,20 @@
     "건": 1
    },
    "text": "D3 data 창구가 갈라짐 chars.json › [].episodes 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].generation",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].generation 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].hp",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].hp 1"
   },
   {
    "key": "규칙 D3|chars.json › [].limited",
@@ -2587,6 +2580,13 @@
     "건": 1
    },
    "text": "D3 data 창구가 갈라짐 chars.json › [].skillGenerationWarning 1"
+  },
+  {
+   "key": "규칙 D3|chars.json › [].skillPlan",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 chars.json › [].skillPlan 1"
   },
   {
    "key": "규칙 D3|chars.json › [].skills",
@@ -2657,6 +2657,13 @@
     "건": 1
    },
    "text": "D3 data 창구가 갈라짐 lib.json 1"
+  },
+  {
+   "key": "규칙 D3|lib.json › [].img",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 lib.json › [].img 1"
   },
   {
    "key": "규칙 D3|lib.json › [].naiPrompt",
