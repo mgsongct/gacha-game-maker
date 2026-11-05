@@ -82,7 +82,7 @@ export function moveMethod(files, name, to) { const { parser } = TS; let from = 
   for (const f of Object.keys(out)) out[f] = out[f].replace(re, () => { n++; return `${to}.${name}`; }); return { from, to: tf, refs: n, files: out }; }
 const TS = await tsInit();
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--move')) {
-  const i = process.argv.indexOf('--move'), name = process.argv[i + 1], to = process.argv[i + 2], paths = [...readdirSync(MAIN).filter(f => f.endsWith('.js')).map(f => `src/main/${f}`), 'build/test.mjs', ...readdirSync(join(ROOT, 'tools/play'), { recursive: true }).filter(f => String(f).endsWith('.mjs') && !/^(games|reports|fixtures|node_modules)\//.test(f)).map(f => `tools/play/${f}`)];
+  const i = process.argv.indexOf('--move'), name = process.argv[i + 1], to = process.argv[i + 2], paths = refFiles();
   const files = Object.fromEntries(paths.map(f => [f, readFileSync(join(ROOT, f), 'utf8')])), R = moveMethod(files, name, to); if (R.error) { console.log(R.error); process.exit(1); }
   console.log(`${R.from.cls}.${name}(${R.from.f}) → ${to}(${R.to}) · 참조 ${R.refs}`); if (APPLY) for (const f of paths) if (R.files[f] !== files[f]) writeFileSync(join(ROOT, f), R.files[f]); process.exit(0); }
 // node tools/reshape.mjs --studio [--apply]: 90-load.js의 프롬프트 조각 등록 문장(X.pfDef('ID', …) — 불러올 때 도는 맨 위 문장)을 프롬프트 스튜디오 class의 메서드
@@ -108,6 +108,24 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     for (let k = 0; k < 20; k++) { const t = readFileSync(F, 'utf8'), m = t.match(CALL), callLine = m ? t.slice(0, m.index + 1).split('\n').length : 0, bad = tdzRefs(await loadUnits(ROOT)).filter(x => String(x.via || '').startsWith(`src/main/90-load.js:${callLine} `) && /^src\/main\/90-load\.js:/.test(x.decl));
       if (!m || !bad.length) break; const line = Math.max(...bad.map(x => +x.decl.split(':')[1])), root2 = parser.parse(t).rootNode; let endAt = -1; for (let i = 0; i < root2.childCount; i++) { const c = root2.child(i); if (c.startPosition.row + 1 <= line && c.endPosition.row + 1 >= line) { endAt = c.endIndex; break; } }
       if (endAt < 0) break; const u = t.replace(CALL, ''), shift = endAt > m.index ? m[0].length : 0, at = endAt - shift; writeFileSync(F, u.slice(0, at) + m[0] + u.slice(at)); console.log(`부르는 자리를 ${bad.map(x => x.name).join('·')} 선언 뒤로(90-load.js:${line})`); } }
+  process.exit(0); }
+/* Class.이름을 쓰는 파일: src/main · src/modules(모듈 블록도 Class.이름으로 부름) · 시험 도구 */
+const refFiles = () => [...readdirSync(MAIN).filter(f => f.endsWith('.js')).map(f => `src/main/${f}`), ...readdirSync(join(ROOT, 'src/modules'), { recursive: true }).filter(f => String(f).endsWith('.js')).map(f => `src/modules/${f}`), 'build/test.mjs', ...readdirSync(join(ROOT, 'tools/play'), { recursive: true }).filter(f => String(f).endsWith('.mjs') && !/^(games|reports|fixtures|node_modules)\//.test(f)).map(f => `tools/play/${f}`)];
+// node tools/reshape.mjs --gateway [--apply]: data 창구 모으기(규칙 D3 — 한 data 경로를 여러 모듈이 씀, 사용자 지시: 생성·수정·제거를 한 창구에서). 경로의 주인 기능(docs/redesign.md 2절 매핑 표)이 아닌 class에 있으면서
+//   쓰는 data가 모두 그 주인 기능 것인 Model 메서드를 주인 기능의 Model class로 옮김(--move와 같이 — 설명 주석·Class.이름 참조). 화면(…View)·처리(…Ctl)·모든 data를 만지는 불러오기 정규화(fix)는 두고 알림
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--gateway')) {
+  const { analyze } = await import('./lib/analyze.mjs'), { buildMap } = await import('./lib/map.mjs'), { stateFlow } = await import('./lib/flow.mjs'), { readDataMap } = await import('./redesign.mjs');
+  const A = await analyze(ROOT), M = buildMap(A.units, A.fns, stateFlow(A.units, A.fns), readFileSync(join(ROOT, 'www/index.html'), 'utf8')), DM = readDataMap(readFileSync(join(ROOT, 'docs/redesign.md'), 'utf8'));
+  const ownerOfPath = k => { const [file, sub] = k.replace(/\s+/g, '').split('›'); return DM.get(sub ? `${file}›${sub.replace(/^\[\]\./, '').split(/[.[]/)[0]}` : file) || DM.get(file) || null; };
+  const byFn = new Map(); for (const [k, d] of Object.entries(M.data)) { const ws = [...new Set(Object.values(d.writers).flat())].filter(w => M.fns[w]), mods = new Set(ws.map(w => M.fns[w].module)); if (mods.size < 2) continue; const o = ownerOfPath(k); for (const w of ws) { if (!byFn.has(w)) byFn.set(w, new Set()); byFn.get(w).add(o); } }
+  const all = new Map(); for (const [k, d] of Object.entries(M.data)) for (const w of new Set(Object.values(d.writers).flat())) { if (!all.has(w)) all.set(w, new Set()); all.get(w).add(ownerOfPath(k)); }
+  const plan = [], kept = []; for (const [w] of byFn) { const f = A.fns.get(w) || [...A.fns.values()].find(x => x.top && x.name === M.fns[w]?.name && !x.key.includes('.')), owners = [...all.get(w)], o = owners[0], to = RENAME[o] || o, home = `src/main/${FILE[to] || '10-' + String(to).toLowerCase()}.js`; /* 열쇠로 정확히 · 주인 = 주인 기능의 파일 */
+    const why = !f?.cls ? '모듈 블록 함수' : /(View|Ctl)$/.test(f.cls) ? '화면·처리 계층' : f.name === 'fix' ? '불러오기 정규화(모든 data)' : owners.length !== 1 || !o ? `주인이 여럿(${owners.join('·')})` : f.loc.startsWith(home + ':') ? '이미 주인' : /Gen$/.test(f.cls) || f.cls !== (RENAME[o] ? f.cls : f.cls) && A.fns.get(`${f.cls}.${f.name}`) ? '상위 class 훅(하위 class째 옮겨야 함)' : null;
+    if (why) { if (why !== '이미 주인') kept.push(`${f?.cls ? f.cls + '.' : ''}${M.fns[w]?.name}(${why})`); } else plan.push({ name: f.name, from: f.cls, to }); }
+  console.log(`창구 모으기: 옮길 메서드 ${plan.length}: ${plan.map(x => `${x.from}.${x.name} → ${x.to}`).join(' · ')}\n두는 것 ${kept.length}: ${kept.join(' · ')}`);
+  if (APPLY && plan.length) { const paths = refFiles(); let files = Object.fromEntries(paths.map(f => [f, readFileSync(join(ROOT, f), 'utf8')])); const orig = { ...files };
+    for (const x of plan) { const R = moveMethod(files, x.name, x.to); if (R.error) { console.log(`${x.name}: ${R.error}`); continue; } files = R.files; }
+    for (const f of paths) if (files[f] !== orig[f]) writeFileSync(join(ROOT, f), files[f]); console.log('옮김'); }
   process.exit(0); }
 // node tools/reshape.mjs --dead [--apply]: 진입점(부팅·src/index.html·화면 조작·생성·실행 중 AI·불러오기 — lib/history.mjs reachable)에서 닿지 않는 class의 static 메서드(YAGNI — 규칙 판정
 //   「닿지 않음」)를 설명 주석과 함께 지움(사용자 지시: 폐기, 지운 것은 git 이력에서). 시험 도구(build/test.mjs·tools/play)가 이름으로 부르는 것은 두고 알림
