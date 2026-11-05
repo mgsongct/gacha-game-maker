@@ -419,13 +419,9 @@ static async buildManualGameDraft(rep,draft,sourceProject){if(String(draft?.stor
     if(!DCH.length){ CoreView.toast(`인물 탭에 ${draft.crewTerm||'동료'}을 1명 이상 적어 주세요`); return; }
     const ng=Core.defaults(), hero=Object.assign({name:'',call:'',gender:'',look:'',bio:'',hide:false},draft.hero||{}), th=draft.theme||'auto';
     const kw=String(draft.kw||'').trim(), title=String(draft.gtitle||'').trim().slice(0,30)||kw.split(/[.\n,]/)[0].slice(0,16)||'새 게임';
-    const ngSty=String(draft.style||'').trim()||(NewGame.presetQualityParts(Core.allPresets().find(x=>x.id===draft.preset)||{}).tags);
-    ng.meta=Object.assign(clone(DEFAULT_META),{title,sub:'',theme:th==='auto'?'tactical':th,accent:'#ffb400'}); ng.meta.shop=NewGame.neutralShop();
-    ng.meta.artTags=ngSty; { const sp=Core.allPresets().find(x=>x.id===draft.preset); if(sp&&ngSty===NewGame.presetQualityParts(sp).tags) ng.meta.artNeg=sp.neg; }
-    ng.meta.tone=String(draft.tone||''); ng.meta.castSex=CAST_SEX[draft.castSex]?draft.castSex:''; const DT=Core.drText(draft); if(DT) ng.meta.bible=DT.slice(0,100000);
-    ng.meta.story={plot:String(draft.story||''),stages:+draft.stages||0,len:STORY_LEN[draft.len]?draft.len:'normal'}; ng.meta.manual=true;
-    ng.meta.terms=clone(DEFAULT_META.terms); if(String(draft.crewTerm||'').trim()) ng.meta.terms.crew=String(draft.crewTerm).trim().slice(0,8); if(String(hero.call||'').trim()) ng.meta.terms.player=String(hero.call).trim().slice(0,12);
-    try{ ng.meta.draft=Story.drClean(draft); }catch(e){}
+    const ngSty=GameBuilder.style(draft,false);
+    const DT=Core.drText(draft); /* 새 게임 meta는 조립 창구가 씀(NewGame GameBuilder) */
+    GameBuilder.meta(ng,draft,hero,{title,sub:'',theme:th==='auto'?'tactical':th,accent:'#ffb400'},{sty:ngSty,tone:String(draft.tone||''),bible:DT?DT.slice(0,100000):'',story:{plot:String(draft.story||''),stages:+draft.stages||0,len:STORY_LEN[draft.len]?draft.len:'normal'},shop:NewGame.neutralShop()}); ng.meta.manual=true;
     const world=String(draft.world||'').trim(), sents=s=>String(s||'').split(/(?<=[.!?。])\s+|\n+/).map(x=>x.trim()).filter(Boolean);
     ng.world=Object.assign(NewGame.blankWorld(),{name:title,summary:sents(world).slice(0,3).join(' ')||kw||title,lore:world||kw,plot:String(draft.story||'').trim(),factions:[],source:draft.fan?String(draft.src||''):''});
     String(draft.setting||'').split('\n').map(x=>x.trim()).filter(x=>/^[-•*]?\s*[^:：]{1,20}[:：]/.test(x)).slice(0,6).forEach(x=>{ const m=x.replace(/^[-•*]\s*/,'').match(/^([^:：]{1,20})[:：]\s*(.*)$/); if(m) ng.world.factions.push({name:m[1].trim(),desc:m[2].trim()}); });
@@ -444,13 +440,13 @@ static async buildManualGameDraft(rep,draft,sourceProject){if(String(draft?.stor
       ng.opening={lines:[...sents(world).slice(0,4),title],prologue:''};
       ng.banners=[{id:'std',name:'상시 '+System.T('gacha'),type:'std',desc:'',pool:{mode:'all',factions:[],ids:[]},pickup:[],rate:50,active:true,bg:''}];
       ng.threads=[]; ng.events=[]; Story.syncEnemies(ng);
-      ng.prog=clone(DEFAULT_PROG); ng.prog.player=String(hero.name||'').slice(0,12); ng.prog.genderTxt=String(hero.gender||''); ng.prog.gender=genderCode(hero.gender); ng.prog.look=String(hero.look||''); ng.prog.bio=String(hero.bio||''); ng.prog.hideEyes=!!hero.hide; ng.prog.nameAsked=true;
+      ng.prog=clone(DEFAULT_PROG); GameBuilder.hero(ng.prog,hero);
       ng.ver=VER;
     } finally { G=oldG; SystemView.applyMeta(); }
     const id2='g'+uid(); if(RSRC){ (RSRC.g.lib||[]).filter(l=>['bg','prop'].includes(l.kind)&&l.img&&!ng.lib.some(x=>x.kind===l.kind&&nameEq(x.name,l.name))).forEach(l=>ng.lib.push(clone(l))); if(!ng.prog.lobbyBg){ const b0=ng.lib.find(l=>l.kind==='bg'); if(b0) ng.prog.lobbyBg=b0.name; } } const RU=Characters.artReuse(ng,RSRC); if(RU){ await NewGame.artReuseCopy(RU,id2); ng.prog.castDone=true; }
     try{ if(hero.av){ const b=await Core.idbGet('draft_avatar'); if(b){ const av={id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:hero.av,img:{idb:true}}; await NewGame.idbPut(id2+'::'+av.id,b); ng.prog.avatar=av; } } }catch(e){}
     if(sourceProject&&Core.PJ().active!==sourceProject)throw Error('게임이 바뀌어 새 게임 적용을 중단했습니다');await Core.flush();
-    LiveOps.ngFinish(ng,draft); const pj=Core.PJ();pj.list.push({id:id2,title:ng.meta.title});pj.active=id2; await appStorage.commitRecords({[System.pjKey(id2)]:JSON.stringify(ng),[PJKEY]:JSON.stringify(pj)});
+    await GameBuilder.save(ng,draft,id2);
     stat('완성! 새 게임으로 전환해요. 글 AI를 등록하면 편집 화면의 ✦ 버튼으로 대사·스킬·설정을 다듬을 수 있어요.'); setTimeout(()=>SystemView.reloadGame(),1200);
   }
 

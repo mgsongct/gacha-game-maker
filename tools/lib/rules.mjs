@@ -94,7 +94,7 @@ export const RULES = [
     judge: '한 data 경로(연관 맵 docs/map.md — 상태 칸·엔티티 필드)를 만들고·고치고·지우는 함수(연관 맵 data.writers — 생성기·실행기·편집기)가 둘 이상의 모듈에 있음',
     fix: '그 기능 모듈에 창구(만들기·고치기·지우기 Model 함수)를 두고, 다른 모듈(생성기·편집 화면·실행 중 AI·처리기)은 창구를 부름', block: '래칫(rules.mjs --strict)',
     find: c => Object.entries(c.M.data).flatMap(([k, d]) => { const ws = [...new Set(Object.values(d.writers).flat())].filter(w => c.M.fns[w]), mods = [...new Set(ws.map(w => c.M.fns[w].module))]; if (mods.length < 2) return [];
-      const by = m => ws.filter(w => c.M.fns[w].module === m).map(w => c.M.fns[w].name); return [{ at: k, what: `${mods.length}개 모듈 — ${mods.map(m => `${String(m).replace(/^src\/(main|modules)\//, '')}(${by(m).slice(0, 3).join('·')}${by(m).length > 3 ? '…' : ''})`).join(' / ')}`, scope: scopeOf(c.fns, ws[0]) }]; }) },
+      const by = m => ws.filter(w => c.M.fns[w].module === m).map(w => c.M.fns[w].name); return [{ at: k, what: `${mods.length}개 모듈 — ${mods.map(m => `${String(m).replace(/^src\/(main|modules)\//, '')}(${by(m).slice(0, 3).join('·')}${by(m).length > 3 ? '…' : ''})`).join(' / ')}`, kind: k.split(/\s*›/)[0] /* data 파일별 */, scope: scopeOf(c.fns, ws[0]) }]; }) },
   { id: 'S1', group: '저장 정책', name: '갈래 없는 저장 키', why: '브라우저 저장소는 캐시, 원본은 PC 서버 옆 data — 새 저장 키는 동기화 대상인지부터 정함',
     judge: '코드가 쓰는 localStorage·appStorage·sessionStorage 키가 STORE_POLICY(0360-sync/010-common.js) 어느 갈래에도 없음',
     fix: 'STORE_POLICY에 갈래(sync·secret·keep·device·cache·legacy)를 정해 넣음', block: '래칫(map.mjs --strict)',

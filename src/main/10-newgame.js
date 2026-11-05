@@ -289,3 +289,19 @@ class DraftCharGen extends DraftGen {
     const RK=/\s*[\[(【]\s*(SSR|SR|R)\s*[\])】]\s*/gi; let rk=''; ['role','profile','speech','look'].forEach(k=>{ let v=S(o[k]); if(!v) return; v=v.replace(RK,(m,g)=>{ rk=rk||g.toUpperCase(); return ' '; }).replace(/\s{2,}/g,' ').trim(); if(v) c2[k]=v; }); if(rk&&!c2.rank&&c2.kind!=='npc') c2.rank=({SSR:3,SR:2,R:1})[rk]; if(!String(c2.name||'').trim()&&S(o.name)) c2.name=S(o.name).replace(RK,' ').trim();
     return `${c2.name||'인물'}을(를) 다듬었어요`; }
 }
+
+/* ===== 새 게임 조립(NewGame의 data 창구 — docs/redesign.md 3절 GameBuilder) =====
+   직접 만들기(System.buildManualGameDraft)·AI로 만들기(Story.buildNewGameDraft)가 같이 씀: 새 게임 ng의 meta(제목·테마·그림 태그·톤·성별 구성·세계 성경·스토리·용어·초안)·
+   주인공(prog)·끝맺음(목록에 넣고 data에 씀)을 한곳에서 — 만드는 길마다 따로 쓰지 않음(규칙 D3 · 사용자 지시: 생성·수정·제거를 한 창구에서). 두 길은 다른 점(제목·테마·스토리 칸·AI 용어)만 넘김 */
+class GameBuilder {
+  /* 그림 태그: 초안의 화풍 글, 없으면 고른 프리셋의 품질 태그(auto면 화풍 글을 안 씀) */
+  static style(draft,auto){ return String((auto?'':draft.style)||'').trim()||(NewGame.presetQualityParts(Core.allPresets().find(x=>x.id===draft.preset)||{}).tags); }
+  /* meta: head(title·sub·theme·accent) 위에 그림 태그(프리셋 태그 그대로면 그 제외 태그도)·톤·성별 구성·세계 성경·스토리·상점·용어(o.terms 위에 초안의 동료 호칭·주인공 호칭이 이김)·초안 */
+  static meta(ng,draft,hero,head,o){ ng.meta=Object.assign(clone(DEFAULT_META),head);
+    ng.meta.artTags=o.sty; { const sp=Core.allPresets().find(x=>x.id===draft.preset); if(sp&&o.sty===NewGame.presetQualityParts(sp).tags) ng.meta.artNeg=sp.neg; } ng.meta.tone=o.tone; ng.meta.castSex=CAST_SEX[draft.castSex]?draft.castSex:''; if(o.bible) ng.meta.bible=o.bible; ng.meta.story=o.story; if(o.shop) ng.meta.shop=o.shop;
+    ng.meta.terms=Object.assign(clone(DEFAULT_META.terms),o.terms||{}); if(String(draft.crewTerm||'').trim()) ng.meta.terms.crew=String(draft.crewTerm).trim().slice(0,8); if(String(hero.call||'').trim()) ng.meta.terms.player=String(hero.call).trim().slice(0,12); try{ ng.meta.draft=Story.drClean(draft); }catch(e){} }
+  /* 주인공(플레이어) 칸 */
+  static hero(prog,hero){ prog.player=String(hero.name||'').slice(0,12); prog.genderTxt=String(hero.gender||''); prog.gender=genderCode(hero.gender); prog.look=String(hero.look||''); prog.bio=String(hero.bio||''); prog.hideEyes=!!hero.hide; prog.nameAsked=true; }
+  /* 끝맺음: 마무리(LiveOps.ngFinish) → 게임 목록에 넣고 → data에 씀 */
+  static async save(ng,draft,id2){ LiveOps.ngFinish(ng,draft); const pj=Core.PJ();pj.list.push({id:id2,title:ng.meta.title});pj.active=id2; await appStorage.commitRecords({[System.pjKey(id2)]:JSON.stringify(ng),[PJKEY]:JSON.stringify(pj)}); }
+}
