@@ -419,8 +419,8 @@ try {
     G.chars.slice(0, 4).forEach(c => { if (!Characters.own(c.id)) Acquire.grantOwned(c, 't'); }); P().squad = G.chars.slice(0, 4).map(c => c.id);
     const A = [{ elem: ELEMS[0], role: 'atk', atk: 100, def: 50, maxhp: 1000, hp: 1000, spd: 100, c: G.chars[0] }], E = [{ elem: ELEMS[1], atk: 100, def: 50, maxhp: 1000, hp: 1000, spd: 100 }];
     System.fieldApply({ field: { k: 'resonance', a: ELEMS[0] } }, A, E); System.fieldApply({ field: { k: 'armor' } }, A, E); o.field = A[0].atk === 130 && E[0].atk === 100 && E[0].def === 80 && E[0].maxhp === 850;
-    o.clean = NewGame.ruleClean(FIELDS, { k: 'resonance', a: '없는속성' }) === null && NewGame.ruleClean(GOALS, { k: 'few', a: '3' }).a === 3 && System.fieldTime({ field: { k: 'timed', a: 45 } }) === 45;
-    const st = Core.buildStages([{ title: 'a', enemies: [{ name: 'x' }] }, { title: 'b', enemies: [{ name: 'y' }], field: { k: 'swift' } }, { title: 'c', enemies: [{ name: 'z', boss: true }] }], { max: 5, reward: () => 10, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
+    o.clean = Story.ruleClean(FIELDS, { k: 'resonance', a: '없는속성' }) === null && Story.ruleClean(GOALS, { k: 'few', a: '3' }).a === 3 && System.fieldTime({ field: { k: 'timed', a: 45 } }) === 45;
+    const st = Story.buildStages([{ title: 'a', enemies: [{ name: 'x' }] }, { title: 'b', enemies: [{ name: 'y' }], field: { k: 'swift' } }, { title: 'c', enemies: [{ name: 'z', boss: true }] }], { max: 5, reward: () => 10, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
     o.gen = !st[0].field && st[1].field.k === 'swift' && ['fast', 'hp'].includes(st[2].goal.k) && st.every(s => s.rulesV === 1) && Core.stageSchema(false).includes('"field"');
     const ch = G.chapters.find(c => c.kind === 'main'), old = ch.stages.find(s => !s.story && s.enemies.length); delete old.rulesV; delete old.field; delete old.goal;
     const ag = LiveOps.auditScan().find(g => g.rule.id === 's_rules'); o.audit = !!ag && ag.items.includes(old); await LiveOpsCtl.auditFix(ag.rule, ag.items); o.auditFix = old.rulesV === 1 && !!old.goal;
@@ -542,7 +542,7 @@ try {
     o.boss = B && B.ctx.boss && B.s === s; CoreCtl.bEnd(true); o.cleared = !Battle.SORTIE() && !!document.querySelector('.rs-stars'); document.querySelector('.result [data-act="bdone"]').click(); await wait(50);
     o.stam = Core.progSlot('stam').v === stam0 - Characters.stamCost('main');
     StoryCtl.startBattle(ch.id, s.id); for (let i = 0; i < 50 && !Battle.SORTIE(); i++) await wait(100); await wait(50); const g0 = P().gold; document.querySelector('[data-act="soretreat"]').click(); o.retreat = !Battle.SORTIE() && P().gold === g0;
-    const st = Core.buildStages([{ title: 'a', enemies: [{ name: 'x' }], route: { n1: '항구 전초', a: '정면 부두', b: '뒷골목', fork: '안개 낀 갈림길', boss: '선창 본대' } }], { max: 3, reward: () => 1, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
+    const st = Story.buildStages([{ title: 'a', enemies: [{ name: 'x' }], route: { n1: '항구 전초', a: '정면 부두', b: '뒷골목', fork: '안개 낀 갈림길', boss: '선창 본대' } }], { max: 3, reward: () => 1, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
     const R = Battle.routeOf(st[0]); o.route = R.nodes[0].name === '항구 전초' && R.nodes[1].name === '정면 부두' && R.fork === '안개 낀 갈림길' && Core.stageSchema(false).includes('"route"');
     o.schema = NewGame.charSchema().includes('"range"') && Characters.cleanChar({ name: 'r', role: 'atk', range: 'ranged' }).range === 'ranged';
     const c = G.chars[1]; delete c.range; o.audit = LiveOps.auditScan().some(g => g.rule.id === 'c_range' && g.items.includes(c));
@@ -590,7 +590,7 @@ try {
   // 24) 생성기 자체: 새 게임 생성이 세력(종류·설정·관계·장별 관계)·등장 계획(start/1장 스테이지/later)·적 도감·전장 규칙을 만들고, 몬스터 캐릭터를 걸러 내고, 픽업은 처음부터 동료로, 프롬프트에 규칙·등장 계획이 들어감. 이후 장 생성이 나중 등장 캐릭터의 첫 등장을 정함
   const p24 = await browser.newPage(), err24 = []; p24.on('pageerror', e => err24.push(String(e)));
   await p24.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort()); await p24.goto(`http://127.0.0.1:${server.address().port}/?t=24`);
-  await p24.waitForFunction(() => (typeof Story==='undefined'?'undefined':typeof Story.buildNewGameDraft) === 'function' && typeof G === 'object', null, { timeout: 15000 });
+  await p24.waitForFunction(() => (typeof NewGame==='undefined'?'undefined':typeof NewGame.buildNewGameDraft) === 'function' && typeof G === 'object', null, { timeout: 15000 });
   const r24 = await p24.evaluate(async () => {
     const o = {}, P0 = window.__P24 = []; P().seenOpening = true; CoreView.closeModal(); CoreView.closeOv(); try { appStorage.removeItem('ggm-ng-draft'); } catch (e) {}
     const ch = (nm, fac, role, deb, extra) => Object.assign({ name: nm, faction: fac, role, rarity: nm.length % 3 + 1, profile: nm + '의 프로필', lines: ['안녕'], naiPrompt: '1girl, solo', debut: deb }, extra || {});
@@ -602,7 +602,7 @@ try {
       return {}; } };
     let saved = null; const orig = appStorage.commitRecords.bind(appStorage); appStorage.commitRecords = async recs => { for (const [k, v] of Object.entries(recs)) if (/"chapters"/.test(v)) saved = JSON.parse(v); return orig(recs); };
     SystemView.reloadGame = () => {}; const btn = document.createElement('button'); document.body.appendChild(btn);
-    await Story.buildNewGameDraft(CoreView.uiProg(btn, '#ng_stat'), { mode: 'auto', auto: '등불섬 판타지', n: 6, con: true }, Core.PJ().active);
+    await NewGame.buildNewGameDraft(CoreView.uiProg(btn, '#ng_stat'), { mode: 'auto', auto: '등불섬 판타지', n: 6, con: true }, Core.PJ().active);
     const g = saved; o.built = !!g && g.meta.title === '심연등불';
     if (!g) return o;
     const F = g.world.factions; o.factions = F.length >= 3 && F.find(f => f.name === '검은 조류').kind === 'hostile' && F.find(f => f.name === '검은 조류').stance.some(s => s.ch === 3 && s.s === 'ally') && F.find(f => f.name === '심해의 것').weakness === '불' && !!F.find(f => f.name === '등불단').rel['검은 조류'];
@@ -648,8 +648,8 @@ try {
     G.chars.slice(0, 4).forEach(c => { if (!Characters.own(c.id)) Acquire.grantOwned(c, 't'); }); const kaya = charById('kaya'); P().squad = ['sera', 'kaya', 'eve'];
     const deb = { mode: 'debate', debate: { opponent: '감사관', goal: '수색 허가', evidence: [{ id: 'e1', name: '출입 기록', desc: '' }, { id: 'e2', name: '파편', desc: '' }], rounds: [{ claim: 'c1', lines: [{ text: '비어 있었소', press: '서류상', weak: '' }, { text: '아무도 안 왔소', press: '경비가', weak: 'e1' }] }, { claim: 'c2', lines: [{ text: '믿을 수 없소', persuade: { who: kaya.name, text: '제가 봤어요' } }] }], hp: 3, win: '허가하지' } };
     o.clean = NewGame.modeClean(deb).mode === 'debate' && NewGame.modeClean({ mode: 'debate', debate: { evidence: [], rounds: [] } }) === null && NewGame.modeClean({ mode: 'contest', contest: { judges: [{ name: 'j', likes: '귀여움' }] } }).contest.judges[0].likes === 'cute';
-    G.meta.story = Object.assign(G.meta.story || {}, { finale: 'battle' }); const stB = Core.buildStages([{ title: 'a', enemies: [{ name: 'x' }] }, { title: '무대', mode: 'contest', contest: { title: '축제', judges: [{ name: 'j', likes: 'cool' }], rivals: [{ name: 'r', power: 1 }] } }], { max: 5, reward: () => 10, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] }); o.finaleBattle = !stB[1].mode; G.meta.story.finale = 'contest'; // 전투 중심이면 마지막은 전투, 무대 경쟁이면 결승 콘테스트 허용
-    const st = Core.buildStages([{ title: 'a', battle: true, enemies: [{ name: 'x' }] }, Object.assign({ title: '회담' }, deb), { title: '무대', mode: 'contest', contest: { title: '축제', judges: [{ name: 'j', likes: 'cool' }], rivals: [{ name: 'r', power: 1 }] } }], { max: 5, reward: () => 10, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
+    G.meta.story = Object.assign(G.meta.story || {}, { finale: 'battle' }); const stB = Story.buildStages([{ title: 'a', enemies: [{ name: 'x' }] }, { title: '무대', mode: 'contest', contest: { title: '축제', judges: [{ name: 'j', likes: 'cool' }], rivals: [{ name: 'r', power: 1 }] } }], { max: 5, reward: () => 10, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] }); o.finaleBattle = !stB[1].mode; G.meta.story.finale = 'contest'; // 전투 중심이면 마지막은 전투, 무대 경쟁이면 결승 콘테스트 허용
+    const st = Story.buildStages([{ title: 'a', battle: true, enemies: [{ name: 'x' }] }, Object.assign({ title: '회담' }, deb), { title: '무대', mode: 'contest', contest: { title: '축제', judges: [{ name: 'j', likes: 'cool' }], rivals: [{ name: 'r', power: 1 }] } }], { max: 5, reward: () => 10, hp: 1000, atk: 80, def: 40, elem: ELEMS[0] });
     o.build = st[1].mode === 'debate' && !st[1].enemies.length && st[2].mode === 'contest' && !st[2].enemies.length && !st[0].mode;
     o.schema = Core.stageSchema(false).includes('"mode":"battle|debate|contest"') && STAGE_MODES.includes('debate(회담');
     G.meta.story = Object.assign({}, G.meta.story, { modes: { debate: false, contest: true } }); o.off = NewGame.modeClean(deb) === null && STAGE_MODES.includes('debate는 쓰지 않는다'); G.meta.story.modes = {};

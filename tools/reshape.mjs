@@ -78,7 +78,8 @@ export function moveMethod(files, name, to) { const { parser } = TS; let from = 
   if (!from) return { error: `static 메서드 ${name} 없음` }; const out = { ...files }; out[from.f] = out[from.f].slice(0, cut.a) + out[from.f].slice(cut.b).replace(/^[ \t]*\n/, '');
   const tf = Object.keys(out).find(f => new RegExp(`^class ${to}\\b`, 'm').test(out[f])); if (!tf) return { error: `class ${to} 없음` }; const troot = parser.parse(out[tf]).rootNode; let end = -1;
   for (let i = 0; i < troot.childCount; i++) { const c = troot.child(i); if (c.type === 'class_declaration' && c.childForFieldName('name')?.text === to) end = c.childForFieldName('body').endIndex - 1; }
-  out[tf] = out[tf].slice(0, end).replace(/\s*$/, '\n\n') + cut.text.replace(/^\n+/, '') + '\n' + out[tf].slice(end); const re = new RegExp(`\\b${from.cls}\\.${name}\\b`, 'g'); let n = 0;
+  out[tf] = out[tf].slice(0, end).replace(/\s*$/, '\n\n') + cut.text.replace(/^\n+/, '') + '\n' + out[tf].slice(end); const re = new RegExp(`\\b${from.cls}\\.${name}\\b`, 'g'), guard = `(typeof ${from.cls}==='undefined'?'undefined':typeof ${from.cls}.${name})`; let n = 0; /* typeof 가드(--refs가 만든 꼴)는 앞뒤 class를 같이 */
+  for (const f of Object.keys(out)) out[f] = out[f].split(guard).join(`(typeof ${to}==='undefined'?'undefined':typeof ${to}.${name})`);
   for (const f of Object.keys(out)) out[f] = out[f].replace(re, () => { n++; return `${to}.${name}`; }); return { from, to: tf, refs: n, files: out }; }
 const TS = await tsInit();
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--move')) {
