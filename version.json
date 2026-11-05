@@ -9,7 +9,7 @@
   ],
   "notice": null,
   "html": "www/index.html",
-  "sha256": "aa0d6f3f1d703342b8968280366a585db7b4a026afe311356bac3835a747b712",
+  "sha256": "b7e933b0e08e490212117a4b7004283b7137ded7e574a00101589d2d7f76b597",
   "apk": {
     "url": "https://github.com/jjhk0803/gacha-game-maker/releases/latest",
     "build": "2026.10.24.1",

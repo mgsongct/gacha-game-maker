@@ -48,14 +48,14 @@ export async function withPage(fn, { tag = 'play', viewport, pcHome, gid, www = 
   page.on('pageerror', e => errors.push(String(e.stack || e).split('\n').slice(0, 4).join(' ← '))); await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
   try {
     await page.goto(url);
-    await page.waitForFunction(() => (typeof Story==='undefined'?'undefined':typeof Story.buildNewGameDraft) === 'function' && typeof G === 'object', null, { timeout: 20000 });
+    await page.waitForFunction(() => (typeof Story==='undefined'?'undefined':typeof NewGame.buildNewGameDraft) === 'function' && typeof G === 'object', null, { timeout: 20000 });
     if (pc) { // 빈 브라우저: 서버 data에 게임이 있으면 앱이 받아 와서 다시 시작함 — 받은 게임이 활성이 될 때까지 기다림
       const has = await fetch(`http://127.0.0.1:${pc.port}/api/store/state`, { headers: { 'X-GGM-Key': pc.key } }).then(r => r.ok).catch(() => false);
       if (has) await until(() => page.evaluate(() => (typeof Core==='undefined'?'undefined':typeof Core.PJ) === 'function' && Core.PJ().active !== 'main' && typeof G === 'object' && !!G && Array.isArray(G.chars)), 60000, 'PC 서버 data에서 게임 받기');
-      await page.waitForFunction(() => (typeof Story==='undefined'?'undefined':typeof Story.buildNewGameDraft) === 'function' && typeof G === 'object' && !!System.PCS(), null, { timeout: 20000 });
+      await page.waitForFunction(() => (typeof Story==='undefined'?'undefined':typeof NewGame.buildNewGameDraft) === 'function' && typeof G === 'object' && !!System.PCS(), null, { timeout: 20000 });
       if (gid && await page.evaluate(id => Core.PJ().active !== id, gid)) { // 그 게임으로 전환(앱의 switchProject — 다시 시작함)
         await page.evaluate(id => { System.switchProject(id); }, gid).catch(() => {});
-        await until(() => page.evaluate(id => (typeof Core==='undefined'?'undefined':typeof Core.PJ) === 'function' && Core.PJ().active === id && typeof G === 'object' && !!G && Array.isArray(G.chars) && (typeof Story==='undefined'?'undefined':typeof Story.buildNewGameDraft) === 'function', gid), 60000, '게임 전환 ' + gid); } }
+        await until(() => page.evaluate(id => (typeof Core==='undefined'?'undefined':typeof Core.PJ) === 'function' && Core.PJ().active === id && typeof G === 'object' && !!G && Array.isArray(G.chars) && (typeof Story==='undefined'?'undefined':typeof NewGame.buildNewGameDraft) === 'function', gid), 60000, '게임 전환 ' + gid); } }
     return { out: await fn(page), errors, pc: pc && { port: pc.port } };
   } finally { await b.close(); if (srv) srv.close(); if (pc) pc.proc.kill(); }
 }

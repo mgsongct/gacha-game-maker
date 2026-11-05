@@ -3,7 +3,7 @@
 //   생성기 쪽: 생성 루트(buildNewGameDraft 등)에서 부르는 함수들이 쓰는 키(ng.*·G.* 대입, Object.assign 리터럴), 객체 리터럴 키, 프롬프트 JSON 스키마 키
 //   생성물 쪽: tools/play/games/*/game.json에 그 키·필드가 있는지, 비었는지, 기본값(DEFAULT_META 등 소스 리터럴)과 같은지
 // 결과: 기능마다 키·필드 표와 판정(생성기 미배선 · 배선됐지만 생성물에 없음 · 기본값 그대로).
-import { walk } from './source.mjs';
+import { walk, calleeName } from './source.mjs';
 
 // 멤버 사슬 → 정규화(ng·g는 생성 중인 게임 = G, .prog는 P()) → 'G.meta.x' / 'G.world.x' / 'P().x' / 'G.x' 로 자름
 export function norm(text) { const m = String(text).replace(/\?\./g, '.').match(/^(ng|G|g)((?:\.\w+)*)$/); if (!m) return null; const parts = m[2].split('.').filter(Boolean); return parts[0] === 'prog' ? ['P()', ...parts.slice(1)].join('.') : ['G', ...parts].join('.'); }
@@ -58,6 +58,10 @@ export function generatorVocab(fns, keys, genFiles = new Set()) { const writes =
           // ng.meta = Object.assign(clone(DEFAULT_META), {title, …}) · ng.meta.x = {…}: 리터럴 키도 그 아래에 쓴 것으로
           const lits = r?.type === 'object' ? [r] : r?.type === 'call_expression' && r.childForFieldName('function')?.text === 'Object.assign' ? r.childForFieldName('arguments').namedChildren.filter(a => a.type === 'object') : [];
           if (base) for (const o of lits) for (const pr of o.namedChildren) { const key = pr.type === 'pair' ? pr.childForFieldName('key').text.replace(/^['"]|['"]$/g, '') : pr.type === 'shorthand_property_identifier' ? pr.text : null; if (key) addW(cut(`${base}.${key}`), f.name); } } }
+      else if (n.type === 'call_expression') { /* 부름에 넘긴 객체 글자가 받는 함수에서 칸 = Object.assign(…, 매개변수)로 새 게임 칸에 합쳐짐(GameBuilder.meta(ng, …, {title, …})) */
+        const g = fns.get(calleeName(n)), ps = g?.node.childForFieldName('parameters')?.namedChildren || []; (n.childForFieldName('arguments')?.namedChildren || []).forEach((a, i) => { if (a.type !== 'object' || !g) return; const pn = ps[i]?.type === 'identifier' ? ps[i].text : ps[i]?.childForFieldName?.('left')?.text; if (!pn) return;
+          walk(g.node, m => { if (m.type !== 'assignment_expression') return; const l = m.childForFieldName('left'), r = m.childForFieldName('right'); if (l?.type !== 'member_expression' || r?.type !== 'call_expression' || r.childForFieldName('function')?.text !== 'Object.assign' || !r.childForFieldName('arguments').namedChildren.some(x => x.text === pn)) return; const base = norm(l.text); if (!base) return;
+            for (const pr of a.namedChildren) { const key = pr.type === 'pair' ? pr.childForFieldName('key').text.replace(/^['"]|['"]$/g, '') : pr.type === 'shorthand_property_identifier' ? pr.text : null; if (key) addW(cut(`${base}.${key}`), f.name); } }); }); }
       else if (own && n.type === 'pair') { const k2 = n.childForFieldName('key'); if (k2) props.add(k2.text.replace(/^['"]|['"]$/g, '')); }
       else if (own && n.type === 'shorthand_property_identifier') props.add(n.text);
       else if ((n.type === 'string_fragment' || n.type === 'string') && /"\w+"\s*:/.test(n.text)) for (const k of schemaKeys(n.text)) schema.add(k);
@@ -118,7 +122,7 @@ function keyFlag(r) { if (r.key.startsWith('P().') || r.user) return null;
   if (!auto && r.userW) return { sev: 'P1', msg: `자동으로 만들어지지 않음 — 사용자 조작(${r.userW})으로만. 자동(생성·실행 중 AI)이 기본` };
   if (!auto && miss) return { sev: 'P1', msg: `생성·실행 중 AI가 게임에 맞춰 정하지 않음 — ${r.def ? '원본 샘플 기본값' : '기능의 공통 기본값'}으로 시작` };
   if (!auto && dflt) return { sev: 'P1', msg: '생성·실행 중 AI가 정하지 않아 원본 샘플 기본값 그대로' };
-  if (gen && miss) return { sev: 'P1', msg: `생성 단계가 만드는 키(${r.gen || '스키마'})인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물` };
+  if (gen && miss) return { sev: 'P1', msg: `생성 단계가 만드는 키(${r.gen ? [].concat(r.gen).flatMap(x => x instanceof Set ? [...x] : [x]).join('·') : '스키마'})인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물` };
   return null; }
 const zeroOnly = g => !g || (/ 0\/\d+$/.test(g) && !/ [1-9]\d*\//.test(g));
 // 원본에 없던 새 필드(기능 함수가 엔티티에서 읽는 프로퍼티) — 생성·실행 중 AI 어휘에 있는지, 생성물 엔티티에 실제로 있는지(한 단계 안 c.persona.traits까지)

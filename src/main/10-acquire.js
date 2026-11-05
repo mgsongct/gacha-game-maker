@@ -398,6 +398,9 @@ static renameEverywhere(old,nu){ let n=0; const skip=new Set(['id','charId','img
     B.engine.events=[];
     if(GGMCombat.cast(B.engine,u,'ultimate')){v2BattleEvents(B.engine.events);Core.bCheck();}
   }
+
+  /* 배너(banners.json) 형식 맞춤(불러올 때): 없으면 기본(샘플 게임이면 샘플 배너, 아니면 상시 배너 하나) · 뽑기 풀·픽업·확률 기본값 */
+  static normalizeBanners(g,isDefaultGame){ if(!Array.isArray(g.banners)) g.banners=isDefaultGame?clone(DEFAULT_BANNERS):[{id:'std',name:'상시 '+(g.meta.terms.gacha||'뽑기'),type:'std',desc:'',pool:{mode:'all',factions:[],ids:[]},pickup:[],rate:50,active:true,bg:''}]; g.banners.forEach(b=>{b.pool=Object.assign({mode:'all',factions:[],ids:[]},b.pool||{});b.pickup=b.pickup||[];if(b.rate==null)b.rate=50;}); }
 }
 
 class AcquireView {

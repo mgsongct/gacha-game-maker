@@ -280,7 +280,7 @@ static async aiChapterGen0(dir,n,cast){
       step(deep?'장 구성을 짜는 중…':'대본을 쓰는 중…');
       const r=await Core.aiJSON(Characters.aiChapterGen0Prompt({dir,cast,memo,rel,k,deep,lastPost,SC,n,LS}),null,'complex');
       if(!(r&&Array.isArray(r.stages)&&r.stages.length)){ return null; }
-      const ch={id:uid(),ord:k,kind:'main',title:String(r.title||`${k+1}장`),logline:String(r.logline||'').slice(0,120),stages:Core.buildStages(r.stages,{max:12,reward:i=>300+150*k+100*i,elem:ELEMS[0],hp:hl,atk:al,def:dl,foe:'적'})};
+      const ch={id:uid(),ord:k,kind:'main',title:String(r.title||`${k+1}장`),logline:String(r.logline||'').slice(0,120),stages:Story.buildStages(r.stages,{max:12,reward:i=>300+150*k+100*i,elem:ELEMS[0],hp:hl,atk:al,def:dl,foe:'적'})};
       await v2BalanceChapter(ch,k);
       // 새 인물·자료를 먼저 넣어야 집필할 때 AI가 알아요
       const newc=Characters.addNewChars(r.newCharacters,SC.newc,ch.stages,{src:ch.title,ch}), npcs=Characters.addNpcs(r.newNpcs); World.stanceApply(r.stance,k+1); World.bestiaryApply(r.bestiary); Characters.debutResolve(ch); // 세력 관계 변화·적 도감·나중 등장 캐릭터(0445)
@@ -314,7 +314,7 @@ static async aiChapterGen0(dir,n,cast){
     const r=await Core.aiJSON(Core.aiEventGen0Prompt({rel,deep,dir,cast,loreHint,n,LS,ncN}),null,'complex');
     if(!r||!Array.isArray(r.stages)||!r.stages.length){ return null; }
     const evId='ev'+uid(), chId='evc'+uid(), bId='b'+uid(), ttl=String(r.title||'이벤트');
-    const ch={id:chId,kind:'event',eventId:evId,ord:200,title:ttl,lore:LORE||undefined,logline:String(r.desc||'').slice(0,120),stages:Core.buildStages(r.stages,{max:6,reward:i=>60+30*i,elem:ELEMS[0],hp:1000,atk:80,def:40,foe:'적',title:'스테이지'})};
+    const ch={id:chId,kind:'event',eventId:evId,ord:200,title:ttl,lore:LORE||undefined,logline:String(r.desc||'').slice(0,120),stages:Story.buildStages(r.stages,{max:6,reward:i=>60+30*i,elem:ELEMS[0],hp:1000,atk:80,def:40,foe:'적',title:'스테이지'})};
     const ncs=Characters.addNewChars(r.newCharacters&&r.newCharacters.length?r.newCharacters:r.newCharacter,ncN,ch.stages,{src:'외전 「'+ttl+'」',giftFirst:true}), nc=ncs[0]||null, npcs=Characters.addNpcs(r.newNpcs); World.bestiaryApply(r.bestiary);
     Story.sysEventFoes(ch); await v2BalanceChapter(ch,Math.max(0,G.chapters.filter(c=>c.kind==='main').length-1)); G.chapters.push(ch); Core.mark('ch:'+chId); Story.syncEnemies(G,NewGame.lookMap(r.stages));
     const ups=[...strs(r.pickup).map(nm=>Characters.findSpeaker(nm)).filter(Boolean).map(c=>c.id)]; if(nc) ups.unshift(nc.id);
@@ -353,95 +353,6 @@ static async aiChapterGen0(dir,n,cast){
 
   static drLoadFrom(d,label){ try{ appStorage.setItem(DR2KEY,JSON.stringify(Story.drClean(d))); }catch(e){} DRTAB='theme'; StoryView.openDraft(); CoreView.toast(`「${label||drName(d)}」 초안을 불러왔어요. 고친 뒤 만들기를 누르면 새 게임으로 만들어져요`); }
 
-  static async buildNewGameDraft(rep,draft,sourceProject){if(String(draft?.story||'').length>100000)throw Error('스토리는 최대 100,000자입니다. 초과 내용은 자르지 않았습니다.'); const RSRC=NewGame.reuseSrc(draft); // 원래 게임은 G를 새 게임으로 바꾸기 전에 잡아 둬요(지금 하던 게임을 리롤할 때)
-    draft=draft||Core.drLoad(); const auto=draft.mode==='auto';
-    const userTitle=String(draft.gtitle||'').trim().slice(0,30);
-    const kw=(auto?String(draft.auto||''):String(draft.kw||'')).trim()||String(draft.world||'').slice(0,120).trim(); if(!kw){CoreView.toast('만들고 싶은 게임을 적어 주세요');return;}
-    const tone=auto?'':String(draft.tone||'').trim(), th=auto?'auto':(draft.theme||'auto'), n=+draft.n||8, stat=m=>{if(rep)rep(m);};
-    const ngSty=GameBuilder.style(draft,auto);
-    const src=!auto&&draft.fan?String(draft.src||'').trim():'';
-    const hero=Object.assign({name:'',call:'',gender:'',look:'',bio:'',hide:false},draft.hero||{}), gen=genderCode(hero.gender), heroBlank=!String(hero.gender||'').trim()&&!String(hero.look||'').trim();
-    const SC=auto?{plot:'',stages:0,len:'normal'}:{plot:String(draft.story||''),stages:+draft.stages||0,len:STORY_LEN[draft.len]?draft.len:'normal'}, LS=STORY_LEN[SC.len][1], N1=SC.stages||4;
-    const DT=auto?'':Core.drText(draft).slice(0,100000), DRA=NewGame.buildNewGameDraftDRAText({DT,draft,plot:SC.plot});
-    const DALL=auto?[]:(draft.chars||[]).filter(c=>String(c.name||'').trim()), DCH=DALL.filter(c=>c.kind!=='npc'), DNPC=DALL.filter(c=>c.kind==='npc');
-    const STY=NewGame.buildNewGameDraftSTYText({SC});
-    const FAN=NewGame.buildNewGameDraftFANText({src});
-    const DK=JSON.stringify({kw,tone,th,n,ngSty,src,SC,DT,ct:String(draft.crewTerm||''),cs:String(draft.castSex||'')}); let DR=null; try{ DR=JSON.parse(appStorage.getItem('ggm-ng-draft')||'null'); }catch(e){} if(!DR||DR.key!==DK) DR={key:DK,r:{}};
-    const saveDR=()=>{ try{ appStorage.setItem('ggm-ng-draft',JSON.stringify(DR)); }catch(e){} };
-    const ngStep=async(k,label,fn,ok)=>{ if(DR.r[k]&&ok(DR.r[k])){ stat(label+' (이전에 만든 것 이어 쓰기)'); return DR.r[k]; }
-      for(let i=0;i<3;i++){ stat(label+(i?` · 다시 시도 ${i}/2${AI_QUIET_LAST?' — '+AI_QUIET_LAST:''}`:'')); AISTAGE='새 게임 '+label.replace(/…$/,''); AI_QUIET=i<2; let r; try{ r=await fn(); }finally{ AI_QUIET=false; } if(r&&ok(r)){ DR.r[k]=r; saveDR(); AISTAGE=''; return r; }
-        if(r) Core.aiLog({ok:false,stage:AISTAGE,err:'응답은 왔지만 필요한 항목이 빠졌어요(길이 제한으로 잘렸거나 형식이 달라요). 받은 항목: '+Object.keys(r).join(', ').slice(0,200)}); await wait(1500); } AISTAGE=''; AI_QUIET_LAST=''; return null; };
-    if(Object.keys(DR.r).length) CoreView.toast('지난번에 만들던 단계부터 이어서 만들어요');
-    rep.lock(); const base=NewGame.buildNewGameDraftBaseText({draft});
-    const a=await ngStep('a','1/4 세계관과 게임 정의를 만드는 중…',()=>Core.aiJSON(NewGame.buildNewGameDraftPrompt({base,FAN,STY,DRA,auto,heroBlank,hero,draft,DT,kw,tone,userTitle,th}),null,'complex'),r=>r&&r.title&&r.world&&String(r.world.plot||r.world.summary||'').trim()); /* 플롯·요약이 없으면 다시 묻기(빈 세계관에 원본 샘플이 남던 문제) */
-    if(!a){rep.end();stat('세계관 생성에 실패했어요. 같은 내용으로 다시 누르면 이어서 만들어요.');return;}
-    const ng=Core.defaults(); ng.lib=ng.lib.filter(l=>!['bg','prop','cg','map'].includes(l.kind)); ng.world=NewGame.blankWorld(); /* 원본 샘플 게임의 배경·소품·세계관은 새 게임에 남기지 않아요 — 남으면 생성 프롬프트의 "기존 목록"으로 들어가 다른 세계의 장소가 대본에 섞여요 */ if(heroBlank&&a.hero&&typeof a.hero==='object'){ hero.gender=String(a.hero.gender||'').slice(0,40); hero.look=String(a.hero.look||'').slice(0,400); } if(hero) GameBuilder.hero(ng.prog,hero);
-    /* 새 게임 meta는 조립 창구가 씀(NewGame GameBuilder) — 장의 마지막 스테이지 형식(finale)은 장르에 따라 */
-    GameBuilder.meta(ng,draft,hero,{title:userTitle||String(a.title||'새 게임'),sub:String(a.sub||''),theme:['tactical','fantasy','neon','pastel','noir'].includes(a.theme)?a.theme:'tactical',accent:/^#[0-9a-f]{6}$/i.test(a.accent||'')?a.accent:'#ffb400'},{sty:ngSty,tone,bible:DT,story:{plot:SC.plot,stages:SC.stages,len:SC.len,depth:draft.depth==='fast'?'fast':'deep',newc:draft.newc==null?2:+draft.newc,talkOnly:draft.talkOnly==null?1:+draft.talkOnly,finale:finaleOf(a.finale)},terms:{...(a.terms||{}),abyss:Story.explorationName(a.terms?.abyss)}});
-    if(Array.isArray(a.elems)&&a.elems.length>=2){ const L=a.elems.slice(0,8).map((e,i)=>({d:String(e.d||'').slice(0,80),n:elemName(e.n||(DEFAULT_META.elems[i]||{}).n||'속성'+(i+1)),c:/^#[0-9a-f]{6}$/i.test(e.c||'')?e.c:(DEFAULT_META.elems[i]||{c:'#999999'}).c,beats:elemName(e.beats)})); if(new Set(L.map(e=>e.n)).size===L.length){ ng.meta.elems=L.map(({beats,...e})=>e); const N=L.map(e=>e.n), beats={}; L.forEach(e=>{ if(N.includes(e.beats)&&e.beats!==e.n) beats[e.n]=e.beats; }); ng.meta.rules=Object.assign(ng.meta.rules||{},Object.keys(beats).length?{beats}:{},{reactions:(Array.isArray(a.reactions)?a.reactions:[]).slice(0,6).map(x=>Object.assign({},x,{a:elemName(x&&x.a),b:elemName(x&&x.b)})).filter(x=>N.includes(x.a)&&N.includes(x.b)&&x.a!==x.b).map(NewGame.reactClean)}); } }
-    if(a.roleDesc&&typeof a.roleDesc==='object'){ ng.meta.rules=Object.assign(ng.meta.rules||{},{roleDesc:Object.fromEntries(['atk','def','sup'].map(k=>[k,String(a.roleDesc[k]||'').slice(0,80)]))}); }
-    { const L=NewGame.posClean(a.positions); if(NewGame.posValid(L)) ng.meta.positions=L; }
-    ng.meta.roles=Object.assign(clone(DEFAULT_META.roles),a.roles||{});
-    ng.world=Object.assign(NewGame.blankWorld(),a.world||{}); ng.world.factions=NewGame.factionClean(ng.world.factions); /* 세력 설계(0445) */ { const sd=[]; ng.world.summary=NewGame.dedupText(ng.world.summary,sd).text; ng.world.lore=NewGame.dedupText(ng.world.lore,sd).text; }
-    Expedition.ngWorldExtras(ng,a);
-    const oldG=G; G=ng; SystemView.applyMeta();
-    const b=await ngStep('b',`2/4 ${System.T('crew')} ${n}명을 만드는 중…`,()=>Core.aiJSON(NewGame.buildNewGameDraftPrompt2({FAN,STY,DCH,DNPC,DRA,ng,n,N1,src}),null,'complex'),r=>r&&Array.isArray(r.chars)&&r.chars.length>=Math.max(1,Math.ceil(n*0.8))&&new Set(r.chars.map(c=>String(c&&c.name||'').trim())).size===r.chars.length); /* 요청 인원의 80% 이상·이름 중복 없음이어야 통과(아니면 다시 묻기) */
-    if(!b){G=oldG;SystemView.applyMeta();rep.end();stat('캐릭터 생성에 실패했어요. 같은 내용으로 다시 누르면 1단계는 건너뛰고 이어서 만들어요.');return;}
-    ng.chars=[]; b.chars.slice(0,Math.max(12,DCH.length)).forEach(x=>{ if(Art.isMonsterLike(x)) return; const c=Characters.cleanChar(x); c.faction=NewGame.factionMatch(ng.world.factions,c.faction); /* 넣기 전에 세력 이름 맞춤 — 반복 중 factions()가 넣은 대원의 소속을 세력으로 추가하므로 늦으면 비슷한 이름이 따로 생김 */ if(!c.name||DNPC.some(d=>d.name===c.name))return; c.ord=ng.chars.length; const db=String(x.debut||'start').trim(); if(db==='later') c.debutLater=true; else if(+db>=1) c.__deb=Math.min(N1,Math.round(+db)); ng.chars.push(c);});
-    { const st=ng.chars.filter(c=>!c.__deb&&!c.debutLater); ng.chars.filter(c=>c.__deb||c.debutLater).slice(0,Math.max(0,3-st.length)).forEach(c=>{ delete c.__deb; delete c.debutLater; }); } // 등장 계획: 처음부터 동료 3명 이상, 소속 세력은 목록에
-    // 초안에 적은 대원은 반드시 대원으로: 이름이 바뀌었으면 되돌리고, 빠졌으면 따로 만들어 넣어요
-    { const findD=d=>ng.chars.find(c=>c.name===d.name)||ng.chars.find(c=>c.name.includes(d.name)||d.name.includes(c.name));
-      let miss=DCH.filter(d=>!findD(d));
-      if(miss.length){ stat(`2/4 초안의 ${System.T('crew')} ${miss.length}명을 마저 만드는 중…`); for(let k=0;k<2&&miss.length;k++){ const r2=await Core.aiJSON(NewGame.buildNewGameDraftPrompt3({ng,miss}),null,'complex');
-          (r2&&Array.isArray(r2.chars)?r2.chars:[]).forEach(x=>{ const c=Characters.cleanChar(x); if(!c.name) return; const d=miss.find(m=>m.name===c.name||c.name.includes(m.name)); if(d) c.name=d.name; c.ord=ng.chars.length; ng.chars.push(c); }); miss=DCH.filter(d=>!findD(d)); } }
-      DCH.forEach(d=>{ const c=findD(d); if(!c) return; c.name=d.name; if(d.rank) c.rarity=+d.rank; const tg=String(d.tags||'').trim(); if(tg) c.naiPrompt=Core.stripAge(tg); }); }
-    NewGame.ngCharsPost(ng,DCH);
-    if(SAMPLE&&ng.chars.some(c=>c.weapon&&Characters.wpBad(c.weapon.prompt))){ stat(`2/4 ${System.T('weapon')} 그림 프롬프트를 정리하는 중…`); await Characters.fixWeaponPrompts(ng.chars,ng.world); }
-    // NPC: 대원은 아니지만 스토리에 나오고 그림(전신·상반신)을 가져요. 나중에 대원으로 쓸 수도 있어요
-    ng.npcs=[]; if(DNPC.length){ stat('2/4 NPC 모습을 정하는 중…'); const r3=await Core.aiJSON(NewGame.buildNewGameDraftPrompt4({ng,DNPC}),null,'default');
-      DNPC.forEach(d=>{ const x=(r3&&Array.isArray(r3.npcs)?r3.npcs:[]).find(y=>y&&y.name===d.name)||{}; const id='npc_'+uid(); ng.npcs.push({id,npc:true,name:d.name,role:d.role||'',profile:d.profile||'',speech:d.speech||'',look:d.look||'',naiPrompt:String(d.tags||'').trim()?Core.stripAge(String(d.tags).trim()):String(x.naiPrompt||''),img:null,faces:[],skins:[],lines:[],touch:{head:[],body:[]},affLines:{},upper:{id:'up_'+id,kind:'upper',name:d.name+' 상반신',prompt:'',img:null}}); }); }
-  
-    ng.world.source=src;
-    // 그림 유지 리롤이면 원래 게임의 그림 있는 배경·소품을 먼저 넣어 두고 AI가 그 이름을 우선 쓰게 해요
-    const RS0=RSRC, KEEP=RS0?(RS0.g.lib||[]).filter(l=>['bg','prop'].includes(l.kind)&&l.img).map(l=>JSON.parse(JSON.stringify(l))):[];
-    if(KEEP.length) ng.lib=[...KEEP,...ng.lib.filter(l=>!['bg','prop'].includes(l.kind))];
-    const KEEPHINT=NewGame.buildNewGameDraftKEEPHINTText({KEEP});
-    const CX0=`${RULES}${FAN}\n${World.ctx().replace(/메인 스토리 진행:.*\n/,'')}${KEEPHINT}`;
-    const c3a=await ngStep('c3a','3/4 오프닝, 배경·소품·음악 목록, 배너를 만드는 중…',()=>Core.aiJSON(NewGame.buildNewGameDraftPrompt5({CX0,LS,ng}),null,'complex'),r=>r&&r.opening&&Array.isArray(r.backgrounds));
-    if(!c3a){G=oldG;SystemView.applyMeta();rep.end();stat('오프닝 생성에 실패했어요. 같은 내용으로 다시 누르면 앞 단계는 건너뛰고 이어서 만들어요.');return;}
-    const bgNames=[...new Set([...(c3a.backgrounds||[]).map(x=>x&&x.name).filter(Boolean),...KEEP.filter(l=>l.kind==='bg').map(l=>l.name)])], prNames=[...new Set([...(c3a.props||[]).map(x=>x&&x.name).filter(Boolean),...KEEP.filter(l=>l.kind==='prop').map(l=>l.name)])];
-    const c3b=await ngStep('c3b','4/4 1장 스토리와 메신저를 만드는 중…',()=>Core.aiJSON(NewGame.buildNewGameDraftPrompt6({CX0,bgNames,prNames,N1,LS,ng}),null,'complex'),r=>r&&r.chapter&&Array.isArray(r.chapter.stages)&&r.chapter.stages.length);
-    const c3=c3b?Object.assign({},c3a,c3b):null;
-    if(!c3||!c3.chapter){G=oldG;SystemView.applyMeta();rep.end();stat('1장 스토리 생성에 실패했어요. 같은 내용으로 다시 누르면 앞 단계(세계관·캐릭터·오프닝)는 건너뛰고 1장만 다시 만들어요. 그림은 아직 그리지 않았어요.');return;}
-    ng.opening={lines:strs(c3.opening&&c3.opening.lines),prologue:nl(c3.opening&&c3.opening.prologue)};
-    const ch=c3.chapter; ng.chapters=[{id:'c1',ord:0,kind:'main',title:String(ch.title||'1장'),logline:String(ch.logline||'').slice(0,120),stages:(ch.stages||[]).slice(0,12).map((s2,i)=>({id:'s1'+(i+1),title:String(s2.title||'작전'),reward:300+100*i,pre:nl(s2.pre),post:nl(s2.post),
-      enemies:(Array.isArray(s2.enemies)?s2.enemies:[]).slice(0,5).map(e2=>({name:String(e2.name||'적'),elem:ELEMS.includes(e2.elem)?e2.elem:ELEMS[0],hp:num(e2.hp,100,99999,900),atk:num(e2.atk,10,999,80),def:num(e2.def,0,500,35),spd:num(e2.spd,50,160,95),boss:!!e2.boss}))}))}];
-    ng.__looks=NewGame.lookMap((c3.chapter||{}).stages);
-    ng.chars.forEach(c=>{ if(c.__deb){ const s2=ng.chapters[0].stages[c.__deb-1]; if(s2) c.debut=s2.id; delete c.__deb; } }); // 등장 계획 → 첫 등장 스테이지(0445)
-    ng.chapters[0].stages.forEach((s,i,a)=>{ const src=(ch.stages||[])[i]||{}, md=i<a.length-1||Battle.storyCfg().finale!=='battle'?NewGame.modeClean(src):null; if(md){ Object.assign(s,md); s.enemies=[]; return; } if(src.battle===false&&i<a.length-1){ s.story=true; s.enemies=[]; if(s.post){ s.pre=[s.pre,s.post].filter(Boolean).join('\n'); s.post=''; } return; } if(!s.enemies.length)s.enemies=[{name:'적',elem:ELEMS[0],hp:900,atk:80,def:35,spd:95,boss:false}]; const rt=NewGame.routeClean(src.route); if(rt) s.route=rt; }); /* 출격 경로 지점 이름(2장 이후와 같게) */
-    ng.chapters[0].summary=String(c3.summary||'').slice(0,6000); ng.rels=[]; try{ NewGame.relApply(c3.relations,'프롤로그·1장',true); NewGame.relFromProfiles(true); Story.relFromScripts(ng.chapters[0],'1장',true); ng.meta.relProf=1; }catch(e){}
-    const L=(kind,arr)=>(Array.isArray(arr)?arr:[]).filter(x=>x&&x.name).map(x=>({id:'l'+uid(),kind,name:String(x.name),prompt:String(x.prompt||''),img:null}));
-    { const fresh=[...L('bg',c3.backgrounds),...L('prop',c3.props)].filter(l=>!KEEP.some(k=>k.kind===l.kind&&k.name===l.name)); ng.lib=[...KEEP,...fresh,...L('bgm',c3.music),...clone(DEFAULT_SFX)]; } Story.syncEnemies(ng,ng.__looks); delete ng.__looks; World.bestiaryApply(c3.bestiary,ng); { const sts=ng.chapters[0].stages; sts.forEach((s2,i)=>{ if(!s2.story) Story.stageAutoRules(s2,i,sts.length); }); } /* 적 도감·전장 규칙(0445·0485) */
-    const mus=ng.lib.filter(l=>l.kind==='bgm').map(l=>l.name), pickM=(re,i)=>mus.find(m=>re.test(m))||mus[i]||'';
-    const bn=c3.banners||{}, ssr=ng.chars.filter(c=>c.rarity===3), pu=ng.chars.find(c=>c.name===(bn.pickup&&bn.pickup.char)&&!c.debut&&!c.debutLater)||ssr.find(c=>!c.debut&&!c.debutLater)||ssr[0], fac=(()=>{ const hasSSR=f=>ng.chars.some(c=>c.faction===f&&c.rarity===3), want=(bn.faction&&bn.faction.faction)||''; return hasSSR(want)?want:((ng.chars.find(c=>c.rarity===3&&c.faction)||ng.chars[0]||{}).faction||''); })();
-    ng.banners=[{id:'std',name:String(bn.std||'상시 '+System.T('gacha')),type:'std',desc:'',pool:{mode:'all',factions:[],ids:[]},pickup:[],rate:50,active:true,bg:''}];
-    if(pu) ng.banners.push({id:'b_pu',name:String((bn.pickup&&bn.pickup.name)||pu.name+' 확률 업'),type:'pickup',desc:`SSR ${pu.name} 확률 상승`,pool:{mode:'all',factions:[],ids:[]},pickup:[pu.id],rate:50,active:true,bg:''});
-    if(fac) ng.banners.push({id:'b_fac',name:String((bn.faction&&bn.faction.name)||fac+' 모집'),type:'pool',desc:`${fac} 소속만 등장`,pool:{mode:'faction',factions:[fac],ids:[]},pickup:[],rate:50,active:true,bg:''});
-    const say1=NewGame.storySayNorms(ng.chapters[0]); ng.threads=(Array.isArray(c3.threads)?c3.threads:[]).map(x=>{const c=ng.chars.find(q=>q.name===String(x.char||'').trim());if(!c||!x.script||NewGame.threadDup(nl(x.script),say1))return null;const st=ng.chapters[0].stages[Math.min(ng.chapters[0].stages.length,Math.max(1,+x.afterStage||1))-1];return {id:uid(),charId:c.id,title:String(x.title||'메시지'),trigger:x.trigger==='start'?{type:'start'}:{type:'clear',value:st.id},needOwn:x.trigger==='start',script:nl(x.script)};}).filter(Boolean);
-    ng.events=[]; { ng.prog=clone(DEFAULT_PROG); ng.prog.gender=gen; if(hero) GameBuilder.hero(ng.prog,hero); /* 주인공 칸은 조립 창구가 다시 씀(위에서 고친 hero 그대로) */ }
-    const bgs=ng.lib.filter(l=>l.kind==='bg').map(l=>l.name);
-    ng.prog.lobbyBg=bgs[0]||''; ng.prog.titleBg=bgs[bgs.length-1]||'';
-    const snd=Core.SND(); snd.scene={title:pickM(/타이틀|title/i,0),lobby:pickM(/로비|lobby/i,1),battle:pickM(/전투|battle/i,4),boss:pickM(/보스|boss/i,5),gacha:pickM(/뽑기|소환|계약|gacha|summon/i,6)};
-    ng.prog.scene=clone(snd.scene); ng.ver=VER; const id2='g'+uid(); const RU=Characters.artReuse(ng,RSRC); if(RU){ stat(`원래 게임의 그림을 옮기는 중… (${System.T('crew')} ${RU.nc}명 · NPC ${RU.nn}명 · 배경 등 ${RU.nl}개)`); await NewGame.artReuseCopy(RU,id2); ng.prog.castDone=RU.nc>=ng.chars.filter(c=>c.naiPrompt).length; }
-    { let b=null, tags=hero.av||''; try{ if(hero.av) b=await Core.idbGet('draft_avatar'); if(!b&&!(RU&&ng.prog.avatar)&&String(hero.look||'').trim()&&Core.imgReady()){ stat('주인공 프로필 그림을 그리는 중…'); tags=await NewGame.heroTags(hero); if(tags) b=await NewGame.naiDraw('char',tags,{frame:'cowboy shot',pose:'looking at viewer'}); }
-        if(b){ const av={id:'pav_'+uid(),kind:'char',name:'플레이어',prompt:tags,img:{idb:true}}; await NewGame.idbPut(id2+'::'+av.id,b); ng.prog.avatar=av; } }catch(e){ CoreView.toast('프로필 그림은 나중에 설정 → 플레이어에서 그려 주세요'); } }
-    if(RU&&RU.ids.some(x=>ng.prog.avatar&&x===ng.prog.avatar.id)){ /* 원래 프로필 그림을 그대로 썼어요 */ }
-    G=oldG;
-    if(sourceProject&&Core.PJ().active!==sourceProject)throw Error('게임이 바뀌어 새 게임 적용을 중단했습니다');await Core.flush();
-    await GameBuilder.save(ng,draft,id2);
-    try{ appStorage.removeItem('ggm-ng-draft'); }catch(e){}
-    stat('완성! 새 게임으로 전환해요.'); setTimeout(()=>SystemView.reloadGame(),900);
-  }
 
   static async handleStoryAndAuthoringAction(a,t,id,p,e){
     switch(a){
@@ -642,9 +553,35 @@ static titleSndLabel(on){ return on?'배경음 끄기':'배경음 켜기'; }
 
     // 스테이지 i/n에 규칙을 정해요(첫 스테이지는 규칙 없음, 마지막(보스)은 시간·체력 목표). 같은 스테이지는 늘 같은 결과
 static stageAutoRules(s,i,n){ if(!s||s.story||!(s.enemies||[]).length) return s; const h=Core.hashN(s.id||s.title||i);
-    if(i>0){ const fk=['resonance','role','home','armor','fortress','swift','resonance','frenzy','suppress'].filter(k=>FIELDS[k].arg!=='faction'||NewGame.ruleFacs().length), k=fk[h%fk.length]; const f=NewGame.ruleClean(FIELDS,{k,a:NewGame.ruleArg(FIELDS[k].arg,h>>3)}); if(f) s.field=f; }
-    const gk=i===n-1?['fast','hp']:['elem','role','noRole','few','hp','faction'].filter(k=>k!=='faction'||NewGame.ruleFacs().length), g=gk[(h>>5)%gk.length], goal=NewGame.ruleClean(GOALS,{k:g,a:NewGame.ruleArg(GOALS[g].arg,h>>7)}); if(goal) s.goal=goal;
+    if(i>0){ const fk=['resonance','role','home','armor','fortress','swift','resonance','frenzy','suppress'].filter(k=>FIELDS[k].arg!=='faction'||NewGame.ruleFacs().length), k=fk[h%fk.length]; const f=Story.ruleClean(FIELDS,{k,a:NewGame.ruleArg(FIELDS[k].arg,h>>3)}); if(f) s.field=f; }
+    const gk=i===n-1?['fast','hp']:['elem','role','noRole','few','hp','faction'].filter(k=>k!=='faction'||NewGame.ruleFacs().length), g=gk[(h>>5)%gk.length], goal=Story.ruleClean(GOALS,{k:g,a:NewGame.ruleArg(GOALS[g].arg,h>>7)}); if(goal) s.goal=goal;
     s.rulesV=1; return s; }
+
+  /* 장(chapters.json)·오프닝 형식 맞춤(불러올 때): 없으면 기본 장 · 예전 형식이면 기본 1장의 대본 · 장 종류 기본(본편) · 오프닝 기본값 위에 */
+  static normalizeChapters(g,d,old){ g.chapters=Array.isArray(g.chapters)?g.chapters:d.chapters; if(old){ const c1=g.chapters.find(ch=>ch.id==='c1'); if(c1){ const dc=d.chapters[0]; c1.stages.forEach(s=>{const ds=dc.stages.find(x=>x.id===s.id); if(ds){s.pre=ds.pre;s.post=ds.post;}}); } } g.chapters.forEach(ch=>{ch.kind=ch.kind||'main';}); g.opening=Object.assign(d.opening,g.opening||{}); }
+
+  /* 새 게임 1장 스테이지 다듬기(AI 답 src마다): 회담·콘테스트 양식 · 이야기만 있는 스테이지(대본을 pre 하나로) · 빈 적이면 기본 적 · 출격 경로 지점 이름(2장 이후 buildStages와 같게) */
+  static shapeFirstStages(stages,srcs=[]){ stages.forEach((s,i,a)=>{ const src=(srcs||[])[i]||{}, md=i<a.length-1||Battle.storyCfg().finale!=='battle'?NewGame.modeClean(src):null; if(md){ Object.assign(s,md); s.enemies=[]; return; } if(src.battle===false&&i<a.length-1){ s.story=true; s.enemies=[]; if(s.post){ s.pre=[s.pre,s.post].filter(Boolean).join('\n'); s.post=''; } return; } if(!s.enemies.length)s.enemies=[{name:'적',elem:ELEMS[0],hp:900,atk:80,def:35,spd:95,boss:false}]; const rt=NewGame.routeClean(src.route); if(rt) s.route=rt; }); }
+
+  /* 장 data 형식 맞춤의 나머지(불러올 때 한 번 — Characters.fix가 부름): 이벤트 → 적 맞춤(syncEnemies) → 예전 난이도 곡선 */
+  static normalizeStory(g,isDefaultGame){ Story.normalizeEvents(g,isDefaultGame); Story.syncEnemies(g); Story.normalizeCurve(g); }
+
+  /* 이벤트(events.json) 형식 맞춤(불러올 때): 없으면 빈 목록(샘플 게임이면 샘플 이벤트와 그 장) · 이벤트 상점 기본 */
+  static normalizeEvents(g,isDefaultGame){ if(!Array.isArray(g.events)){ g.events=[]; if(isDefaultGame){ g.events=clone(DEFAULT_EVENTS); if(!g.chapters.some(ch=>ch.id==='evc1')) g.chapters.push(clone(DEFAULT_EVENT_CHAPTER)); } } g.events.forEach(ev=>{ if(!ev.shop||!ev.shop.length) ev.shop=Core.defaultShop(ev,g); }); }
+
+  /* 예전 난이도 곡선(curve<3)이면 본편 장의 적을 다시 맞춤(불러올 때) */
+  static normalizeCurve(g){ if(!(g.meta.curve>=3)){ g.chapters.filter(ch=>ch.kind==='main').forEach((ch,k)=>Story.rebalanceChapter(ch,k)); g.meta.curve=3; g.__curveNew=true; } }
+
+  static buildStages(arr,o){ const list=(Array.isArray(arr)?arr:[]).slice(0,o.max), n=list.length;
+    return list.map((s,i)=>{ s=s||{}; const md=i<n-1||Battle.storyCfg().finale!=='battle'?NewGame.modeClean(s):null; /* 전투 중심이면 마지막(보스) 스테이지는 전투 */ const story=!md&&s.battle===false&&i<n-1;
+      const st={id:uid(),title:String(s.title||(story?'이야기':o.title||'작전')),reward:o.reward(i),pre:nl(s.pre),post:story?'':nl(s.post),beats:strs(s.beats).slice(0,14).map(x=>x.slice(0,300)),
+        enemies:story?[]:(Array.isArray(s.enemies)?s.enemies:[]).slice(0,5).map(e=>({name:String(e.name||'적'),elem:ELEMS.includes(e.elem)?e.elem:o.elem,hp:num(e.hp,100,99999,o.hp),atk:num(e.atk,10,999,o.atk),def:num(e.def,0,500,o.def),spd:num(e.spd,50,160,95),boss:!!e.boss}))};
+      if(md){ Object.assign(st,md); st.enemies=[]; if(!st.beats.length) delete st.beats; return st; } // 회담·콘테스트(0488)
+      if(story){ st.story=true; if(s.post) st.pre=[st.pre,nl(s.post)].filter(Boolean).join('\n'); }
+      else if(!st.enemies.length) st.enemies=[{name:o.foe||'적',elem:o.elem,hp:o.hp,atk:o.atk,def:o.def,spd:95,boss:false}];
+      if(!st.beats.length) delete st.beats; if(!story){ const f=Story.ruleClean(FIELDS,s.field); Story.stageAutoRules(st,i,n); if(f) st.field=f; const rt=NewGame.routeClean(s.route); if(rt) st.route=rt; } return st; }); }
+
+  static ruleClean(cat,r){ if(!r||typeof r!=='object') return null; const o={k:String(r.k||'')}; if(cat[o.k]&&cat[o.k].arg) o.a=['sec','pct','n'].includes(cat[o.k].arg)?Math.round(+r.a||0):String(r.a||'').trim(); return NewGame.ruleOk(cat,o)?o:null; }
 }
 
 class StoryView {

@@ -13,6 +13,8 @@ const HUB = 25; // 이만큼 많은 함수가 부르면 공용 기반으로 봄
 
 // opts.modOf: 파일 → 모듈(폴더 모듈은 폴더 전체 — tools/lib/scope.mjs moduleOf) · opts.layer: 설계상 여러 모듈의 데이터를 읽는 층(프롬프트 스튜디오 — 기능 데이터로 프롬프트를 만듦)은 영역 침범 판단에서 뺌
 // 상태 주인: 상태 키(G.meta.x·G.world.x·G.x·P().x)를 가장 많이 쓰는 모듈
+/* 자기 모듈이 주인인 상태 키를 쓰는 함수(data 창구) */
+function gateFns(sf, modOf, modOfFile) { const { owner } = stateOwners(sf, l => modOfFile(String(l).split(':')[0])), out = new Set(); for (const k of sf.list) { const o = owner.get(k.key); if (o) for (const w of k.w) if (modOf.get(w) === o) out.add(w); } return out; }
 function stateOwners(sf, fileOf) { const owner = new Map(), keyFiles = new Map();
   for (const k of sf.list) { if (!/^(G\.meta\.|G\.world\.|P\(\)\.|G\.)\w+$/.test(k.key) || /^G\.(meta|world|prog)$/.test(k.key)) continue; const c = new Map(); k.wl.forEach(l => { const f = fileOf(l); c.set(f, (c.get(f) || 0) + 1); });
     if (!c.size) continue; owner.set(k.key, [...c].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))[0][0]); keyFiles.set(k.key, c); }
@@ -133,8 +135,9 @@ function mixedOf(comm, modOf, name, byComm, byMod) {
     if (parts.length >= 2 && parts[1][1] >= 3 && parts[1][1] / ns.length >= 0.3) out.push({ mod: m, fns: ns.length, parts: parts.slice(0, 3).map(([c, k]) => ({ n: k, cluster: label(c), sample: byComm.get(c).filter(x => modOf.get(x) === m).slice(0, 4).map(x => name.get(x)), fns: byComm.get(c).filter(x => modOf.get(x) === m).map(x => name.get(x)) /* 고칠 때 옮길 묶음 전체(out/modules.json) */ })) }); }
   return out; }
 // 기능 분산(제자리 아닌 함수): 함수의 연결 무게가 다른 한 모듈로 60%↑이고 자기 모듈 쪽의 2배↑(근거 무게 2↑)
-function displacedOf(adj, modOf, name, layer) { const out = [];
-  for (const [n, nb] of adj) { const own = modOf.get(n), by = new Map(); if (layer && own === layer) continue; /* 설계상 층(프롬프트 스튜디오)은 여러 기능 데이터를 읽음 */ let tot = 0; for (const [j, w] of nb) { by.set(modOf.get(j), (by.get(modOf.get(j)) || 0) + w); tot += w; }
+/* gate: data 창구 함수(자기 모듈이 주인인 상태 키를 씀 — G.lib.push 하는 자료 만들기 등) — 부르는 쪽이 한 기능이어도 data 주인 모듈에 둠(규칙 D3·사용자 지시: 생성·수정·제거를 한 창구에서가 기능 분산보다 먼저) */
+function displacedOf(adj, modOf, name, layer, gate = new Set()) { const out = [];
+  for (const [n, nb] of adj) { const own = modOf.get(n), by = new Map(); if ((layer && own === layer) || gate.has(n)) continue; /* 설계상 층(프롬프트 스튜디오)은 여러 기능 데이터를 읽음 */ let tot = 0; for (const [j, w] of nb) { by.set(modOf.get(j), (by.get(modOf.get(j)) || 0) + w); tot += w; }
     const [tm, tw] = [...by].filter(([m]) => m !== own).sort((a, b) => b[1] - a[1])[0] || []; if (tm && tot >= 2 && tw / tot >= 0.6 && tw >= 2 * (by.get(own) || 0)) out.push({ fn: name.get(n), mod: own, to: tm, share: Math.round(100 * tw / tot), weight: r2(tot) }); }
   return out.sort((a, b) => a.to.localeCompare(b.to) || b.share - a.share); }
 // 함수 하나의 연결 무게를 모듈별로(자연 경계와 같은 그래프 — map.mjs --why <함수>가 보여 줌): [[모듈, 무게]] 무거운 순, 그래프에서 빠진 함수(공용 기반·분배기·층)는 null
@@ -146,4 +149,4 @@ export function naturalBoundaries(fns, sf, M, modOfFile = f => f, layer = null, 
   const votes = new Map(); for (let sd = 1; sd <= SEEDS; sd++) { const c2 = louvain(adj, sd), bc2 = groupBy(c2.keys(), n => c2.get(n)); for (const x of mixedOf(c2, modOf, name, bc2, byMod)) votes.set(x.mod, (votes.get(x.mod) || 0) + 1); }
   const stable = m => (votes.get(m) || 0) * 2 > SEEDS, mixed0 = mixedOf(comm, modOf, name, byComm, byMod), mixed = mixed0.filter(x => stable(x.mod)).map(x => ({ ...x, votes: votes.get(x.mod) }));
   const Qfile = modularity(adj, new Map([...adj.keys()].map(n => [n, modOf.get(n)]))), Qnat = modularity(adj, comm);
-  return { nodes: adj.size, clusters: byComm.size, Qfile: Math.round(Qfile * 1000) / 1000, Qnat: Math.round(Qnat * 1000) / 1000, overSplit: overSplitOf(adj, modOf, byMod, name), mixed, mixedUnstable: mixed0.filter(x => !stable(x.mod)).map(x => ({ mod: x.mod, votes: votes.get(x.mod) || 0 })), displaced: displacedOf(adj, modOf, name, layer) }; }
+  return { nodes: adj.size, clusters: byComm.size, Qfile: Math.round(Qfile * 1000) / 1000, Qnat: Math.round(Qnat * 1000) / 1000, overSplit: overSplitOf(adj, modOf, byMod, name), mixed, mixedUnstable: mixed0.filter(x => !stable(x.mod)).map(x => ({ mod: x.mod, votes: votes.get(x.mod) || 0 })), displaced: displacedOf(adj, modOf, name, layer, gateFns(sf, modOf, modOfFile)) }; }

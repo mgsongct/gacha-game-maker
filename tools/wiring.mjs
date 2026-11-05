@@ -7,6 +7,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import { loadUnits } from './lib/source.mjs';
 import { buildGraph } from './lib/graph.mjs';
 import { stateFlow } from './lib/flow.mjs';
@@ -21,7 +22,8 @@ import { auditRules, migrationWrites, upgradeCoverage, upstreamGenKeys } from '.
 const HERE = dirname(fileURLToPath(import.meta.url)), ROOT = resolve(HERE, '..'), OUT = join(HERE, 'out'), REG = JSON.parse(readFileSync(join(HERE, 'fork-features.json'), 'utf8'));
 const srcAtRef = ref => srcAt(ROOT, OUT, ref);
 
-const units = await loadUnits(ROOT), { fns } = buildGraph(units), sf = stateFlow(units, fns), defaults = constLiterals(units, ['DEFAULT_META', 'DEFAULT_WORLD', 'DEFAULT_PROG']);
+/* --src <폴더>: 그 폴더의 src로 같은 분석(--rebase가 기준 커밋을 지금 도구로 잴 때) · --findings-out <파일>: 판정 목록만 JSON으로 */
+const SRC = process.argv.indexOf('--src'), units = await loadUnits(SRC > 0 ? resolve(process.argv[SRC + 1]) : ROOT), { fns } = buildGraph(units), sf = stateFlow(units, fns), defaults = constLiterals(units, ['DEFAULT_META', 'DEFAULT_WORLD', 'DEFAULT_PROG']);
 const upstream = await srcAtRef(REG.upstreamSrc || REG.upstream), features = [];
 for (const f of REG.features) { const added = new Set();
   for (const c of f.commits) { const [now, before] = [await srcAtRef(c), await srcAtRef(c + '^')], b = new Set(before.fns); now.fns.filter(k => !b.has(k)).forEach(k => added.add(k)); }
@@ -45,6 +47,12 @@ const md = [`# 포크 기능 배선 점검 (생성기 ↔ 기능 ↔ 생성물)`
 mkdirSync(OUT, { recursive: true }); writeFileSync(join(OUT, 'wiring.md'), md); writeFileSync(join(OUT, 'wiring.json'), JSON.stringify({ ...W, upgrade: UP }, (k, v) => v instanceof Set ? [...v] : v, 1));
 // 래칫: 판정 목록을 기준선과 비교(새로 생긴 P0·P1이 있으면 --strict 실패)
 const WF = [...[...P0, ...P1].map(x => ({ key: `배선 ${x.sev}|${x.f} ${x.key}`, num: {}, text: `${x.sev} ${x.f} ${x.key}: ${x.msg}` })), ...UPGAP.map(x => ({ key: `구버전 감지·보완 없음|${x.f} ${x.what}`, num: {}, text: `구버전 게임 ${x.f} ${x.what}: 불러오기 이전·점검 규칙·실행 중 AI·기본값 어느 것도 없음` }))], WB = readBaseline(ROOT, 'wiring'), WD = WB ? compare(WB, WF) : null, arg = k => process.argv.includes(k);
+const val = k => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : null; }; /* 값이 있는 옵션 */
+if (val('--findings-out')) { writeFileSync(val('--findings-out'), JSON.stringify(WF)); process.exit(0); }
+/* --rebase <커밋>: 분석 도구가 바뀌었을 때 바뀐 도구로 그 커밋의 src를 재서 기준선으로(지금 코드로 올리지 않음 — check·rules와 같은 규칙) */
+if (val('--rebase')) { const ref = await srcAtRef(val('--rebase')), dir = join(OUT, 'ref-src', ref.sha), tmp = join(OUT, 'wiring-rebase.json');
+  const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), '--src', dir, '--findings-out', tmp], { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 26 }); if (r.status) { console.log(r.stdout + r.stderr); process.exit(1); }
+  const F0 = JSON.parse(readFileSync(tmp, 'utf8')), D0 = compare(F0, WF); writeBaseline(ROOT, F0, 'wiring'); console.log(`배선 기준선을 ${ref.sha.slice(0, 7)}의 src(지금 도구로 잼)로: ${F0.length}개 · 지금 코드는 그 대비 새로 생김 ${D0.added.length} · 해결 ${D0.fixed.length}`); D0.added.forEach(f => console.log('  + ' + f.text)); process.exit(D0.added.length ? 1 : 0); }
 if (WD) writeFileSync(join(OUT, 'wiring-baseline-diff.md'), '# 배선 점검 기준선 대비\n\n' + diffMd(WD, '배선 판정'));
 if (arg('--update-baseline')) { if (WD && WD.added.length && !arg('--force')) { console.log(`기준선을 올리는 갱신은 하지 않아요: 새 판정 ${WD.added.length} — 고치세요(out/wiring-baseline-diff.md)`); process.exit(1); } writeBaseline(ROOT, WF, 'wiring'); console.log(`배선 기준선 갱신: ${WF.length}개`); }
 console.log(`배선 점검: 기능 ${W.features.length} · 단계별 함수 ${Object.values(W.closure).join('/')} · 게임 ${W.games.length} · P0 ${P0.length} · P1 ${P1.length} · 구버전 게임 감지·보완: 없음 ${UPGAP.length} · 기본값으로만 ${UPDEF.length} / ${UP.reduce((a, f) => a + f.rows.length, 0)}`); P0.slice(0, 30).forEach(x => console.log(`  P0 ${x.f} ${x.key}: ${x.msg}`)); console.log('보고서: ' + join(OUT, 'wiring.md'));

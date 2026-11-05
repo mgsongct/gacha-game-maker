@@ -58,8 +58,8 @@ function renamed(out) { const sig = f => `${String(f.key).split('|')[0]}|${fileO
 //   경로가 위치일 뿐인 범주만(빈 catch·이름 모호는 파일별 개수, 함수·상태 키 항목) — 경로를 뺀 정체(종류·함수 이름·상태 키)로 묶어
 //   그 정체의 합계(개수·복잡도 등, 수치 없으면 항목 수)가 기준보다 늘지 않았고 같은 정체가 기준 쪽에서 줄었으면 옮김(실패 아님, 따로 보고).
 //   모듈 자체가 정체인 범주(과잉 분할·기능 섞임)는 그대로. 계층 섞임·방향 위반의 모듈별 수도 위치일 뿐(함수를 기능 모듈로 모으면 모듈만 바뀜) — 합계로
-const MOVABLE = new Set(['규칙 L1', '규칙 L2', '규칙 L3', '규칙 S1', '계층 섞임', '계층 방향', '빈 catch', '도구 빈 catch', '이름 모호', '영역 침범 후보', '기능 분산', '남의 상태 쓰기', '복잡한 함수', '복잡한 익명 콜백', '복잡한 분배기 case', '도구 복잡한 함수', '도구 안 쓰는 함수']);
-const PATHS = /@?\s*(?:src|tools|build|pc|www)\/[\w./가-힣-]*/g;
+const MOVABLE = new Set(['규칙 L1', '규칙 L2', '규칙 L3', '규칙 S1', '규칙 C1', '규칙 A1', '규칙 Y1', '규칙 Y2', '계층 섞임', '계층 방향', '빈 catch', '도구 빈 catch', '이름 모호', '영역 침범 후보', '기능 분산', '남의 상태 쓰기', '복잡한 함수', '복잡한 익명 콜백', '복잡한 분배기 case', '도구 복잡한 함수', '도구 안 쓰는 함수']);
+const PATHS = /@?\s*(?:src|tools|build|pc|www)\/[\w./가-힣-]*(?::\d+)?/g; /* 줄 번호도 위치일 뿐 */
 export const movedId = f => { const k = String(f.key), cat = k.split('|')[0]; return MOVABLE.has(cat) ? k.replace(PATHS, ' ').replace(/\s+/g, ' ').replace(/\|\s/, '|').trim() : null; };
 function moved(out, base, cur) { out.moved = [];
   const sum = (L, id) => { const s = {}; let n = 0; for (const f of L) if (movedId(f) === id) { n++; for (const [k, v] of Object.entries(f.num || {})) s[k] = (s[k] || 0) + (+v || 0); } return { s, n }; };

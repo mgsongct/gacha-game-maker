@@ -4,11 +4,11 @@
   {
    "key": "복잡한 함수|buildNewGameDraft",
    "num": {
-    "복잡도": 142,
+    "복잡도": 124,
     "줄": 89,
     "중첩": 2
    },
-   "text": "buildNewGameDraft (src/main/10-story.js:356) 복잡도 142 · 89줄 · 중첩 2"
+   "text": "buildNewGameDraft (src/main/10-story.js:356) 복잡도 124 · 89줄 · 중첩 2"
   },
   {
    "key": "복잡한 함수|cbPlay",
@@ -17,7 +17,7 @@
     "줄": 44,
     "중첩": 3
    },
-   "text": "cbPlay (src/main/10-system.js:1433) 복잡도 106 · 44줄 · 중첩 3"
+   "text": "cbPlay (src/main/10-system.js:1429) 복잡도 106 · 44줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|v2CompileSlot",
@@ -116,7 +116,7 @@
     "줄": 81,
     "중첩": 1
    },
-   "text": "studioHTML (src/main/10-system.js:983) 복잡도 68 · 81줄 · 중첩 1"
+   "text": "studioHTML (src/main/10-system.js:979) 복잡도 68 · 81줄 · 중첩 1"
   },
   {
    "key": "복잡한 함수|liveTick",
@@ -171,15 +171,6 @@
     "중첩": 3
    },
    "text": "v2EditorAction (src/modules/combat/050-bridge.js:148) 복잡도 56 · 37줄 · 중첩 3"
-  },
-  {
-   "key": "복잡한 함수|buildManualGameDraft",
-   "num": {
-    "복잡도": 55,
-    "줄": 40,
-    "중첩": 3
-   },
-   "text": "buildManualGameDraft (src/main/10-system.js:416) 복잡도 55 · 40줄 · 중첩 3"
   },
   {
    "key": "복잡한 함수|openNaiPrep",
@@ -290,6 +281,15 @@
    "text": "eraseColorData (src/main/10-characters.js:301) 복잡도 41 · 26줄 · 중첩 4"
   },
   {
+   "key": "복잡한 함수|buildManualGameDraft",
+   "num": {
+    "복잡도": 40,
+    "줄": 36,
+    "중첩": 3
+   },
+   "text": "buildManualGameDraft (src/main/10-system.js:416) 복잡도 40 · 36줄 · 중첩 3"
+  },
+  {
    "key": "복잡한 함수|value",
    "num": {
     "복잡도": 25,
@@ -305,7 +305,7 @@
     "줄": 12,
     "중첩": 7
    },
-   "text": "lkOp (src/main/10-system.js:1525) 복잡도 22 · 12줄 · 중첩 7"
+   "text": "lkOp (src/main/10-system.js:1521) 복잡도 22 · 12줄 · 중첩 7"
   },
   {
    "key": "복잡한 함수|v2DrainBattleEvents",
@@ -395,7 +395,7 @@
     "줄": 16,
     "중첩": 9
    },
-   "text": "parseScript→r(Boolean).flatMap(System.splitTags).map @src/main/10-system.js (src/main/10-system.js:709) 복잡도 18 · 16줄 · 중첩 9"
+   "text": "parseScript→r(Boolean).flatMap(System.splitTags).map @src/main/10-system.js (src/main/10-system.js:705) 복잡도 18 · 16줄 · 중첩 9"
   },
   {
    "key": "복잡한 익명 콜백|main (최상위)→document.addEventListener #4 @src/main/90-load.js",
@@ -615,6 +615,13 @@
    "text": "src/main/10-newgame.js 저장소 대체 1개"
   },
   {
+   "key": "빈 catch|src/main/10-newgame.js 동기 대체",
+   "num": {
+    "개수": 1
+   },
+   "text": "src/main/10-newgame.js 동기 대체 1개"
+  },
+  {
    "key": "빈 catch|src/main/10-promptstudio.js 저장소 대체",
    "num": {
     "개수": 1
@@ -624,9 +631,9 @@
   {
    "key": "빈 catch|src/main/10-story.js 동기 대체",
    "num": {
-    "개수": 4
+    "개수": 3
    },
-   "text": "src/main/10-story.js 동기 대체 4개"
+   "text": "src/main/10-story.js 동기 대체 3개"
   },
   {
    "key": "빈 catch|src/main/10-story.js 저장소 대체",
@@ -659,9 +666,9 @@
   {
    "key": "빈 catch|src/main/10-system.js 동기 대체",
    "num": {
-    "개수": 16
+    "개수": 15
    },
-   "text": "src/main/10-system.js 동기 대체 16개"
+   "text": "src/main/10-system.js 동기 대체 15개"
   },
   {
    "key": "빈 catch|src/main/80-misc.js 동기 대체",
@@ -734,464 +741,32 @@
    "text": "src/boot/storage-boot.js 의도 표시 1개"
   },
   {
-   "key": "쓰기만 하는 키|P().cres",
-   "num": {},
-   "text": "P().cres"
-  },
-  {
-   "key": "쓰기만 하는 키|P().cbuild",
-   "num": {},
-   "text": "P().cbuild"
-  },
-  {
-   "key": "쓰기만 하는 키|P().rogue",
-   "num": {},
-   "text": "P().rogue"
-  },
-  {
-   "key": "쓰기만 하는 키|P().avatar",
-   "num": {},
-   "text": "P().avatar"
-  },
-  {
-   "key": "쓰기만 하는 키|P().dm",
-   "num": {},
-   "text": "P().dm"
-  },
-  {
-   "key": "쓰기만 하는 키|P().raid",
-   "num": {},
-   "text": "P().raid"
-  },
-  {
-   "key": "쓰기만 하는 키|P().tower",
-   "num": {},
-   "text": "P().tower"
-  },
-  {
-   "key": "쓰기만 하는 키|P().gifts",
-   "num": {},
-   "text": "P().gifts"
-  },
-  {
-   "key": "쓰기만 하는 키|P().cxSeen",
-   "num": {},
-   "text": "P().cxSeen"
-  },
-  {
-   "key": "쓰기만 하는 키|P().sched",
-   "num": {},
-   "text": "P().sched"
-  },
-  {
-   "key": "쓰기만 하는 키|P().stam",
-   "num": {},
-   "text": "P().stam"
-  },
-  {
-   "key": "쓰기만 하는 키|P().mail",
-   "num": {},
-   "text": "P().mail"
-  },
-  {
-   "key": "쓰기만 하는 키|P().shop",
-   "num": {},
-   "text": "P().shop"
-  },
-  {
-   "key": "쓰기만 하는 키|P().dboard",
-   "num": {},
-   "text": "P().dboard"
-  },
-  {
-   "key": "쓰기만 하는 키|P().fchat",
-   "num": {},
-   "text": "P().fchat"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.rules",
-   "num": {},
-   "text": "G.meta.rules"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.balance",
-   "num": {},
-   "text": "G.meta.balance"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.plan",
-   "num": {},
-   "text": "G.world.plan"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.storyMemory",
-   "num": {},
-   "text": "G.meta.storyMemory"
-  },
-  {
-   "key": "쓰기만 하는 키|G.rels",
-   "num": {},
-   "text": "G.rels"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.codex",
-   "num": {},
-   "text": "G.world.codex"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.codexNotes",
-   "num": {},
-   "text": "G.world.codexNotes"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.factions",
-   "num": {},
-   "text": "G.world.factions"
-  },
-  {
-   "key": "쓰기만 하는 키|G.banners",
-   "num": {},
-   "text": "G.banners"
-  },
-  {
-   "key": "쓰기만 하는 키|P().curBanner",
-   "num": {},
-   "text": "P().curBanner"
-  },
-  {
-   "key": "쓰기만 하는 키|G.events",
-   "num": {},
-   "text": "G.events"
-  },
-  {
-   "key": "쓰기만 하는 키|P().pity",
-   "num": {},
-   "text": "P().pity"
-  },
-  {
-   "key": "쓰기만 하는 키|P().pities",
-   "num": {},
-   "text": "P().pities"
-  },
-  {
-   "key": "쓰기만 하는 키|P().guar",
-   "num": {},
-   "text": "P().guar"
-  },
-  {
-   "key": "쓰기만 하는 키|P().spark",
-   "num": {},
-   "text": "P().spark"
-  },
-  {
-   "key": "쓰기만 하는 키|P().hist2",
-   "num": {},
-   "text": "P().hist2"
-  },
-  {
-   "key": "쓰기만 하는 키|P().sec",
-   "num": {},
-   "text": "P().sec"
-  },
-  {
-   "key": "쓰기만 하는 키|P().squad",
-   "num": {},
-   "text": "P().squad"
-  },
-  {
-   "key": "쓰기만 하는 키|P().history",
-   "num": {},
-   "text": "P().history"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.construct",
-   "num": {},
-   "text": "G.meta.construct"
-  },
-  {
-   "key": "쓰기만 하는 키|P().gateSeen",
-   "num": {},
-   "text": "P().gateSeen"
-  },
-  {
-   "key": "쓰기만 하는 키|P().gems",
-   "num": {},
-   "text": "P().gems"
-  },
-  {
-   "key": "쓰기만 하는 키|P().firstTen",
-   "num": {},
-   "text": "P().firstTen"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.variants",
-   "num": {},
-   "text": "G.meta.variants"
-  },
-  {
-   "key": "쓰기만 하는 키|G.chapters",
-   "num": {},
-   "text": "G.chapters"
-  },
-  {
-   "key": "쓰기만 하는 키|P().bootPrep",
-   "num": {},
-   "text": "P().bootPrep"
-  },
-  {
-   "key": "쓰기만 하는 키|P().prepAsked",
-   "num": {},
-   "text": "P().prepAsked"
-  },
-  {
-   "key": "쓰기만 하는 키|P().prepNever",
-   "num": {},
-   "text": "P().prepNever"
-  },
-  {
-   "key": "쓰기만 하는 키|P().prompt",
-   "num": {},
-   "text": "P().prompt"
-  },
-  {
-   "key": "쓰기만 하는 키|P().useCg",
-   "num": {},
-   "text": "P().useCg"
-  },
-  {
-   "key": "쓰기만 하는 키|P().seen",
-   "num": {},
-   "text": "P().seen"
-  },
-  {
-   "key": "쓰기만 하는 키|P().stars",
-   "num": {},
-   "text": "P().stars"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.design",
-   "num": {},
-   "text": "G.meta.design"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.title",
-   "num": {},
-   "text": "G.meta.title"
-  },
-  {
-   "key": "쓰기만 하는 키|P().lobbyMode",
-   "num": {},
-   "text": "P().lobbyMode"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.sub",
-   "num": {},
-   "text": "G.meta.sub"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.artTags",
-   "num": {},
-   "text": "G.meta.artTags"
-  },
-  {
-   "key": "쓰기만 하는 키|P().seenOpening",
-   "num": {},
-   "text": "P().seenOpening"
-  },
-  {
-   "key": "쓰기만 하는 키|P().castDone",
-   "num": {},
-   "text": "P().castDone"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.story",
-   "num": {},
-   "text": "G.meta.story"
-  },
-  {
-   "key": "쓰기만 하는 키|P().sortie",
-   "num": {},
-   "text": "P().sortie"
-  },
-  {
-   "key": "쓰기만 하는 키|P().presets",
-   "num": {},
-   "text": "P().presets"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.persona",
-   "num": {},
-   "text": "G.meta.persona"
-  },
-  {
-   "key": "쓰기만 하는 키|P().csFull",
-   "num": {},
-   "text": "P().csFull"
-  },
-  {
-   "key": "쓰기만 하는 키|P().scene",
-   "num": {},
-   "text": "P().scene"
-  },
-  {
-   "key": "쓰기만 하는 키|P().cxBadge",
-   "num": {},
-   "text": "P().cxBadge"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.cast",
-   "num": {},
-   "text": "G.meta.cast"
-  },
-  {
-   "key": "쓰기만 하는 키|P().gold",
-   "num": {},
-   "text": "P().gold"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.summary",
-   "num": {},
-   "text": "G.world.summary"
-  },
-  {
-   "key": "쓰기만 하는 키|P().mailInit",
-   "num": {},
-   "text": "P().mailInit"
-  },
-  {
-   "key": "쓰기만 하는 키|P().mailBuild",
-   "num": {},
-   "text": "P().mailBuild"
-  },
-  {
-   "key": "쓰기만 하는 키|P().curEvent",
-   "num": {},
-   "text": "P().curEvent"
-  },
-  {
-   "key": "쓰기만 하는 키|P().flags",
-   "num": {},
-   "text": "P().flags"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.spots",
-   "num": {},
-   "text": "G.meta.spots"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.auditSeen",
-   "num": {},
-   "text": "G.meta.auditSeen"
-  },
-  {
-   "key": "쓰기만 하는 키|P().fcAff",
-   "num": {},
-   "text": "P().fcAff"
-  },
-  {
-   "key": "쓰기만 하는 키|P().fcPhoto",
-   "num": {},
-   "text": "P().fcPhoto"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.castSex",
-   "num": {},
-   "text": "G.meta.castSex"
-  },
-  {
-   "key": "쓰기만 하는 키|P().gender",
-   "num": {},
-   "text": "P().gender"
-  },
-  {
-   "key": "쓰기만 하는 키|P().hideEyes",
-   "num": {},
-   "text": "P().hideEyes"
-  },
-  {
-   "key": "쓰기만 하는 키|P().genderTxt",
-   "num": {},
-   "text": "P().genderTxt"
-  },
-  {
-   "key": "쓰기만 하는 키|P().look",
-   "num": {},
-   "text": "P().look"
-  },
-  {
-   "key": "쓰기만 하는 키|P().bio",
-   "num": {},
-   "text": "P().bio"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.prompts",
-   "num": {},
-   "text": "G.meta.prompts"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.elems",
-   "num": {},
-   "text": "G.meta.elems"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.positions",
-   "num": {},
-   "text": "G.meta.positions"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.tone",
-   "num": {},
-   "text": "G.meta.tone"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.relProf",
-   "num": {},
-   "text": "G.meta.relProf"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.name",
-   "num": {},
-   "text": "G.world.name"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.lore",
-   "num": {},
-   "text": "G.world.lore"
-  },
-  {
-   "key": "쓰기만 하는 키|G.world.plot",
-   "num": {},
-   "text": "G.world.plot"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.logoStyle",
-   "num": {},
-   "text": "G.meta.logoStyle"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.artNeg",
-   "num": {},
-   "text": "G.meta.artNeg"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.theme",
-   "num": {},
-   "text": "G.meta.theme"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.accent",
-   "num": {},
-   "text": "G.meta.accent"
-  },
-  {
-   "key": "쓰기만 하는 키|P().memoOn",
-   "num": {},
-   "text": "P().memoOn"
-  },
-  {
-   "key": "쓰기만 하는 키|G.meta.pub",
-   "num": {},
-   "text": "G.meta.pub"
+   "key": "흩어진 상태 쓰기|P().rogue",
+   "num": {
+    "쓰는곳": 11
+   },
+   "text": "P().rogue — 11곳에서 씀"
+  },
+  {
+   "key": "흩어진 상태 쓰기|G.lib",
+   "num": {
+    "쓰는곳": 9
+   },
+   "text": "G.lib — 9곳에서 씀"
+  },
+  {
+   "key": "흩어진 상태 쓰기|P().exped",
+   "num": {
+    "쓰는곳": 8
+   },
+   "text": "P().exped — 8곳에서 씀"
+  },
+  {
+   "key": "흩어진 상태 쓰기|P().curBanner",
+   "num": {
+    "쓰는곳": 8
+   },
+   "text": "P().curBanner — 8곳에서 씀"
   },
   {
    "key": "발신 없는 처리기|raidstart",
@@ -1399,11 +974,6 @@
    "text": "checkUpdatePrivate (src/main/00-core.js) — 참조 100%가 src/main/10-liveops.js"
   },
   {
-   "key": "영역 침범 후보|src/main/10-characters.js factionCtx",
-   "num": {},
-   "text": "factionCtx (src/main/10-characters.js) — 참조 100%가 src/main/10-world.js"
-  },
-  {
    "key": "영역 침범 후보|src/main/10-story.js stageAutoRules",
    "num": {},
    "text": "stageAutoRules (src/main/10-story.js) — 참조 100%가 src/main/10-newgame.js"
@@ -1414,24 +984,44 @@
    "text": "cbPlay (src/main/10-system.js) — 참조 100%가 src/main/10-challenge.js"
   },
   {
-   "key": "영역 침범 후보|src/main/10-story.js buildNewGameDraft",
+   "key": "영역 침범 후보|src/main/10-characters.js factionCtx",
    "num": {},
-   "text": "buildNewGameDraft (src/main/10-story.js) — 참조 77%가 src/main/10-newgame.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/10-characters.js bannerPool",
-   "num": {},
-   "text": "bannerPool (src/main/10-characters.js) — 참조 75%가 src/main/10-acquire.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/10-story.js liveTick",
-   "num": {},
-   "text": "liveTick (src/main/10-story.js) — 참조 71%가 src/main/10-liveops.js"
+   "text": "factionCtx (src/main/10-characters.js) — 참조 90%가 src/main/10-world.js"
   },
   {
    "key": "영역 침범 후보|src/main/10-system.js buildManualGameDraft",
    "num": {},
-   "text": "buildManualGameDraft (src/main/10-system.js) — 참조 70%가 src/main/10-newgame.js"
+   "text": "buildManualGameDraft (src/main/10-system.js) — 참조 90%가 src/main/10-newgame.js"
+  },
+  {
+   "key": "영역 침범 후보|src/main/10-story.js buildNewGameDraft",
+   "num": {},
+   "text": "buildNewGameDraft (src/main/10-story.js) — 참조 82%가 src/main/10-newgame.js"
+  },
+  {
+   "key": "영역 침범 후보|src/main/10-system.js openMeta",
+   "num": {},
+   "text": "openMeta (src/main/10-system.js) — 참조 82%가 src/main/10-story.js"
+  },
+  {
+   "key": "영역 침범 후보|src/main/10-characters.js bannerPool",
+   "num": {},
+   "text": "bannerPool (src/main/10-characters.js) — 참조 67%가 src/main/10-acquire.js"
+  },
+  {
+   "key": "영역 침범 후보|src/main/10-characters.js cxNewFast",
+   "num": {},
+   "text": "cxNewFast (src/main/10-characters.js) — 참조 67%가 src/main/10-world.js"
+  },
+  {
+   "key": "영역 침범 후보|src/main/10-system.js applyMeta",
+   "num": {},
+   "text": "applyMeta (src/main/10-system.js) — 참조 67%가 src/main/10-story.js"
+  },
+  {
+   "key": "영역 침범 후보|src/main/10-world.js memCatchUp",
+   "num": {},
+   "text": "memCatchUp (src/main/10-world.js) — 참조 67%가 src/main/10-story.js"
   },
   {
    "key": "영역 침범 후보|src/main/00-core.js faceDrawOne",
@@ -1444,14 +1034,19 @@
    "text": "skinAcceptRun (src/main/00-core.js) — 참조 64%가 src/main/10-liveops.js"
   },
   {
-   "key": "영역 침범 후보|src/main/10-messenger.js charSheetShow",
-   "num": {},
-   "text": "charSheetShow (src/main/10-messenger.js) — 참조 64%가 src/main/10-art.js"
-  },
-  {
    "key": "영역 침범 후보|src/main/00-core.js auditFixOne",
    "num": {},
    "text": "auditFixOne (src/main/00-core.js) — 참조 63%가 src/main/10-liveops.js"
+  },
+  {
+   "key": "영역 침범 후보|src/main/10-characters.js drawCardArts",
+   "num": {},
+   "text": "drawCardArts (src/main/10-characters.js) — 참조 63%가 src/main/10-challenge.js"
+  },
+  {
+   "key": "영역 침범 후보|src/main/10-story.js liveTick",
+   "num": {},
+   "text": "liveTick (src/main/10-story.js) — 참조 63%가 src/main/10-liveops.js"
   },
   {
    "key": "영역 침범 후보|src/main/00-core.js phPlay",
@@ -1469,24 +1064,24 @@
    "text": "runPrep (src/main/00-core.js) — 참조 56%가 src/main/10-art.js"
   },
   {
+   "key": "영역 침범 후보|src/main/10-messenger.js charSheetShow",
+   "num": {},
+   "text": "charSheetShow (src/main/10-messenger.js) — 참조 53%가 src/main/10-art.js"
+  },
+  {
    "key": "영역 침범 후보|src/main/00-core.js regenRun",
    "num": {},
    "text": "regenRun (src/main/00-core.js) — 참조 50%가 src/main/80-misc.js"
   },
   {
-   "key": "영역 침범 후보|src/main/10-battle.js stageSettle",
+   "key": "영역 침범 후보|src/main/10-characters.js aiChapterGen0Prompt",
    "num": {},
-   "text": "stageSettle (src/main/10-battle.js) — 참조 50%가 src/main/10-economy.js"
+   "text": "aiChapterGen0Prompt (src/main/10-characters.js) — 참조 50%가 src/main/10-newgame.js"
   },
   {
-   "key": "영역 침범 후보|src/main/10-characters.js drawCardArts",
+   "key": "영역 침범 후보|src/main/10-story.js scanScriptAssets",
    "num": {},
-   "text": "drawCardArts (src/main/10-characters.js) — 참조 50%가 src/main/10-challenge.js"
-  },
-  {
-   "key": "영역 침범 후보|src/main/10-system.js studioHTML",
-   "num": {},
-   "text": "studioHTML (src/main/10-system.js) — 참조 50%가 src/main/10-liveops.js"
+   "text": "scanScriptAssets (src/main/10-story.js) — 참조 50%가 src/main/10-art.js"
   },
   {
    "key": "남의 상태 쓰기|src/main/10-economy.js P().cres",
@@ -1610,9 +1205,9 @@
   {
    "key": "남의 상태 쓰기|src/main/10-story.js G.banners",
    "num": {
-    "곳": 2
+    "곳": 3
    },
-   "text": "src/main/10-story.js가 G.banners(주인 src/main/10-acquire.js)를 씀 2곳"
+   "text": "src/main/10-story.js가 G.banners(주인 src/main/10-acquire.js)를 씀 3곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/10-economy.js P().curBanner",
@@ -1622,18 +1217,46 @@
    "text": "src/main/10-economy.js가 P().curBanner(주인 src/main/10-acquire.js)를 씀 1곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/10-story.js G.chars",
+   "key": "남의 상태 쓰기|src/main/10-acquire.js G.chars",
    "num": {
     "곳": 1
    },
-   "text": "src/main/10-story.js가 G.chars(주인 src/main/10-acquire.js)를 씀 1곳"
+   "text": "src/main/10-acquire.js가 G.chars(주인 src/main/10-characters.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-story.js G.chars",
+   "num": {
+    "곳": 2
+   },
+   "text": "src/main/10-story.js가 G.chars(주인 src/main/10-characters.js)를 씀 2곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-acquire.js G.lib",
+   "num": {
+    "곳": 3
+   },
+   "text": "src/main/10-acquire.js가 G.lib(주인 src/main/10-art.js)를 씀 3곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-story.js G.lib",
+   "num": {
+    "곳": 2
+   },
+   "text": "src/main/10-story.js가 G.lib(주인 src/main/10-art.js)를 씀 2곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-world.js G.lib",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-world.js가 G.lib(주인 src/main/10-art.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/90-load.js G.lib",
    "num": {
-    "곳": 1
+    "곳": 3
    },
-   "text": "src/main/90-load.js가 G.lib(주인 src/main/10-acquire.js)를 씀 1곳"
+   "text": "src/main/90-load.js가 G.lib(주인 src/main/10-art.js)를 씀 3곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/90-load.js P().pity",
@@ -1643,6 +1266,20 @@
    "text": "src/main/90-load.js가 P().pity(주인 src/main/10-acquire.js)를 씀 1곳"
   },
   {
+   "key": "남의 상태 쓰기|src/main/10-acquire.js P().squad",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-acquire.js가 P().squad(주인 src/main/10-challenge.js)를 씀 1곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-characters.js P().squad",
+   "num": {
+    "곳": 1
+   },
+   "text": "src/main/10-characters.js가 P().squad(주인 src/main/10-challenge.js)를 씀 1곳"
+  },
+  {
    "key": "남의 상태 쓰기|src/main/90-load.js P().squad",
    "num": {
     "곳": 2
@@ -1650,18 +1287,25 @@
    "text": "src/main/90-load.js가 P().squad(주인 src/main/10-challenge.js)를 씀 2곳"
   },
   {
-   "key": "남의 상태 쓰기|src/main/10-messenger.js G.threads",
+   "key": "남의 상태 쓰기|src/main/10-acquire.js G.threads",
+   "num": {
+    "곳": 2
+   },
+   "text": "src/main/10-acquire.js가 G.threads(주인 src/main/10-messenger.js)를 씀 2곳"
+  },
+  {
+   "key": "남의 상태 쓰기|src/main/10-characters.js G.threads",
    "num": {
     "곳": 1
    },
-   "text": "src/main/10-messenger.js가 G.threads(주인 src/main/10-acquire.js)를 씀 1곳"
+   "text": "src/main/10-characters.js가 G.threads(주인 src/main/10-messenger.js)를 씀 1곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/10-story.js G.threads",
    "num": {
-    "곳": 2
+    "곳": 3
    },
-   "text": "src/main/10-story.js가 G.threads(주인 src/main/10-acquire.js)를 씀 2곳"
+   "text": "src/main/10-story.js가 G.threads(주인 src/main/10-messenger.js)를 씀 3곳"
   },
   {
    "key": "남의 상태 쓰기|src/main/10-liveops.js P().bootPrep",
@@ -1727,6 +1371,27 @@
    "text": "src/main/10-world.js가 G.meta.relProf(주인 src/main/10-story.js)를 씀 1곳"
   },
   {
+   "key": "파편화 상태|G.lib",
+   "num": {
+    "모듈": 5
+   },
+   "text": "G.lib — 5개 모듈이 씀"
+  },
+  {
+   "key": "파편화 상태|P().squad",
+   "num": {
+    "모듈": 4
+   },
+   "text": "P().squad — 4개 모듈이 씀"
+  },
+  {
+   "key": "파편화 상태|G.threads",
+   "num": {
+    "모듈": 4
+   },
+   "text": "G.threads — 4개 모듈이 씀"
+  },
+  {
    "key": "파편화 상태|P().rogue",
    "num": {
     "모듈": 3
@@ -1748,11 +1413,11 @@
    "text": "G.world.factions — 3개 모듈이 씀"
   },
   {
-   "key": "파편화 상태|G.threads",
+   "key": "파편화 상태|G.chars",
    "num": {
     "모듈": 3
    },
-   "text": "G.threads — 3개 모듈이 씀"
+   "text": "G.chars — 3개 모듈이 씀"
   },
   {
    "key": "파편화 상태|G.meta.artTags",
@@ -1764,14 +1429,21 @@
   {
    "key": "과잉 분할|src/main/10-newgame.js ↔ src/main/10-story.js",
    "num": {},
-   "text": "서로 강하게 묶임: src/main/10-newgame.js ↔ src/main/10-story.js — 사이 27.51 · 안 22.36/77.85"
+   "text": "서로 강하게 묶임: src/main/10-newgame.js ↔ src/main/10-story.js — 사이 30.9 · 안 23.75/83.7"
   },
   {
    "key": "기능 섞임|src/main/10-world.js",
    "num": {
     "묶음": 3
    },
-   "text": "src/main/10-world.js — 묶음 36·31·10"
+   "text": "src/main/10-world.js — 묶음 48·31·9"
+  },
+  {
+   "key": "기능 섞임|src/main/10-economy.js",
+   "num": {
+    "묶음": 3
+   },
+   "text": "src/main/10-economy.js — 묶음 15·13·7"
   },
   {
    "key": "기능 섞임|src/modules/combat/030-core.js",
@@ -1779,6 +1451,11 @@
     "묶음": 3
    },
    "text": "src/modules/combat/030-core.js — 묶음 75·38·13"
+  },
+  {
+   "key": "기능 분산|src/main/10-liveops.js sparkSettle",
+   "num": {},
+   "text": "sparkSettle (src/main/10-liveops.js) — 연결 90%가 src/main/10-acquire.js"
   },
   {
    "key": "기능 분산|src/main/80-misc.js flushNow",
@@ -1798,7 +1475,12 @@
   {
    "key": "기능 분산|src/main/10-expedition.js ngWorldExtras",
    "num": {},
-   "text": "ngWorldExtras (src/main/10-expedition.js) — 연결 67%가 src/main/10-newgame.js"
+   "text": "ngWorldExtras (src/main/10-expedition.js) — 연결 70%가 src/main/10-newgame.js"
+  },
+  {
+   "key": "기능 분산|src/main/10-story.js buildNewGameDraft",
+   "num": {},
+   "text": "buildNewGameDraft (src/main/10-story.js) — 연결 66%가 src/main/10-newgame.js"
   },
   {
    "key": "기능 분산|src/main/10-story.js stageAutoRules",
@@ -1811,24 +1493,39 @@
    "text": "posClean (src/main/10-newgame.js) — 연결 87%가 src/main/10-rules.js"
   },
   {
-   "key": "기능 분산|src/main/10-art.js addLib",
+   "key": "기능 분산|src/main/10-newgame.js hero",
    "num": {},
-   "text": "addLib (src/main/10-art.js) — 연결 86%가 src/main/10-story.js"
+   "text": "hero (src/main/10-newgame.js) — 연결 100%가 src/main/10-story.js"
+  },
+  {
+   "key": "기능 분산|src/main/10-liveops.js planCtx",
+   "num": {},
+   "text": "planCtx (src/main/10-liveops.js) — 연결 77%가 src/main/10-story.js"
   },
   {
    "key": "기능 분산|src/main/10-battle.js storyCfg",
    "num": {},
-   "text": "storyCfg (src/main/10-battle.js) — 연결 86%가 src/main/10-story.js"
+   "text": "storyCfg (src/main/10-battle.js) — 연결 69%가 src/main/10-story.js"
   },
   {
-   "key": "기능 분산|src/main/10-messenger.js addThreads",
+   "key": "기능 분산|src/main/10-economy.js evShopHTML",
    "num": {},
-   "text": "addThreads (src/main/10-messenger.js) — 연결 65%가 src/main/10-story.js"
+   "text": "evShopHTML (src/main/10-economy.js) — 연결 65%가 src/main/10-story.js"
+  },
+  {
+   "key": "기능 분산|src/main/10-player.js opEnd",
+   "num": {},
+   "text": "opEnd (src/main/10-player.js) — 연결 60%가 src/main/10-story.js"
   },
   {
    "key": "기능 분산|src/main/10-art.js isMonsterLike",
    "num": {},
    "text": "isMonsterLike (src/main/10-art.js) — 연결 87%가 src/main/10-world.js"
+  },
+  {
+   "key": "기능 분산|src/main/10-acquire.js renameEverywhere",
+   "num": {},
+   "text": "renameEverywhere (src/main/10-acquire.js) — 연결 71%가 src/main/10-world.js"
   },
   {
    "key": "기능 분산|src/main/10-newgame.js factionClean",
@@ -1911,6 +1608,16 @@
    "key": "배선 P1|persona G.meta.persona",
    "num": {},
    "text": "P1 persona G.meta.persona: 생성 단계가 만드는 키([object Set])인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
+  },
+  {
+   "key": "배선 P1|combat G.meta.spots",
+   "num": {},
+   "text": "P1 combat G.meta.spots: 생성 단계가 만드는 키([object Set], spotsAuto)인데 생성 게임에 없음 — 응답 누락·검증 없음 또는 그 전에 만든 생성물"
+  },
+  {
+   "key": "구버전 감지·보완 없음|expedition G.meta.expedition",
+   "num": {},
+   "text": "구버전 게임 expedition G.meta.expedition: 불러오기 이전·점검 규칙·실행 중 AI·기본값 어느 것도 없음"
   }
  ],
  "names": [
@@ -2232,6 +1939,13 @@
    "text": "L1 계층 섞임 main/10-characters.js 3"
   },
   {
+   "key": "규칙 L1|src/main/10-economy.js",
+   "num": {
+    "건": 1
+   },
+   "text": "L1 계층 섞임 main/10-economy.js 1"
+  },
+  {
    "key": "규칙 L1|src/main/10-messenger.js",
    "num": {
     "건": 1
@@ -2274,11 +1988,25 @@
    "text": "L2 그리다가 바꿈 main/00-core.js 15"
   },
   {
+   "key": "규칙 L2|src/main/10-acquire.js",
+   "num": {
+    "건": 2
+   },
+   "text": "L2 그리다가 바꿈 main/10-acquire.js 2"
+  },
+  {
    "key": "규칙 L2|src/main/10-art.js",
    "num": {
     "건": 2
    },
    "text": "L2 그리다가 바꿈 main/10-art.js 2"
+  },
+  {
+   "key": "규칙 L2|src/main/10-battle.js",
+   "num": {
+    "건": 1
+   },
+   "text": "L2 그리다가 바꿈 main/10-battle.js 1"
   },
   {
    "key": "규칙 L2|src/main/10-challenge.js",
@@ -2293,13 +2021,6 @@
     "건": 7
    },
    "text": "L2 그리다가 바꿈 main/10-characters.js 7"
-  },
-  {
-   "key": "규칙 L2|src/main/10-economy.js",
-   "num": {
-    "건": 13
-   },
-   "text": "L2 그리다가 바꿈 main/10-economy.js 13"
   },
   {
    "key": "규칙 L2|src/main/10-liveops.js",
@@ -2353,9 +2074,30 @@
   {
    "key": "규칙 L3|src/main/10-acquire.js",
    "num": {
+    "건": 3
+   },
+   "text": "L3 처리가 화면을 부름 main/10-acquire.js 3"
+  },
+  {
+   "key": "규칙 L3|src/main/10-challenge.js",
+   "num": {
+    "건": 3
+   },
+   "text": "L3 처리가 화면을 부름 main/10-challenge.js 3"
+  },
+  {
+   "key": "규칙 L3|src/main/10-economy.js",
+   "num": {
     "건": 2
    },
-   "text": "L3 처리가 화면을 부름 main/10-acquire.js 2"
+   "text": "L3 처리가 화면을 부름 main/10-economy.js 2"
+  },
+  {
+   "key": "규칙 L3|src/main/10-story.js",
+   "num": {
+    "건": 2
+   },
+   "text": "L3 처리가 화면을 부름 main/10-story.js 2"
   },
   {
    "key": "규칙 L3|src/main/10-system.js",
@@ -2708,13 +2450,6 @@
    "text": "D3 data 창구가 갈라짐 meta.json › artTags 1"
   },
   {
-   "key": "규칙 D3|meta.json › bible",
-   "num": {
-    "건": 1
-   },
-   "text": "D3 data 창구가 갈라짐 meta.json › bible 1"
-  },
-  {
    "key": "규칙 D3|meta.json › castSex",
    "num": {
     "건": 1
@@ -2722,11 +2457,39 @@
    "text": "D3 data 창구가 갈라짐 meta.json › castSex 1"
   },
   {
-   "key": "규칙 D3|meta.json › draft",
+   "key": "규칙 D3|meta.json › elems",
    "num": {
     "건": 1
    },
-   "text": "D3 data 창구가 갈라짐 meta.json › draft 1"
+   "text": "D3 data 창구가 갈라짐 meta.json › elems 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › persona",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › persona 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › positions",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › positions 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › relProf",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › relProf 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › rules",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › rules 1"
   },
   {
    "key": "규칙 D3|meta.json › shop",
@@ -2750,13 +2513,6 @@
    "text": "D3 data 창구가 갈라짐 meta.json › sub 1"
   },
   {
-   "key": "규칙 D3|meta.json › terms",
-   "num": {
-    "건": 1
-   },
-   "text": "D3 data 창구가 갈라짐 meta.json › terms 1"
-  },
-  {
    "key": "규칙 D3|meta.json › theme",
    "num": {
     "건": 1
@@ -2776,6 +2532,13 @@
     "건": 1
    },
    "text": "D3 data 창구가 갈라짐 meta.json › tone 1"
+  },
+  {
+   "key": "규칙 D3|meta.json › variants",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 meta.json › variants 1"
   },
   {
    "key": "규칙 D3|npcs.json",
@@ -2799,11 +2562,11 @@
    "text": "D3 data 창구가 갈라짐 prog.json › avatar 1"
   },
   {
-   "key": "규칙 D3|prog.json › bio",
+   "key": "규칙 D3|prog.json › bootPrep",
    "num": {
     "건": 1
    },
-   "text": "D3 data 창구가 갈라짐 prog.json › bio 1"
+   "text": "D3 data 창구가 갈라짐 prog.json › bootPrep 1"
   },
   {
    "key": "규칙 D3|prog.json › castDone",
@@ -2813,6 +2576,41 @@
    "text": "D3 data 창구가 갈라짐 prog.json › castDone 1"
   },
   {
+   "key": "규칙 D3|prog.json › cres",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › cres 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › curBanner",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › curBanner 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › cxSeen",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › cxSeen 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › dboard",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › dboard 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › dm",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › dm 1"
+  },
+  {
    "key": "규칙 D3|prog.json › gender",
    "num": {
     "건": 1
@@ -2820,18 +2618,11 @@
    "text": "D3 data 창구가 갈라짐 prog.json › gender 1"
   },
   {
-   "key": "규칙 D3|prog.json › genderTxt",
+   "key": "규칙 D3|prog.json › gold",
    "num": {
     "건": 1
    },
-   "text": "D3 data 창구가 갈라짐 prog.json › genderTxt 1"
-  },
-  {
-   "key": "규칙 D3|prog.json › hideEyes",
-   "num": {
-    "건": 1
-   },
-   "text": "D3 data 창구가 갈라짐 prog.json › hideEyes 1"
+   "text": "D3 data 창구가 갈라짐 prog.json › gold 1"
   },
   {
    "key": "규칙 D3|prog.json › lobbyBg",
@@ -2841,25 +2632,53 @@
    "text": "D3 data 창구가 갈라짐 prog.json › lobbyBg 1"
   },
   {
-   "key": "규칙 D3|prog.json › look",
+   "key": "규칙 D3|prog.json › pass",
    "num": {
     "건": 1
    },
-   "text": "D3 data 창구가 갈라짐 prog.json › look 1"
+   "text": "D3 data 창구가 갈라짐 prog.json › pass 1"
   },
   {
-   "key": "규칙 D3|prog.json › nameAsked",
+   "key": "규칙 D3|prog.json › prepAsked",
    "num": {
     "건": 1
    },
-   "text": "D3 data 창구가 갈라짐 prog.json › nameAsked 1"
+   "text": "D3 data 창구가 갈라짐 prog.json › prepAsked 1"
   },
   {
-   "key": "규칙 D3|prog.json › player",
+   "key": "규칙 D3|prog.json › rogue",
    "num": {
     "건": 1
    },
-   "text": "D3 data 창구가 갈라짐 prog.json › player 1"
+   "text": "D3 data 창구가 갈라짐 prog.json › rogue 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › scene",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › scene 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › squad",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › squad 1"
+  },
+  {
+   "key": "규칙 D3|prog.json › stam",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 prog.json › stam 1"
+  },
+  {
+   "key": "규칙 D3|rels.json",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 rels.json 1"
   },
   {
    "key": "규칙 D3|threads.json",
@@ -2888,6 +2707,20 @@
     "건": 1
    },
    "text": "D3 data 창구가 갈라짐 world.json › lore 1"
+  },
+  {
+   "key": "규칙 D3|world.json › name",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 world.json › name 1"
+  },
+  {
+   "key": "규칙 D3|world.json › plot",
+   "num": {
+    "건": 1
+   },
+   "text": "D3 data 창구가 갈라짐 world.json › plot 1"
   },
   {
    "key": "규칙 D3|world.json › source",

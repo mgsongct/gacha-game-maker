@@ -2,7 +2,10 @@
 import { walk, calleeName } from './source.mjs';
 
 const ACT_VAR = /^(a|act)$|\.dataset\.act$/;
-const ownerFn = (fns, unit, n) => { for (let p = n.parent; p; p = p.parent) if (/function|arrow_function|method_definition/.test(p.type)) { const nm = p.type === 'function_declaration' ? p.childForFieldName('name')?.text : p.parent?.type === 'variable_declarator' ? p.parent.childForFieldName('name')?.text : null; if (nm) return fns.get(unit.name === 'main' ? nm : `${unit.name}#${nm}`) || null; } return null; };
+/* 감싸는 이름 있는 함수: 함수 선언 · 이름 붙인 함수 값 · class의 static 메서드(열쇠는 이름, 같은 이름이 여러 class면 Class.이름 — lib/graph.mjs) */
+const ownerFn = (fns, unit, n) => { for (let p = n.parent; p; p = p.parent) if (/function|arrow_function|method_definition/.test(p.type)) { const cls = p.type === 'method_definition' && p.parent?.type === 'class_body' ? p.parent.parent?.childForFieldName('name')?.text : null;
+    const nm = p.type === 'function_declaration' || cls ? p.childForFieldName('name')?.text : p.parent?.type === 'variable_declarator' ? p.parent.childForFieldName('name')?.text : null;
+    if (nm) return (cls && fns.get(`${cls}.${nm}`)) || fns.get(unit.name === 'main' ? nm : `${unit.name}#${nm}`) || null; } return null; };
 const strVal = n => n && (n.type === 'string' ? n.text.slice(1, -1) : null);
 
 // ① 액션
@@ -89,7 +92,8 @@ export function stateFlow(units, fns) { const acc = progAccessors(fns);
       const rec = K(key); if (fn !== 'progRead' && fn !== 'gameRead') { if (f) rec.w.add(f.key); rec.wl.push(u.loc(n)); } if (f) rec.r.add(f.key); });
     walk(u.tree.rootNode, n => { if (n.type !== 'member_expression') return; const o = n.childForFieldName('object'), p = n.childForFieldName('property'); if (!o || !p) return;
     const base = BASES[o.text] || (o.type === 'identifier' ? aliasOf(o) : null); if (!base || n.parent?.type === 'member_expression' && n.parent.childForFieldName('object')?.startIndex === n.startIndex && base === 'G' && /^(meta|world)$/.test(p.text)) return;
-    const key = `${base}.${p.text}`, f = ownerFn(fns, u, n), par = n.parent, write = (par?.type === 'assignment_expression' || par?.type === 'augmented_assignment_expression') && par.childForFieldName('left')?.startIndex === n.startIndex; /* tree-sitter 노드는 매번 새 객체라 위치로 비교 */
+    const key = `${base}.${p.text}`, f = ownerFn(fns, u, n), par = n.parent, write = ((par?.type === 'assignment_expression' || par?.type === 'augmented_assignment_expression') && par.childForFieldName('left')?.startIndex === n.startIndex) /* tree-sitter 노드는 매번 새 객체라 위치로 비교 */
+      || (par?.type === 'member_expression' && par.childForFieldName('object')?.startIndex === n.startIndex && /^(push|unshift|splice|pop|shift|sort|reverse|fill|copyWithin)$/.test(par.childForFieldName('property')?.text || '') && par.parent?.type === 'call_expression'); /* G.lib.push(…) 같은 배열 바꾸기도 쓰기 */
     const rec = K(key); if (write) { if (f) rec.w.add(f.key); rec.wl.push(u.loc(n)); } else if (f) rec.r.add(f.key); }); }
   const seen = r => SCREEN.test(r) || [...(fns.get(r)?.callers || [])].some(c => SCREEN.test(c)); // 화면 함수가 직접 읽거나, 읽는 함수를 화면 함수가 부름
   const list = [...keys.entries()].map(([k, v]) => ({ key: k, writers: v.w.size, readers: v.r.size, screens: [...v.r].filter(seen).length, w: v.w, r: v.r, wl: v.wl }));

@@ -558,14 +558,7 @@ static prepTarget(it){ return it.k==='scg'?Characters.scgSlot(it.c):it.k==='map'
 
   static posOf(c){ return Rules.posById(c&&c.pos)||Rules.POSITIONS().find(p=>p.base===(c&&c.role))||Rules.POSITIONS()[0]; }
 
-  static buildStages(arr,o){ const list=(Array.isArray(arr)?arr:[]).slice(0,o.max), n=list.length;
-    return list.map((s,i)=>{ s=s||{}; const md=i<n-1||Battle.storyCfg().finale!=='battle'?NewGame.modeClean(s):null; /* 전투 중심이면 마지막(보스) 스테이지는 전투 */ const story=!md&&s.battle===false&&i<n-1;
-      const st={id:uid(),title:String(s.title||(story?'이야기':o.title||'작전')),reward:o.reward(i),pre:nl(s.pre),post:story?'':nl(s.post),beats:strs(s.beats).slice(0,14).map(x=>x.slice(0,300)),
-        enemies:story?[]:(Array.isArray(s.enemies)?s.enemies:[]).slice(0,5).map(e=>({name:String(e.name||'적'),elem:ELEMS.includes(e.elem)?e.elem:o.elem,hp:num(e.hp,100,99999,o.hp),atk:num(e.atk,10,999,o.atk),def:num(e.def,0,500,o.def),spd:num(e.spd,50,160,95),boss:!!e.boss}))};
-      if(md){ Object.assign(st,md); st.enemies=[]; if(!st.beats.length) delete st.beats; return st; } // 회담·콘테스트(0488)
-      if(story){ st.story=true; if(s.post) st.pre=[st.pre,nl(s.post)].filter(Boolean).join('\n'); }
-      else if(!st.enemies.length) st.enemies=[{name:o.foe||'적',elem:o.elem,hp:o.hp,atk:o.atk,def:o.def,spd:95,boss:false}];
-      if(!st.beats.length) delete st.beats; if(!story){ const f=NewGame.ruleClean(FIELDS,s.field); Story.stageAutoRules(st,i,n); if(f) st.field=f; const rt=NewGame.routeClean(s.route); if(rt) st.route=rt; } return st; }); } // 전장 규칙: AI가 고른 것 우선, 없으면 자동(0485)
+ // 전장 규칙: AI가 고른 것 우선, 없으면 자동(0485)
 
   static planActOf(n){ return Story.PLAN().acts.find(a=>n<=(+a.upto||999))||Story.PLAN().acts.at(-1)||null; }
 
@@ -647,6 +640,7 @@ static async quitConfirm(){ const so=!!B.ctx.sortie; if(!(await appConfirm(so?'�
   static bossPatText(e,raid){ return Challenge.bossPats(e,raid).map(k=>BPATS[k][0]).join(' · ')+' · 체력 40% 이하 광폭화 (15초 / 재사용 30초)'; }
 
   static farmReward(key,lv){ const m=Expedition.seasonIs('train')?2:1, i=Math.max(0,Math.min(FARM_N-1,lv-1)); return key==='exp'?{exp:FARM_RW.exp[i]*m}:key==='gold'?{gold:FARM_RW.gold[i]*m}:key==='wmat'?{wmat:FARM_RW.wmat[i]*m}:{core:FARM_RW.core[i]*m}; }
+
 }
 
 class CoreView {
